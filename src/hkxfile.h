@@ -22,6 +22,7 @@ public:
     void closeFile(){if (isOpen()) close();}
 protected:
     virtual bool parse(){return true;}
+    virtual void read(){}
     void setRootObject(HkObjectExpSharedPtr obj){rootObject = obj;}
 private:
     HkObjectExpSharedPtr rootObject;
@@ -34,6 +35,7 @@ public:
     virtual ~BehaviorFile(){}
 protected:
     virtual bool parse();
+    //void read();
 private:
     HkxXmlReader reader;
     QList <hkbGeneratorExpSharedPtr> generators;

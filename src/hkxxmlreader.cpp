@@ -1,10 +1,10 @@
 #include "hkxxmlreader.h"
 #include "hkxfile.h"
 
-HkxXmlReader::HkxXmlReader(BehaviorFile *file): hkxXmlFile(file), isElementValueSplitOnMutipleLines(false){
+HkxXmlReader::HkxXmlReader(BehaviorFile *file): hkxXmlFile(file), isElementValueSplitOnMutipleLines(false), isEOF(false), nestLevel(0){
 }
 
-bool HkxXmlReader::beginParse(){
+bool HkxXmlReader::parse(){
     if (!hkxXmlFile->open(QIODevice::ReadOnly)){
         isEOF = true;
         return false;
@@ -12,6 +12,13 @@ bool HkxXmlReader::beginParse(){
     isEOF = false;
     QByteArray line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGHT);
     if (line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\n") return false;
+    HkxXmlParseLine result = NoError;
+    while (!atEnd()){
+        result = readNextLine();
+        if (result != NoError && result != EmptyLine){
+            return false;
+        }
+    }
     return true;
 }
 
@@ -48,6 +55,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
             int index = 0;
             while (i < line.size()){
                 if (line.at(i) == '/'){//end element
+                    nestLevel--;
                     i++;
                     while (i < line.size() && line.at(i) != ' ' && line.at(i) != '>'){
                         if ((line.at(i) < '0') || (line.at(i) > '9' && line.at(i) < 'A') || (line.at(i) > 'Z' && line.at(i) < 'a') || (line.at(i) > 'z')) return InvalidElementName;
@@ -59,13 +67,26 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                         i++;
                     }//check if elem exists at the back of elementlist
                     if (!elementList.isEmpty()){
-                        if (elementList.last().name != elem.remove(0, 1)) return OrphanedElementTag;
+                        int lastElemTag = elementList.size() - nestLevel;
+                        if (nestLevel >= elementList.size()){
+                            return UnknownError;
+                        }
+                        if (!isElementValueSplitOnMutipleLines){
+                            if (qstrcmp(elementList.last().name.constData(), elem.constData()) != 0){
+                                return OrphanedElementTag;
+                            }
+                        }else{
+                            if (qstrcmp(elementList.at(lastElemTag).name.constData(), elem.constData()) != 0){
+                                return OrphanedElementTag;
+                            }
+                        }
                     }
                     if (line.at(i) == '>'){
                         i++;
-                        if (i >= line.size()) return UnknownError;
+                        if (i >= line.size()){
+                            return UnknownError;
+                        }
                         if (line.at(i) == '\n'){
-                            //isElementValueSplitOnMutipleLines = false;
                             return NoError;
                         }else{
                             break;
@@ -76,24 +97,39 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                 }else if (line.at(i) == '!'){//check comment
                     isElementValueSplitOnMutipleLines = false;
                     i++;
-                    if (i >= line.size()) return UnknownError;
-                    if (line.at(i) != '-') return MalformedComment;
+                    if (i >= line.size()){
+                        return UnknownError;
+                    }else if (line.at(i) != '-'){
+                        return MalformedComment;
+                    }
                     i++;
-                    if (i >= line.size()) return UnknownError;
-                    if (line.at(i) != '-') return MalformedComment;
+                    if (i >= line.size()){
+                        return UnknownError;
+                    }else if (line.at(i) != '-'){
+                        return MalformedComment;
+                    }
                     i++;
                     while (i < line.size() && line.at(i) != '-'){
                         i++;
                     }
                     i++;
-                    if (i >= line.size()) return UnknownError;
-                    if (line.at(i) != '-') return MalformedComment;
+                    if (i >= line.size()){
+                        return UnknownError;
+                    }else if (line.at(i) != '-'){
+                        return MalformedComment;
+                    }
                     i++;
-                    if (i >= line.size()) return UnknownError;
-                    if (line.at(i) != '>') return MalformedComment;
+                    if (i >= line.size()){
+                        return UnknownError;
+                    }else if (line.at(i) != '>'){
+                        return MalformedComment;
+                    }
                     break;
                 }else{//is start of an element tag
-                    if (i >= line.size()) return UnknownError;
+                    nestLevel++;
+                    if (i >= line.size()){
+                        return UnknownError;
+                    }
                     while (i < line.size() && line.at(i) != ' ' && line.at(i) != '>'){
                         //if ((line.at(i) < '0') || (line.at(i) > '9' && line.at(i) < 'A') || (line.at(i) > 'Z' && line.at(i) < 'a') || (line.at(i) > 'z')) return InvalidElementName;
                         if (index >= elem.size()){
@@ -106,7 +142,9 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                     elementList.append(Element(elem));
                     if (line.at(i) == '>'){
                         i++;
-                        if (i >= line.size()) return UnknownError;
+                        if (i >= line.size()){
+                            return UnknownError;
+                        }
                         if (line.at(i) == '\n'){
                             isElementValueSplitOnMutipleLines = true;
                             return NoError;
@@ -115,7 +153,9 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                         int index = 0;
                         while (i < line.size() && line.at(i) != '<'){
                             if (line.at(i) == '\n'){
-                                if (elementList.isEmpty()) return OrphanedAttribute;
+                                if (elementList.isEmpty()){
+                                    return OrphanedAttribute;
+                                }
                                 elementList.last().value = value;
                                 return NoError;
                             }
@@ -127,13 +167,17 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                             index++;
                             i++;
                         }
-                        if (elementList.isEmpty()) return OrphanedAttribute;
+                        if (elementList.isEmpty()){
+                            return OrphanedAttribute;
+                        }
                         elementList.last().value = value;
                     }else if (line.at(i) == ' '){//get attributes
                         while (i < line.size() && line.at(i) != '>'){
                             QByteArray attrib(15, '\0');
                             int index = 0;
-                            if (line.at(i) == '\n') return UnexpectedNewlineCharacter;
+                            if (line.at(i) == '\n'){
+                                return UnexpectedNewlineCharacter;
+                            }
                             if (line.at(i) == ' '){
                                 i++;
                                 while (i < line.size() && line.at(i) != '='){
@@ -145,12 +189,20 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                                     index++;
                                     i++;
                                 }//set attribute name, get attribute value
-                                if (i >= line.size()) return UnknownError;
-                                if (elementList.isEmpty()) return OrphanedAttribute;
+                                if (i >= line.size()){
+                                    return UnknownError;
+                                }
+                                if (elementList.isEmpty()){
+                                    return OrphanedAttribute;
+                                }
                                 elementList.last().attributeList.append(attrib);
                                 i++;
-                                if (i >= line.size()) return UnknownError;
-                                if (line.at(i) != '"') return OrphanedCharacter;
+                                if (i >= line.size()){
+                                    return UnknownError;
+                                }
+                                if (line.at(i) != '\"'){
+                                    return OrphanedCharacter;
+                                }
                                 QByteArray value(9, '\0');
                                 int index = 0;
                                 i++;
@@ -164,40 +216,52 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                                     index++;
                                     i++;
                                 }
-                                if (line.at(i) != '"') return OrphanedCharacter;
+                                if (line.at(i) != '"'){
+                                    return OrphanedCharacter;
+                                }
                                 elementList.last().attributeList.last().value = value;
                             }
                             i++;
                         }
-                        //get element value?
-                        i++;
-                        if (i >= line.size()) return UnknownError;
-                        if (line.at(i) == '\n'){
-                            isElementValueSplitOnMutipleLines = true;
-                            return NoError;
-                        }
-                        QByteArray value(9, '\0');
-                        int index = 0;
-                        while (i < line.size() && line.at(i) != '<'){
-                            if (line.at(i) == '\n'){
-                                if (elementList.isEmpty()) return OrphanedAttribute;
-                                elementList.last().value = value;
-                                return NoError;
-                            }
-                            //if (line.at(i) < 'A' || line.at(i) > '~') return InvalidElementValue;
-                            if (index >= value.size()){
-                                value.append(QByteArray(value.size() * 2, '\0'));
-                            }
-                            value[index] = line.at(i);
-                            index++;
-                            i++;
-                        }
-                        if (elementList.isEmpty()) return OrphanedAttribute;
-                        elementList.last().value = value;
                     }
                     break;
                 }
             }
+            continue;
+        }else if (line.at(i) == '>'){//get element value
+            i++;
+            if (i >= line.size()){
+                return UnknownError;
+            }
+            if (line.at(i) == '\n'){
+                isElementValueSplitOnMutipleLines = true;
+                return NoError;
+            }else if (line.at(i) == '<'){//empty element
+                continue;
+            }
+            QByteArray value(9, '\0');
+            int index = 0;
+            while (i < line.size() && line.at(i) != '<'){
+                if (line.at(i) == '\n'){
+                    if (elementList.isEmpty()){
+                        return OrphanedAttribute;
+                    }
+                    elementList.last().value = value;
+                    return NoError;
+                }
+                //if (line.at(i) < 'A' || line.at(i) > '~') return InvalidElementValue;
+                if (index >= value.size()){
+                    value.append(QByteArray(value.size() * 2, '\0'));
+                }
+                value[index] = line.at(i);
+                index++;
+                i++;
+            }
+            if (elementList.isEmpty()){
+                return OrphanedAttribute;
+            }
+            elementList.last().value = value;
+            continue;
         }else if (isElementValueSplitOnMutipleLines && line.at(i) != '\n'){//get element data on separate line
             QByteArray value(9, '\0');
             int index = 0;
@@ -210,9 +274,11 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                 index++;
                 i++;
             }
-            if (elementList.isEmpty()) return OrphanedAttribute;
+            if (elementList.isEmpty()){
+                return OrphanedAttribute;
+            }
             elementList.last().value = value;
-        }else{
+        }else if (line.at(i) != '\n'){
             return OrphanedCharacter;
         }
         i++;

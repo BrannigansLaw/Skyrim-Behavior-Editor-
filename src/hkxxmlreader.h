@@ -30,7 +30,7 @@ public:
     HkxXmlReader(BehaviorFile *file = NULL);
     virtual ~HkxXmlReader(){/*if (hkxXmlFile){hkxXmlFile->closeFile();}*/}
     void setBehaviorFile(BehaviorFile *file){hkxXmlFile = file;}
-    bool beginParse();
+    bool parse();
     bool atEnd() const{return isEOF;}
     int getLastElementIndex()const{return elementList.size() - 1;}
     int getNumElements()const{return elementList.size();}
@@ -56,6 +56,7 @@ private:
     QList <Element> elementList;
     bool isElementValueSplitOnMutipleLines;
     bool isEOF;
+    int nestLevel;
 };
 
 #endif // HKXXMLREADER_H
