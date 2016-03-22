@@ -47,16 +47,15 @@ private:
         QByteArray value;
     };
     struct Element{
-        Element(const QByteArray & elem): name(elem){name.append(QByteArray(10, '\0'));value.append(QByteArray(9, '\0'));}
+        Element(const QByteArray & elem): name(elem), isContainedOnOneLine(true){name.append(QByteArray(10, '\0'));value.append(QByteArray(9, '\0'));}
         QByteArray name;
         QByteArray value;
         QList <Attribute> attributeList;
+        bool isContainedOnOneLine;
     };
     BehaviorFile *hkxXmlFile;
     QList <Element> elementList;
-    bool isElementValueSplitOnMutipleLines;
     bool isEOF;
-    int nestLevel;
 };
 
 #endif // HKXXMLREADER_H
