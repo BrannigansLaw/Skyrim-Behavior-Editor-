@@ -49,6 +49,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
         }
         i++;
     }
+    bool isIsolatedEndElemTag = true;
     while (i < line.size()){
         if (line.at(i) == '<'){//get the element name
             i++;
@@ -65,21 +66,23 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                         elem[index] = line.at(i);
                         index++;
                         i++;
-                    }//check if elem exists at the back of elementlist
+                    }//check if elem end tag is correctly paired
                     if (!elementList.isEmpty()){
-                        /*int lastElemTag = elementList.size() - nestLevel;
-                        if (nestLevel >= elementList.size()){
+                        if (indexOfElemTags.isEmpty() || indexOfElemTags.last() >= elementList.size()){
                             return UnknownError;
                         }
-                        /*if (!isElementValueSplitOnMutipleLines){
-                            if (qstrcmp(elementList.last().name.constData(), elem.constData()) != 0){
+                        if (isIsolatedEndElemTag && !elementList.at(indexOfElemTags.last()).isContainedOnOneLine){
+                            if (qstrcmp(elementList.at(indexOfElemTags.last()).name.constData(), elem.constData()) != 0){
+                                //elementList[k].isClosed = true;
                                 return OrphanedElementTag;
+                            }else{
+                                if (indexOfElemTags.isEmpty()){
+                                    return UnknownError;
+                                }else{
+                                    indexOfElemTags.removeLast();
+                                }
                             }
-                        }else{
-                            if (qstrcmp(elementList.at(lastElemTag).name.constData(), elem.constData()) != 0){
-                                return OrphanedElementTag;
-                            }
-                        }*/
+                        }
                     }
                     if (line.at(i) == '>'){
                         i++;
@@ -123,8 +126,10 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                     }else if (line.at(i) != '>'){
                         return MalformedComment;
                     }
+                    i++;
                     break;
                 }else{//is start of an element tag
+                    isIsolatedEndElemTag = false;
                     if (i >= line.size()){
                         return UnknownError;
                     }
@@ -139,39 +144,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                     }
                     elementList.append(Element(elem));
                     if (line.at(i) == '>'){
-                        i++;
-                        if (i >= line.size()){
-                            return UnknownError;
-                        }
-                        if (line.at(i) == '\n'){
-                            if (elementList.isEmpty()){
-                                return UnknownError;
-                            }
-                            elementList.last().isContainedOnOneLine = false;
-                            return NoError;
-                        }
-                        QByteArray value(9, '\0');
-                        int index = 0;
-                        while (i < line.size() && line.at(i) != '<'){
-                            if (line.at(i) == '\n'){
-                                if (elementList.isEmpty()){
-                                    return OrphanedAttribute;
-                                }
-                                elementList.last().value = value;
-                                return NoError;
-                            }
-                            //if (line.at(i) < 'A' || line.at(i) > '~') return InvalidElementValue;
-                            if (index >= value.size()){
-                                value.append(QByteArray(value.size() * 2, '\0'));
-                            }
-                            value[index] = line.at(i);
-                            index++;
-                            i++;
-                        }
-                        if (elementList.isEmpty()){
-                            return OrphanedAttribute;
-                        }
-                        elementList.last().value = value;
+                        break;
                     }else if (line.at(i) == ' '){//get attributes
                         while (i < line.size() && line.at(i) != '>'){
                             QByteArray attrib(15, '\0');
@@ -238,12 +211,15 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                 return UnknownError;
             }
             if (line.at(i) == '\n'){
+                indexOfElemTags.append(elementList.size() - 1);
                 elementList.last().isContainedOnOneLine = false;
                 return NoError;
             }else if (line.at(i) == '<'){//empty element
+                elementList.last().isContainedOnOneLine = true;
                 continue;
             }
             elementList.last().isContainedOnOneLine = true;
+            //elementList.last().isClosed = true;
             QByteArray value(9, '\0');
             int index = 0;
             while (i < line.size() && line.at(i) != '<'){
