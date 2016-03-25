@@ -15,7 +15,7 @@ bool HkxXmlReader::parse(){
     HkxXmlParseLine result = NoError;
     while (!atEnd()){
         result = readNextLine();
-        if (result != NoError && result != EmptyLine){
+        if (result != NoError && result != EmptyLine && result != EmptyLineEndFile){
             return false;
         }
     }

@@ -298,6 +298,28 @@ hkVector4 HkObject::readVector4(const QByteArray &lineIn, bool *ok){
     return vector;
 }
 
+/*
+ * CLASS: HkObjectExpSharedPtr
+*/
+
+bool HkObjectExpSharedPtr::readReference(long index, const HkxXmlReader & reader){
+    bool ok = true;
+    //need to remove the '#' from the reference string
+    QByteArray temp = reader.getElementValueAt(index);
+    if (temp.at(0) == '#'){
+        temp.remove(0, 1);
+    }
+    if (qstrcmp(temp.constData(), "null") == 0){
+        setReference(-1);
+    }else{
+        setReference(temp.toLong(&ok));
+    }
+    if (!ok){
+        return false;
+    }
+    return true;
+}
+
 /**
  * hkRootLevelContainer
  */
@@ -310,19 +332,22 @@ bool hkRootLevelContainer::readData(const HkxXmlReader &reader, int startIndex){
         //need to use strcmp for dealing with dynamically sized qbytearrays
         if (qstrcmp(reader.getNthAttributeValueAt(startIndex, 0).constData(), "namedVariants") == 0){
             int numVariants = reader.getNthAttributeValueAt(startIndex, 1).toInt(&ok);
-            if (!ok) return false;
+            if (!ok){
+                return false;
+            }
             for (int j = 0; j < numVariants; j++){
                 namedVariants.append(hkRootLevelContainerNamedVariant());
                 while (startIndex < reader.getNumElements() && reader.getNthAttributeNameAt(startIndex, 1) != "class"){
                     if (qstrcmp(reader.getNthAttributeValueAt(startIndex, 0).constData(), "name") == 0){
-                        QByteArray t = reader.getElementValueAt(startIndex);
                         namedVariants.last().name = reader.getElementValueAt(startIndex);
                     }else if (qstrcmp(reader.getNthAttributeValueAt(startIndex, 0).constData(), "className") == 0){
                         namedVariants.last().className = reader.getElementValueAt(startIndex);
                     }else if (qstrcmp(reader.getNthAttributeValueAt(startIndex, 0).constData(), "variant") == 0){
                         //need to remove the '#' from the reference string
                         namedVariants.last().variant.setReference(reader.getElementValueAt(startIndex).remove(0,1).toLong(&ok));
-                        if (!ok) return false;
+                        if (!ok){
+                            return false;
+                        }
                     }
                     startIndex++;
                 }

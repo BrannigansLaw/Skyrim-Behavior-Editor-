@@ -28,4 +28,5 @@ HEADERS  += \
     src/hkxfile.h \
     src/hkxxmlreader.h \
     src/mainwindow.h \
-    src/utility.h
+    src/utility.h \
+    src/modifiers.h

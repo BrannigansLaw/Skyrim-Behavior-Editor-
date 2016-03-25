@@ -5,6 +5,7 @@
 #include "hkxxmlreader.h"
 #include "hkobject.h"
 #include "generators.h"
+#include "modifiers.h"
 
 #include <QList>
 #include <QFile>
@@ -30,6 +31,8 @@ private:
 
 class BehaviorFile: public HkxFile
 {
+    template <typename T>
+    bool appendAndReadData(int ind, T * obj);
 public:
     BehaviorFile(const QString & name): HkxFile(name){reader.setBehaviorFile(this);parse();}
     virtual ~BehaviorFile(){}
@@ -39,7 +42,7 @@ protected:
 private:
     HkxXmlReader reader;
     QList <hkbGeneratorExpSharedPtr> generators;
-    QList <HkObjectExpSharedPtr> modifiers;
+    QList <HkbModifierExpSharedPtr> modifiers;
     QList <HkObjectExpSharedPtr> otherTypes;
 };
 

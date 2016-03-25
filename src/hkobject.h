@@ -2,20 +2,22 @@
 #define HKOBJECT_H
 
 #include "utility.h"
-
+#
 class HkxFile;
 class HkxXmlReader;
 
 class HkObject: public QSharedData
 {
 public:
-    enum HkxType {TYPE_OTHER=0, TYPE_GENERATOR=1, MODIFIER=2};
+    enum HkxType {TYPE_OTHER=0, TYPE_GENERATOR=1, TYPE_MODIFIER=2};
 public:
     virtual ~HkObject(){}
     qint64 getSignature(){return signature;}
+    HkxType getType()const{return typeCheck;}
     //virtual bool readData(const HkxXmlReader & reader, int startIndex){return false;}
 protected:
-    HkObject(HkxFile *parent = NULL, qint32 ref = 0): parentFile(parent), reference(ref){}
+    HkObject(HkxFile *parent = NULL/*, long ref = 0*/): parentFile(parent)/*, reference(ref)*/{}
+    //void setRef(long ref){reference = ref;}
     void setType(HkxSignature sig, HkxType type){signature = sig;typeCheck = type;}
     bool readIntegers(const QByteArray &line, QVector<qint16> & ints);
     bool readSingleBool(const QByteArray &line, bool *ok);
@@ -32,7 +34,7 @@ private:
     HkObject& operator=(const HkObject&);
 private:
     HkxFile *parentFile;
-    qint32 reference;
+    //long reference;
     HkxSignature signature;
     HkxType typeCheck;
 };
@@ -40,27 +42,18 @@ private:
 class HkObjectExpSharedPtr: public QSharedDataPointer <HkObject>
 {
 public:
-    HkObjectExpSharedPtr(HkObject *obj = NULL, qint32 ref = -1):QSharedDataPointer(obj), reference(ref){}
-    void setReference(qint32 ref){reference = ref;}
-    qint32 getReference()const{return reference;}
+    HkObjectExpSharedPtr(HkObject *obj = NULL, long ref = -1):QSharedDataPointer(obj), reference(ref){}
+    void setReference(long ref){reference = ref;}
+    long getReference()const{return reference;}
+    bool readReference(long index, const HkxXmlReader & reader);
 private:
-    qint32 reference;
+    long reference;
 };
-
-/*class HkbModifierExpSharedPtr: public QSharedDataPointer <hkbModifier>
-{
-public:
-    HkbModifierExpSharedPtr(qint32 ref = -1): reference(ref){}
-    void setReference(qint32 ref){reference = ref;}
-    qint32 getReference()const{return reference;}
-private:
-    qint32 reference;
-};*/
 
 class hkRootLevelContainer: public HkObject
 {
 public:
-    hkRootLevelContainer(HkxFile *parent = NULL, qint32 ref = 0): HkObject(parent, ref){refCount++;setType(HK_ROOT_LEVEL_CONTAINER, TYPE_OTHER);}
+    hkRootLevelContainer(HkxFile *parent = NULL/*, long ref = 0*/): HkObject(parent/*, ref*/){refCount++;setType(HK_ROOT_LEVEL_CONTAINER, TYPE_OTHER);}
     virtual ~hkRootLevelContainer(){refCount--;}
     bool readData(const HkxXmlReader & reader, int startIndex);
 private:
@@ -83,12 +76,14 @@ class HkDynamicObject: public HkObject
 public:
     virtual ~HkDynamicObject(){}
 protected:
-    HkDynamicObject(HkxFile *parent = NULL, qint32 ref = 0): HkObject(parent, ref){}
+    HkDynamicObject(HkxFile *parent = NULL/*, long ref = 0*/): HkObject(parent/*, ref*/){}
+protected:
+    HkObjectExpSharedPtr variableBindingSet;
 private:
     HkDynamicObject& operator=(const HkDynamicObject&);
     HkDynamicObject(const HkDynamicObject &);
 private:
-    HkObjectExpSharedPtr variableBindingSet;
+    //HkObjectExpSharedPtr variableBindingSet;
 };
 
 #endif // HKOBJECT_H
