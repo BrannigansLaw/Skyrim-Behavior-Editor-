@@ -66,7 +66,8 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                         elem[index] = line.at(i);
                         index++;
                         i++;
-                    }//check if elem end tag is correctly paired
+                    }//check if elem end tag is correctly paired and remove null characters
+                    elem.remove(index, elem.size() - index);
                     if (!elementList.isEmpty()){
                         if (indexOfElemTags.isEmpty() || indexOfElemTags.last() >= elementList.size()){
                             return UnknownError;
@@ -142,6 +143,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                         index++;
                         i++;
                     }
+                    elem.truncate(index);
                     elementList.append(Element(elem));
                     if (line.at(i) == '>'){
                         break;
@@ -163,6 +165,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                                     index++;
                                     i++;
                                 }//set attribute name, get attribute value
+                                attrib.truncate(index);
                                 if (i >= line.size()){
                                     return UnknownError;
                                 }
@@ -190,6 +193,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                                     index++;
                                     i++;
                                 }
+                                value.truncate(index);
                                 if (line.at(i) != '"'){
                                     return OrphanedCharacter;
                                 }
@@ -238,6 +242,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                 index++;
                 i++;
             }
+            value.truncate(index);
             if (elementList.isEmpty()){
                 return OrphanedAttribute;
             }
@@ -261,6 +266,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                 index++;
                 i++;
             }
+            value.truncate(index);
             if (line.at(i) != '\n'){
                 return UnknownError;
             }

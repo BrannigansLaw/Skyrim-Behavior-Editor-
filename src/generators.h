@@ -16,7 +16,15 @@ protected:
 class hkbGeneratorExpSharedPtr: public QSharedDataPointer <hkbGenerator>
 {
 public:
-    hkbGeneratorExpSharedPtr(hkbGenerator *obj = NULL, long ref = -1):QSharedDataPointer(obj), reference(ref){}
+    hkbGeneratorExpSharedPtr(hkbGenerator *obj = NULL, long ref = -1)
+        :QSharedDataPointer(obj), reference(ref)
+    {
+        //
+    }
+    hkbGeneratorExpSharedPtr operator=(const hkbGeneratorExpSharedPtr & obj){
+        static_cast<QSharedDataPointer>(*this) = static_cast<const QSharedDataPointer<hkbGenerator>>(obj);
+        reference = obj.reference;
+    }
     void setReference(long ref){reference = ref;}
     long getReference()const{return reference;}
     bool readReference(long index, const HkxXmlReader & reader);

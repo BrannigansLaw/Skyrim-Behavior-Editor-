@@ -20,12 +20,12 @@ protected:
     //void setRef(long ref){reference = ref;}
     void setType(HkxSignature sig, HkxType type){signature = sig;typeCheck = type;}
     bool readIntegers(const QByteArray &line, QVector<qint16> & ints);
-    bool readSingleBool(const QByteArray &line, bool *ok);
-    qint16 readSingleInt(const QByteArray &line, bool *ok);
-    qreal readSingleDouble(const QByteArray &line, bool *ok);
+    bool toBool(const QByteArray &line, bool *ok);
+    //qint16 readSingleInt(const QByteArray &line, bool *ok);
+    //qreal readSingleDouble(const QByteArray &line, bool *ok);
     bool readDoubles(const QByteArray &line, QVector<qreal> & doubles);
-    qint16 readNumberElements(const QByteArray &line, bool *ok);
-    qint16 readReference(const QByteArray &lineIn, bool *ok);
+    //qint16 readNumberElements(const QByteArray &line, bool *ok);
+    //qint16 readReference(const QByteArray &lineIn, bool *ok);
     bool readReferences(const QByteArray &line, QVector<qint16> & refs);
     hkVector3 readVector3(const QByteArray &lineIn, bool *ok);
     hkVector4 readVector4(const QByteArray &lineIn, bool *ok);

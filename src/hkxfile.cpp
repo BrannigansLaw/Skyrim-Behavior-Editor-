@@ -23,7 +23,10 @@ bool BehaviorFile::appendAndReadData(int index, T * obj){
     if (!ok){
         return false;
     }
-    obj->readData(reader, index);
+    index++;    //Skip the current line.
+    if (!obj->readData(reader, index)){
+        return false;
+    }
     return true;
 }
 

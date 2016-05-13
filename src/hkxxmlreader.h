@@ -42,12 +42,12 @@ public:
     HkxXmlParseLine readNextLine();
 private:
     struct Attribute{
-        Attribute(const QByteArray & elem): name(elem){name.resize(15);}
+        Attribute(const QByteArray & elem): name(elem){}
         QByteArray name;
         QByteArray value;
     };
     struct Element{
-        Element(const QByteArray & elem): name(elem), isContainedOnOneLine(false)/*, isClosed(false)*/{name.append(QByteArray(10, '\0'));value.append(QByteArray(9, '\0'));}
+        Element(const QByteArray & elem): name(elem), isContainedOnOneLine(false)/*, isClosed(false)*/{}
         QByteArray name;
         QByteArray value;
         QList <Attribute> attributeList;

@@ -12,7 +12,7 @@ bool hkbGeneratorExpSharedPtr::readReference(long index, const HkxXmlReader & re
     if (temp.at(0) == '#'){
         temp.remove(0, 1);
     }
-    if (qstrcmp(temp.constData(), "null") == 0){
+    if (temp == "null"){
         setReference(-1);
     }else{
         setReference(temp.toLong(&ok));
@@ -42,44 +42,43 @@ bool hkbStateMachineStateInfo::readData(const HkxXmlReader &reader, long index){
     QByteArray text(15, '\0');
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
-        //need to use strcmp for dealing with dynamically sized qbytearrays
-        if (qstrcmp(text.constData(), "variableBindingSet") == 0){
+        if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
                 return false;
             }
-        }else if (qstrcmp(text.constData(), "enterNotifyEvents") == 0){
+        }else if (text == "enterNotifyEvents"){
             if (!enterNotifyEvents.readReference(index, reader)){
                 return false;
             }
-        }else if (qstrcmp(text.constData(), "exitNotifyEvents") == 0){
+        }else if (text == "exitNotifyEvents"){
             if (!exitNotifyEvents.readReference(index, reader)){
                 return false;
             }
-        }else if (qstrcmp(text.constData(), "transitions") == 0){
+        }else if (text == "transitions"){
             if (!transitions.readReference(index, reader)){
                 return false;
             }
-        }else if (qstrcmp(text.constData(), "generator") == 0){
+        }else if (text == "generator"){
             if (!generator.readReference(index, reader)){
                 return false;
             }
-        }else if (qstrcmp(text.constData(), "name") == 0){
+        }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
                 return false;
             }
-        }else if (qstrcmp(text.constData(), "stateId") == 0){
-            stateId = readSingleInt(reader.getElementValueAt(index), &ok);
+        }else if (text == "stateId"){
+            stateId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
                 return false;
             }
-        }else if (qstrcmp(text.constData(), "probability") == 0){
-            probability = readSingleDouble(reader.getElementValueAt(index), &ok);
+        }else if (text == "probability"){
+            probability = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
                 return false;
             }
-        }else if (qstrcmp(text.constData(), "enable") == 0){
-            enable = readSingleBool(reader.getElementValueAt(index), &ok);
+        }else if (text == "enable"){
+            enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
                 return false;
             }
@@ -117,8 +116,7 @@ hkbStateMachine::hkbStateMachine(HkxFile *parent/*, qint16 ref*/): HkDynamicObje
 bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){
     bool ok;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-        //need to use strcmp for dealing with dynamically sized qbytearrays
-        if (qstrcmp(reader.getNthAttributeValueAt(index, 0).constData(), "namedVariants") == 0){
+        if (reader.getNthAttributeValueAt(index, 0) == "namedVariants"){
             //
         }
         index++;
@@ -141,8 +139,7 @@ hkbModifierGenerator::hkbModifierGenerator(HkxFile *parent/*, qint16 ref*/): HkD
 bool hkbModifierGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-        //need to use strcmp for dealing with dynamically sized qbytearrays
-        if (qstrcmp(reader.getNthAttributeValueAt(index, 0).constData(), "namedVariants") == 0){
+        if (reader.getNthAttributeValueAt(index, 0) == "namedVariants"){
             //
         }
         index++;
@@ -167,8 +164,7 @@ hkbManualSelectorGenerator::hkbManualSelectorGenerator(HkxFile *parent/*, qint16
 bool hkbManualSelectorGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-        //need to use strcmp for dealing with dynamically sized qbytearrays
-        if (qstrcmp(reader.getNthAttributeValueAt(index, 0).constData(), "namedVariants") == 0){
+        if (reader.getNthAttributeValueAt(index, 0) == "namedVariants"){
             //
         }
         index++;
@@ -192,8 +188,7 @@ hkbBlenderGeneratorChild::hkbBlenderGeneratorChild(HkxFile *parent/*, qint16 ref
 bool hkbBlenderGeneratorChild::readData(const HkxXmlReader &reader, long index){
     bool ok;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-        //need to use strcmp for dealing with dynamically sized qbytearrays
-        if (qstrcmp(reader.getNthAttributeValueAt(index, 0).constData(), "namedVariants") == 0){
+        if (reader.getNthAttributeValueAt(index, 0) == "namedVariants"){
             //
         }
         index++;
@@ -225,8 +220,7 @@ hkbBlenderGenerator::hkbBlenderGenerator(HkxFile *parent/*, qint16 ref*/): HkDyn
 bool hkbBlenderGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-        //need to use strcmp for dealing with dynamically sized qbytearrays
-        if (qstrcmp(reader.getNthAttributeValueAt(index, 0).constData(), "namedVariants") == 0){
+        if (reader.getNthAttributeValueAt(index, 0) == "namedVariants"){
             //
         }
         index++;
@@ -249,8 +243,7 @@ hkbBehaviorReferenceGenerator::hkbBehaviorReferenceGenerator(HkxFile *parent/*, 
 bool hkbBehaviorReferenceGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-        //need to use strcmp for dealing with dynamically sized qbytearrays
-        if (qstrcmp(reader.getNthAttributeValueAt(index, 0).constData(), "namedVariants") == 0){
+        if (reader.getNthAttributeValueAt(index, 0) == "namedVariants"){
             //
         }
         index++;
@@ -285,8 +278,7 @@ hkbClipGenerator::hkbClipGenerator(HkxFile *parent/*, qint16 ref*/): HkDynamicOb
 bool hkbClipGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-        //need to use strcmp for dealing with dynamically sized qbytearrays
-        if (qstrcmp(reader.getNthAttributeValueAt(index, 0).constData(), "namedVariants") == 0){
+        if (reader.getNthAttributeValueAt(index, 0) == "namedVariants"){
             //
         }
         index++;
@@ -311,8 +303,7 @@ hkbBehaviorGraph::hkbBehaviorGraph(HkxFile *parent/*, qint16 ref*/): HkDynamicOb
 bool hkbBehaviorGraph::readData(const HkxXmlReader &reader, long index){
     bool ok;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-        //need to use strcmp for dealing with dynamically sized qbytearrays
-        if (qstrcmp(reader.getNthAttributeValueAt(index, 0).constData(), "namedVariants") == 0){
+        if (reader.getNthAttributeValueAt(index, 0) == "namedVariants"){
             //
         }
         index++;

@@ -31,23 +31,11 @@ bool HkObject::readIntegers(const QByteArray &line, QVector<qint16> & ints){
     return ok;
 }
 
-bool HkObject::readSingleBool(const QByteArray &line, bool *ok){
+bool HkObject::toBool(const QByteArray &line, bool *ok){
     *ok = true;
-    qint16 start = 0;
-    qint16 end = line.indexOf('\0', start);
-    if (end == -1){
-        *ok = false;
-        return false;
-    }
-    qint16 size = end - start;
-    QByteArray value(size, '\0');
-    for (qint16 i = 0; i < size; i++){
-        value[i] = line.at(start);
-        start++;
-    }
-    if (value == "true"){
+    if (line == "true"){
         return true;
-    }else if (value == "false"){
+    }else if (line == "false"){
         return false;
     }else {
         *ok = false;
@@ -55,6 +43,7 @@ bool HkObject::readSingleBool(const QByteArray &line, bool *ok){
     }
 }
 
+/*
 qint16 HkObject::readSingleInt(const QByteArray &line, bool *ok){
     qint16 start = 0;
     qint16 end = line.indexOf('\0', start);
@@ -85,7 +74,7 @@ qreal HkObject::readSingleDouble(const QByteArray &line, bool *ok){
         start++;
     }
     return value.toDouble(ok);
-}
+}*/
 
 bool HkObject::readDoubles(const QByteArray &line, QVector<qreal> & doubles){
     qint16 size = 0;
@@ -113,7 +102,7 @@ bool HkObject::readDoubles(const QByteArray &line, QVector<qreal> & doubles){
     return ok;
 }
 
-qint16 HkObject::readNumberElements(const QByteArray &line, bool *ok){
+/*qint16 HkObject::readNumberElements(const QByteArray &line, bool *ok){
     qint16 start = 0;
     qint16 end = line.indexOf('\0', start);
     if (end == -1){
@@ -157,7 +146,7 @@ qint16 HkObject::readReference(const QByteArray &lineIn, bool *ok){
         return -1;
     }
     return end;
-}
+}*/
 
 bool HkObject::readReferences(const QByteArray &line, QVector<qint16> & refs){
     qint16 size = 0;
@@ -309,7 +298,7 @@ bool HkObjectExpSharedPtr::readReference(long index, const HkxXmlReader & reader
     if (temp.at(0) == '#'){
         temp.remove(0, 1);
     }
-    if (qstrcmp(temp.constData(), "null") == 0){
+    if (temp == "null"){
         setReference(-1);
     }else{
         setReference(temp.toLong(&ok));
@@ -330,7 +319,7 @@ bool hkRootLevelContainer::readData(const HkxXmlReader &reader, int startIndex){
     bool ok;
     while (startIndex < reader.getNumElements() && reader.getNthAttributeNameAt(startIndex, 1) != "class"){
         //need to use strcmp for dealing with dynamically sized qbytearrays
-        if (qstrcmp(reader.getNthAttributeValueAt(startIndex, 0).constData(), "namedVariants") == 0){
+        if (reader.getNthAttributeValueAt(startIndex, 0) == "namedVariants"){
             int numVariants = reader.getNthAttributeValueAt(startIndex, 1).toInt(&ok);
             if (!ok){
                 return false;
@@ -338,14 +327,12 @@ bool hkRootLevelContainer::readData(const HkxXmlReader &reader, int startIndex){
             for (int j = 0; j < numVariants; j++){
                 namedVariants.append(hkRootLevelContainerNamedVariant());
                 while (startIndex < reader.getNumElements() && reader.getNthAttributeNameAt(startIndex, 1) != "class"){
-                    if (qstrcmp(reader.getNthAttributeValueAt(startIndex, 0).constData(), "name") == 0){
+                    if (reader.getNthAttributeValueAt(startIndex, 0) == "name"){
                         namedVariants.last().name = reader.getElementValueAt(startIndex);
-                    }else if (qstrcmp(reader.getNthAttributeValueAt(startIndex, 0).constData(), "className") == 0){
+                    }else if (reader.getNthAttributeValueAt(startIndex, 0) == "className"){
                         namedVariants.last().className = reader.getElementValueAt(startIndex);
-                    }else if (qstrcmp(reader.getNthAttributeValueAt(startIndex, 0).constData(), "variant") == 0){
-                        //need to remove the '#' from the reference string
-                        namedVariants.last().variant.setReference(reader.getElementValueAt(startIndex).remove(0,1).toLong(&ok));
-                        if (!ok){
+                    }else if (reader.getNthAttributeValueAt(startIndex, 0) == "variant"){
+                        if (!namedVariants.last().variant.readReference(startIndex, reader)){
                             return false;
                         }
                     }
