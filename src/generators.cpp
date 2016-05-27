@@ -769,7 +769,7 @@ bool hkbBlenderGenerator::link(){
             return false;
         }
         children[i] = *ptr;
-        if (!static_cast<hkbBlenderGeneratorChild *>(generators.at(i).data())->link()){
+        if (!static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->link()){
             return false;
         }
     }
