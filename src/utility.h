@@ -11,7 +11,37 @@
 
 #define MAX_HKXXML_LINE_LENGHT 512
 
-enum HkxSignature {
+struct hkVector3
+{
+    hkVector3(qreal x = 0, qreal y = 0, qreal z = 0): x(x), y(y), z(z){}
+    qreal x;
+    qreal y;
+    qreal z;
+};
+
+struct hkVector4
+{
+    hkVector4(qreal x = 0, qreal y = 0, qreal z = 0, qreal w = 0): x(x), y(y), z(z), w(w){}
+    qreal x;
+    qreal y;
+    qreal z;
+    qreal w;
+};
+
+struct hkTransform
+{
+    hkVector3 transformA;
+    hkVector3 transformB;
+};
+
+struct hkQsTransform
+{
+    hkVector3 v1;
+    hkVector4 v2;
+    hkVector3 v3;
+};
+
+enum HkxSignature: unsigned long long {
     NULL_SIGNATURE = 0x0,
     //Project
     HK_ROOT_LEVEL_CONTAINER = 0x2772c11e,
@@ -106,36 +136,6 @@ enum HkxSignature {
     BS_TIMER_MODIFIER = 0x531f3292,
     BS_TWEENER_MODIFIER = 0x0d2d9a04,
     HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY = 0xb07b4388
-};
-
-struct hkVector3
-{
-    hkVector3(qreal x = 0, qreal y = 0, qreal z = 0): x(x), y(y), z(z){}
-    qreal x;
-    qreal y;
-    qreal z;
-};
-
-struct hkVector4
-{
-    hkVector4(qreal x = 0, qreal y = 0, qreal z = 0, qreal w = 0): x(x), y(y), z(z), w(w){}
-    qreal x;
-    qreal y;
-    qreal z;
-    qreal w;
-};
-
-struct hkTransform
-{
-    hkVector3 transformA;
-    hkVector3 transformB;
-};
-
-struct hkQsTransform
-{
-    hkVector3 v1;
-    hkVector4 v2;
-    hkVector3 v3;
 };
 
 #endif // UTILITY_H

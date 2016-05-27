@@ -7,18 +7,9 @@ class hkbModifier: public HkDynamicObject
 {
 public:
     virtual ~hkbModifier(){}
+    bool link(){return true;}
 protected:
-    hkbModifier(HkxFile *parent = NULL/*, long ref = 0*/): HkDynamicObject(parent/*, ref*/){}
-};
-
-class HkbModifierExpSharedPtr: public QSharedDataPointer <hkbModifier>
-{
-public:
-    HkbModifierExpSharedPtr(hkbModifier *obj = NULL, long ref = -1):QSharedDataPointer(obj), reference(ref){}
-    void setReference(long ref){reference = ref;}
-    long getReference()const{return reference;}
-private:
-    long reference;
+    hkbModifier(BehaviorFile *parent = NULL/*, long ref = 0*/): HkDynamicObject(parent/*, ref*/){}
 };
 
 

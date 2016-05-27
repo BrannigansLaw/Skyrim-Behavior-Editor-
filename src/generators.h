@@ -9,35 +9,42 @@ class hkbGenerator: public HkDynamicObject
 {
 public:
     virtual ~hkbGenerator(){}
+    bool link();
 protected:
-    hkbGenerator(HkxFile *parent = NULL/*, long ref = 0*/): HkDynamicObject(parent/*, ref*/){}
+    hkbGenerator(BehaviorFile *parent = NULL/*, long ref = 0*/): HkDynamicObject(parent/*, ref*/){}
+    //bool readReferences(const QByteArray &lineIn, QList <HkObjectExpSharedPtr> & children);
 };
 
-class hkbGeneratorExpSharedPtr: public QSharedDataPointer <hkbGenerator>
+class hkRootLevelContainer: public HkObject
 {
 public:
-    hkbGeneratorExpSharedPtr(hkbGenerator *obj = NULL, long ref = -1)
-        :QSharedDataPointer(obj), reference(ref)
-    {
-        //
-    }
-    hkbGeneratorExpSharedPtr operator=(const hkbGeneratorExpSharedPtr & obj){
-        static_cast<QSharedDataPointer>(*this) = static_cast<const QSharedDataPointer<hkbGenerator>>(obj);
-        reference = obj.reference;
-    }
-    void setReference(long ref){reference = ref;}
-    long getReference()const{return reference;}
-    bool readReference(long index, const HkxXmlReader & reader);
+    hkRootLevelContainer(BehaviorFile *parent = NULL/*, long ref = 0*/): HkObject(parent/*, ref*/){refCount++;setType(HK_ROOT_LEVEL_CONTAINER, TYPE_OTHER);}
+    virtual ~hkRootLevelContainer(){refCount--;}
+    //bool readData(const HkxXmlReader & reader, int startIndex);
+    bool link();
+    bool readData(const HkxXmlReader & reader, int index);
 private:
-    long reference;
+    hkRootLevelContainer& operator=(const hkRootLevelContainer&);
+    hkRootLevelContainer(const hkRootLevelContainer &);
+private:
+    static uint refCount;
+    struct hkRootLevelContainerNamedVariant
+    {
+        hkRootLevelContainerNamedVariant(QString varname = "default", QString classname = "default"):name(varname), className(classname){}
+        QString name;
+        QString className;
+        HkObjectExpSharedPtr variant;  //This can be one of many (any?) types.
+    };
+    QList <hkRootLevelContainerNamedVariant> namedVariants;
 };
 
 class hkbStateMachineStateInfo: public HkDynamicObject
 {
 public:
-    hkbStateMachineStateInfo(HkxFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbStateMachineStateInfo(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbStateMachineStateInfo(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
+    bool link();
 private:
     hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&);
     hkbStateMachineStateInfo(const hkbStateMachineStateInfo &);
@@ -46,7 +53,7 @@ private:
     HkObjectExpSharedPtr enterNotifyEvents;
     HkObjectExpSharedPtr exitNotifyEvents;
     HkObjectExpSharedPtr transitions;
-    hkbGeneratorExpSharedPtr generator;
+    HkObjectExpSharedPtr generator;
     QString name;
     ushort stateId;
     qreal probability;
@@ -56,9 +63,10 @@ private:
 class hkbStateMachine: public HkDynamicObject
 {
 public:
-    hkbStateMachine(HkxFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbStateMachine(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbStateMachine(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
+    bool link();
 private:
     hkbStateMachine& operator=(const hkbStateMachine&);
     hkbStateMachine(const hkbStateMachine &);
@@ -68,7 +76,9 @@ private:
     static uint refCount;
     ulong userData;
     QString name;
-    HkObjectExpSharedPtr eventToSendWhenStateOrTransitionChanges;
+    //HkObjectExpSharedPtr eventToSendWhenStateOrTransitionChanges;
+    int id;
+    HkObjectExpSharedPtr payload;
     int startStateId;
     int returnToPreviousStateEventId;
     int randomTransitionEventId;
@@ -79,7 +89,7 @@ private:
     ushort maxSimultaneousTransitions;  //Max 32, min 0.
     QString startStateMode;
     QString selfTransitionMode;
-    QList <hkbGeneratorExpSharedPtr> states;
+    QList <HkObjectExpSharedPtr> states;
     HkObjectExpSharedPtr wildcardTransitions;
 };
 
@@ -87,9 +97,10 @@ private:
 class hkbModifierGenerator: public HkDynamicObject
 {
 public:
-    hkbModifierGenerator(HkxFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbModifierGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbModifierGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
+    bool link();
 private:
     hkbModifierGenerator& operator=(const hkbModifierGenerator&);
     hkbModifierGenerator(const hkbModifierGenerator &);
@@ -98,15 +109,16 @@ private:
     long userData;
     QString name;
     HkObjectExpSharedPtr modifier;
-    hkbGeneratorExpSharedPtr generator;
+    HkObjectExpSharedPtr generator;
 };
 
 class hkbManualSelectorGenerator: public HkDynamicObject
 {
 public:
-    hkbManualSelectorGenerator(HkxFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbManualSelectorGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbManualSelectorGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
+    bool link();
 private:
     hkbManualSelectorGenerator& operator=(const hkbManualSelectorGenerator&);
     hkbManualSelectorGenerator(const hkbManualSelectorGenerator &);
@@ -114,7 +126,7 @@ private:
     static uint refCount;
     long userData;
     QString name;
-    QList <hkbGeneratorExpSharedPtr> generators;
+    QList <HkObjectExpSharedPtr> generators;
     qint8 selectedGeneratorIndex;
     qint8 currentGeneratorIndex;
 };
@@ -122,15 +134,16 @@ private:
 class hkbBlenderGeneratorChild: public HkDynamicObject
 {
 public:
-    hkbBlenderGeneratorChild(HkxFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbBlenderGeneratorChild(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbBlenderGeneratorChild(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
+    bool link();
 private:
     hkbBlenderGeneratorChild& operator=(const hkbBlenderGeneratorChild&);
     hkbBlenderGeneratorChild(const hkbBlenderGeneratorChild &);
 private:
     static uint refCount;
-    hkbGeneratorExpSharedPtr generator;
+    HkObjectExpSharedPtr generator;
     HkObjectExpSharedPtr boneWeights;
     qreal weight;
     qreal worldFromModelWeight;
@@ -139,9 +152,10 @@ private:
 class hkbBlenderGenerator: public HkDynamicObject
 {
 public:
-    hkbBlenderGenerator(HkxFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbBlenderGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbBlenderGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
+    bool link();
 private:
     static QStringList Flags;   //{FLAG_SYNC=1, FLAG_SMOOTH_GENERATOR_WEIGHTS=4, FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS=8, FLAG_PARAMETRIC_BLEND=16, FLAG_IS_PARAMETRIC_BLEND_CYCLIC=32, FLAG_FORCE_DENSE_POSE=64};
     static uint refCount;
@@ -154,15 +168,16 @@ private:
     qint16 indexOfSyncMasterChild;
     QString flags;
     bool subtractLastChild;
-    QList <hkbGeneratorExpSharedPtr> children;
+    QList <HkObjectExpSharedPtr> children;
 };
 
 class hkbBehaviorReferenceGenerator: public HkDynamicObject
 {
 public:
-    hkbBehaviorReferenceGenerator(HkxFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbBehaviorReferenceGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbBehaviorReferenceGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
+    bool link();
 private:
     hkbBehaviorReferenceGenerator& operator=(const hkbBehaviorReferenceGenerator&);
     hkbBehaviorReferenceGenerator(const hkbBehaviorReferenceGenerator &);
@@ -176,9 +191,10 @@ private:
 class hkbClipGenerator: public HkDynamicObject
 {
 public:
-    hkbClipGenerator(HkxFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbClipGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbClipGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
+    bool link();
 private:
     hkbClipGenerator& operator=(const hkbClipGenerator&);
     hkbClipGenerator(const hkbClipGenerator &);
@@ -204,9 +220,10 @@ private:
 class hkbBehaviorGraph: public HkDynamicObject
 {
 public:
-    hkbBehaviorGraph(HkxFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbBehaviorGraph(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbBehaviorGraph(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
+    bool link();
 private:
     hkbBehaviorGraph& operator=(const hkbBehaviorGraph&);
     hkbBehaviorGraph(const hkbBehaviorGraph &);
@@ -216,7 +233,7 @@ private:
     qint64 userData;
     QString name;
     QString variableMode;
-    hkbGeneratorExpSharedPtr rootGenerator;
+    HkObjectExpSharedPtr rootGenerator;
     HkObjectExpSharedPtr data;
 };
 

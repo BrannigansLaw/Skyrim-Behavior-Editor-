@@ -23,8 +23,10 @@ public:
     void closeFile(){if (isOpen()) close();}
 protected:
     virtual bool parse(){return true;}
-    virtual void read(){}
-    void setRootObject(HkObjectExpSharedPtr obj){rootObject = obj;}
+    virtual bool link(){return true;}
+    //virtual void read(){}
+    void setRootObject(const HkObjectExpSharedPtr & obj){rootObject = obj;}
+    HkObjectExpSharedPtr & getRootObject(){return rootObject;}
 private:
     HkObjectExpSharedPtr rootObject;
 };
@@ -36,13 +38,17 @@ class BehaviorFile: public HkxFile
 public:
     BehaviorFile(const QString & name): HkxFile(name){reader.setBehaviorFile(this);parse();}
     virtual ~BehaviorFile(){}
+    HkObjectExpSharedPtr * findHkObject(long ref);
+    HkObjectExpSharedPtr * findGenerator(long ref);
+    HkObjectExpSharedPtr * findModifier(long ref);
 protected:
-    virtual bool parse();
+    bool parse();
+    bool link();
     //void read();
 private:
     HkxXmlReader reader;
-    QList <hkbGeneratorExpSharedPtr> generators;
-    QList <HkbModifierExpSharedPtr> modifiers;
+    QList <HkObjectExpSharedPtr> generators;
+    QList <HkObjectExpSharedPtr> modifiers;
     QList <HkObjectExpSharedPtr> otherTypes;
 };
 

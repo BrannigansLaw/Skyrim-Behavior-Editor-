@@ -1,5 +1,7 @@
 #include "hkobject.h"
 #include "hkxxmlreader.h"
+#include "generators.h"
+#include "hkxfile.h"
 
 /**
  * HkObject
@@ -148,50 +150,6 @@ qint16 HkObject::readReference(const QByteArray &lineIn, bool *ok){
     return end;
 }*/
 
-bool HkObject::readReferences(const QByteArray &line, QVector<qint16> & refs){
-    qint16 size = 0;
-    qint16 start;
-    bool ok = true;
-    for (qint16 i = 0; i < line.size(); i++){
-        if (line.at(i) == '#'){
-            i++;
-            start = i;
-            size = 0;
-            do{
-                size++;
-                i++;
-            }while (i < line.size() && line.at(i) != ' ' && line.at(i) != '\n');
-            QByteArray value(size, '\0');
-            for (qint16 j = 0; j < size; j++){
-                value[j] = line[start];
-                start++;
-            }
-            refs.append(value.toInt(&ok));
-            if (!ok){
-                return false;
-            }
-        }else if (line.at(i) == 'n'){
-            start = i;
-            size = 0;
-            do{
-                size++;
-                i++;
-            }while (i < line.size() && line.at(i) != ' ' && line.at(i) != '\n');
-            QByteArray value(size, '\0');
-            for (qint16 j = 0; j < size; j++){
-                value[j] = line[start];
-                start++;
-            }
-            if (value == "null"){
-                refs.append(0);
-            } else {
-                return false;
-            }
-        }
-    }
-    return ok;
-}
-
 hkVector3 HkObject::readVector3(const QByteArray &lineIn, bool *ok){
     enum {X = 1, Y = 2, Z = 3};
     qint16 size = 0;
@@ -310,46 +268,177 @@ bool HkObjectExpSharedPtr::readReference(long index, const HkxXmlReader & reader
 }
 
 /**
- * hkRootLevelContainer
+ * hkbStateMachineEventPropertyArray
  */
 
-uint hkRootLevelContainer::refCount = 0;
+uint hkbStateMachineEventPropertyArray::refCount = 0;
 
-bool hkRootLevelContainer::readData(const HkxXmlReader &reader, int startIndex){
+bool hkbStateMachineEventPropertyArray::readData(const HkxXmlReader &reader, long index){
     bool ok;
-    while (startIndex < reader.getNumElements() && reader.getNthAttributeNameAt(startIndex, 1) != "class"){
-        //need to use strcmp for dealing with dynamically sized qbytearrays
-        if (reader.getNthAttributeValueAt(startIndex, 0) == "namedVariants"){
-            int numVariants = reader.getNthAttributeValueAt(startIndex, 1).toInt(&ok);
+    QByteArray text;
+    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+        text = reader.getNthAttributeValueAt(index, 0);
+        if (text == "events"){
+            int numEvents = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
                 return false;
             }
-            for (int j = 0; j < numVariants; j++){
-                namedVariants.append(hkRootLevelContainerNamedVariant());
-                while (startIndex < reader.getNumElements() && reader.getNthAttributeNameAt(startIndex, 1) != "class"){
-                    if (reader.getNthAttributeValueAt(startIndex, 0) == "name"){
-                        namedVariants.last().name = reader.getElementValueAt(startIndex);
-                    }else if (reader.getNthAttributeValueAt(startIndex, 0) == "className"){
-                        namedVariants.last().className = reader.getElementValueAt(startIndex);
-                    }else if (reader.getNthAttributeValueAt(startIndex, 0) == "variant"){
-                        if (!namedVariants.last().variant.readReference(startIndex, reader)){
+            for (int j = 0; j < numEvents; j++){
+                events.append(HkEvent());
+                while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+                    if (reader.getNthAttributeValueAt(index, 0) == "id"){
+                        events.last().id = reader.getElementValueAt(index).toInt(&ok);
+                        if (!ok){
+                            return false;
+                        }
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "payload"){
+                        if (!events.last().payload.readReference(index, reader)){
                             return false;
                         }
                     }
-                    startIndex++;
+                    index++;
                 }
             }
         }
-        startIndex++;
+        index++;
     }
     return true;
 }
 
+bool hkbStateMachineEventPropertyArray::link(){
+    if (!getParentFile()){
+        return false;
+    }
+    HkObjectExpSharedPtr *ptr;
+    for (int i = 0; i < events.size(); i++){
+        //payload
+        ptr = getParentFile()->findHkObject(events.at(i).payload.getReference());
+        if (ptr){
+            if ((*ptr)->getType() != HKB_STRING_EVENT_PAYLOAD){
+                return false;
+            }
+            events[i].payload = *ptr;
+        }
+    }
+    return true;
+}
 
+/**
+ * hkbStateMachineTransitionInfoArray
+ */
 
+uint hkbStateMachineTransitionInfoArray::refCount = 0;
 
+bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, long index){
+    bool ok;
+    QByteArray text;
+    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+        text = reader.getNthAttributeValueAt(index, 0);
+        if (text == "transitions"){
+            int numtrans = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            if (!ok){
+                return false;
+            }
+            for (int j = 0; j < numtrans; j++){
+                transitions.append(HkTransition());
+                while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+                    if (reader.getNthAttributeValueAt(index, 0) == "transition"){
+                        if (!transitions.last().transition.readReference(index, reader)){
+                            return false;
+                        }
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "condition"){
+                        if (!transitions.last().condition.readReference(index, reader)){
+                            return false;
+                        }
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "eventId"){
+                        transitions.last().eventId = reader.getElementValueAt(index).toInt(&ok);
+                        if (!ok){
+                            return false;
+                        }
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "toStateId"){
+                        transitions.last().toStateId = reader.getElementValueAt(index).toInt(&ok);
+                        if (!ok){
+                            return false;
+                        }
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "fromNestedStateId"){
+                        transitions.last().fromNestedStateId = reader.getElementValueAt(index).toInt(&ok);
+                        if (!ok){
+                            return false;
+                        }
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "toNestedStateId"){
+                        transitions.last().toNestedStateId = reader.getElementValueAt(index).toInt(&ok);
+                        if (!ok){
+                            return false;
+                        }
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "priority"){
+                        transitions.last().priority = reader.getElementValueAt(index).toInt(&ok);
+                        if (!ok){
+                            return false;
+                        }
+                    }else if(reader.getNthAttributeValueAt(index, 0) == "flags"){
+                        transitions.last().flags = reader.getElementValueAt(index);
+                        if (transitions.last().flags == ""){
+                            return false;
+                        }
+                    }
+                    index++;
+                }
+            }
+        }
+        index++;
+    }
+    return true;
+}
 
+bool hkbStateMachineTransitionInfoArray::link(){
+    if (!getParentFile()){
+        return false;
+    }
+    HkObjectExpSharedPtr *ptr;
+    for (int i = 0; i < transitions.size(); i++){
+        //transition
+        ptr = getParentFile()->findHkObject(transitions.at(i).transition.getReference());
+        if (ptr){
+            if ((*ptr)->getType() != HKB_BLENDING_TRANSITION_EFFECT || (*ptr)->getType() != HKB_GENERATOR_TRANSITION_EFFECT){
+                return false;
+            }
+            transitions[i].transition = *ptr;
+        }
+        //condition
+        ptr = getParentFile()->findHkObject(transitions.at(i).condition.getReference());
+        if (ptr){
+            if ((*ptr)->getSignature() != HKB_EXPRESSION_CONDITION){
+                return false;
+            }
+            transitions[i].condition = *ptr;
+        }
+    }
+    return true;
+}
 
+/**
+ * hkbStringEventPayload
+ */
+
+uint hkbStringEventPayload::refCount = 0;
+
+/**
+ * HkDynamicObject
+ */
+
+bool HkDynamicObject::linkVar(){
+    if (!getParentFile()){
+        return false;
+    }
+    HkObjectExpSharedPtr *ptr = getParentFile()->findHkObject(variableBindingSet.getReference());
+    if (ptr){
+        if ((*ptr)->getSignature() != HKB_VARIABLE_BINDING_SET){
+            return false;
+        }
+        variableBindingSet = *ptr;
+    }
+    return true;
+}
 
 
 
