@@ -482,15 +482,14 @@ bool hkbModifierGenerator::link(){
     HkObjectExpSharedPtr *ptr;
     //modifier
     ptr = getParentFile()->findModifier(modifier.getReference());
-    if (!ptr){
-        return false;
-    }
-    if ((*ptr)->getType() != TYPE_MODIFIER){
-        return false;
-    }
-    modifier = *ptr;
-    if (!static_cast<hkbModifier *>(modifier.data())->link()){
-        return false;
+    if (ptr){
+        if ((*ptr)->getType() != TYPE_MODIFIER){
+            return false;
+        }
+        modifier = *ptr;
+        if (!static_cast<hkbModifier *>(modifier.data())->link()){
+            return false;
+        }
     }
     //generator
     ptr = getParentFile()->findGenerator(generator.getReference());

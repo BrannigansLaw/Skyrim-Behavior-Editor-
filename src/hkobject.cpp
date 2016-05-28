@@ -295,6 +295,8 @@ bool hkbStateMachineEventPropertyArray::readData(const HkxXmlReader &reader, lon
                         if (!events.last().payload.readReference(index, reader)){
                             return false;
                         }
+                        index++;
+                        break;
                     }
                     index++;
                 }
@@ -380,6 +382,8 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
                         if (transitions.last().flags == ""){
                             return false;
                         }
+                        //index++;
+                        break;
                     }
                     index++;
                 }
