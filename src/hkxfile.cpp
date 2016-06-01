@@ -103,6 +103,7 @@ bool BehaviorFile::parse(){
         }
         index++;
     }
+    closeFile();
     link();
     return true;
 }

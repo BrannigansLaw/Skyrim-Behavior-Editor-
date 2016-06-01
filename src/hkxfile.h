@@ -17,16 +17,17 @@ class hkRootLevelContainer;
 
 class HkxFile: public QFile
 {
+    friend class BehaviorGraphView;
 public:
     HkxFile(const QString & name): QFile(name){parse();}
     virtual ~HkxFile(){}
     void closeFile(){if (isOpen()) close();}
+    HkObjectExpSharedPtr & getRootObject(){return rootObject;}
 protected:
     virtual bool parse(){return true;}
     virtual bool link(){return true;}
     //virtual void read(){}
     void setRootObject(const HkObjectExpSharedPtr & obj){rootObject = obj;}
-    HkObjectExpSharedPtr & getRootObject(){return rootObject;}
 private:
     HkObjectExpSharedPtr rootObject;
 };

@@ -17,6 +17,7 @@ protected:
 
 class hkRootLevelContainer: public HkObject
 {
+    friend class BehaviorGraphView;
 public:
     hkRootLevelContainer(BehaviorFile *parent = NULL/*, long ref = 0*/): HkObject(parent/*, ref*/){refCount++;setType(HK_ROOT_LEVEL_CONTAINER, TYPE_OTHER);}
     virtual ~hkRootLevelContainer(){refCount--;}
@@ -40,11 +41,13 @@ private:
 
 class hkbStateMachineStateInfo: public HkDynamicObject
 {
+    friend class BehaviorGraphView;
 public:
     hkbStateMachineStateInfo(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbStateMachineStateInfo(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    QString getName() const{return name;}
 private:
     hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&);
     hkbStateMachineStateInfo(const hkbStateMachineStateInfo &);
@@ -62,11 +65,13 @@ private:
 
 class hkbStateMachine: public HkDynamicObject
 {
+    friend class BehaviorGraphView;
 public:
     hkbStateMachine(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbStateMachine(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    QString getName() const{return name;}
 private:
     hkbStateMachine& operator=(const hkbStateMachine&);
     hkbStateMachine(const hkbStateMachine &);
@@ -96,6 +101,7 @@ private:
 //Do not allow variables to be bound to this class in the editor...
 class hkbModifierGenerator: public HkDynamicObject
 {
+    friend class BehaviorGraphView;
 public:
     hkbModifierGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbModifierGenerator(){refCount--;}
@@ -114,6 +120,7 @@ private:
 
 class hkbManualSelectorGenerator: public HkDynamicObject
 {
+    friend class BehaviorGraphView;
 public:
     hkbManualSelectorGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbManualSelectorGenerator(){refCount--;}
@@ -133,6 +140,7 @@ private:
 
 class hkbBlenderGeneratorChild: public HkDynamicObject
 {
+    friend class BehaviorGraphView;
 public:
     hkbBlenderGeneratorChild(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbBlenderGeneratorChild(){refCount--;}
@@ -151,6 +159,7 @@ private:
 
 class hkbBlenderGenerator: public HkDynamicObject
 {
+    friend class BehaviorGraphView;
 public:
     hkbBlenderGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbBlenderGenerator(){refCount--;}
@@ -173,6 +182,7 @@ private:
 
 class hkbBehaviorReferenceGenerator: public HkDynamicObject
 {
+    friend class BehaviorGraphView;
 public:
     hkbBehaviorReferenceGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbBehaviorReferenceGenerator(){refCount--;}
@@ -190,6 +200,7 @@ private:
 
 class hkbClipGenerator: public HkDynamicObject
 {
+    friend class BehaviorGraphView;
 public:
     hkbClipGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbClipGenerator(){refCount--;}
@@ -219,6 +230,7 @@ private:
 
 class hkbBehaviorGraph: public HkDynamicObject
 {
+    friend class BehaviorGraphView;
 public:
     hkbBehaviorGraph(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbBehaviorGraph(){refCount--;}
