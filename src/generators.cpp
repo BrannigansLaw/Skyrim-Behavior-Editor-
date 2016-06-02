@@ -69,6 +69,31 @@ bool hkbGenerator::link(){
             return false;
         }
         break;
+    case BS_I_STATE_TAGGING_GENERATOR:
+        if (!reinterpret_cast<BSiStateTaggingGenerator *>(this)->link()){
+            return false;
+        }
+        break;
+    case BS_BONE_SWITCH_GENERATOR:
+        if (!reinterpret_cast<BSBoneSwitchGenerator *>(this)->link()){
+            return false;
+        }
+        break;
+    case BS_BONE_SWITCH_GENERATOR_BONE_DATA:
+        if (!reinterpret_cast<BSBoneSwitchGeneratorBoneData *>(this)->link()){
+            return false;
+        }
+        break;
+    case BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+        if (!reinterpret_cast<BSCyclicBlendTransitionGenerator *>(this)->link()){
+            return false;
+        }
+        break;
+    case BS_SYNCHRONIZED_CLIP_GENERATOR:
+        if (!reinterpret_cast<BSSynchronizedClipGenerator *>(this)->link()){
+            return false;
+        }
+        break;
     case HKB_MODIFIER_GENERATOR:
         if (!reinterpret_cast<hkbModifierGenerator *>(this)->link()){
             return false;
@@ -122,17 +147,6 @@ bool hkRootLevelContainer::readData(const HkxXmlReader &reader, int index){
 }
 
 bool hkRootLevelContainer::link(){
-    /*for (int i = 0; i < namedVariants.size(); i++){
-        if (namedVariants.at(i).className == "hkbBehaviorGraph"){
-            if (!namedVariants.at(i).variant.data() || namedVariants.at(i).variant.data()->getSignature() != HKB_BEHAVIOR_GRAPH){
-                return false;
-            }
-            static_cast<hkbBehaviorGraph *>(namedVariants.at(i).variant.data())->link();
-        }else{
-            return false;
-        }
-    }*/
-    //HkObject *ptr = NULL;
     if (!getParentFile()){
         return false;
     }
@@ -257,7 +271,7 @@ bool hkbStateMachineStateInfo::link(){
     if (!ptr){
         return false;
     }
-    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
         return false;
     }
     generator = *ptr;
@@ -496,7 +510,7 @@ bool hkbModifierGenerator::link(){
     if (!ptr){
         return false;
     }
-    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
         return false;
     }
     generator = *ptr;
@@ -575,7 +589,7 @@ bool hkbManualSelectorGenerator::link(){
         if (!ptr){
             return false;
         }
-        if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+        if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
             return false;
         }
         generators[i] = *ptr;
@@ -653,7 +667,7 @@ bool hkbBlenderGeneratorChild::link(){
     if (!ptr){
         return false;
     }
-    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
         return false;
     }
     generator = *ptr;
@@ -771,6 +785,354 @@ bool hkbBlenderGenerator::link(){
         if (!static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->link()){
             return false;
         }
+    }
+    return true;
+}
+
+/*
+ * CLASS: BSBoneSwitchGeneratorBoneData
+*/
+
+uint BSBoneSwitchGeneratorBoneData::refCount = 0;
+
+BSBoneSwitchGeneratorBoneData::BSBoneSwitchGeneratorBoneData(BehaviorFile *parent/*, qint16 ref*/)
+    : HkDynamicObject(parent/*, ref*/)
+{
+    refCount++;
+    setType(BS_BONE_SWITCH_GENERATOR_BONE_DATA, TYPE_GENERATOR);
+}
+
+bool BSBoneSwitchGeneratorBoneData::readData(const HkxXmlReader &reader, long index){
+    QByteArray text;
+    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+        text = reader.getNthAttributeValueAt(index, 0);
+        if (text == "variableBindingSet"){
+            if (!variableBindingSet.readReference(index, reader)){
+                return false;
+            }
+        }else if (text == "pGenerator"){
+            if (!pGenerator.readReference(index, reader)){
+                return false;
+            }
+        }else if (text == "spBoneWeight"){
+            if (!spBoneWeight.readReference(index, reader)){
+                return false;
+            }
+        }
+        index++;
+    }
+    return true;
+}
+
+bool BSBoneSwitchGeneratorBoneData::link(){
+    if (!getParentFile()){
+        return false;
+    }
+    //variableBindingSet
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+        return false;
+    }
+    //pGenerator
+    HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pGenerator.getReference());
+    if (!ptr){
+        return false;
+    }
+    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+        return false;
+    }
+    pGenerator = *ptr;
+    if (!static_cast<hkbGenerator *>(pGenerator.data())->link()){
+        return false;
+    }
+    //spBoneWeight
+    ptr = getParentFile()->findHkObject(spBoneWeight.getReference());
+    if (ptr){
+        if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
+            return false;
+        }
+        spBoneWeight = *ptr;
+    }
+    return true;
+}
+
+/*
+ * CLASS: BSBoneSwitchGenerator
+*/
+
+uint BSBoneSwitchGenerator::refCount = 0;
+
+BSBoneSwitchGenerator::BSBoneSwitchGenerator(BehaviorFile *parent/*, qint16 ref*/)
+    : HkDynamicObject(parent/*, ref*/),\
+    userData(0)
+{
+    refCount++;
+    setType(BS_BONE_SWITCH_GENERATOR, TYPE_GENERATOR);
+}
+
+bool BSBoneSwitchGenerator::readData(const HkxXmlReader &reader, long index){
+    bool ok;
+    QByteArray text;
+    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+        text = reader.getNthAttributeValueAt(index, 0);
+        if (text == "variableBindingSet"){
+            if (!variableBindingSet.readReference(index, reader)){
+                return false;
+            }
+        }else if (text == "userData"){
+            userData = reader.getElementValueAt(index).toULong(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "name"){
+            name = reader.getElementValueAt(index);
+            if (name == ""){
+                return false;
+            }
+        }else if (text == "pDefaultGenerator"){
+            if (!pDefaultGenerator.readReference(index, reader)){
+                return false;
+            }
+        }else if (text == "ChildrenA"){
+            if (!readReferences(reader.getElementValueAt(index), ChildrenA)){
+                return false;
+            }
+        }
+        index++;
+    }
+    return true;
+}
+
+bool BSBoneSwitchGenerator::link(){
+    if (!getParentFile()){
+        return false;
+    }
+    //variableBindingSet
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+        return false;
+    }
+    //pDefaultGenerator
+    HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pDefaultGenerator.getReference());
+    if (!ptr){
+        return false;
+    }
+    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+        return false;
+    }
+    pDefaultGenerator = *ptr;
+    if (!static_cast<hkbGenerator *>(pDefaultGenerator.data())->link()){
+        return false;
+    }
+    for (int i = 0; i < ChildrenA.size(); i++){
+        //ChildrenA
+        ptr = getParentFile()->findGenerator(ChildrenA.at(i).getReference());
+        if (!ptr){
+            return false;
+        }
+        if ((*ptr)->getSignature() != BS_BONE_SWITCH_GENERATOR_BONE_DATA){
+            return false;
+        }
+        ChildrenA[i] = *ptr;
+        if (!static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data())->link()){
+            return false;
+        }
+    }
+    return true;
+}
+
+/*
+ * CLASS: BSCyclicBlendTransitionGenerator
+*/
+
+uint BSCyclicBlendTransitionGenerator::refCount = 0;
+
+QStringList BSCyclicBlendTransitionGenerator::BlendCurve = {"BLEND_CURVE_SMOOTH"};
+
+BSCyclicBlendTransitionGenerator::BSCyclicBlendTransitionGenerator(BehaviorFile *parent/*, qint16 ref*/)
+    :HkDynamicObject(parent/*, ref*/),\
+    userData(0),\
+    fBlendParameter(1),\
+    fTransitionDuration(0),\
+    eBlendCurve(BlendCurve.first())
+{
+    refCount++;
+    setType(BS_CYCLIC_BLEND_TRANSITION_GENERATOR, TYPE_GENERATOR);
+}
+
+bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long index){
+    bool ok;
+    QByteArray text;
+    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+        text = reader.getNthAttributeValueAt(index, 0);
+        if (text == "variableBindingSet"){
+            if (!variableBindingSet.readReference(index, reader)){
+                return false;
+            }
+        }else if (text == "userData"){
+            userData = reader.getElementValueAt(index).toULong(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "name"){
+            name = reader.getElementValueAt(index);
+            if (name == ""){
+                return false;
+            }
+        }else if (text == "pBlenderGenerator"){
+            if (!pBlenderGenerator.readReference(index, reader)){
+                return false;
+            }
+        }else if (text == "EventToFreezeBlendValue"){
+            index++;
+            while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+                text = reader.getNthAttributeValueAt(index, 0);
+                if (text == "id"){
+                    eventToFreezeBlendValueId = reader.getElementValueAt(index).toInt(&ok);
+                    if (!ok){
+                        return false;
+                    }
+                }else if (text == "payload"){
+                    if (!eventToFreezeBlendValuePayload.readReference(index, reader)){
+                        return false;
+                    }
+                    break;
+                }
+                index++;
+            }
+        }else if (text == "EventToCrossBlend"){
+            index++;
+            while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+                text = reader.getNthAttributeValueAt(index, 0);
+                if (text == "id"){
+                    eventToCrossBlendId = reader.getElementValueAt(index).toInt(&ok);
+                    if (!ok){
+                        return false;
+                    }
+                }else if (text == "payload"){
+                    if (!eventToCrossBlendPayload.readReference(index, reader)){
+                        return false;
+                    }
+                    break;
+                }
+                index++;
+            }
+        }else if (text == "fBlendParameter"){
+            fBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "fTransitionDuration"){
+            fTransitionDuration = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "eBlendCurve"){
+            eBlendCurve = reader.getElementValueAt(index);
+            if (eBlendCurve == ""){
+                return false;
+            }
+        }
+        index++;
+    }
+    return true;
+}
+
+bool BSCyclicBlendTransitionGenerator::link(){
+    if (!getParentFile()){
+        return false;
+    }
+    //variableBindingSet
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+        return false;
+    }
+    //pBlenderGenerator
+    HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pBlenderGenerator.getReference());
+    if (!ptr){
+        return false;
+    }
+    if ((*ptr)->getSignature() != HKB_BLENDER_GENERATOR){
+        return false;
+    }
+    pBlenderGenerator = *ptr;
+    if (!static_cast<hkbBlenderGenerator *>(pBlenderGenerator.data())->link()){
+        return false;
+    }
+    return true;
+}
+
+/*
+ * CLASS: BSiStateTaggingGenerator
+*/
+
+uint BSiStateTaggingGenerator::refCount = 0;
+
+BSiStateTaggingGenerator::BSiStateTaggingGenerator(BehaviorFile *parent/*, qint16 ref*/)
+    : HkDynamicObject(parent/*, ref*/),\
+      userData(1),\
+      iStateToSetAs(-1),\
+      iPriority(0)
+{
+    setType(BS_I_STATE_TAGGING_GENERATOR, TYPE_GENERATOR);
+    refCount++;
+}
+
+bool BSiStateTaggingGenerator::readData(const HkxXmlReader &reader, long index){
+    bool ok;
+    QByteArray text;
+    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+        text = reader.getNthAttributeValueAt(index, 0);
+        if (text == "variableBindingSet"){
+            if (!variableBindingSet.readReference(index, reader)){
+                return false;
+            }
+        }else if (text == "userData"){
+            userData = reader.getElementValueAt(index).toULong(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "name"){
+            name = reader.getElementValueAt(index);
+            if (name == ""){
+                return false;
+            }
+        }else if (text == "pDefaultGenerator"){
+            if (!pDefaultGenerator.readReference(index, reader)){
+                return false;
+            }
+        }else if (text == "iStateToSetAs"){
+            iStateToSetAs = reader.getElementValueAt(index).toInt(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "iPriority"){
+            iPriority = reader.getElementValueAt(index).toInt(&ok);
+            if (!ok){
+                return false;
+            }
+        }
+        index++;
+    }
+    return true;
+}
+
+bool BSiStateTaggingGenerator::link(){
+    if (!getParentFile()){
+        return false;
+    }
+    //variableBindingSet
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+        return false;
+    }
+    //pDefaultGenerator
+    HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pDefaultGenerator.getReference());
+    if (!ptr){
+        return false;
+    }
+    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+        return false;
+    }
+    pDefaultGenerator = *ptr;
+    if (!static_cast<hkbGenerator *>(pDefaultGenerator.data())->link()){
+        return false;
     }
     return true;
 }
@@ -939,6 +1301,115 @@ bool hkbClipGenerator::link(){
             return false;
         }
         triggers = *ptr;
+    }
+    return true;
+}
+
+/*
+ * CLASS: BSSynchronizedClipGenerator
+*/
+
+uint BSSynchronizedClipGenerator::refCount = 0;
+
+BSSynchronizedClipGenerator::BSSynchronizedClipGenerator(BehaviorFile *parent/*, qint16 ref*/)
+    : HkDynamicObject(parent/*, ref*/),\
+    userData(0),\
+    bSyncClipIgnoreMarkPlacement(false),\
+    fGetToMarkTime(0),\
+    fMarkErrorThreshold(0),\
+    bLeadCharacter(false),\
+    bReorientSupportChar(false),\
+    bApplyMotionFromRoot(false),\
+    sAnimationBindingIndex(-1)
+{
+    refCount++;
+    setType(BS_SYNCHRONIZED_CLIP_GENERATOR, TYPE_GENERATOR);
+}
+
+bool BSSynchronizedClipGenerator::readData(const HkxXmlReader &reader, long index){
+    bool ok;
+    QByteArray text;
+    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+        text = reader.getNthAttributeValueAt(index, 0);
+        if (text == "variableBindingSet"){
+            if (!variableBindingSet.readReference(index, reader)){
+                return false;
+            }
+        }else if (text == "userData"){
+            userData = reader.getElementValueAt(index).toULong(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "name"){
+            name = reader.getElementValueAt(index);
+            if (name == ""){
+                return false;
+            }
+        }else if (text == "pClipGenerator"){
+            if (!pClipGenerator.readReference(index, reader)){
+                return false;
+            }
+        }else if (text == "SyncAnimPrefix"){
+            SyncAnimPrefix = reader.getElementValueAt(index);
+            if (SyncAnimPrefix == ""){
+                return false;
+            }
+        }else if (text == "bSyncClipIgnoreMarkPlacement"){
+            bSyncClipIgnoreMarkPlacement = toBool(reader.getElementValueAt(index), &ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "fGetToMarkTime"){
+            fGetToMarkTime = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "fMarkErrorThreshold"){
+            fMarkErrorThreshold = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "bLeadCharacter"){
+            bLeadCharacter = toBool(reader.getElementValueAt(index), &ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "bReorientSupportChar"){
+            bReorientSupportChar = toBool(reader.getElementValueAt(index), &ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "bApplyMotionFromRoot"){
+            bApplyMotionFromRoot = toBool(reader.getElementValueAt(index), &ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "sAnimationBindingIndex"){
+            sAnimationBindingIndex = reader.getElementValueAt(index).toInt(&ok);
+            if (!ok){
+                return false;
+            }
+        }
+        index++;
+    }
+    return true;
+}
+
+bool BSSynchronizedClipGenerator::link(){
+    if (!getParentFile()){
+        return false;
+    }
+    //variableBindingSet
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+        return false;
+    }
+    //pClipGenerator
+    HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pClipGenerator.getReference());
+    if (ptr){
+        if ((*ptr)->getSignature() != HKB_CLIP_GENERATOR){
+            return false;
+        }
+        pClipGenerator = *ptr;
     }
     return true;
 }

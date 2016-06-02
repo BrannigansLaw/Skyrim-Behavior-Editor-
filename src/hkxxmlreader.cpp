@@ -100,32 +100,21 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                     }
                 }else if (line.at(i) == '!'){//check comment
                     i++;
-                    if (i >= line.size()){
-                        return UnknownError;
-                    }else if (line.at(i) != '-'){
-                        return MalformedComment;
-                    }
-                    i++;
-                    if (i >= line.size()){
-                        return UnknownError;
-                    }else if (line.at(i) != '-'){
-                        return MalformedComment;
-                    }
-                    i++;
-                    while (i < line.size() && line.at(i) != '-'){
-                        i++;
-                    }
-                    i++;
-                    if (i >= line.size()){
-                        return UnknownError;
-                    }else if (line.at(i) != '-'){
-                        return MalformedComment;
-                    }
-                    i++;
-                    if (i >= line.size()){
-                        return UnknownError;
-                    }else if (line.at(i) != '>'){
-                        return MalformedComment;
+                    for (int y = 0; y < 2; y++){
+                        int c = 0;
+                        while (i < line.size() && line.at(i) == '-'){
+                            i++;
+                            c++;
+                        }
+                        if (c != 2){
+                            return MalformedComment;
+                        }
+                        if (y == 1 && line.at(i) != '>'){
+                            return MalformedComment;
+                        }
+                        while (i < line.size() && line.at(i) != '-'){
+                            i++;
+                        }
                     }
                     i++;
                     break;
@@ -226,7 +215,79 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
             //elementList.last().isClosed = true;
             QByteArray value(9, '\0');
             int index = 0;
-            while (i < line.size() && line.at(i) != '<'){
+            //Need to deal with embedded comments...FFS
+            while (i < line.size()){
+                if (line.at(i) == '\n'){
+                    if (elementList.isEmpty()){
+                        return OrphanedAttribute;
+                    }
+                    elementList.last().value = value;
+                    return NoError;
+                }else if (line.at(i) == '<'){
+                    int h = i + 1;
+                    if (h >= line.size()){
+                        return UnknownError;
+                    }
+                    if (line.at(h) == '!'){
+                        for (int g =0; g < 2; g++){
+                            if (index >= value.size()){
+                                value.append(QByteArray(value.size() * 2, '\0'));
+                            }
+                            if (i >= line.size()){
+                                return UnknownError;
+                            }
+                            value[index] = line.at(i);
+                            index++;
+                            i++;
+                        }
+                        for (int y = 0; y < 2; y++){
+                            int c = 0;
+                            while (i < line.size() && line.at(i) == '-'){
+                                if (index >= value.size()){
+                                    value.append(QByteArray(value.size() * 2, '\0'));
+                                }
+                                value[index] = line.at(i);
+                                index++;
+                                i++;
+                                c++;
+                            }
+                            if (c != 2){
+                                return MalformedComment;
+                            }
+                            if (y == 1){
+                                if (line.at(i) != '>'){
+                                    return MalformedComment;
+                                }
+                                if (index >= value.size()){
+                                    value.append(QByteArray(value.size() * 2, '\0'));
+                                }
+                                value[index] = line.at(i);
+                                index++;
+                                i++;
+                                continue;
+                            }
+                            while (i < line.size() && line.at(i) != '-'){
+                                if (index >= value.size()){
+                                    value.append(QByteArray(value.size() * 2, '\0'));
+                                }
+                                value[index] = line.at(i);
+                                index++;
+                                i++;
+                            }
+                        }
+                    }else{
+                        break;
+                    }
+                }
+                //if (line.at(i) < 'A' || line.at(i) > '~') return InvalidElementValue;
+                if (index >= value.size()){
+                    value.append(QByteArray(value.size() * 2, '\0'));
+                }
+                value[index] = line.at(i);
+                index++;
+                i++;
+            }
+            /*while (i < line.size() && line.at(i) != '<'){
                 if (line.at(i) == '\n'){
                     if (elementList.isEmpty()){
                         return OrphanedAttribute;
@@ -241,7 +302,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                 value[index] = line.at(i);
                 index++;
                 i++;
-            }
+            }*/
             value.truncate(index);
             if (elementList.isEmpty()){
                 return OrphanedAttribute;

@@ -59,6 +59,26 @@ bool BehaviorFile::parse(){
                     if (!appendAndReadData(index, new hkbModifierGenerator(this))){
                         return false;
                     }
+                }else if (signature == BS_I_STATE_TAGGING_GENERATOR){
+                    if (!appendAndReadData(index, new BSiStateTaggingGenerator(this))){
+                        return false;
+                    }
+                }else if (signature == BS_CYCLIC_BLEND_TRANSITION_GENERATOR){
+                    if (!appendAndReadData(index, new BSCyclicBlendTransitionGenerator(this))){
+                        return false;
+                    }
+                }else if (signature == BS_BONE_SWITCH_GENERATOR){
+                    if (!appendAndReadData(index, new BSBoneSwitchGenerator(this))){
+                        return false;
+                    }
+                }else if (signature == BS_BONE_SWITCH_GENERATOR_BONE_DATA){
+                    if (!appendAndReadData(index, new BSBoneSwitchGeneratorBoneData(this))){
+                        return false;
+                    }
+                }else if (signature == BS_SYNCHRONIZED_CLIP_GENERATOR){
+                    if (!appendAndReadData(index, new BSSynchronizedClipGenerator(this))){
+                        return false;
+                    }
                 }else if (signature == HKB_MANUAL_SELECTOR_GENERATOR){
                     if (!appendAndReadData(index, new hkbManualSelectorGenerator(this))){
                         return false;
@@ -104,7 +124,9 @@ bool BehaviorFile::parse(){
         index++;
     }
     closeFile();
-    link();
+    if (!link()){
+        return false;
+    }
     return true;
 }
 

@@ -166,6 +166,9 @@ public:
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
 private:
+    hkbBlenderGenerator& operator=(const hkbBlenderGenerator&);
+    hkbBlenderGenerator(const hkbBlenderGenerator &);
+private:
     static QStringList Flags;   //{FLAG_SYNC=1, FLAG_SMOOTH_GENERATOR_WEIGHTS=4, FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS=8, FLAG_PARAMETRIC_BLEND=16, FLAG_IS_PARAMETRIC_BLEND_CYCLIC=32, FLAG_FORCE_DENSE_POSE=64};
     static uint refCount;
     ulong userData;
@@ -178,6 +181,88 @@ private:
     QString flags;
     bool subtractLastChild;
     QList <HkObjectExpSharedPtr> children;
+};
+
+class BSBoneSwitchGeneratorBoneData: public HkDynamicObject
+{
+    friend class BehaviorGraphView;
+public:
+    BSBoneSwitchGeneratorBoneData(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    virtual ~BSBoneSwitchGeneratorBoneData(){refCount--;}
+    bool readData(const HkxXmlReader & reader, long index);
+    bool link();
+private:
+    BSBoneSwitchGeneratorBoneData& operator=(const BSBoneSwitchGeneratorBoneData&);
+    BSBoneSwitchGeneratorBoneData(const BSBoneSwitchGeneratorBoneData &);
+private:
+    static uint refCount;
+    HkObjectExpSharedPtr pGenerator;
+    HkObjectExpSharedPtr spBoneWeight;
+};
+
+class BSBoneSwitchGenerator: public HkDynamicObject
+{
+    friend class BehaviorGraphView;
+public:
+    BSBoneSwitchGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    virtual ~BSBoneSwitchGenerator(){refCount--;}
+    bool readData(const HkxXmlReader & reader, long index);
+    bool link();
+private:
+    BSBoneSwitchGenerator& operator=(const BSBoneSwitchGenerator&);
+    BSBoneSwitchGenerator(const BSBoneSwitchGenerator &);
+private:
+    static uint refCount;
+    long userData;
+    QString name;
+    HkObjectExpSharedPtr pDefaultGenerator;
+    QList <HkObjectExpSharedPtr> ChildrenA;
+};
+
+class BSCyclicBlendTransitionGenerator: public HkDynamicObject
+{
+    friend class BehaviorGraphView;
+public:
+    BSCyclicBlendTransitionGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    virtual ~BSCyclicBlendTransitionGenerator(){refCount--;}
+    bool readData(const HkxXmlReader & reader, long index);
+    bool link();
+private:
+    BSCyclicBlendTransitionGenerator& operator=(const BSCyclicBlendTransitionGenerator&);
+    BSCyclicBlendTransitionGenerator(const BSCyclicBlendTransitionGenerator &);
+private:
+    static QStringList BlendCurve;   //BLEND_CURVE_SMOOTH
+    static uint refCount;
+    ulong userData;
+    QString name;
+    HkObjectExpSharedPtr pBlenderGenerator;
+    int eventToFreezeBlendValueId;
+    HkObjectExpSharedPtr eventToFreezeBlendValuePayload;
+    int eventToCrossBlendId;
+    HkObjectExpSharedPtr eventToCrossBlendPayload;
+    qreal fBlendParameter;
+    qreal fTransitionDuration;
+    QString eBlendCurve;
+};
+
+class BSiStateTaggingGenerator: public HkDynamicObject
+{
+    friend class BehaviorGraphView;
+public:
+    BSiStateTaggingGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    virtual ~BSiStateTaggingGenerator(){refCount--;}
+    bool readData(const HkxXmlReader & reader, long index);
+    bool link();
+private:
+    BSiStateTaggingGenerator& operator=(const BSiStateTaggingGenerator&);
+    BSiStateTaggingGenerator(const BSiStateTaggingGenerator &);
+private:
+    static uint refCount;
+    ulong userData;
+    QString name;
+    HkObjectExpSharedPtr pDefaultGenerator;
+    int iStateToSetAs;
+    int iPriority;
 };
 
 class hkbBehaviorReferenceGenerator: public HkDynamicObject
@@ -226,6 +311,32 @@ private:
     qint16 animationBindingIndex;
     QString mode;
     QString flags;
+};
+
+class BSSynchronizedClipGenerator: public HkDynamicObject
+{
+    friend class BehaviorGraphView;
+public:
+    BSSynchronizedClipGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    virtual ~BSSynchronizedClipGenerator(){refCount--;}
+    bool readData(const HkxXmlReader & reader, long index);
+    bool link();
+private:
+    BSSynchronizedClipGenerator& operator=(const BSSynchronizedClipGenerator&);
+    BSSynchronizedClipGenerator(const BSSynchronizedClipGenerator &);
+private:
+    static uint refCount;
+    ulong userData;
+    QString name;
+    HkObjectExpSharedPtr pClipGenerator;
+    QString SyncAnimPrefix;
+    bool bSyncClipIgnoreMarkPlacement;
+    qreal fGetToMarkTime;
+    qreal fMarkErrorThreshold;
+    bool bLeadCharacter;
+    bool bReorientSupportChar;
+    bool bApplyMotionFromRoot;
+    int sAnimationBindingIndex;
 };
 
 class hkbBehaviorGraph: public HkDynamicObject

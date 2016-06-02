@@ -20,6 +20,7 @@ class BehaviorFile;
 
 class GeneratorIcon: public QGraphicsItem
 {
+    friend class BehaviorGraphView;
 public:
     GeneratorIcon(const HkObjectExpSharedPtr & d, const QString & s){data = d;name = s;}
     QRectF boundingRect() const{return QRectF(0, 0, 200, 50);}
@@ -36,7 +37,7 @@ class BehaviorGraphView: public QGraphicsView
     Q_OBJECT
 public:
     BehaviorGraphView(BehaviorFile * file): behavior(file), behaviorGS(new QGraphicsScene){setScene(behaviorGS);}
-    void drawBehaviorGraph(const HkObjectExpSharedPtr & ptr, GeneratorIcon * parentIcon = NULL);
+    bool drawBehaviorGraph(const HkObjectExpSharedPtr & ptr, GeneratorIcon * parentIcon = NULL);
 protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE{
         if (event->button() == Qt::LeftButton)  this->setDragMode(QGraphicsView::ScrollHandDrag);
@@ -55,13 +56,21 @@ private:
         if (!parentIcon){
             return NULL;
         }
-        if (behaviorGS->items().isEmpty()){
+        if (!type){
+            return NULL;
+        }
+        if (behaviorGS->items(Qt::AscendingOrder).isEmpty()){
             return NULL;
         }
         GeneratorIcon *icon = new GeneratorIcon(obj, type->name);
-        icon->setFlag(QGraphicsItem::ItemIsMovable);
+        //icon->setFlag(QGraphicsItem::ItemIsMovable);
         //icon->setParentItem(parentIcon);
-        GeneratorIcon *lastIcon = reinterpret_cast<GeneratorIcon *>(behaviorGS->items(Qt::AscendingOrder).last());
+        GeneratorIcon *lastIcon = dynamic_cast<GeneratorIcon *>(behaviorGS->items(Qt::AscendingOrder).last());
+        if (!lastIcon){
+            return NULL;
+        }
+        behaviorGS->addLine(parentIcon->pos().x() + 1.0*parentIcon->boundingRect().width(), parentIcon->pos().y() + 1.0*parentIcon->boundingRect().height(),\
+                            parentIcon->pos().x() + 1.5*parentIcon->boundingRect().width(), lastIcon->pos().y() + 2*lastIcon->boundingRect().height());
         behaviorGS->addItem(icon);
         icon->setPos(parentIcon->pos().x() + 1.5*parentIcon->boundingRect().width(), lastIcon->pos().y() + 2*lastIcon->boundingRect().height());
         return icon;

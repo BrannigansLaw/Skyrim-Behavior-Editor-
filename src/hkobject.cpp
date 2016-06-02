@@ -45,39 +45,6 @@ bool HkObject::toBool(const QByteArray &line, bool *ok){
     }
 }
 
-/*
-qint16 HkObject::readSingleInt(const QByteArray &line, bool *ok){
-    qint16 start = 0;
-    qint16 end = line.indexOf('\0', start);
-    if (end == -1){
-        *ok = false;
-        return -1;
-    }
-    qint16 size = end - start;
-    QByteArray value(size, '\0');
-    for (qint16 i = 0; i < size; i++){
-        value[i] = line.at(start);
-        start++;
-    }
-    return value.toLong(ok);
-}
-
-qreal HkObject::readSingleDouble(const QByteArray &line, bool *ok){
-    qint16 start = 0;
-    qint16 end = line.indexOf('\0', start);
-    if (end == -1){
-        *ok = false;
-        return -1;
-    }
-    qint16 size = end - start;
-    QByteArray value(size, '\0');
-    for (qint16 i = 0; i < size; i++){
-        value[i] = line.at(start);
-        start++;
-    }
-    return value.toDouble(ok);
-}*/
-
 bool HkObject::readDoubles(const QByteArray &line, QVector<qreal> & doubles){
     qint16 size = 0;
     qint16 start;
@@ -103,52 +70,6 @@ bool HkObject::readDoubles(const QByteArray &line, QVector<qreal> & doubles){
     }
     return ok;
 }
-
-/*qint16 HkObject::readNumberElements(const QByteArray &line, bool *ok){
-    qint16 start = 0;
-    qint16 end = line.indexOf('\0', start);
-    if (end == -1){
-        *ok = false;
-        return -1;
-    }
-    qint16 size = end - start;
-    QByteArray value(size, '\0');
-    for (qint16 i = 0; i < size; i++){
-        value[i] = line.at(start);
-        start++;
-    }
-    end = value.toInt(ok);
-    if (!*ok){
-        return -1;
-    }
-    return end;
-}
-
-qint16 HkObject::readReference(const QByteArray &lineIn, bool *ok){
-    qint16 start = 0;
-    qint16 end = lineIn.indexOf('\0', start);
-    if (end == -1){
-        *ok = false;
-        return -1;
-    }
-    if (lineIn.at(start) == '#'){
-        start++;
-    }
-    qint16 size = end - start;
-    QString value(size, '\0');
-    for (qint16 i = 0; i < size; i++){
-        value[i] = lineIn.at(start);
-        start++;
-    }
-    if (value == "null"){
-        return 0;
-    }
-    end = value.toInt(ok);
-    if (!*ok){
-        return -1;
-    }
-    return end;
-}*/
 
 hkVector3 HkObject::readVector3(const QByteArray &lineIn, bool *ok){
     enum {X = 1, Y = 2, Z = 3};
