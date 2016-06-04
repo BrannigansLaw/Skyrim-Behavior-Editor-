@@ -11,6 +11,13 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Skyrim_Behavior_Tool
 TEMPLATE = app
 
+# remove possible other optimization flags
+#QMAKE_CXXFLAGS_DEBUG -= -O
+#QMAKE_CXXFLAGS_DEBUG -= -O1
+#QMAKE_CXXFLAGS_DEBUG -= -O2
+
+# add the desired -O3 if not present
+#QMAKE_CXXFLAGS_DEBUG *= -O3
 
 SOURCES += \
     src/fileselectwindow.cpp \

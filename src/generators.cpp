@@ -54,6 +54,11 @@ bool readReferences(const QByteArray &line, QList <HkObjectExpSharedPtr> & child
 bool hkbGenerator::link(){
     qulonglong sig = getSignature();
     switch (sig) {
+    case HKB_STATE_MACHINE_STATE_INFO:
+        if (!reinterpret_cast<hkbStateMachineStateInfo *>(this)->link()){
+            return false;
+        }
+        break;
     case HKB_STATE_MACHINE:
         if (!reinterpret_cast<hkbStateMachine *>(this)->link()){
             return false;
@@ -61,6 +66,11 @@ bool hkbGenerator::link(){
         break;
     case HKB_MANUAL_SELECTOR_GENERATOR:
         if (!reinterpret_cast<hkbManualSelectorGenerator *>(this)->link()){
+            return false;
+        }
+        break;
+    case HKB_BLENDER_GENERATOR_CHILD:
+        if (!reinterpret_cast<hkbBlenderGeneratorChild *>(this)->link()){
             return false;
         }
         break;
@@ -101,6 +111,11 @@ bool hkbGenerator::link(){
         break;
     case HKB_CLIP_GENERATOR:
         if (!reinterpret_cast<hkbClipGenerator *>(this)->link()){
+            return false;
+        }
+        break;
+    case HKB_BEHAVIOR_GRAPH:
+        if (!reinterpret_cast<hkbBehaviorGraph *>(this)->link()){
             return false;
         }
         break;
@@ -162,9 +177,9 @@ bool hkRootLevelContainer::link(){
             return false;
         }
         namedVariants[i].variant = *ptr;
-        if (!static_cast<hkbBehaviorGraph *>(namedVariants[i].variant.data())->link()){
+        /*if (!static_cast<hkbBehaviorGraph *>(namedVariants[i].variant.data())->link()){
             return false;
-        }
+        }*/
     }
     return true;
 }
@@ -275,9 +290,9 @@ bool hkbStateMachineStateInfo::link(){
         return false;
     }
     generator = *ptr;
-    if (!static_cast<hkbGenerator *>(generator.data())->link()){
+    /*if (!static_cast<hkbGenerator *>(generator.data())->link()){
         return false;
-    }
+    }*/
     return true;
 }
 
@@ -432,9 +447,9 @@ bool hkbStateMachine::link(){
             return false;
         }
         states[i] = *ptr;
-        if (!static_cast<hkbStateMachineStateInfo *>(states.at(i).data())->link()){
+        /*if (!static_cast<hkbStateMachineStateInfo *>(states.at(i).data())->link()){
             return false;
-        }
+        }*/
     }
     return true;
 }
@@ -514,9 +529,9 @@ bool hkbModifierGenerator::link(){
         return false;
     }
     generator = *ptr;
-    if (!static_cast<hkbGenerator *>(generator.data())->link()){
+    /*if (!static_cast<hkbGenerator *>(generator.data())->link()){
         return false;
-    }
+    }*/
     return true;
 }
 
@@ -593,9 +608,9 @@ bool hkbManualSelectorGenerator::link(){
             return false;
         }
         generators[i] = *ptr;
-        if (!static_cast<hkbGenerator *>(generators.at(i).data())->link()){
+        /*if (!static_cast<hkbGenerator *>(generators.at(i).data())->link()){
             return false;
-        }
+        }*/
     }
     return true;
 }
@@ -671,9 +686,9 @@ bool hkbBlenderGeneratorChild::link(){
         return false;
     }
     generator = *ptr;
-    if (!static_cast<hkbGenerator *>(generator.data())->link()){
+    /*if (!static_cast<hkbGenerator *>(generator.data())->link()){
         return false;
-    }
+    }*/
     return true;
 }
 
@@ -782,9 +797,9 @@ bool hkbBlenderGenerator::link(){
             return false;
         }
         children[i] = *ptr;
-        if (!static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->link()){
+        /*if (!static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->link()){
             return false;
-        }
+        }*/
     }
     return true;
 }
@@ -841,9 +856,9 @@ bool BSBoneSwitchGeneratorBoneData::link(){
         return false;
     }
     pGenerator = *ptr;
-    if (!static_cast<hkbGenerator *>(pGenerator.data())->link()){
+    /*if (!static_cast<hkbGenerator *>(pGenerator.data())->link()){
         return false;
-    }
+    }*/
     //spBoneWeight
     ptr = getParentFile()->findHkObject(spBoneWeight.getReference());
     if (ptr){
@@ -919,9 +934,9 @@ bool BSBoneSwitchGenerator::link(){
         return false;
     }
     pDefaultGenerator = *ptr;
-    if (!static_cast<hkbGenerator *>(pDefaultGenerator.data())->link()){
+    /*if (!static_cast<hkbGenerator *>(pDefaultGenerator.data())->link()){
         return false;
-    }
+    }*/
     for (int i = 0; i < ChildrenA.size(); i++){
         //ChildrenA
         ptr = getParentFile()->findGenerator(ChildrenA.at(i).getReference());
@@ -932,9 +947,9 @@ bool BSBoneSwitchGenerator::link(){
             return false;
         }
         ChildrenA[i] = *ptr;
-        if (!static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data())->link()){
+        /*if (!static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data())->link()){
             return false;
-        }
+        }*/
     }
     return true;
 }
@@ -1053,9 +1068,9 @@ bool BSCyclicBlendTransitionGenerator::link(){
         return false;
     }
     pBlenderGenerator = *ptr;
-    if (!static_cast<hkbBlenderGenerator *>(pBlenderGenerator.data())->link()){
+    /*if (!static_cast<hkbBlenderGenerator *>(pBlenderGenerator.data())->link()){
         return false;
-    }
+    }*/
     return true;
 }
 
@@ -1131,9 +1146,9 @@ bool BSiStateTaggingGenerator::link(){
         return false;
     }
     pDefaultGenerator = *ptr;
-    if (!static_cast<hkbGenerator *>(pDefaultGenerator.data())->link()){
+    /*if (!static_cast<hkbGenerator *>(pDefaultGenerator.data())->link()){
         return false;
-    }
+    }*/
     return true;
 }
 
@@ -1481,9 +1496,9 @@ bool hkbBehaviorGraph::link(){
     if (rootGenerator->getSignature() != HKB_STATE_MACHINE){
         return false;
     }
-    if (!static_cast<hkbStateMachine *>(rootGenerator.data())->link()){
+    /*if (!static_cast<hkbStateMachine *>(rootGenerator.data())->link()){
         return false;
-    }
+    }*/
     /*ptr = getParentFile()->findGenerator(data.getReference());
     if (!ptr){
         return false;

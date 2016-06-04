@@ -134,8 +134,13 @@ bool BehaviorFile::link(){
     if (!getRootObject().constData() || getRootObject()->getSignature() != HK_ROOT_LEVEL_CONTAINER){
         return false;
     }
-    if (!static_cast<hkRootLevelContainer *>(getRootObject().data())->link()){
+    if (!static_cast<hkRootLevelContainer * >(getRootObject().data())->link()){
         return false;
+    }
+    for (int i = generators.size() - 1; i >= 0; i--){
+        if (!static_cast<hkbGenerator * >(generators.at(i).data())->link()){
+            return false;
+        }
     }
     return true;
 }
