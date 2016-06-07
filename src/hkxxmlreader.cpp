@@ -11,7 +11,9 @@ bool HkxXmlReader::parse(){
     }
     isEOF = false;
     QByteArray line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGHT);
-    if (line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\n") return false;
+    if (line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\n" && line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\r\n"){
+        return false;
+    }
     HkxXmlParseLine result = NoError;
     while (!atEnd()){
         result = readNextLine();
@@ -38,7 +40,10 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
     while (i < line.size()){
         if (line.at(i) == '<'){
             break;
-        }else if (line.at(i) != '\t'){
+        }else if (line.at(i) != '\t' && line.at(i) != '\r'){
+            if (line.at(i) == '\n'){
+                break;
+            }
             if (elementList.isEmpty()){
                 return UnknownError;
             }
@@ -203,10 +208,21 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
             if (elementList.isEmpty()){
                 return UnknownError;
             }
+            //Fucking carriage return character...
             if (line.at(i) == '\n'){
                 indexOfElemTags.append(elementList.size() - 1);
                 elementList.last().isContainedOnOneLine = false;
                 return NoError;
+            }else if (line.at(i) == '\r'){
+                i++;
+                if (i >= line.size()){
+                    return UnknownError;
+                }
+                if (line.at(i) == '\n'){
+                    indexOfElemTags.append(elementList.size() - 1);
+                    elementList.last().isContainedOnOneLine = false;
+                    return NoError;
+                }
             }else if (line.at(i) == '<'){//empty element
                 elementList.last().isContainedOnOneLine = true;
                 continue;
@@ -309,7 +325,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
             }
             elementList.last().value = value;
             continue;
-        }else if (line.at(i) != '\n'){//get element data on separate line
+        }else if (line.at(i) != '\n' && line.at(i) != '\r'){//get element data on separate line
             if (elementList.isEmpty()){
                 return UnknownError;
             }

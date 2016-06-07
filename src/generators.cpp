@@ -1,6 +1,7 @@
 #include "generators.h"
 #include "hkxxmlreader.h"
 #include "hkxfile.h"
+#include "modifiers.h"
 
 
 bool readReferences(const QByteArray &line, QList <HkObjectExpSharedPtr> & children){
@@ -15,7 +16,7 @@ bool readReferences(const QByteArray &line, QList <HkObjectExpSharedPtr> & child
             do{
                 size++;
                 i++;
-            }while (i < line.size() && line.at(i) != ' ' && line.at(i) != '\n');
+            }while (i < line.size() && line.at(i) != ' ' && line.at(i) != '\n' && line.at(i) != '\r');
             QByteArray value(size, '\0');
             for (qint16 j = 0; j < size; j++){
                 value[j] = line[start];

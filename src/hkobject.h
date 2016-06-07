@@ -19,7 +19,7 @@ public:
     virtual bool link() = 0;
     //virtual bool readData(const HkxXmlReader & reader, int index) = 0;
 protected:
-    HkObject(BehaviorFile *parent = NULL/*, long ref = 0*/): parentFile(parent)/*, reference(ref)*/{}
+    HkObject(BehaviorFile *parent = NULL/*, long ref = 0*/): parentFile(parent), reference(0)/*, reference(ref)*/{}
     BehaviorFile * getParentFile(){return parentFile;}
     //void setRef(long ref){reference = ref;}
     void setType(HkxSignature sig, HkxType type){signature = sig;typeCheck = type;}
@@ -40,7 +40,7 @@ private:
     HkObject& operator=(const HkObject&);
 private:
     BehaviorFile *parentFile;
-    //long reference;
+    long reference;
     HkxSignature signature;
     HkxType typeCheck;
 };
@@ -66,10 +66,10 @@ struct HkEvent
     HkObjectExpSharedPtr payload;
 };
 
-class hkbStateMachineEventPropertyArray: public HkObject
+/*class hkbStateMachineEventPropertyArray: public HkObject
 {
 public:
-    hkbStateMachineEventPropertyArray(BehaviorFile *parent = NULL/*, long ref = 0*/): HkObject(parent/*, ref*/){refCount++;setType(HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY, TYPE_OTHER);}
+    hkbStateMachineEventPropertyArray(BehaviorFile *parent = NULL): HkObject(parent){refCount++;setType(HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY, TYPE_OTHER);}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
 protected:
@@ -81,7 +81,7 @@ private:
 class hkbStateMachineTransitionInfoArray: public HkObject
 {
 public:
-    hkbStateMachineTransitionInfoArray(BehaviorFile *parent = NULL/*, long ref = 0*/): HkObject(parent/*, ref*/){refCount++;setType(HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY, TYPE_OTHER);}
+    hkbStateMachineTransitionInfoArray(BehaviorFile *parent = NULL): HkObject(parent){refCount++;setType(HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY, TYPE_OTHER);}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
 protected:
@@ -89,7 +89,6 @@ private:
     struct HkTransition
     {
         HkTransition(): eventId(-1), toStateId(0), fromNestedStateId(0), toNestedStateId(0), priority(0){}
-
         struct HkInterval
         {
             HkInterval(): enterEventId(-1), exitEventId(-1), enterTime(0), exitTime(0){}
@@ -113,7 +112,7 @@ private:
 
     static uint refCount;
     QVector <HkTransition> transitions;
-};
+};*/
 
 class hkbStringEventPayload: public HkObject
 {

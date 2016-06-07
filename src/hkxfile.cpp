@@ -3,6 +3,7 @@
 //#include "utility.h"
 #include "hkxxmlreader.h"
 #include "modifiers.h"
+#include "generators.h"
 
 template <typename T>
 bool BehaviorFile::appendAndReadData(int index, T * obj){
@@ -99,7 +100,7 @@ bool BehaviorFile::parse(){
                     if (!appendAndReadData(index, new hkbBehaviorReferenceGenerator(this))){
                         return false;
                     }
-                }else if (signature == HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
+                }/*else if (signature == HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
                     if (!appendAndReadData(index, new hkbStateMachineTransitionInfoArray(this))){
                         return false;
                     }
@@ -107,7 +108,7 @@ bool BehaviorFile::parse(){
                     if (!appendAndReadData(index, new hkbStateMachineEventPropertyArray(this))){
                         return false;
                     }
-                }else if (signature == HKB_BEHAVIOR_GRAPH){
+                }*/else if (signature == HKB_BEHAVIOR_GRAPH){
                     if (!appendAndReadData(index, new hkbBehaviorGraph(this))){
                         return false;
                     }

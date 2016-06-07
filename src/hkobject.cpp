@@ -191,7 +191,7 @@ bool HkObjectExpSharedPtr::readReference(long index, const HkxXmlReader & reader
 /**
  * hkbStateMachineEventPropertyArray
  */
-
+/*
 uint hkbStateMachineEventPropertyArray::refCount = 0;
 
 bool hkbStateMachineEventPropertyArray::readData(const HkxXmlReader &reader, long index){
@@ -244,12 +244,12 @@ bool hkbStateMachineEventPropertyArray::link(){
         }
     }
     return true;
-}
+}*/
 
 /**
  * hkbStateMachineTransitionInfoArray
  */
-
+/*
 uint hkbStateMachineTransitionInfoArray::refCount = 0;
 
 bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, long index){
@@ -339,7 +339,7 @@ bool hkbStateMachineTransitionInfoArray::link(){
         }
     }
     return true;
-}
+}*/
 
 /**
  * hkbStringEventPayload

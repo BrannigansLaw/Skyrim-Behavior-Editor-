@@ -22,12 +22,14 @@ class hkbBlenderGenerator;
 class hkbBlenderGeneratorChild;
 class hkbStateMachine;
 class hkbStateMachineStateInfo;
+class BSBoneSwitchGenerator;
+class BSBoneSwitchGeneratorBoneData;
 
 class GeneratorIcon: public QGraphicsItem
 {
     friend class BehaviorGraphView;
 public:
-    GeneratorIcon(const HkObjectExpSharedPtr & d, const QString & s){data = d;name = s;}
+    GeneratorIcon(const HkObjectExpSharedPtr & d, const QString & s);
     QRectF boundingRect() const{return QRectF(0, 0, 200, 50);}
     QString getName() const{return name;}
 protected:
@@ -53,43 +55,66 @@ protected:
         QGraphicsView::mouseReleaseEvent(event);
     }
 private:
-    //enum {OBJECT_CHILDREN_TRAVERSED = -5};
     BehaviorFile *behavior;
     QGraphicsScene *behaviorGS;
     QList <GeneratorIcon *> icons;
 private:
     template<typename T>
-    void helperFunction(const T & ptr, QList<HkObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons){
+    bool helperFunction(const T & ptr, QList<HkObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons){
+        if (parentIcons.isEmpty()){
+            return false;
+        }
+        if (objects.isEmpty()){
+            return false;
+        }
         GeneratorIcon *icon = positionIcon(objects.last(), ptr, parentIcons.last());
         if (parentIcons.last()->data->getSignature() == HKB_MANUAL_SELECTOR_GENERATOR){
             if (static_cast<hkbManualSelectorGenerator *>(parentIcons.last()->data.data())->generators.size() < 2 ||\
                     static_cast<hkbManualSelectorGenerator *>(parentIcons.last()->data.data())->generators.last() == objects.last())
             {
+                if (parentIcons.isEmpty()){
+                    return false;
+                }
                 parentIcons.removeLast();
-                //objects.removeLast();
             }
-            objects.removeLast();
         }else if (parentIcons.last()->data->getSignature() == HKB_BLENDER_GENERATOR){
             if (static_cast<hkbBlenderGenerator *>(parentIcons.last()->data.data())->children.size() < 2 ||\
                     static_cast<hkbBlenderGeneratorChild *>(static_cast<hkbBlenderGenerator *>(parentIcons.last()->data.data())->children.last().data())->generator == objects.last())
             {
+                if (parentIcons.isEmpty()){
+                    return false;
+                }
                 parentIcons.removeLast();
-                //objects.removeLast();
             }
-            objects.removeLast();
+        }else if (parentIcons.last()->data->getSignature() == BS_BONE_SWITCH_GENERATOR){
+            if (static_cast<BSBoneSwitchGenerator *>(parentIcons.last()->data.data())->pDefaultGenerator == objects.last())
+            {
+                if (parentIcons.isEmpty()){
+                    return false;
+                }
+                parentIcons.removeLast();
+            }
         }else if (parentIcons.last()->data->getSignature() == HKB_STATE_MACHINE){
             if (static_cast<hkbStateMachine *>(parentIcons.last()->data.data())->states.size() < 2 ||\
                     static_cast<hkbStateMachineStateInfo *>(static_cast<hkbStateMachine *>(parentIcons.last()->data.data())->states.last().data())->generator == objects.last())
             {
+                if (parentIcons.isEmpty()){
+                    return false;
+                }
                 parentIcons.removeLast();
-                //objects.removeLast();
             }
-            objects.removeLast();
         }else{
+            if (parentIcons.isEmpty()){
+                return false;
+            }
             parentIcons.removeLast();
-            objects.removeLast();
         }
+        if (objects.isEmpty()){
+            return false;
+        }
+        objects.removeLast();
         parentIcons.append(icon);
+        return true;
     }
 
     template<typename T>

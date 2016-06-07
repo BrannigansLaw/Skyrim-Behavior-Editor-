@@ -4,8 +4,8 @@
 #include "utility.h"
 #include "hkxxmlreader.h"
 #include "hkobject.h"
-#include "generators.h"
-#include "modifiers.h"
+//#include "generators.h"
+//#include "modifiers.h"
 
 #include <QList>
 #include <QFile>
@@ -27,7 +27,7 @@ protected:
     virtual bool parse(){return true;}
     virtual bool link(){return true;}
     //virtual void read(){}
-    void setRootObject(const HkObjectExpSharedPtr & obj){rootObject = obj;}
+    void setRootObject(HkObjectExpSharedPtr & obj){rootObject = obj;}
 private:
     HkObjectExpSharedPtr rootObject;
 };
@@ -37,7 +37,12 @@ class BehaviorFile: public HkxFile
     template <typename T>
     bool appendAndReadData(int ind, T * obj);
 public:
-    BehaviorFile(const QString & name): HkxFile(name){reader.setBehaviorFile(this);parse();}
+    BehaviorFile(const QString & name): HkxFile(name){
+        reader.setBehaviorFile(this);
+        if (!parse()){
+            int i = 9;
+        }
+    }
     virtual ~BehaviorFile(){}
     HkObjectExpSharedPtr * findHkObject(long ref);
     HkObjectExpSharedPtr * findGenerator(long ref);
