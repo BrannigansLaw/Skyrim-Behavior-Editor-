@@ -24,6 +24,7 @@ class hkbStateMachine;
 class hkbStateMachineStateInfo;
 class BSBoneSwitchGenerator;
 class BSBoneSwitchGeneratorBoneData;
+class hkbGenerator;
 
 class GeneratorIcon: public QGraphicsItem
 {
@@ -60,12 +61,12 @@ private:
     QList <GeneratorIcon *> icons;
 private:
     template<typename T>
-    bool helperFunction(const T & ptr, QList<HkObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons){
+    int helperFunction(T & ptr, QList<HkObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons){
         if (parentIcons.isEmpty()){
-            return false;
+            return -1;
         }
         if (objects.isEmpty()){
-            return false;
+            return -1;
         }
         GeneratorIcon *icon = positionIcon(objects.last(), ptr, parentIcons.last());
         if (parentIcons.last()->data->getSignature() == HKB_MANUAL_SELECTOR_GENERATOR){
@@ -73,7 +74,7 @@ private:
                     static_cast<hkbManualSelectorGenerator *>(parentIcons.last()->data.data())->generators.last() == objects.last())
             {
                 if (parentIcons.isEmpty()){
-                    return false;
+                    return -1;
                 }
                 parentIcons.removeLast();
             }
@@ -82,7 +83,7 @@ private:
                     static_cast<hkbBlenderGeneratorChild *>(static_cast<hkbBlenderGenerator *>(parentIcons.last()->data.data())->children.last().data())->generator == objects.last())
             {
                 if (parentIcons.isEmpty()){
-                    return false;
+                    return -1;
                 }
                 parentIcons.removeLast();
             }
@@ -90,7 +91,7 @@ private:
             if (static_cast<BSBoneSwitchGenerator *>(parentIcons.last()->data.data())->pDefaultGenerator == objects.last())
             {
                 if (parentIcons.isEmpty()){
-                    return false;
+                    return -1;
                 }
                 parentIcons.removeLast();
             }
@@ -99,22 +100,30 @@ private:
                     static_cast<hkbStateMachineStateInfo *>(static_cast<hkbStateMachine *>(parentIcons.last()->data.data())->states.last().data())->generator == objects.last())
             {
                 if (parentIcons.isEmpty()){
-                    return false;
+                    return -1;
                 }
                 parentIcons.removeLast();
             }
         }else{
             if (parentIcons.isEmpty()){
-                return false;
+                return -1;
             }
             parentIcons.removeLast();
         }
         if (objects.isEmpty()){
-            return false;
+            return -1;
         }
+        if (ptr->getSignature() != HKB_CLIP_GENERATOR && ptr->getSignature() != HKB_BEHAVIOR_REFERENCE_GENERATOR){
+            if (!ptr->icons.isEmpty()){
+                ptr->icons.append(icon);
+                objects.removeLast();
+                return 1;
+            }
+            parentIcons.append(icon);
+        }
+        ptr->icons.append(icon);
         objects.removeLast();
-        parentIcons.append(icon);
-        return true;
+        return 0;
     }
 
     template<typename T>
@@ -130,19 +139,13 @@ private:
         }
         GeneratorIcon *icon = new GeneratorIcon(obj, type->name);
         //icon->setFlag(QGraphicsItem::ItemIsMovable);
-        //icon->setParentItem(parentIcon);
         GeneratorIcon *lastIcon = dynamic_cast<GeneratorIcon *>(behaviorGS->items(Qt::AscendingOrder).last());
-        /*if (icons.isEmpty()){
-            return NULL;
-        }*/
-        //GeneratorIcon *lastIcon = icons.last();
         if (!lastIcon){
             return NULL;
         }
         behaviorGS->addLine(parentIcon->pos().x() + 1.0*parentIcon->boundingRect().width(), parentIcon->pos().y() + 1.0*parentIcon->boundingRect().height(),\
                             parentIcon->pos().x() + 1.5*parentIcon->boundingRect().width(), lastIcon->pos().y() + 2*lastIcon->boundingRect().height());
         behaviorGS->addItem(icon);
-        //icons.append(icon);
         icon->setPos(parentIcon->pos().x() + 1.5*parentIcon->boundingRect().width(), lastIcon->pos().y() + 2*lastIcon->boundingRect().height());
         return icon;
     }

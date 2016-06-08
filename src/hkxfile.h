@@ -40,7 +40,7 @@ public:
     BehaviorFile(const QString & name): HkxFile(name){
         reader.setBehaviorFile(this);
         if (!parse()){
-            int i = 9;
+            //int i = 9;
         }
     }
     virtual ~BehaviorFile(){}

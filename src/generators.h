@@ -7,12 +7,14 @@
 
 class hkbGenerator: public HkDynamicObject
 {
+    friend class BehaviorGraphView;
 public:
     virtual ~hkbGenerator(){}
     bool link();
 protected:
     hkbGenerator(BehaviorFile *parent = NULL/*, long ref = 0*/): HkDynamicObject(parent/*, ref*/){}
-    //bool readReferences(const QByteArray &lineIn, QList <HkObjectExpSharedPtr> & children);
+private:
+    QList <GeneratorIcon *> icons;
 };
 
 class hkRootLevelContainer: public HkObject
@@ -39,7 +41,7 @@ private:
     QList <hkRootLevelContainerNamedVariant> namedVariants;
 };
 
-class hkbStateMachineStateInfo: public HkDynamicObject
+class hkbStateMachineStateInfo: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
@@ -63,7 +65,7 @@ private:
     bool enable;
 };
 
-class hkbStateMachine: public HkDynamicObject
+class hkbStateMachine: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
@@ -99,7 +101,7 @@ private:
 };
 
 //Do not allow variables to be bound to this class in the editor...
-class hkbModifierGenerator: public HkDynamicObject
+class hkbModifierGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
@@ -118,7 +120,7 @@ private:
     HkObjectExpSharedPtr generator;
 };
 
-class hkbManualSelectorGenerator: public HkDynamicObject
+class hkbManualSelectorGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
@@ -138,7 +140,7 @@ private:
     qint8 currentGeneratorIndex;
 };
 
-class hkbBlenderGeneratorChild: public HkDynamicObject
+class hkbBlenderGeneratorChild: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
@@ -157,7 +159,7 @@ private:
     qreal worldFromModelWeight;
 };
 
-class hkbBlenderGenerator: public HkDynamicObject
+class hkbBlenderGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
@@ -183,7 +185,7 @@ private:
     QList <HkObjectExpSharedPtr> children;
 };
 
-class BSBoneSwitchGeneratorBoneData: public HkDynamicObject
+class BSBoneSwitchGeneratorBoneData: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
@@ -200,7 +202,7 @@ private:
     HkObjectExpSharedPtr spBoneWeight;
 };
 
-class BSBoneSwitchGenerator: public HkDynamicObject
+class BSBoneSwitchGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
@@ -219,7 +221,7 @@ private:
     QList <HkObjectExpSharedPtr> ChildrenA;
 };
 
-class BSCyclicBlendTransitionGenerator: public HkDynamicObject
+class BSCyclicBlendTransitionGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
@@ -245,7 +247,7 @@ private:
     QString eBlendCurve;
 };
 
-class BSiStateTaggingGenerator: public HkDynamicObject
+class BSiStateTaggingGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
@@ -265,7 +267,7 @@ private:
     int iPriority;
 };
 
-class hkbBehaviorReferenceGenerator: public HkDynamicObject
+class hkbBehaviorReferenceGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
@@ -283,7 +285,7 @@ private:
     QString behaviorName;
 };
 
-class hkbClipGenerator: public HkDynamicObject
+class hkbClipGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
@@ -313,7 +315,7 @@ private:
     QString flags;
 };
 
-class BSSynchronizedClipGenerator: public HkDynamicObject
+class BSSynchronizedClipGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
@@ -339,7 +341,7 @@ private:
     int sAnimationBindingIndex;
 };
 
-class hkbBehaviorGraph: public HkDynamicObject
+class hkbBehaviorGraph: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:

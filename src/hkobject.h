@@ -7,6 +7,7 @@ class HkxFile;
 class HkxXmlReader;
 class BehaviorFile;
 class HkObjectExpSharedPtr;
+class GeneratorIcon;
 
 class HkObject: public QSharedData
 {

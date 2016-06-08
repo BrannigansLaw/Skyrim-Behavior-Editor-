@@ -191,7 +191,7 @@ bool hkRootLevelContainer::link(){
 
 uint hkbStateMachineStateInfo::refCount = 0;
 
-hkbStateMachineStateInfo::hkbStateMachineStateInfo(BehaviorFile *parent/*, qint16 ref*/): HkDynamicObject(parent/*, ref*/){
+hkbStateMachineStateInfo::hkbStateMachineStateInfo(BehaviorFile *parent/*, qint16 ref*/): hkbGenerator(parent/*, ref*/){
     setType(HKB_STATE_MACHINE_STATE_INFO, TYPE_GENERATOR);
     refCount++;
     stateId = 0;
@@ -255,7 +255,7 @@ bool hkbStateMachineStateInfo::link(){
         return false;
     }
     //variableBindingSet
-    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
         return false;
     }
     //enterNotifyEvents
@@ -306,7 +306,7 @@ uint hkbStateMachine::refCount = 0;
 QStringList hkbStateMachine::StartStateMode = {"START_STATE_MODE_DEFAULT", "START_STATE_MODE_SYNC", "START_STATE_MODE_RANDOM", "START_STATE_MODE_CHOOSER"};
 QStringList hkbStateMachine::SelfTransitionMode = {"SELF_TRANSITION_MODE_NO_TRANSITION", "SELF_TRANSITION_MODE_TRANSITION_TO_START_STATE", "SELF_TRANSITION_MODE_FORCE_TRANSITION_TO_START_STATE"};
 
-hkbStateMachine::hkbStateMachine(BehaviorFile *parent/*, qint16 ref*/): HkDynamicObject(parent/*, ref*/){
+hkbStateMachine::hkbStateMachine(BehaviorFile *parent/*, qint16 ref*/): hkbGenerator(parent/*, ref*/){
     setType(HKB_STATE_MACHINE, TYPE_GENERATOR);
     refCount++;
     userData = 0;
@@ -427,7 +427,7 @@ bool hkbStateMachine::link(){
         return false;
     }
     //variableBindingSet
-    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
         return false;
     }
     //payload
@@ -461,7 +461,7 @@ bool hkbStateMachine::link(){
 
 uint hkbModifierGenerator::refCount = 0;
 
-hkbModifierGenerator::hkbModifierGenerator(BehaviorFile *parent/*, qint16 ref*/): HkDynamicObject(parent/*, ref*/){
+hkbModifierGenerator::hkbModifierGenerator(BehaviorFile *parent/*, qint16 ref*/): hkbGenerator(parent/*, ref*/){
     setType(HKB_MODIFIER_GENERATOR, TYPE_GENERATOR);
     refCount++;
     userData = 0;
@@ -505,7 +505,7 @@ bool hkbModifierGenerator::link(){
         return false;
     }
     //variableBindingSet
-    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
         return false;
     }
     //enterNotifyEvents
@@ -542,7 +542,7 @@ bool hkbModifierGenerator::link(){
 
 uint hkbManualSelectorGenerator::refCount = 0;
 
-hkbManualSelectorGenerator::hkbManualSelectorGenerator(BehaviorFile *parent/*, qint16 ref*/): HkDynamicObject(parent/*, ref*/){
+hkbManualSelectorGenerator::hkbManualSelectorGenerator(BehaviorFile *parent/*, qint16 ref*/): hkbGenerator(parent/*, ref*/){
     setType(HKB_MANUAL_SELECTOR_GENERATOR, TYPE_GENERATOR);
     refCount++;
     userData = 0;
@@ -594,7 +594,7 @@ bool hkbManualSelectorGenerator::link(){
         return false;
     }
     //variableBindingSet
-    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
         return false;
     }
     //generators
@@ -622,7 +622,7 @@ bool hkbManualSelectorGenerator::link(){
 
 uint hkbBlenderGeneratorChild::refCount = 0;
 
-hkbBlenderGeneratorChild::hkbBlenderGeneratorChild(BehaviorFile *parent/*, qint16 ref*/): HkDynamicObject(parent/*, ref*/){
+hkbBlenderGeneratorChild::hkbBlenderGeneratorChild(BehaviorFile *parent/*, qint16 ref*/): hkbGenerator(parent/*, ref*/){
     setType(HKB_BLENDER_GENERATOR_CHILD, TYPE_GENERATOR);
     refCount++;
     weight = 0;
@@ -667,7 +667,7 @@ bool hkbBlenderGeneratorChild::link(){
         return false;
     }
     //variableBindingSet
-    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
         return false;
     }
     //boneWeights
@@ -701,7 +701,7 @@ uint hkbBlenderGenerator::refCount = 0;
 
 QStringList hkbBlenderGenerator::Flags = {"0", "FLAG_SYNC", "FLAG_SMOOTH_GENERATOR_WEIGHTS", "FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS", "FLAG_PARAMETRIC_BLEND", "FLAG_IS_PARAMETRIC_BLEND_CYCLIC", "FLAG_FORCE_DENSE_POSE"};
 
-hkbBlenderGenerator::hkbBlenderGenerator(BehaviorFile *parent/*, qint16 ref*/): HkDynamicObject(parent/*, ref*/){
+hkbBlenderGenerator::hkbBlenderGenerator(BehaviorFile *parent/*, qint16 ref*/): hkbGenerator(parent/*, ref*/){
     setType(HKB_BLENDER_GENERATOR, TYPE_GENERATOR);
     refCount++;
     userData = 0;
@@ -783,7 +783,7 @@ bool hkbBlenderGenerator::link(){
         return false;
     }
     //variableBindingSet
-    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
         return false;
     }
     //children
@@ -812,7 +812,7 @@ bool hkbBlenderGenerator::link(){
 uint BSBoneSwitchGeneratorBoneData::refCount = 0;
 
 BSBoneSwitchGeneratorBoneData::BSBoneSwitchGeneratorBoneData(BehaviorFile *parent/*, qint16 ref*/)
-    : HkDynamicObject(parent/*, ref*/)
+    : hkbGenerator(parent/*, ref*/)
 {
     refCount++;
     setType(BS_BONE_SWITCH_GENERATOR_BONE_DATA, TYPE_GENERATOR);
@@ -845,7 +845,7 @@ bool BSBoneSwitchGeneratorBoneData::link(){
         return false;
     }
     //variableBindingSet
-    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
         return false;
     }
     //pGenerator
@@ -878,7 +878,7 @@ bool BSBoneSwitchGeneratorBoneData::link(){
 uint BSBoneSwitchGenerator::refCount = 0;
 
 BSBoneSwitchGenerator::BSBoneSwitchGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    : HkDynamicObject(parent/*, ref*/),\
+    : hkbGenerator(parent/*, ref*/),\
     userData(0)
 {
     refCount++;
@@ -923,7 +923,7 @@ bool BSBoneSwitchGenerator::link(){
         return false;
     }
     //variableBindingSet
-    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
         return false;
     }
     //pDefaultGenerator
@@ -964,7 +964,7 @@ uint BSCyclicBlendTransitionGenerator::refCount = 0;
 QStringList BSCyclicBlendTransitionGenerator::BlendCurve = {"BLEND_CURVE_SMOOTH"};
 
 BSCyclicBlendTransitionGenerator::BSCyclicBlendTransitionGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    :HkDynamicObject(parent/*, ref*/),\
+    :hkbGenerator(parent/*, ref*/),\
     userData(0),\
     fBlendParameter(1),\
     fTransitionDuration(0),\
@@ -1057,7 +1057,7 @@ bool BSCyclicBlendTransitionGenerator::link(){
         return false;
     }
     //variableBindingSet
-    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
         return false;
     }
     //pBlenderGenerator
@@ -1082,7 +1082,7 @@ bool BSCyclicBlendTransitionGenerator::link(){
 uint BSiStateTaggingGenerator::refCount = 0;
 
 BSiStateTaggingGenerator::BSiStateTaggingGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    : HkDynamicObject(parent/*, ref*/),\
+    : hkbGenerator(parent/*, ref*/),\
       userData(1),\
       iStateToSetAs(-1),\
       iPriority(0)
@@ -1135,7 +1135,7 @@ bool BSiStateTaggingGenerator::link(){
         return false;
     }
     //variableBindingSet
-    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
         return false;
     }
     //pDefaultGenerator
@@ -1159,7 +1159,7 @@ bool BSiStateTaggingGenerator::link(){
 
 uint hkbBehaviorReferenceGenerator::refCount = 0;
 
-hkbBehaviorReferenceGenerator::hkbBehaviorReferenceGenerator(BehaviorFile *parent/*, qint16 ref*/): HkDynamicObject(parent/*, ref*/){
+hkbBehaviorReferenceGenerator::hkbBehaviorReferenceGenerator(BehaviorFile *parent/*, qint16 ref*/): hkbGenerator(parent/*, ref*/){
     setType(HKB_BEHAVIOR_REFERENCE_GENERATOR, TYPE_GENERATOR);
     refCount++;
     userData = 0;
@@ -1208,7 +1208,7 @@ uint hkbClipGenerator::refCount = 0;
 QStringList hkbClipGenerator::PlaybackMode = {"MODE_SINGLE_PLAY", "MODE_LOOPING", "MODE_USER_CONTROLLED", "MODE_PING_PONG", "MODE_COUNT"};
 QStringList hkbClipGenerator::ClipFlags = {"0", "FLAG_CONTINUE_MOTION_AT_END", "FLAG_SYNC_HALF_CYCLE_IN_PING_PONG_MODE", "FLAG_MIRROR", "FLAG_FORCE_DENSE_POSE", "FLAG_DONT_CONVERT_ANNOTATIONS_TO_TRIGGERS", "FLAG_IGNORE_MOTION"};
 
-hkbClipGenerator::hkbClipGenerator(BehaviorFile *parent/*, qint16 ref*/): HkDynamicObject(parent/*, ref*/){
+hkbClipGenerator::hkbClipGenerator(BehaviorFile *parent/*, qint16 ref*/): hkbGenerator(parent/*, ref*/){
     setType(HKB_CLIP_GENERATOR, TYPE_GENERATOR);
     refCount++;
     userData = 0;
@@ -1307,7 +1307,7 @@ bool hkbClipGenerator::link(){
         return false;
     }
     //variableBindingSet
-    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
         return false;
     }
     //triggers
@@ -1328,7 +1328,7 @@ bool hkbClipGenerator::link(){
 uint BSSynchronizedClipGenerator::refCount = 0;
 
 BSSynchronizedClipGenerator::BSSynchronizedClipGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    : HkDynamicObject(parent/*, ref*/),\
+    : hkbGenerator(parent/*, ref*/),\
     userData(0),\
     bSyncClipIgnoreMarkPlacement(false),\
     fGetToMarkTime(0),\
@@ -1416,7 +1416,7 @@ bool BSSynchronizedClipGenerator::link(){
         return false;
     }
     //variableBindingSet
-    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
         return false;
     }
     //pClipGenerator
@@ -1438,7 +1438,7 @@ uint hkbBehaviorGraph::refCount = 0;
 
 QStringList hkbBehaviorGraph::VariableMode = {"VARIABLE_MODE_DISCARD_WHEN_INACTIVE", "VARIABLE_MODE_MAINTAIN_VALUES_WHEN_INACTIVE"};
 
-hkbBehaviorGraph::hkbBehaviorGraph(BehaviorFile *parent/*, qint16 ref*/): HkDynamicObject(parent/*, ref*/){
+hkbBehaviorGraph::hkbBehaviorGraph(BehaviorFile *parent/*, qint16 ref*/): hkbGenerator(parent/*, ref*/){
     setType(HKB_BEHAVIOR_GRAPH, TYPE_GENERATOR);
     refCount++;
     userData = 0;
@@ -1486,7 +1486,7 @@ bool hkbBehaviorGraph::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
         return false;
     }
     HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(rootGenerator.getReference());

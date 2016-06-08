@@ -40,23 +40,27 @@ int getLastIndex(const QList <HkObjectExpSharedPtr> & list){
 bool BehaviorGraphView::drawBehaviorGraph(){
     QList <HkObjectExpSharedPtr> objects;
     QList <GeneratorIcon *> parentIcons;
-    //int index = 0;
+    int result;
+    int numitems = 0;
     objects.append(behavior->getRootObject());
     while (!objects.isEmpty()){
+        numitems = behaviorGS->items().size();
         qulonglong sig = objects.last()->getSignature();
         switch (sig){
         case HKB_STATE_MACHINE:
         {
             hkbStateMachine *ptr = static_cast<hkbStateMachine *>(objects.last().data());
-            if (!helperFunction(ptr, objects, parentIcons)){
+            result = helperFunction(ptr, objects, parentIcons);
+            if (result == 0){
+                for (int i = ptr->states.size() - 1; i >= 0; i--){
+                    objects.append(static_cast<hkbStateMachineStateInfo *>(ptr->states.at(i).data())->generator);
+                }
+            }else if (result == -1){
                 return false;
-            }
-            for (int i = ptr->states.size() - 1; i >= 0; i--){
-                objects.append(ptr->states.at(i));
             }
             break;
         }
-        case HKB_STATE_MACHINE_STATE_INFO:
+        /*case HKB_STATE_MACHINE_STATE_INFO:
         {
             if (parentIcons.isEmpty()){
                 return false;
@@ -75,173 +79,106 @@ bool BehaviorGraphView::drawBehaviorGraph(){
             objects.append(ptr->generator);
             parentIcons.append(icon);
             break;
-        }
+        }*/
         case BS_SYNCHRONIZED_CLIP_GENERATOR:
         {
             BSSynchronizedClipGenerator *ptr = static_cast<BSSynchronizedClipGenerator *>(objects.last().data());
-            if (!helperFunction(ptr, objects, parentIcons)){
+            result = helperFunction(ptr, objects, parentIcons);
+            if (result == 0){
+                objects.append(ptr->pClipGenerator);
+            }else if (result == -1){
                 return false;
             }
-            objects.append(ptr->pClipGenerator);
             break;
         }
         case BS_I_STATE_TAGGING_GENERATOR:
         {
             BSiStateTaggingGenerator *ptr = static_cast<BSiStateTaggingGenerator *>(objects.last().data());
-            if (!helperFunction(ptr, objects, parentIcons)){
+            result = helperFunction(ptr, objects, parentIcons);
+            if (result == 0){
+                objects.append(ptr->pDefaultGenerator);
+            }else if (result == -1){
                 return false;
             }
-            objects.append(ptr->pDefaultGenerator);
             break;
         }
         case BS_BONE_SWITCH_GENERATOR:
         {
             BSBoneSwitchGenerator *ptr = static_cast<BSBoneSwitchGenerator *>(objects.last().data());
-            if (!helperFunction(ptr, objects, parentIcons)){
+            result = helperFunction(ptr, objects, parentIcons);
+            if (result == 0){
+                objects.append(ptr->pDefaultGenerator);
+                for (int i = ptr->ChildrenA.size() - 1; i >= 0; i--){
+                    objects.append(static_cast<BSBoneSwitchGeneratorBoneData *>(ptr->ChildrenA.at(i).data())->pGenerator);
+                }
+            }else if (result == -1){
                 return false;
             }
-            objects.append(ptr->pDefaultGenerator);
-            for (int i = ptr->ChildrenA.size() - 1; i >= 0; i--){
-                objects.append(static_cast<BSBoneSwitchGeneratorBoneData *>(ptr->ChildrenA.at(i).data())->pGenerator);
-            }
-            return false;
             break;
         }
         case HKB_MANUAL_SELECTOR_GENERATOR:
         {
             hkbManualSelectorGenerator *ptr = static_cast<hkbManualSelectorGenerator *>(objects.last().data());
-            if (!helperFunction(ptr, objects, parentIcons)){
+            result = helperFunction(ptr, objects, parentIcons);
+            if (result == 0){
+                for (int i = ptr->generators.size() - 1; i >= 0; i--){
+                    objects.append(ptr->generators.at(i));
+                }
+            }else if (result == -1){
                 return false;
-            }
-            for (int i = ptr->generators.size() - 1; i >= 0; i--){
-                objects.append(ptr->generators.at(i));
             }
             break;
         }
         case HKB_BLENDER_GENERATOR:
         {
             hkbBlenderGenerator *ptr = static_cast<hkbBlenderGenerator *>(objects.last().data());
-            if (!helperFunction(ptr, objects, parentIcons)){
+            result = helperFunction(ptr, objects, parentIcons);
+            if (result == 0){
+                for (int i = ptr->children.size() - 1; i >= 0; i--){
+                    objects.append(static_cast<hkbBlenderGeneratorChild *>(ptr->children.at(i).data())->generator);
+                }
+            }else if (result == -1){
                 return false;
-            }
-            for (int i = ptr->children.size() - 1; i >= 0; i--){
-                objects.append(static_cast<hkbBlenderGeneratorChild *>(ptr->children.at(i).data())->generator);
             }
             break;
         }
         case HKB_MODIFIER_GENERATOR:
         {
             hkbModifierGenerator *ptr = static_cast<hkbModifierGenerator *>(objects.last().data());
-            if (!helperFunction(ptr, objects, parentIcons)){
+            result = helperFunction(ptr, objects, parentIcons);
+            if (result == 0){
+                //objects.append(ptr->modifier);
+                objects.append(ptr->generator);
+            }else if (result == -1){
                 return false;
             }
-            //objects.append(ptr->modifier);
-            objects.append(ptr->generator);
             break;
         }
         case BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
         {
             BSCyclicBlendTransitionGenerator *ptr = static_cast<BSCyclicBlendTransitionGenerator *>(objects.last().data());
-            if (!helperFunction(ptr, objects, parentIcons)){
+            result = helperFunction(ptr, objects, parentIcons);
+            if (result == 0){
+                objects.append(ptr->pBlenderGenerator);
+            }else if (result == -1){
                 return false;
             }
-            objects.append(ptr->pBlenderGenerator);
             break;
         }
         case HKB_BEHAVIOR_REFERENCE_GENERATOR:
         {
-            if (parentIcons.isEmpty()){
-                return false;
-            }
-            if (objects.isEmpty()){
-                return false;
-            }
             hkbBehaviorReferenceGenerator *ptr = static_cast<hkbBehaviorReferenceGenerator *>(objects.last().data());
-            positionIcon(objects.last(), ptr, parentIcons.last());
-            if (parentIcons.last()->data->getSignature() == HKB_MANUAL_SELECTOR_GENERATOR){
-                if (static_cast<hkbManualSelectorGenerator *>(parentIcons.last()->data.data())->generators.size() < 2 ||\
-                        static_cast<hkbManualSelectorGenerator *>(parentIcons.last()->data.data())->generators.last() == objects.last())
-                {
-                    if (parentIcons.isEmpty()){
-                        return false;
-                    }
-                    parentIcons.removeLast();
-                }
-            }else if (parentIcons.last()->data->getSignature() == HKB_BLENDER_GENERATOR){
-                if (static_cast<hkbBlenderGenerator *>(parentIcons.last()->data.data())->children.size() < 2 ||\
-                        static_cast<hkbBlenderGeneratorChild *>(static_cast<hkbBlenderGenerator *>(parentIcons.last()->data.data())->children.last().data())->generator == objects.last())
-                {
-                    if (parentIcons.isEmpty()){
-                        return false;
-                    }
-                    parentIcons.removeLast();
-                }
-            }else if (parentIcons.last()->data->getSignature() == BS_BONE_SWITCH_GENERATOR){
-                if (static_cast<BSBoneSwitchGenerator *>(parentIcons.last()->data.data())->pDefaultGenerator == objects.last())
-                {
-                    if (parentIcons.isEmpty()){
-                        return false;
-                    }
-                    parentIcons.removeLast();
-                }
-            }else{
-                if (parentIcons.isEmpty()){
-                    return false;
-                }
-                parentIcons.removeLast();
-            }
-            if (objects.isEmpty()){
+            if (helperFunction(ptr, objects, parentIcons) == -1){
                 return false;
             }
-            objects.removeLast();
             break;
         }
         case HKB_CLIP_GENERATOR:
         {
-            if (parentIcons.isEmpty()){
-                return false;
-            }
-            if (objects.isEmpty()){
-                return false;
-            }
             hkbClipGenerator *ptr = static_cast<hkbClipGenerator *>(objects.last().data());
-            positionIcon(objects.last(), ptr, parentIcons.last());
-            if (parentIcons.last()->data->getSignature() == HKB_MANUAL_SELECTOR_GENERATOR){
-                if (static_cast<hkbManualSelectorGenerator *>(parentIcons.last()->data.data())->generators.size() < 2 ||\
-                        static_cast<hkbManualSelectorGenerator *>(parentIcons.last()->data.data())->generators.last() == objects.last())
-                {
-                    if (parentIcons.isEmpty()){
-                        return false;
-                    }
-                    parentIcons.removeLast();
-                }
-            }else if (parentIcons.last()->data->getSignature() == HKB_BLENDER_GENERATOR){
-                if (static_cast<hkbBlenderGenerator *>(parentIcons.last()->data.data())->children.size() < 2 ||\
-                        static_cast<hkbBlenderGeneratorChild *>(static_cast<hkbBlenderGenerator *>(parentIcons.last()->data.data())->children.last().data())->generator == objects.last())
-                {
-                    if (parentIcons.isEmpty()){
-                        return false;
-                    }
-                    parentIcons.removeLast();
-                }
-            }else if (parentIcons.last()->data->getSignature() == BS_BONE_SWITCH_GENERATOR){
-                if (static_cast<BSBoneSwitchGenerator *>(parentIcons.last()->data.data())->pDefaultGenerator == objects.last())
-                {
-                    if (parentIcons.isEmpty()){
-                        return false;
-                    }
-                    parentIcons.removeLast();
-                }
-            }else{
-                if (parentIcons.isEmpty()){
-                    return false;
-                }
-                parentIcons.removeLast();
-            }
-            if (objects.isEmpty()){
+            if (helperFunction(ptr, objects, parentIcons) == -1){
                 return false;
             }
-            objects.removeLast();
             break;
         }
         case HKB_BEHAVIOR_GRAPH:
@@ -306,7 +243,9 @@ void MainWindow::openDirView(){
 void MainWindow::openHkxfile(QString name){
     hkxFile = new BehaviorFile(name);
     behaviorGraphViewIV = new BehaviorGraphView(hkxFile);
-    behaviorGraphViewIV->drawBehaviorGraph();
+    if (!behaviorGraphViewIV->drawBehaviorGraph()){
+        //
+    }
     iconGBLyt->addWidget(behaviorGraphViewIV);
     behaviorGraphViewGB->setLayout(iconGBLyt);
     topLyt->addWidget(behaviorGraphViewGB);
