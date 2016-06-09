@@ -110,6 +110,16 @@ bool hkbGenerator::link(){
             return false;
         }
         break;
+    case BS_OFFSET_ANIMATION_GENERATOR:
+        if (!reinterpret_cast<BSOffsetAnimationGenerator *>(this)->link()){
+            return false;
+        }
+        break;
+    case HKB_POSE_MATCHING_GENERATOR:
+        if (!reinterpret_cast<hkbPoseMatchingGenerator *>(this)->link()){
+            return false;
+        }
+        break;
     case HKB_CLIP_GENERATOR:
         if (!reinterpret_cast<hkbClipGenerator *>(this)->link()){
             return false;
@@ -1426,6 +1436,280 @@ bool BSSynchronizedClipGenerator::link(){
             return false;
         }
         pClipGenerator = *ptr;
+    }
+    return true;
+}
+
+/*
+ * CLASS: hkbPoseMatchingGenerator
+*/
+
+uint hkbPoseMatchingGenerator::refCount = 0;
+
+QStringList hkbPoseMatchingGenerator::Flags = {"0", "FLAG_SYNC", "FLAG_SMOOTH_GENERATOR_WEIGHTS", "FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS", "FLAG_PARAMETRIC_BLEND", "FLAG_IS_PARAMETRIC_BLEND_CYCLIC", "FLAG_FORCE_DENSE_POSE"};
+
+hkbPoseMatchingGenerator::hkbPoseMatchingGenerator(BehaviorFile *parent/*, qint16 ref*/)
+    : hkbGenerator(parent/*, ref*/),\
+    userData(0),\
+    referencePoseWeightThreshold(0),\
+    blendParameter(0),\
+    minCyclicBlendParameter(0),\
+    maxCyclicBlendParameter(0),\
+    indexOfSyncMasterChild(-1),\
+    flags(Flags.first()),\
+    subtractLastChild(false),\
+    blendSpeed(0),\
+    minSpeedToSwitch(0),\
+    minSwitchTimeNoError(0),\
+    minSwitchTimeFullError(0),\
+    startPlayingEventId(-1),\
+    startMatchingEventId(-1),\
+    rootBoneIndex(-1),\
+    otherBoneIndex(-1),\
+    anotherBoneIndex(-1),\
+    pelvisIndex(-1)
+{
+    setType(HKB_POSE_MATCHING_GENERATOR, TYPE_GENERATOR);
+    refCount++;
+}
+
+bool hkbPoseMatchingGenerator::readData(const HkxXmlReader &reader, long index){
+    bool ok;
+    QByteArray text;
+    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+        text = reader.getNthAttributeValueAt(index, 0);
+        if (text == "variableBindingSet"){
+            if (!variableBindingSet.readReference(index, reader)){
+                return false;
+            }
+        }else if (text == "userData"){
+            userData = reader.getElementValueAt(index).toULong(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "name"){
+            name = reader.getElementValueAt(index);
+            if (name == ""){
+                return false;
+            }
+        }else if (text == "referencePoseWeightThreshold"){
+            referencePoseWeightThreshold = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "blendParameter"){
+            blendParameter = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "minCyclicBlendParameter"){
+            minCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "maxCyclicBlendParameter"){
+            maxCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "indexOfSyncMasterChild"){
+            indexOfSyncMasterChild = reader.getElementValueAt(index).toInt(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "flags"){
+            flags = reader.getElementValueAt(index);
+            if (flags == ""){
+                return false;
+            }
+        }else if (text == "subtractLastChild"){
+            subtractLastChild = toBool(reader.getElementValueAt(index), &ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "children"){
+            if (!readReferences(reader.getElementValueAt(index), children)){
+                return false;
+            }
+        }else if (text == "worldFromModelRotation"){
+            worldFromModelRotation = readVector4(reader.getElementValueAt(index), &ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "blendSpeed"){
+            blendSpeed = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "minSpeedToSwitch"){
+            minSpeedToSwitch = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "minSwitchTimeNoError"){
+            minSwitchTimeNoError = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "minSwitchTimeFullError"){
+            minSwitchTimeFullError = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "startPlayingEventId"){
+            startPlayingEventId = reader.getElementValueAt(index).toInt(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "startMatchingEventId"){
+            startMatchingEventId = reader.getElementValueAt(index).toInt(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "rootBoneIndex"){
+            rootBoneIndex = reader.getElementValueAt(index).toInt(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "otherBoneIndex"){
+            otherBoneIndex = reader.getElementValueAt(index).toInt(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "anotherBoneIndex"){
+            anotherBoneIndex = reader.getElementValueAt(index).toInt(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "pelvisIndex"){
+            pelvisIndex = reader.getElementValueAt(index).toInt(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "mode"){
+            mode = reader.getElementValueAt(index);
+            if (mode == ""){
+                return false;
+            }
+        }
+        index++;
+    }
+    return true;
+}
+
+bool hkbPoseMatchingGenerator::link(){
+    if (!getParentFile()){
+        return false;
+    }
+    //variableBindingSet
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+        return false;
+    }
+    //children
+    HkObjectExpSharedPtr *ptr;
+    for (int i = 0; i < children.size(); i++){
+        //generators
+        ptr = getParentFile()->findGenerator(children.at(i).getReference());
+        if (!ptr){
+            return false;
+        }
+        if ((*ptr)->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
+            return false;
+        }
+        children[i] = *ptr;
+    }
+    return true;
+}
+
+/*
+ * CLASS: BSOffsetAnimationGenerator
+*/
+
+uint BSOffsetAnimationGenerator::refCount = 0;
+
+BSOffsetAnimationGenerator::BSOffsetAnimationGenerator(BehaviorFile *parent/*, qint16 ref*/)
+    : hkbGenerator(parent/*, ref*/),\
+      userData(0),\
+      fOffsetVariable(0),\
+      fOffsetRangeStart(0),\
+      fOffsetRangeEnd(0)
+{
+    refCount++;
+    setType(BS_OFFSET_ANIMATION_GENERATOR, TYPE_GENERATOR);
+}
+
+bool BSOffsetAnimationGenerator::readData(const HkxXmlReader &reader, long index){
+    QByteArray text;
+    bool ok;
+    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+        text = reader.getNthAttributeValueAt(index, 0);
+        if (text == "variableBindingSet"){
+            if (!variableBindingSet.readReference(index, reader)){
+                return false;
+            }
+        }else if (text == "userData"){
+            userData = reader.getElementValueAt(index).toULong(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "name"){
+            name = reader.getElementValueAt(index);
+            if (name == ""){
+                return false;
+            }
+        }else if (text == "pDefaultGenerator"){
+            if (!pDefaultGenerator.readReference(index, reader)){
+                return false;
+            }
+        }else if (text == "pOffsetClipGenerator"){
+            if (!pOffsetClipGenerator.readReference(index, reader)){
+                return false;
+            }
+        }else if (text == "fOffsetVariable"){
+            fOffsetVariable = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "fOffsetRangeStart"){
+            fOffsetRangeStart = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }else if (text == "fOffsetRangeEnd"){
+            fOffsetRangeEnd = reader.getElementValueAt(index).toDouble(&ok);
+            if (!ok){
+                return false;
+            }
+        }
+        index++;
+    }
+    return true;
+}
+
+bool BSOffsetAnimationGenerator::link(){
+    if (!getParentFile()){
+        return false;
+    }
+    //variableBindingSet
+    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+        return false;
+    }
+    //pDefaultGenerator
+    HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pDefaultGenerator.getReference());
+    if (!ptr){
+        return false;
+    }
+    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+        return false;
+    }
+    pDefaultGenerator = *ptr;
+    //pOffsetClipGenerator
+    ptr = getParentFile()->findGenerator(pOffsetClipGenerator.getReference());
+    if (ptr){
+        if ((*ptr)->getSignature() != HKB_CLIP_GENERATOR){
+            return false;
+        }
+        pOffsetClipGenerator = *ptr;
     }
     return true;
 }

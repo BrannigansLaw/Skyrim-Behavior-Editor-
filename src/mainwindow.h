@@ -87,6 +87,15 @@ private:
                 }
                 parentIcons.removeLast();
             }
+        }else if (parentIcons.last()->data->getSignature() == HKB_POSE_MATCHING_GENERATOR){
+            if (static_cast<hkbPoseMatchingGenerator *>(parentIcons.last()->data.data())->children.size() < 2 ||\
+                    static_cast<hkbBlenderGeneratorChild *>(static_cast<hkbPoseMatchingGenerator *>(parentIcons.last()->data.data())->children.last().data())->generator == objects.last())
+            {
+                if (parentIcons.isEmpty()){
+                    return -1;
+                }
+                parentIcons.removeLast();
+            }
         }else if (parentIcons.last()->data->getSignature() == BS_BONE_SWITCH_GENERATOR){
             if (static_cast<BSBoneSwitchGenerator *>(parentIcons.last()->data.data())->pDefaultGenerator == objects.last())
             {

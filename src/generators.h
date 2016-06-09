@@ -5,6 +5,14 @@
 
 #include <QtGlobal>
 
+/**
+ * Adding new generator classes:
+ *
+ * Need to add to hkbGenerator::link()
+ * Need to add to MainWindow::drawBehaviorGraph()
+ * Need to add to BehaviorFile::parse()
+ */
+
 class hkbGenerator: public HkDynamicObject
 {
     friend class BehaviorGraphView;
@@ -339,6 +347,67 @@ private:
     bool bReorientSupportChar;
     bool bApplyMotionFromRoot;
     int sAnimationBindingIndex;
+};
+
+class hkbPoseMatchingGenerator: public hkbGenerator
+{
+    friend class BehaviorGraphView;
+public:
+    hkbPoseMatchingGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    virtual ~hkbPoseMatchingGenerator(){refCount--;}
+    bool readData(const HkxXmlReader & reader, long index);
+    bool link();
+private:
+    hkbPoseMatchingGenerator& operator=(const hkbPoseMatchingGenerator&);
+    hkbPoseMatchingGenerator(const hkbPoseMatchingGenerator &);
+private:
+    static QStringList Flags;
+    static QStringList Mode;
+    static uint refCount;
+    ulong userData;
+    QString name;
+    qreal referencePoseWeightThreshold;
+    qreal blendParameter;
+    qreal minCyclicBlendParameter;
+    qreal maxCyclicBlendParameter;
+    qint16 indexOfSyncMasterChild;
+    QString flags;
+    bool subtractLastChild;
+    QList <HkObjectExpSharedPtr> children;
+    hkVector4 worldFromModelRotation;
+    qreal blendSpeed;
+    qreal minSpeedToSwitch;
+    qreal minSwitchTimeNoError;
+    qreal minSwitchTimeFullError;
+    int startPlayingEventId;
+    int startMatchingEventId;
+    int rootBoneIndex;
+    int otherBoneIndex;
+    int anotherBoneIndex;
+    int pelvisIndex;
+    QString mode;
+};
+
+class BSOffsetAnimationGenerator: public hkbGenerator
+{
+    friend class BehaviorGraphView;
+public:
+    BSOffsetAnimationGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    virtual ~BSOffsetAnimationGenerator(){refCount--;}
+    bool readData(const HkxXmlReader & reader, long index);
+    bool link();
+private:
+    BSOffsetAnimationGenerator& operator=(const BSOffsetAnimationGenerator&);
+    BSOffsetAnimationGenerator(const BSOffsetAnimationGenerator &);
+private:
+    static uint refCount;
+    ulong userData;
+    QString name;
+    HkObjectExpSharedPtr pDefaultGenerator;
+    HkObjectExpSharedPtr pOffsetClipGenerator;
+    qreal fOffsetVariable;
+    qreal fOffsetRangeStart;
+    qreal fOffsetRangeEnd;
 };
 
 class hkbBehaviorGraph: public hkbGenerator

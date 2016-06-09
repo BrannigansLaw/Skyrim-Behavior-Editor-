@@ -33,9 +33,9 @@ void GeneratorIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
  * BehaviorGraphView
  */
 
-int getLastIndex(const QList <HkObjectExpSharedPtr> & list){
+/*int getLastIndex(const QList <HkObjectExpSharedPtr> & list){
     return list.size() - 1;
-}
+}*/
 
 bool BehaviorGraphView::drawBehaviorGraph(){
     QList <HkObjectExpSharedPtr> objects;
@@ -142,6 +142,19 @@ bool BehaviorGraphView::drawBehaviorGraph(){
             }
             break;
         }
+        case HKB_POSE_MATCHING_GENERATOR:
+        {
+            hkbPoseMatchingGenerator *ptr = static_cast<hkbPoseMatchingGenerator *>(objects.last().data());
+            result = helperFunction(ptr, objects, parentIcons);
+            if (result == 0){
+                for (int i = ptr->children.size() - 1; i >= 0; i--){
+                    objects.append(static_cast<hkbBlenderGeneratorChild *>(ptr->children.at(i).data())->generator);
+                }
+            }else if (result == -1){
+                return false;
+            }
+            break;
+        }
         case HKB_MODIFIER_GENERATOR:
         {
             hkbModifierGenerator *ptr = static_cast<hkbModifierGenerator *>(objects.last().data());
@@ -149,6 +162,18 @@ bool BehaviorGraphView::drawBehaviorGraph(){
             if (result == 0){
                 //objects.append(ptr->modifier);
                 objects.append(ptr->generator);
+            }else if (result == -1){
+                return false;
+            }
+            break;
+        }
+        case BS_OFFSET_ANIMATION_GENERATOR:
+        {
+            BSOffsetAnimationGenerator *ptr = static_cast<BSOffsetAnimationGenerator *>(objects.last().data());
+            result = helperFunction(ptr, objects, parentIcons);
+            if (result == 0){
+                objects.append(ptr->pDefaultGenerator);
+                objects.append(ptr->pOffsetClipGenerator);
             }else if (result == -1){
                 return false;
             }

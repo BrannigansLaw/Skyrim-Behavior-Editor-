@@ -92,6 +92,14 @@ bool BehaviorFile::parse(){
                     if (!appendAndReadData(index, new hkbBlenderGenerator(this))){
                         return false;
                     }
+                }else if (signature == BS_OFFSET_ANIMATION_GENERATOR){
+                    if (!appendAndReadData(index, new BSOffsetAnimationGenerator(this))){
+                        return false;
+                    }
+                }else if (signature == HKB_POSE_MATCHING_GENERATOR){
+                    if (!appendAndReadData(index, new hkbPoseMatchingGenerator(this))){
+                        return false;
+                    }
                 }else if (signature == HKB_CLIP_GENERATOR){
                     if (!appendAndReadData(index, new hkbClipGenerator(this))){
                         return false;
