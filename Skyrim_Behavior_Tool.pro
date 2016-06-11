@@ -26,7 +26,8 @@ SOURCES += \
     src/hkxfile.cpp \
     src/hkxxmlreader.cpp \
     src/main.cpp \
-    src/mainwindow.cpp
+    src/mainwindow.cpp \
+    src/behaviorgraphui.cpp
 
 HEADERS  += \
     src/fileselectwindow.h \
@@ -36,4 +37,5 @@ HEADERS  += \
     src/hkxxmlreader.h \
     src/mainwindow.h \
     src/utility.h \
-    src/modifiers.h
+    src/modifiers.h \
+    src/behaviorgraphui.h
