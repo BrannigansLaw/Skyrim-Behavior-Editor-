@@ -30,45 +30,77 @@ class GeneratorIcon: public QGraphicsItem
 {
     friend class BehaviorGraphView;
 public:
-    GeneratorIcon(const HkObjectExpSharedPtr & d, const QString & s);
-    QRectF boundingRect() const{return QRectF(0, 0, 200, 50);}
+    GeneratorIcon(const HkObjectExpSharedPtr & d, const QString & s, GeneratorIcon *par = NULL);
+    QRectF boundingRect() const{return boundingRectangle;}
     QString getName() const{return name;}
+    void setLinkCoordinates(const QLineF & line){if (linkToParent){linkToParent->setLine(line);}}
 protected:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
 private:
+    static void updateStaticMembers();
+    void expandBranch(GeneratorIcon * icon, bool expandAll = false);
+    void contractBranch(GeneratorIcon * icon, bool contractAll = false);
+    bool getLastIconY(GeneratorIcon *parent, qreal &lastIconY);
+    void updatePosition();
+private:
+    static QRectF boundingRectangle;
+    static QRectF button;
+    static QRectF textRec;
+    static QFont font;
+    //static QRadialGradient rGrad;
+    //static QPen textPen;
+    static QPen pen;
+    static QBrush brush;
+    static QBrush buttonBrush;
+    static QLineF vert;
+    static QLineF horiz;
+    static QRectF ellipse;
+    static QPolygonF polygon;
+    static QRectF square;
+    static QPolygonF arrowHead;
+    QRadialGradient rGrad;
+    QPen textPen;
+    QPainterPath path;
     QString name;
     HkObjectExpSharedPtr data;
+    bool isExpanded;
+    GeneratorIcon *parent;
+    QList <GeneratorIcon *> children;
+    QGraphicsLineItem *linkToParent;
 };
 
 class BehaviorGraphView: public QGraphicsView
 {
     Q_OBJECT
+    friend class GeneratorIcon;
 public:
-    BehaviorGraphView(BehaviorFile * file): behavior(file), behaviorGS(new QGraphicsScene){setScene(behaviorGS);}
+    BehaviorGraphView(BehaviorFile * file);
     bool drawBehaviorGraph();
+    void repositionIcons(GeneratorIcon * icon);
 protected:
-    void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE{
-        if (event->button() == Qt::LeftButton)  this->setDragMode(QGraphicsView::ScrollHandDrag);
-        QGraphicsView::mousePressEvent(event);
-    }
-    void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE{
-        if (event->button() == Qt::LeftButton) this->setDragMode(QGraphicsView::NoDrag);
-        QGraphicsView::mouseReleaseEvent(event);
-    }
+    void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
+    void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 private:
     BehaviorFile *behavior;
     QGraphicsScene *behaviorGS;
-    QList <GeneratorIcon *> icons;
+    GeneratorIcon *selectedIcon;
 private:
+    int manageIcons();
+    bool positionIcon(GeneratorIcon * icon);
     template<typename T>
-    int helperFunction(T & ptr, QList<HkObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons){
+    int initializeIcons(const T & ptr, QList<HkObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons){
         if (parentIcons.isEmpty()){
             return -1;
         }
         if (objects.isEmpty()){
             return -1;
         }
-        GeneratorIcon *icon = positionIcon(objects.last(), ptr, parentIcons.last());
+        GeneratorIcon *icon = addIconToGraph(objects.last(), ptr, parentIcons.last());
+        if (!icon){
+            return -1;
+        }
         if (parentIcons.last()->data->getSignature() == HKB_MANUAL_SELECTOR_GENERATOR){
             if (static_cast<hkbManualSelectorGenerator *>(parentIcons.last()->data.data())->generators.size() < 2 ||\
                     static_cast<hkbManualSelectorGenerator *>(parentIcons.last()->data.data())->generators.last() == objects.last())
@@ -136,7 +168,7 @@ private:
     }
 
     template<typename T>
-    GeneratorIcon * positionIcon(const HkObjectExpSharedPtr & obj, const T & type, GeneratorIcon * parentIcon){
+    GeneratorIcon * addIconToGraph(const HkObjectExpSharedPtr & obj, const T & type, GeneratorIcon * parentIcon){
         if (!parentIcon){
             return NULL;
         }
@@ -146,14 +178,15 @@ private:
         if (behaviorGS->items(Qt::AscendingOrder).isEmpty()){
             return NULL;
         }
-        GeneratorIcon *icon = new GeneratorIcon(obj, type->name);
+        GeneratorIcon *icon = new GeneratorIcon(obj, type->name, parentIcon);
         //icon->setFlag(QGraphicsItem::ItemIsMovable);
         GeneratorIcon *lastIcon = dynamic_cast<GeneratorIcon *>(behaviorGS->items(Qt::AscendingOrder).last());
         if (!lastIcon){
             return NULL;
         }
-        behaviorGS->addLine(parentIcon->pos().x() + 1.0*parentIcon->boundingRect().width(), parentIcon->pos().y() + 1.0*parentIcon->boundingRect().height(),\
-                            parentIcon->pos().x() + 1.5*parentIcon->boundingRect().width(), lastIcon->pos().y() + 2*lastIcon->boundingRect().height());
+        icon->setLinkCoordinates(QLineF(parentIcon->pos().x() + 1.0*parentIcon->boundingRect().width(), parentIcon->pos().y() + 1.0*parentIcon->boundingRect().height(),\
+                                        parentIcon->pos().x() + 1.5*parentIcon->boundingRect().width(), lastIcon->pos().y() + 2*lastIcon->boundingRect().height()));
+        behaviorGS->addItem(icon->linkToParent);
         behaviorGS->addItem(icon);
         icon->setPos(parentIcon->pos().x() + 1.5*parentIcon->boundingRect().width(), lastIcon->pos().y() + 2*lastIcon->boundingRect().height());
         return icon;

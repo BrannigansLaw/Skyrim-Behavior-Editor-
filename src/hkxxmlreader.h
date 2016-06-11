@@ -40,6 +40,7 @@ public:
     QByteArray getNthAttributeNameAt(int index, int nth) const;
     QByteArray getNthAttributeValueAt(int index, int nth) const;
     HkxXmlParseLine readNextLine();
+    void clear(){elementList.clear();}
 private:
     struct Attribute{
         Attribute(const QByteArray & elem): name(elem){}

@@ -16,6 +16,7 @@
 class hkbGenerator: public HkDynamicObject
 {
     friend class BehaviorGraphView;
+    friend class GeneratorIcon;
 public:
     virtual ~hkbGenerator(){}
     bool link();

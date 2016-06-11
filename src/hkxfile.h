@@ -42,6 +42,7 @@ public:
         if (!parse()){
             //int i = 9;
         }
+        reader.clear();
     }
     virtual ~BehaviorFile(){}
     HkObjectExpSharedPtr * findHkObject(long ref);
