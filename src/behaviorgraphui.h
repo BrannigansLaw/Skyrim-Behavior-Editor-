@@ -78,104 +78,87 @@ public:
     BehaviorGraphView(BehaviorFile * file);
     bool drawBehaviorGraph();
     void repositionIcons(GeneratorIcon * icon);
+    void popUpMenuRequested(const QPoint &pos, const HkObjectExpSharedPtr & obj);
 protected:
     void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+private slots:
+    void wrapStateMachine();
 private:
     BehaviorFile *behavior;
     QGraphicsScene *behaviorGS;
     GeneratorIcon *selectedIcon;
+    QMenu *contextMenu;
+    QMenu *wrapGeneratorMenu;
+    QAction *wrapSMAct;
+    QAction *wrapMSGAct;
+    QAction *wrapMGAct;
+    QAction *wrapBSISTGAct;
+    QAction *wrapBSSCGAct;
+    QAction *wrapBSOAGAct;
+    QAction *wrapBSCBTGAct;
+    QAction *wrapPMGAct;
+    QMenu *wrapBlenderMenu;
+    QAction *wrapBGAct;
+    QAction *wrapBSBSGAct;
 private:
     int manageIcons();
     bool positionIcon(GeneratorIcon * icon);
 
     template<typename T>
-    int initializeIcons(const T & ptr, QList<HkObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons){
+    int initializeIcons(const T & ptr, QList<HkObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount){
         if (parentIcons.isEmpty()){
             return -1;
         }
         if (objects.isEmpty()){
             return -1;
         }
-        GeneratorIcon *parentIcon = parentIcons.last();
-        if (parentIcon->data->getSignature() == HKB_MANUAL_SELECTOR_GENERATOR){
-            if (static_cast<hkbManualSelectorGenerator *>(parentIcon->data.data())->generators.size() < 2 ||\
-                    static_cast<hkbManualSelectorGenerator *>(parentIcon->data.data())->generators.last() == objects.last())
-            {
-                if (parentIcons.isEmpty()){
-                    return -1;
-                }
-                parentIcons.removeLast();
-            }
-        }else if (parentIcon->data->getSignature() == HKB_BLENDER_GENERATOR){
-            if (static_cast<hkbBlenderGenerator *>(parentIcon->data.data())->children.size() < 2 ||\
-                    static_cast<hkbBlenderGeneratorChild *>(static_cast<hkbBlenderGenerator *>(parentIcon->data.data())->children.last().data())->generator == objects.last())
-            {
-                if (parentIcons.isEmpty()){
-                    return -1;
-                }
-                parentIcons.removeLast();
-            }
-        }else if (parentIcon->data->getSignature() == HKB_POSE_MATCHING_GENERATOR){
-            if (static_cast<hkbPoseMatchingGenerator *>(parentIcon->data.data())->children.size() < 2 ||\
-                    static_cast<hkbBlenderGeneratorChild *>(static_cast<hkbPoseMatchingGenerator *>(parentIcon->data.data())->children.last().data())->generator == objects.last())
-            {
-                if (parentIcons.isEmpty()){
-                    return -1;
-                }
-                parentIcons.removeLast();
-            }
-        }else if (parentIcon->data->getSignature() == BS_BONE_SWITCH_GENERATOR){
-            if (static_cast<BSBoneSwitchGenerator *>(parentIcon->data.data())->pDefaultGenerator == objects.last())
-            {
-                if (parentIcons.isEmpty()){
-                    return -1;
-                }
-                parentIcons.removeLast();
-            }
-        }else if (parentIcon->data->getSignature() == HKB_STATE_MACHINE){
-            if (static_cast<hkbStateMachine *>(parentIcon->data.data())->states.size() < 2 ||\
-                    static_cast<hkbStateMachineStateInfo *>(static_cast<hkbStateMachine *>(parentIcon->data.data())->states.last().data())->generator == objects.last())
-            {
-                if (parentIcons.isEmpty()){
-                    return -1;
-                }
-                parentIcons.removeLast();
-            }
-        }else{
-            if (parentIcons.isEmpty()){
-                return -1;
-            }
-            parentIcons.removeLast();
+        if (objectChildCount.isEmpty()){
+            return -1;
         }
         int count = 0;
-        for (int i = 0; i < parentIcon->children.size(); i++){
-            if (parentIcon->children.at(i)->data == objects.last()){
+        for (int i = 0; i < parentIcons.last()->children.size(); i++){
+            if (parentIcons.last()->children.at(i)->data == objects.last()){
                 count++;
-                if (count > 0){
+                if (count > 1){
                     objects.removeLast();
+                    objectChildCount.last()--;
+                    if (objectChildCount.last() < 1){
+                        parentIcons.removeLast();
+                        objectChildCount.removeLast();
+                    }
                     return 1;
                 }
             }
         }
-        GeneratorIcon *icon = addIconToGraph(objects.last(), ptr, parentIcon);
+        GeneratorIcon *icon = addIconToGraph(objects.last(), ptr, parentIcons.last());
         if (!icon){
-            return -1;
-        }
-        if (objects.isEmpty()){
             return -1;
         }
         if (ptr->getSignature() != HKB_CLIP_GENERATOR && ptr->getSignature() != HKB_BEHAVIOR_REFERENCE_GENERATOR){
             if (!ptr->icons.isEmpty()){
                 ptr->icons.append(icon);
                 objects.removeLast();
+                objectChildCount.last()--;
+                if (objectChildCount.last() < 1){
+                    parentIcons.removeLast();
+                    objectChildCount.removeLast();
+                }
                 return 1;
             }
+        }
+        objects.removeLast();
+        objectChildCount.last()--;
+        if (objectChildCount.last() < 1){
+            parentIcons.removeLast();
+            objectChildCount.removeLast();
+        }
+        if (ptr->getSignature() != HKB_CLIP_GENERATOR && ptr->getSignature() != HKB_BEHAVIOR_REFERENCE_GENERATOR){
+            objectChildCount.append(0);
             parentIcons.append(icon);
         }
         ptr->icons.append(icon);
-        objects.removeLast();
         return 0;
     }
 
@@ -201,6 +184,35 @@ private:
         behaviorGS->addItem(icon->linkToParent);
         behaviorGS->addItem(icon);
         icon->setPos(parentIcon->pos().x() + 1.5*parentIcon->boundingRect().width(), lastIcon->pos().y() + 2*lastIcon->boundingRect().height());
+        return icon;
+    }
+
+    template<typename T>
+    GeneratorIcon * initalizeInjectedIcon(const HkObjectExpSharedPtr & obj, const T & type, GeneratorIcon * parentIcon){
+        GeneratorIcon *icon = new GeneratorIcon(obj, type->name, parentIcon);
+        //qreal iconY = 0;
+        //getLastIconY(parentIcon, iconY);
+        //qreal x = icon->parent->pos().x() + 1.5*(icon->parent->boundingRect().width());
+        //qreal yt = icon->parent->pos().y() + 2*icon->parent->boundingRect().height();
+        //icon->setPos(x, yt);
+        QLineF line(icon->parent->pos().x() + 1.0*icon->parent->boundingRect().width(), icon->parent->pos().y() + 1.0*icon->parent->boundingRect().height(),\
+                     icon->parent->pos().x() + 1.5*icon->parent->boundingRect().width(), icon->parent->boundingRect().height());
+        if (icon->linkToParent){
+            icon->linkToParent->setLine(line);
+        }else {
+            icon->linkToParent = new QGraphicsLineItem(line);
+        }
+        for (int j = 0; j < selectedIcon->parent->children.size(); j++){
+            if (selectedIcon->parent->children.at(j) == selectedIcon){
+                selectedIcon->parent->children.replace(j, icon);
+                break;
+            }
+        }
+        selectedIcon->parent = icon;
+        icon->children.append(selectedIcon);
+        //Order is important??
+        behaviorGS->addItem(icon->linkToParent);
+        behaviorGS->addItem(icon);
         return icon;
     }
 };

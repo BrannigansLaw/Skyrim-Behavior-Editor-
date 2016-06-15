@@ -34,6 +34,7 @@ private:
 
 class BehaviorFile: public HkxFile
 {
+    friend class BehaviorGraphView;
     template <typename T>
     bool appendAndReadData(int ind, T * obj);
 public:

@@ -22,6 +22,7 @@ public:
     bool link();
 protected:
     hkbGenerator(BehaviorFile *parent = NULL/*, long ref = 0*/): HkDynamicObject(parent/*, ref*/){}
+    void appendIcon(GeneratorIcon * icon){icons.append(icon);}
 private:
     QList <GeneratorIcon *> icons;
 };
