@@ -3,6 +3,7 @@
 #include "hkxfile.h"
 #include "generators.h"
 #include "behaviorgraphui.h"
+#include "hkobject.h"
 
 #include <QBoxLayout>
 #include <QMenuBar>
@@ -11,6 +12,7 @@
 #include <QGroupBox>
 #include <QMessageBox>
 #include <QGraphicsSceneMouseEvent>
+#include <QSize>
 
 /**
  * GeneratorIcon
@@ -51,6 +53,9 @@ GeneratorIcon::GeneratorIcon(const HkObjectExpSharedPtr & d, const QString & s, 
       parent(par),
       linkToParent(NULL)
 {
+    /*if (data->getType() == HkObject::TYPE_GENERATOR){
+        static_cast<hkbGenerator *>(data.data())->icons.append(this);
+    }*/
     textPen.setColor(Qt::white);
     rGrad.setCenter(boundingRect().topLeft());
     rGrad.setCenterRadius(boundingRect().width());
@@ -111,7 +116,7 @@ void GeneratorIcon::mousePressEvent(QGraphicsSceneMouseEvent *event){
     }
     BehaviorGraphView *view = static_cast<BehaviorGraphView *>(scene()->views().first());
     GeneratorIcon *icon = static_cast<BehaviorGraphView *>(scene()->views().first())->selectedIcon;
-    GeneratorIcon *firstSceneIcon = static_cast<GeneratorIcon *>(scene()->items(Qt::AscendingOrder).first());
+    GeneratorIcon *firstSceneIcon = static_cast<GeneratorIcon *>(scene()->items(Qt::AscendingOrder).first())->children.first();
     if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton){
         if (icon != this){
             view->selectedIcon = this;
@@ -128,8 +133,11 @@ void GeneratorIcon::mousePressEvent(QGraphicsSceneMouseEvent *event){
             }
             if (ptr->icons.first() != this){
                 if (!ptr->icons.first()->isVisible()){
-                    expandBranch(firstSceneIcon, true);
+                    view->expandBranch(firstSceneIcon, true);
                 }
+                view->repositionIcons(firstSceneIcon);
+                view->scale(view->iconFocusScale, view->iconFocusScale);
+                view->currentScale = view->iconFocusScale;
                 view->centerOn(ptr->icons.first());
                 view->selectedIcon = ptr->icons.first();
                 ptr->icons.first()->rGrad.setColorAt(1.0, Qt::green);
@@ -138,14 +146,14 @@ void GeneratorIcon::mousePressEvent(QGraphicsSceneMouseEvent *event){
                 textPen.setColor(Qt::white);
             }else{
                 if (isExpanded){
-                    contractBranch(this);
+                    view->contractBranch(this);
                     isExpanded = false;
                 }else{
                     isExpanded = true;
-                    expandBranch(this);
+                    view->expandBranch(this);
                 }
+                view->repositionIcons(firstSceneIcon);
             }
-            view->repositionIcons(firstSceneIcon);
         }
         if (event->button() == Qt::RightButton){
             view->popUpMenuRequested(view->mapFromScene(event->scenePos()), data);
@@ -190,40 +198,6 @@ void GeneratorIcon::updatePosition(){
     }
 }
 
-void GeneratorIcon::contractBranch(GeneratorIcon * icon, bool contractAll){
-    if (!icon){
-        return;
-    }
-    for (int i = 0; i < icon->children.size(); i++){
-        icon->children.at(i)->setVisible(false);
-        if (icon->children.at(i)->linkToParent){
-            icon->children.at(i)->linkToParent->setVisible(false);
-        }
-        if (contractAll){
-            icon->children.at(i)->isExpanded = false;
-            contractBranch(icon->children.at(i), true);
-        }else{
-            contractBranch(icon->children.at(i));
-        }
-    }
-}
-
-void GeneratorIcon::expandBranch(GeneratorIcon * icon, bool expandAll){
-    if (!icon){
-        return;
-    }
-    icon->isExpanded = true;
-    for (int i = 0; i < icon->children.size(); i++){
-        icon->children.at(i)->setVisible(true);
-        if (icon->children.at(i)->linkToParent){
-            icon->children.at(i)->linkToParent->setVisible(true);
-        }
-        if (expandAll || (icon->children.at(i)->isExpanded)){
-            expandBranch(icon->children.at(i));
-        }
-    }
-}
-
 /**
  * BehaviorGraphView
  */
@@ -244,7 +218,14 @@ BehaviorGraphView::BehaviorGraphView(BehaviorFile * file)
       wrapPMGAct(new QAction("Pose Matching Generator", wrapGeneratorMenu)),
       wrapBlenderMenu(new QMenu("Wrap inside Blend:", contextMenu)),
       wrapBGAct(new QAction("Blender Generator", wrapBlenderMenu)),
-      wrapBSBSGAct(new QAction("BS Bone Switch Generator", wrapBlenderMenu))
+      wrapBSBSGAct(new QAction("BS Bone Switch Generator", wrapBlenderMenu)),
+      minScale(0.001),
+      maxScale(4),
+      initScale(1),
+      iconFocusScale(1.5),
+      currentScale(1),
+      scaleUpFactor(1.2),
+      scaleDownFactor(0.8)
 {
     setScene(behaviorGS);
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -262,6 +243,42 @@ BehaviorGraphView::BehaviorGraphView(BehaviorFile * file)
     wrapBlenderMenu->addAction(wrapBGAct);
     wrapBlenderMenu->addAction(wrapBSBSGAct);
     connect(wrapSMAct, SIGNAL(triggered()), this, SLOT(wrapStateMachine()));
+}
+
+void BehaviorGraphView::contractBranch(GeneratorIcon * icon, bool contractAll){
+    if (!icon){
+        return;
+    }
+    for (int i = 0; i < icon->children.size(); i++){
+        icon->children.at(i)->setVisible(false);
+        if (icon->children.at(i)->linkToParent){
+            icon->children.at(i)->linkToParent->setVisible(false);
+        }
+        if (contractAll){
+            icon->children.at(i)->isExpanded = false;
+            contractBranch(icon->children.at(i), true);
+        }else{
+            contractBranch(icon->children.at(i));
+        }
+    }
+}
+
+void BehaviorGraphView::expandBranch(GeneratorIcon * icon, bool expandAll){
+    if (!icon){
+        return;
+    }
+    icon->isExpanded = true;
+    for (int i = 0; i < icon->children.size(); i++){
+        icon->children.at(i)->setVisible(true);
+        if (icon->children.at(i)->linkToParent){
+            icon->children.at(i)->linkToParent->setVisible(true);
+        }
+        if (expandAll){
+            expandBranch(icon->children.at(i), true);
+        }else if (icon->children.at(i)->isExpanded){
+            expandBranch(icon->children.at(i));
+        }
+    }
 }
 
 void BehaviorGraphView::wrapStateMachine(){
@@ -411,9 +428,10 @@ void BehaviorGraphView::wrapStateMachine(){
         behavior->generators.append(HkObjectExpSharedPtr(stateMachine));
         behavior->generators.append(HkObjectExpSharedPtr(state));
         if (behaviorGS && !behaviorGS->items(Qt::AscendingOrder).isEmpty()){
-            GeneratorIcon *behaviorGraphIcon = static_cast<GeneratorIcon *>(scene()->items(Qt::AscendingOrder).first());
-            behaviorGraphIcon->expandBranch(behaviorGraphIcon, true);
+            GeneratorIcon *behaviorGraphIcon = static_cast<GeneratorIcon *>(scene()->items(Qt::AscendingOrder).first())->children.first();
+            expandBranch(behaviorGraphIcon, true);
             repositionIcons(behaviorGraphIcon);
+            behaviorGS->update();
         }
     }
 }
@@ -445,10 +463,12 @@ void BehaviorGraphView::repositionIcons(GeneratorIcon *icon){
 
 void BehaviorGraphView::wheelEvent(QWheelEvent *event){
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-    if (event->delta() > 0){
-        scale(1.2, 1.2);
-    }else{
-        scale(0.8, 0.8);
+    if (event->delta() > 0 && currentScale < maxScale){
+        scale(scaleUpFactor, scaleUpFactor);
+        currentScale = currentScale*scaleUpFactor;
+    }else if (currentScale > minScale){
+        scale(scaleDownFactor, scaleDownFactor);
+        currentScale = currentScale*scaleDownFactor;
     }
 }
 
@@ -651,5 +671,6 @@ bool BehaviorGraphView::drawBehaviorGraph(){
             break;
         }
     }
+    //setSceneRect(0, 0, frameSize().width(), frameSize().height());
     return true;
 }

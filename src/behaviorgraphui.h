@@ -39,8 +39,6 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
 private:
     static void updateStaticMembers();
-    void expandBranch(GeneratorIcon * icon, bool expandAll = false);
-    void contractBranch(GeneratorIcon * icon, bool contractAll = false);
     bool getLastIconY(GeneratorIcon *parent, qreal &lastIconY);
     void updatePosition();
 private:
@@ -48,8 +46,6 @@ private:
     static QRectF button;
     static QRectF textRec;
     static QFont font;
-    //static QRadialGradient rGrad;
-    //static QPen textPen;
     static QPen pen;
     static QBrush brush;
     static QBrush buttonBrush;
@@ -79,6 +75,8 @@ public:
     bool drawBehaviorGraph();
     void repositionIcons(GeneratorIcon * icon);
     void popUpMenuRequested(const QPoint &pos, const HkObjectExpSharedPtr & obj);
+    void expandBranch(GeneratorIcon * icon, bool expandAll = false);
+    void contractBranch(GeneratorIcon * icon, bool contractAll = false);
 protected:
     void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
@@ -102,6 +100,13 @@ private:
     QMenu *wrapBlenderMenu;
     QAction *wrapBGAct;
     QAction *wrapBSBSGAct;
+    const qreal minScale;
+    const qreal maxScale;
+    const qreal initScale;
+    const qreal iconFocusScale;
+    qreal currentScale;
+    const qreal scaleUpFactor;
+    const qreal scaleDownFactor;
 private:
     int manageIcons();
     bool positionIcon(GeneratorIcon * icon);
@@ -117,10 +122,18 @@ private:
         if (objectChildCount.isEmpty()){
             return -1;
         }
-        int count = 0;
+        //int count = 0;
+        bool isBranchTip = true;
         for (int i = 0; i < parentIcons.last()->children.size(); i++){
             if (parentIcons.last()->children.at(i)->data == objects.last()){
-                count++;
+                objects.removeLast();
+                objectChildCount.last()--;
+                if (objectChildCount.last() < 1){
+                    parentIcons.removeLast();
+                    objectChildCount.removeLast();
+                }
+                return 1;
+                /*count++;
                 if (count > 1){
                     objects.removeLast();
                     objectChildCount.last()--;
@@ -129,7 +142,7 @@ private:
                         objectChildCount.removeLast();
                     }
                     return 1;
-                }
+                }*/
             }
         }
         GeneratorIcon *icon = addIconToGraph(objects.last(), ptr, parentIcons.last());
@@ -137,6 +150,7 @@ private:
             return -1;
         }
         if (ptr->getSignature() != HKB_CLIP_GENERATOR && ptr->getSignature() != HKB_BEHAVIOR_REFERENCE_GENERATOR){
+            isBranchTip = false;
             if (!ptr->icons.isEmpty()){
                 ptr->icons.append(icon);
                 objects.removeLast();
@@ -154,7 +168,7 @@ private:
             parentIcons.removeLast();
             objectChildCount.removeLast();
         }
-        if (ptr->getSignature() != HKB_CLIP_GENERATOR && ptr->getSignature() != HKB_BEHAVIOR_REFERENCE_GENERATOR){
+        if (!isBranchTip){
             objectChildCount.append(0);
             parentIcons.append(icon);
         }
@@ -189,14 +203,12 @@ private:
 
     template<typename T>
     GeneratorIcon * initalizeInjectedIcon(const HkObjectExpSharedPtr & obj, const T & type, GeneratorIcon * parentIcon){
+        if (!parentIcon){
+            return NULL;
+        }
         GeneratorIcon *icon = new GeneratorIcon(obj, type->name, parentIcon);
-        //qreal iconY = 0;
-        //getLastIconY(parentIcon, iconY);
-        //qreal x = icon->parent->pos().x() + 1.5*(icon->parent->boundingRect().width());
-        //qreal yt = icon->parent->pos().y() + 2*icon->parent->boundingRect().height();
-        //icon->setPos(x, yt);
         QLineF line(icon->parent->pos().x() + 1.0*icon->parent->boundingRect().width(), icon->parent->pos().y() + 1.0*icon->parent->boundingRect().height(),\
-                     icon->parent->pos().x() + 1.5*icon->parent->boundingRect().width(), icon->parent->boundingRect().height());
+                             icon->parent->pos().x() + 1.5*icon->parent->boundingRect().width(), icon->parent->boundingRect().height());
         if (icon->linkToParent){
             icon->linkToParent->setLine(line);
         }else {
@@ -205,9 +217,16 @@ private:
         for (int j = 0; j < selectedIcon->parent->children.size(); j++){
             if (selectedIcon->parent->children.at(j) == selectedIcon){
                 selectedIcon->parent->children.replace(j, icon);
+                //Constructor for GeneratorIcon appends icon to parent so we need to remove it...
+                if (selectedIcon->parent->children.size() - 1 != j){
+                    selectedIcon->parent->children.removeLast();
+                }else{
+                    //Problem???
+                }
                 break;
             }
         }
+        //type->icons.append(icon);
         selectedIcon->parent = icon;
         icon->children.append(selectedIcon);
         //Order is important??
