@@ -3,7 +3,6 @@
 #include "hkxfile.h"
 #include "modifiers.h"
 
-
 bool readReferences(const QByteArray &line, QList <HkObjectExpSharedPtr> & children){
     qint16 size = 0;
     qint16 start;
@@ -148,7 +147,8 @@ bool hkRootLevelContainer::readData(const HkxXmlReader &reader, int index){
         if (reader.getNthAttributeValueAt(index, 0) == "namedVariants"){
             int numVariants = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkRootLevelContainer: readData()!\nAttempt to read the number of variants failed!");
+                //return false;
             }
             for (int j = 0; j < numVariants; j++){
                 namedVariants.append(hkRootLevelContainerNamedVariant());
@@ -176,17 +176,17 @@ bool hkRootLevelContainer::link(){
         return false;
     }
     for (int i = 0; i < namedVariants.size(); i++){
-        if (namedVariants.at(i).variant.getReference() == -1){
-            return false;
-        }
         HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(namedVariants.at(i).variant.getReference());
         if (!ptr){
-            return false;
+            writeToLog("hkRootLevelContainer: link()!\nUnable to link variant reference "+QString::number(namedVariants.at(i).variant.getReference())+"!");
+            setDataValidity(false);
+        }else if ((*ptr)->getSignature() != HKB_BEHAVIOR_GRAPH){
+            writeToLog("hkRootLevelContainer: link()!\nThe linked object is not a HKB_BEHAVIOR_GRAPH!");
+            setDataValidity(false);
+            namedVariants[i].variant = *ptr;
+        }else{
+            namedVariants[i].variant = *ptr;
         }
-        if ((*ptr)->getSignature() != HKB_BEHAVIOR_GRAPH){
-            return false;
-        }
-        namedVariants[i].variant = *ptr;
     }
     return true;
 }
@@ -210,48 +210,49 @@ hkbStateMachineStateInfo::hkbStateMachineStateInfo(BehaviorFile *parent/*, qint1
 
 bool hkbStateMachineStateInfo::readData(const HkxXmlReader &reader, long index){
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("hkbStateMachineStateInfo: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "enterNotifyEvents"){
             if (!enterNotifyEvents.readReference(index, reader)){
-                return false;
+                writeToLog("hkbStateMachineStateInfo: readData()!\nFailed to properly read 'enterNotifyEvents' reference!\nObject Reference: "+ref);
             }
         }else if (text == "exitNotifyEvents"){
             if (!exitNotifyEvents.readReference(index, reader)){
-                return false;
+                writeToLog("hkbStateMachineStateInfo: readData()!\nFailed to properly read 'exitNotifyEvents' reference!\nObject Reference: "+ref);
             }
         }else if (text == "transitions"){
             if (!transitions.readReference(index, reader)){
-                return false;
+                writeToLog("hkbStateMachineStateInfo: readData()!\nFailed to properly read 'transitions' reference!\nObject Reference: "+ref);
             }
         }else if (text == "generator"){
             if (!generator.readReference(index, reader)){
-                return false;
+                writeToLog("hkbStateMachineStateInfo: readData()!\nFailed to properly read 'generator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                return false;
+                writeToLog("hkbStateMachineStateInfo: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "stateId"){
             stateId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbStateMachineStateInfo: readData()!\nFailed to properly read 'stateId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "probability"){
             probability = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbStateMachineStateInfo: readData()!\nFailed to properly read 'probability' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                return false;
+                writeToLog("hkbStateMachineStateInfo: readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -265,13 +266,14 @@ bool hkbStateMachineStateInfo::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("hkbStateMachineStateInfo: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     //enterNotifyEvents
     HkObjectExpSharedPtr *ptr = getParentFile()->findHkObject(enterNotifyEvents.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
-            return false;
+            writeToLog("hkbStateMachineStateInfo: linkVar()!\nThe linked object 'enterNotifyEvents' is not a HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY!");
+            setDataValidity(false);
         }
         enterNotifyEvents = *ptr;
     }
@@ -279,7 +281,8 @@ bool hkbStateMachineStateInfo::link(){
     ptr = getParentFile()->findHkObject(exitNotifyEvents.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
-            return false;
+            writeToLog("hkbStateMachineStateInfo: linkVar()!\nThe linked object 'exitNotifyEvents' is not a HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY!");
+            setDataValidity(false);
         }
         exitNotifyEvents = *ptr;
     }
@@ -287,19 +290,23 @@ bool hkbStateMachineStateInfo::link(){
     ptr = getParentFile()->findHkObject(transitions.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
-            return false;
+            writeToLog("hkbStateMachineStateInfo: linkVar()!\nThe linked object 'transitions' is not a HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY!");
+            setDataValidity(false);
         }
         transitions = *ptr;
     }
     //generator
     ptr = getParentFile()->findGenerator(generator.getReference());
     if (!ptr){
-        return false;
+        writeToLog("hkbStateMachineStateInfo: link()!\nFailed to properly link 'generator' data field!\nObject Name: "+name);
+        setDataValidity(false);
+    }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+        writeToLog("hkbStateMachineStateInfo: link()!\n'generator' data field is linked to invalid child!\nObject Name: "+name);
+        setDataValidity(false);
+        generator = *ptr;
+    }else{
+        generator = *ptr;
     }
-    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        return false;
-    }
-    generator = *ptr;
     return true;
 }
 
@@ -334,31 +341,32 @@ hkbStateMachine::hkbStateMachine(BehaviorFile *parent/*, qint16 ref*/)
 
 bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("hkbStateMachine: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbStateMachine: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                return false;
+                writeToLog("hkbStateMachine: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "id"){
             id = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbStateMachine: readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
             }
         }else if (text == "payload"){
             if (!payload.readReference(index, reader)){
-                return false;
+                writeToLog("hkbStateMachine: readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
             }
         /*}*else if (text == "startStateChooser"){
             if (!generator.readReference(index, reader)){
@@ -367,37 +375,37 @@ bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){
         }else if (text == "startStateId"){
             startStateId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbStateMachine: readData()!\nFailed to properly read 'startStateId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "returnToPreviousStateEventId"){
             returnToPreviousStateEventId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbStateMachine: readData()!\nFailed to properly read 'returnToPreviousStateEventId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "transitionToNextHigherStateEventId"){
             transitionToNextHigherStateEventId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbStateMachine: readData()!\nFailed to properly read 'transitionToNextHigherStateEventId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "transitionToNextLowerStateEventId"){
             transitionToNextLowerStateEventId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbStateMachine: readData()!\nFailed to properly read 'transitionToNextLowerStateEventId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "syncVariableIndex"){
             syncVariableIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbStateMachine: readData()!\nFailed to properly read 'syncVariableIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "wrapAroundStateId"){
             wrapAroundStateId = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                return false;
+                writeToLog("hkbStateMachine: readData()!\nFailed to properly read 'wrapAroundStateId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "maxSimultaneousTransitions"){
             maxSimultaneousTransitions = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbStateMachine: readData()!\nFailed to properly read 'maxSimultaneousTransitions' data field!\nObject Reference: "+ref);
             }
         }else if (text == "startStateMode"){
             startStateMode = reader.getElementValueAt(index);
@@ -408,6 +416,9 @@ bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){
                     i = StartStateMode.size();
                 }
             }
+            if (!ok){
+                writeToLog("hkbStateMachine: readData()!\nInvalid 'startStateMode' data!\nObject Reference: "+ref);
+            }
         }else if (text == "selfTransitionMode"){
             selfTransitionMode = reader.getElementValueAt(index);
             ok = false;
@@ -417,13 +428,16 @@ bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){
                     i = SelfTransitionMode.size();
                 }
             }
+            if (!ok){
+                writeToLog("hkbStateMachine: readData()!\nInvalid 'selfTransitionMode' data!\nObject Reference: "+ref);
+            }
         }else if (text == "states"){
             if (!readReferences(reader.getElementValueAt(index), states)){
-                return false;
+                writeToLog("hkbStateMachine: readData()!\nFailed to properly read 'states' references!\nObject Reference: "+ref);
             }
         }else if (text == "wildcardTransitions"){
             if (!wildcardTransitions.readReference(index, reader)){
-                return false;
+                writeToLog("hkbStateMachine: readData()!\nFailed to properly read 'wildcardTransitions' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -437,13 +451,13 @@ bool hkbStateMachine::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("hkbStateMachine: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     //payload
     HkObjectExpSharedPtr *ptr = getParentFile()->findHkObject(payload.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            return false;
+            writeToLog("hkbStateMachine: linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
         }
         payload = *ptr;
     }
@@ -451,12 +465,15 @@ bool hkbStateMachine::link(){
         //states
         ptr = getParentFile()->findGenerator(states.at(i).getReference());
         if (!ptr){
-            return false;
+            writeToLog("hkbStateMachine: link()!\nFailed to properly link 'states' data field!\nObject Name: "+name);
+            setDataValidity(false);
+        }else if ((*ptr)->getSignature() != HKB_STATE_MACHINE_STATE_INFO){
+            writeToLog("hkbStateMachine: link()!\n'generator' data field is linked to invalid child!\nObject Name: "+name);
+            setDataValidity(false);
+            states[i] = *ptr;
+        }else{
+            states[i] = *ptr;
         }
-        if ((*ptr)->getSignature() != HKB_STATE_MACHINE_STATE_INFO){
-            return false;
-        }
-        states[i] = *ptr;
     }
     return true;
 }
@@ -478,30 +495,31 @@ hkbModifierGenerator::hkbModifierGenerator(BehaviorFile *parent/*, qint16 ref*/)
 
 bool hkbModifierGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("hkbModifierGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbModifierGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                return false;
+                writeToLog("hkbModifierGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "modifier"){
             if (!modifier.readReference(index, reader)){
-                return false;
+                writeToLog("hkbModifierGenerator: readData()!\nFailed to properly read 'modifier' reference!\nObject Reference: "+ref);
             }
         }else if (text == "generator"){
             if (!generator.readReference(index, reader)){
-                return false;
+                writeToLog("hkbModifierGenerator: readData()!\nFailed to properly read 'generator' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -515,7 +533,7 @@ bool hkbModifierGenerator::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("hkbModifierGenerator: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     //enterNotifyEvents
     HkObjectExpSharedPtr *ptr;
@@ -523,22 +541,23 @@ bool hkbModifierGenerator::link(){
     ptr = getParentFile()->findModifier(modifier.getReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_MODIFIER){
-            return false;
+            writeToLog("hkbModifierGenerator: link()!\n'modifier' data field is linked to invalid child!\nObject Name: "+name);
+            setDataValidity(false);
         }
         modifier = *ptr;
-        if (!static_cast<hkbModifier *>(modifier.data())->link()){
-            return false;
-        }
     }
     //generator
     ptr = getParentFile()->findGenerator(generator.getReference());
     if (!ptr){
-        return false;
+        writeToLog("hkbModifierGenerator: link()!\nFailed to properly link 'generator' data field!\nObject Name: "+name);
+        setDataValidity(false);
+    }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+        writeToLog("hkbModifierGenerator: link()!\n'generator' data field is linked to invalid child!\nObject Name: "+name);
+        setDataValidity(false);
+        generator = *ptr;
+    }else{
+        generator = *ptr;
     }
-    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        return false;
-    }
-    generator = *ptr;
     return true;
 }
 
@@ -561,36 +580,37 @@ hkbManualSelectorGenerator::hkbManualSelectorGenerator(BehaviorFile *parent/*, q
 
 bool hkbManualSelectorGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("hkbManualSelectorGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbManualSelectorGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                return false;
+                writeToLog("hkbManualSelectorGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "generators"){
             if (!readReferences(reader.getElementValueAt(index), generators)){
-                return false;
+                writeToLog("hkbManualSelectorGenerator: readData()!\nFailed to properly read 'generators' references!\nObject Reference: "+ref);
             }
         }else if (text == "selectedGeneratorIndex"){
             selectedGeneratorIndex = reader.getElementValueAt(index).toShort(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbManualSelectorGenerator: readData()!\nFailed to properly read 'selectedGeneratorIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "currentGeneratorIndex"){
             currentGeneratorIndex = reader.getElementValueAt(index).toShort(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbManualSelectorGenerator: readData()!\nFailed to properly read 'currentGeneratorIndex' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -604,7 +624,7 @@ bool hkbManualSelectorGenerator::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("hkbManualSelectorGenerator: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     //generators
     HkObjectExpSharedPtr *ptr;
@@ -612,12 +632,15 @@ bool hkbManualSelectorGenerator::link(){
         //generators
         ptr = getParentFile()->findGenerator(generators.at(i).getReference());
         if (!ptr){
-            return false;
+            writeToLog("hkbManualSelectorGenerator: link()!\nFailed to properly link 'generators' data field!\nObject Name: "+name);
+            setDataValidity(false);
+        }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+            writeToLog("hkbManualSelectorGenerator: link()!\n'generators' data field is linked to invalid child!\nObject Name: "+name);
+            setDataValidity(false);
+            generators[i] = *ptr;
+        }else{
+            generators[i] = *ptr;
         }
-        if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-            return false;
-        }
-        generators[i] = *ptr;
     }
     return true;
 }
@@ -639,30 +662,31 @@ hkbBlenderGeneratorChild::hkbBlenderGeneratorChild(BehaviorFile *parent/*, qint1
 
 bool hkbBlenderGeneratorChild::readData(const HkxXmlReader &reader, long index){
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("hkbBlenderGeneratorChild: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "generator"){
             if (!generator.readReference(index, reader)){
-                return false;
+                writeToLog("hkbBlenderGeneratorChild: readData()!\nFailed to properly read 'generator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "boneWeights"){
             if (!boneWeights.readReference(index, reader)){
-                return false;
+                writeToLog("hkbBlenderGeneratorChild: readData()!\nFailed to properly read 'boneWeights' reference!\nObject Reference: "+ref);
             }
         }else if (text == "weight"){
             weight = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbBlenderGeneratorChild: readData()!\nFailed to properly read 'weight' data field!\nObject Reference: "+ref);
             }
         }else if (text == "worldFromModelWeight"){
             worldFromModelWeight = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbBlenderGeneratorChild: readData()!\nFailed to properly read 'worldFromModelWeight' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -676,25 +700,29 @@ bool hkbBlenderGeneratorChild::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("hkbBlenderGeneratorChild: link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
     //boneWeights
     HkObjectExpSharedPtr *ptr = getParentFile()->findHkObject(boneWeights.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-            return false;
+            writeToLog("hkbBlenderGeneratorChild: link()!\n'boneWeights' data field is linked to invalid child!");
+            setDataValidity(false);
         }
         boneWeights = *ptr;
     }
     //generator
     ptr = getParentFile()->findGenerator(generator.getReference());
     if (!ptr){
-        return false;
+        writeToLog("hkbBlenderGeneratorChild: link()!\nFailed to properly link 'generator' data field!");
+        setDataValidity(false);
+    }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+        writeToLog("hkbBlenderGeneratorChild: link()!\n'generator' data field is linked to invalid child!");
+        setDataValidity(false);
+        generator = *ptr;
+    }else{
+        generator = *ptr;
     }
-    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        return false;
-    }
-    generator = *ptr;
     return true;
 }
 
@@ -724,61 +752,62 @@ hkbBlenderGenerator::hkbBlenderGenerator(BehaviorFile *parent/*, qint16 ref*/)
 
 bool hkbBlenderGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                return false;
+                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "referencePoseWeightThreshold"){
             referencePoseWeightThreshold = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'referencePoseWeightThreshold' data field!\nObject Reference: "+ref);
             }
         }else if (text == "blendParameter"){
             blendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'blendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minCyclicBlendParameter"){
             minCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'minCyclicBlendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "maxCyclicBlendParameter"){
             maxCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'maxCyclicBlendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "indexOfSyncMasterChild"){
             indexOfSyncMasterChild = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'indexOfSyncMasterChild' data field!\nObject Reference: "+ref);
             }
         }else if (text == "flags"){
             flags = reader.getElementValueAt(index);
             if (flags == ""){
-                return false;
+                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
             }
         }else if (text == "subtractLastChild"){
             subtractLastChild = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                return false;
+                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'subtractLastChild' data field!\nObject Reference: "+ref);
             }
         }else if (text == "children"){
             if (!readReferences(reader.getElementValueAt(index), children)){
-                return false;
+                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'children' references!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -792,7 +821,7 @@ bool hkbBlenderGenerator::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("hkbBlenderGenerator: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     //children
     HkObjectExpSharedPtr *ptr;
@@ -800,12 +829,15 @@ bool hkbBlenderGenerator::link(){
         //generators
         ptr = getParentFile()->findGenerator(children.at(i).getReference());
         if (!ptr){
-            return false;
+            writeToLog("hkbBlenderGenerator: link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
+            setDataValidity(false);
+        }else if ((*ptr)->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
+            writeToLog("hkbBlenderGenerator: link()!\n'children' data field is linked to invalid child!\nObject Name: "+name);
+            setDataValidity(false);
+            children[i] = *ptr;
+        }else{
+            children[i] = *ptr;
         }
-        if ((*ptr)->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
-            return false;
-        }
-        children[i] = *ptr;
     }
     return true;
 }
@@ -824,20 +856,21 @@ BSBoneSwitchGeneratorBoneData::BSBoneSwitchGeneratorBoneData(BehaviorFile *paren
 }
 
 bool BSBoneSwitchGeneratorBoneData::readData(const HkxXmlReader &reader, long index){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("BSBoneSwitchGeneratorBoneData: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "pGenerator"){
             if (!pGenerator.readReference(index, reader)){
-                return false;
+                writeToLog("BSBoneSwitchGeneratorBoneData: readData()!\nFailed to properly read 'pGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "spBoneWeight"){
             if (!spBoneWeight.readReference(index, reader)){
-                return false;
+                writeToLog("BSBoneSwitchGeneratorBoneData: readData()!\nFailed to properly read 'spBoneWeight' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -851,22 +884,26 @@ bool BSBoneSwitchGeneratorBoneData::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("BSBoneSwitchGeneratorBoneData: link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
     //pGenerator
     HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pGenerator.getReference());
     if (!ptr){
-        return false;
+        writeToLog("BSBoneSwitchGeneratorBoneData: link()!\nFailed to properly link 'pGenerator' data field!");
+        setDataValidity(false);
+    }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+        writeToLog("BSBoneSwitchGeneratorBoneData: link()!\n'pGenerator' data field is linked to invalid child!");
+        setDataValidity(false);
+        pGenerator = *ptr;
+    }else{
+        pGenerator = *ptr;
     }
-    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        return false;
-    }
-    pGenerator = *ptr;
     //spBoneWeight
     ptr = getParentFile()->findHkObject(spBoneWeight.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-            return false;
+            writeToLog("BSBoneSwitchGeneratorBoneData: link()!\n'spBoneWeight' data field is linked to invalid child!");
+            setDataValidity(false);
         }
         spBoneWeight = *ptr;
     }
@@ -890,30 +927,31 @@ BSBoneSwitchGenerator::BSBoneSwitchGenerator(BehaviorFile *parent/*, qint16 ref*
 
 bool BSBoneSwitchGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("BSBoneSwitchGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSBoneSwitchGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                return false;
+                writeToLog("BSBoneSwitchGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pDefaultGenerator"){
             if (!pDefaultGenerator.readReference(index, reader)){
-                return false;
+                writeToLog("BSBoneSwitchGenerator: readData()!\nFailed to properly read 'pDefaultGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "ChildrenA"){
             if (!readReferences(reader.getElementValueAt(index), ChildrenA)){
-                return false;
+                writeToLog("BSBoneSwitchGenerator: readData()!\nFailed to properly read 'ChildrenA' references!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -927,27 +965,33 @@ bool BSBoneSwitchGenerator::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("BSBoneSwitchGenerator: link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
     //pDefaultGenerator
     HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pDefaultGenerator.getReference());
     if (!ptr){
-        return false;
+        writeToLog("BSBoneSwitchGenerator: link()!\nFailed to properly link 'pDefaultGenerator' data field!");
+        setDataValidity(false);
+    }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+        writeToLog("BSBoneSwitchGenerator: link()!\n'pDefaultGenerator' data field is linked to invalid child!");
+        setDataValidity(false);
+        pDefaultGenerator = *ptr;
+    }else{
+        pDefaultGenerator = *ptr;
     }
-    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        return false;
-    }
-    pDefaultGenerator = *ptr;
     for (int i = 0; i < ChildrenA.size(); i++){
         //ChildrenA
         ptr = getParentFile()->findGenerator(ChildrenA.at(i).getReference());
         if (!ptr){
-            return false;
+            writeToLog("BSBoneSwitchGenerator: link()!\nFailed to properly link 'ChildrenA' data field!");
+            setDataValidity(false);
+        }else if ((*ptr)->getSignature() != BS_BONE_SWITCH_GENERATOR_BONE_DATA){
+            writeToLog("BSBoneSwitchGenerator: link()!\n'ChildrenA' data field is linked to invalid child!");
+            setDataValidity(false);
+            ChildrenA[i] = *ptr;
+        }else{
+            ChildrenA[i] = *ptr;
         }
-        if ((*ptr)->getSignature() != BS_BONE_SWITCH_GENERATOR_BONE_DATA){
-            return false;
-        }
-        ChildrenA[i] = *ptr;
     }
     return true;
 }
@@ -974,26 +1018,27 @@ BSCyclicBlendTransitionGenerator::BSCyclicBlendTransitionGenerator(BehaviorFile 
 
 bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("BSCyclicBlendTransitionGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSCyclicBlendTransitionGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                return false;
+                writeToLog("BSCyclicBlendTransitionGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pBlenderGenerator"){
             if (!pBlenderGenerator.readReference(index, reader)){
-                return false;
+                writeToLog("BSCyclicBlendTransitionGenerator: readData()!\nFailed to properly read 'pBlenderGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "EventToFreezeBlendValue"){
             index++;
@@ -1002,11 +1047,11 @@ bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long
                 if (text == "id"){
                     eventToFreezeBlendValueId = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        return false;
+                        writeToLog("BSCyclicBlendTransitionGenerator: readData()!\nFailed to properly read 'eventToFreezeBlendValueId' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!eventToFreezeBlendValuePayload.readReference(index, reader)){
-                        return false;
+                        writeToLog("BSCyclicBlendTransitionGenerator: readData()!\nFailed to properly read 'eventToFreezeBlendValuePayload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -1019,11 +1064,11 @@ bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long
                 if (text == "id"){
                     eventToCrossBlendId = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        return false;
+                        writeToLog("BSCyclicBlendTransitionGenerator: readData()!\nFailed to properly read 'eventToCrossBlendId' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!eventToCrossBlendPayload.readReference(index, reader)){
-                        return false;
+                        writeToLog("BSCyclicBlendTransitionGenerator: readData()!\nFailed to properly read 'eventToCrossBlendPayload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -1032,17 +1077,17 @@ bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long
         }else if (text == "fBlendParameter"){
             fBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSCyclicBlendTransitionGenerator: readData()!\nFailed to properly read 'fBlendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "fTransitionDuration"){
             fTransitionDuration = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSCyclicBlendTransitionGenerator: readData()!\nFailed to properly read 'fTransitionDuration' data field!\nObject Reference: "+ref);
             }
         }else if (text == "eBlendCurve"){
             eBlendCurve = reader.getElementValueAt(index);
             if (eBlendCurve == ""){
-                return false;
+                writeToLog("BSCyclicBlendTransitionGenerator: readData()!\nFailed to properly read 'eBlendCurve' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -1056,17 +1101,20 @@ bool BSCyclicBlendTransitionGenerator::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("BSCyclicBlendTransitionGenerator: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     //pBlenderGenerator
     HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pBlenderGenerator.getReference());
     if (!ptr){
-        return false;
+        writeToLog("BSCyclicBlendTransitionGenerator: link()!\nFailed to properly link 'pBlenderGenerator' data field!\nObject Name: "+name);
+        setDataValidity(false);
+    }else if ((*ptr)->getSignature() != HKB_BLENDER_GENERATOR){
+        writeToLog("BSCyclicBlendTransitionGenerator: link()!\n'pBlenderGenerator' data field is linked to invalid child!\nObject Name: "+name);
+        setDataValidity(false);
+        pBlenderGenerator = *ptr;
+    }else{
+        pBlenderGenerator = *ptr;
     }
-    if ((*ptr)->getSignature() != HKB_BLENDER_GENERATOR){
-        return false;
-    }
-    pBlenderGenerator = *ptr;
     return true;
 }
 
@@ -1089,36 +1137,37 @@ BSiStateTaggingGenerator::BSiStateTaggingGenerator(BehaviorFile *parent/*, qint1
 
 bool BSiStateTaggingGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("BSiStateTaggingGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSiStateTaggingGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                return false;
+                writeToLog("BSiStateTaggingGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pDefaultGenerator"){
             if (!pDefaultGenerator.readReference(index, reader)){
-                return false;
+                writeToLog("BSiStateTaggingGenerator: readData()!\nFailed to properly read 'pDefaultGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "iStateToSetAs"){
             iStateToSetAs = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSiStateTaggingGenerator: readData()!\nFailed to properly read 'iStateToSetAs' data field!\nObject Reference: "+ref);
             }
         }else if (text == "iPriority"){
             iPriority = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSiStateTaggingGenerator: readData()!\nFailed to properly read 'iPriority' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -1132,17 +1181,20 @@ bool BSiStateTaggingGenerator::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("BSiStateTaggingGenerator: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     //pDefaultGenerator
     HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pDefaultGenerator.getReference());
     if (!ptr){
-        return false;
+        writeToLog("BSiStateTaggingGenerator: link()!\nFailed to properly link 'pDefaultGenerator' data field!\nObject Name: "+name);
+        setDataValidity(false);
+    }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+        writeToLog("BSiStateTaggingGenerator: link()!\n'pDefaultGenerator' data field is linked to invalid child!\nObject Name: "+name);
+        setDataValidity(false);
+        pDefaultGenerator = *ptr;
+    }else{
+        pDefaultGenerator = *ptr;
     }
-    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        return false;
-    }
-    pDefaultGenerator = *ptr;
     return true;
 }
 
@@ -1163,27 +1215,28 @@ hkbBehaviorReferenceGenerator::hkbBehaviorReferenceGenerator(BehaviorFile *paren
 
 bool hkbBehaviorReferenceGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("hkbBehaviorReferenceGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbBehaviorReferenceGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                return false;
+                writeToLog("hkbBehaviorReferenceGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "behaviorName"){
             behaviorName = reader.getElementValueAt(index);
             if (behaviorName == ""){
-                return false;
+                writeToLog("hkbBehaviorReferenceGenerator: readData()!\nFailed to properly read 'behaviorName' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -1224,76 +1277,77 @@ hkbClipGenerator::hkbClipGenerator(BehaviorFile *parent/*, qint16 ref*/)
 
 bool hkbClipGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("hkbClipGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbClipGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                return false;
+                writeToLog("hkbClipGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "animationName"){
             animationName = reader.getElementValueAt(index);
             if (animationName == ""){
-                return false;
+                writeToLog("hkbClipGenerator: readData()!\nFailed to properly read 'animationName' data field!\nObject Reference: "+ref);
             }
         }else if (text == "triggers"){
             if (!triggers.readReference(index, reader)){
-                return false;
+                writeToLog("hkbClipGenerator: readData()!\nFailed to properly read 'triggers' reference!\nObject Reference: "+ref);
             }
         }else if (text == "cropStartAmountLocalTime"){
             cropStartAmountLocalTime = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbClipGenerator: readData()!\nFailed to properly read 'cropStartAmountLocalTime' data field!\nObject Reference: "+ref);
             }
         }else if (text == "cropEndAmountLocalTime"){
             cropEndAmountLocalTime = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbClipGenerator: readData()!\nFailed to properly read 'cropEndAmountLocalTime' data field!\nObject Reference: "+ref);
             }
         }else if (text == "startTime"){
             startTime = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbClipGenerator: readData()!\nFailed to properly read 'startTime' data field!\nObject Reference: "+ref);
             }
         }else if (text == "playbackSpeed"){
             playbackSpeed = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbClipGenerator: readData()!\nFailed to properly read 'playbackSpeed' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enforcedDuration"){
             enforcedDuration = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbClipGenerator: readData()!\nFailed to properly read 'enforcedDuration' data field!\nObject Reference: "+ref);
             }
         }else if (text == "userControlledTimeFraction"){
             userControlledTimeFraction = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbClipGenerator: readData()!\nFailed to properly read 'userControlledTimeFraction' data field!\nObject Reference: "+ref);
             }
         }else if (text == "animationBindingIndex"){
             animationBindingIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbClipGenerator: readData()!\nFailed to properly read 'animationBindingIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "mode"){
             mode = reader.getElementValueAt(index);
             if (mode == ""){
-                return false;
+                writeToLog("hkbClipGenerator: readData()!\nFailed to properly read 'mode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "flags"){
             flags = reader.getElementValueAt(index);
             if (flags == ""){
-                return false;
+                writeToLog("hkbClipGenerator: readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -1307,13 +1361,14 @@ bool hkbClipGenerator::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("hkbClipGenerator: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     //triggers
     HkObjectExpSharedPtr *ptr = getParentFile()->findHkObject(triggers.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_CLIP_TRIGGER_ARRAY){
-            return false;
+            writeToLog("hkbClipGenerator: link()!\n'triggers' data field is linked to invalid child!\nObject Name: "+name);
+            setDataValidity(false);
         }
         triggers = *ptr;
     }
@@ -1344,66 +1399,67 @@ BSSynchronizedClipGenerator::BSSynchronizedClipGenerator(BehaviorFile *parent/*,
 
 bool BSSynchronizedClipGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                return false;
+                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pClipGenerator"){
             if (!pClipGenerator.readReference(index, reader)){
-                return false;
+                writeToLog("BSiStateTaggingGenerator: readData()!\nFailed to properly read 'pClipGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "SyncAnimPrefix"){
             SyncAnimPrefix = reader.getElementValueAt(index);
             if (SyncAnimPrefix == ""){
-                return false;
+                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'SyncAnimPrefix' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bSyncClipIgnoreMarkPlacement"){
             bSyncClipIgnoreMarkPlacement = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                return false;
+                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'bSyncClipIgnoreMarkPlacement' data field!\nObject Reference: "+ref);
             }
         }else if (text == "fGetToMarkTime"){
             fGetToMarkTime = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'fGetToMarkTime' data field!\nObject Reference: "+ref);
             }
         }else if (text == "fMarkErrorThreshold"){
             fMarkErrorThreshold = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'fMarkErrorThreshold' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bLeadCharacter"){
             bLeadCharacter = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                return false;
+                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'bLeadCharacter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bReorientSupportChar"){
             bReorientSupportChar = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                return false;
+                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'bReorientSupportChar' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bApplyMotionFromRoot"){
             bApplyMotionFromRoot = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                return false;
+                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'bApplyMotionFromRoot' data field!\nObject Reference: "+ref);
             }
         }else if (text == "sAnimationBindingIndex"){
             sAnimationBindingIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'sAnimationBindingIndex' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -1417,14 +1473,18 @@ bool BSSynchronizedClipGenerator::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("BSSynchronizedClipGenerator: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     //pClipGenerator
     HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pClipGenerator.getReference());
-    if (ptr){
-        if ((*ptr)->getSignature() != HKB_CLIP_GENERATOR){
-            return false;
-        }
+    if (!ptr){
+        writeToLog("BSSynchronizedClipGenerator: link()!\nFailed to properly link 'pClipGenerator' data field!\nObject Name: "+name);
+        setDataValidity(false);
+    }else if ((*ptr)->getSignature() != HKB_CLIP_GENERATOR){
+        writeToLog("BSSynchronizedClipGenerator: link()!\n'pClipGenerator' data field is linked to invalid child!\nObject Name: "+name);
+        setDataValidity(false);
+        pClipGenerator = *ptr;
+    }else{
         pClipGenerator = *ptr;
     }
     return true;
@@ -1466,121 +1526,122 @@ hkbPoseMatchingGenerator::hkbPoseMatchingGenerator(BehaviorFile *parent/*, qint1
 
 bool hkbPoseMatchingGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "referencePoseWeightThreshold"){
             referencePoseWeightThreshold = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'referencePoseWeightThreshold' data field!\nObject Reference: "+ref);
             }
         }else if (text == "blendParameter"){
             blendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'blendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minCyclicBlendParameter"){
             minCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'minCyclicBlendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "maxCyclicBlendParameter"){
             maxCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'maxCyclicBlendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "indexOfSyncMasterChild"){
             indexOfSyncMasterChild = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'indexOfSyncMasterChild' data field!\nObject Reference: "+ref);
             }
         }else if (text == "flags"){
             flags = reader.getElementValueAt(index);
             if (flags == ""){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
             }
         }else if (text == "subtractLastChild"){
             subtractLastChild = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'subtractLastChild' data field!\nObject Reference: "+ref);
             }
         }else if (text == "children"){
             if (!readReferences(reader.getElementValueAt(index), children)){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'children' references!\nObject Reference: "+ref);
             }
         }else if (text == "worldFromModelRotation"){
             worldFromModelRotation = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'worldFromModelRotation' data field!\nObject Reference: "+ref);
             }
         }else if (text == "blendSpeed"){
             blendSpeed = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'blendSpeed' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minSpeedToSwitch"){
             minSpeedToSwitch = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'minSpeedToSwitch' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minSwitchTimeNoError"){
             minSwitchTimeNoError = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'minSwitchTimeNoError' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minSwitchTimeFullError"){
             minSwitchTimeFullError = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'minSwitchTimeFullError' data field!\nObject Reference: "+ref);
             }
         }else if (text == "startPlayingEventId"){
             startPlayingEventId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'startPlayingEventId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "startMatchingEventId"){
             startMatchingEventId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'startMatchingEventId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "rootBoneIndex"){
             rootBoneIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'rootBoneIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "otherBoneIndex"){
             otherBoneIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'otherBoneIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "anotherBoneIndex"){
             anotherBoneIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'anotherBoneIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pelvisIndex"){
             pelvisIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'pelvisIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "mode"){
             mode = reader.getElementValueAt(index);
             if (mode == ""){
-                return false;
+                writeToLog("hkbPoseMatchingGenerator: readData()!\nFailed to properly read 'mode' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -1594,7 +1655,7 @@ bool hkbPoseMatchingGenerator::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("hkbPoseMatchingGenerator: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     //children
     HkObjectExpSharedPtr *ptr;
@@ -1602,12 +1663,15 @@ bool hkbPoseMatchingGenerator::link(){
         //generators
         ptr = getParentFile()->findGenerator(children.at(i).getReference());
         if (!ptr){
-            return false;
+            writeToLog("hkbPoseMatchingGenerator: link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
+            setDataValidity(false);
+        }else if ((*ptr)->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
+            writeToLog("hkbPoseMatchingGenerator: link()!\n'children' data field is linked to invalid child!\nObject Name: "+name);
+            setDataValidity(false);
+            children[i] = *ptr;
+        }else{
+            children[i] = *ptr;
         }
-        if ((*ptr)->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
-            return false;
-        }
-        children[i] = *ptr;
     }
     return true;
 }
@@ -1631,46 +1695,47 @@ BSOffsetAnimationGenerator::BSOffsetAnimationGenerator(BehaviorFile *parent/*, q
 }
 
 bool BSOffsetAnimationGenerator::readData(const HkxXmlReader &reader, long index){
-    QByteArray text;
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("BSOffsetAnimationGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSOffsetAnimationGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                return false;
+                writeToLog("BSOffsetAnimationGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pDefaultGenerator"){
             if (!pDefaultGenerator.readReference(index, reader)){
-                return false;
+                writeToLog("BSOffsetAnimationGenerator: readData()!\nFailed to properly read 'pDefaultGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "pOffsetClipGenerator"){
             if (!pOffsetClipGenerator.readReference(index, reader)){
-                return false;
+                writeToLog("BSOffsetAnimationGenerator: readData()!\nFailed to properly read 'pOffsetClipGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "fOffsetVariable"){
             fOffsetVariable = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSOffsetAnimationGenerator: readData()!\nFailed to properly read 'fOffsetVariable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "fOffsetRangeStart"){
             fOffsetRangeStart = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSOffsetAnimationGenerator: readData()!\nFailed to properly read 'fOffsetRangeStart' data field!\nObject Reference: "+ref);
             }
         }else if (text == "fOffsetRangeEnd"){
             fOffsetRangeEnd = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                return false;
+                writeToLog("BSOffsetAnimationGenerator: readData()!\nFailed to properly read 'fOffsetRangeEnd' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -1684,23 +1749,30 @@ bool BSOffsetAnimationGenerator::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("BSOffsetAnimationGenerator: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     //pDefaultGenerator
     HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pDefaultGenerator.getReference());
     if (!ptr){
-        return false;
+        writeToLog("BSOffsetAnimationGenerator: link()!\nFailed to properly link 'pDefaultGenerator' data field!\nObject Name: "+name);
+        setDataValidity(false);
+    }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+        writeToLog("BSOffsetAnimationGenerator: link()!\n'pDefaultGenerator' data field is linked to invalid child!\nObject Name: "+name);
+        setDataValidity(false);
+        pDefaultGenerator = *ptr;
+    }else{
+        pDefaultGenerator = *ptr;
     }
-    if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        return false;
-    }
-    pDefaultGenerator = *ptr;
     //pOffsetClipGenerator
     ptr = getParentFile()->findGenerator(pOffsetClipGenerator.getReference());
-    if (ptr){
-        if ((*ptr)->getSignature() != HKB_CLIP_GENERATOR){
-            return false;
-        }
+    if (!ptr){
+        writeToLog("BSOffsetAnimationGenerator: link()!\nFailed to properly link 'pOffsetClipGenerator' data field!\nObject Name: "+name);
+        setDataValidity(false);
+    }else if ((*ptr)->getSignature() != HKB_CLIP_GENERATOR){
+        writeToLog("BSOffsetAnimationGenerator: link()!\n'pOffsetClipGenerator' data field is linked to invalid child!\nObject Name: "+name);
+        setDataValidity(false);
+        pOffsetClipGenerator = *ptr;
+    }else{
         pOffsetClipGenerator = *ptr;
     }
     return true;
@@ -1725,35 +1797,36 @@ hkbBehaviorGraph::hkbBehaviorGraph(BehaviorFile *parent/*, qint16 ref*/)
 
 bool hkbBehaviorGraph::readData(const HkxXmlReader &reader, long index){
     bool ok;
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                return false;
+                writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                return false;
+                writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                return false;
+                writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "variableMode"){
             variableMode = reader.getElementValueAt(index);
             if (variableMode == ""){
-                return false;
+                writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'variableMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "rootGenerator"){
             if (!rootGenerator.readReference(index, reader)){
-                return false;
+                writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'rootGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "data"){
             if (!data.readReference(index, reader)){
-                return false;
+                writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'data' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -1766,44 +1839,29 @@ bool hkbBehaviorGraph::link(){
         return false;
     }
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        return false;
+        writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(rootGenerator.getReference());
     if (!ptr){
-        return false;
+        writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'rootGenerator' data field!\nObject Name: "+name);
+        setDataValidity(false);
+    }else if ((*ptr)->getSignature() != HKB_STATE_MACHINE){
+        writeToLog("hkbBehaviorGraph: link()!\n'rootGenerator' data field is linked to invalid child!\nObject Name: "+name);
+        setDataValidity(false);
+        rootGenerator = *ptr;
+    }else{
+        rootGenerator = *ptr;
     }
-    rootGenerator = *ptr;
-    if (rootGenerator->getSignature() != HKB_STATE_MACHINE){
-        return false;
-    }
-    /*ptr = getParentFile()->findGenerator(data.getReference());
+    ptr = getParentFile()->findHkObject(data.getReference());
     if (!ptr){
-        return false;
+        writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'data' data field!\nObject Name: "+name, true);
+        setDataValidity(false);
+    }else if ((*ptr)->getSignature() != HKB_BEHAVIOR_GRAPH_DATA){
+        writeToLog("hkbBehaviorGraph: link()!\n'data' data field is linked to invalid child!\nObject Name: "+name, true);
+        setDataValidity(false);
+        data = *ptr;
+    }else{
+        data = *ptr;
     }
-    data = *ptr;
-    if (data->getSignature() != HKB_BEHAVIOR_GRAPH_DATA){
-        return false;
-    }*/
     return true;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

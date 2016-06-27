@@ -17,6 +17,7 @@ class FileSelectWindow: public QWidget
 public:
     FileSelectWindow(QString windowName);
     virtual ~FileSelectWindow();
+    QString getSelectedFilename();
 private:
     QGridLayout *topLyt;
     QFormLayout *fileInfoLyt;

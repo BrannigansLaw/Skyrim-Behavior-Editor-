@@ -15,25 +15,37 @@ public:
     enum HkxType {TYPE_OTHER=0, TYPE_GENERATOR=1, TYPE_MODIFIER=2};
 public:
     virtual ~HkObject(){}
-    qint64 getSignature(){return signature;}
-    HkxType getType()const{return typeCheck;}
+    void writeToLog(const QString & message, bool isError = false);
+    void setProgressData(const QString & message, int value);
+    qint64 getSignature() const{
+        return signature;
+    }
+    HkxType getType()const{
+        return typeCheck;
+    }
     virtual bool link() = 0;
-    //virtual bool readData(const HkxXmlReader & reader, int index) = 0;
 protected:
-    HkObject(BehaviorFile *parent = NULL/*, long ref = 0*/): parentFile(parent), reference(0)/*, reference(ref)*/{}
-    BehaviorFile * getParentFile(){return parentFile;}
-    //void setRef(long ref){reference = ref;}
-    void setType(HkxSignature sig, HkxType type){signature = sig;typeCheck = type;}
+    HkObject(BehaviorFile *parent = NULL/*, long ref = 0*/)
+        : parentFile(parent),
+          reference(0),
+          isDataValid(true)
+        /*, reference(ref)*/
+    {
+        //
+    }
+    BehaviorFile * getParentFile() const{
+        return parentFile;
+    }
+    void setType(HkxSignature sig, HkxType type){
+        signature = sig;typeCheck = type;
+    }
+    void setDataValidity(bool isValid){
+        isDataValid = isValid;
+    }
+
     bool readIntegers(const QByteArray &line, QVector<qint16> & ints);
     bool toBool(const QByteArray &line, bool *ok);
-    //qint16 readSingleInt(const QByteArray &line, bool *ok);
-    //qreal readSingleDouble(const QByteArray &line, bool *ok);
     bool readDoubles(const QByteArray &line, QVector<qreal> & doubles);
-    //qint16 readNumberElements(const QByteArray &line, bool *ok);
-    //qint16 readReference(const QByteArray &lineIn, bool *ok);
-    //virtual bool readReferences() = 0;
-    //bool readReferences(const QByteArray &line, QList <HkObjectExpSharedPtr> & refs);
-    //virtual bool readData(const HkxXmlReader & reader, int index){return true;}
     hkVector3 readVector3(const QByteArray &lineIn, bool *ok);
     hkVector4 readVector4(const QByteArray &lineIn, bool *ok);
 private:
@@ -44,6 +56,7 @@ private:
     long reference;
     HkxSignature signature;
     HkxType typeCheck;
+    bool isDataValid;
 };
 
 class HkObjectExpSharedPtr: public QExplicitlySharedDataPointer <HkObject>

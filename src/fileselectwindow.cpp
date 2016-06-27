@@ -36,7 +36,12 @@ FileSelectWindow::~FileSelectWindow(){
     //
 }
 
+QString FileSelectWindow::getSelectedFilename(){
+    return filenameLE->text();
+}
+
 void FileSelectWindow::select(){
+    filenameLE->setText(fileSysFSM->fileName(dirViewTV->currentIndex()));
     emit selectFile(fileSysFSM->filePath(dirViewTV->currentIndex()));
     hide();
 }

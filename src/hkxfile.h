@@ -14,21 +14,49 @@ class hkbGenerator;
 class hkbModifier;
 class hkbOther;
 class hkRootLevelContainer;
+class MainWindow;
 
 class HkxFile: public QFile
 {
     friend class BehaviorGraphView;
 public:
-    HkxFile(const QString & name): QFile(name){parse();}
+    void writeToLog(const QString & message, bool isError = false);
+    void setProgressData(const QString & message, int value);
+
+    HkxFile(MainWindow *window, const QString & name): QFile(name), ui(window){
+        parse();
+    }
+
     virtual ~HkxFile(){}
-    void closeFile(){if (isOpen()) close();}
-    HkObjectExpSharedPtr & getRootObject(){return rootObject;}
+
+    void closeFile(){
+        if (isOpen()){
+            close();
+        }
+    }
+
+    HkObjectExpSharedPtr & getRootObject(){
+        return rootObject;
+    }
+
 protected:
-    virtual bool parse(){return true;}
-    virtual bool link(){return true;}
+    virtual bool parse(){
+        return true;
+    }
+    virtual bool link(){
+        return true;
+    }
     //virtual void read(){}
-    void setRootObject(HkObjectExpSharedPtr & obj){rootObject = obj;}
+    void setRootObject(HkObjectExpSharedPtr & obj){
+        rootObject = obj;
+    }
+
+    MainWindow * getUI(){
+        return ui;
+    }
+
 private:
+    MainWindow *ui;
     HkObjectExpSharedPtr rootObject;
 };
 
@@ -38,13 +66,7 @@ class BehaviorFile: public HkxFile
     template <typename T>
     bool appendAndReadData(int ind, T * obj);
 public:
-    BehaviorFile(const QString & name): HkxFile(name){
-        reader.setBehaviorFile(this);
-        if (!parse()){
-            //int i = 9;
-        }
-        reader.clear();
-    }
+    BehaviorFile(MainWindow *window, const QString & name);
     virtual ~BehaviorFile(){}
     HkObjectExpSharedPtr * findHkObject(long ref);
     HkObjectExpSharedPtr * findGenerator(long ref);

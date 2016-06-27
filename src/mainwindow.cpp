@@ -4,29 +4,44 @@
 #include "generators.h"
 #include "behaviorgraphui.h"
 
-#include <QBoxLayout>
-#include <QMenuBar>
-#include <QFile>
-#include <QSettings>
-#include <QGroupBox>
-#include <QMessageBox>
-#include <QGraphicsSceneMouseEvent>
+#include <QtWidgets>
 
-MainWindow::MainWindow(){
-    topLyt = new QVBoxLayout(this);
-    topMB = new QMenuBar(this);
-    openA = new QAction("Open Project", this);
+MainWindow::MainWindow()
+    :
+      topLyt(new QGridLayout(this)),
+      topMB(new QMenuBar(this)),
+      debugLog(new QPlainTextEdit(this)),
+      openA(new QAction("Open Project", this)),
+      openM(new QMenu("File", this)),
+      behaviorGraphViewIV(NULL),
+      dirViewFSW(new FileSelectWindow("Select a hkx file to open!")),
+      hkxFile(NULL),
+      iconGBLyt(new QVBoxLayout(this)),
+      behaviorGraphViewGB(new QGroupBox("Behavior Graph")),
+      objectDataGB(new QGroupBox("Object Data")),
+      eventsGB(new QGroupBox("Events")),
+      variablesGB(new QGroupBox("Variables")),
+      logGB(new QGroupBox("Debug Log")),
+      logGBLyt(new QVBoxLayout(this)),
+      drawGraph(true),
+      progressD(/*new QProgressDialog(this)*/NULL)
+{
+    logGB->setMinimumHeight(300);
+    logGB->setMinimumWidth(300);
     openA->setStatusTip("Open a hkx project file!");
     openA->setShortcut(QKeySequence::Open);
-    openM =new QMenu("File");
     openM->addAction(openA);
+    topMB->setMaximumHeight(50);
     topMB->addMenu(openM);
-    topLyt->addWidget(topMB);
-    dirViewFSW = new FileSelectWindow("Select a hkx file to open!");
-    hkxFile = NULL;
-    iconGBLyt = new QVBoxLayout;
-    behaviorGraphViewGB = new QGroupBox("Behavior Graph");
-    //BehaviorGraphViewGB->setLayout(iconGBLyt);
+    logGBLyt->addWidget(debugLog);
+    logGB->setLayout(logGBLyt);
+    topLyt->addWidget(topMB, 0, 0, 1, 10);
+    topLyt->addWidget(behaviorGraphViewGB, 1, 0, 6, 6);
+    topLyt->addWidget(objectDataGB, 1, 6, 6, 4);
+    topLyt->addWidget(eventsGB, 7, 0, 3, 3);
+    topLyt->addWidget(variablesGB, 7, 3, 3, 3);
+    topLyt->addWidget(logGB, 7, 6, 3, 4);
+    //progressD->hide();
     readSettings();
     setLayout(topLyt);
     connect(openA, SIGNAL(triggered(bool)), this, SLOT(openDirView()));
@@ -37,31 +52,92 @@ MainWindow::~MainWindow(){
     //
 }
 
+void MainWindow::setProgressData(const QString & message, int max, int min, int value){
+    if (progressD){
+        progressD->setWindowTitle("Opening "+dirViewFSW->getSelectedFilename());
+        progressD->setLabelText(message);
+        progressD->setMaximum(max);
+        progressD->setMinimum(min);
+        progressD->setValue(value);
+        progressD->resize(geometry().width()*0.15, geometry().height()*0.05);
+        progressD->open();
+        QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+    }
+}
+
+void MainWindow::setProgressData(const QString & message, int value){
+    if (progressD){
+        QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+        progressD->setLabelText(message);
+        progressD->setValue(value);
+        //progressD->resize(geometry().width()*0.15, geometry().height()*0.15);
+        //progressD->open();
+    }
+}
+
+void MainWindow::writeToLog(const QString &message, bool isError){
+    QString str;
+    QString temp = "\n#########################################";
+    if (!isError){
+        str = "WARNING!!!-->";
+    }else{
+        str = "ERROR!!!-->";
+    }
+    debugLog->appendPlainText(temp+"\n"+str+message+temp);
+    QTextCursor tempTC(debugLog->document());
+    tempTC.movePosition(QTextCursor::End);
+    debugLog->setTextCursor(tempTC);
+}
+
 void MainWindow::openDirView(){
     dirViewFSW->show();
 }
 
 void MainWindow::openHkxfile(QString name){
+    QTime t;
+    t.start();
+    if (progressD){
+        delete progressD;
+    }
+    progressD = new QProgressDialog(this);
+    progressD->setWindowModality(Qt::WindowModal);
+    setProgressData("Opening file...", 0, 100, 0);
+    drawGraph = true;
     if (!hkxFile){
-        hkxFile = new BehaviorFile(name);
+        setProgressData("Beginning XML parse...", 5);
+        hkxFile = new BehaviorFile(this, name);
+        if (!drawGraph){
+            delete hkxFile;
+            return;
+        }
         behaviorGraphViewIV = new BehaviorGraphView(hkxFile);
         behaviorGraphViewGB->setTitle(name);
+        setProgressData("Drawing Behavior Graph...", 60);
         if (!behaviorGraphViewIV->drawBehaviorGraph()){
-            //
+            writeToLog("MainWindow: drawBehaviorGraph() failed!\nThe behavior graph was drawn incorrectly!", true);
         }
     }else{
+        setProgressData("Deleting previously loaded Behavior Graph...", 0);
         delete hkxFile;
         delete behaviorGraphViewIV;
         behaviorGraphViewGB->setTitle(name);
-        hkxFile = new BehaviorFile(name);
+        setProgressData("Beginning XML parse...", 5);
+        hkxFile = new BehaviorFile(this, name);
+        if (!drawGraph){
+            delete hkxFile;
+            return;
+        }
         behaviorGraphViewIV = new BehaviorGraphView(hkxFile);
+        setProgressData("Drawing Behavior Graph...", 90);
         if (!behaviorGraphViewIV->drawBehaviorGraph()){
-            //
+            writeToLog("MainWindow: drawBehaviorGraph() failed!\nThe behavior graph was drawn incorrectly!", true);
         }
     }
     iconGBLyt->addWidget(behaviorGraphViewIV);
     behaviorGraphViewGB->setLayout(iconGBLyt);
-    topLyt->addWidget(behaviorGraphViewGB);
+    progressD->setValue(100);
+    progressD->done(0);
+    debugLog->appendPlainText("\n-------------------------\nTime taken to open file \""+dirViewFSW->getSelectedFilename()+"\" is approximately "+QString::number(t.elapsed()/1000)+" seconds\n-------------------------\n");
 }
 
 void MainWindow::readSettings()

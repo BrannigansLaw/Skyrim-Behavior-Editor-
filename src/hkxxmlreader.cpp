@@ -1,36 +1,50 @@
 #include "hkxxmlreader.h"
 #include "hkxfile.h"
 
-HkxXmlReader::HkxXmlReader(BehaviorFile *file): hkxXmlFile(file), isEOF(false){
+HkxXmlReader::HkxXmlReader(BehaviorFile *file)
+    :
+      hkxXmlFile(file),
+      isEOF(false),
+      lineNumber(0)
+{
+    //
 }
 
 bool HkxXmlReader::parse(){
     if (!hkxXmlFile->open(QIODevice::ReadOnly)){
         isEOF = true;
+        hkxXmlFile->writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" failed to open!", true);
         return false;
     }
     isEOF = false;
     QByteArray line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGHT);
+    lineNumber++;
     if (line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\n" && line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\r\n"){
+        hkxXmlFile->writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" is not in the correct XML format!", true);
         return false;
     }
     HkxXmlParseLine result = NoError;
     while (!atEnd()){
+        //hkxXmlFile->setProgressData("Parsing XML line number "+QString::number(lineNumber), 20);
         result = readNextLine();
         if (result != NoError && result != EmptyLine && result != EmptyLineEndFile){
+            hkxXmlFile->writeToLog("HkxXmlReader: parse() failed because readNextLine() failed!", true);
             return false;
         }
     }
+    hkxXmlFile->setProgressData("XML parsed successfully!", 40);
     return true;
 }
 
 HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
     QByteArray line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGHT);
+    lineNumber++;
     if (line.isEmpty()){
         isEOF = true;
         return EmptyLineEndFile;
     }else if (line.size() == 1){
         if (line.at(0) != '\n'){
+            hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because an orphaned character was found on line "+QString::number(lineNumber)+"!", true);
             return OrphanedCharacter;
         }else{
             return EmptyLine;
@@ -45,9 +59,11 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                 break;
             }
             if (elementList.isEmpty()){
+                hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because 'elementList' is empty!\nLine number: "+QString::number(lineNumber), true);
                 return UnknownError;
             }
             if (elementList.last().isContainedOnOneLine == true){
+                hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because an orphaned character was found on line "+QString::number(lineNumber)+"!", true);
                 return OrphanedCharacter;
             }
             break;
@@ -75,14 +91,20 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                     elem.remove(index, elem.size() - index);
                     if (!elementList.isEmpty()){
                         if (indexOfElemTags.isEmpty() || indexOfElemTags.last() >= elementList.size()){
+                            hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because 'elementList' is empty!\nLine number: "+QString::number(lineNumber), true);
+                            return UnknownError;
+                        }
+                        if (indexOfElemTags.last() >= elementList.size()){
+                            hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because 'indexOfElemTags' last value is corrupted!\nLine number: "+QString::number(lineNumber), true);
                             return UnknownError;
                         }
                         if (isIsolatedEndElemTag && !elementList.at(indexOfElemTags.last()).isContainedOnOneLine){
                             if (qstrcmp(elementList.at(indexOfElemTags.last()).name.constData(), elem.constData()) != 0){
-                                //elementList[k].isClosed = true;
+                                hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because an orphaned element tag was found on line "+QString::number(lineNumber)+"!", true);
                                 return OrphanedElementTag;
                             }else{
                                 if (indexOfElemTags.isEmpty()){
+                                    hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because 'indexOfElemTags' is empty!\nLine number: "+QString::number(lineNumber), true);
                                     return UnknownError;
                                 }else{
                                     indexOfElemTags.removeLast();
@@ -93,6 +115,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                     if (line.at(i) == '>'){
                         i++;
                         if (i >= line.size()){
+                            hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because index of the current line is out of bounds!\nLine number: "+QString::number(lineNumber), true);
                             return UnknownError;
                         }
                         if (line.at(i) == '\n'){
@@ -101,6 +124,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                             break;
                         }
                     }else{
+                        hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because index of the current line is out of bounds!\nLine number: "+QString::number(lineNumber), true);
                         return MalformedEndElementTag;
                     }
                 }else if (line.at(i) == '!'){//check comment
@@ -112,9 +136,11 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                             c++;
                         }
                         if (c != 2){
+                            hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because the current comment is malformed!\nLine number: "+QString::number(lineNumber), true);
                             return MalformedComment;
                         }
                         if (y == 1 && line.at(i) != '>'){
+                            hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because the current comment is malformed!\nLine number: "+QString::number(lineNumber), true);
                             return MalformedComment;
                         }
                         while (i < line.size() && line.at(i) != '-'){
@@ -126,6 +152,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                 }else{//is start of an element tag
                     isIsolatedEndElemTag = false;
                     if (i >= line.size()){
+                        hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because index of the current line is out of bounds!\nLine number: "+QString::number(lineNumber), true);
                         return UnknownError;
                     }
                     while (i < line.size() && line.at(i) != ' ' && line.at(i) != '>'){
@@ -146,6 +173,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                             QByteArray attrib(15, '\0');
                             int index = 0;
                             if (line.at(i) == '\n'){
+                                hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because there is a newline character within an attribute!\nLine number: "+QString::number(lineNumber), true);
                                 return UnexpectedNewlineCharacter;
                             }
                             if (line.at(i) == ' '){
@@ -161,17 +189,21 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                                 }//set attribute name, get attribute value
                                 attrib.truncate(index);
                                 if (i >= line.size()){
+                                    hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because index of the current line is out of bounds!\nLine number: "+QString::number(lineNumber), true);
                                     return UnknownError;
                                 }
                                 if (elementList.isEmpty()){
+                                    hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because an orphaned attribute was found!\nLine number: "+QString::number(lineNumber), true);
                                     return OrphanedAttribute;
                                 }
                                 elementList.last().attributeList.append(attrib);
                                 i++;
                                 if (i >= line.size()){
+                                    hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because index of the current line is out of bounds!\nLine number: "+QString::number(lineNumber), true);
                                     return UnknownError;
                                 }
                                 if (line.at(i) != '\"'){
+                                    hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because an orphaned character was found!\nLine number: "+QString::number(lineNumber), true);
                                     return OrphanedCharacter;
                                 }
                                 QByteArray value(9, '\0');
@@ -189,6 +221,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                                 }
                                 value.truncate(index);
                                 if (line.at(i) != '"'){
+                                    hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because an orphaned character was found!\nLine number: "+QString::number(lineNumber), true);
                                     return OrphanedCharacter;
                                 }
                                 elementList.last().attributeList.last().value = value;
@@ -203,9 +236,11 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
         }else if (line.at(i) == '>'){//get element value
             i++;
             if (i >= line.size()){
+                hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because index of the current line is out of bounds!\nLine number: "+QString::number(lineNumber), true);
                 return UnknownError;
             }
             if (elementList.isEmpty()){
+                hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because 'elementList' is empty!\nLine number: "+QString::number(lineNumber), true);
                 return UnknownError;
             }
             //Fucking carriage return character...
@@ -216,6 +251,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
             }else if (line.at(i) == '\r'){
                 i++;
                 if (i >= line.size()){
+                    hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because index of the current line is out of bounds!\nLine number: "+QString::number(lineNumber), true);
                     return UnknownError;
                 }
                 if (line.at(i) == '\n'){
@@ -235,6 +271,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
             while (i < line.size()){
                 if (line.at(i) == '\n'){
                     if (elementList.isEmpty()){
+                        hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because an orphaned attribute was found!\nLine number: "+QString::number(lineNumber), true);
                         return OrphanedAttribute;
                     }
                     elementList.last().value = value;
@@ -242,6 +279,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                 }else if (line.at(i) == '<'){
                     int h = i + 1;
                     if (h >= line.size()){
+                        hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because index of the current line is out of bounds!\nLine number: "+QString::number(lineNumber), true);
                         return UnknownError;
                     }
                     if (line.at(h) == '!'){
@@ -250,6 +288,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                                 value.append(QByteArray(value.size() * 2, '\0'));
                             }
                             if (i >= line.size()){
+                                hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because index of the current line is out of bounds!\nLine number: "+QString::number(lineNumber), true);
                                 return UnknownError;
                             }
                             value[index] = line.at(i);
@@ -268,10 +307,12 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                                 c++;
                             }
                             if (c != 2){
+                                hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because the current comment is malformed!\nLine number: "+QString::number(lineNumber), true);
                                 return MalformedComment;
                             }
                             if (y == 1){
                                 if (line.at(i) != '>'){
+                                    hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because the current comment is malformed!\nLine number: "+QString::number(lineNumber), true);
                                     return MalformedComment;
                                 }
                                 if (index >= value.size()){
@@ -303,33 +344,20 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                 index++;
                 i++;
             }
-            /*while (i < line.size() && line.at(i) != '<'){
-                if (line.at(i) == '\n'){
-                    if (elementList.isEmpty()){
-                        return OrphanedAttribute;
-                    }
-                    elementList.last().value = value;
-                    return NoError;
-                }
-                //if (line.at(i) < 'A' || line.at(i) > '~') return InvalidElementValue;
-                if (index >= value.size()){
-                    value.append(QByteArray(value.size() * 2, '\0'));
-                }
-                value[index] = line.at(i);
-                index++;
-                i++;
-            }*/
             value.truncate(index);
             if (elementList.isEmpty()){
+                hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because an orphaned attribute was found!\nLine number: "+QString::number(lineNumber), true);
                 return OrphanedAttribute;
             }
             elementList.last().value = value;
             continue;
         }else if (line.at(i) != '\n' && line.at(i) != '\r'){//get element data on separate line
             if (elementList.isEmpty()){
+                hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed for some unknown reason!\nLine number: "+QString::number(lineNumber), true);
                 return UnknownError;
             }
             if (elementList.last().isContainedOnOneLine == true){
+                hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because an orphaned character was found!\nLine number: "+QString::number(lineNumber), true);
                 return OrphanedCharacter;
             }
             QByteArray value(9, '\0');
@@ -345,9 +373,11 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
             }
             value.truncate(index);
             if (line.at(i) != '\n'){
+                hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed for some unknown reason!\nLine number: "+QString::number(lineNumber), true);
                 return UnknownError;
             }
             if (elementList.isEmpty()){
+                hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because an orphaned attribute was found!\nLine number: "+QString::number(lineNumber), true);
                 return OrphanedAttribute;
             }
             if (elementList.last().value.endsWith('\n')){
@@ -403,30 +433,3 @@ QByteArray HkxXmlReader::getNthAttributeValueAt(int index, int nth) const{
         return "";
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

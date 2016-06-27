@@ -26,7 +26,7 @@ QRectF GeneratorIcon::textRec = QRectF(120, 10, 240, 40);
 //QRadialGradient GeneratorIcon::rGrad = QRadialGradient();
 QFont GeneratorIcon::font = QFont("Helvetica [Cronyx]", 9);
 //QPen GeneratorIcon::textPen = QPen(Qt::white);
-QPen GeneratorIcon::pen = QPen(QBrush(Qt::black), 2);
+//QPen GeneratorIcon::pen = QPen(QBrush(Qt::black), 2);
 QBrush GeneratorIcon::brush = QBrush(Qt::green);
 QBrush GeneratorIcon::buttonBrush = QBrush(Qt::gray);
 QPolygonF GeneratorIcon::polygon = QPolygonF();
@@ -56,6 +56,7 @@ GeneratorIcon::GeneratorIcon(const HkObjectExpSharedPtr & d, const QString & s, 
     /*if (data->getType() == HkObject::TYPE_GENERATOR){
         static_cast<hkbGenerator *>(data.data())->icons.append(this);
     }*/
+    pen = QPen(QBrush(Qt::black), 2);
     textPen.setColor(Qt::white);
     rGrad.setCenter(boundingRect().topLeft());
     rGrad.setCenterRadius(boundingRect().width());
@@ -219,6 +220,7 @@ BehaviorGraphView::BehaviorGraphView(BehaviorFile * file)
       wrapBlenderMenu(new QMenu("Wrap inside Blend:", contextMenu)),
       wrapBGAct(new QAction("Blender Generator", wrapBlenderMenu)),
       wrapBSBSGAct(new QAction("BS Bone Switch Generator", wrapBlenderMenu)),
+      removeObjAct(new QAction("Remove Selected Object", contextMenu)),
       minScale(0.001),
       maxScale(4),
       initScale(1),
@@ -227,6 +229,8 @@ BehaviorGraphView::BehaviorGraphView(BehaviorFile * file)
       scaleUpFactor(1.2),
       scaleDownFactor(0.8)
 {
+    setMinimumHeight(200);
+    setMinimumWidth(200);
     setScene(behaviorGS);
     setContextMenuPolicy(Qt::CustomContextMenu);
     GeneratorIcon::updateStaticMembers();
@@ -243,6 +247,7 @@ BehaviorGraphView::BehaviorGraphView(BehaviorFile * file)
     wrapBlenderMenu->addAction(wrapBGAct);
     wrapBlenderMenu->addAction(wrapBSBSGAct);
     connect(wrapSMAct, SIGNAL(triggered()), this, SLOT(wrapStateMachine()));
+    connect(removeObjAct, SIGNAL(triggered()), this, SLOT(removeSelectedObject()));
 }
 
 void BehaviorGraphView::contractBranch(GeneratorIcon * icon, bool contractAll){
@@ -279,6 +284,230 @@ void BehaviorGraphView::expandBranch(GeneratorIcon * icon, bool expandAll){
             expandBranch(icon->children.at(i));
         }
     }
+}
+
+HkObjectExpSharedPtr & BehaviorGraphView::getFirstChild(const HkObjectExpSharedPtr & obj){
+    if (obj.constData()){
+        qulonglong sig = obj->getSignature();
+        switch (sig) {
+        case HKB_STATE_MACHINE:
+        {
+            hkbStateMachine *ptr = static_cast<hkbStateMachine *>(obj.data());
+            return static_cast<hkbStateMachineStateInfo *>(ptr->states.first().data())->generator;
+        }
+        case HKB_MANUAL_SELECTOR_GENERATOR:
+        {
+            hkbManualSelectorGenerator *ptr = static_cast<hkbManualSelectorGenerator *>(obj.data());
+            return ptr->generators.first();
+        }
+        case HKB_BLENDER_GENERATOR:
+        {
+            hkbBlenderGenerator *ptr = static_cast<hkbBlenderGenerator *>(obj.data());
+            return static_cast<hkbBlenderGeneratorChild *>(ptr->children.first().data())->generator;
+        }
+        case BS_I_STATE_TAGGING_GENERATOR:
+        {
+            BSiStateTaggingGenerator *ptr = static_cast<BSiStateTaggingGenerator *>(obj.data());
+            return ptr->pDefaultGenerator;
+        }
+        case BS_BONE_SWITCH_GENERATOR:
+        {
+            BSBoneSwitchGenerator *ptr = static_cast<BSBoneSwitchGenerator *>(obj.data());
+            return ptr->pDefaultGenerator;
+        }
+        case BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+        {
+            BSCyclicBlendTransitionGenerator *ptr = static_cast<BSCyclicBlendTransitionGenerator *>(obj.data());
+            return ptr->pBlenderGenerator;
+        }
+        case BS_SYNCHRONIZED_CLIP_GENERATOR:
+        {
+            BSSynchronizedClipGenerator *ptr = static_cast<BSSynchronizedClipGenerator *>(obj.data());
+            return ptr->pClipGenerator;
+        }
+        case HKB_MODIFIER_GENERATOR:
+        {
+            hkbModifierGenerator *ptr = static_cast<hkbModifierGenerator *>(obj.data());
+            return ptr->generator;
+        }
+        case BS_OFFSET_ANIMATION_GENERATOR:
+        {
+            BSOffsetAnimationGenerator *ptr = static_cast<BSOffsetAnimationGenerator *>(obj.data());
+            return ptr->pDefaultGenerator;
+        }
+        case HKB_POSE_MATCHING_GENERATOR:
+        {
+            hkbPoseMatchingGenerator *ptr = static_cast<hkbPoseMatchingGenerator *>(obj.data());
+            return static_cast<hkbBlenderGeneratorChild *>(ptr->children.first().data())->generator;
+        }
+        case HKB_BEHAVIOR_GRAPH:
+        {
+            hkbBehaviorGraph *ptr = static_cast<hkbBehaviorGraph *>(obj.data());
+            return ptr->rootGenerator;
+        }
+        default:
+            ;
+        }
+    }
+    return (HkObjectExpSharedPtr)obj;
+}
+
+void BehaviorGraphView::removeSelectedObject(){
+    /*if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
+        qulonglong sig = selectedIcon->parent->data->getSignature();
+        switch (sig){
+        case HKB_STATE_MACHINE:
+        {
+            const hkbStateMachine *parent = static_cast<const hkbStateMachine *>(selectedIcon->parent->data.constData());
+            hkbStateMachineStateInfo *parentChild;
+            for (int i = 0; i < parent->states.size(); i++){
+                parentChild = static_cast<hkbStateMachineStateInfo *>(parent->states.at(i).data());
+                if (parentChild->generator == selectedIcon->data){
+                    //Get this sig and connect first child this state's generator then if this is the only instance of the object remove from list....
+                    state->generator = getFirstChild(selectedIcon->data);
+                    hkbGenerator *gen = static_cast<hkbGenerator *>(selectedIcon->data.data());
+                    if (gen->icons.first() == selectedIcon){
+                        if (gen->icons.size() > 1){
+                            if (gen->icons.at(1)->children.isEmpty()){
+                                for (int i = 0; i < selectedIcon->children.size(); i++){
+                                    gen->icons.at(i)->children.append(selectedIcon->children.at(i));
+                                }
+                            }else{
+                                //Error!
+                            }
+                        }else{
+                            //Error!
+                        }
+                    }
+                    if (!gen->icons.removeOne(selectedIcon)){
+                        //Error!
+                    }
+                    delete behaviorGS->removeItem(selectedIcon);
+                    if (static_cast<hkbGenerator *>(selectedIcon->data.data())->icons.size() < 2){
+                        if (!behavior->generators.removeOne(selectedIcon->data)){
+                            //Error!
+                        }
+                    }
+                }
+            }
+            break;
+        }
+        case HKB_MANUAL_SELECTOR_GENERATOR:
+        {
+            hkbManualSelectorGenerator *parent = static_cast<hkbManualSelectorGenerator *>(selectedIcon->parent->data.data());
+            for (int i = 0; i < parent->generators.size(); i++){
+                if (parent->generators.at(i) == selectedIcon->data){
+                    state->generator = parent->generators.at(i);
+                    parent->generators[i] = HkObjectExpSharedPtr(stateMachine);
+                    if (drawIcon){
+                        stateMachine->appendIcon(initalizeInjectedIcon(parent->generators.at(i), stateMachine, selectedIcon->parent));
+                        drawIcon = false;
+                    }
+                }
+            }
+            break;
+        }
+        case HKB_BLENDER_GENERATOR:
+        {
+            const hkbBlenderGenerator *parent = static_cast<const hkbBlenderGenerator *>(selectedIcon->parent->data.constData());
+            hkbBlenderGeneratorChild *parentChild;
+            for (int i = 0; i < parent->children.size(); i++){
+                parentChild = static_cast<hkbBlenderGeneratorChild *>(parent->children.at(i).data());
+                if (parentChild->generator == selectedIcon->data){
+                    state->generator = parentChild->generator;
+                    parentChild->generator = HkObjectExpSharedPtr(stateMachine);
+                    if (drawIcon){
+                        stateMachine->appendIcon(initalizeInjectedIcon(parentChild->generator, stateMachine, selectedIcon->parent));
+                        drawIcon = false;
+                    }
+                }
+            }
+            break;
+        }
+        case BS_I_STATE_TAGGING_GENERATOR:
+        {
+            BSiStateTaggingGenerator *parent = static_cast<BSiStateTaggingGenerator *>(selectedIcon->parent->data.data());
+            if (parent->pDefaultGenerator == selectedIcon->data){
+                state->generator = parent->pDefaultGenerator;
+                parent->pDefaultGenerator = HkObjectExpSharedPtr(stateMachine);
+                stateMachine->appendIcon(initalizeInjectedIcon(parent->pDefaultGenerator, stateMachine, selectedIcon->parent));
+            }
+            break;
+        }
+        case BS_BONE_SWITCH_GENERATOR:
+        {
+            BSBoneSwitchGenerator *parent = static_cast<BSBoneSwitchGenerator *>(selectedIcon->parent->data.data());
+            BSBoneSwitchGeneratorBoneData *parentChild;
+            if (parent->pDefaultGenerator == selectedIcon->data){
+                state->generator = parent->pDefaultGenerator;
+                parent->pDefaultGenerator = HkObjectExpSharedPtr(stateMachine);
+                stateMachine->appendIcon(initalizeInjectedIcon(parent->pDefaultGenerator, stateMachine, selectedIcon->parent));
+                drawIcon = false;
+            }
+            for (int i = 0; i < parent->ChildrenA.size(); i++){
+                parentChild = static_cast<BSBoneSwitchGeneratorBoneData *>(parent->ChildrenA.at(i).data());
+                if (parentChild->pGenerator == selectedIcon->data){
+                    state->generator = parentChild->pGenerator;
+                    parentChild->pGenerator = HkObjectExpSharedPtr(stateMachine);
+                    if (drawIcon){
+                        stateMachine->appendIcon(initalizeInjectedIcon(parentChild->pGenerator, stateMachine, selectedIcon->parent));
+                        drawIcon = false;
+                    }
+                }
+            }
+            break;
+        }
+        case HKB_MODIFIER_GENERATOR:
+        {
+            hkbModifierGenerator *parent = static_cast<hkbModifierGenerator *>(selectedIcon->parent->data.data());
+            if (parent->generator == selectedIcon->data){
+                state->generator = parent->generator;
+                parent->generator = HkObjectExpSharedPtr(stateMachine);
+                stateMachine->appendIcon(initalizeInjectedIcon(parent->generator, stateMachine, selectedIcon->parent));
+            }
+            break;
+        }
+        case BS_OFFSET_ANIMATION_GENERATOR:
+        {
+            BSOffsetAnimationGenerator *parent = static_cast<BSOffsetAnimationGenerator *>(selectedIcon->parent->data.data());
+            if (parent->pDefaultGenerator == selectedIcon->data){
+                state->generator = parent->pDefaultGenerator;
+                parent->pDefaultGenerator = HkObjectExpSharedPtr(stateMachine);
+                stateMachine->appendIcon(initalizeInjectedIcon(parent->pDefaultGenerator, stateMachine, selectedIcon->parent));
+            }
+            break;
+        }
+        case HKB_POSE_MATCHING_GENERATOR:
+        {
+            const hkbPoseMatchingGenerator *parent = static_cast<const hkbPoseMatchingGenerator *>(selectedIcon->parent->data.constData());
+            hkbBlenderGeneratorChild *parentChild;
+            for (int i = 0; i < parent->children.size(); i++){
+                parentChild = static_cast<hkbBlenderGeneratorChild *>(parent->children.at(i).data());
+                if (parentChild->generator == selectedIcon->data){
+                    state->generator = parentChild->generator;
+                    parentChild->generator = HkObjectExpSharedPtr(stateMachine);
+                    if (drawIcon){
+                        stateMachine->appendIcon(initalizeInjectedIcon(parentChild->generator, stateMachine, selectedIcon->parent));
+                        drawIcon = false;
+                    }
+                }
+            }
+            break;
+        }
+        case HKB_BEHAVIOR_GRAPH:
+        {
+            hkbBehaviorGraph *parent = static_cast<hkbBehaviorGraph *>(selectedIcon->parent->data.data());
+            if (parent->rootGenerator == selectedIcon->data){
+                state->generator = parent->rootGenerator;
+                parent->rootGenerator = HkObjectExpSharedPtr(stateMachine);
+                stateMachine->appendIcon(initalizeInjectedIcon(parent->rootGenerator, stateMachine, selectedIcon->parent));
+            }
+            break;
+        }
+        default:
+            return;
+        }
+    }*/
 }
 
 void BehaviorGraphView::wrapStateMachine(){

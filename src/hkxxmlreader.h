@@ -28,19 +28,31 @@ public:
         UnknownError = 50
     };
     HkxXmlReader(BehaviorFile *file = NULL);
-    virtual ~HkxXmlReader(){/*if (hkxXmlFile){hkxXmlFile->closeFile();}*/}
-    void setBehaviorFile(BehaviorFile *file){hkxXmlFile = file;}
+    virtual ~HkxXmlReader(){
+        /*if (hkxXmlFile){hkxXmlFile->closeFile();}*/
+    }
+    void setBehaviorFile(BehaviorFile *file){
+        hkxXmlFile = file;
+    }
     bool parse();
-    bool atEnd() const{return isEOF;}
-    int getLastElementIndex()const{return elementList.size() - 1;}
-    int getNumElements()const{return elementList.size();}
+    bool atEnd() const{
+        return isEOF;
+    }
+    int getLastElementIndex() const{
+        return elementList.size() - 1;
+    }
+    int getNumElements() const{
+        return elementList.size();
+    }
     int getNumAttributesAt(int index) const;
     QByteArray getElementNameAt(int index) const;
     QByteArray getElementValueAt(int index) const;
     QByteArray getNthAttributeNameAt(int index, int nth) const;
     QByteArray getNthAttributeValueAt(int index, int nth) const;
     HkxXmlParseLine readNextLine();
-    void clear(){elementList.clear();}
+    void clear(){
+        elementList.clear();
+    }
 private:
     struct Attribute{
         Attribute(const QByteArray & elem): name(elem){}
@@ -53,12 +65,12 @@ private:
         QByteArray value;
         QList <Attribute> attributeList;
         bool isContainedOnOneLine;
-        //bool isClosed;
     };
     BehaviorFile *hkxXmlFile;
     QList <Element> elementList;
     bool isEOF;
     QVector <long> indexOfElemTags;
+    ulong lineNumber;
 };
 
 #endif // HKXXMLREADER_H

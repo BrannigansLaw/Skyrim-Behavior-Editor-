@@ -31,9 +31,27 @@ class GeneratorIcon: public QGraphicsItem
     friend class BehaviorGraphView;
 public:
     GeneratorIcon(const HkObjectExpSharedPtr & d, const QString & s, GeneratorIcon *par = NULL);
-    QRectF boundingRect() const{return boundingRectangle;}
-    QString getName() const{return name;}
-    void setLinkCoordinates(const QLineF & line){if (linkToParent){linkToParent->setLine(line);}}
+    QRectF boundingRect() const{
+        return boundingRectangle;
+    }
+    QString getName() const{
+        return name;
+    }
+    void setLinkCoordinates(const QLineF & line){
+        if (linkToParent){
+            linkToParent->setLine(line);
+        }
+    }
+    void errorHighlight(){
+        if (pen.color() == Qt::black){
+            pen.setColor(Qt::red);
+        }else{
+            pen.setColor(Qt::black);
+        }
+        if (scene()){
+            scene()->update();
+        }
+    }
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
@@ -46,7 +64,7 @@ private:
     static QRectF button;
     static QRectF textRec;
     static QFont font;
-    static QPen pen;
+    QPen pen;
     static QBrush brush;
     static QBrush buttonBrush;
     static QLineF vert;
@@ -73,16 +91,16 @@ class BehaviorGraphView: public QGraphicsView
 public:
     BehaviorGraphView(BehaviorFile * file);
     bool drawBehaviorGraph();
-    void repositionIcons(GeneratorIcon * icon);
-    void popUpMenuRequested(const QPoint &pos, const HkObjectExpSharedPtr & obj);
-    void expandBranch(GeneratorIcon * icon, bool expandAll = false);
-    void contractBranch(GeneratorIcon * icon, bool contractAll = false);
+    QSize sizeHint() const Q_DECL_OVERRIDE{
+        return QSize(500, 400);
+    }
 protected:
     void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 private slots:
     void wrapStateMachine();
+    void removeSelectedObject();
 private:
     BehaviorFile *behavior;
     QGraphicsScene *behaviorGS;
@@ -100,6 +118,7 @@ private:
     QMenu *wrapBlenderMenu;
     QAction *wrapBGAct;
     QAction *wrapBSBSGAct;
+    QAction *removeObjAct;
     const qreal minScale;
     const qreal maxScale;
     const qreal initScale;
@@ -108,6 +127,11 @@ private:
     const qreal scaleUpFactor;
     const qreal scaleDownFactor;
 private:
+    void repositionIcons(GeneratorIcon * icon);
+    void popUpMenuRequested(const QPoint &pos, const HkObjectExpSharedPtr & obj);
+    void expandBranch(GeneratorIcon * icon, bool expandAll = false);
+    void contractBranch(GeneratorIcon * icon, bool contractAll = false);
+    HkObjectExpSharedPtr & getFirstChild(const HkObjectExpSharedPtr &obj);
     int manageIcons();
     bool positionIcon(GeneratorIcon * icon);
 
@@ -122,7 +146,6 @@ private:
         if (objectChildCount.isEmpty()){
             return -1;
         }
-        //int count = 0;
         bool isBranchTip = true;
         for (int i = 0; i < parentIcons.last()->children.size(); i++){
             if (parentIcons.last()->children.at(i)->data == objects.last()){
@@ -133,16 +156,6 @@ private:
                     objectChildCount.removeLast();
                 }
                 return 1;
-                /*count++;
-                if (count > 1){
-                    objects.removeLast();
-                    objectChildCount.last()--;
-                    if (objectChildCount.last() < 1){
-                        parentIcons.removeLast();
-                        objectChildCount.removeLast();
-                    }
-                    return 1;
-                }*/
             }
         }
         GeneratorIcon *icon = addIconToGraph(objects.last(), ptr, parentIcons.last());

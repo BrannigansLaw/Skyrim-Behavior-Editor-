@@ -7,6 +7,18 @@
  * HkObject
  */
 
+void HkObject::writeToLog(const QString & message, bool isError){
+    if (getParentFile()){
+        getParentFile()->writeToLog(message, isError);
+    }
+}
+
+void HkObject::setProgressData(const QString & message, int value){
+    if (getParentFile()){
+        getParentFile()->setProgressData(message, value);
+    }
+}
+
 bool HkObject::readIntegers(const QByteArray &line, QVector<qint16> & ints){
     qint16 size = 0;
     qint16 start;
@@ -358,6 +370,8 @@ bool HkDynamicObject::linkVar(){
     HkObjectExpSharedPtr *ptr = getParentFile()->findHkObject(variableBindingSet.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_VARIABLE_BINDING_SET){
+            getParentFile()->writeToLog("HkDynamicObject: linkVar()!\nThe linked object is not a HKB_VARIABLE_BINDING_SET!\nRemoving the link to the invalid object!");
+            variableBindingSet = NULL;
             return false;
         }
         variableBindingSet = *ptr;

@@ -4,6 +4,26 @@
 #include "hkxxmlreader.h"
 #include "modifiers.h"
 #include "generators.h"
+#include "mainwindow.h"
+
+void HkxFile::writeToLog(const QString & message, bool isError){
+    if (ui){
+        ui->writeToLog(message, isError);
+    }
+}
+
+void HkxFile::setProgressData(const QString & message, int value){
+    ui->setProgressData(message, value);
+}
+
+BehaviorFile::BehaviorFile(MainWindow *window, const QString & name): HkxFile(window, name){
+    reader.setBehaviorFile(this);
+    if (!parse()){
+        writeToLog("MainWindow: parse() failed!");
+        getUI()->drawGraph = false;
+    }
+    reader.clear();
+}
 
 template <typename T>
 bool BehaviorFile::appendAndReadData(int index, T * obj){
@@ -19,12 +39,15 @@ bool BehaviorFile::appendAndReadData(int index, T * obj){
     }else if (obj->getType() == HkObject::TYPE_OTHER){
         otherTypes.append(HkObjectExpSharedPtr(obj, temp.toLong(&ok)));
     }else{
+        writeToLog("BehaviorFile: appendAndReadData() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16), true);
         return false;
     }
     if (!ok){
+        writeToLog("BehaviorFile: appendAndReadData() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!", true);
         return false;
     }
-    index++;    //Skip the current line.
+    //Skip the current line.
+    index++;
     if (!obj->readData(reader, index)){
         return false;
     }
@@ -39,6 +62,7 @@ bool BehaviorFile::parse(){
     bool ok = true;
     qulonglong signature;
     QByteArray value;
+    setProgressData("Creating HKX objects...", 60);
     while (index < reader.getNumElements()){
         value = reader.getNthAttributeNameAt(index, 1);
         if (value == "class"){
@@ -46,6 +70,7 @@ bool BehaviorFile::parse(){
             if (value != ""){
                 signature = value.toULongLong(&ok, 16);
                 if (!ok){
+                    writeToLog("BehaviorFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!", true);
                     return false;
                 }
                 if (signature == HKB_STATE_MACHINE_STATE_INFO){
@@ -120,34 +145,42 @@ bool BehaviorFile::parse(){
                     if (!appendAndReadData(index, new hkbBehaviorGraph(this))){
                         return false;
                     }
-                }if (signature == HK_ROOT_LEVEL_CONTAINER){
+                }else if (signature == HK_ROOT_LEVEL_CONTAINER){
                     if (!appendAndReadData(index, new hkRootLevelContainer(this))){
                         return false;
                     }
                     setRootObject(otherTypes.last());
                 }else{
-                    //return false;
+                    writeToLog("BehaviorFile: parse()!\nUnknown signature detected!\nUnknown object class name is: "+reader.getNthAttributeValueAt(index, 1)+"\nUnknown object signature is: "+QString::number(signature, 16));
                 }
             }
         }
         index++;
     }
     closeFile();
+    setProgressData("Linking HKX objects...", 80);
     if (!link()){
+        writeToLog("BehaviorFile: parse() failed because link() failed!", true);
         return false;
     }
     return true;
 }
 
 bool BehaviorFile::link(){
-    if (!getRootObject().constData() || getRootObject()->getSignature() != HK_ROOT_LEVEL_CONTAINER){
+    if (!getRootObject().constData()){
+        writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file is NULL!", true);
+        return false;
+    }else if (getRootObject()->getSignature() != HK_ROOT_LEVEL_CONTAINER){
+        writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16), true);
         return false;
     }
     if (!static_cast<hkRootLevelContainer * >(getRootObject().data())->link()){
+        writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file failed to link to it's children!", true);
         return false;
     }
     for (int i = generators.size() - 1; i >= 0; i--){
         if (!static_cast<hkbGenerator * >(generators.at(i).data())->link()){
+            writeToLog("BehaviorFile: link() failed!\nA generator failed to link to it's children!\nObject signature: "+QString::number(generators.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getReference()), true);
             return false;
         }
     }
