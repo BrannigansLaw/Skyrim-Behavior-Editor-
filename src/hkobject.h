@@ -23,6 +23,12 @@ public:
     HkxType getType()const{
         return typeCheck;
     }
+    void setDataValidity(bool isValid){
+        isDataValid = isValid;
+    }
+    bool getIsDataValid()const{
+        return isDataValid;
+    }
     virtual bool link() = 0;
 protected:
     HkObject(BehaviorFile *parent = NULL/*, long ref = 0*/)
@@ -38,9 +44,6 @@ protected:
     }
     void setType(HkxSignature sig, HkxType type){
         signature = sig;typeCheck = type;
-    }
-    void setDataValidity(bool isValid){
-        isDataValid = isValid;
     }
 
     bool readIntegers(const QByteArray &line, QVector<qint16> & ints);

@@ -137,6 +137,7 @@ void MainWindow::openHkxfile(QString name){
     behaviorGraphViewGB->setLayout(iconGBLyt);
     progressD->setValue(100);
     progressD->done(0);
+    progressD->close();
     debugLog->appendPlainText("\n-------------------------\nTime taken to open file \""+dirViewFSW->getSelectedFilename()+"\" is approximately "+QString::number(t.elapsed()/1000)+" seconds\n-------------------------\n");
 }
 

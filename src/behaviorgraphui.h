@@ -101,6 +101,7 @@ protected:
 private slots:
     void wrapStateMachine();
     void removeSelectedObject();
+    void removeSelectedObjectBranch();
 private:
     BehaviorFile *behavior;
     QGraphicsScene *behaviorGS;
@@ -119,6 +120,7 @@ private:
     QAction *wrapBGAct;
     QAction *wrapBSBSGAct;
     QAction *removeObjAct;
+    QAction *removeObjBranchAct;
     const qreal minScale;
     const qreal maxScale;
     const qreal initScale;
@@ -127,13 +129,48 @@ private:
     const qreal scaleUpFactor;
     const qreal scaleDownFactor;
 private:
+    bool drawBranch(GeneratorIcon * rootIcon);
+    void removeChildIcons(GeneratorIcon *parent, int startIndex = 0);
     void repositionIcons(GeneratorIcon * icon);
     void popUpMenuRequested(const QPoint &pos, const HkObjectExpSharedPtr & obj);
     void expandBranch(GeneratorIcon * icon, bool expandAll = false);
     void contractBranch(GeneratorIcon * icon, bool contractAll = false);
-    HkObjectExpSharedPtr & getFirstChild(const HkObjectExpSharedPtr &obj);
+    HkObject * getFirstChild(const HkObjectExpSharedPtr &obj);
     int manageIcons();
     bool positionIcon(GeneratorIcon * icon);
+
+    template<typename T>
+    int initializeIconsForNewBranch(const T & ptr, QList<HkObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount){
+        if (parentIcons.isEmpty()){
+            return -1;
+        }
+        if (objects.isEmpty()){
+            return -1;
+        }
+        if (objectChildCount.isEmpty()){
+            return -1;
+        }
+        bool isBranchTip = true;
+        GeneratorIcon *icon = addIconToGraph(objects.last(), ptr, parentIcons.last());
+        if (!icon){
+            return -1;
+        }
+        if (ptr->getSignature() != HKB_CLIP_GENERATOR && ptr->getSignature() != HKB_BEHAVIOR_REFERENCE_GENERATOR){
+            isBranchTip = false;
+        }
+        objects.removeLast();
+        objectChildCount.last()--;
+        if (objectChildCount.last() < 1){
+            parentIcons.removeLast();
+            objectChildCount.removeLast();
+        }
+        if (!isBranchTip){
+            objectChildCount.append(0);
+            parentIcons.append(icon);
+        }
+        ptr->icons.append(icon);
+        return 0;
+    }
 
     template<typename T>
     int initializeIcons(const T & ptr, QList<HkObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount){
@@ -197,20 +234,24 @@ private:
         if (!type){
             return NULL;
         }
-        if (behaviorGS->items(Qt::AscendingOrder).isEmpty()){
+        /*if (behaviorGS->items(Qt::AscendingOrder).isEmpty()){
             return NULL;
-        }
+        }*/
         GeneratorIcon *icon = new GeneratorIcon(obj, type->name, parentIcon);
         //icon->setFlag(QGraphicsItem::ItemIsMovable);
-        GeneratorIcon *lastIcon = dynamic_cast<GeneratorIcon *>(behaviorGS->items(Qt::AscendingOrder).last());
+        qreal lastY = 0;
+        icon->getLastIconY(parentIcon, lastY);
+        icon->setLinkCoordinates(QLineF(parentIcon->pos().x() + 1.0*parentIcon->boundingRect().width(), parentIcon->pos().y() + 1.0*parentIcon->boundingRect().height(),\
+                                        parentIcon->pos().x() + 1.5*parentIcon->boundingRect().width(), lastY + 2*icon->boundingRect().height()));
+        /*GeneratorIcon *lastIcon = dynamic_cast<GeneratorIcon *>(behaviorGS->items(Qt::AscendingOrder).last());
         if (!lastIcon){
             return NULL;
         }
         icon->setLinkCoordinates(QLineF(parentIcon->pos().x() + 1.0*parentIcon->boundingRect().width(), parentIcon->pos().y() + 1.0*parentIcon->boundingRect().height(),\
-                                        parentIcon->pos().x() + 1.5*parentIcon->boundingRect().width(), lastIcon->pos().y() + 2*lastIcon->boundingRect().height()));
+                                        parentIcon->pos().x() + 1.5*parentIcon->boundingRect().width(), lastIcon->pos().y() + 2*lastIcon->boundingRect().height()));*/
         behaviorGS->addItem(icon->linkToParent);
         behaviorGS->addItem(icon);
-        icon->setPos(parentIcon->pos().x() + 1.5*parentIcon->boundingRect().width(), lastIcon->pos().y() + 2*lastIcon->boundingRect().height());
+        icon->setPos(parentIcon->pos().x() + 1.5*parentIcon->boundingRect().width(), lastY + 2*icon->boundingRect().height());
         return icon;
     }
 
