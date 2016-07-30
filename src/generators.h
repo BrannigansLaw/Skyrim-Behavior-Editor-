@@ -20,6 +20,7 @@ class hkbGenerator: public HkDynamicObject
 public:
     virtual ~hkbGenerator(){}
     bool link();
+    QString getName() const;
 protected:
     hkbGenerator(BehaviorFile *parent = NULL/*, long ref = 0*/): HkDynamicObject(parent/*, ref*/){}
     void appendIcon(GeneratorIcon * icon){icons.append(icon);}

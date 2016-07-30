@@ -26,64 +26,6 @@ class BSBoneSwitchGenerator;
 class BSBoneSwitchGeneratorBoneData;
 class hkbGenerator;
 
-class GeneratorIcon: public QGraphicsItem
-{
-    friend class BehaviorGraphView;
-public:
-    GeneratorIcon(const HkObjectExpSharedPtr & d, const QString & s, GeneratorIcon *par = NULL);
-    QRectF boundingRect() const{
-        return boundingRectangle;
-    }
-    QString getName() const{
-        return name;
-    }
-    void setLinkCoordinates(const QLineF & line){
-        if (linkToParent){
-            linkToParent->setLine(line);
-        }
-    }
-    void errorHighlight(){
-        if (pen.color() == Qt::black){
-            pen.setColor(Qt::red);
-        }else{
-            pen.setColor(Qt::black);
-        }
-        if (scene()){
-            scene()->update();
-        }
-    }
-protected:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
-    void mousePressEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
-private:
-    static void updateStaticMembers();
-    bool getLastIconY(GeneratorIcon *parent, qreal &lastIconY);
-    void updatePosition();
-private:
-    static QRectF boundingRectangle;
-    static QRectF button;
-    static QRectF textRec;
-    static QFont font;
-    QPen pen;
-    static QBrush brush;
-    static QBrush buttonBrush;
-    static QLineF vert;
-    static QLineF horiz;
-    static QRectF ellipse;
-    static QPolygonF polygon;
-    static QRectF square;
-    static QPolygonF arrowHead;
-    QRadialGradient rGrad;
-    QPen textPen;
-    QPainterPath path;
-    QString name;
-    HkObjectExpSharedPtr data;
-    bool isExpanded;
-    GeneratorIcon *parent;
-    QList <GeneratorIcon *> children;
-    QGraphicsLineItem *linkToParent;
-};
-
 class BehaviorGraphView: public QGraphicsView
 {
     Q_OBJECT
@@ -99,6 +41,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 private slots:
+    void appendStateMachine();
     void wrapStateMachine();
     void removeSelectedObject();
     void removeSelectedObjectBranch();
@@ -107,6 +50,18 @@ private:
     QGraphicsScene *behaviorGS;
     GeneratorIcon *selectedIcon;
     QMenu *contextMenu;
+    QMenu *appendGeneratorMenu;
+    QAction *appendSMAct;
+    QAction *appendMSGAct;
+    QAction *appendMGAct;
+    QAction *appendBSISTGAct;
+    QAction *appendBSSCGAct;
+    QAction *appendBSOAGAct;
+    QAction *appendBSCBTGAct;
+    QAction *appendPMGAct;
+    QMenu *appendBlenderMenu;
+    QAction *appendBGAct;
+    QAction *appendBSBSGAct;
     QMenu *wrapGeneratorMenu;
     QAction *wrapSMAct;
     QAction *wrapMSGAct;
@@ -119,7 +74,7 @@ private:
     QMenu *wrapBlenderMenu;
     QAction *wrapBGAct;
     QAction *wrapBSBSGAct;
-    QAction *removeObjAct;
+    //QAction *removeObjAct;
     QAction *removeObjBranchAct;
     const qreal minScale;
     const qreal maxScale;
@@ -129,15 +84,19 @@ private:
     const qreal scaleUpFactor;
     const qreal scaleDownFactor;
 private:
+    void expandBranchForIcon(GeneratorIcon *icon);
     bool drawBranch(GeneratorIcon * rootIcon);
-    void removeChildIcons(GeneratorIcon *parent, int startIndex = 0);
-    void repositionIcons(GeneratorIcon * icon);
+    void removeIcon(GeneratorIcon *iconToRemove);
+    void removeChildIcons(GeneratorIcon *parent);
+    void repositionIcons(GeneratorIcon * icon, bool updateNonVisable = false);
     void popUpMenuRequested(const QPoint &pos, const HkObjectExpSharedPtr & obj);
     void expandBranch(GeneratorIcon * icon, bool expandAll = false);
     void contractBranch(GeneratorIcon * icon, bool contractAll = false);
     HkObject * getFirstChild(const HkObjectExpSharedPtr &obj);
     int manageIcons();
     bool positionIcon(GeneratorIcon * icon);
+    void createIconBranch(QList <GeneratorIcon *> & icons, GeneratorIcon *parent);
+    void deleteSelectedBranch();
 
     template<typename T>
     int initializeIconsForNewBranch(const T & ptr, QList<HkObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount){
@@ -283,6 +242,27 @@ private:
         //type->icons.append(icon);
         selectedIcon->parent = icon;
         icon->children.append(selectedIcon);
+        //Order is important??
+        behaviorGS->addItem(icon->linkToParent);
+        behaviorGS->addItem(icon);
+        return icon;
+    }
+
+    template<typename T>
+    GeneratorIcon * initalizeAppendedIcon(const HkObjectExpSharedPtr & obj, const T & type, GeneratorIcon * parentIcon){
+        if (!parentIcon){
+            return NULL;
+        }
+        GeneratorIcon *icon = new GeneratorIcon(obj, type->name, parentIcon);
+        QLineF line(icon->parent->pos().x() + 1.0*icon->parent->boundingRect().width(), icon->parent->pos().y() + 1.0*icon->parent->boundingRect().height(),\
+                             icon->parent->pos().x() + 1.5*icon->parent->boundingRect().width(), icon->parent->boundingRect().height());
+        if (icon->linkToParent){
+            icon->linkToParent->setLine(line);
+        }else {
+            icon->linkToParent = new QGraphicsLineItem(line);
+        }
+        //type->icons.append(icon);
+        parentIcon->children.append(icon);
         //Order is important??
         behaviorGS->addItem(icon->linkToParent);
         behaviorGS->addItem(icon);

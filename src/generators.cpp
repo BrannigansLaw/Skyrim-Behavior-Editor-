@@ -135,6 +135,42 @@ bool hkbGenerator::link(){
     return true;
 }
 
+QString hkbGenerator::getName() const{
+    qulonglong sig = getSignature();
+    switch (sig) {
+    case HKB_STATE_MACHINE_STATE_INFO:
+        return static_cast<hkbStateMachineStateInfo const *>(this)->getName();
+    case HKB_STATE_MACHINE:
+        return static_cast<hkbStateMachine const *>(this)->getName();
+    case HKB_MANUAL_SELECTOR_GENERATOR:
+        return static_cast<hkbManualSelectorGenerator const *>(this)->getName();
+    case HKB_BLENDER_GENERATOR:
+        return static_cast<hkbBlenderGenerator const *>(this)->getName();
+    case BS_I_STATE_TAGGING_GENERATOR:
+        return static_cast<BSiStateTaggingGenerator const *>(this)->getName();
+    case BS_BONE_SWITCH_GENERATOR:
+        return static_cast<BSBoneSwitchGenerator const *>(this)->getName();
+    case BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+        return static_cast<BSCyclicBlendTransitionGenerator const *>(this)->getName();
+    case BS_SYNCHRONIZED_CLIP_GENERATOR:
+        return static_cast<BSSynchronizedClipGenerator const *>(this)->getName();
+    case HKB_MODIFIER_GENERATOR:
+        return static_cast<hkbModifierGenerator const *>(this)->getName();
+    case BS_OFFSET_ANIMATION_GENERATOR:
+        return static_cast<BSOffsetAnimationGenerator const *>(this)->getName();
+    case HKB_POSE_MATCHING_GENERATOR:
+        return static_cast<hkbPoseMatchingGenerator const *>(this)->getName();
+    case HKB_CLIP_GENERATOR:
+        return static_cast<hkbClipGenerator const *>(this)->getName();
+    case HKB_BEHAVIOR_GRAPH:
+        return static_cast<hkbBehaviorGraph const *>(this)->getName();
+    default:
+        break;
+    }
+    return true;
+}
+
+
 /**
  * hkRootLevelContainer
  */
