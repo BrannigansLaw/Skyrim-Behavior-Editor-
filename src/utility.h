@@ -12,16 +12,6 @@
 
 #define MAX_HKXXML_LINE_LENGHT 512
 
-bool confirmationDialogue(const QString & message, QObject *parent){
-    QMessageBox::StandardButton ret;
-    ret = QMessageBox::warning(parent, tr("Application"), tr(message), QMessageBox::Yes | QMessageBox::Cancel);
-    if (ret == QMessageBox::Yes){
-        return true;
-    }else if (ret == QMessageBox::Cancel){
-        return false;
-    }
-}
-
 struct hkVector3
 {
     hkVector3(qreal x = 0, qreal y = 0, qreal z = 0): x(x), y(y), z(z){}

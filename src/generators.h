@@ -120,6 +120,7 @@ public:
     virtual ~hkbModifierGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    QString getName() const{return name;}
 private:
     hkbModifierGenerator& operator=(const hkbModifierGenerator&);
     hkbModifierGenerator(const hkbModifierGenerator &);
@@ -139,6 +140,7 @@ public:
     virtual ~hkbManualSelectorGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    QString getName() const{return name;}
 private:
     hkbManualSelectorGenerator& operator=(const hkbManualSelectorGenerator&);
     hkbManualSelectorGenerator(const hkbManualSelectorGenerator &);
@@ -178,6 +180,7 @@ public:
     virtual ~hkbBlenderGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    QString getName() const{return name;}
 private:
     hkbBlenderGenerator& operator=(const hkbBlenderGenerator&);
     hkbBlenderGenerator(const hkbBlenderGenerator &);
@@ -221,6 +224,7 @@ public:
     virtual ~BSBoneSwitchGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    QString getName() const{return name;}
 private:
     BSBoneSwitchGenerator& operator=(const BSBoneSwitchGenerator&);
     BSBoneSwitchGenerator(const BSBoneSwitchGenerator &);
@@ -240,6 +244,7 @@ public:
     virtual ~BSCyclicBlendTransitionGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    QString getName() const{return name;}
 private:
     BSCyclicBlendTransitionGenerator& operator=(const BSCyclicBlendTransitionGenerator&);
     BSCyclicBlendTransitionGenerator(const BSCyclicBlendTransitionGenerator &);
@@ -260,12 +265,14 @@ private:
 
 class BSiStateTaggingGenerator: public hkbGenerator
 {
+    friend class BSiStateTaggingGeneratorUI;
     friend class BehaviorGraphView;
 public:
     BSiStateTaggingGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~BSiStateTaggingGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    QString getName() const{return name;}
 private:
     BSiStateTaggingGenerator& operator=(const BSiStateTaggingGenerator&);
     BSiStateTaggingGenerator(const BSiStateTaggingGenerator &);
@@ -286,6 +293,7 @@ public:
     virtual ~hkbBehaviorReferenceGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    QString getName() const{return name;}
 private:
     hkbBehaviorReferenceGenerator& operator=(const hkbBehaviorReferenceGenerator&);
     hkbBehaviorReferenceGenerator(const hkbBehaviorReferenceGenerator &);
@@ -304,6 +312,7 @@ public:
     virtual ~hkbClipGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    QString getName() const{return name;}
 private:
     hkbClipGenerator& operator=(const hkbClipGenerator&);
     hkbClipGenerator(const hkbClipGenerator &);
@@ -334,6 +343,7 @@ public:
     virtual ~BSSynchronizedClipGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    QString getName() const{return name;}
 private:
     BSSynchronizedClipGenerator& operator=(const BSSynchronizedClipGenerator&);
     BSSynchronizedClipGenerator(const BSSynchronizedClipGenerator &);
@@ -360,6 +370,7 @@ public:
     virtual ~hkbPoseMatchingGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    QString getName() const{return name;}
 private:
     hkbPoseMatchingGenerator& operator=(const hkbPoseMatchingGenerator&);
     hkbPoseMatchingGenerator(const hkbPoseMatchingGenerator &);
@@ -399,6 +410,7 @@ public:
     virtual ~BSOffsetAnimationGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    QString getName() const{return name;}
 private:
     BSOffsetAnimationGenerator& operator=(const BSOffsetAnimationGenerator&);
     BSOffsetAnimationGenerator(const BSOffsetAnimationGenerator &);
@@ -421,6 +433,7 @@ public:
     virtual ~hkbBehaviorGraph(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    QString getName() const{return name;}
 private:
     hkbBehaviorGraph& operator=(const hkbBehaviorGraph&);
     hkbBehaviorGraph(const hkbBehaviorGraph &);

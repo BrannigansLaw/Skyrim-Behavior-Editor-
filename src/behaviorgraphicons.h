@@ -10,6 +10,7 @@
 
 class GeneratorIcon: public QGraphicsItem
 {
+    friend class HkDataUI;
     friend class BehaviorGraphView;
 public:
     GeneratorIcon(const HkObjectExpSharedPtr & d, const QString & s, GeneratorIcon *par = NULL);

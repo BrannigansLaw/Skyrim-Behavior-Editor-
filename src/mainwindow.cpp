@@ -3,6 +3,7 @@
 #include "hkxfile.h"
 #include "generators.h"
 #include "behaviorgraphui.h"
+#include "hkobjectui.h"
 
 #include <QtWidgets>
 
@@ -18,7 +19,8 @@ MainWindow::MainWindow()
       hkxFile(NULL),
       iconGBLyt(new QVBoxLayout(this)),
       behaviorGraphViewGB(new QGroupBox("Behavior Graph")),
-      objectDataGB(new QGroupBox("Object Data")),
+      //objectDataGB(new QGroupBox("Object Data")),
+      objectDataWid(new HkDataUI("Object Data")),
       eventsGB(new QGroupBox("Events")),
       variablesGB(new QGroupBox("Variables")),
       logGB(new QGroupBox("Debug Log")),
@@ -37,7 +39,8 @@ MainWindow::MainWindow()
     logGB->setLayout(logGBLyt);
     topLyt->addWidget(topMB, 0, 0, 1, 10);
     topLyt->addWidget(behaviorGraphViewGB, 1, 0, 6, 6);
-    topLyt->addWidget(objectDataGB, 1, 6, 6, 4);
+    //topLyt->addWidget(objectDataGB, 1, 6, 6, 4);
+    topLyt->addWidget(objectDataWid, 1, 6, 6, 4);
     topLyt->addWidget(eventsGB, 7, 0, 3, 3);
     topLyt->addWidget(variablesGB, 7, 3, 3, 3);
     topLyt->addWidget(logGB, 7, 6, 3, 4);
@@ -108,9 +111,10 @@ void MainWindow::openHkxfile(QString name){
         hkxFile = new BehaviorFile(this, name);
         if (!drawGraph){
             delete hkxFile;
+            hkxFile = NULL;
             return;
         }
-        behaviorGraphViewIV = new BehaviorGraphView(hkxFile);
+        behaviorGraphViewIV = new BehaviorGraphView(objectDataWid, hkxFile);
         behaviorGraphViewGB->setTitle(name);
         setProgressData("Drawing Behavior Graph...", 60);
         if (!behaviorGraphViewIV->drawBehaviorGraph()){
@@ -125,9 +129,10 @@ void MainWindow::openHkxfile(QString name){
         hkxFile = new BehaviorFile(this, name);
         if (!drawGraph){
             delete hkxFile;
+            hkxFile = NULL;
             return;
         }
-        behaviorGraphViewIV = new BehaviorGraphView(hkxFile);
+        behaviorGraphViewIV = new BehaviorGraphView(objectDataWid, hkxFile);
         setProgressData("Drawing Behavior Graph...", 90);
         if (!behaviorGraphViewIV->drawBehaviorGraph()){
             writeToLog("MainWindow: drawBehaviorGraph() failed!\nThe behavior graph was drawn incorrectly!", true);

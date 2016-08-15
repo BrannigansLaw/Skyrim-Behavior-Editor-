@@ -2,8 +2,9 @@
 #include "hkxxmlreader.h"
 #include "hkxfile.h"
 #include "modifiers.h"
+#include "hkobject.h"
 
-bool readReferences(const QByteArray &line, QList <HkObjectExpSharedPtr> & children){
+/*bool readReferences(const QByteArray &line, QList <HkObjectExpSharedPtr> & children){
     qint16 size = 0;
     qint16 start;
     bool ok = true;
@@ -45,7 +46,7 @@ bool readReferences(const QByteArray &line, QList <HkObjectExpSharedPtr> & child
         }
     }
     return ok;
-}
+}*/
 
 /**
  * hkbGenerator
@@ -167,7 +168,7 @@ QString hkbGenerator::getName() const{
     default:
         break;
     }
-    return true;
+    return "";
 }
 
 
@@ -1888,7 +1889,7 @@ bool hkbBehaviorGraph::link(){
     }else{
         rootGenerator = *ptr;
     }
-    ptr = getParentFile()->findHkObject(data.getReference());
+    ptr = &getParentFile()->graphData;
     if (!ptr){
         writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'data' data field!\nObject Name: "+name, true);
         setDataValidity(false);

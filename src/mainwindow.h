@@ -20,6 +20,7 @@ class QHBoxLayout;
 class BehaviorFile;
 class BehaviorGraphView;
 class QPlainTextEdit;
+class HkDataUI;
 
 class MainWindow : public QWidget
 {
@@ -43,7 +44,8 @@ private:
     BehaviorGraphView *behaviorGraphViewIV;
     QGroupBox *behaviorGraphViewGB;
     QVBoxLayout *iconGBLyt;
-    QGroupBox *objectDataGB;
+    //QGroupBox *objectDataGB;
+    HkDataUI *objectDataWid;
     QGroupBox *eventsGB;
     QGroupBox *variablesGB;
     QGroupBox *logGB;

@@ -25,27 +25,59 @@ class hkbStateMachineStateInfo;
 class BSBoneSwitchGenerator;
 class BSBoneSwitchGeneratorBoneData;
 class hkbGenerator;
+class HkDataUI;
 
 class BehaviorGraphView: public QGraphicsView
 {
     Q_OBJECT
     friend class GeneratorIcon;
+    friend class HkDataUI;
 public:
-    BehaviorGraphView(BehaviorFile * file);
+    BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file);
     bool drawBehaviorGraph();
+    void reconnectBranch(const HkObjectExpSharedPtr &oldChild, const HkObjectExpSharedPtr &newChild, GeneratorIcon *icon);
     QSize sizeHint() const Q_DECL_OVERRIDE{
         return QSize(500, 400);
+    }
+    GeneratorIcon* getSelectedItem() const{
+        return selectedIcon;
     }
 protected:
     void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+signals:
+    void iconSelected(GeneratorIcon *icon);
 private slots:
     void appendStateMachine();
+    void appendManualSelectorGenerator();
+    void appendModifierGenerator();
+    void appendIStateTaggingGenerator();
+    void appendSynchronizedClipGenerator();
+    void appendOffsetAnimationGenerator();
+    void appendCyclicBlendTransitionGenerator();
+    void appendPoseMatchingGenerator();
+    void appendBlenderGenerator();
+    void appendBoneSwitchGenerator();
+    void appendClipGenerator();
+    void appendBehaviorReferenceGenerator();
     void wrapStateMachine();
-    void removeSelectedObject();
-    void removeSelectedObjectBranch();
+    void wrapBlenderGenerator();
+    void wrapPoseMatchingGenerator();
+
+    void wrapManualSelectorGenerator();
+    void wrapModifierGenerator();
+    void wrapIStateTaggingGenerator();
+    void wrapSynchronizedClipGenerator();
+    void wrapOffsetAnimationGenerator();
+    void wrapCyclicBlendTransitionGenerator();
+    void wrapBoneSwitchGenerator();
+    //void removeSelectedObject();
+    void removeSelectedObjectBranchSlot();
 private:
+    void removeSelectedObjectBranch(GeneratorIcon *icon);
+private:
+    HkDataUI *ui;
     BehaviorFile *behavior;
     QGraphicsScene *behaviorGS;
     GeneratorIcon *selectedIcon;
@@ -59,6 +91,8 @@ private:
     QAction *appendBSOAGAct;
     QAction *appendBSCBTGAct;
     QAction *appendPMGAct;
+    QAction *appendCGAct;
+    QAction *appendBRGAct;
     QMenu *appendBlenderMenu;
     QAction *appendBGAct;
     QAction *appendBSBSGAct;
@@ -84,19 +118,25 @@ private:
     const qreal scaleUpFactor;
     const qreal scaleDownFactor;
 private:
+    //bool removeData(const HkObjectExpSharedPtr & smtptr);
+    void removeData();
     void expandBranchForIcon(GeneratorIcon *icon);
     bool drawBranch(GeneratorIcon * rootIcon);
-    void removeIcon(GeneratorIcon *iconToRemove);
+    //void removeIcon(GeneratorIcon *iconToRemove);
     void removeChildIcons(GeneratorIcon *parent);
     void repositionIcons(GeneratorIcon * icon, bool updateNonVisable = false);
-    void popUpMenuRequested(const QPoint &pos, const HkObjectExpSharedPtr & obj);
+    void popUpMenuRequested(const QPoint &pos, GeneratorIcon *icon);
     void expandBranch(GeneratorIcon * icon, bool expandAll = false);
     void contractBranch(GeneratorIcon * icon, bool contractAll = false);
     HkObject * getFirstChild(const HkObjectExpSharedPtr &obj);
+    HkObjectExpSharedPtr * getFirstChildSmartPointer(HkObject *obj);
     int manageIcons();
     bool positionIcon(GeneratorIcon * icon);
     void createIconBranch(QList <GeneratorIcon *> & icons, GeneratorIcon *parent);
-    void deleteSelectedBranch();
+    void deleteSelectedBranch(GeneratorIcon *icon);
+
+    template <typename T> bool appendObject(T * ptr);
+    template <typename T> void wrapObject(T *obj);
 
     template<typename T>
     int initializeIconsForNewBranch(const T & ptr, QList<HkObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount){
@@ -253,7 +293,7 @@ private:
         if (!parentIcon){
             return NULL;
         }
-        GeneratorIcon *icon = new GeneratorIcon(obj, type->name, parentIcon);
+        GeneratorIcon *icon = new GeneratorIcon(obj, type->getName(), parentIcon);
         QLineF line(icon->parent->pos().x() + 1.0*icon->parent->boundingRect().width(), icon->parent->pos().y() + 1.0*icon->parent->boundingRect().height(),\
                              icon->parent->pos().x() + 1.5*icon->parent->boundingRect().width(), icon->parent->boundingRect().height());
         if (icon->linkToParent){
@@ -262,7 +302,7 @@ private:
             icon->linkToParent = new QGraphicsLineItem(line);
         }
         //type->icons.append(icon);
-        parentIcon->children.append(icon);
+        //parentIcon->children.append(icon); constructor does this...
         //Order is important??
         behaviorGS->addItem(icon->linkToParent);
         behaviorGS->addItem(icon);

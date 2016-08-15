@@ -125,7 +125,7 @@ void GeneratorIcon::mousePressEvent(QGraphicsSceneMouseEvent *event){
     }
     BehaviorGraphView *view = static_cast<BehaviorGraphView *>(scene()->views().first());
     GeneratorIcon *icon = static_cast<BehaviorGraphView *>(scene()->views().first())->selectedIcon;
-    GeneratorIcon *firstSceneIcon = static_cast<GeneratorIcon *>(scene()->items(Qt::AscendingOrder).first())->children.first();
+    GeneratorIcon *firstSceneIcon = static_cast<GeneratorIcon *>(scene()->items(Qt::AscendingOrder).first());
     if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton){
         if (icon != this){
             view->selectedIcon = this;
@@ -165,7 +165,7 @@ void GeneratorIcon::mousePressEvent(QGraphicsSceneMouseEvent *event){
             }
         }
         if (event->button() == Qt::RightButton){
-            view->popUpMenuRequested(view->mapFromScene(event->scenePos()), data);
+            view->popUpMenuRequested(view->mapFromScene(event->scenePos()), this);
         }
     }
     scene()->update();

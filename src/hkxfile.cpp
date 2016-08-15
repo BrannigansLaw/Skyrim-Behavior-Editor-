@@ -113,6 +113,10 @@ bool BehaviorFile::parse(){
                     if (!appendAndReadData(index, new hkbBlenderGeneratorChild(this))){
                         return false;
                     }
+                }else if (signature == HKB_BONE_WEIGHT_ARRAY){
+                    if (!appendAndReadData(index, new hkbBoneWeightArray(this))){
+                        return false;
+                    }
                 }else if (signature == HKB_BLENDER_GENERATOR){
                     if (!appendAndReadData(index, new hkbBlenderGenerator(this))){
                         return false;
@@ -145,11 +149,30 @@ bool BehaviorFile::parse(){
                     if (!appendAndReadData(index, new hkbBehaviorGraph(this))){
                         return false;
                     }
+                }else if (signature == HKB_BEHAVIOR_GRAPH_DATA){
+                    if (!appendAndReadData(index, new hkbBehaviorGraphData(this))){
+                        return false;
+                    }
+                    graphData = otherTypes.last();
+                    otherTypes.removeLast();
+                }else if (signature == HKB_BEHAVIOR_GRAPH_STRING_DATA){
+                    if (!appendAndReadData(index, new hkbBehaviorGraphStringData(this))){
+                        return false;
+                    }
+                    stringData = otherTypes.last();
+                    otherTypes.removeLast();
+                }else if (signature == HKB_VARIABLE_VALUE_SET){
+                    if (!appendAndReadData(index, new hkbVariableValueSet(this))){
+                        return false;
+                    }
+                    variableValues = otherTypes.last();
+                    otherTypes.removeLast();
                 }else if (signature == HK_ROOT_LEVEL_CONTAINER){
                     if (!appendAndReadData(index, new hkRootLevelContainer(this))){
                         return false;
                     }
                     setRootObject(otherTypes.last());
+                    otherTypes.removeLast();
                 }else{
                     writeToLog("BehaviorFile: parse()!\nUnknown signature detected!\nUnknown object class name is: "+reader.getNthAttributeValueAt(index, 1)+"\nUnknown object signature is: "+QString::number(signature, 16));
                 }
@@ -163,6 +186,7 @@ bool BehaviorFile::parse(){
         writeToLog("BehaviorFile: parse() failed because link() failed!", true);
         return false;
     }
+    removeUnneededGenerators();
     return true;
 }
 
@@ -183,6 +207,14 @@ bool BehaviorFile::link(){
             writeToLog("BehaviorFile: link() failed!\nA generator failed to link to it's children!\nObject signature: "+QString::number(generators.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getReference()), true);
             return false;
         }
+    }
+    if (!static_cast<hkbVariableValueSet * >(variableValues.data())->link()){
+        writeToLog("BehaviorFile: link() failed!\nhkbVariableValueSet failed to link to it's children!\n", true);
+        return false;
+    }
+    if (!static_cast<hkbBehaviorGraphData * >(graphData.data())->link()){
+        writeToLog("BehaviorFile: link() failed!\nhkbBehaviorGraphData failed to link to it's children!\n", true);
+        return false;
     }
     return true;
 }
@@ -223,7 +255,55 @@ HkObjectExpSharedPtr * BehaviorFile::findHkObject(long ref){
     return NULL;
 }
 
-
+QStringList BehaviorFile::getGeneratorNames(){
+    QStringList list;
+    qulonglong sig;
+    for (int i = 0; i < generators.size(); i++){
+        if (generators.at(i).constData()->getType() == HkObject::TYPE_GENERATOR){
+            list.append("Name: "+static_cast<hkbGenerator *>(generators.at(i).data())->getName());
+            sig = generators.at(i).constData()->getSignature();
+            switch (sig){
+            case HKB_STATE_MACHINE:
+                list.last().append(" Type: hkbStateMachine");
+                break;
+            case HKB_MANUAL_SELECTOR_GENERATOR:
+                list.last().append(" Type: hkbManualSelectorGenerator");
+                break;
+            case HKB_BLENDER_GENERATOR:
+                list.last().append(" Type: hkbBlenderGenerator");
+                break;
+            case BS_I_STATE_TAGGING_GENERATOR:
+                list.last().append(" Type: BSiStateTaggingGenerator");
+                break;
+            case BS_BONE_SWITCH_GENERATOR:
+                list.last().append(" Type: BSBoneSwitchGenerator");
+                break;
+            case BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+                list.last().append(" Type: BSCyclicBlendTransitionGenerator");
+                break;
+            case BS_SYNCHRONIZED_CLIP_GENERATOR:
+                list.last().append(" Type: BSSynchronizedClipGenerator");
+                break;
+            case HKB_MODIFIER_GENERATOR:
+                list.last().append(" Type: hkbModifierGenerator");
+                break;
+            case BS_OFFSET_ANIMATION_GENERATOR:
+                list.last().append(" Type: BSOffsetAnimationGenerator");
+                break;
+            case HKB_POSE_MATCHING_GENERATOR:
+                list.last().append(" Type: hkbPoseMatchingGenerator");
+                break;
+            case HKB_CLIP_GENERATOR:
+                list.last().append(" Type: hkbClipGenerator");
+                break;
+            default:
+                writeToLog("BehaviorFile: getGeneratorNames() failed!\n'generators' contains an invalid type!\n", true);
+                break;
+            }
+        }
+    }
+    return list;
+}
 
 
 

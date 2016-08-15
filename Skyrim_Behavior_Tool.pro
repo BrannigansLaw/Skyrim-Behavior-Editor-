@@ -28,7 +28,8 @@ SOURCES += \
     src/main.cpp \
     src/mainwindow.cpp \
     src/behaviorgraphui.cpp \
-    src/behaviorgraphicons.cpp
+    src/behaviorgraphicons.cpp \
+    src/hkobjectui.cpp
 
 HEADERS  += \
     src/fileselectwindow.h \
@@ -40,4 +41,6 @@ HEADERS  += \
     src/utility.h \
     src/modifiers.h \
     src/behaviorgraphui.h \
-    src/behaviorgraphicons.h
+    src/behaviorgraphicons.h \
+    src/hkobjectui.h \
+    src/genericdatawidgets.h
