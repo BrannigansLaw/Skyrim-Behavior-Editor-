@@ -213,7 +213,7 @@ bool hkRootLevelContainer::link(){
         return false;
     }
     for (int i = 0; i < namedVariants.size(); i++){
-        HkObjectExpSharedPtr *ptr = getParentFile()->findGenerator(namedVariants.at(i).variant.getReference());
+        HkObjectExpSharedPtr *ptr = getParentFile()->findBehaviorGraph(namedVariants.at(i).variant.getReference());//getParentFile()->findGenerator(namedVariants.at(i).variant.getReference());
         if (!ptr){
             writeToLog("hkRootLevelContainer: link()!\nUnable to link variant reference "+QString::number(namedVariants.at(i).variant.getReference())+"!");
             setDataValidity(false);

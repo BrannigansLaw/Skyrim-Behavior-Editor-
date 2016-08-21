@@ -13,6 +13,7 @@ class PointerWidget;
 class StringWidget;
 class IntWidget;
 class BSiStateTaggingGeneratorUI;
+class ModifierGeneratorUI;
 
 #include "hkobject.h"
 
@@ -29,15 +30,40 @@ private:
     HkDataUI& operator=(const HkDataUI&);
     HkDataUI(const HkDataUI &);
 private:
+    enum {NO_DATA_SELECTED = 0, BS_I_STATE_TAG_GEN = 1, MOD_GEN = 2};
     BehaviorGraphView *behaviorView;
     QVBoxLayout *verLyt;
     QHBoxLayout *horLyt;
     QPushButton *button1;
     QPushButton *button2;
     QStackedLayout *stack;
-    QList <HkObject *> viewedData;
+    HkObject *loadedData;
+    //QList <HkObject *> viewedData;
     //All hkObjectData UI's??
+    QLabel *noDataL;
     BSiStateTaggingGeneratorUI *iSTGUI;
+    ModifierGeneratorUI *modGenUI;
+};
+
+class ModifierGeneratorUI: public QGroupBox
+{
+    Q_OBJECT
+    friend class HkDataUI;
+public:
+    ModifierGeneratorUI();
+    virtual ~ModifierGeneratorUI(){}
+    void loadData(const HkObjectExpSharedPtr & data);
+private slots:
+    void setName();
+    void setModifier(int index);
+    void setGenerator(int index);
+private:
+    BehaviorGraphView *behaviorView;
+    HkObjectExpSharedPtr bsData;
+    QVBoxLayout *lyt;
+    StringWidget *name;
+    PointerWidget *modifier;
+    PointerWidget *generator;
 };
 
 class BSiStateTaggingGeneratorUI: public QGroupBox
@@ -49,7 +75,10 @@ public:
     virtual ~BSiStateTaggingGeneratorUI(){}
     void loadData(const HkObjectExpSharedPtr & data);
 private slots:
+    void setName();
     void setDefaultGenerator(int index);
+    void setIStateToSetAs();
+    void setIPriority();
 private:
     BehaviorGraphView *behaviorView;
     HkObjectExpSharedPtr bsData;

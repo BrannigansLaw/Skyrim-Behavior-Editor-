@@ -190,11 +190,12 @@ public:
         lyt->addWidget(new QLabel("Type: "+type), 1);
         lyt->addWidget(pointers, 1);
         setLayout(lyt);
-        connect(pointers, SIGNAL(activated(int)), this, SIGNAL(editingDone(int)));
+        connect(pointers, SIGNAL(currentIndexChanged(int)), this, SIGNAL(editingDone(int)));
     }
 
     void setStringList(const QStringList & sl){
         list.clear();
+        pointers->clear();
         list.append("None");
         list.append(sl);
         pointers->addItems(list);
@@ -202,6 +203,14 @@ public:
 
     void setSelectedItem(int index){
         pointers->setCurrentIndex(index);
+    }
+
+    void silence(){
+        disconnect(pointers, SIGNAL(currentIndexChanged(int)), this, SIGNAL(editingDone(int)));
+    }
+
+    void reconnect(){
+        connect(pointers, SIGNAL(currentIndexChanged(int)), this, SIGNAL(editingDone(int)));
     }
 
     virtual ~PointerWidget(){}

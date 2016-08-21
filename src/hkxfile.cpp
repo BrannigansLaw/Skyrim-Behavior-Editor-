@@ -149,6 +149,8 @@ bool BehaviorFile::parse(){
                     if (!appendAndReadData(index, new hkbBehaviorGraph(this))){
                         return false;
                     }
+                    behaviorGraph = generators.last();
+                    generators.removeLast();
                 }else if (signature == HKB_BEHAVIOR_GRAPH_DATA){
                     if (!appendAndReadData(index, new hkbBehaviorGraphData(this))){
                         return false;
@@ -208,6 +210,10 @@ bool BehaviorFile::link(){
             return false;
         }
     }
+    if (!static_cast<hkbBehaviorGraph * >(behaviorGraph.data())->link()){
+        writeToLog("BehaviorFile: link() failed!\nhkbBehaviorGraph failed to link to it's children!\n", true);
+        return false;
+    }
     if (!static_cast<hkbVariableValueSet * >(variableValues.data())->link()){
         writeToLog("BehaviorFile: link() failed!\nhkbVariableValueSet failed to link to it's children!\n", true);
         return false;
@@ -253,6 +259,31 @@ HkObjectExpSharedPtr * BehaviorFile::findHkObject(long ref){
         }
     }
     return NULL;
+}
+
+HkObjectExpSharedPtr * BehaviorFile::findBehaviorGraph(long ref){
+    if (behaviorGraph.getReference() == ref){
+        return &behaviorGraph;
+    }
+    return NULL;
+}
+
+void BehaviorFile::removeData(){
+    for (int i = 0; i < generators.size(); i++){
+        if (generators.at(i).constData()->ref < 2){
+            generators.removeAt(i);
+        }
+    }
+    for (int i = 0; i < modifiers.size(); i++){
+        if (modifiers.at(i).constData()->ref < 2){
+            modifiers.removeAt(i);
+        }
+    }
+    for (int i = 0; i < otherTypes.size(); i++){
+        if (otherTypes.at(i).constData()->ref < 2){
+            otherTypes.removeAt(i);
+        }
+    }
 }
 
 QStringList BehaviorFile::getGeneratorNames(){
@@ -302,6 +333,56 @@ QStringList BehaviorFile::getGeneratorNames(){
             }
         }
     }
+    return list;
+}
+
+QStringList BehaviorFile::getModifierNames(){
+    QStringList list;
+    /*qulonglong sig;
+    for (int i = 0; i < modifiers.size(); i++){
+        if (modifiers.at(i).constData()->getType() == HkObject::TYPE_MODIFIER){
+            list.append("Name: "+static_cast<hkbModifier *>(modifiers.at(i).data())->getName());
+            sig = modifiers.at(i).constData()->getSignature();
+            switch (sig){
+            case HKB_STATE_MACHINE:
+                list.last().append(" Type: hkbStateMachine");
+                break;
+            case HKB_MANUAL_SELECTOR_GENERATOR:
+                list.last().append(" Type: hkbManualSelectorGenerator");
+                break;
+            case HKB_BLENDER_GENERATOR:
+                list.last().append(" Type: hkbBlenderGenerator");
+                break;
+            case BS_I_STATE_TAGGING_GENERATOR:
+                list.last().append(" Type: BSiStateTaggingGenerator");
+                break;
+            case BS_BONE_SWITCH_GENERATOR:
+                list.last().append(" Type: BSBoneSwitchGenerator");
+                break;
+            case BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+                list.last().append(" Type: BSCyclicBlendTransitionGenerator");
+                break;
+            case BS_SYNCHRONIZED_CLIP_GENERATOR:
+                list.last().append(" Type: BSSynchronizedClipGenerator");
+                break;
+            case HKB_MODIFIER_GENERATOR:
+                list.last().append(" Type: hkbModifierGenerator");
+                break;
+            case BS_OFFSET_ANIMATION_GENERATOR:
+                list.last().append(" Type: BSOffsetAnimationGenerator");
+                break;
+            case HKB_POSE_MATCHING_GENERATOR:
+                list.last().append(" Type: hkbPoseMatchingGenerator");
+                break;
+            case HKB_CLIP_GENERATOR:
+                list.last().append(" Type: hkbClipGenerator");
+                break;
+            default:
+                writeToLog("BehaviorFile: getGeneratorNames() failed!\n'generators' contains an invalid type!\n", true);
+                break;
+            }
+        }
+    }*/
     return list;
 }
 

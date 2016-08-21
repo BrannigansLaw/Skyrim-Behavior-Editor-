@@ -54,9 +54,9 @@ GeneratorIcon::GeneratorIcon(const HkObjectExpSharedPtr & d, const QString & s, 
       parent(par),
       linkToParent(NULL)
 {
-    /*if (data->getType() == HkObject::TYPE_GENERATOR){
+    if (data->getType() == HkObject::TYPE_GENERATOR){
         static_cast<hkbGenerator *>(data.data())->icons.append(this);
-    }*/
+    }
     pen = QPen(QBrush(Qt::black), 2);
     textPen.setColor(Qt::white);
     rGrad.setCenter(boundingRect().topLeft());
@@ -71,10 +71,17 @@ GeneratorIcon::GeneratorIcon(const HkObjectExpSharedPtr & d, const QString & s, 
         path.addPolygon(polygon);
     }
     if (parent){
-        parent->children.append(this);
+        qreal lastY = 0;
+        getLastIconY(parent, lastY);
+        int index = parent->children.indexOf(this);
+        if (index == -1){
+            parent->children.append(this);
+        }else{
+            parent->children.replace(index, this);
+        }
         linkToParent = new QGraphicsLineItem(parent->pos().x() + 1.0*parent->boundingRect().width(), parent->pos().y() + 1.0*parent->boundingRect().height(),
-                                             parent->pos().x() + 1.5*parent->boundingRect().width(), pos().y() + 2*boundingRect().height());
-        setPos(parent->pos().x() + 1.5*parent->boundingRect().width(), pos().y() + 2*boundingRect().height());
+                                             parent->pos().x() + 1.5*parent->boundingRect().width(), lastY + 2*boundingRect().height());
+        setPos(parent->pos().x() + 1.5*parent->boundingRect().width(), lastY + 2*boundingRect().height());
     }
 }
 

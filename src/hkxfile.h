@@ -73,13 +73,20 @@ public:
     HkObjectExpSharedPtr * findHkObject(long ref);
     HkObjectExpSharedPtr * findGenerator(long ref);
     HkObjectExpSharedPtr * findModifier(long ref);
+    HkObjectExpSharedPtr * findBehaviorGraph(long ref);
+
+    void removeData();
+
     int getIndexOfGenerator(const HkObjectExpSharedPtr & obj){
         return generators.indexOf(obj);
     }
-    void setGeneratorData(HkObjectExpSharedPtr & ptrToSet, int index){
+
+    bool setGeneratorData(HkObjectExpSharedPtr & ptrToSet, int index){
         if (index >= 0 && index < generators.size()){
             ptrToSet = generators.at(index);
+            return true;
         }
+        return false;
     }
 
     HkObjectExpSharedPtr* getGeneratorDataAt(int index){
@@ -89,10 +96,30 @@ public:
         return NULL;
     }
 
+    int getIndexOfModifier(const HkObjectExpSharedPtr & obj){
+        return modifiers.indexOf(obj);
+    }
+
+    bool setModifierData(HkObjectExpSharedPtr & ptrToSet, int index){
+        if (index >= 0 && index < modifiers.size()){
+            ptrToSet = modifiers.at(index);
+            return true;
+        }
+        return false;
+    }
+
+    HkObjectExpSharedPtr* getModifierDataAt(int index){
+        if (index >= 0 && index < modifiers.size()){
+            return &modifiers[index];
+        }
+        return NULL;
+    }
+
     QStringList & getVariableNames() const{
         return static_cast<hkbBehaviorGraphData *>(graphData.data())->getVariableNames();
     }
     QStringList getGeneratorNames();
+    QStringList getModifierNames();
 protected:
     bool parse();
     bool link();
@@ -113,6 +140,7 @@ private:
 
 private:
     HkxXmlReader reader;
+    HkObjectExpSharedPtr behaviorGraph;
     HkObjectExpSharedPtr stringData;
     HkObjectExpSharedPtr variableValues;
     HkObjectExpSharedPtr graphData;

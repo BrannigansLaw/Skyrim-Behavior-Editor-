@@ -115,6 +115,7 @@ private:
 class hkbModifierGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
+    friend class ModifierGeneratorUI;
 public:
     hkbModifierGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbModifierGenerator(){refCount--;}
