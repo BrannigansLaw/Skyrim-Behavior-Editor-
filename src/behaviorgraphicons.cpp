@@ -5,6 +5,7 @@
 #include "behaviorgraphui.h"
 #include "hkobject.h"
 #include "behaviorgraphicons.h"
+#include "hkobjectui.h"
 
 #include <QBoxLayout>
 #include <QMenuBar>
@@ -122,7 +123,6 @@ void GeneratorIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
             painter->drawLine(vert);
         }
     }
-
 }
 
 void GeneratorIcon::mousePressEvent(QGraphicsSceneMouseEvent *event){
@@ -136,6 +136,7 @@ void GeneratorIcon::mousePressEvent(QGraphicsSceneMouseEvent *event){
     if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton){
         if (icon != this){
             view->selectedIcon = this;
+            view->ui->changeCurrentDataWidget(view->selectedIcon);
             if (icon){
                 icon->rGrad.setColorAt(1.0, Qt::black);
                 icon->textPen.setColor(Qt::white);

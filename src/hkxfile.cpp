@@ -269,29 +269,53 @@ HkObjectExpSharedPtr * BehaviorFile::findBehaviorGraph(long ref){
 }
 
 void BehaviorFile::removeData(){
-    for (int i = 0; i < generators.size(); i++){
-        if (generators.at(i).constData()->ref < 2){
+    for (int i = generators.size() - 1; i >= 0; i--){
+        if (generators.at(i).constData() && generators.at(i).constData()->ref < 2){
             generators.removeAt(i);
         }
     }
-    for (int i = 0; i < modifiers.size(); i++){
-        if (modifiers.at(i).constData()->ref < 2){
+    for (int i = modifiers.size() - 1; i >= 0; i--){
+        if (modifiers.at(i).constData() && modifiers.at(i).constData()->ref < 2){
             modifiers.removeAt(i);
         }
     }
-    for (int i = 0; i < otherTypes.size(); i++){
-        if (otherTypes.at(i).constData()->ref < 2){
+    for (int i = otherTypes.size() - 1; i >= 0; i--){
+        if (otherTypes.at(i).constData() && otherTypes.at(i).constData()->ref < 2){
             otherTypes.removeAt(i);
         }
     }
 }
+
+/*void BehaviorFile::removeData(){
+    for (int i = generators.size() - 1; i >= 0; i--){
+        if (generators.at(i).data() && generators.at(i).data()->ref < 3){
+            generators.at(i).data()->unlink();
+            generators.removeAt(i);
+            i = otherTypes.size() - 1;
+        }
+    }
+    for (int i = modifiers.size() - 1; i >= 0; i--){
+        if (modifiers.at(i).data() && modifiers.at(i).data()->ref < 3){
+            modifiers.at(i).data()->unlink();
+            modifiers.removeAt(i);
+            i = otherTypes.size() - 1;
+        }
+    }
+    for (int i = otherTypes.size() - 1; i >= 0; i--){
+        if (otherTypes.at(i).data() && otherTypes.at(i).data()->ref < 3){
+            otherTypes.at(i).data()->unlink();
+            otherTypes.removeAt(i);
+            i = otherTypes.size() - 1;
+        }
+    }
+}*/
 
 QStringList BehaviorFile::getGeneratorNames(){
     QStringList list;
     qulonglong sig;
     for (int i = 0; i < generators.size(); i++){
         if (generators.at(i).constData()->getType() == HkObject::TYPE_GENERATOR){
-            list.append("Name: "+static_cast<hkbGenerator *>(generators.at(i).data())->getName());
+            list.append(static_cast<hkbGenerator *>(generators.at(i).data())->getName());
             sig = generators.at(i).constData()->getSignature();
             switch (sig){
             case HKB_STATE_MACHINE:
@@ -326,6 +350,9 @@ QStringList BehaviorFile::getGeneratorNames(){
                 break;
             case HKB_CLIP_GENERATOR:
                 list.last().append(" Type: hkbClipGenerator");
+                break;
+            case HKB_BEHAVIOR_REFERENCE_GENERATOR:
+                list.last().append(" Type: hkbBehaviorReferenceGenerator");
                 break;
             default:
                 writeToLog("BehaviorFile: getGeneratorNames() failed!\n'generators' contains an invalid type!\n", true);

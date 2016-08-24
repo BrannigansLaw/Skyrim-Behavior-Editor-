@@ -14,6 +14,8 @@ class StringWidget;
 class IntWidget;
 class BSiStateTaggingGeneratorUI;
 class ModifierGeneratorUI;
+class BSiStateTaggingGenerator;
+class hkbModifierGenerator;
 
 #include "hkobject.h"
 
@@ -24,7 +26,7 @@ public:
     HkDataUI(const QString & title, const QString & button1Name = "Back", const QString & button2Name = "Forward");
     virtual ~HkDataUI(){}
     void setBehaviorView(BehaviorGraphView *view);
-private slots:
+public slots:
     void changeCurrentDataWidget(GeneratorIcon *icon);
 private:
     HkDataUI& operator=(const HkDataUI&);
@@ -52,14 +54,14 @@ class ModifierGeneratorUI: public QGroupBox
 public:
     ModifierGeneratorUI();
     virtual ~ModifierGeneratorUI(){}
-    void loadData(const HkObjectExpSharedPtr & data);
+    void loadData(HkObject *data);
 private slots:
     void setName();
     void setModifier(int index);
     void setGenerator(int index);
 private:
     BehaviorGraphView *behaviorView;
-    HkObjectExpSharedPtr bsData;
+    hkbModifierGenerator *bsData;
     QVBoxLayout *lyt;
     StringWidget *name;
     PointerWidget *modifier;
@@ -73,7 +75,7 @@ class BSiStateTaggingGeneratorUI: public QGroupBox
 public:
     BSiStateTaggingGeneratorUI();
     virtual ~BSiStateTaggingGeneratorUI(){}
-    void loadData(const HkObjectExpSharedPtr & data);
+    void loadData(HkObject *data);
 private slots:
     void setName();
     void setDefaultGenerator(int index);
@@ -81,7 +83,7 @@ private slots:
     void setIPriority();
 private:
     BehaviorGraphView *behaviorView;
-    HkObjectExpSharedPtr bsData;
+    BSiStateTaggingGenerator *bsData;
     QVBoxLayout *lyt;
     StringWidget *name;
     PointerWidget *pDefaultGenerator;

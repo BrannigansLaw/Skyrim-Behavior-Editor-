@@ -566,6 +566,10 @@ bool hkbVariableValueSet::link(){
     return true;
 }
 
+void HkDynamicObject::unlink(){
+    variableBindingSet = HkObjectExpSharedPtr();
+}
+
 /*
  * CLASS: hkbBehaviorGraphData
 */

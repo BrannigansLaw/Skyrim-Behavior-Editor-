@@ -39,10 +39,13 @@ public:
         return false;
     }
 
-    bool isGranfatherParadox(const HkObjectExpSharedPtr & child) const{
+    bool isGranfatherParadox(HkObject *child) const{
+        if (child == data.data()){
+            return true;
+        }
         GeneratorIcon *parentIcon = parent;
         while (parentIcon){
-            if (parentIcon->data == child){
+            if (parentIcon->data.data() == child){
                 return true;
             }
             parentIcon = parentIcon->parent;

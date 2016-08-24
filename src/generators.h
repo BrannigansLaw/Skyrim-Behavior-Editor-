@@ -19,8 +19,8 @@ class hkbGenerator: public HkDynamicObject
     friend class GeneratorIcon;
 public:
     virtual ~hkbGenerator(){}
-    bool link();
-    QString getName() const;
+    bool link(){return true;}
+    virtual QString getName() const{return "";}
 protected:
     hkbGenerator(BehaviorFile *parent = NULL/*, long ref = 0*/): HkDynamicObject(parent/*, ref*/){}
     void appendIcon(GeneratorIcon * icon){icons.append(icon);}
@@ -37,6 +37,7 @@ public:
     //bool readData(const HkxXmlReader & reader, int startIndex);
     bool link();
     bool readData(const HkxXmlReader & reader, int index);
+    void unlink();
 private:
     hkRootLevelContainer& operator=(const hkRootLevelContainer&);
     hkRootLevelContainer(const hkRootLevelContainer &);
@@ -60,6 +61,7 @@ public:
     virtual ~hkbStateMachineStateInfo(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
     QString getName() const{return name;}
 private:
     hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&);
@@ -84,6 +86,7 @@ public:
     virtual ~hkbStateMachine(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
     QString getName() const{return name;}
 private:
     hkbStateMachine& operator=(const hkbStateMachine&);
@@ -121,6 +124,7 @@ public:
     virtual ~hkbModifierGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
     QString getName() const{return name;}
 private:
     hkbModifierGenerator& operator=(const hkbModifierGenerator&);
@@ -141,6 +145,7 @@ public:
     virtual ~hkbManualSelectorGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
     QString getName() const{return name;}
 private:
     hkbManualSelectorGenerator& operator=(const hkbManualSelectorGenerator&);
@@ -162,6 +167,7 @@ public:
     virtual ~hkbBlenderGeneratorChild(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
 private:
     hkbBlenderGeneratorChild& operator=(const hkbBlenderGeneratorChild&);
     hkbBlenderGeneratorChild(const hkbBlenderGeneratorChild &);
@@ -181,6 +187,7 @@ public:
     virtual ~hkbBlenderGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
     QString getName() const{return name;}
 private:
     hkbBlenderGenerator& operator=(const hkbBlenderGenerator&);
@@ -208,6 +215,7 @@ public:
     virtual ~BSBoneSwitchGeneratorBoneData(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
 private:
     BSBoneSwitchGeneratorBoneData& operator=(const BSBoneSwitchGeneratorBoneData&);
     BSBoneSwitchGeneratorBoneData(const BSBoneSwitchGeneratorBoneData &);
@@ -225,6 +233,7 @@ public:
     virtual ~BSBoneSwitchGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
     QString getName() const{return name;}
 private:
     BSBoneSwitchGenerator& operator=(const BSBoneSwitchGenerator&);
@@ -245,6 +254,7 @@ public:
     virtual ~BSCyclicBlendTransitionGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
     QString getName() const{return name;}
 private:
     BSCyclicBlendTransitionGenerator& operator=(const BSCyclicBlendTransitionGenerator&);
@@ -273,6 +283,7 @@ public:
     virtual ~BSiStateTaggingGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
     QString getName() const{return name;}
 private:
     BSiStateTaggingGenerator& operator=(const BSiStateTaggingGenerator&);
@@ -294,6 +305,7 @@ public:
     virtual ~hkbBehaviorReferenceGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void removeData(){}
     QString getName() const{return name;}
 private:
     hkbBehaviorReferenceGenerator& operator=(const hkbBehaviorReferenceGenerator&);
@@ -313,6 +325,8 @@ public:
     virtual ~hkbClipGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
+    void removeData(){}
     QString getName() const{return name;}
 private:
     hkbClipGenerator& operator=(const hkbClipGenerator&);
@@ -344,6 +358,7 @@ public:
     virtual ~BSSynchronizedClipGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
     QString getName() const{return name;}
 private:
     BSSynchronizedClipGenerator& operator=(const BSSynchronizedClipGenerator&);
@@ -371,6 +386,7 @@ public:
     virtual ~hkbPoseMatchingGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
     QString getName() const{return name;}
 private:
     hkbPoseMatchingGenerator& operator=(const hkbPoseMatchingGenerator&);
@@ -411,6 +427,7 @@ public:
     virtual ~BSOffsetAnimationGenerator(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
     QString getName() const{return name;}
 private:
     BSOffsetAnimationGenerator& operator=(const BSOffsetAnimationGenerator&);
@@ -434,6 +451,7 @@ public:
     virtual ~hkbBehaviorGraph(){refCount--;}
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
     QString getName() const{return name;}
 private:
     hkbBehaviorGraph& operator=(const hkbBehaviorGraph&);

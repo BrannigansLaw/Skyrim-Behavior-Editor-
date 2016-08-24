@@ -30,6 +30,7 @@ public:
         return isDataValid;
     }
     virtual bool link() = 0;
+    virtual void unlink(){}
 protected:
     HkObject(BehaviorFile *parent = NULL/*, long ref = 0*/)
         : parentFile(parent),
@@ -238,6 +239,7 @@ class HkDynamicObject: public HkObject
 public:
     virtual ~HkDynamicObject(){}
     bool linkVar();
+    void unlink();
 protected:
     HkDynamicObject(BehaviorFile *parent = NULL/*, long ref = 0*/): HkObject(parent/*, ref*/){}
 protected:

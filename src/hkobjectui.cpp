@@ -32,27 +32,29 @@ HkDataUI::HkDataUI(const QString &title, const QString &button1Name, const QStri
 
 void HkDataUI::changeCurrentDataWidget(GeneratorIcon * icon){
     qulonglong sig;
-    //Need to null smptr in ui widget when data view changes to ensure proper behavior data removal...
     if (icon && icon->data.constData()){
         sig = icon->data.constData()->getSignature();
         loadedData = icon->data.data();
         switch (sig) {
         case BS_I_STATE_TAGGING_GENERATOR:
-            if (icon->data != iSTGUI->bsData){
-                iSTGUI->loadData(icon->data);
-            }
+            //if (loadedData != iSTGUI->bsData){
+                iSTGUI->loadData(loadedData);
+            //}
             stack->setCurrentIndex(BS_I_STATE_TAG_GEN);
             break;
         case HKB_MODIFIER_GENERATOR:
-            if (icon->data != modGenUI->bsData){
-                modGenUI->loadData(icon->data);
-            }
+            //if (loadedData != modGenUI->bsData){
+                modGenUI->loadData(loadedData);
+            //}
             stack->setCurrentIndex(MOD_GEN);
             break;
         default:
             stack->setCurrentIndex(NO_DATA_SELECTED);
             break;
         }
+    }else{
+        stack->setCurrentIndex(NO_DATA_SELECTED);
+        loadedData = NULL;
     }
 }
 
@@ -87,64 +89,72 @@ BSiStateTaggingGeneratorUI::BSiStateTaggingGeneratorUI()
 }
 
 void BSiStateTaggingGeneratorUI::setName(){
-    BSiStateTaggingGenerator *ptr = static_cast<BSiStateTaggingGenerator *>(bsData.data());
-    if (ptr){
-        ptr->name = name->getText();
+    if (bsData){
+        bsData->name = name->getText();
     }
 }
 
 void BSiStateTaggingGeneratorUI::setDefaultGenerator(int index){
-    BSiStateTaggingGenerator *ptr = static_cast<BSiStateTaggingGenerator *>(bsData.data());
-    {
-        //Done to ensure smptr goes out of scope before removing the data...
-        HkObjectExpSharedPtr smptr = ptr->pDefaultGenerator;
-        //ptr->getParentFile()->setGeneratorData(ptr->pDefaultGenerator, index - 1);//PREVENT RECURSION!!!
-        if (behaviorView){
-            if (!behaviorView->reconnectBranch(smptr, *ptr->getParentFile()->getGeneratorDataAt(index -1), behaviorView->getSelectedItem())){
-                QMessageBox msg;
-                msg.setWindowTitle("Skyrim Behavior Tool");
-                msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch!!!");
-                msg.exec();
-                return;
-            }
-        }
-        ptr->getParentFile()->setGeneratorData(ptr->pDefaultGenerator, index - 1);//PREVENT RECURSION!!!
+    if (index < 1){
+        QMessageBox msg;
+        msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a dead end!!!");
+        msg.exec();
+        pDefaultGenerator->silence();
+        pDefaultGenerator->setSelectedItem(pDefaultGenerator->getLastIndex());
+        pDefaultGenerator->reconnect();
+        return;
     }
-    ptr->getParentFile()->removeData();
+    if (!bsData){
+        return;
+    }
+    HkObject *temp = bsData->pDefaultGenerator.data();
+    if (!temp){
+        return;
+    }
+    if (behaviorView){
+        HkObjectExpSharedPtr ptr = *(bsData->getParentFile()->getGeneratorDataAt(index -1));
+        if (!behaviorView->reconnectBranch(temp, ptr.data(), behaviorView->getSelectedItem())){
+            QMessageBox msg;
+            msg.setWindowTitle("Skyrim Behavior Tool");
+            msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch!!!");
+            msg.exec();
+            return;
+        }
+    }
+    bsData->getParentFile()->setGeneratorData(bsData->pDefaultGenerator, index - 1);
+    bsData->getParentFile()->removeData();
     pDefaultGenerator->silence();
-    pDefaultGenerator->setStringList(ptr->getParentFile()->getGeneratorNames());
-    pDefaultGenerator->setSelectedItem(ptr->getParentFile()->getIndexOfGenerator(ptr->pDefaultGenerator) + 1);
+    pDefaultGenerator->setStringList(bsData->getParentFile()->getGeneratorNames());
+    pDefaultGenerator->setSelectedItem(bsData->getParentFile()->getIndexOfGenerator(bsData->pDefaultGenerator) + 1);
     pDefaultGenerator->reconnect();
 }
 
-void BSiStateTaggingGeneratorUI::loadData(const HkObjectExpSharedPtr & data){
-    BSiStateTaggingGenerator *ptr = NULL;
-    if (data.constData() && data.constData()->getSignature() == BS_I_STATE_TAGGING_GENERATOR){
-        bsData = data;
-        ptr = static_cast<BSiStateTaggingGenerator *>(bsData.data());
-        name->setText(ptr->name);
+void BSiStateTaggingGeneratorUI::loadData(HkObject *data){
+    if (data && data->getSignature() == BS_I_STATE_TAGGING_GENERATOR){
+        bsData = static_cast<BSiStateTaggingGenerator *>(data);
+        name->setText(bsData->name);
         pDefaultGenerator->silence();
-        pDefaultGenerator->setStringList(ptr->getParentFile()->getGeneratorNames());
-        pDefaultGenerator->setSelectedItem(ptr->getParentFile()->getIndexOfGenerator(ptr->pDefaultGenerator) + 1);
+        pDefaultGenerator->setStringList(bsData->getParentFile()->getGeneratorNames());
+        int index = bsData->getParentFile()->getIndexOfGenerator(bsData->pDefaultGenerator) + 1;
+        pDefaultGenerator->setLastIndex(index);
+        pDefaultGenerator->setSelectedItem(index);
         pDefaultGenerator->reconnect();
-        iStateToSetAs->setValue(ptr->iStateToSetAs);
-        iStateToSetAs->setBoundVariableList(ptr->getParentFile()->getVariableNames());
-        iPriority->setValue(ptr->iPriority);
-        iPriority->setBoundVariableList(ptr->getParentFile()->getVariableNames());
+        iStateToSetAs->setValue(bsData->iStateToSetAs);
+        iStateToSetAs->setBoundVariableList(bsData->getParentFile()->getVariableNames());
+        iPriority->setValue(bsData->iPriority);
+        iPriority->setBoundVariableList(bsData->getParentFile()->getVariableNames());
     }
 }
 
 void BSiStateTaggingGeneratorUI::setIStateToSetAs(){
-    BSiStateTaggingGenerator *ptr = static_cast<BSiStateTaggingGenerator *>(bsData.data());
-    if (ptr){
-        ptr->iStateToSetAs = iStateToSetAs->getValue();
+    if (bsData){
+        bsData->iStateToSetAs = iStateToSetAs->getValue();
     }
 }
 
 void BSiStateTaggingGeneratorUI::setIPriority(){
-    BSiStateTaggingGenerator *ptr = static_cast<BSiStateTaggingGenerator *>(bsData.data());
-    if (ptr){
-        ptr->iPriority = iPriority->getValue();
+    if (bsData){
+        bsData->iPriority = iPriority->getValue();
     }
 }
 /*
@@ -168,70 +178,95 @@ ModifierGeneratorUI::ModifierGeneratorUI()
 }
 
 void ModifierGeneratorUI::setName(){
-    hkbModifierGenerator *ptr = static_cast<hkbModifierGenerator *>(bsData.data());
-    if (ptr){
-        ptr->name = name->getText();
+    if (bsData){
+        bsData->name = name->getText();
     }
 }
 
 void ModifierGeneratorUI::setModifier(int index){
-    hkbModifierGenerator *ptr = static_cast<hkbModifierGenerator *>(bsData.data());
-    {
-        //Done to ensure smptr goes out of scope before removing the data...
-        HkObjectExpSharedPtr smptr = ptr->modifier;
-        if (behaviorView){
-            if (!behaviorView->reconnectBranch(smptr, *ptr->getParentFile()->getModifierDataAt(index -1), behaviorView->getSelectedItem())){
-                QMessageBox msg;
-                msg.setWindowTitle("Skyrim Behavior Tool");
-                msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch!!!");
-                msg.exec();
-                return;
-            }
-        }
-        ptr->getParentFile()->setModifierData(ptr->modifier, index - 1);//PREVENT RECURSION!!!
+    if (index < 1){
+        QMessageBox msg;
+        msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a dead end!!!");
+        msg.exec();
+        modifier->silence();
+        modifier->setSelectedItem(modifier->getLastIndex());
+        modifier->reconnect();
+        return;
     }
-    ptr->getParentFile()->removeData();
+    if (!bsData){
+        return;
+    }
+    HkObject *temp = bsData->modifier.data();
+    if (!temp){
+        return;
+    }
+    if (behaviorView){
+        HkObjectExpSharedPtr ptr = *(bsData->getParentFile()->getModifierDataAt(index -1));
+        if (!behaviorView->reconnectBranch(temp, ptr.data(), behaviorView->getSelectedItem())){
+            QMessageBox msg;
+            msg.setWindowTitle("Skyrim Behavior Tool");
+            msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch!!!");
+            msg.exec();
+            return;
+        }
+    }
+    bsData->getParentFile()->setModifierData(bsData->modifier, index - 1);
+    bsData->getParentFile()->removeData();
     modifier->silence();
-    modifier->setStringList(ptr->getParentFile()->getModifierNames());
-    modifier->setSelectedItem(ptr->getParentFile()->getIndexOfModifier(ptr->modifier) + 1);
+    modifier->setStringList(bsData->getParentFile()->getModifierNames());
+    modifier->setSelectedItem(bsData->getParentFile()->getIndexOfModifier(bsData->modifier) + 1);
     modifier->reconnect();
 }
 
 void ModifierGeneratorUI::setGenerator(int index){
-    hkbModifierGenerator *ptr = static_cast<hkbModifierGenerator *>(bsData.data());
-    {
-        //Done to ensure smptr goes out of scope before removing the data...
-        HkObjectExpSharedPtr smptr = ptr->generator;
-        if (behaviorView){
-            if (!behaviorView->reconnectBranch(smptr, *ptr->getParentFile()->getGeneratorDataAt(index -1), behaviorView->getSelectedItem())){
-                QMessageBox msg;
-                msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch!!!");
-                msg.exec();
-                return;
-            }
-        }
-        ptr->getParentFile()->setGeneratorData(ptr->generator, index - 1);//PREVENT RECURSION!!!
+    if (index < 1){
+        QMessageBox msg;
+        msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a dead end!!!");
+        msg.exec();
+        generator->silence();
+        generator->setSelectedItem(generator->getLastIndex());
+        generator->reconnect();
+        return;
     }
-    ptr->getParentFile()->removeData();
+    if (!bsData){
+        return;
+    }
+    HkObject *temp = bsData->generator.data();
+    if (!temp){
+        //return;
+    }
+    if (behaviorView){
+        HkObjectExpSharedPtr ptr = *(bsData->getParentFile()->getGeneratorDataAt(index -1));
+        if (!behaviorView->reconnectBranch(temp, ptr.data(), behaviorView->getSelectedItem())){
+            QMessageBox msg;
+            msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch!!!");
+            msg.exec();
+            return;
+        }
+    }
+    bsData->getParentFile()->setGeneratorData(bsData->generator, index - 1);
+    bsData->getParentFile()->removeData();
     generator->silence();
-    generator->setStringList(ptr->getParentFile()->getGeneratorNames());
-    generator->setSelectedItem(ptr->getParentFile()->getIndexOfGenerator(ptr->generator) + 1);
+    generator->setStringList(bsData->getParentFile()->getGeneratorNames());
+    generator->setSelectedItem(bsData->getParentFile()->getIndexOfGenerator(bsData->generator) + 1);
     generator->reconnect();
 }
 
-void ModifierGeneratorUI::loadData(const HkObjectExpSharedPtr & data){
-    hkbModifierGenerator *ptr = NULL;
-    if (data.constData() && data.constData()->getSignature() == HKB_MODIFIER_GENERATOR){
-        bsData = data;
-        ptr = static_cast<hkbModifierGenerator *>(bsData.data());
-        name->setText(ptr->name);
+void ModifierGeneratorUI::loadData(HkObject *data){
+    if (data && data->getSignature() == HKB_MODIFIER_GENERATOR){
+        bsData = static_cast<hkbModifierGenerator *>(data);
+        name->setText(bsData->name);
         modifier->silence();
-        modifier->setStringList(ptr->getParentFile()->getModifierNames());
-        modifier->setSelectedItem(ptr->getParentFile()->getIndexOfModifier(ptr->modifier) + 1);
+        modifier->setStringList(bsData->getParentFile()->getModifierNames());
+        int index = bsData->getParentFile()->getIndexOfModifier(bsData->modifier) + 1;
+        modifier->setLastIndex(index);
+        modifier->setSelectedItem(index);
         modifier->reconnect();
         generator->silence();
-        generator->setStringList(ptr->getParentFile()->getGeneratorNames());
-        generator->setSelectedItem(ptr->getParentFile()->getIndexOfGenerator(ptr->generator) + 1);
+        generator->setStringList(bsData->getParentFile()->getGeneratorNames());
+        index = bsData->getParentFile()->getIndexOfGenerator(bsData->generator) + 1;
+        generator->setLastIndex(index);
+        generator->setSelectedItem(index);
         generator->reconnect();
     }
 }

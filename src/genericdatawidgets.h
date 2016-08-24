@@ -183,12 +183,13 @@ class PointerWidget: public QGroupBox
 public:
     PointerWidget(const QString & name, const QString & type)
         : lyt(new QHBoxLayout),
-          pointers(new QComboBox)
+          pointers(new QComboBox),
+          lastIndex(1)
     {
         setStyleSheet("background-color: white;");
         lyt->addWidget(new QLabel(name), 1);
         lyt->addWidget(new QLabel("Type: "+type), 1);
-        lyt->addWidget(pointers, 1);
+        lyt->addWidget(pointers, 3);
         setLayout(lyt);
         connect(pointers, SIGNAL(currentIndexChanged(int)), this, SIGNAL(editingDone(int)));
     }
@@ -202,7 +203,18 @@ public:
     }
 
     void setSelectedItem(int index){
+        if (pointers->currentIndex() > 0){
+            lastIndex = pointers->currentIndex();
+        }
         pointers->setCurrentIndex(index);
+    }
+
+    void setLastIndex(int i){
+        lastIndex = i;
+    }
+
+    int getLastIndex() const{
+        return lastIndex;
     }
 
     void silence(){
@@ -220,6 +232,7 @@ private:
     QHBoxLayout *lyt;
     QComboBox *pointers;
     QStringList list;
+    int lastIndex;
 };
 
 class Vector4Widget: public QGroupBox

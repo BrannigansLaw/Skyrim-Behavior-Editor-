@@ -35,7 +35,7 @@ class BehaviorGraphView: public QGraphicsView
 public:
     BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file);
     bool drawBehaviorGraph();
-    bool reconnectBranch(const HkObjectExpSharedPtr &oldChild, const HkObjectExpSharedPtr &newChild, GeneratorIcon *icon);
+    bool reconnectBranch(HkObject *oldChild, HkObject *newChild, GeneratorIcon *icon);
     QSize sizeHint() const Q_DECL_OVERRIDE{
         return QSize(500, 400);
     }

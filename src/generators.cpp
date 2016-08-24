@@ -49,130 +49,6 @@
 }*/
 
 /**
- * hkbGenerator
- */
-
-bool hkbGenerator::link(){
-    qulonglong sig = getSignature();
-    switch (sig) {
-    case HKB_STATE_MACHINE_STATE_INFO:
-        if (!reinterpret_cast<hkbStateMachineStateInfo *>(this)->link()){
-            return false;
-        }
-        break;
-    case HKB_STATE_MACHINE:
-        if (!reinterpret_cast<hkbStateMachine *>(this)->link()){
-            return false;
-        }
-        break;
-    case HKB_MANUAL_SELECTOR_GENERATOR:
-        if (!reinterpret_cast<hkbManualSelectorGenerator *>(this)->link()){
-            return false;
-        }
-        break;
-    case HKB_BLENDER_GENERATOR_CHILD:
-        if (!reinterpret_cast<hkbBlenderGeneratorChild *>(this)->link()){
-            return false;
-        }
-        break;
-    case HKB_BLENDER_GENERATOR:
-        if (!reinterpret_cast<hkbBlenderGenerator *>(this)->link()){
-            return false;
-        }
-        break;
-    case BS_I_STATE_TAGGING_GENERATOR:
-        if (!reinterpret_cast<BSiStateTaggingGenerator *>(this)->link()){
-            return false;
-        }
-        break;
-    case BS_BONE_SWITCH_GENERATOR:
-        if (!reinterpret_cast<BSBoneSwitchGenerator *>(this)->link()){
-            return false;
-        }
-        break;
-    case BS_BONE_SWITCH_GENERATOR_BONE_DATA:
-        if (!reinterpret_cast<BSBoneSwitchGeneratorBoneData *>(this)->link()){
-            return false;
-        }
-        break;
-    case BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
-        if (!reinterpret_cast<BSCyclicBlendTransitionGenerator *>(this)->link()){
-            return false;
-        }
-        break;
-    case BS_SYNCHRONIZED_CLIP_GENERATOR:
-        if (!reinterpret_cast<BSSynchronizedClipGenerator *>(this)->link()){
-            return false;
-        }
-        break;
-    case HKB_MODIFIER_GENERATOR:
-        if (!reinterpret_cast<hkbModifierGenerator *>(this)->link()){
-            return false;
-        }
-        break;
-    case BS_OFFSET_ANIMATION_GENERATOR:
-        if (!reinterpret_cast<BSOffsetAnimationGenerator *>(this)->link()){
-            return false;
-        }
-        break;
-    case HKB_POSE_MATCHING_GENERATOR:
-        if (!reinterpret_cast<hkbPoseMatchingGenerator *>(this)->link()){
-            return false;
-        }
-        break;
-    case HKB_CLIP_GENERATOR:
-        if (!reinterpret_cast<hkbClipGenerator *>(this)->link()){
-            return false;
-        }
-        break;
-    case HKB_BEHAVIOR_GRAPH:
-        if (!reinterpret_cast<hkbBehaviorGraph *>(this)->link()){
-            return false;
-        }
-        break;
-    default:
-        break;
-    }
-    return true;
-}
-
-QString hkbGenerator::getName() const{
-    qulonglong sig = getSignature();
-    switch (sig) {
-    case HKB_STATE_MACHINE_STATE_INFO:
-        return static_cast<hkbStateMachineStateInfo const *>(this)->getName();
-    case HKB_STATE_MACHINE:
-        return static_cast<hkbStateMachine const *>(this)->getName();
-    case HKB_MANUAL_SELECTOR_GENERATOR:
-        return static_cast<hkbManualSelectorGenerator const *>(this)->getName();
-    case HKB_BLENDER_GENERATOR:
-        return static_cast<hkbBlenderGenerator const *>(this)->getName();
-    case BS_I_STATE_TAGGING_GENERATOR:
-        return static_cast<BSiStateTaggingGenerator const *>(this)->getName();
-    case BS_BONE_SWITCH_GENERATOR:
-        return static_cast<BSBoneSwitchGenerator const *>(this)->getName();
-    case BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
-        return static_cast<BSCyclicBlendTransitionGenerator const *>(this)->getName();
-    case BS_SYNCHRONIZED_CLIP_GENERATOR:
-        return static_cast<BSSynchronizedClipGenerator const *>(this)->getName();
-    case HKB_MODIFIER_GENERATOR:
-        return static_cast<hkbModifierGenerator const *>(this)->getName();
-    case BS_OFFSET_ANIMATION_GENERATOR:
-        return static_cast<BSOffsetAnimationGenerator const *>(this)->getName();
-    case HKB_POSE_MATCHING_GENERATOR:
-        return static_cast<hkbPoseMatchingGenerator const *>(this)->getName();
-    case HKB_CLIP_GENERATOR:
-        return static_cast<hkbClipGenerator const *>(this)->getName();
-    case HKB_BEHAVIOR_GRAPH:
-        return static_cast<hkbBehaviorGraph const *>(this)->getName();
-    default:
-        break;
-    }
-    return "";
-}
-
-
-/**
  * hkRootLevelContainer
  */
 
@@ -226,6 +102,12 @@ bool hkRootLevelContainer::link(){
         }
     }
     return true;
+}
+
+void hkRootLevelContainer::unlink(){
+    for (int i = 0; i < namedVariants.size(); i++){
+        namedVariants[i].variant = HkObjectExpSharedPtr();
+    }
 }
 
 /*
@@ -345,6 +227,14 @@ bool hkbStateMachineStateInfo::link(){
         generator = *ptr;
     }
     return true;
+}
+
+void hkbStateMachineStateInfo::unlink(){
+    HkDynamicObject::unlink();
+    enterNotifyEvents = HkObjectExpSharedPtr();
+    exitNotifyEvents = HkObjectExpSharedPtr();
+    transitions = HkObjectExpSharedPtr();
+    generator = HkObjectExpSharedPtr();
 }
 
 /*
@@ -515,6 +405,18 @@ bool hkbStateMachine::link(){
     return true;
 }
 
+void hkbStateMachine::unlink(){
+    HkDynamicObject::unlink();
+    payload = HkObjectExpSharedPtr();
+    for (int i = 0; i < states.size(); i++){
+        if (states.at(i).data()){
+            states[i].data()->unlink(); //Do here since this is not stored in the hkx file for long...
+        }
+        states[i] = HkObjectExpSharedPtr();
+    }
+    wildcardTransitions = HkObjectExpSharedPtr();
+}
+
 /*
  * CLASS: hkbModifierGenerator
 */
@@ -596,6 +498,12 @@ bool hkbModifierGenerator::link(){
         generator = *ptr;
     }
     return true;
+}
+
+void hkbModifierGenerator::unlink(){
+    HkDynamicObject::unlink();
+    modifier = HkObjectExpSharedPtr();
+    generator = HkObjectExpSharedPtr();
 }
 
 /*
@@ -682,6 +590,13 @@ bool hkbManualSelectorGenerator::link(){
     return true;
 }
 
+void hkbManualSelectorGenerator::unlink(){
+    HkDynamicObject::unlink();
+    for (int i = 0; i < generators.size(); i++){
+        generators[i] = HkObjectExpSharedPtr();
+    }
+}
+
 /*
  * CLASS: hkbBlenderGeneratorChild
 */
@@ -761,6 +676,12 @@ bool hkbBlenderGeneratorChild::link(){
         generator = *ptr;
     }
     return true;
+}
+
+void hkbBlenderGeneratorChild::unlink(){
+    HkDynamicObject::unlink();
+    generator = HkObjectExpSharedPtr();
+    boneWeights = HkObjectExpSharedPtr();
 }
 
 /*
@@ -879,6 +800,16 @@ bool hkbBlenderGenerator::link(){
     return true;
 }
 
+void hkbBlenderGenerator::unlink(){
+    HkDynamicObject::unlink();
+    for (int i = 0; i < children.size(); i++){
+        if (children.at(i).data()){
+            children[i].data()->unlink(); //Do here since this is not stored in the hkx file for long...
+        }
+        children[i] = HkObjectExpSharedPtr();
+    }
+}
+
 /*
  * CLASS: BSBoneSwitchGeneratorBoneData
 */
@@ -945,6 +876,12 @@ bool BSBoneSwitchGeneratorBoneData::link(){
         spBoneWeight = *ptr;
     }
     return true;
+}
+
+void BSBoneSwitchGeneratorBoneData::unlink(){
+    HkDynamicObject::unlink();
+    pGenerator = HkObjectExpSharedPtr();
+    spBoneWeight = HkObjectExpSharedPtr();
 }
 
 /*
@@ -1031,6 +968,17 @@ bool BSBoneSwitchGenerator::link(){
         }
     }
     return true;
+}
+
+void BSBoneSwitchGenerator::unlink(){
+    HkDynamicObject::unlink();
+    pDefaultGenerator = HkObjectExpSharedPtr();
+    for (int i = 0; i < ChildrenA.size(); i++){
+        if (ChildrenA.at(i).data()){
+            ChildrenA[i].data()->unlink(); //Do here since this is not stored in the hkx file for long...
+        }
+        ChildrenA[i] = HkObjectExpSharedPtr();
+    }
 }
 
 /*
@@ -1155,6 +1103,13 @@ bool BSCyclicBlendTransitionGenerator::link(){
     return true;
 }
 
+void BSCyclicBlendTransitionGenerator::unlink(){
+    HkDynamicObject::unlink();
+    pBlenderGenerator = HkObjectExpSharedPtr();
+    eventToFreezeBlendValuePayload = HkObjectExpSharedPtr();
+    eventToCrossBlendPayload = HkObjectExpSharedPtr();
+}
+
 /*
  * CLASS: BSiStateTaggingGenerator
 */
@@ -1233,6 +1188,11 @@ bool BSiStateTaggingGenerator::link(){
         pDefaultGenerator = *ptr;
     }
     return true;
+}
+
+void BSiStateTaggingGenerator::unlink(){
+    HkDynamicObject::unlink();
+    pDefaultGenerator = HkObjectExpSharedPtr();
 }
 
 /*
@@ -1412,6 +1372,11 @@ bool hkbClipGenerator::link(){
     return true;
 }
 
+void hkbClipGenerator::unlink(){
+    HkDynamicObject::unlink();
+    triggers = HkObjectExpSharedPtr();
+}
+
 /*
  * CLASS: BSSynchronizedClipGenerator
 */
@@ -1525,6 +1490,11 @@ bool BSSynchronizedClipGenerator::link(){
         pClipGenerator = *ptr;
     }
     return true;
+}
+
+void BSSynchronizedClipGenerator::unlink(){
+    HkDynamicObject::unlink();
+    pClipGenerator = HkObjectExpSharedPtr();
 }
 
 /*
@@ -1713,6 +1683,16 @@ bool hkbPoseMatchingGenerator::link(){
     return true;
 }
 
+void hkbPoseMatchingGenerator::unlink(){
+    HkDynamicObject::unlink();
+    for (int i = 0; i < children.size(); i++){
+        if (children.at(i).data()){
+            children[i].data()->unlink(); //Do here since this is not stored in the hkx file for long...
+        }
+        children[i] = HkObjectExpSharedPtr();
+    }
+}
+
 /*
  * CLASS: BSOffsetAnimationGenerator
 */
@@ -1815,6 +1795,12 @@ bool BSOffsetAnimationGenerator::link(){
     return true;
 }
 
+void BSOffsetAnimationGenerator::unlink(){
+    HkDynamicObject::unlink();
+    pDefaultGenerator = HkObjectExpSharedPtr();
+    pOffsetClipGenerator = HkObjectExpSharedPtr();
+}
+
 /*
  * CLASS: hkbBehaviorGraph
 */
@@ -1901,4 +1887,10 @@ bool hkbBehaviorGraph::link(){
         data = *ptr;
     }
     return true;
+}
+
+void hkbBehaviorGraph::unlink(){
+    HkDynamicObject::unlink();
+    rootGenerator = HkObjectExpSharedPtr();
+    data = HkObjectExpSharedPtr();
 }
