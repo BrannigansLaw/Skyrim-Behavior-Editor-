@@ -1,0 +1,78 @@
+#ifndef HKXOBJECT_H
+#define HKXOBJECT_H
+
+#include <QSharedData>
+
+#include "src/utility.h"
+
+class BehaviorFile;
+class HkxXmlReader;
+class HkxObjectExpSharedPtr;
+
+class HkxObject: public QSharedData
+{
+public:
+    enum HkxType {TYPE_OTHER=0, TYPE_GENERATOR=1, TYPE_MODIFIER=2};
+public:
+    virtual ~HkxObject();
+    void writeToLog(const QString & message, bool isError = false);
+    void setProgressData(const QString & message, int value);
+    qulonglong getSignature() const;
+    HkxType getType() const;
+    void setDataValidity(bool isValid);
+    bool getIsDataValid() const;
+    virtual bool link() = 0;
+    virtual void unlink();
+protected:
+    HkxObject(BehaviorFile *parent = NULL/*, long ref = 0*/);
+    BehaviorFile * getParentFile() const;
+    void setType(HkxSignature sig, HkxType type);
+    bool readMultipleVector4(const QByteArray &lineIn,  QVector <hkVector4> & vectors);
+    bool readReferences(const QByteArray &line, QList <HkxObjectExpSharedPtr> & children);
+    bool readIntegers(const QByteArray &line, QVector<qint16> & ints);
+    bool toBool(const QByteArray &line, bool *ok);
+    bool readDoubles(const QByteArray &line, QVector<qreal> & doubles);
+    hkVector3 readVector3(const QByteArray &lineIn, bool *ok);
+    hkVector4 readVector4(const QByteArray &lineIn, bool *ok);
+private:
+    HkxObject(const HkxObject &obj);
+    HkxObject& operator=(const HkxObject&);
+private:
+    BehaviorFile *parentFile;
+    long reference;
+    HkxSignature signature;
+    HkxType typeCheck;
+    bool isDataValid;
+};
+
+class HkxObjectExpSharedPtr: public QExplicitlySharedDataPointer <HkxObject>
+{
+public:
+    HkxObjectExpSharedPtr(HkxObject *obj = NULL, long ref = -1);
+    void setReference(long ref);
+    long getReference() const;
+    bool readReference(long index, const HkxXmlReader & reader);
+private:
+    long reference;
+};
+
+class HkDynamicObject: public HkxObject
+{
+public:
+    virtual ~HkDynamicObject();
+    bool linkVar();
+    void unlink();
+protected:
+    HkDynamicObject(BehaviorFile *parent = NULL/*, long ref = 0*/);
+protected:
+    HkxObjectExpSharedPtr variableBindingSet;
+protected:
+    //bool link();
+private:
+    HkDynamicObject& operator=(const HkDynamicObject&);
+    HkDynamicObject(const HkDynamicObject &);
+private:
+    //HkxObjectExpSharedPtr variableBindingSet;
+};
+
+#endif // HKXOBJECT_H

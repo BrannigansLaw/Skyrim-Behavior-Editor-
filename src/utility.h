@@ -2,13 +2,6 @@
 #define UTILITY_H
 
 #include <QtGlobal>
-#include <QString>
-#include <QStringBuilder>
-#include <QList>
-#include <QVector>
-#include <QExplicitlySharedDataPointer>
-#include <QSharedData>
-#include <QMessageBox>
 
 #define MAX_HKXXML_LINE_LENGHT 512
 
