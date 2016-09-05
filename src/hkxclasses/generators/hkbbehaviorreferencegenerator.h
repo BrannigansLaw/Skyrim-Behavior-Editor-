@@ -13,11 +13,14 @@ public:
     bool link();
     void removeData(){}
     QString getName() const;
+    bool evaulateDataValidity();
+    static QString getClassname();
 private:
     hkbBehaviorReferenceGenerator& operator=(const hkbBehaviorReferenceGenerator&);
     hkbBehaviorReferenceGenerator(const hkbBehaviorReferenceGenerator &);
 private:
     static uint refCount;
+    static QString classname;
     ulong userData;
     QString name;
     QString behaviorName;

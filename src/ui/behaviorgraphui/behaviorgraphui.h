@@ -32,6 +32,7 @@ class BehaviorGraphView: public QGraphicsView
     Q_OBJECT
     friend class GeneratorIcon;
     friend class HkDataUI;
+    friend class ManualSelectorGeneratorUI;
 public:
     BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file);
     bool drawBehaviorGraph();
@@ -75,7 +76,7 @@ private slots:
     //void removeSelectedObject();
     void removeSelectedObjectBranchSlot();
 private:
-    void removeSelectedObjectBranch(GeneratorIcon *icon);
+    void removeSelectedObjectBranch(GeneratorIcon *icon, GeneratorIcon *iconToKeep = NULL);
 private:
     HkDataUI *ui;
     BehaviorFile *behavior;
@@ -118,11 +119,12 @@ private:
     const qreal scaleUpFactor;
     const qreal scaleDownFactor;
 private:
+    void fixIconPositions(GeneratorIcon *rootIcon);
     //bool removeData(const HkxObjectExpSharedPtr & smtptr);
     void expandBranchForIcon(GeneratorIcon *icon);
     //bool drawBranch(GeneratorIcon * rootIcon);
     //void removeIcon(GeneratorIcon *iconToRemove);
-    void removeChildIcons(GeneratorIcon *parent);
+    void removeChildIcons(GeneratorIcon *parent, GeneratorIcon *iconToKeep = NULL);
     void repositionIcons(GeneratorIcon * icon, bool updateNonVisable = false);
     void popUpMenuRequested(const QPoint &pos, GeneratorIcon *icon);
     void expandBranch(GeneratorIcon * icon, bool expandAll = false);
@@ -132,7 +134,7 @@ private:
     int manageIcons();
     bool positionIcon(GeneratorIcon * icon);
     void createIconBranch(QList <GeneratorIcon *> & icons, GeneratorIcon *parent);
-    void deleteSelectedBranch(GeneratorIcon *icon);
+    void deleteSelectedBranch(GeneratorIcon *icon, GeneratorIcon *iconToKeep = NULL);
 
     template <typename T> bool appendObject(T * ptr, GeneratorIcon *parentObjIcon);
     template <typename T> void wrapObject(T *obj, GeneratorIcon *parentObjIcon);

@@ -7,7 +7,10 @@
 
 uint hkbBlenderGenerator::refCount = 0;
 
-QStringList hkbBlenderGenerator::Flags = {"0", "FLAG_SYNC", "FLAG_SMOOTH_GENERATOR_WEIGHTS", "FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS", "FLAG_PARAMETRIC_BLEND", "FLAG_IS_PARAMETRIC_BLEND_CYCLIC", "FLAG_FORCE_DENSE_POSE"};
+QString hkbBlenderGenerator::classname = "hkbBlenderGenerator";
+
+//QStringList hkbBlenderGenerator::Flags = {"0", "FLAG_SYNC", "FLAG_SMOOTH_GENERATOR_WEIGHTS", "FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS", "FLAG_PARAMETRIC_BLEND", "FLAG_IS_PARAMETRIC_BLEND_CYCLIC", "FLAG_FORCE_DENSE_POSE"};
+QStringList hkbBlenderGenerator::Flags = {"0", "1", "2", "8", "16", "32", "64"};
 
 hkbBlenderGenerator::hkbBlenderGenerator(BehaviorFile *parent/*, qint16 ref*/)
     : hkbGenerator(parent/*, ref*/),
@@ -23,6 +26,10 @@ hkbBlenderGenerator::hkbBlenderGenerator(BehaviorFile *parent/*, qint16 ref*/)
     setType(HKB_BLENDER_GENERATOR, TYPE_GENERATOR);
     refCount++;
     name = "Blender Generator "+QString::number(refCount);
+}
+
+QString hkbBlenderGenerator::getClassname(){
+    return classname;
 }
 
 QString hkbBlenderGenerator::getName() const{
@@ -129,6 +136,32 @@ void hkbBlenderGenerator::unlink(){
         }
         children[i] = HkxObjectExpSharedPtr();
     }
+}
+
+bool hkbBlenderGenerator::evaulateDataValidity(){
+    bool valid = true;
+    for (int i = 0; i < children.size(); i++){
+        if (!children.at(i).data() || children.at(i).data()->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
+            valid = false;
+        }
+    }
+    QStringList list = flags.split('|');
+    for (int i = 0; i < list.size(); i++){
+        if (!Flags.contains(list.at(i))){
+            valid = false;
+        }
+    }
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (!Flags.contains(flags)){
+    }else if (name == ""){
+    }else if (children.isEmpty()){
+    }else if (valid){
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 hkbBlenderGenerator::~hkbBlenderGenerator(){

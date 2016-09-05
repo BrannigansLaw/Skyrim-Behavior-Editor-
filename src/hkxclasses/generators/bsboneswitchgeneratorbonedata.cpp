@@ -8,11 +8,17 @@
 
 uint BSBoneSwitchGeneratorBoneData::refCount = 0;
 
+QString BSBoneSwitchGeneratorBoneData::classname = "BSBoneSwitchGeneratorBoneData";
+
 BSBoneSwitchGeneratorBoneData::BSBoneSwitchGeneratorBoneData(BehaviorFile *parent/*, qint16 ref*/)
     : hkbGenerator(parent/*, ref*/)
 {
     refCount++;
     setType(BS_BONE_SWITCH_GENERATOR_BONE_DATA, TYPE_GENERATOR);
+}
+
+QString BSBoneSwitchGeneratorBoneData::getClassname(){
+    return classname;
 }
 
 bool BSBoneSwitchGeneratorBoneData::readData(const HkxXmlReader &reader, long index){
@@ -74,6 +80,19 @@ void BSBoneSwitchGeneratorBoneData::unlink(){
     HkDynamicObject::unlink();
     pGenerator = HkxObjectExpSharedPtr();
     spBoneWeight = HkxObjectExpSharedPtr();
+}
+
+bool BSBoneSwitchGeneratorBoneData::evaulateDataValidity(){
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (spBoneWeight.data() && spBoneWeight.data()->getSignature() != HKB_BONE_WEIGHT_ARRAY){
+    }else if (!pGenerator.data() || pGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){
+    }else{
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 BSBoneSwitchGeneratorBoneData::~BSBoneSwitchGeneratorBoneData(){

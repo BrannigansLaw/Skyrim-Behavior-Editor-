@@ -14,11 +14,14 @@ public:
     bool link();
     void unlink();
     QString getName() const;
+    bool evaulateDataValidity();
+    static QString getClassname();
 private:
     BSiStateTaggingGenerator& operator=(const BSiStateTaggingGenerator&);
     BSiStateTaggingGenerator(const BSiStateTaggingGenerator &);
 private:
     static uint refCount;
+    static QString classname;
     ulong userData;
     QString name;
     HkxObjectExpSharedPtr pDefaultGenerator;

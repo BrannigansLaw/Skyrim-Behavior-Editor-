@@ -8,6 +8,8 @@
 
 uint hkbBehaviorGraph::refCount = 0;
 
+QString hkbBehaviorGraph::classname = "hkbBehaviorGraph";
+
 QStringList hkbBehaviorGraph::VariableMode = {"VARIABLE_MODE_DISCARD_WHEN_INACTIVE", "VARIABLE_MODE_MAINTAIN_VALUES_WHEN_INACTIVE"};
 
 hkbBehaviorGraph::hkbBehaviorGraph(BehaviorFile *parent/*, qint16 ref*/)
@@ -17,6 +19,10 @@ hkbBehaviorGraph::hkbBehaviorGraph(BehaviorFile *parent/*, qint16 ref*/)
     setType(HKB_BEHAVIOR_GRAPH, TYPE_GENERATOR);
     refCount++;
     name = "Behavior Graph "+QString::number(refCount);
+}
+
+QString hkbBehaviorGraph::getClassname(){
+    return classname;
 }
 
 QString hkbBehaviorGraph::getName() const{
@@ -98,6 +104,21 @@ void hkbBehaviorGraph::unlink(){
     HkDynamicObject::unlink();
     rootGenerator = HkxObjectExpSharedPtr();
     data = HkxObjectExpSharedPtr();
+}
+
+bool hkbBehaviorGraph::evaulateDataValidity(){
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (!rootGenerator.data() || rootGenerator.data()->getSignature() != HKB_STATE_MACHINE){
+    }else if (!data.data() || data.data()->getSignature() != HKB_BEHAVIOR_GRAPH_DATA){
+    }else if (!VariableMode.contains(variableMode)){
+    }else if (name == ""){
+    }else{
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 hkbBehaviorGraph::~hkbBehaviorGraph(){

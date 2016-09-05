@@ -5,7 +5,7 @@
 #include "behaviorgraphui.h"
 #include "src/hkxclasses/hkxobject.h"
 #include "behaviorgraphicons.h"
-#include "src/ui/objectdataui/hkobjectui.h"
+#include "src/ui/hkdataui.h"
 
 #include <QBoxLayout>
 #include <QMenuBar>
@@ -87,7 +87,7 @@ GeneratorIcon::GeneratorIcon(const HkxObjectExpSharedPtr & d, const QString & s,
 }
 
 void GeneratorIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
-    if (data.constData()->getIsDataValid()){
+    if (data.constData()->isDataValid()){
         pen.setColor(Qt::black);
     }else{
         pen.setColor(Qt::red);
@@ -126,24 +126,28 @@ void GeneratorIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
 }
 
 void GeneratorIcon::mousePressEvent(QGraphicsSceneMouseEvent *event){
+    setSelected(event);
+}
+
+void GeneratorIcon::setSelected(QGraphicsSceneMouseEvent *event){
     hkbGenerator *ptr = static_cast<hkbGenerator *>(data.data());
-    if (!scene() || scene()->views().isEmpty() || scene()->items(Qt::AscendingOrder).isEmpty()){
-        return;
-    }
-    BehaviorGraphView *view = static_cast<BehaviorGraphView *>(scene()->views().first());
-    GeneratorIcon *icon = static_cast<BehaviorGraphView *>(scene()->views().first())->selectedIcon;
-    GeneratorIcon *firstSceneIcon = static_cast<GeneratorIcon *>(scene()->items(Qt::AscendingOrder).first());
-    if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton){
-        if (icon != this){
-            view->selectedIcon = this;
-            view->ui->changeCurrentDataWidget(view->selectedIcon);
-            if (icon){
-                icon->rGrad.setColorAt(1.0, Qt::black);
-                icon->textPen.setColor(Qt::white);
+    BehaviorGraphView *view = NULL;
+    GeneratorIcon *firstSceneIcon = NULL;
+    if (scene() && !scene()->items(Qt::AscendingOrder).isEmpty() && !scene()->views().isEmpty()){
+        view = static_cast<BehaviorGraphView *>(scene()->views().first());
+        firstSceneIcon = static_cast<GeneratorIcon *>(scene()->items(Qt::AscendingOrder).first());
+        if (view->selectedIcon != this){
+            if (view->selectedIcon){
+                view->selectedIcon->rGrad.setColorAt(1.0, Qt::black);
+                view->selectedIcon->textPen.setColor(Qt::white);
             }
+            view->selectedIcon = this;
+            view->ui->changeCurrentDataWidget(this);
         }
         rGrad.setColorAt(1.0, Qt::green);
         textPen.setColor(Qt::blue);
+    }
+    if (event && (event->button() == Qt::LeftButton || event->button() == Qt::RightButton)){
         if (button.contains(event->lastPos())){
             if (ptr->icons.isEmpty()){
                 return;
@@ -175,6 +179,29 @@ void GeneratorIcon::mousePressEvent(QGraphicsSceneMouseEvent *event){
         if (event->button() == Qt::RightButton){
             view->popUpMenuRequested(view->mapFromScene(event->scenePos()), this);
         }
+    }else{
+        view->expandBranch(firstSceneIcon);
+        view->repositionIcons(firstSceneIcon, true);
+    }
+    scene()->update();
+}
+
+void GeneratorIcon::unselect(){
+    BehaviorGraphView *view = NULL;
+    GeneratorIcon *firstSceneIcon = NULL;
+    if (scene() && !scene()->items(Qt::AscendingOrder).isEmpty() && !scene()->views().isEmpty()){
+        view = static_cast<BehaviorGraphView *>(scene()->views().first());
+        firstSceneIcon = static_cast<GeneratorIcon *>(scene()->items(Qt::AscendingOrder).first());
+        if (view->selectedIcon == this){
+            if (view->selectedIcon){
+                view->selectedIcon->rGrad.setColorAt(1.0, Qt::black);
+                view->selectedIcon->textPen.setColor(Qt::white);
+                view->selectedIcon = NULL;
+                view->ui->changeCurrentDataWidget(NULL);
+            }
+        }
+        rGrad.setColorAt(1.0, Qt::green);
+        textPen.setColor(Qt::blue);
     }
     scene()->update();
 }

@@ -7,6 +7,8 @@
 
 uint hkbClipGenerator::refCount = 0;
 
+QString hkbClipGenerator::classname = "hkbClipGenerator";
+
 QStringList hkbClipGenerator::PlaybackMode = {"MODE_SINGLE_PLAY", "MODE_LOOPING", "MODE_USER_CONTROLLED", "MODE_PING_PONG", "MODE_COUNT"};
 QStringList hkbClipGenerator::ClipFlags = {"0", "FLAG_CONTINUE_MOTION_AT_END", "FLAG_SYNC_HALF_CYCLE_IN_PING_PONG_MODE", "FLAG_MIRROR", "FLAG_FORCE_DENSE_POSE", "FLAG_DONT_CONVERT_ANNOTATIONS_TO_TRIGGERS", "FLAG_IGNORE_MOTION"};
 
@@ -26,6 +28,10 @@ hkbClipGenerator::hkbClipGenerator(BehaviorFile *parent/*, qint16 ref*/)
     setType(HKB_CLIP_GENERATOR, TYPE_GENERATOR);
     refCount++;
     name = "Clip Generator "+QString::number(refCount);
+}
+
+QString hkbClipGenerator::getClassname(){
+    return classname;
 }
 
 QString hkbClipGenerator::getName() const{
@@ -135,6 +141,28 @@ bool hkbClipGenerator::link(){
 void hkbClipGenerator::unlink(){
     HkDynamicObject::unlink();
     triggers = HkxObjectExpSharedPtr();
+}
+
+bool hkbClipGenerator::evaulateDataValidity(){
+    bool valid = true;
+    QStringList list = flags.split('|');
+    for (int i = 0; i < list.size(); i++){
+        if (!ClipFlags.contains(list.at(i))){
+            valid = false;
+        }
+    }
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (!PlaybackMode.contains(mode)){
+    }else if (triggers.data() && triggers.data()->getSignature() != HKB_CLIP_TRIGGER_ARRAY){
+    }else if (name == ""){
+    }else if (animationName == ""){
+    }else if (valid){
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 hkbClipGenerator::~hkbClipGenerator(){

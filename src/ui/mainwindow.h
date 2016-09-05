@@ -21,6 +21,7 @@ class BehaviorFile;
 class BehaviorGraphView;
 class QPlainTextEdit;
 class HkDataUI;
+class BehaviorVariablesUI;
 
 class MainWindow : public QWidget
 {
@@ -46,8 +47,8 @@ private:
     QVBoxLayout *iconGBLyt;
     //QGroupBox *objectDataGB;
     HkDataUI *objectDataWid;
+    BehaviorVariablesUI *variablesWid;
     QGroupBox *eventsGB;
-    QGroupBox *variablesGB;
     QGroupBox *logGB;
     QVBoxLayout *logGBLyt;
     QProgressDialog *progressD;

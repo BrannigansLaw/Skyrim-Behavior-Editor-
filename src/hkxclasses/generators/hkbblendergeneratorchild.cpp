@@ -7,6 +7,8 @@
 
 uint hkbBlenderGeneratorChild::refCount = 0;
 
+QString hkbBlenderGeneratorChild::classname = "hkbBlenderGeneratorChild";
+
 hkbBlenderGeneratorChild::hkbBlenderGeneratorChild(BehaviorFile *parent/*, qint16 ref*/)
     : hkbGenerator(parent/*, ref*/),
       weight(0),
@@ -14,6 +16,10 @@ hkbBlenderGeneratorChild::hkbBlenderGeneratorChild(BehaviorFile *parent/*, qint1
 {
     setType(HKB_BLENDER_GENERATOR_CHILD, TYPE_GENERATOR);
     refCount++;
+}
+
+QString hkbBlenderGeneratorChild::getClassname(){
+    return classname;
 }
 
 bool hkbBlenderGeneratorChild::readData(const HkxXmlReader &reader, long index){
@@ -86,6 +92,19 @@ void hkbBlenderGeneratorChild::unlink(){
     HkDynamicObject::unlink();
     generator = HkxObjectExpSharedPtr();
     boneWeights = HkxObjectExpSharedPtr();
+}
+
+bool hkbBlenderGeneratorChild::evaulateDataValidity(){
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (boneWeights.data() && boneWeights.data()->getSignature() != HKB_BONE_WEIGHT_ARRAY){
+    }else if (!generator.data() || generator.data()->getType() != HkxObject::TYPE_GENERATOR){
+    }else{
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 hkbBlenderGeneratorChild::~hkbBlenderGeneratorChild(){

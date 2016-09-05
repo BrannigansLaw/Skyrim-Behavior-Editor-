@@ -7,6 +7,8 @@
 
 uint BSSynchronizedClipGenerator::refCount = 0;
 
+QString BSSynchronizedClipGenerator::classname = "BSSynchronizedClipGenerator";
+
 BSSynchronizedClipGenerator::BSSynchronizedClipGenerator(BehaviorFile *parent/*, qint16 ref*/)
     : hkbGenerator(parent/*, ref*/),
     userData(0),
@@ -21,6 +23,10 @@ BSSynchronizedClipGenerator::BSSynchronizedClipGenerator(BehaviorFile *parent/*,
     refCount++;
     setType(BS_SYNCHRONIZED_CLIP_GENERATOR, TYPE_GENERATOR);
     name = "BS Synchronized Clip Generator "+QString::number(refCount);
+}
+
+QString BSSynchronizedClipGenerator::getClassname(){
+    return classname;
 }
 
 QString BSSynchronizedClipGenerator::getName() const{
@@ -123,6 +129,19 @@ bool BSSynchronizedClipGenerator::link(){
 void BSSynchronizedClipGenerator::unlink(){
     HkDynamicObject::unlink();
     pClipGenerator = HkxObjectExpSharedPtr();
+}
+
+bool BSSynchronizedClipGenerator::evaulateDataValidity(){
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (!pClipGenerator.data() || pClipGenerator.data()->getSignature() != HKB_CLIP_GENERATOR){
+    }else if (name == ""){
+    }else{
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 BSSynchronizedClipGenerator::~BSSynchronizedClipGenerator(){

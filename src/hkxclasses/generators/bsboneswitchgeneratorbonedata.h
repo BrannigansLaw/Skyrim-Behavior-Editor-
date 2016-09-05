@@ -12,11 +12,14 @@ public:
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
     void unlink();
+    bool evaulateDataValidity();
+    static QString getClassname();
 private:
     BSBoneSwitchGeneratorBoneData& operator=(const BSBoneSwitchGeneratorBoneData&);
     BSBoneSwitchGeneratorBoneData(const BSBoneSwitchGeneratorBoneData &);
 private:
     static uint refCount;
+    static QString classname;
     HkxObjectExpSharedPtr pGenerator;
     HkxObjectExpSharedPtr spBoneWeight;
 };

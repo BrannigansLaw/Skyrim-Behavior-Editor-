@@ -7,6 +7,8 @@
 
 uint hkbManualSelectorGenerator::refCount = 0;
 
+QString hkbManualSelectorGenerator::classname = "hkbManualSelectorGenerator";
+
 hkbManualSelectorGenerator::hkbManualSelectorGenerator(BehaviorFile *parent/*, qint16 ref*/)
     : hkbGenerator(parent/*, ref*/),
       userData(0),
@@ -16,6 +18,10 @@ hkbManualSelectorGenerator::hkbManualSelectorGenerator(BehaviorFile *parent/*, q
     setType(HKB_MANUAL_SELECTOR_GENERATOR, TYPE_GENERATOR);
     refCount++;
     name = "Manual Selector Generator "+QString::number(refCount);
+}
+
+QString hkbManualSelectorGenerator::getClassname(){
+    return classname;
 }
 
 QString hkbManualSelectorGenerator::getName() const{
@@ -94,6 +100,27 @@ void hkbManualSelectorGenerator::unlink(){
     for (int i = 0; i < generators.size(); i++){
         generators[i] = HkxObjectExpSharedPtr();
     }
+}
+
+bool hkbManualSelectorGenerator::evaulateDataValidity(){
+    bool valid = true;
+    for (int i = 0; i < generators.size(); i++){
+        if (!generators.at(i).data() || generators.at(i).data()->getType() != HkxObject::TYPE_GENERATOR){
+            valid = false;
+        }
+    }
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (selectedGeneratorIndex < 0 || selectedGeneratorIndex > generators.size()){
+    }else if (currentGeneratorIndex < 0 || currentGeneratorIndex > generators.size()){
+    }else if (name == ""){
+    }else if (generators.isEmpty()){
+    }else if (valid){
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 hkbManualSelectorGenerator::~hkbManualSelectorGenerator(){

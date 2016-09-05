@@ -13,11 +13,14 @@ public:
     bool link();
     void unlink();
     QString getName() const;
+    bool evaulateDataValidity();
+    static QString getClassname();
 private:
     BSSynchronizedClipGenerator& operator=(const BSSynchronizedClipGenerator&);
     BSSynchronizedClipGenerator(const BSSynchronizedClipGenerator &);
 private:
     static uint refCount;
+    static QString classname;
     ulong userData;
     QString name;
     HkxObjectExpSharedPtr pClipGenerator;

@@ -7,6 +7,7 @@
 #include <QGraphicsItem>
 
 #include "src/hkxclasses/hkxobject.h"
+#include "src/hkxclasses/generators/hkbgenerator.h"
 
 class GeneratorIcon: public QGraphicsItem
 {
@@ -14,6 +15,11 @@ class GeneratorIcon: public QGraphicsItem
     friend class BehaviorGraphView;
 public:
     GeneratorIcon(const HkxObjectExpSharedPtr & d, const QString & s, GeneratorIcon *par = NULL);
+
+    virtual ~GeneratorIcon(){
+        //
+    }
+
     QRectF boundingRect() const{
         return boundingRectangle;
     }
@@ -22,9 +28,39 @@ public:
         return name;
     }
 
-    /*void setHighlight(bool selected){
-        if (selected){
+    void unhighlight(){
+        rGrad.setColorAt(1.0, Qt::black);
+        textPen.setColor(Qt::white);
+        if (scene()){
+            scene()->update();
+        }
+    }
 
+    GeneratorIcon* getChildIcon(HkxObject *child){
+        for (int i = 0; i < children.size(); i++){
+            if (children.at(i)->data.data() == child){
+                return children.at(i);
+            }
+        }
+        return NULL;
+    }
+
+    void unselect();
+
+    void setSelected(QGraphicsSceneMouseEvent *event = NULL);
+
+    /*void removeFromScene(){
+        if (scene() && data.data()){
+            hkbGenerator *gen = static_cast<hkbGenerator *>(data.data());
+            if (parent && !parent->children.isEmpty()){
+                parent->children.removeAll(this);
+            }
+            gen->icons.removeAll(this);
+            if (gen->icons.isEmpty()){
+                gen->unlink();
+            }
+            scene()->removeItem(this);
+            scene()->removeItem(linkToParent);
         }
     }*/
 
@@ -59,6 +95,21 @@ public:
         return false;
     }
 
+    bool isDescendant(GeneratorIcon *icon){
+        if (icon){
+            for (int i = 0; i < children.size(); i++){
+                if (children.at(i) == icon){
+                    return true;
+                }else{
+                    if (children.at(i)->isDescendant(icon)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     void errorHighlight(){
         if (pen.color() == Qt::black){
             pen.setColor(Qt::red);
@@ -82,9 +133,7 @@ public:
         }
         int index = newParent->children.indexOf(this);
         if (index == -1){
-            if (i > 0){
-                newParent->children.insert(i - 1, this);
-            }else if (i == 0){
+            if (i >= 0){
                 newParent->children.insert(i, this);
             }else{
                 newParent->children.append(this);

@@ -33,7 +33,6 @@ SOURCES += \
     src/hkxclasses/generators/hkbgenerator.cpp \
     src/ui/behaviorgraphui/behaviorgraphicons.cpp \
     src/ui/behaviorgraphui/behaviorgraphui.cpp \
-    src/ui/objectdataui/hkobjectui.cpp \
     src/hkxclasses/hkrootlevelcontainer.cpp \
     src/hkxclasses/generators/hkbbehaviorreferencegenerator.cpp \
     src/hkxclasses/generators/hkbstatemachine.cpp \
@@ -53,11 +52,17 @@ SOURCES += \
     src/hkxclasses/hkbstringeventpayload.cpp \
     src/hkxclasses/hkbboneweightarray.cpp \
     src/hkxclasses/hkbstatemachineeventpropertyarray.cpp \
-    src/hkxclasses/hkbstatemachinetransitioninfoarray.cpp
+    src/hkxclasses/hkbstatemachinetransitioninfoarray.cpp \
+    src/hkxclasses/modifiers/hkbmodifier.cpp \
+    src/ui/hkdataui.cpp \
+    src/ui/objectdataui/generators/bsistatetagginggeneratorui.cpp \
+    src/ui/objectdataui/generators/modifiergeneratorui.cpp \
+    src/ui/objectdataui/generators/manualselectorgeneratorui.cpp \
+    src/ui/behaviorvariablesui.cpp \
+    src/ui/eventvariablesui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
-    src/hkxclasses/modifiers.h \
     src/ui/fileselectwindow.h \
     src/ui/mainwindow.h \
     src/xml/hkxxmlreader.h \
@@ -69,7 +74,6 @@ HEADERS  += \
     src/hkxclasses/generators/hkbgenerator.h \
     src/ui/behaviorgraphui/behaviorgraphicons.h \
     src/ui/behaviorgraphui/behaviorgraphui.h \
-    src/ui/objectdataui/hkobjectui.h \
     src/hkxclasses/hkrootlevelcontainer.h \
     src/hkxclasses/generators/hkbbehaviorreferencegenerator.h \
     src/hkxclasses/generators/hkbstatemachine.h \
@@ -90,4 +94,12 @@ HEADERS  += \
     src/hkxclasses/hkbboneweightarray.h \
     src/hkxclasses/hkbstatemachineeventpropertyarray.h \
     src/hkxclasses/hkbstatemachinetransitioninfoarray.h \
-    src/ui/genericdatawidgets.h
+    src/ui/genericdatawidgets.h \
+    src/hkxclasses/modifiers/hkbmodifier.h \
+    src/ui/hkdataui.h \
+    src/ui/objectdataui/generators/bsistatetagginggeneratorui.h \
+    src/ui/objectdataui/generators/modifiergeneratorui.h \
+    src/ui/objectdataui/generators/manualselectorgeneratorui.h \
+    src/ui/behaviorvariablesui.h \
+    src/utility.h \
+    src/ui/eventvariablesui.h

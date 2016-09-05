@@ -7,8 +7,11 @@ class hkbStateMachineEventPropertyArray: public HkxObject
 {
 public:
     hkbStateMachineEventPropertyArray(BehaviorFile *parent = NULL);
+    virtual ~hkbStateMachineEventPropertyArray();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    bool evaulateDataValidity();
+    static QString getClassname();
 protected:
 private:
     struct HkEvent
@@ -17,6 +20,7 @@ private:
         HkxObjectExpSharedPtr payload;
     };
     static uint refCount;
+    static QString classname;
     //QVector <HkEvent> events;
 };
 

@@ -12,10 +12,13 @@ public:
     bool link();
     bool readData(const HkxXmlReader & reader, int index);
     void unlink();
+    bool evaulateDataValidity();
+    static QString getClassname();
 private:
     hkRootLevelContainer& operator=(const hkRootLevelContainer&);
     hkRootLevelContainer(const hkRootLevelContainer &);
 private:
+    static QString classname;
     static uint refCount;
     struct hkRootLevelContainerNamedVariant
     {

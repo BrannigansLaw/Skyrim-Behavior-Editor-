@@ -7,8 +7,11 @@ class hkbStateMachineTransitionInfoArray: public HkxObject
 {
 public:
     hkbStateMachineTransitionInfoArray(BehaviorFile *parent = NULL);
+    virtual ~hkbStateMachineTransitionInfoArray();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    bool evaulateDataValidity();
+    static QString getClassname();
 protected:
 private:
     struct HkTransition
@@ -36,6 +39,7 @@ private:
     };
 
     static uint refCount;
+    static QString classname;
     //QVector <HkTransition> transitions;
 };
 

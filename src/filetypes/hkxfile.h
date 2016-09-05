@@ -60,6 +60,7 @@ public:
     QStringList & getVariableNames() const;
     QStringList getGeneratorNames();
     QStringList getModifierNames();
+    HkxObject * getBehaviorGraphData() const;
 protected:
     bool parse();
     bool link();

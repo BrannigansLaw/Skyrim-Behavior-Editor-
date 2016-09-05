@@ -13,9 +13,9 @@ struct hkVector3
     qreal z;
 };
 
-struct hkVector4
+struct hkQuadVariable
 {
-    hkVector4(qreal x = 0, qreal y = 0, qreal z = 0, qreal w = 0): x(x), y(y), z(z), w(w){}
+    hkQuadVariable(qreal x = 0, qreal y = 0, qreal z = 0, qreal w = 0): x(x), y(y), z(z), w(w){}
     qreal x;
     qreal y;
     qreal z;
@@ -31,7 +31,7 @@ struct hkTransform
 struct hkQsTransform
 {
     hkVector3 v1;
-    hkVector4 v2;
+    hkQuadVariable v2;
     hkVector3 v3;
 };
 

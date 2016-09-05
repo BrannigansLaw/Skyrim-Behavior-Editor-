@@ -19,21 +19,22 @@ public:
     void setProgressData(const QString & message, int value);
     qulonglong getSignature() const;
     HkxType getType() const;
-    void setDataValidity(bool isValid);
-    bool getIsDataValid() const;
+    virtual bool evaulateDataValidity();
+    bool isDataValid() const;
     virtual bool link() = 0;
     virtual void unlink();
 protected:
     HkxObject(BehaviorFile *parent = NULL/*, long ref = 0*/);
     BehaviorFile * getParentFile() const;
+    void setDataValidity(bool isValid);
     void setType(HkxSignature sig, HkxType type);
-    bool readMultipleVector4(const QByteArray &lineIn,  QVector <hkVector4> & vectors);
+    bool readMultipleVector4(const QByteArray &lineIn,  QVector <hkQuadVariable> & vectors);
     bool readReferences(const QByteArray &line, QList <HkxObjectExpSharedPtr> & children);
     bool readIntegers(const QByteArray &line, QVector<qint16> & ints);
     bool toBool(const QByteArray &line, bool *ok);
     bool readDoubles(const QByteArray &line, QVector<qreal> & doubles);
     hkVector3 readVector3(const QByteArray &lineIn, bool *ok);
-    hkVector4 readVector4(const QByteArray &lineIn, bool *ok);
+    hkQuadVariable readVector4(const QByteArray &lineIn, bool *ok);
 private:
     HkxObject(const HkxObject &obj);
     HkxObject& operator=(const HkxObject&);
@@ -42,9 +43,10 @@ private:
     long reference;
     HkxSignature signature;
     HkxType typeCheck;
-    bool isDataValid;
+    bool dataValid;
 };
 
+//Don't implement == operator!!!
 class HkxObjectExpSharedPtr: public QExplicitlySharedDataPointer <HkxObject>
 {
 public:
@@ -62,6 +64,7 @@ public:
     virtual ~HkDynamicObject();
     bool linkVar();
     void unlink();
+    bool evaulateDataValidity();
 protected:
     HkDynamicObject(BehaviorFile *parent = NULL/*, long ref = 0*/);
 protected:

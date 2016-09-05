@@ -7,11 +7,17 @@
 
 uint hkbVariableValueSet::refCount = 0;
 
+QString hkbVariableValueSet::classname = "hkbVariableValueSet";
+
 hkbVariableValueSet::hkbVariableValueSet(BehaviorFile *parent/*, qint16 ref*/)
     : HkxObject(parent/*, ref*/)
 {
     setType(HKB_VARIABLE_VALUE_SET, TYPE_OTHER);
     refCount++;
+}
+
+QString hkbVariableValueSet::getClassname(){
+    return classname;
 }
 
 bool hkbVariableValueSet::readData(const HkxXmlReader &reader, long index){
@@ -88,6 +94,17 @@ bool hkbVariableValueSet::link(){
             variantVariableValues[i] = *ptr;
         }
     }
+    return true;
+}
+
+bool hkbVariableValueSet::evaulateDataValidity(){
+    for (int i = 0; i < variantVariableValues.size(); i++){
+        if (!variantVariableValues.at(i).data() || variantVariableValues.at(i).data()->getSignature() != HKB_BONE_WEIGHT_ARRAY){
+            setDataValidity(false);
+            return false;
+        }
+    }
+    setDataValidity(true);
     return true;
 }
 

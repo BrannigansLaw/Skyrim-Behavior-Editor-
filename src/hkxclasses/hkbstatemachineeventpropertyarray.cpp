@@ -7,11 +7,17 @@
 
 uint hkbStateMachineEventPropertyArray::refCount = 0;
 
+QString hkbStateMachineEventPropertyArray::classname = "hkbStateMachineEventPropertyArray";
+
 hkbStateMachineEventPropertyArray::hkbStateMachineEventPropertyArray(BehaviorFile *parent)
     : HkxObject(parent)
 {
     refCount++;
     setType(HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY, TYPE_OTHER);
+}
+
+QString hkbStateMachineEventPropertyArray::getClassname(){
+    return classname;
 }
 
 bool hkbStateMachineEventPropertyArray::readData(const HkxXmlReader &reader, long index){
@@ -66,3 +72,17 @@ bool hkbStateMachineEventPropertyArray::link(){
     return true;
 }
 
+bool hkbStateMachineEventPropertyArray::evaulateDataValidity(){
+    /*for (int i = 0; i < events.size(); i++){
+        if (events.at(i).payload.data() && events.at(i).payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+            setDataValidity(false);
+            return false;
+        }
+    }*/
+    setDataValidity(true);
+    return true;
+}
+
+hkbStateMachineEventPropertyArray::~hkbStateMachineEventPropertyArray(){
+    refCount--;
+}

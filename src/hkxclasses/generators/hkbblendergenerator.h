@@ -13,12 +13,15 @@ public:
     bool link();
     void unlink();
     QString getName() const;
+    bool evaulateDataValidity();
+    static QString getClassname();
 private:
     hkbBlenderGenerator& operator=(const hkbBlenderGenerator&);
     hkbBlenderGenerator(const hkbBlenderGenerator &);
 private:
     static QStringList Flags;   //{FLAG_SYNC=1, FLAG_SMOOTH_GENERATOR_WEIGHTS=4, FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS=8, FLAG_PARAMETRIC_BLEND=16, FLAG_IS_PARAMETRIC_BLEND_CYCLIC=32, FLAG_FORCE_DENSE_POSE=64};
     static uint refCount;
+    static QString classname;
     ulong userData;
     QString name;
     qreal referencePoseWeightThreshold;

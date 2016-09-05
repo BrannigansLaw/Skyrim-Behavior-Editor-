@@ -7,9 +7,13 @@ class hkbStringEventPayload: public HkxObject
 {
 public:
     hkbStringEventPayload(BehaviorFile *parent = NULL/*, long ref = 0*/);
+    virtual ~hkbStringEventPayload();
+    bool evaulateDataValidity();
+    static QString getClassname();
 protected:
 private:
     static uint refCount;
+    static QString classname;
     QString data;
 };
 

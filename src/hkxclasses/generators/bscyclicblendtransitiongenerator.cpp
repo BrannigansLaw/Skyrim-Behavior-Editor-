@@ -8,7 +8,9 @@
 
 uint BSCyclicBlendTransitionGenerator::refCount = 0;
 
-QStringList BSCyclicBlendTransitionGenerator::BlendCurve = {"BLEND_CURVE_SMOOTH"};
+QString BSCyclicBlendTransitionGenerator::classname = "BSCyclicBlendTransitionGenerator";
+
+QStringList BSCyclicBlendTransitionGenerator::BlendCurve = {"BLEND_CURVE_SMOOTH", "BLEND_CURVE_LINEAR", "BLEND_CURVE_LINEAR_TO_SMOOTH", "BLEND_CURVE_SMOOTH_TO_LINEAR"};
 
 BSCyclicBlendTransitionGenerator::BSCyclicBlendTransitionGenerator(BehaviorFile *parent/*, qint16 ref*/)
     :hkbGenerator(parent/*, ref*/),
@@ -20,6 +22,10 @@ BSCyclicBlendTransitionGenerator::BSCyclicBlendTransitionGenerator(BehaviorFile 
     refCount++;
     setType(BS_CYCLIC_BLEND_TRANSITION_GENERATOR, TYPE_GENERATOR);
     name = "BS Cyclic Blend Transition Generator "+QString::number(refCount);
+}
+
+QString BSCyclicBlendTransitionGenerator::getClassname(){
+    return classname;
 }
 
 QString BSCyclicBlendTransitionGenerator::getName() const{
@@ -133,6 +139,22 @@ void BSCyclicBlendTransitionGenerator::unlink(){
     pBlenderGenerator = HkxObjectExpSharedPtr();
     eventToFreezeBlendValuePayload = HkxObjectExpSharedPtr();
     eventToCrossBlendPayload = HkxObjectExpSharedPtr();
+}
+
+bool BSCyclicBlendTransitionGenerator::evaulateDataValidity(){
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (!pBlenderGenerator.data() || pBlenderGenerator.data()->getSignature() != HKB_BLENDER_GENERATOR){
+    }else if (eventToFreezeBlendValuePayload.data() && eventToFreezeBlendValuePayload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+    }else if (eventToCrossBlendPayload.data() && eventToCrossBlendPayload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+    }else if (!BlendCurve.contains(eBlendCurve)){
+    }else if (name == ""){
+    }else{
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 BSCyclicBlendTransitionGenerator::~BSCyclicBlendTransitionGenerator(){

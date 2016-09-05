@@ -3,11 +3,15 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/hkxfile.h"
 
+#include "src/hkxclasses/hkbvariablevalueset.h"
+
 /*
  * CLASS: hkbBehaviorGraphData
 */
 
 uint hkbBehaviorGraphData::refCount = 0;
+
+QString hkbBehaviorGraphData::classname = "hkbBehaviorGraphData";
 
 QStringList hkbBehaviorGraphData::Type = {
     "VARIABLE_TYPE_BOOL",
@@ -26,6 +30,133 @@ hkbBehaviorGraphData::hkbBehaviorGraphData(BehaviorFile *parent/*, qint16 ref*/)
     setType(HKB_BEHAVIOR_GRAPH_DATA, TYPE_OTHER);
     refCount++;
 }
+
+QString hkbBehaviorGraphData::getClassname(){
+    return classname;
+}
+
+void hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name){
+    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    hkVariableInfo varInfo;
+    switch (type){
+    case VARIABLE_TYPE_BOOL:
+        varInfo.type = "VARIABLE_TYPE_BOOL";
+        break;
+    case VARIABLE_TYPE_INT8:
+        varInfo.type = "VARIABLE_TYPE_INT8";
+        break;
+    case VARIABLE_TYPE_INT16:
+        varInfo.type = "VARIABLE_TYPE_INT16";
+        break;
+    case VARIABLE_TYPE_INT32:
+        varInfo.type = "VARIABLE_TYPE_INT32";
+        break;
+    case VARIABLE_TYPE_REAL:
+        varInfo.type = "VARIABLE_TYPE_REAL";
+        break;
+    case VARIABLE_TYPE_POINTER:
+        varInfo.type = "VARIABLE_TYPE_POINTER";
+        varData->variantVariableValues.append(HkxObjectExpSharedPtr());
+        break;
+    case VARIABLE_TYPE_VECTOR4:
+        varInfo.type = "VARIABLE_TYPE_VECTOR4";
+        varData->quadVariableValues.append(hkQuadVariable());
+        break;
+    case VARIABLE_TYPE_QUATERNION:
+        varInfo.type = "VARIABLE_TYPE_QUATERNION";
+        varData->quadVariableValues.append(hkQuadVariable());
+        break;
+    default:
+        return;
+    }
+    strData->variableNames.append(name);
+    varData->wordVariableValues.append(0);
+    variableInfos.append(varInfo);
+}
+
+void hkbBehaviorGraphData::removeVariable(int index){
+    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    int count = -1;
+    if (index < strData->variableNames.size() && index < varData->wordVariableValues.size() && index < variableInfos.size()){
+        if (variableInfos.at(index).type == "VARIABLE_TYPE_POINTER"){
+            for (int i = 0; i <= index; i++){
+                if (variableInfos.at(i).type == "VARIABLE_TYPE_POINTER"){
+                    count++;
+                }
+            }
+            if (count < varData->variantVariableValues.size() && count > -1){
+                varData->variantVariableValues.removeAt(count);
+            }
+        }else if (variableInfos.at(index).type == "VARIABLE_TYPE_VECTOR4" || variableInfos.at(index).type == "VARIABLE_TYPE_QUATERNION"){
+            for (int i = 0; i <= index; i++){
+                if (variableInfos.at(i).type == "VARIABLE_TYPE_POINTER" || variableInfos.at(i).type == "VARIABLE_TYPE_QUATERNION"){
+                    count++;
+                }
+            }
+            if (count < varData->quadVariableValues.size() && count > -1){
+                varData->quadVariableValues.removeAt(count);
+            }
+        }
+        strData->variableNames.removeAt(index);
+        varData->wordVariableValues.removeAt(index);
+        variableInfos.removeAt(index);
+    }
+}
+
+void hkbBehaviorGraphData::setVariableNameAt(int index, const QString & name){
+    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    if (strData->variableNames.size() > index && index > -1){
+        strData->variableNames.replace(index, name);
+    }
+}
+
+void hkbBehaviorGraphData::setWordVariableValueAt(int index, int value){
+    hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    if (varData->wordVariableValues.size() > index && index > -1){
+        varData->wordVariableValues.replace(index, value);
+    }
+}
+
+void hkbBehaviorGraphData::setQuadVariableValueAt(int index, hkQuadVariable value){
+    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    int count = -1;
+    if (index < strData->variableNames.size() && index < varData->wordVariableValues.size() && index < variableInfos.size()){
+        if (variableInfos.at(index).type == "VARIABLE_TYPE_VECTOR4" || variableInfos.at(index).type == "VARIABLE_TYPE_QUATERNION"){
+            for (int i = 0; i <= index; i++){
+                if (variableInfos.at(i).type == "VARIABLE_TYPE_VECTOR4" || variableInfos.at(i).type == "VARIABLE_TYPE_QUATERNION"){
+                    count++;
+                }
+            }
+            if (count < varData->quadVariableValues.size() && count > -1){
+                varData->quadVariableValues.replace(count, value);
+            }
+        }else{
+            return;
+        }
+    }
+}
+
+hkQuadVariable hkbBehaviorGraphData::getQuadVariable(int index, bool *ok){
+    *ok = false;
+    hkbVariableValueSet *variableValues = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    if (variableValues->wordVariableValues.size() > index && variableInfos.size() > index){
+        int count = -1;
+        for (int i = 0; i <= index; i++){
+            if (variableInfos.at(i).type == "VARIABLE_TYPE_VECTOR4" || variableInfos.at(i).type == "VARIABLE_TYPE_QUATERNION"){
+                count++;
+            }
+        }
+        if (count < variableValues->quadVariableValues.size() && count > -1){
+            *ok = true;
+            return variableValues->quadVariableValues.at(count);
+        }
+    }
+    return hkQuadVariable();
+}
+
 
 bool hkbBehaviorGraphData::readData(const HkxXmlReader &reader, long index){
     bool ok;
@@ -214,6 +345,19 @@ bool hkbBehaviorGraphData::link(){
 
 QStringList & hkbBehaviorGraphData::getVariableNames() const{
     return static_cast<hkbBehaviorGraphStringData *>(stringData.data())->variableNames;
+}
+
+bool hkbBehaviorGraphData::evaulateDataValidity(){
+    if (!variableInitialValues.data() || variableInitialValues.data()->getSignature() != HKB_VARIABLE_VALUE_SET){
+        setDataValidity(false);
+        return false;
+    }else if (!stringData.data() || stringData.data()->getSignature() != HKB_BEHAVIOR_GRAPH_STRING_DATA){
+        setDataValidity(false);
+        return false;
+    }
+    //Check other data...
+    setDataValidity(true);
+    return true;
 }
 
 hkbBehaviorGraphData::~hkbBehaviorGraphData(){

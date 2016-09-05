@@ -7,6 +7,8 @@
 
 uint hkbStateMachineStateInfo::refCount = 0;
 
+QString hkbStateMachineStateInfo::classname = "hkbStateMachineStateInfo";
+
 hkbStateMachineStateInfo::hkbStateMachineStateInfo(BehaviorFile *parent/*, qint16 ref*/)
     : hkbGenerator(parent/*, ref*/),
       name("State"),
@@ -16,6 +18,10 @@ hkbStateMachineStateInfo::hkbStateMachineStateInfo(BehaviorFile *parent/*, qint1
 {
     setType(HKB_STATE_MACHINE_STATE_INFO, TYPE_GENERATOR);
     refCount++;
+}
+
+QString hkbStateMachineStateInfo::getClassname(){
+    return classname;
 }
 
 QString hkbStateMachineStateInfo::getName() const{
@@ -130,6 +136,22 @@ void hkbStateMachineStateInfo::unlink(){
     exitNotifyEvents = HkxObjectExpSharedPtr();
     transitions = HkxObjectExpSharedPtr();
     generator = HkxObjectExpSharedPtr();
+}
+
+bool hkbStateMachineStateInfo::evaulateDataValidity(){
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (enterNotifyEvents.data() && enterNotifyEvents.data()->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
+    }else if (exitNotifyEvents.data() && exitNotifyEvents.data()->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
+    }else if (transitions.data() && transitions.data()->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
+    }else if (!generator.data() || generator.data()->getType() != HkxObject::TYPE_GENERATOR){
+    }else if (name == ""){
+    }else{
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 hkbStateMachineStateInfo::~hkbStateMachineStateInfo(){

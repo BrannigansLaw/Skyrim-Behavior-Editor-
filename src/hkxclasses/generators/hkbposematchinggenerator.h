@@ -13,13 +13,16 @@ public:
     bool link();
     void unlink();
     QString getName() const;
+    bool evaulateDataValidity();
+    static QString getClassname();
 private:
     hkbPoseMatchingGenerator& operator=(const hkbPoseMatchingGenerator&);
     hkbPoseMatchingGenerator(const hkbPoseMatchingGenerator &);
 private:
-    static QStringList Flags;
-    static QStringList Mode;
+    static QStringList Flags;   //FLAG_SYNC=1;FLAG_SMOOTH_GENERATOR_WEIGHTS=4;FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS=8;FLAG_PARAMETRIC_BLEND=16;FLAG_IS_PARAMETRIC_BLEND_CYCLIC=32;FLAG_FORCE_DENSE_POSE=64
+    static QStringList Mode;    //MODE_MATCH=0;MODE_PLAY=1
     static uint refCount;
+    static QString classname;
     ulong userData;
     QString name;
     qreal referencePoseWeightThreshold;
@@ -30,7 +33,7 @@ private:
     QString flags;
     bool subtractLastChild;
     QList <HkxObjectExpSharedPtr> children;
-    hkVector4 worldFromModelRotation;
+    hkQuadVariable worldFromModelRotation;
     qreal blendSpeed;
     qreal minSpeedToSwitch;
     qreal minSwitchTimeNoError;

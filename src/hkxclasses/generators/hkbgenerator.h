@@ -21,6 +21,7 @@ public:
     virtual ~hkbGenerator();
     bool link();
     virtual QString getName() const;
+    QString getClassname() const;
 protected:
     hkbGenerator(BehaviorFile *parent = NULL/*, long ref = 0*/);
     void appendIcon(GeneratorIcon * icon);

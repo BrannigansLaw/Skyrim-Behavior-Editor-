@@ -13,11 +13,14 @@ public:
     bool link();
     void unlink();
     QString getName() const;
+    bool evaulateDataValidity();
+    static QString getClassname();
 private:
     hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&);
     hkbStateMachineStateInfo(const hkbStateMachineStateInfo &);
 private:
     static uint refCount;
+    static QString classname;
     HkxObjectExpSharedPtr enterNotifyEvents;
     HkxObjectExpSharedPtr exitNotifyEvents;
     HkxObjectExpSharedPtr transitions;

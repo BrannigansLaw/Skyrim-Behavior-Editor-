@@ -1,7 +1,7 @@
 #include "hkxfile.h"
 #include "src/hkxclasses/hkxobject.h"
 #include "src/xml/hkxxmlreader.h"
-#include "src/hkxclasses/modifiers.h"
+//#include "src/hkxclasses/modifiers.h"
 #include "src/hkxclasses/generators/hkbgenerator.h"
 #include "src/ui/mainwindow.h"
 #include "src/hkxclasses/generators/hkbstatemachinestateinfo.h"
@@ -102,9 +102,9 @@ bool BehaviorFile::appendAndReadData(int index, T * obj){
         temp.remove(0, 1);
     }
     if (obj->getType() == HkxObject::TYPE_GENERATOR){
-        generators.append(HkxObjectExpSharedPtr(reinterpret_cast<hkbGenerator*>(obj), temp.toLong(&ok)));
+        generators.append(HkxObjectExpSharedPtr(obj, temp.toLong(&ok)));
     }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
-        modifiers.append(HkxObjectExpSharedPtr(reinterpret_cast<hkbModifier*>(obj), temp.toLong(&ok)));
+        modifiers.append(HkxObjectExpSharedPtr(obj, temp.toLong(&ok)));
     }else if (obj->getType() == HkxObject::TYPE_OTHER){
         otherTypes.append(HkxObjectExpSharedPtr(obj, temp.toLong(&ok)));
     }else{
@@ -480,6 +480,10 @@ QStringList BehaviorFile::getModifierNames(){
         }
     }*/
     return list;
+}
+
+HkxObject * BehaviorFile::getBehaviorGraphData() const{
+    return graphData.data();
 }
 
 int BehaviorFile::getIndexOfGenerator(const HkxObjectExpSharedPtr & obj){

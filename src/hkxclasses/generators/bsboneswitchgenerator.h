@@ -13,11 +13,14 @@ public:
     bool link();
     void unlink();
     QString getName() const;
+    bool evaulateDataValidity();
+    static QString getClassname();
 private:
     BSBoneSwitchGenerator& operator=(const BSBoneSwitchGenerator&);
     BSBoneSwitchGenerator(const BSBoneSwitchGenerator &);
 private:
     static uint refCount;
+    static QString classname;
     long userData;
     QString name;
     HkxObjectExpSharedPtr pDefaultGenerator;

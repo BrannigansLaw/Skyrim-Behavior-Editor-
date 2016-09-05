@@ -15,11 +15,14 @@ public:
     bool link();
     void unlink();
     QString getName() const;
+    bool evaulateDataValidity();
+    static QString getClassname();
 private:
     hkbModifierGenerator& operator=(const hkbModifierGenerator&);
     hkbModifierGenerator(const hkbModifierGenerator &);
 private:
     static uint refCount;
+    static QString classname;
     long userData;
     QString name;
     HkxObjectExpSharedPtr modifier;

@@ -10,7 +10,7 @@
 HkxObject::HkxObject(BehaviorFile *parent/*, long ref = 0*/)
     : parentFile(parent),
       reference(0),
-      isDataValid(true)
+      dataValid(true)
     /*, reference(ref)*/
 {
     //
@@ -25,10 +25,16 @@ HkxObject::HkxType HkxObject::getType() const{
 }
 
 void HkxObject::setDataValidity(bool isValid){
-    isDataValid = isValid;
+    dataValid = isValid;
 }
-bool HkxObject::getIsDataValid()const{
-    return isDataValid;
+
+bool HkxObject::isDataValid()const{
+    return dataValid;
+}
+
+bool HkxObject::evaulateDataValidity(){
+    //isDataValid = true;
+    return true;
 }
 
 void HkxObject::unlink(){
@@ -209,12 +215,12 @@ hkVector3 HkxObject::readVector3(const QByteArray &lineIn, bool *ok){
     return vector3;
 }
 
-hkVector4 HkxObject::readVector4(const QByteArray &lineIn, bool *ok){
+hkQuadVariable HkxObject::readVector4(const QByteArray &lineIn, bool *ok){
     enum {X = 1, Y = 2, Z = 3, W = 4};
     qint16 size = 0;
     qint16 start;
     ushort axisVar = 0;
-    hkVector4 vector;
+    hkQuadVariable vector;
     for (qint16 i = 0; i < lineIn.size(); i++){
         if ((lineIn.at(i) >= '0' && lineIn.at(i) <= '9') || (lineIn.at(i) == '-')){
             start = i;
@@ -243,27 +249,27 @@ hkVector4 HkxObject::readVector4(const QByteArray &lineIn, bool *ok){
                 vector.w = value.toDouble(ok);
                 if (lineIn.at(i) != ')'){
                     *ok = false;
-                    return hkVector4();
+                    return hkQuadVariable();
                 }
                 break;
             default:
                 *ok = false;
-                return hkVector4();
+                return hkQuadVariable();
             }
             if (!*ok){
-                return hkVector4();
+                return hkQuadVariable();
             }
         }
     }
     return vector;
 }
 
-bool HkxObject::readMultipleVector4(const QByteArray &lineIn,  QVector <hkVector4> & vectors){
+bool HkxObject::readMultipleVector4(const QByteArray &lineIn,  QVector <hkQuadVariable> & vectors){
     enum {X = 1, Y = 2, Z = 3, W = 4};
     qint16 size = 0;
     qint16 start;
     ushort axisVar = 0;
-    hkVector4 vector;
+    hkQuadVariable vector;
     bool ok = false;
     bool loop = false;
     for (qint16 i = 0; i < lineIn.size(); i++){
@@ -385,6 +391,15 @@ bool HkDynamicObject::linkVar(){
 
 void HkDynamicObject::unlink(){
     variableBindingSet = HkxObjectExpSharedPtr();
+}
+
+bool HkDynamicObject::evaulateDataValidity(){
+    if (variableBindingSet.data() && variableBindingSet.data()->getSignature() != HKB_VARIABLE_BINDING_SET){
+        setDataValidity(false);
+        return false;
+    }
+    setDataValidity(true);
+    return true;
 }
 
 HkDynamicObject::~HkDynamicObject(){

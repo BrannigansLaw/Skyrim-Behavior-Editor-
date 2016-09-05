@@ -9,18 +9,23 @@ class hkbVariableValueSet: public HkxObject
 {
     friend class hkbBehaviorGraphData;
     friend class BehaviorGraphView;
+    friend class BehaviorVariablesUI;
 public:
     hkbVariableValueSet(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbVariableValueSet();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    bool evaulateDataValidity();
+    static QString getClassname();
+    hkQuadVariable getQuadVariable(int index);
 private:
     hkbVariableValueSet& operator=(const hkbVariableValueSet&);
     hkbVariableValueSet(const hkbVariableValueSet &);
 private:
     static uint refCount;
+    static QString classname;
     QVector <int> wordVariableValues;
-    QVector <hkVector4> quadVariableValues;
+    QVector <hkQuadVariable> quadVariableValues;
     QList <HkxObjectExpSharedPtr> variantVariableValues;
 };
 

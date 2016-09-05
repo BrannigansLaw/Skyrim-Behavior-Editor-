@@ -8,6 +8,8 @@
 
 uint BSiStateTaggingGenerator::refCount = 0;
 
+QString BSiStateTaggingGenerator::classname = "BSiStateTaggingGenerator";
+
 BSiStateTaggingGenerator::BSiStateTaggingGenerator(BehaviorFile *parent/*, qint16 ref*/)
     : hkbGenerator(parent/*, ref*/),
       userData(1),
@@ -17,6 +19,10 @@ BSiStateTaggingGenerator::BSiStateTaggingGenerator(BehaviorFile *parent/*, qint1
     setType(BS_I_STATE_TAGGING_GENERATOR, TYPE_GENERATOR);
     refCount++;
     name = "BS iState Tagging Generator "+QString::number(refCount);
+}
+
+QString BSiStateTaggingGenerator::getClassname(){
+    return classname;
 }
 
 QString BSiStateTaggingGenerator::getName() const{
@@ -89,6 +95,19 @@ bool BSiStateTaggingGenerator::link(){
 void BSiStateTaggingGenerator::unlink(){
     HkDynamicObject::unlink();
     pDefaultGenerator = HkxObjectExpSharedPtr();
+}
+
+bool BSiStateTaggingGenerator::evaulateDataValidity(){
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (!pDefaultGenerator.data() || pDefaultGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){
+    }else if (name == ""){
+    }else{
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 BSiStateTaggingGenerator::~BSiStateTaggingGenerator(){

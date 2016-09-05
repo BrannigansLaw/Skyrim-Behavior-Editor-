@@ -11,16 +11,20 @@ class hkbBehaviorGraphStringData: public HkxObject
 {
     friend class hkbBehaviorGraphData;
     friend class BehaviorGraphView;
+    friend class BehaviorVariablesUI;
 public:
     hkbBehaviorGraphStringData(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbBehaviorGraphStringData();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    bool evaulateDataValidity();
+    static QString getClassname();
 private:
     hkbBehaviorGraphStringData& operator=(const hkbBehaviorGraphStringData&);
     hkbBehaviorGraphStringData(const hkbBehaviorGraphStringData &);
 private:
     static uint refCount;
+    static QString classname;
     QStringList eventNames;
     QStringList attributeNames;
     QStringList variableNames;

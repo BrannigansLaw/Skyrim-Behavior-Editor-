@@ -13,11 +13,14 @@ public:
     bool link();
     void unlink();
     QString getName() const;
+    bool evaulateDataValidity();
+    static QString getClassname();
 private:
     hkbBehaviorGraph& operator=(const hkbBehaviorGraph&);
     hkbBehaviorGraph(const hkbBehaviorGraph &);
 private:
     static uint refCount;
+    static QString classname;
     static QStringList VariableMode;    //{VARIABLE_MODE_DISCARD_WHEN_INACTIVE=0, VARIABLE_MODE_MAINTAIN_VALUES_WHEN_INACTIVE=1};
     qint64 userData;
     QString name;

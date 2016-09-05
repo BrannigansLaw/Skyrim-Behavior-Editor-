@@ -7,7 +7,11 @@
 
 uint hkbPoseMatchingGenerator::refCount = 0;
 
-QStringList hkbPoseMatchingGenerator::Flags = {"0", "FLAG_SYNC", "FLAG_SMOOTH_GENERATOR_WEIGHTS", "FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS", "FLAG_PARAMETRIC_BLEND", "FLAG_IS_PARAMETRIC_BLEND_CYCLIC", "FLAG_FORCE_DENSE_POSE"};
+QString hkbPoseMatchingGenerator::classname = "hkbPoseMatchingGenerator";
+
+QStringList hkbPoseMatchingGenerator::Mode = {"MODE_MATCH", "MODE_PLAY"};
+//QStringList hkbPoseMatchingGenerator::Flags = {"0", "FLAG_SYNC", "FLAG_SMOOTH_GENERATOR_WEIGHTS", "FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS", "FLAG_PARAMETRIC_BLEND", "FLAG_IS_PARAMETRIC_BLEND_CYCLIC", "FLAG_FORCE_DENSE_POSE"};
+QStringList hkbPoseMatchingGenerator::Flags = {"0", "1", "2", "8", "16", "32", "64"};
 
 hkbPoseMatchingGenerator::hkbPoseMatchingGenerator(BehaviorFile *parent/*, qint16 ref*/)
     : hkbGenerator(parent/*, ref*/),
@@ -33,6 +37,10 @@ hkbPoseMatchingGenerator::hkbPoseMatchingGenerator(BehaviorFile *parent/*, qint1
     setType(HKB_POSE_MATCHING_GENERATOR, TYPE_GENERATOR);
     refCount++;
     name = "Pose Matching Generator "+QString::number(refCount);
+}
+
+QString hkbPoseMatchingGenerator::getClassname(){
+    return classname;
 }
 
 QString hkbPoseMatchingGenerator::getName() const{
@@ -199,6 +207,33 @@ void hkbPoseMatchingGenerator::unlink(){
         }
         children[i] = HkxObjectExpSharedPtr();
     }
+}
+
+bool hkbPoseMatchingGenerator::evaulateDataValidity(){
+    bool valid = true;
+    for (int i = 0; i < children.size(); i++){
+        if (!children.at(i).data() || children.at(i).data()->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
+            valid = false;
+        }
+    }
+    QStringList list = flags.split('|');
+    for (int i = 0; i < list.size(); i++){
+        if (!Flags.contains(list.at(i))){
+            valid = false;
+        }
+    }
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (!Flags.contains(flags)){
+    }else if (!Mode.contains(mode)){
+    }else if (name == ""){
+    }else if (children.isEmpty()){
+    }else if (valid){
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 hkbPoseMatchingGenerator::~hkbPoseMatchingGenerator(){

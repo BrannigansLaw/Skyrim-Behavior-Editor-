@@ -7,6 +7,8 @@
 
 uint BSOffsetAnimationGenerator::refCount = 0;
 
+QString BSOffsetAnimationGenerator::classname = "BSOffsetAnimationGenerator";
+
 BSOffsetAnimationGenerator::BSOffsetAnimationGenerator(BehaviorFile *parent/*, qint16 ref*/)
     : hkbGenerator(parent/*, ref*/),
       userData(0),
@@ -17,6 +19,10 @@ BSOffsetAnimationGenerator::BSOffsetAnimationGenerator(BehaviorFile *parent/*, q
     refCount++;
     setType(BS_OFFSET_ANIMATION_GENERATOR, TYPE_GENERATOR);
     name = "BS Offset Animation Generator "+QString::number(refCount);
+}
+
+QString BSOffsetAnimationGenerator::getClassname(){
+    return classname;
 }
 
 QString BSOffsetAnimationGenerator::getName() const{
@@ -111,6 +117,20 @@ void BSOffsetAnimationGenerator::unlink(){
     HkDynamicObject::unlink();
     pDefaultGenerator = HkxObjectExpSharedPtr();
     pOffsetClipGenerator = HkxObjectExpSharedPtr();
+}
+
+bool BSOffsetAnimationGenerator::evaulateDataValidity(){
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (!pDefaultGenerator.data() || pDefaultGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){
+    }else if (!pOffsetClipGenerator.data() || pOffsetClipGenerator.data()->getSignature() != HKB_CLIP_GENERATOR){
+    }else if (name == ""){
+    }else{
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 BSOffsetAnimationGenerator::~BSOffsetAnimationGenerator(){

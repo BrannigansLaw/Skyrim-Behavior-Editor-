@@ -7,6 +7,8 @@
 
 uint hkbModifierGenerator::refCount = 0;
 
+QString hkbModifierGenerator::classname = "hkbModifierGenerator";
+
 hkbModifierGenerator::hkbModifierGenerator(BehaviorFile *parent/*, qint16 ref*/)
     : hkbGenerator(parent/*, ref*/),
       userData(0)
@@ -14,6 +16,10 @@ hkbModifierGenerator::hkbModifierGenerator(BehaviorFile *parent/*, qint16 ref*/)
     setType(HKB_MODIFIER_GENERATOR, TYPE_GENERATOR);
     refCount++;
     name = "Modifier Generator "+QString::number(refCount);
+}
+
+QString hkbModifierGenerator::getClassname(){
+    return classname;
 }
 
 QString hkbModifierGenerator::getName() const{
@@ -92,6 +98,20 @@ void hkbModifierGenerator::unlink(){
     HkDynamicObject::unlink();
     modifier = HkxObjectExpSharedPtr();
     generator = HkxObjectExpSharedPtr();
+}
+
+bool hkbModifierGenerator::evaulateDataValidity(){
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (modifier.data() && modifier.data()->getType() != HkxObject::TYPE_MODIFIER){
+    }else if (!generator.data() || generator.data()->getType() != HkxObject::TYPE_GENERATOR){
+    }else if (name == ""){
+    }else{
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 hkbModifierGenerator::~hkbModifierGenerator(){

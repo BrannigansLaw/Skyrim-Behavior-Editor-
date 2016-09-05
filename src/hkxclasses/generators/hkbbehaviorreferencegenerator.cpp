@@ -7,6 +7,8 @@
 
 uint hkbBehaviorReferenceGenerator::refCount = 0;
 
+QString hkbBehaviorReferenceGenerator::classname = "hkbBehaviorReferenceGenerator";
+
 hkbBehaviorReferenceGenerator::hkbBehaviorReferenceGenerator(BehaviorFile *parent/*, qint16 ref*/)
     : hkbGenerator(parent/*, ref*/),
       userData(0)
@@ -14,6 +16,10 @@ hkbBehaviorReferenceGenerator::hkbBehaviorReferenceGenerator(BehaviorFile *paren
     setType(HKB_BEHAVIOR_REFERENCE_GENERATOR, TYPE_GENERATOR);
     refCount++;
     name = "Behavior Reference Generator "+QString::number(refCount);
+}
+
+QString hkbBehaviorReferenceGenerator::getClassname(){
+    return classname;
 }
 
 bool hkbBehaviorReferenceGenerator::readData(const HkxXmlReader &reader, long index){
@@ -53,6 +59,17 @@ bool hkbBehaviorReferenceGenerator::link(){
 
 QString hkbBehaviorReferenceGenerator::getName() const{
     return name;
+}
+
+bool hkbBehaviorReferenceGenerator::evaulateDataValidity(){
+    if (name == ""){
+    }else if (behaviorName == ""){
+    }else{
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 hkbBehaviorReferenceGenerator::~hkbBehaviorReferenceGenerator(){

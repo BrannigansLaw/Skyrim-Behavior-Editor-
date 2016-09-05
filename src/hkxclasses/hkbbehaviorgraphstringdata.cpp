@@ -8,11 +8,17 @@
 
 uint hkbBehaviorGraphStringData::refCount = 0;
 
+QString hkbBehaviorGraphStringData::classname = "hkbBehaviorGraphStringData";
+
 hkbBehaviorGraphStringData::hkbBehaviorGraphStringData(BehaviorFile *parent/*, qint16 ref*/)
     : HkxObject(parent/*, ref*/)
 {
     setType(HKB_BEHAVIOR_GRAPH_STRING_DATA, TYPE_OTHER);
     refCount++;
+}
+
+QString hkbBehaviorGraphStringData::getClassname(){
+    return classname;
 }
 
 bool hkbBehaviorGraphStringData::readData(const HkxXmlReader &reader, long index){
@@ -96,4 +102,35 @@ bool hkbBehaviorGraphStringData::link(){
     return true;
 }
 
-hkbBehaviorGraphStringData::~hkbBehaviorGraphStringData(){refCount--;}
+bool hkbBehaviorGraphStringData::evaulateDataValidity(){
+    for (int i = 0; i < eventNames.size(); i++){
+        if (eventNames.at(i) == ""){
+            setDataValidity(false);
+            return false;
+        }
+    }
+    for (int i = 0; i < attributeNames.size(); i++){
+        if (attributeNames.at(i) == ""){
+            setDataValidity(false);
+            return false;
+        }
+    }
+    for (int i = 0; i < variableNames.size(); i++){
+        if (variableNames.at(i) == ""){
+            setDataValidity(false);
+            return false;
+        }
+    }
+    for (int i = 0; i < characterPropertyNames.size(); i++){
+        if (characterPropertyNames.at(i) == ""){
+            setDataValidity(false);
+            return false;
+        }
+    }
+    setDataValidity(true);
+    return true;
+}
+
+hkbBehaviorGraphStringData::~hkbBehaviorGraphStringData(){
+    refCount--;
+}

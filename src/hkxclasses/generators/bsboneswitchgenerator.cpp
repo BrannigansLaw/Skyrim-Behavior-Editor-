@@ -8,6 +8,8 @@
 
 uint BSBoneSwitchGenerator::refCount = 0;
 
+QString BSBoneSwitchGenerator::classname = "BSBoneSwitchGenerator";
+
 BSBoneSwitchGenerator::BSBoneSwitchGenerator(BehaviorFile *parent/*, qint16 ref*/)
     : hkbGenerator(parent/*, ref*/),\
     userData(0)
@@ -15,6 +17,10 @@ BSBoneSwitchGenerator::BSBoneSwitchGenerator(BehaviorFile *parent/*, qint16 ref*
     refCount++;
     setType(BS_BONE_SWITCH_GENERATOR, TYPE_GENERATOR);
     name = "BS Bone Switch Generator "+QString::number(refCount);
+}
+
+QString BSBoneSwitchGenerator::getClassname(){
+    return classname;
 }
 
 QString BSBoneSwitchGenerator::getName() const{
@@ -101,6 +107,26 @@ void BSBoneSwitchGenerator::unlink(){
         }
         ChildrenA[i] = HkxObjectExpSharedPtr();
     }
+}
+
+bool BSBoneSwitchGenerator::evaulateDataValidity(){
+    bool valid = true;
+    for (int i = 0; i < ChildrenA.size(); i++){
+        if (!ChildrenA.at(i).data() || ChildrenA.at(i).data()->getSignature() != BS_BONE_SWITCH_GENERATOR_BONE_DATA){
+            valid = false;
+        }
+    }
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (name == ""){
+    }else if (!pDefaultGenerator.data() || pDefaultGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){
+    }else if (ChildrenA.isEmpty()){
+    }else if (valid){
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 BSBoneSwitchGenerator::~BSBoneSwitchGenerator(){

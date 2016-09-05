@@ -7,6 +7,8 @@
 
 uint hkbStateMachine::refCount = 0;
 
+QString hkbStateMachine::classname = "hkbStateMachine";
+
 QStringList hkbStateMachine::StartStateMode = {"START_STATE_MODE_DEFAULT", "START_STATE_MODE_SYNC", "START_STATE_MODE_RANDOM", "START_STATE_MODE_CHOOSER"};
 QStringList hkbStateMachine::SelfTransitionMode = {"SELF_TRANSITION_MODE_NO_TRANSITION", "SELF_TRANSITION_MODE_TRANSITION_TO_START_STATE", "SELF_TRANSITION_MODE_FORCE_TRANSITION_TO_START_STATE"};
 
@@ -28,6 +30,10 @@ hkbStateMachine::hkbStateMachine(BehaviorFile *parent/*, qint16 ref*/)
     setType(HKB_STATE_MACHINE, TYPE_GENERATOR);
     refCount++;
     name = "State Machine "+QString::number(refCount);
+}
+
+QString hkbStateMachine::getClassname(){
+    return classname;
 }
 
 QString hkbStateMachine::getName() const{
@@ -183,6 +189,30 @@ void hkbStateMachine::unlink(){
         states[i] = HkxObjectExpSharedPtr();
     }
     wildcardTransitions = HkxObjectExpSharedPtr();
+}
+
+bool hkbStateMachine::evaulateDataValidity(){
+    bool valid = true;
+    for (int i = 0; i < states.size(); i++){
+        if (!states.at(i).data() || states.at(i).data()->getSignature() != HKB_STATE_MACHINE_STATE_INFO){
+            valid = false;
+        }
+    }
+    if (!HkDynamicObject::evaulateDataValidity()){
+        return false;
+    }else if (payload.data() && payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+    }else if (maxSimultaneousTransitions > 32){
+    }else if (!StartStateMode.contains(startStateMode)){
+    }else if (!SelfTransitionMode.contains(selfTransitionMode)){
+    }else if (name == ""){
+    }else if (wildcardTransitions.data() && wildcardTransitions.data()->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
+    }else if (states.isEmpty()){
+    }else if (valid){
+        setDataValidity(true);
+        return true;
+    }
+    setDataValidity(false);
+    return false;
 }
 
 hkbStateMachine::~hkbStateMachine(){

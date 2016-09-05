@@ -13,11 +13,14 @@ public:
     virtual ~hkbBoneWeightArray();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    //bool evaulateDataValidity();
+    static QString getClassname();
 private:
     hkbBoneWeightArray& operator=(const hkbBoneWeightArray&);
     hkbBoneWeightArray(const hkbBoneWeightArray &);
 private:
     static uint refCount;
+    static QString classname;
     QVector <qreal> boneWeights;
 };
 

@@ -7,11 +7,17 @@
 
 uint hkbStateMachineTransitionInfoArray::refCount = 0;
 
+QString hkbStateMachineTransitionInfoArray::classname = "hkbStateMachineTransitionInfoArray";
+
 hkbStateMachineTransitionInfoArray::hkbStateMachineTransitionInfoArray(BehaviorFile *parent)
     : HkxObject(parent)
 {
     refCount++;
     setType(HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY, TYPE_OTHER);
+}
+
+QString hkbStateMachineTransitionInfoArray::getClassname(){
+    return classname;
 }
 
 bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, long index){
@@ -101,4 +107,25 @@ bool hkbStateMachineTransitionInfoArray::link(){
         }
     }*/
     return true;
+}
+
+bool hkbStateMachineTransitionInfoArray::evaulateDataValidity(){
+    /*for (int i = 0; i < transitions.size(); i++){
+        if (transitions.at(i).condition.data() && transitions.at(i).condition.data()->getSignature() != HKB_EXPRESSION_CONDITION){
+            setDataValidity(false);
+            return false;
+        }else if (transitions.at(i).transition.data() && (transitions.at(i).transition.data()->getSignature() != HKB_BLENDING_TRANSITION_EFFECT || transitions.at(i).transition.data()->getSignature() != HKB_GENERATOR_TRANSITION_EFFECT)){
+            setDataValidity(false);
+            return false;
+        }else if (transitions.at(i).flags == ""){
+            setDataValidity(false);
+            return false;
+        }
+    }*/
+    setDataValidity(true);
+    return true;
+}
+
+hkbStateMachineTransitionInfoArray::~hkbStateMachineTransitionInfoArray(){
+    refCount--;
 }

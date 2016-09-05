@@ -13,11 +13,14 @@ public:
     bool link();
     void unlink();
     QString getName() const;
+    bool evaulateDataValidity();
+    static QString getClassname();
 private:
     BSOffsetAnimationGenerator& operator=(const BSOffsetAnimationGenerator&);
     BSOffsetAnimationGenerator(const BSOffsetAnimationGenerator &);
 private:
     static uint refCount;
+    static QString classname;
     ulong userData;
     QString name;
     HkxObjectExpSharedPtr pDefaultGenerator;
