@@ -12,6 +12,7 @@ class hkbBehaviorGraphStringData: public HkxObject
     friend class hkbBehaviorGraphData;
     friend class BehaviorGraphView;
     friend class BehaviorVariablesUI;
+    friend class EventsUI;
 public:
     hkbBehaviorGraphStringData(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbBehaviorGraphStringData();

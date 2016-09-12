@@ -9,6 +9,7 @@ class hkbBehaviorGraphData: public HkxObject
 {
     friend class BehaviorGraphView;
     friend class BehaviorVariablesUI;
+    friend class EventsUI;
 public:
     enum hkVariableType {
         VARIABLE_TYPE_BOOL,
@@ -24,7 +25,8 @@ public:
     virtual ~hkbBehaviorGraphData();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
-    QStringList & getVariableNames() const;
+    QStringList getVariableNames() const;
+    QStringList getEventNames() const;
     bool evaulateDataValidity();
     static QString getClassname();
     hkQuadVariable getQuadVariable(int index, bool *ok);
@@ -32,11 +34,17 @@ private:
     hkbBehaviorGraphData& operator=(const hkbBehaviorGraphData&);
     hkbBehaviorGraphData(const hkbBehaviorGraphData &);
 private:
-    void addVariable(hkVariableType type, const QString &name);
+    void addVariable(hkVariableType type, const QString & name);
+    void addVariable(hkVariableType type);
     void removeVariable(int index);
     void setVariableNameAt(int index, const QString & name);
     void setWordVariableValueAt(int index, int value);
     void setQuadVariableValueAt(int index, hkQuadVariable value);
+    void addEvent(const QString &name);
+    void addEvent();
+    void removeEvent(int index);
+    void setEventNameAt(int index, const QString & name);
+    void setEventFlagAt(int index, bool state);
 private:
     static QStringList Type;    //See hkVariableType...
     struct hkVariableInfo

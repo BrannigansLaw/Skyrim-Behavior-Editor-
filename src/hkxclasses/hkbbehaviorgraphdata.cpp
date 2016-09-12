@@ -75,11 +75,71 @@ void hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name
     variableInfos.append(varInfo);
 }
 
+void hkbBehaviorGraphData::addVariable(hkVariableType type){
+    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    hkVariableInfo varInfo;
+    switch (type){
+    case VARIABLE_TYPE_BOOL:
+        varInfo.type = "VARIABLE_TYPE_BOOL";
+        break;
+    case VARIABLE_TYPE_INT8:
+        varInfo.type = "VARIABLE_TYPE_INT8";
+        break;
+    case VARIABLE_TYPE_INT16:
+        varInfo.type = "VARIABLE_TYPE_INT16";
+        break;
+    case VARIABLE_TYPE_INT32:
+        varInfo.type = "VARIABLE_TYPE_INT32";
+        break;
+    case VARIABLE_TYPE_REAL:
+        varInfo.type = "VARIABLE_TYPE_REAL";
+        break;
+    case VARIABLE_TYPE_POINTER:
+        varInfo.type = "VARIABLE_TYPE_POINTER";
+        varData->variantVariableValues.append(HkxObjectExpSharedPtr());
+        break;
+    case VARIABLE_TYPE_VECTOR4:
+        varInfo.type = "VARIABLE_TYPE_VECTOR4";
+        varData->quadVariableValues.append(hkQuadVariable());
+        break;
+    case VARIABLE_TYPE_QUATERNION:
+        varInfo.type = "VARIABLE_TYPE_QUATERNION";
+        varData->quadVariableValues.append(hkQuadVariable());
+        break;
+    default:
+        return;
+    }
+    QString name = "NEW-"+varInfo.type;
+    int num = 0;
+    int index;
+    for (int i = 0; i < strData->variableNames.size(); i++){
+        if (strData->variableNames.at(i) == name){
+            index = name.indexOf('_');
+            if (index > -1){
+                name.remove(name.indexOf('_'), name.size());
+            }
+            name.append("_"+QString::number(num));
+            num++;
+            if (num > 1){
+                if (num > 10){
+                    name = name+"_FUCKING RENAME YOUR VARIABLES PROPERLY!";
+                    break;
+                }
+                i = 0;
+            }
+        }
+    }
+    strData->variableNames.append(name);
+    varData->wordVariableValues.append(0);
+    variableInfos.append(varInfo);
+}
+
 void hkbBehaviorGraphData::removeVariable(int index){
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
     int count = -1;
-    if (index < strData->variableNames.size() && index < varData->wordVariableValues.size() && index < variableInfos.size()){
+    if (index < strData->variableNames.size() && index < varData->wordVariableValues.size() && index < variableInfos.size() && index > -1){
         if (variableInfos.at(index).type == "VARIABLE_TYPE_POINTER"){
             for (int i = 0; i <= index; i++){
                 if (variableInfos.at(i).type == "VARIABLE_TYPE_POINTER"){
@@ -91,7 +151,7 @@ void hkbBehaviorGraphData::removeVariable(int index){
             }
         }else if (variableInfos.at(index).type == "VARIABLE_TYPE_VECTOR4" || variableInfos.at(index).type == "VARIABLE_TYPE_QUATERNION"){
             for (int i = 0; i <= index; i++){
-                if (variableInfos.at(i).type == "VARIABLE_TYPE_POINTER" || variableInfos.at(i).type == "VARIABLE_TYPE_QUATERNION"){
+                if (variableInfos.at(i).type == "VARIABLE_TYPE_VECTOR4" || variableInfos.at(i).type == "VARIABLE_TYPE_QUATERNION"){
                     count++;
                 }
             }
@@ -102,6 +162,63 @@ void hkbBehaviorGraphData::removeVariable(int index){
         strData->variableNames.removeAt(index);
         varData->wordVariableValues.removeAt(index);
         variableInfos.removeAt(index);
+    }
+}
+
+void hkbBehaviorGraphData::addEvent(const QString &name){
+    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    strData->variableNames.append(name);
+    eventInfos.append("0");
+}
+
+void hkbBehaviorGraphData::addEvent(){
+    QString name = "NEW-hkEvent";
+    int num = 0;
+    int index;
+    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    for (int i = 0; i < strData->eventNames.size(); i++){
+        if (strData->eventNames.at(i) == name){
+            index = name.indexOf('_');
+            if (index > -1){
+                name.remove(name.indexOf('_'), name.size());
+            }
+            name.append("_"+QString::number(num));
+            num++;
+            if (num > 1){
+                if (num > 10){
+                    name = name+"_FUCKING RENAME YOUR EVENTS PROPERLY!";
+                    break;
+                }
+                i = 0;
+            }
+        }
+    }
+    strData->eventNames.append(name);
+    eventInfos.append("0");
+}
+
+void hkbBehaviorGraphData::removeEvent(int index){
+    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    if (index < strData->eventNames.size() && index < eventInfos.size() && index > -1){
+        strData->eventNames.removeAt(index);
+        eventInfos.removeAt(index);
+    }
+}
+
+void hkbBehaviorGraphData::setEventNameAt(int index, const QString & name){
+    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    if (strData->eventNames.size() > index && index > -1){
+        strData->eventNames.replace(index, name);
+    }
+}
+
+void hkbBehaviorGraphData::setEventFlagAt(int index, bool state){
+    if (eventInfos.size() > index && index > -1){
+        if (state){
+            eventInfos.replace(index, "FLAG_SYNC_POINT");
+        }else{
+            eventInfos.replace(index, "0");
+        }
     }
 }
 
@@ -343,7 +460,11 @@ bool hkbBehaviorGraphData::link(){
     return true;
 }
 
-QStringList & hkbBehaviorGraphData::getVariableNames() const{
+QStringList hkbBehaviorGraphData::getVariableNames() const{
+    return static_cast<hkbBehaviorGraphStringData *>(stringData.data())->variableNames;
+}
+
+QStringList hkbBehaviorGraphData::getEventNames() const{
     return static_cast<hkbBehaviorGraphStringData *>(stringData.data())->variableNames;
 }
 

@@ -5,6 +5,7 @@
 
 class hkbStringEventPayload: public HkxObject
 {
+    friend class StateMachineUI;
 public:
     hkbStringEventPayload(BehaviorFile *parent = NULL/*, long ref = 0*/);
     virtual ~hkbStringEventPayload();

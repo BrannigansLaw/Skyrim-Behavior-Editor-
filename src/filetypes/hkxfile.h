@@ -57,7 +57,8 @@ public:
     int getIndexOfModifier(const HkxObjectExpSharedPtr & obj);
     bool setModifierData(HkxObjectExpSharedPtr & ptrToSet, int index);
     HkxObject* getModifierDataAt(int index);
-    QStringList & getVariableNames() const;
+    QStringList getVariableNames() const;
+    QStringList getEventNames() const;
     QStringList getGeneratorNames();
     QStringList getModifierNames();
     HkxObject * getBehaviorGraphData() const;

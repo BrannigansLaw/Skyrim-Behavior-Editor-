@@ -1,4 +1,6 @@
 #include "hkbstatemachine.h"
+#include "hkbstatemachinestateinfo.h"
+#include "src/hkxclasses/hkbstatemachinetransitioninfoarray.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/hkxfile.h"
 /*
@@ -38,6 +40,17 @@ QString hkbStateMachine::getClassname(){
 
 QString hkbStateMachine::getName() const{
     return name;
+}
+
+QString hkbStateMachine::getStateName(int stateId){
+    hkbStateMachineStateInfo *state;
+    for (int i = 0; i < states.size(); i++){
+        state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+        if (state->stateId == stateId){
+            return name;
+        }
+    }
+    return "";
 }
 
 bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){
@@ -174,8 +187,17 @@ bool hkbStateMachine::link(){
             states[i] = *ptr;
         }else{
             states[i] = *ptr;
+            static_cast<hkbStateMachineStateInfo *>(states[i].data())->parentSM = this;
         }
     }
+    ptr = getParentFile()->findHkxObject(wildcardTransitions.getReference());
+        if (ptr){
+            if ((*ptr)->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
+                writeToLog("hkbStateMachine: linkVar()!\nThe linked object 'wildcardTransitions' is not a HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY!");
+            }
+            wildcardTransitions = *ptr;
+            static_cast<hkbStateMachineTransitionInfoArray *>(wildcardTransitions.data())->parent = this;
+        }
     return true;
 }
 

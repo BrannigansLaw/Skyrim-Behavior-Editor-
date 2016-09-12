@@ -6,6 +6,7 @@
 class hkbStateMachine: public hkbGenerator
 {
     friend class BehaviorGraphView;
+    friend class StateMachineUI;
 public:
     hkbStateMachine(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbStateMachine();
@@ -15,6 +16,7 @@ public:
     QString getName() const;
     bool evaulateDataValidity();
     static QString getClassname();
+    QString getStateName(int stateId);
 private:
     hkbStateMachine& operator=(const hkbStateMachine&);
     hkbStateMachine(const hkbStateMachine &);

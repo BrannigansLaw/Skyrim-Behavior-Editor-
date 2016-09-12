@@ -3,11 +3,14 @@
 
 #include "hkbgenerator.h"
 
+class hkbStateMachine;
+
 class hkbStateMachineStateInfo: public hkbGenerator
 {
     friend class BehaviorGraphView;
+    friend class hkbStateMachine;
 public:
-    hkbStateMachineStateInfo(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbStateMachineStateInfo(BehaviorFile *parent = NULL, hkbStateMachine *parentSM = NULL/*, qint16 ref = 0*/);
     virtual ~hkbStateMachineStateInfo();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
@@ -15,10 +18,12 @@ public:
     QString getName() const;
     bool evaulateDataValidity();
     static QString getClassname();
+    hkbStateMachine * getParentStateMachine() const;
 private:
     hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&);
     hkbStateMachineStateInfo(const hkbStateMachineStateInfo &);
 private:
+    HkxObjectExpSharedPtr parentSM;
     static uint refCount;
     static QString classname;
     HkxObjectExpSharedPtr enterNotifyEvents;

@@ -1,4 +1,5 @@
 #include "hkbstatemachinestateinfo.h"
+#include "src/hkxclasses/hkbstatemachinetransitioninfoarray.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/hkxfile.h"
 /*
@@ -9,12 +10,13 @@ uint hkbStateMachineStateInfo::refCount = 0;
 
 QString hkbStateMachineStateInfo::classname = "hkbStateMachineStateInfo";
 
-hkbStateMachineStateInfo::hkbStateMachineStateInfo(BehaviorFile *parent/*, qint16 ref*/)
+hkbStateMachineStateInfo::hkbStateMachineStateInfo(BehaviorFile *parent/*, qint16 ref*/, hkbStateMachine *parentSM)
     : hkbGenerator(parent/*, ref*/),
       name("State"),
       stateId(0),
       probability(1),
-      enable(true)
+      enable(true),
+      parentSM(reinterpret_cast<HkxObject *>(parentSM))
 {
     setType(HKB_STATE_MACHINE_STATE_INFO, TYPE_GENERATOR);
     refCount++;
@@ -26,6 +28,13 @@ QString hkbStateMachineStateInfo::getClassname(){
 
 QString hkbStateMachineStateInfo::getName() const{
     return name;
+}
+
+hkbStateMachine * hkbStateMachineStateInfo::getParentStateMachine() const{
+    if (parentSM.data() && parentSM.data()->getSignature() == HKB_STATE_MACHINE){
+        return reinterpret_cast<hkbStateMachine *>(parentSM.data());
+    }
+    return NULL;
 }
 
 bool hkbStateMachineStateInfo::readData(const HkxXmlReader &reader, long index){
@@ -114,6 +123,7 @@ bool hkbStateMachineStateInfo::link(){
             setDataValidity(false);
         }
         transitions = *ptr;
+        static_cast<hkbStateMachineTransitionInfoArray *>(transitions.data())->parent = this;
     }
     //generator
     ptr = getParentFile()->findGenerator(generator.getReference());

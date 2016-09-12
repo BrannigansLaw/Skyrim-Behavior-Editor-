@@ -17,7 +17,7 @@ public:
     bool link();
     bool evaulateDataValidity();
     static QString getClassname();
-    hkQuadVariable getQuadVariable(int index);
+    //hkQuadVariable getQuadVariable(int index);
 private:
     hkbVariableValueSet& operator=(const hkbVariableValueSet&);
     hkbVariableValueSet(const hkbVariableValueSet &);

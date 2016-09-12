@@ -9,6 +9,11 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QMessageBox>
+#include <QTableWidget>
+#include <QSpinBox>
+#include <QLineEdit>
+#include <QHeaderView>
+#include <QSignalMapper>
 
 /*
  * ManualSelectorGeneratorUI
@@ -29,90 +34,181 @@ QStringList ManualSelectorGeneratorUI::list = {
     "hkbBehaviorReferenceGenerator"
 };
 
+QStringList ManualSelectorGeneratorUI::headerLabels1 = {
+    "Name",
+    "Type",
+    "Bound Variable",
+    "Value"
+};
+
+QStringList ManualSelectorGeneratorUI::headerLabels2 = {
+    "Name",
+    "Type",
+    "Value"
+};
+
 ManualSelectorGeneratorUI::ManualSelectorGeneratorUI()
     : behaviorView(NULL),
       lyt(new QVBoxLayout),
-      name(new StringWidget("Name")),
-      generators(new GenericTabelWidget("Generators")),
-      selectedGeneratorIndex(new IntWidget("SelectedGeneratorIndex")),
-      currentGeneratorIndex(new IntWidget("CurrentGeneratorIndex"))
+      table(new QTableWidget),
+      name(new QLineEdit),
+      generators(new QTableWidget),
+      addObjectPB(new QPushButton("Add Generator")),
+      removeObjectPB(new QPushButton("Remove Selected Generator")),
+      typeSelectorCB(new QComboBox),
+      signalMapper(new QSignalMapper),
+      buttonLyt(new QHBoxLayout),
+      selectedGeneratorIndex(new QSpinBox),
+      selectedGeneratorIndexBind(new QComboBox),
+      currentGeneratorIndex(new QSpinBox),
+      currentGeneratorIndexBind(new QComboBox)
 {
     setTitle("hkbManualSelectorGenerator");
-    generators->setTypes(list);
-    lyt->addWidget(name);
-    lyt->addWidget(selectedGeneratorIndex);
-    lyt->addWidget(currentGeneratorIndex);
-    lyt->addWidget(generators);
+    buttonLyt->addWidget(addObjectPB, 1);
+    buttonLyt->addWidget(typeSelectorCB, 2);
+    buttonLyt->addWidget(removeObjectPB, 1);
+    table->setRowCount(3);
+    table->setColumnCount(4);
+    table->setHorizontalHeaderLabels(headerLabels1);
+    //table->setItem(0, 0, new QTableWidgetItem());
+    table->setCellWidget(0, 0, name);
+    table->setItem(0, 1, new QTableWidgetItem("String"));
+    table->setItem(0, 2, new QTableWidgetItem("N/A"));
+    table->setItem(0, 3, new QTableWidgetItem("N/A"));
+    table->setItem(1, 0, new QTableWidgetItem("selectedGeneratorIndex"));
+    table->setItem(1, 1, new QTableWidgetItem("Int"));
+    table->setCellWidget(1, 2, selectedGeneratorIndexBind);
+    table->setCellWidget(1, 3, selectedGeneratorIndex);
+    table->setItem(2, 0, new QTableWidgetItem("currentGeneratorIndex"));
+    table->setItem(2, 1, new QTableWidgetItem("Int"));
+    table->setCellWidget(2, 2, currentGeneratorIndexBind);
+    table->setCellWidget(2, 3, currentGeneratorIndex);
+    table->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    generators->setColumnCount(3);
+    generators->setHorizontalHeaderLabels(headerLabels2);
+    generators->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    generators->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    generators->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    generators->setSelectionBehavior(QAbstractItemView::SelectRows);
+    typeSelectorCB->insertItems(0, list);
+    lyt->addWidget(table, 3);
+    lyt->addLayout(buttonLyt, 1);
+    lyt->addWidget(generators, 5);
     setLayout(lyt);
-    connect(generators, SIGNAL(itemAdded(int)), this, SLOT(addNewGenerator(int)));
-    connect(generators, SIGNAL(existingItemAdded(int)), this, SLOT(addExistingGenerator(int)));
-    connect(generators, SIGNAL(itemRemoved(int)), this, SLOT(removeGenerator(int)));
-    connect(selectedGeneratorIndex, SIGNAL(editingDone()), this, SLOT(setSelectedGeneratorIndex()));
-    connect(currentGeneratorIndex, SIGNAL(editingDone()), this, SLOT(setCurrentGeneratorIndex()));
+    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
+    connect(addObjectPB, SIGNAL(released()), this, SLOT(addNewGenerator()));
+    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(addExistingGenerator(int)));
+    connect(removeObjectPB, SIGNAL(released()), this, SLOT(removeGenerator()));
+    connect(selectedGeneratorIndex, SIGNAL(valueChanged(int)), this, SLOT(setSelectedGeneratorIndex(int)));
+    connect(selectedGeneratorIndexBind, SIGNAL(activated(int)), this, SLOT(setSelectedGeneratorIndexBoundVariable(int)));
+    connect(currentGeneratorIndex, SIGNAL(valueChanged(int)), this, SLOT(setCurrentGeneratorIndex(int)));
+    connect(currentGeneratorIndexBind, SIGNAL(activated(int)), this, SLOT(setCurrentGeneratorIndexBoundVariable(int)));
 }
 
 void ManualSelectorGeneratorUI::setName(){
     if (bsData){
-        bsData->name = name->getText();
+        bsData->name = name->text();
     }
 }
 
 void ManualSelectorGeneratorUI::loadData(HkxObject *data){
     if (data && data->getSignature() == HKB_MANUAL_SELECTOR_GENERATOR){
-        hkbGenerator *gen;
         bsData = static_cast<hkbManualSelectorGenerator *>(data);
+        hkbGenerator *gen;
+        QComboBox *comboBox;
+        int index;
+        QStringList genList = bsData->getParentFile()->getGeneratorNames();
+        QStringList varList = bsData->getParentFile()->getVariableNames();
+        genList.prepend("None");
+        varList.prepend("None");
+        selectedGeneratorIndexBind->clear();
+        currentGeneratorIndexBind->clear();
+        selectedGeneratorIndexBind->insertItems(0, varList);
+        currentGeneratorIndexBind->insertItems(0, varList);
         name->setText(bsData->name);
-        generators->clear();
-        QStringList list = bsData->getParentFile()->getGeneratorNames();
-        list.prepend("None");
-        generators->setObjectList(list);
+        generators->setRowCount(0);
         for (int i = 0; i < bsData->generators.size(); i++){
             gen = static_cast<hkbGenerator *>(bsData->generators.at(i).data());
             if (bsData->generators.at(i).data()){
-                generators->addItem(gen->getName(), gen->getClassname());
+                generators->setRowCount(generators->rowCount() + 1);
+                generators->setItem(i, 0, new QTableWidgetItem(gen->getName()));
+                generators->setItem(i, 1, new QTableWidgetItem(gen->getClassname()));
+                comboBox = new QComboBox;
+                comboBox->addItems(genList);
+                generators->setCellWidget(i, 2, comboBox);
+                index = bsData->getParentFile()->getIndexOfGenerator(bsData->generators.at(i)) + 1;
+                if (index > -1 && index < comboBox->count()){
+                    comboBox->setCurrentIndex(index);
+                }
+                connect(comboBox, SIGNAL(currentIndexChanged(int)), signalMapper, SLOT(map()));
+                signalMapper->setMapping(comboBox, i);
             }
         }
         selectedGeneratorIndex->setValue(bsData->selectedGeneratorIndex);
-        selectedGeneratorIndex->setBoundVariableList(bsData->getParentFile()->getVariableNames());
         currentGeneratorIndex->setValue(bsData->currentGeneratorIndex);
-        currentGeneratorIndex->setBoundVariableList(bsData->getParentFile()->getVariableNames());
     }
 }
 
-void ManualSelectorGeneratorUI::setSelectedGeneratorIndex(){
+void ManualSelectorGeneratorUI::setSelectedGeneratorIndex(int value){
     if (bsData){
-        bsData->selectedGeneratorIndex = selectedGeneratorIndex->getValue();
+        bsData->selectedGeneratorIndex = value;
     }
 }
 
-void ManualSelectorGeneratorUI::setCurrentGeneratorIndex(){
+void ManualSelectorGeneratorUI::setCurrentGeneratorIndex(int value){
     if (bsData){
-        bsData->currentGeneratorIndex = currentGeneratorIndex->getValue();
+        bsData->currentGeneratorIndex = value;
     }
+}
+
+void ManualSelectorGeneratorUI::setSelectedGeneratorIndexBoundVariable(int index){
+    //
+}
+
+void ManualSelectorGeneratorUI::setCurrentGeneratorIndexBoundVariable(int index){
+    //
 }
 
 void ManualSelectorGeneratorUI::addExistingGenerator(int index){
-    if (behaviorView){
-        HkxObject *ptr = bsData->getParentFile()->getGeneratorDataAt(index - 1);
+    if (behaviorView && index > -1 && index < bsData->generators.size() && index < generators->rowCount()){
+        behaviorView->removeSelectedObjectBranch(behaviorView->selectedIcon->getChildIcon(bsData->generators.at(index).data()));
+        QComboBox *comboBox = qobject_cast<QComboBox *>(generators->cellWidget(index, 2));
+        HkxObject *ptr = bsData->getParentFile()->getGeneratorDataAt(comboBox->currentIndex() - 1);
         if (!behaviorView->selectedIcon->getChildIcon(ptr)){
-            if (index < 1 || !ptr || ptr == bsData || !behaviorView->reconnectBranch(NULL, ptr, behaviorView->getSelectedItem())){
+            if (/*index < 1 || */!ptr || ptr == bsData || !behaviorView->reconnectBranch(NULL, ptr, behaviorView->getSelectedItem())){
                 QMessageBox msg;
                 msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!");
                 msg.exec();
-                loadData(bsData);
+                int i = bsData->getParentFile()->getIndexOfGenerator(bsData->generators.at(index));
+                i++;
+                disconnect(signalMapper, 0, this, 0);
+                comboBox->setCurrentIndex(i);
+                connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(addExistingGenerator(int)));
                 return;
             }
         }
-        bsData->generators.append(HkxObjectExpSharedPtr(ptr));
+        if (index > 0){
+            bsData->generators.insert(index, HkxObjectExpSharedPtr(ptr));
+            generators->item(index, 0)->setText(static_cast<hkbGenerator *>(ptr)->getName());
+            generators->item(index, 1)->setText(static_cast<hkbGenerator *>(ptr)->getClassname());
+        }
     }
 }
 
-void ManualSelectorGeneratorUI::addNewGenerator(int index){
+void ManualSelectorGeneratorUI::addNewGenerator(){
     if (!behaviorView){
         return;
     }
-    Type type = static_cast<Type>(index);
-    switch (type){
+    QComboBox *genSelector = new QComboBox;
+    QStringList genList = bsData->getParentFile()->getGeneratorNames();
+    genList.prepend("None");
+    genSelector->insertItems(0, genList);
+    connect(genSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(addExistingGenerator(int)));
+    Type typeEnum = static_cast<Type>(typeSelectorCB->currentIndex());
+    switch (typeEnum){
     case STATE_MACHINE:
         behaviorView->appendStateMachine();
         break;
@@ -150,11 +246,19 @@ void ManualSelectorGeneratorUI::addNewGenerator(int index){
         behaviorView->appendBehaviorReferenceGenerator();
         break;
     default:
+        delete genSelector;
         return;
+    }
+    if (!bsData->generators.isEmpty() && bsData->generators.last().data()){
+        generators->setRowCount(generators->rowCount() + 1);
+        generators->setItem(generators->rowCount(), 0, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->generators.last().data())->getName()));
+        generators->setItem(generators->rowCount(), 1, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->generators.last().data())->getClassname()));
+        generators->setCellWidget(generators->rowCount(), 2, genSelector);
     }
 }
 
-void ManualSelectorGeneratorUI::removeGenerator(int index){
+void ManualSelectorGeneratorUI::removeGenerator(){
+    int index = generators->currentRow();
     if (!behaviorView || bsData->generators.size() <= index || index < 0){
         return;
     }
@@ -164,6 +268,9 @@ void ManualSelectorGeneratorUI::removeGenerator(int index){
     }else{
         bsData->generators.removeAt(index);
     }
+    delete generators->cellWidget(index, 2);
+    generators->removeCellWidget(index, 2);
+    generators->removeRow(index);
     behaviorView->behavior->removeData();
     loadData(bsData);
 }

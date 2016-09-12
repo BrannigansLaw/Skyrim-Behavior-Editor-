@@ -17,193 +17,196 @@
 
 #include <QPushButton>
 #include <QMessageBox>
-#include <QStackedLayout>
+#include <QSignalMapper>
+#include <QTableWidget>
+#include <QHeaderView>
+#include <QComboBox>
+
+QStringList BehaviorVariablesUI::types = {
+    "VARIABLE_TYPE_BOOL",
+    "VARIABLE_TYPE_INT32",
+    "VARIABLE_TYPE_REAL",
+    "VARIABLE_TYPE_POINTER",
+    "VARIABLE_TYPE_VECTOR4",
+    "VARIABLE_TYPE_QUATERNION"
+};
+
+QStringList BehaviorVariablesUI::headerLabels = {
+    "Name",
+    "Type",
+    "Value"
+};
 
 BehaviorVariablesUI::BehaviorVariablesUI(const QString &title)
     : dataUI(NULL),
       verLyt(new QVBoxLayout),
-      stack(new QStackedLayout),
       loadedData(NULL),
-      noDataL(new QLabel("No Data Selected!")),
-      backPB(new QPushButton("To Parent")),
-      view(new GenericListWidget("Behavior Variables")),
-      boolWidget(new BoolWidget("")),
-      intWidget(new IntWidget("")),
-      doubleWidget(new DoubleWidget("")),
-      quadVariableWidget(new QuadVariableWidget("")),
-      quaternionWidget(new QuadVariableWidget(""))
+      table(new QTableWidget),
+      addObjectPB(new QPushButton("Add Variable")),
+      removeObjectPB(new QPushButton("Remove Selected Variable")),
+      buttonLyt(new QHBoxLayout),
+      valueMapper(new QSignalMapper),
+      nameMapper(new QSignalMapper),
+      typeSelector(new QComboBox)
 {
     setTitle(title);
-    stack->addWidget(view);
-    stack->addWidget(boolWidget);
-    stack->addWidget(intWidget);
-    stack->addWidget(doubleWidget);
-    stack->addWidget(quadVariableWidget);
-    stack->addWidget(quaternionWidget);
-    boolWidget->setBoundVariableVisbility(false);
-    intWidget->setBoundVariableVisbility(false);
-    doubleWidget->setBoundVariableVisbility(false);
-    quadVariableWidget->setBoundVariableVisbility(false);
-    quaternionWidget->setBoundVariableVisbility(false);
-    boolWidget->setNameReadOnly(false);
-    intWidget->setNameReadOnly(false);
-    doubleWidget->setNameReadOnly(false);
-    quadVariableWidget->setNameReadOnly(false);
-    quaternionWidget->setNameReadOnly(false);
-    backPB->setMaximumSize(size().width()*0.2, size().height()*0.1);
-    verLyt->addWidget(backPB, 1, Qt::AlignCenter);
-    verLyt->addLayout(stack, 20);
+    buttonLyt->addWidget(addObjectPB, 1);
+    buttonLyt->addWidget(typeSelector, 2);
+    buttonLyt->addWidget(removeObjectPB, 1);
+    table->setColumnCount(3);
+    table->setHorizontalHeaderLabels(headerLabels);
+    verLyt->addLayout(buttonLyt, 1);
+    verLyt->addWidget(table, 10);
+    typeSelector->insertItems(0, types);
+    table->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
     setLayout(verLyt);
-    connect(view, SIGNAL(itemRemoved(int)), this, SLOT(removeVariable(int)));
-    connect(view, SIGNAL(itemAdded(int)), this, SLOT(addVariable(int)));
-    connect(view, SIGNAL(itemSelected(int,int)), this, SLOT(changeCurrentDataWidget(int, int)));
-    connect(backPB, SIGNAL(pressed()), this, SLOT(loadTable()));
-    connect(boolWidget, SIGNAL(editingDone()), this, SLOT(setBoolVariableValue()));
-    connect(intWidget, SIGNAL(editingDone()), this, SLOT(setIntVariableValue()));
-    connect(doubleWidget, SIGNAL(editingDone()), this, SLOT(setDoubleVariableValue()));
-    connect(quadVariableWidget, SIGNAL(editingDone()), this, SLOT(setVector4VariableValue()));
-    connect(quaternionWidget, SIGNAL(editingDone()), this, SLOT(setQuaternionVariableValue()));
-    connect(boolWidget, SIGNAL(textEdited(QString)), this, SLOT(renameSelectedVariable(QString)));
-    connect(intWidget, SIGNAL(textEdited(QString)), this, SLOT(renameSelectedVariable(QString)));
-    connect(doubleWidget, SIGNAL(textEdited(QString)), this, SLOT(renameSelectedVariable(QString)));
-    connect(quadVariableWidget, SIGNAL(textEdited(QString)), this, SLOT(renameSelectedVariable(QString)));
-    connect(quaternionWidget, SIGNAL(textEdited(QString)), this, SLOT(renameSelectedVariable(QString)));
+    connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addVariable()));
+    connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeVariable()));
+    connect(nameMapper, SIGNAL(mapped(int)), this, SLOT(renameSelectedVariable(int)));
+    connect(valueMapper, SIGNAL(mapped(int)), this, SLOT(setVariableValue(int)));
 }
 
-void BehaviorVariablesUI::setBoolVariableValue(){
-    loadedData->setWordVariableValueAt(view->getSelectedRow(), boolWidget->getValue());
+void BehaviorVariablesUI::setVariableValue(int index){
+    QString type = table->item(index, 1)->text();
+    if (type == "VARIABLE_TYPE_BOOL"){
+        loadedData->setWordVariableValueAt(index, qobject_cast<QCheckBox *>(table->cellWidget(index, 2))->isChecked());
+    }else if (type == "VARIABLE_TYPE_INT32"){
+        loadedData->setWordVariableValueAt(index, qobject_cast<QSpinBox *>(table->cellWidget(index, 2))->value());
+    }else if (type == "VARIABLE_TYPE_REAL"){
+        loadedData->setWordVariableValueAt(index, qobject_cast<QDoubleSpinBox *>(table->cellWidget(index, 2))->value());
+    }else if (type == "VARIABLE_TYPE_POINTER"){
+        loadedData->setWordVariableValueAt(index, qobject_cast<QSpinBox *>(table->cellWidget(index, 2))->value());
+    }else if (type == "VARIABLE_TYPE_VECTOR4"){
+        loadedData->setQuadVariableValueAt(index, qobject_cast<QuadVariableWidget *>(table->cellWidget(index, 2))->getValue());
+    }else if (type == "VARIABLE_TYPE_QUATERNION"){
+        loadedData->setQuadVariableValueAt(index, qobject_cast<QuadVariableWidget *>(table->cellWidget(index, 2))->getValue());
+    }
 }
 
-void BehaviorVariablesUI::setIntVariableValue(){
-    loadedData->setWordVariableValueAt(view->getSelectedRow(), intWidget->getValue());
+void BehaviorVariablesUI::renameSelectedVariable(int index){
+    loadedData->setVariableNameAt(index, qobject_cast<QLineEdit *>(table->cellWidget(index, 0))->text());
 }
 
-void BehaviorVariablesUI::setDoubleVariableValue(){
-    loadedData->setWordVariableValueAt(view->getSelectedRow(), doubleWidget->getValue());
+template <typename T, typename W>
+void BehaviorVariablesUI::addVariableToTable(const QString & name, const QString & type, const T & value, W *widget){
+    int row = table->rowCount();
+    QLineEdit *lineEdit = new QLineEdit(name);
+    table->setRowCount(row + 1);
+    table->setCellWidget(row, 0, lineEdit);
+    table->setItem(row, 1, new QTableWidgetItem(type));
+    widget->setValue(value);
+    table->setCellWidget(row, 2, widget);
+    connect(widget, SIGNAL(editingFinished()), valueMapper, SLOT(map()));
+    connect(lineEdit, SIGNAL(editingFinished()), nameMapper, SLOT(map()));
+    valueMapper->setMapping(widget, row);
+    nameMapper->setMapping(lineEdit, row);
 }
 
-void BehaviorVariablesUI::setVector4VariableValue(){
-    loadedData->setQuadVariableValueAt(view->getSelectedRow(), quadVariableWidget->getValue());
+template <typename T>
+void BehaviorVariablesUI::addVariableToTable(const QString & name, const QString & type, const T & value, QCheckBox *widget){
+    int row = table->rowCount();
+    QLineEdit *lineEdit = new QLineEdit(name);
+    table->setRowCount(row + 1);
+    table->setCellWidget(row, 0, lineEdit);
+    table->setItem(row, 1, new QTableWidgetItem(type));
+    widget->setChecked(value);
+    table->setCellWidget(row, 2, widget);
+    connect(widget, SIGNAL(clicked(bool)), valueMapper, SLOT(map()));
+    connect(lineEdit, SIGNAL(editingFinished()), nameMapper, SLOT(map()));
+    valueMapper->setMapping(widget, row);
+    nameMapper->setMapping(lineEdit, row);
 }
 
-void BehaviorVariablesUI::setQuaternionVariableValue(){
-    loadedData->setQuadVariableValueAt(view->getSelectedRow(), quaternionWidget->getValue());
-}
-
-void BehaviorVariablesUI::renameSelectedVariable(const QString & name){
-    loadedData->setVariableNameAt(view->getSelectedRow(), name);
-    view->renameItemAt(view->getSelectedRow(), name);
-}
-
-void BehaviorVariablesUI::loadTable(){
-    stack->setCurrentIndex(TABLE_WIDGET);
+void BehaviorVariablesUI::removeVariableFromTable(int row){
+    if (row < table->rowCount()){
+        table->removeRow(row);
+        for (int i = row; i < table->rowCount(); i++){
+            valueMapper->setMapping(table->cellWidget(i, 2), i);
+            nameMapper->setMapping(table->cellWidget(i, 0), i);
+        }
+    }
 }
 
 void BehaviorVariablesUI::loadData(HkxObject *data){
     if (data && data->getSignature() == HKB_BEHAVIOR_GRAPH_DATA){
-        QString type;
+        bool ok;
         loadedData = static_cast<hkbBehaviorGraphData *>(data);
-        hkbBehaviorGraphStringData *variableNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        view->clear();
-        QStringList types = {
-            "VARIABLE_TYPE_BOOL",
-            "VARIABLE_TYPE_INT32",
-            "VARIABLE_TYPE_REAL",
-            "VARIABLE_TYPE_POINTER",
-            "VARIABLE_TYPE_VECTOR4",
-            "VARIABLE_TYPE_QUATERNION"
-        };
-        view->setTypes(types);
-        for (int i = 0; i < variableNames->variableNames.size(); i++){
-            if (i < loadedData->variableInfos.size()){
-                type = loadedData->variableInfos.at(i).type;
-                view->addItem(variableNames->variableNames.at(i), type);
+        hkbBehaviorGraphStringData *vars = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
+        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->variableInitialValues.data());
+        table->setRowCount(0);
+        QString type;
+        QSpinBox *spinBox;
+        QDoubleSpinBox *doubleBox;
+        for (int i = 0; i < vars->variableNames.size(); i++){
+            type = loadedData->variableInfos.at(i).type;
+            if (type == "VARIABLE_TYPE_BOOL"){
+                addVariableToTable(vars->variableNames.at(i), "VARIABLE_TYPE_BOOL", varValues->wordVariableValues.at(i), new QCheckBox);
+            }else if (type == "VARIABLE_TYPE_INT32"){
+                spinBox = new QSpinBox;
+                addVariableToTable(vars->variableNames.at(i), "VARIABLE_TYPE_INT32", varValues->wordVariableValues.at(i), spinBox);
+            }else if (type == "VARIABLE_TYPE_REAL"){
+                doubleBox = new QDoubleSpinBox;
+                doubleBox->setMaximum(std::numeric_limits<double>::max());
+                doubleBox->setMinimum(std::numeric_limits<double>::min());
+                addVariableToTable(vars->variableNames.at(i), "VARIABLE_TYPE_REAL", varValues->wordVariableValues.at(i), doubleBox);
+            }else if (type == "VARIABLE_TYPE_POINTER"){
+                addVariableToTable(vars->variableNames.at(i), "VARIABLE_TYPE_POINTER", varValues->wordVariableValues.at(i), new QSpinBox);
+            }else if (type == "VARIABLE_TYPE_VECTOR4"){
+                addVariableToTable(vars->variableNames.at(i), "VARIABLE_TYPE_VECTOR4", loadedData->getQuadVariable(i, &ok), new QuadVariableWidget);
+            }else if (type == "VARIABLE_TYPE_QUATERNION"){
+                addVariableToTable(vars->variableNames.at(i), "VARIABLE_TYPE_QUATERNION", loadedData->getQuadVariable(i, &ok), new QuadVariableWidget);
             }
         }
     }
 }
 
-void BehaviorVariablesUI::addVariable(int type){
+void BehaviorVariablesUI::addVariable(){
+    int type = typeSelector->currentIndex();
     hkbBehaviorGraphData::hkVariableType varType;
+    hkbBehaviorGraphStringData *vars = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
     switch (type){
     case VARIABLE_TYPE_BOOL:
         varType = hkbBehaviorGraphData::hkVariableType::VARIABLE_TYPE_BOOL;
+        loadedData->addVariable(varType);
+        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_BOOL", false, new QCheckBox);
         break;
     case VARIABLE_TYPE_INT32:
         varType = hkbBehaviorGraphData::hkVariableType::VARIABLE_TYPE_INT32;
+        loadedData->addVariable(varType);
+        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_INT32", 0, new QSpinBox);
         break;
     case VARIABLE_TYPE_REAL:
         varType = hkbBehaviorGraphData::hkVariableType::VARIABLE_TYPE_REAL;
+        loadedData->addVariable(varType);
+        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_REAL", 0, new QDoubleSpinBox);
         break;
     case VARIABLE_TYPE_POINTER:
         varType = hkbBehaviorGraphData::hkVariableType::VARIABLE_TYPE_POINTER;
+        loadedData->addVariable(varType);
+        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_POINTER", 0, new QSpinBox);
         break;
     case VARIABLE_TYPE_VECTOR4:
         varType = hkbBehaviorGraphData::hkVariableType::VARIABLE_TYPE_VECTOR4;
+        loadedData->addVariable(varType);
+        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_VECTOR4", hkQuadVariable(), new QuadVariableWidget);
         break;
     case VARIABLE_TYPE_QUATERNION:
         varType = hkbBehaviorGraphData::hkVariableType::VARIABLE_TYPE_QUATERNION;
+        loadedData->addVariable(varType);
+        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_QUATERNION", hkQuadVariable(), new QuadVariableWidget);
         break;
     default:
         return;
     }
-    loadedData->addVariable(varType, view->getLastItemName());
 }
 
-void BehaviorVariablesUI::removeVariable(int index){
+void BehaviorVariablesUI::removeVariable(){
+    int index = table->currentRow();
     loadedData->removeVariable(index);
-}
-
-void BehaviorVariablesUI::changeCurrentDataWidget(int index, int column){
-    bool ok;
-    hkbVariableValueSet *variableValues = static_cast<hkbVariableValueSet *>(loadedData->variableInitialValues.data());
-    hkbBehaviorGraphStringData *variableNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-    if (column == 2 && loadedData && loadedData->variableInfos.size() > index){
-        QString type = loadedData->variableInfos.at(index).type;
-        if (type == "VARIABLE_TYPE_BOOL"){
-            if (variableValues && variableValues->wordVariableValues.size() > index && variableNames->variableNames.size() > index){
-                boolWidget->setValue(variableValues->wordVariableValues.at(index));
-                boolWidget->setName(variableNames->variableNames.at(index));
-                stack->setCurrentIndex(BOOL_WIDGET);
-            }
-        }else if (type == "VARIABLE_TYPE_INT8"){
-            if (variableValues && variableValues->wordVariableValues.size() > index && variableNames->variableNames.size() > index){
-                intWidget->setValue(variableValues->wordVariableValues.at(index));
-                intWidget->setName(variableNames->variableNames.at(index));
-                stack->setCurrentIndex(INT_WIDGET);
-            }
-        }else if (type == "VARIABLE_TYPE_INT16"){
-            if (variableValues && variableValues->wordVariableValues.size() > index && variableNames->variableNames.size() > index){
-                intWidget->setValue(variableValues->wordVariableValues.at(index));
-                intWidget->setName(variableNames->variableNames.at(index));
-                stack->setCurrentIndex(INT_WIDGET);
-            }
-        }else if (type == "VARIABLE_TYPE_INT32"){
-            if (variableValues && variableValues->wordVariableValues.size() > index && variableNames->variableNames.size() > index){
-                intWidget->setValue(variableValues->wordVariableValues.at(index));
-                intWidget->setName(variableNames->variableNames.at(index));
-                stack->setCurrentIndex(INT_WIDGET);
-            }
-        }else if (type == "VARIABLE_TYPE_REAL"){
-            if (variableValues && variableValues->wordVariableValues.size() > index && variableNames->variableNames.size() > index){
-                doubleWidget->setValue(variableValues->wordVariableValues.at(index));
-                doubleWidget->setName(variableNames->variableNames.at(index));
-                stack->setCurrentIndex(DOUBLE_WIDGET);
-            }
-        }else if (type == "VARIABLE_TYPE_VECTOR4"){
-            if (variableValues && variableValues->wordVariableValues.size() > index && variableNames->variableNames.size() > index){
-                quadVariableWidget->setValue(loadedData->getQuadVariable(index, &ok));
-                quadVariableWidget->setName(variableNames->variableNames.at(index));
-                stack->setCurrentIndex(VECTOR_4_WIDGET);
-            }
-        }else if (type == "VARIABLE_TYPE_QUATERNION"){
-            if (variableValues && variableValues->wordVariableValues.size() > index && variableNames->variableNames.size() > index){
-                quaternionWidget->setValue(loadedData->getQuadVariable(index, &ok));
-                quaternionWidget->setName(variableNames->variableNames.at(index));
-                stack->setCurrentIndex(QUATERNION_WIDGET);
-            }
-        }
-    }
+    removeVariableFromTable(index);
 }
 
 void BehaviorVariablesUI::setHkDataUI(HkDataUI *ui){

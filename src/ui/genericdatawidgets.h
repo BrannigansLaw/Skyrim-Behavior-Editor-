@@ -1,7 +1,7 @@
 #ifndef DATAWIDGETS_H
 #define DATAWIDGETS_H
 
-#include <QHBoxLayout>
+#include <QGridLayout>
 #include <QLabel>
 #include <QComboBox>
 #include <limits.h>
@@ -21,23 +21,28 @@ class BoolWidget: public QGroupBox
     Q_OBJECT
 public:
     BoolWidget(const QString & name)
-        : lyt(new QHBoxLayout),
+        : lyt(new QGridLayout),
           checkBox(new QCheckBox),
           boundVariable(new QComboBox),
           nameLE(new QLineEdit(name)),
           boundVariableL(new QLabel("Bound Variable: "))
     {
         setStyleSheet("background-color: white;");
-        lyt->addWidget(nameLE, 1);
-        lyt->addWidget(new QLabel("Type: Bool"), 1);
-        lyt->addWidget(boundVariableL, 1);
-        lyt->addWidget(boundVariable, 1);
-        lyt->addWidget(checkBox, 1);
+        lyt->addWidget(new QLabel("Name:"), 0, 0, 1, 1, Qt::AlignCenter);
+        lyt->addWidget(nameLE, 1, 0, 1, 3, Qt::AlignLeft);
+        lyt->addWidget(new QLabel("Type: Bool"), 0, 3, 1, 1);
+        lyt->addWidget(boundVariableL, 0, 4, 1, 1, Qt::AlignCenter);
+        lyt->addWidget(boundVariable, 1, 4, 1, 1, Qt::AlignLeft);
+        lyt->addWidget(checkBox, 1, 3, 1, 1, Qt::AlignCenter);
         setLayout(lyt);
         nameLE->setReadOnly(true);
         connect(nameLE, SIGNAL(textEdited(QString)), this, SIGNAL(textEdited(QString)));
         connect(checkBox, SIGNAL(released()), this, SIGNAL(editingDone()));
         connect(boundVariable, SIGNAL(activated(int)), this, SIGNAL(editingDone()));
+    }
+
+    QSize sizeHint() const{
+        return QSize(500, 100);
     }
 
     bool getValue() const{
@@ -72,7 +77,7 @@ signals:
     void editingDone();
     void textEdited(QString newText);
 private:
-    QHBoxLayout *lyt;
+    QGridLayout *lyt;
     QCheckBox *checkBox;
     QComboBox *boundVariable;
     QLineEdit *nameLE;
@@ -84,7 +89,7 @@ class IntWidget: public QGroupBox
     Q_OBJECT
 public:
     IntWidget(const QString & name)
-        : lyt(new QHBoxLayout),
+        : lyt(new QGridLayout),
           spinBox(new QSpinBox),
           boundVariable(new QComboBox),
           nameLE(new QLineEdit(name)),
@@ -93,16 +98,23 @@ public:
         setStyleSheet("background-color: white;");
         spinBox->setMaximum(std::numeric_limits<int>::max());
         spinBox->setMinimum(std::numeric_limits<int>::min());
-        lyt->addWidget(nameLE, 1);
-        lyt->addWidget(new QLabel("Type: Int"), 1);
-        lyt->addWidget(boundVariableL, 1);
-        lyt->addWidget(boundVariable, 1);
-        lyt->addWidget(spinBox, 1);
+        lyt->addWidget(new QLabel("Name:"), 0, 0, 1, 1);
+        lyt->addWidget(nameLE, 1, 0, 1, 1);
+        lyt->addWidget(new QLabel("Type: Int"), 0, 1, 1, 1);
+        lyt->addWidget(boundVariableL, 0, 2, 1, 1);
+        lyt->addWidget(boundVariable, 1, 2, 1, 1);
+        lyt->addWidget(spinBox, 1, 3, 1, 1);
         setLayout(lyt);
+        //setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
+        nameLE->setMaximumWidth(size().width()*0.4);
         nameLE->setReadOnly(true);
         connect(nameLE, SIGNAL(textEdited(QString)), this, SIGNAL(textEdited(QString)));
         connect(spinBox, SIGNAL(editingFinished()), this, SIGNAL(editingDone()));
         connect(boundVariable, SIGNAL(activated(int)), this, SIGNAL(editingDone()));
+    }
+
+    QSize sizeHint() const{
+        return QSize(1000, 100);
     }
 
     int getValue() const{
@@ -137,7 +149,7 @@ signals:
     void editingDone();
     void textEdited(QString newText);
 private:
-    QHBoxLayout *lyt;
+    QGridLayout *lyt;
     QSpinBox *spinBox;
     QComboBox *boundVariable;
     QLineEdit *nameLE;
@@ -149,7 +161,7 @@ class DoubleWidget: public QGroupBox
     Q_OBJECT
 public:
     DoubleWidget(const QString & name)
-        : lyt(new QHBoxLayout),
+        : lyt(new QGridLayout),
           spinBox(new QDoubleSpinBox),
           boundVariable(new QComboBox),
           nameLE(new QLineEdit(name)),
@@ -158,16 +170,21 @@ public:
         setStyleSheet("background-color: white;");
         spinBox->setMaximum(std::numeric_limits<double>::max());
         spinBox->setMinimum(std::numeric_limits<double>::min());
-        lyt->addWidget(nameLE, 1);
-        lyt->addWidget(new QLabel("Type: Double"), 1);
-        lyt->addWidget(boundVariableL, 1);
-        lyt->addWidget(boundVariable, 1);
-        lyt->addWidget(spinBox, 1);
+        lyt->addWidget(new QLabel("Name:"), 0, 0, 1, 1, Qt::AlignCenter);
+        lyt->addWidget(nameLE, 1, 0, 1, 3, Qt::AlignLeft);
+        lyt->addWidget(new QLabel("Type: Double"), 0, 3, 1, 1);
+        lyt->addWidget(boundVariableL, 0, 4, 1, 1, Qt::AlignCenter);
+        lyt->addWidget(boundVariable, 1, 4, 1, 1, Qt::AlignLeft);
+        lyt->addWidget(spinBox, 1, 3, 1, 1, Qt::AlignCenter);
         setLayout(lyt);
         nameLE->setReadOnly(true);
         connect(nameLE, SIGNAL(textEdited(QString)), this, SIGNAL(textEdited(QString)));
         connect(spinBox, SIGNAL(editingFinished()), this, SIGNAL(editingDone()));
         connect(boundVariable, SIGNAL(activated(int)), this, SIGNAL(editingDone()));
+    }
+
+    QSize sizeHint() const{
+        return QSize(500, 100);
     }
 
     qreal getValue() const{
@@ -202,7 +219,7 @@ signals:
     void editingDone();
     void textEdited(QString newText);
 private:
-    QHBoxLayout *lyt;
+    QGridLayout *lyt;
     QDoubleSpinBox *spinBox;
     QComboBox *boundVariable;
     QLineEdit *nameLE;
@@ -214,17 +231,20 @@ class StringWidget: public QGroupBox
     Q_OBJECT
 public:
     StringWidget(const QString & name)
-        : lyt(new QHBoxLayout),
+        : lyt(new QGridLayout),
           lineEdit(new QLineEdit),
-          nameLE(new QLineEdit(name)),
-          boundVariableL(new QLabel("Bound Variable: "))
+          nameLE(new QLineEdit(name))
     {
         setStyleSheet("background-color: white;");
-        lyt->addWidget(nameLE, 1);
-        lyt->addWidget(new QLabel("Type: String"), 1);
-        lyt->addWidget(lineEdit, 1);
+        lyt->addWidget(new QLabel("Name:"), 0, 0, 1, 1, Qt::AlignCenter);
+        lyt->addWidget(nameLE, 1, 0, 1, 2, Qt::AlignLeft);
+        lyt->addWidget(lineEdit, 1, 2, 1, 2, Qt::AlignCenter);
         setLayout(lyt);
         connect(lineEdit, SIGNAL(editingFinished()), this, SIGNAL(editingDone()));
+    }
+
+    QSize sizeHint() const{
+        return QSize(500, 100);
     }
 
     QString getText()const{
@@ -243,10 +263,9 @@ public:
 signals:
     void editingDone();
 private:
-    QHBoxLayout *lyt;
+    QGridLayout *lyt;
     QLineEdit *lineEdit;
     QLineEdit *nameLE;
-    QLabel *boundVariableL;
 };
 
 class PointerWidget: public QGroupBox
@@ -254,18 +273,26 @@ class PointerWidget: public QGroupBox
     Q_OBJECT
 public:
     PointerWidget(const QString & name, const QString & type)
-        : lyt(new QHBoxLayout),
+        : lyt(new QGridLayout),
           pointers(new QComboBox),
           lastIndex(1),
           nameLE(new QLineEdit(name)),
-          boundVariableL(new QLabel("Bound Variable: "))
+          boundVariableL(new QLabel("Bound Variable: ")),
+          boundVariable(new QComboBox)
     {
         setStyleSheet("background-color: white;");
-        lyt->addWidget(nameLE, 1);
-        lyt->addWidget(new QLabel("Type: "+type), 1);
-        lyt->addWidget(pointers, 3);
+        lyt->addWidget(new QLabel("Name:"), 0, 0, 1, 1, Qt::AlignCenter);
+        lyt->addWidget(nameLE, 1, 0, 1, 2, Qt::AlignLeft);
+        lyt->addWidget(new QLabel(type), 0, 2, 1, 1, Qt::AlignCenter);
+        lyt->addWidget(boundVariableL, 0, 5, 1, 1, Qt::AlignCenter);
+        lyt->addWidget(boundVariable, 1, 5, 1, 2, Qt::AlignLeft);
+        lyt->addWidget(pointers, 1, 3, 1, 2, Qt::AlignLeft);
         setLayout(lyt);
         connect(pointers, SIGNAL(currentIndexChanged(int)), this, SIGNAL(editingDone(int)));
+    }
+
+    QSize sizeHint() const{
+        return QSize(500, 100);
     }
 
     void setStringList(const QStringList & sl){
@@ -281,6 +308,17 @@ public:
             lastIndex = pointers->currentIndex();
         }
         pointers->setCurrentIndex(index);
+    }
+
+    void setBoundVariableList(const QStringList & sl){
+        boundVariable->clear();
+        boundVariable->addItem("None");
+        boundVariable->addItems(sl);
+    }
+
+    void setBoundVariableVisbility(bool visable){
+        boundVariable->setVisible(visable);
+        boundVariableL->setVisible(false);
     }
 
     void setName(const QString & name){
@@ -311,29 +349,31 @@ public:
 signals:
     void editingDone(int index);
 private:
-    QHBoxLayout *lyt;
+    QGridLayout *lyt;
     QComboBox *pointers;
     QStringList list;
     int lastIndex;
     QLineEdit *nameLE;
     QLabel *boundVariableL;
+    QComboBox *boundVariable;
 };
 
-class QuadVariableWidget: public QGroupBox
+class QuadVariableWidget: public QWidget
 {
     Q_OBJECT
 public:
-    QuadVariableWidget(const QString & name, const QString & type = "hkQuadVariable")
+    QuadVariableWidget()
         : lyt(new QHBoxLayout),
           spinBoxX(new QDoubleSpinBox),
           spinBoxY(new QDoubleSpinBox),
           spinBoxZ(new QDoubleSpinBox),
-          spinBoxW(new QDoubleSpinBox),
-          boundVariable(new QComboBox),
-          nameLE(new QLineEdit(name)),
-          boundVariableL(new QLabel("Bound Variable: "))
+          spinBoxW(new QDoubleSpinBox)
     {
         setStyleSheet("background-color: white;");
+        spinBoxX->setPrefix("X: ");
+        spinBoxY->setPrefix("Y: ");
+        spinBoxZ->setPrefix("Z: ");
+        spinBoxW->setPrefix("W: ");
         spinBoxX->setMaximum(std::numeric_limits<double>::max());
         spinBoxX->setMinimum(std::numeric_limits<double>::min());
         spinBoxY->setMaximum(std::numeric_limits<double>::max());
@@ -342,31 +382,20 @@ public:
         spinBoxZ->setMinimum(std::numeric_limits<double>::min());
         spinBoxW->setMaximum(std::numeric_limits<double>::max());
         spinBoxW->setMinimum(std::numeric_limits<double>::min());
-        lyt->addWidget(nameLE);
-        lyt->addWidget(new QLabel("Type: "+type));
-        lyt->addWidget(boundVariableL, 1);
-        lyt->addWidget(boundVariable, 1);
-        lyt->addWidget(new QLabel("X"));
         lyt->addWidget(spinBoxX);
-        lyt->addWidget(new QLabel("Y"));
         lyt->addWidget(spinBoxY);
-        lyt->addWidget(new QLabel("Z"));
         lyt->addWidget(spinBoxZ);
-        lyt->addWidget(new QLabel("W"));
         lyt->addWidget(spinBoxW);
         setLayout(lyt);
-        nameLE->setReadOnly(true);
-        connect(nameLE, SIGNAL(textEdited(QString)), this, SIGNAL(textEdited(QString)));
-        connect(spinBoxX, SIGNAL(editingFinished()), this, SIGNAL(editingDone()));
-        connect(spinBoxY, SIGNAL(editingFinished()), this, SIGNAL(editingDone()));
-        connect(spinBoxZ, SIGNAL(editingFinished()), this, SIGNAL(editingDone()));
-        connect(spinBoxW, SIGNAL(editingFinished()), this, SIGNAL(editingDone()));
-        connect(boundVariable, SIGNAL(activated(int)), this, SIGNAL(editingDone()));
+        connect(spinBoxX, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()));
+        connect(spinBoxY, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()));
+        connect(spinBoxZ, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()));
+        connect(spinBoxW, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()));
     }
 
-    void setName(const QString & name){
-        nameLE->setText(name);
-    }
+    /*QSize sizeHint() const{
+        return QSize(800, 100);
+    }*/
 
     hkQuadVariable getValue() const{
         return hkQuadVariable(spinBoxX->value(), spinBoxY->value(), spinBoxZ->value(), spinBoxW->value());
@@ -379,41 +408,22 @@ public:
         spinBoxW->setValue(value.w);
     }
 
-    void setBoundVariableList(const QStringList & sl){
-        boundVariable->clear();
-        boundVariable->addItem("None");
-        boundVariable->addItems(sl);
-    }
-
-    void setBoundVariableVisbility(bool visable){
-        boundVariable->setVisible(visable);
-        boundVariableL->setVisible(false);
-    }
-
-    void setNameReadOnly(bool readOnly){
-        nameLE->setReadOnly(readOnly);
-    }
-
     virtual ~QuadVariableWidget(){}
 signals:
-    void editingDone();
-    void textEdited(QString newText);
+    void editingFinished();
 private:
     QHBoxLayout *lyt;
     QDoubleSpinBox *spinBoxX;
     QDoubleSpinBox *spinBoxY;
     QDoubleSpinBox *spinBoxZ;
     QDoubleSpinBox *spinBoxW;
-    QComboBox *boundVariable;
-    QLineEdit *nameLE;
-    QLabel *boundVariableL;
 };
 
-class GenericTabelWidget: public QGroupBox
+class GenericTableWidget: public QGroupBox
 {
     Q_OBJECT
 public:
-    GenericTabelWidget(const QString & title)
+    GenericTableWidget(const QString & title)
         : lyt(new QGridLayout),
           view(new QTableWidget),
           addNewItemPB(new QPushButton("Add new Object")),
@@ -477,7 +487,7 @@ public:
         view->setItem(view->rowCount() - 1, 2, new QTableWidgetItem(tr("Click to Edit")));
         view->setCurrentItem(view->item(view->rowCount() - 1, 0));
         view->setVisible(false);
-        view->resizeColumnsToContents();
+        //view->resizeColumnsToContents();
         view->setVisible(true);
     }
 
@@ -489,7 +499,7 @@ public:
         view->setItem(view->rowCount() - 1, 2, new QTableWidgetItem(tr("Click to Edit")));
         view->setCurrentItem(view->item(view->rowCount() - 1, 0));
         view->setVisible(false);
-        view->resizeColumnsToContents();
+        //view->resizeColumnsToContents();
         view->setVisible(true);
     }
 
@@ -499,7 +509,7 @@ public:
         view->setColumnWidth(2, view->viewport()->size().width()*0.2);
     }
 
-    virtual ~GenericTabelWidget(){
+    virtual ~GenericTableWidget(){
         //
     }
 signals:
@@ -578,6 +588,10 @@ public:
         connect(removeSelectedItemPB, SIGNAL(pressed()), this, SLOT(remove()));
     }
 
+    void setTypeSelectorVisability(bool visable){
+        typeSelectorCB->setVisible(visable);
+    }
+
     void clear(){
         //view->clearContents();
         for (int i = view->rowCount() - 1; i >= 0; i--){
@@ -626,7 +640,7 @@ public:
         view->setItem(view->rowCount() - 1, 2, new QTableWidgetItem(tr("Click to Edit")));
         view->setCurrentItem(view->item(view->rowCount() - 1, 0));
         view->setVisible(false);
-        view->resizeColumnsToContents();
+        //view->resizeColumnsToContents();
         view->setVisible(true);
     }
 
@@ -638,7 +652,7 @@ public:
         view->setItem(view->rowCount() - 1, 2, new QTableWidgetItem(tr("Click to Edit")));
         view->setCurrentItem(view->item(view->rowCount() - 1, 0));
         view->setVisible(false);
-        view->resizeColumnsToContents();
+        //view->resizeColumnsToContents();
         view->setVisible(true);
     }
 

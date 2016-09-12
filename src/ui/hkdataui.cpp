@@ -10,6 +10,7 @@
 #include "src/ui/objectdataui/generators/bsistatetagginggeneratorui.h"
 #include "src/ui/objectdataui/generators/modifiergeneratorui.h"
 #include "src/ui/objectdataui/generators/manualselectorgeneratorui.h"
+#include "src/ui/objectdataui/generators/statemachineui.h"
 
 #include <QPushButton>
 #include <QMessageBox>
@@ -26,13 +27,16 @@ HkDataUI::HkDataUI(const QString &title/*, const QString &button1Name, const QSt
       noDataL(new QLabel("No Data Selected!")),
       iSTGUI(new BSiStateTaggingGeneratorUI),
       modGenUI(new ModifierGeneratorUI),
-      manSelGenUI(new ManualSelectorGeneratorUI)
+      manSelGenUI(new ManualSelectorGeneratorUI),
+      stateMachineUI(new StateMachineUI)
 {
     setTitle(title);
     stack->addWidget(noDataL);
     stack->addWidget(iSTGUI);
     stack->addWidget(modGenUI);
     stack->addWidget(manSelGenUI);
+    stack->addWidget(stateMachineUI);
+    //setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     //horLyt->addWidget(button1);
     //horLyt->addWidget(button2);
     //verLyt->addLayout(horLyt, 1);
@@ -66,6 +70,12 @@ void HkDataUI::changeCurrentDataWidget(GeneratorIcon * icon){
             //}
             stack->setCurrentIndex(MSG);
             break;
+        case HKB_STATE_MACHINE:
+            //if (loadedData != modGenUI->bsData){
+                stateMachineUI->loadData(loadedData);
+            //}
+            stack->setCurrentIndex(SM);
+            break;
         default:
             stack->setCurrentIndex(NO_DATA_SELECTED);
             break;
@@ -81,4 +91,5 @@ void HkDataUI::setBehaviorView(BehaviorGraphView *view){
     iSTGUI->behaviorView = view;
     modGenUI->behaviorView = view;
     manSelGenUI->behaviorView = view;
+    stateMachineUI->behaviorView = view;
 }

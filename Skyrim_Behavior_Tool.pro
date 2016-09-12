@@ -59,7 +59,8 @@ SOURCES += \
     src/ui/objectdataui/generators/modifiergeneratorui.cpp \
     src/ui/objectdataui/generators/manualselectorgeneratorui.cpp \
     src/ui/behaviorvariablesui.cpp \
-    src/ui/eventvariablesui.cpp
+    src/ui/eventsui.cpp \
+    src/ui/objectdataui/generators/statemachineui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -102,4 +103,5 @@ HEADERS  += \
     src/ui/objectdataui/generators/manualselectorgeneratorui.h \
     src/ui/behaviorvariablesui.h \
     src/utility.h \
-    src/ui/eventvariablesui.h
+    src/ui/eventsui.h \
+    src/ui/objectdataui/generators/statemachineui.h

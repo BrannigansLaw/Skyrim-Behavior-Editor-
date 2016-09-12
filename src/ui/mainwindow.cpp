@@ -5,6 +5,7 @@
 #include "src/ui/behaviorgraphui/behaviorgraphui.h"
 #include "src/ui/hkdataui.h"
 #include "src/ui/behaviorvariablesui.h"
+#include "src/ui/eventsui.h"
 
 #include <QtWidgets>
 
@@ -22,7 +23,8 @@ MainWindow::MainWindow()
       behaviorGraphViewGB(new QGroupBox("Behavior Graph")),
       //objectDataGB(new QGroupBox("Object Data")),
       objectDataWid(new HkDataUI("Object Data")),
-      eventsGB(new QGroupBox("Events")),
+      objectDataSA(new QScrollArea),
+      eventsWid(new EventsUI("Events")),
       variablesWid(new BehaviorVariablesUI("Behavior Variables")),
       logGB(new QGroupBox("Debug Log")),
       logGBLyt(new QVBoxLayout(this)),
@@ -38,20 +40,22 @@ MainWindow::MainWindow()
     topMB->addMenu(openM);
     logGBLyt->addWidget(debugLog);
     logGB->setLayout(logGBLyt);
+    eventsWid->setHkDataUI(objectDataWid);
     variablesWid->setHkDataUI(objectDataWid);
     topLyt->addWidget(topMB, 0, 0, 1, 10);
     topLyt->addWidget(behaviorGraphViewGB, 1, 0, 6, 6);
     //topLyt->addWidget(objectDataGB, 1, 6, 6, 4);
-    topLyt->addWidget(objectDataWid, 1, 6, 6, 4);
-    topLyt->addWidget(eventsGB, 7, 0, 3, 3);
+    topLyt->addWidget(objectDataSA, 1, 6, 6, 4);
+    topLyt->addWidget(eventsWid, 7, 0, 3, 3);
     topLyt->addWidget(variablesWid, 7, 3, 3, 3);
     topLyt->addWidget(logGB, 7, 6, 3, 4);
     //progressD->hide();
     readSettings();
     setLayout(topLyt);
+    objectDataSA->setWidget(objectDataWid);
     variablesWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
-    logGB->setMaximumSize(size().width()*0.2, size().height()*0.25);
-    eventsGB->setMaximumSize(size().width()*0.4, size().height()*0.25);
+    eventsWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
+    //logGB->setMaximumSize(size().width()*0.4, size().height()*0.25);
     connect(openA, SIGNAL(triggered(bool)), this, SLOT(openDirView()));
     connect(dirViewFSW, SIGNAL(selectFile(QString)), this, SLOT(openHkxfile(QString)));
 }
@@ -143,7 +147,10 @@ void MainWindow::openHkxfile(QString name){
             writeToLog("MainWindow: drawBehaviorGraph() failed!\nThe behavior graph was drawn incorrectly!", true);
         }
     }
+    setProgressData("Loading Variables...", 95);
     variablesWid->loadData(hkxFile->getBehaviorGraphData());
+    setProgressData("Loading Events...", 99);
+    eventsWid->loadData(hkxFile->getBehaviorGraphData());
     iconGBLyt->addWidget(behaviorGraphViewIV);
     behaviorGraphViewGB->setLayout(iconGBLyt);
     progressD->setValue(100);

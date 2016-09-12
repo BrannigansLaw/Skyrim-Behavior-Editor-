@@ -206,11 +206,11 @@ bool BehaviorFile::parse(){
                     if (!appendAndReadData(index, new hkbBehaviorReferenceGenerator(this))){
                         return false;
                     }
-                }/*else if (signature == HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
+                }else if (signature == HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
                     if (!appendAndReadData(index, new hkbStateMachineTransitionInfoArray(this))){
                         return false;
                     }
-                }else if (signature == HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
+                }/*else if (signature == HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
                     if (!appendAndReadData(index, new hkbStateMachineEventPropertyArray(this))){
                         return false;
                     }
@@ -524,8 +524,12 @@ HkxObject* BehaviorFile::getModifierDataAt(int index){
     return NULL;
 }
 
-QStringList & BehaviorFile::getVariableNames() const{
+QStringList BehaviorFile::getVariableNames() const{
     return static_cast<hkbBehaviorGraphData *>(graphData.data())->getVariableNames();
+}
+
+QStringList BehaviorFile::getEventNames() const{
+    return static_cast<hkbBehaviorGraphData *>(graphData.data())->getEventNames();
 }
 
 void BehaviorFile::removeUnneededGenerators(){

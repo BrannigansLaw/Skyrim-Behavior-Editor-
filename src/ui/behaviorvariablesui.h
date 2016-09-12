@@ -6,17 +6,13 @@
 class HkDataUI;
 class QVBoxLayout;
 class QHBoxLayout;
-class GenericListWidget;
-class QStackedLayout;
-class QLabel;
-class DoubleWidget;
-class QuadVariableWidget;
-class IntWidget;
-class BoolWidget;
+class QSignalMapper;
+class QTableWidget;
 class QPushButton;
-
 class hkbBehaviorGraphData;
 class HkxObject;
+class QCheckBox;
+class QComboBox;
 
 class BehaviorVariablesUI: public QGroupBox
 {
@@ -25,30 +21,19 @@ public:
     BehaviorVariablesUI(const QString & title);
     virtual ~BehaviorVariablesUI(){}
 public slots:
-    void changeCurrentDataWidget(int index, int column);
-    void loadTable();
     void setHkDataUI(HkDataUI *ui);
     void loadData(HkxObject *data);
-    void addVariable(int type);
-    void removeVariable(int index);
-    void setBoolVariableValue();
-    void setIntVariableValue();
-    void setDoubleVariableValue();
-    void setVector4VariableValue();
-    void setQuaternionVariableValue();
-    void renameSelectedVariable(const QString & name);
+    void addVariable();
+    void removeVariable();
+    void setVariableValue(int index);
+    void renameSelectedVariable(int index);
 private:
     BehaviorVariablesUI& operator=(const BehaviorVariablesUI&);
     BehaviorVariablesUI(const BehaviorVariablesUI &);
+    template <typename T, typename W> void addVariableToTable(const QString & name, const QString & type, const T & value, W *widget);
+    template <typename T> void addVariableToTable(const QString & name, const QString & type, const T & value, QCheckBox *widget);
+    void removeVariableFromTable(int row);
 private:
-    enum WidgetType {
-        TABLE_WIDGET = 0,
-        BOOL_WIDGET = 1,
-        INT_WIDGET = 2,
-        DOUBLE_WIDGET = 3,
-        VECTOR_4_WIDGET = 4,
-        QUATERNION_WIDGET = 5
-    };
     enum hkTypes {
         VARIABLE_TYPE_BOOL = 0,
         VARIABLE_TYPE_INT32 = 1,
@@ -57,18 +42,18 @@ private:
         VARIABLE_TYPE_VECTOR4 = 4,
         VARIABLE_TYPE_QUATERNION = 5
     };
+    static QStringList types;
+    static QStringList headerLabels;
     HkDataUI *dataUI;
     QVBoxLayout *verLyt;
-    QStackedLayout *stack;
     hkbBehaviorGraphData *loadedData;
-    QLabel *noDataL;
-    QPushButton *backPB;
-    GenericListWidget *view;
-    BoolWidget *boolWidget;
-    IntWidget *intWidget;
-    DoubleWidget *doubleWidget;
-    QuadVariableWidget *quadVariableWidget;
-    QuadVariableWidget *quaternionWidget;
+    QTableWidget *table;
+    QPushButton *addObjectPB;
+    QPushButton *removeObjectPB;
+    QHBoxLayout *buttonLyt;
+    QSignalMapper *valueMapper;
+    QSignalMapper *nameMapper;
+    QComboBox *typeSelector;
 };
 
 #endif // BEHAVIORVARIABLESUI_H

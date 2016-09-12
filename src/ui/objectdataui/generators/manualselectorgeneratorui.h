@@ -8,9 +8,17 @@ class BehaviorGraphView;
 class PointerWidget;
 class StringWidget;
 class IntWidget;
-class GenericTabelWidget;
+class GenericTableWidget;
 class hkbManualSelectorGenerator;
 class QVBoxLayout;
+class QTableWidget;
+class QTableWidgetItem;
+class QSpinBox;
+class QLineEdit;
+class QComboBox;
+class QPushButton;
+class QHBoxLayout;
+class QSignalMapper;
 
 class ManualSelectorGeneratorUI: public QGroupBox
 {
@@ -22,11 +30,13 @@ public:
     void loadData(HkxObject *data);
 private slots:
     void setName();
-    void addNewGenerator(int index);
+    void addNewGenerator();
     void addExistingGenerator(int index);
-    void removeGenerator(int index);
-    void setSelectedGeneratorIndex();
-    void setCurrentGeneratorIndex();
+    void removeGenerator();
+    void setSelectedGeneratorIndex(int value);
+    void setSelectedGeneratorIndexBoundVariable(int index);
+    void setCurrentGeneratorIndex(int value);
+    void setCurrentGeneratorIndexBoundVariable(int index);
 private:
     enum Type {
         STATE_MACHINE = 0,
@@ -44,13 +54,23 @@ private:
     };
 
     static QStringList list;
+    static QStringList headerLabels1;
+    static QStringList headerLabels2;
     BehaviorGraphView *behaviorView;
     hkbManualSelectorGenerator *bsData;
     QVBoxLayout *lyt;
-    StringWidget *name;
-    GenericTabelWidget *generators;
-    IntWidget *selectedGeneratorIndex;
-    IntWidget *currentGeneratorIndex;
+    QTableWidget *table;
+    QLineEdit *name;
+    QTableWidget *generators;
+    QPushButton *addObjectPB;
+    QPushButton *removeObjectPB;
+    QComboBox *typeSelectorCB;
+    QSignalMapper *signalMapper;
+    QHBoxLayout *buttonLyt;
+    QSpinBox *selectedGeneratorIndex;
+    QComboBox *selectedGeneratorIndexBind;
+    QSpinBox *currentGeneratorIndex;
+    QComboBox *currentGeneratorIndexBind;
 };
 
 #endif // MANUALSELECTORGENERATORUI_H

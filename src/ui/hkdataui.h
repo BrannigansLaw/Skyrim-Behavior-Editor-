@@ -13,6 +13,7 @@ class QLabel;
 class BSiStateTaggingGeneratorUI;
 class ModifierGeneratorUI;
 class ManualSelectorGeneratorUI;
+class StateMachineUI;
 class GeneratorIcon;
 
 class HkDataUI: public QGroupBox
@@ -28,7 +29,7 @@ private:
     HkDataUI& operator=(const HkDataUI&);
     HkDataUI(const HkDataUI &);
 private:
-    enum {NO_DATA_SELECTED = 0, BS_I_STATE_TAG_GEN = 1, MOD_GEN = 2, MSG = 3};
+    enum {NO_DATA_SELECTED = 0, BS_I_STATE_TAG_GEN = 1, MOD_GEN = 2, MSG = 3, SM = 4};
     BehaviorGraphView *behaviorView;
     QVBoxLayout *verLyt;
     //QHBoxLayout *horLyt;
@@ -42,6 +43,7 @@ private:
     BSiStateTaggingGeneratorUI *iSTGUI;
     ModifierGeneratorUI *modGenUI;
     ManualSelectorGeneratorUI *manSelGenUI;
+    StateMachineUI *stateMachineUI;
 };
 
 #endif // HKDATAUI_H
