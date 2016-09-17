@@ -65,6 +65,9 @@ public:
     bool linkVar();
     void unlink();
     bool evaulateDataValidity();
+    void addBinding(const QString & path, int varIndex, bool isProperty = false);
+    void removeBinding(const QString & path);
+    void removeBinding(int varIndex);
 protected:
     HkDynamicObject(BehaviorFile *parent = NULL/*, long ref = 0*/);
 protected:

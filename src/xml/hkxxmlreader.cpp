@@ -17,7 +17,7 @@ bool HkxXmlReader::parse(){
         return false;
     }
     isEOF = false;
-    QByteArray line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGHT);
+    QByteArray line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGTH);
     lineNumber++;
     if (line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\n" && line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\r\n"){
         hkxXmlFile->writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" is not in the correct XML format!", true);
@@ -37,7 +37,7 @@ bool HkxXmlReader::parse(){
 }
 
 HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
-    QByteArray line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGHT);
+    QByteArray line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGTH);
     lineNumber++;
     if (line.isEmpty()){
         isEOF = true;

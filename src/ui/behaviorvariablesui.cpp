@@ -87,7 +87,9 @@ void BehaviorVariablesUI::setVariableValue(int index){
 }
 
 void BehaviorVariablesUI::renameSelectedVariable(int index){
-    loadedData->setVariableNameAt(index, qobject_cast<QLineEdit *>(table->cellWidget(index, 0))->text());
+    QString newName = qobject_cast<QLineEdit *>(table->cellWidget(index, 0))->text();
+    loadedData->setVariableNameAt(index, newName);
+    emit variableNameChanged(newName, index);
 }
 
 template <typename T, typename W>
@@ -165,48 +167,50 @@ void BehaviorVariablesUI::loadData(HkxObject *data){
 
 void BehaviorVariablesUI::addVariable(){
     int type = typeSelector->currentIndex();
-    hkbBehaviorGraphData::hkVariableType varType;
+    hkVariableType varType;
     hkbBehaviorGraphStringData *vars = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
     switch (type){
     case VARIABLE_TYPE_BOOL:
-        varType = hkbBehaviorGraphData::hkVariableType::VARIABLE_TYPE_BOOL;
+        varType = hkVariableType::VARIABLE_TYPE_BOOL;
         loadedData->addVariable(varType);
         addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_BOOL", false, new QCheckBox);
         break;
     case VARIABLE_TYPE_INT32:
-        varType = hkbBehaviorGraphData::hkVariableType::VARIABLE_TYPE_INT32;
+        varType = hkVariableType::VARIABLE_TYPE_INT32;
         loadedData->addVariable(varType);
         addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_INT32", 0, new QSpinBox);
         break;
     case VARIABLE_TYPE_REAL:
-        varType = hkbBehaviorGraphData::hkVariableType::VARIABLE_TYPE_REAL;
+        varType = hkVariableType::VARIABLE_TYPE_REAL;
         loadedData->addVariable(varType);
         addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_REAL", 0, new QDoubleSpinBox);
         break;
     case VARIABLE_TYPE_POINTER:
-        varType = hkbBehaviorGraphData::hkVariableType::VARIABLE_TYPE_POINTER;
+        varType = hkVariableType::VARIABLE_TYPE_POINTER;
         loadedData->addVariable(varType);
         addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_POINTER", 0, new QSpinBox);
         break;
     case VARIABLE_TYPE_VECTOR4:
-        varType = hkbBehaviorGraphData::hkVariableType::VARIABLE_TYPE_VECTOR4;
+        varType = hkVariableType::VARIABLE_TYPE_VECTOR4;
         loadedData->addVariable(varType);
         addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_VECTOR4", hkQuadVariable(), new QuadVariableWidget);
         break;
     case VARIABLE_TYPE_QUATERNION:
-        varType = hkbBehaviorGraphData::hkVariableType::VARIABLE_TYPE_QUATERNION;
+        varType = hkVariableType::VARIABLE_TYPE_QUATERNION;
         loadedData->addVariable(varType);
         addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_QUATERNION", hkQuadVariable(), new QuadVariableWidget);
         break;
     default:
         return;
     }
+    emit variableAdded(vars->variableNames.last());
 }
 
 void BehaviorVariablesUI::removeVariable(){
     int index = table->currentRow();
     loadedData->removeVariable(index);
     removeVariableFromTable(index);
+    emit variableRemoved(index);
 }
 
 void BehaviorVariablesUI::setHkDataUI(HkDataUI *ui){

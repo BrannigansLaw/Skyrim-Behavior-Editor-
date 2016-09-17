@@ -100,7 +100,7 @@ void GeneratorIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
     painter->setBrush(brush);
     painter->drawPath(path);
     painter->setPen(textPen);
-    painter->drawText(textRec, name);
+    painter->drawText(textRec, static_cast<hkbGenerator *>(data.data())->getName());
     painter->setPen(pen);
     painter->setBrush(buttonBrush);
     if (data->getSignature() != HKB_CLIP_GENERATOR && data->getSignature() != HKB_BEHAVIOR_REFERENCE_GENERATOR){

@@ -9,6 +9,8 @@ class hkbStateMachineStateInfo: public hkbGenerator
 {
     friend class BehaviorGraphView;
     friend class hkbStateMachine;
+    friend class StateMachineUI;
+    friend class StateUI;
 public:
     hkbStateMachineStateInfo(BehaviorFile *parent = NULL, hkbStateMachine *parentSM = NULL/*, qint16 ref = 0*/);
     virtual ~hkbStateMachineStateInfo();

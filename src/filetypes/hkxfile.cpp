@@ -26,6 +26,7 @@
 #include "src/hkxclasses/hkbbehaviorgraphdata.h"
 #include "src/hkxclasses/hkbbehaviorgraphstringdata.h"
 #include "src/hkxclasses/hkbvariablevalueset.h"
+#include "src/hkxclasses/hkbvariablebindingset.h"
 #include "src/hkxclasses/hkrootlevelcontainer.h"
 
 /**
@@ -96,11 +97,25 @@ BehaviorFile::BehaviorFile(MainWindow *window, const QString & name): HkxFile(wi
 
 template <typename T>
 bool BehaviorFile::appendAndReadData(int index, T * obj){
-    bool ok;
     QByteArray temp = reader.getNthAttributeValueAt(index, 0);
     if (temp.at(0) == '#'){
         temp.remove(0, 1);
     }
+    if (!addObjectToFile(obj, temp)){
+        writeToLog("BehaviorFile: appendAndReadData() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!", true);
+        return false;
+    }
+    //Skip the current line.
+    index++;
+    if (!obj->readData(reader, index)){
+        return false;
+    }
+    return true;
+}
+
+template <typename T>
+bool BehaviorFile::addObjectToFile(T *obj, const QByteArray & temp){
+    bool ok;
     if (obj->getType() == HkxObject::TYPE_GENERATOR){
         generators.append(HkxObjectExpSharedPtr(obj, temp.toLong(&ok)));
     }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
@@ -108,16 +123,10 @@ bool BehaviorFile::appendAndReadData(int index, T * obj){
     }else if (obj->getType() == HkxObject::TYPE_OTHER){
         otherTypes.append(HkxObjectExpSharedPtr(obj, temp.toLong(&ok)));
     }else{
-        writeToLog("BehaviorFile: appendAndReadData() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16), true);
+        writeToLog("BehaviorFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16), true);
         return false;
     }
     if (!ok){
-        writeToLog("BehaviorFile: appendAndReadData() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!", true);
-        return false;
-    }
-    //Skip the current line.
-    index++;
-    if (!obj->readData(reader, index)){
         return false;
     }
     return true;
@@ -148,6 +157,10 @@ bool BehaviorFile::parse(){
                     }
                 }else if (signature == HKB_STATE_MACHINE){
                     if (!appendAndReadData(index, new hkbStateMachine(this))){
+                        return false;
+                    }
+                }else if (signature == HKB_VARIABLE_BINDING_SET){
+                    if (!appendAndReadData(index, new hkbVariableBindingSet(this))){
                         return false;
                     }
                 }else if (signature == HKB_MODIFIER_GENERATOR){
@@ -210,11 +223,11 @@ bool BehaviorFile::parse(){
                     if (!appendAndReadData(index, new hkbStateMachineTransitionInfoArray(this))){
                         return false;
                     }
-                }/*else if (signature == HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
+                }else if (signature == HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
                     if (!appendAndReadData(index, new hkbStateMachineEventPropertyArray(this))){
                         return false;
                     }
-                }*/else if (signature == HKB_BEHAVIOR_GRAPH){
+                }else if (signature == HKB_BEHAVIOR_GRAPH){
                     if (!appendAndReadData(index, new hkbBehaviorGraph(this))){
                         return false;
                     }
@@ -330,6 +343,14 @@ HkxObjectExpSharedPtr * BehaviorFile::findHkxObject(long ref){
     return NULL;
 }
 
+void BehaviorFile::removeBindings(int varIndex){
+    for (int i = 0; i < otherTypes.size(); i++){
+        if (otherTypes.at(i).data()->getSignature() == HKB_VARIABLE_BINDING_SET){
+            static_cast<hkbVariableBindingSet *>(otherTypes.at(i).data())->removeBinding(varIndex);
+        }
+    }
+}
+
 HkxObjectExpSharedPtr * BehaviorFile::findBehaviorGraph(long ref){
     if (behaviorGraph.getReference() == ref){
         return &behaviorGraph;
@@ -337,47 +358,42 @@ HkxObjectExpSharedPtr * BehaviorFile::findBehaviorGraph(long ref){
     return NULL;
 }
 
-void BehaviorFile::removeData(){
+QVector<int> BehaviorFile::removeGeneratorData(){
+    QVector<int> removedIndices;
     for (int i = generators.size() - 1; i >= 0; i--){
         if (generators.at(i).constData() && generators.at(i).constData()->ref < 2){
             generators.removeAt(i);
+            removedIndices.append(i);
         }
     }
+    return removedIndices;
+}
+
+QVector<int> BehaviorFile::removeModifierData(){
+    QVector<int> removedIndices;
     for (int i = modifiers.size() - 1; i >= 0; i--){
         if (modifiers.at(i).constData() && modifiers.at(i).constData()->ref < 2){
             modifiers.removeAt(i);
+            removedIndices.append(i);
         }
     }
+    return removedIndices;
+}
+
+QVector<int> BehaviorFile::removeOtherData(){
+    QVector<int> removedIndices;
     for (int i = otherTypes.size() - 1; i >= 0; i--){
         if (otherTypes.at(i).constData() && otherTypes.at(i).constData()->ref < 2){
             otherTypes.removeAt(i);
+            removedIndices.append(i);
         }
     }
+    return removedIndices;
 }
 
-/*void BehaviorFile::removeData(){
-    for (int i = generators.size() - 1; i >= 0; i--){
-        if (generators.at(i).data() && generators.at(i).data()->ref < 3){
-            generators.at(i).data()->unlink();
-            generators.removeAt(i);
-            i = otherTypes.size() - 1;
-        }
-    }
-    for (int i = modifiers.size() - 1; i >= 0; i--){
-        if (modifiers.at(i).data() && modifiers.at(i).data()->ref < 3){
-            modifiers.at(i).data()->unlink();
-            modifiers.removeAt(i);
-            i = otherTypes.size() - 1;
-        }
-    }
-    for (int i = otherTypes.size() - 1; i >= 0; i--){
-        if (otherTypes.at(i).data() && otherTypes.at(i).data()->ref < 3){
-            otherTypes.at(i).data()->unlink();
-            otherTypes.removeAt(i);
-            i = otherTypes.size() - 1;
-        }
-    }
-}*/
+hkVariableType BehaviorFile::getVariableTypeAt(int index) const{
+    return static_cast<hkbBehaviorGraphData *>(graphData.data())->getVariableTypeAt(index);
+}
 
 QStringList BehaviorFile::getGeneratorNames(){
     QStringList list;
@@ -486,7 +502,7 @@ HkxObject * BehaviorFile::getBehaviorGraphData() const{
     return graphData.data();
 }
 
-int BehaviorFile::getIndexOfGenerator(const HkxObjectExpSharedPtr & obj){
+int BehaviorFile::getIndexOfGenerator(const HkxObjectExpSharedPtr & obj) const{
     return generators.indexOf(obj);
 }
 
@@ -505,7 +521,7 @@ HkxObject * BehaviorFile::getGeneratorDataAt(int index){
     return NULL;
 }
 
-int BehaviorFile::getIndexOfModifier(const HkxObjectExpSharedPtr & obj){
+int BehaviorFile::getIndexOfModifier(const HkxObjectExpSharedPtr & obj) const{
     return modifiers.indexOf(obj);
 }
 

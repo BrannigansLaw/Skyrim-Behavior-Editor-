@@ -1,4 +1,5 @@
 #include "hkbgenerator.h"
+#include "src/ui/behaviorgraphui/behaviorgraphicons.h"
 
 hkbGenerator::hkbGenerator(BehaviorFile *parent/*, long ref = 0*/)
     : HkDynamicObject(parent/*, ref*/)
@@ -12,6 +13,13 @@ bool hkbGenerator::link(){
 
 QString hkbGenerator::getName() const{
     return "";
+}
+
+void hkbGenerator::updateIconNames(){
+    icons.first()->scene()->update();
+    /*for (int i = 0; i < icons.size(); i++){
+        icons.at(i)->update(QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size())));
+    }*/
 }
 
 QString hkbGenerator::getClassname() const{

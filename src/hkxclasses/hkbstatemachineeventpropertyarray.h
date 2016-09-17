@@ -21,7 +21,7 @@ private:
     };
     static uint refCount;
     static QString classname;
-    //QVector <HkEvent> events;
+    QList <HkEvent> events;
 };
 
 #endif // HKBSTATEMACHINEEVENTPROPERTYARRAY_H

@@ -156,8 +156,12 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     connect(removeObjBranchAct, SIGNAL(triggered()), this, SLOT(removeSelectedObjectBranchSlot()));
     if (ui){
         ui->setBehaviorView(this);
-        //connect(this, SIGNAL(iconSelected(GeneratorIcon *)), ui, SLOT(changeCurrentDataWidget(GeneratorIcon *)));
+        connect(this, SIGNAL(iconSelected(GeneratorIcon *)), ui, SLOT(changeCurrentDataWidget(GeneratorIcon *)));
     }
+}
+
+void BehaviorGraphView::writeToLog(const QString &message, bool isError){
+    behavior->writeToLog(message, isError);
 }
 
 void BehaviorGraphView::contractBranch(GeneratorIcon * icon, bool contractAll){
@@ -194,6 +198,25 @@ void BehaviorGraphView::expandBranch(GeneratorIcon * icon, bool expandAll){
             expandBranch(icon->children.at(i));
         }
     }
+}
+
+void BehaviorGraphView::removeGeneratorData(){
+    QVector <int> removedIndices;
+    removedIndices = behavior->removeGeneratorData();
+    for (int i = 0; i < removedIndices.size(); i++){
+        emit removedGenerator(removedIndices.at(i));
+    }
+}
+
+void BehaviorGraphView::removeModifierData(){
+    QVector <int> removedIndices = behavior->removeModifierData();
+    for (int i = 0; i < removedIndices.size(); i++){
+        emit removedModifier(removedIndices.at(i));
+    }
+}
+
+void BehaviorGraphView::removeOtherData(){
+    behavior->removeOtherData();
 }
 
 void BehaviorGraphView::createIconBranch(QList <GeneratorIcon *> & icons, GeneratorIcon *parent){
@@ -392,7 +415,9 @@ bool BehaviorGraphView::reconnectBranch(HkxObject *oldChild, HkxObject *newChild
     /*if (icon->data.data()){
         icon->data.data()->evaulateDataValidity();
     }*/
-    //behavior->removeData();
+    //behavior->removeGeneratorData();
+    //behavior->removeModifierData();
+    //behavior->removeOtherData();
     return true;
 }
 
@@ -411,7 +436,16 @@ void BehaviorGraphView::removeSelectedObjectBranchSlot(){
     }
     ui->changeCurrentDataWidget(NULL);
     selectedIcon = NULL;
-    behavior->removeData();
+    QVector <int> removedIndices;
+    removedIndices = behavior->removeGeneratorData();
+    for (int i = 0; i < removedIndices.size(); i++){
+        emit removedGenerator(removedIndices.at(i));
+    }
+    removedIndices = behavior->removeModifierData();
+    for (int i = 0; i < removedIndices.size(); i++){
+        emit removedModifier(removedIndices.at(i));
+    }
+    behavior->removeOtherData();
 }
 
 void BehaviorGraphView::removeSelectedObjectBranch(GeneratorIcon *icon, GeneratorIcon *iconToKeep){
@@ -956,6 +990,7 @@ void BehaviorGraphView::appendStateMachine(){
             selectedIcon->parent->data.data()->evaulateDataValidity();
         }
         selectedIcon->data.data()->evaulateDataValidity();
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -970,6 +1005,7 @@ void BehaviorGraphView::appendManualSelectorGenerator(){
             selectedIcon->parent->data.data()->evaulateDataValidity();
         }
         selectedIcon->data.data()->evaulateDataValidity();
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -984,6 +1020,7 @@ void BehaviorGraphView::appendModifierGenerator(){
             selectedIcon->parent->data.data()->evaulateDataValidity();
         }
         selectedIcon->data.data()->evaulateDataValidity();
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -998,6 +1035,7 @@ void BehaviorGraphView::appendIStateTaggingGenerator(){
             selectedIcon->parent->data.data()->evaulateDataValidity();
         }
         selectedIcon->data.data()->evaulateDataValidity();
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1012,6 +1050,7 @@ void BehaviorGraphView::appendSynchronizedClipGenerator(){
             selectedIcon->parent->data.data()->evaulateDataValidity();
         }
         selectedIcon->data.data()->evaulateDataValidity();
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1026,6 +1065,7 @@ void BehaviorGraphView::appendOffsetAnimationGenerator(){
             selectedIcon->parent->data.data()->evaulateDataValidity();
         }
         selectedIcon->data.data()->evaulateDataValidity();
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1040,6 +1080,7 @@ void BehaviorGraphView::appendCyclicBlendTransitionGenerator(){
             selectedIcon->parent->data.data()->evaulateDataValidity();
         }
         selectedIcon->data.data()->evaulateDataValidity();
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1057,6 +1098,7 @@ void BehaviorGraphView::appendPoseMatchingGenerator(){
             selectedIcon->parent->data.data()->evaulateDataValidity();
         }
         selectedIcon->data.data()->evaulateDataValidity();
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1074,6 +1116,7 @@ void BehaviorGraphView::appendBlenderGenerator(){
             selectedIcon->parent->data.data()->evaulateDataValidity();
         }
         selectedIcon->data.data()->evaulateDataValidity();
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1088,6 +1131,7 @@ void BehaviorGraphView::appendBoneSwitchGenerator(){
             selectedIcon->parent->data.data()->evaulateDataValidity();
         }
         selectedIcon->data.data()->evaulateDataValidity();
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1101,6 +1145,7 @@ void BehaviorGraphView::appendClipGenerator(){
             selectedIcon->parent->data.data()->evaulateDataValidity();
         }
         selectedIcon->data.data()->evaulateDataValidity();
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1114,6 +1159,7 @@ void BehaviorGraphView::appendBehaviorReferenceGenerator(){
             selectedIcon->parent->data.data()->evaulateDataValidity();
         }
         selectedIcon->data.data()->evaulateDataValidity();
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1308,6 +1354,7 @@ void BehaviorGraphView::wrapManualSelectorGenerator(){
     if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
         hkbManualSelectorGenerator *obj = new hkbManualSelectorGenerator(behavior);
         wrapObject(obj, selectedIcon);
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1315,6 +1362,7 @@ void BehaviorGraphView::wrapModifierGenerator(){
     if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
         hkbModifierGenerator *obj = new hkbModifierGenerator(behavior);
         wrapObject(obj, selectedIcon);
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1322,6 +1370,7 @@ void BehaviorGraphView::wrapIStateTaggingGenerator(){
     if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
         BSiStateTaggingGenerator *obj = new BSiStateTaggingGenerator(behavior);
         wrapObject(obj, selectedIcon);
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1329,6 +1378,7 @@ void BehaviorGraphView::wrapSynchronizedClipGenerator(){
     if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
         BSSynchronizedClipGenerator *obj = new BSSynchronizedClipGenerator(behavior);
         wrapObject(obj, selectedIcon);
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1336,6 +1386,7 @@ void BehaviorGraphView::wrapOffsetAnimationGenerator(){
     if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
         BSOffsetAnimationGenerator *obj = new BSOffsetAnimationGenerator(behavior);
         wrapObject(obj, selectedIcon);
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1343,6 +1394,7 @@ void BehaviorGraphView::wrapCyclicBlendTransitionGenerator(){
     if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
         BSCyclicBlendTransitionGenerator *obj = new BSCyclicBlendTransitionGenerator(behavior);
         wrapObject(obj, selectedIcon);
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1351,6 +1403,7 @@ void BehaviorGraphView::wrapBoneSwitchGenerator(){
         BSBoneSwitchGenerator *obj = new BSBoneSwitchGenerator(behavior);
         obj->evaulateDataValidity();
         wrapObject(obj, selectedIcon);
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1360,6 +1413,7 @@ void BehaviorGraphView::wrapStateMachine(){
         hkbStateMachineStateInfo *state = new hkbStateMachineStateInfo(behavior, obj);
         obj->states.append(HkxObjectExpSharedPtr(state));
         wrapObject(obj, selectedIcon);
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1369,6 +1423,7 @@ void BehaviorGraphView::wrapBlenderGenerator(){
         hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior);
         obj->children.append(HkxObjectExpSharedPtr(blendChild));
         wrapObject(obj, selectedIcon);
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1378,6 +1433,7 @@ void BehaviorGraphView::wrapPoseMatchingGenerator(){
         hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior);
         obj->children.append(HkxObjectExpSharedPtr(blendChild));
         wrapObject(obj, selectedIcon);
+        emit addedGenerator(obj->getName());
     }
 }
 
@@ -1890,4 +1946,8 @@ bool BehaviorGraphView::drawBehaviorGraph(){
     }
     //setSceneRect(0, 0, frameSize().width(), frameSize().height());
     return true;
+}
+
+BehaviorGraphView::~BehaviorGraphView(){
+    ui->setBehaviorView(NULL);
 }

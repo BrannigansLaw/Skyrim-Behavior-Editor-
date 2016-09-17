@@ -21,7 +21,7 @@ QString hkbStateMachineEventPropertyArray::getClassname(){
 }
 
 bool hkbStateMachineEventPropertyArray::readData(const HkxXmlReader &reader, long index){
-    /*bool ok;
+    bool ok;
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
@@ -50,7 +50,7 @@ bool hkbStateMachineEventPropertyArray::readData(const HkxXmlReader &reader, lon
             }
         }
         index++;
-    }*/
+    }
     return true;
 }
 
@@ -58,7 +58,7 @@ bool hkbStateMachineEventPropertyArray::link(){
     if (!getParentFile()){
         return false;
     }
-    /*HkxObjectExpSharedPtr *ptr;
+    HkxObjectExpSharedPtr *ptr;
     for (int i = 0; i < events.size(); i++){
         //payload
         ptr = getParentFile()->findHkxObject(events.at(i).payload.getReference());
@@ -68,17 +68,17 @@ bool hkbStateMachineEventPropertyArray::link(){
             }
             events[i].payload = *ptr;
         }
-    }*/
+    }
     return true;
 }
 
 bool hkbStateMachineEventPropertyArray::evaulateDataValidity(){
-    /*for (int i = 0; i < events.size(); i++){
+    for (int i = 0; i < events.size(); i++){
         if (events.at(i).payload.data() && events.at(i).payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             setDataValidity(false);
             return false;
         }
-    }*/
+    }
     setDataValidity(true);
     return true;
 }

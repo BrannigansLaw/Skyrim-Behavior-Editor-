@@ -16,7 +16,8 @@ public:
     QString getName() const;
     bool evaulateDataValidity();
     static QString getClassname();
-    QString getStateName(int stateId);
+    QString getStateName(int stateId) const;
+    QStringList getStateNames() const;
 private:
     hkbStateMachine& operator=(const hkbStateMachine&);
     hkbStateMachine(const hkbStateMachine &);

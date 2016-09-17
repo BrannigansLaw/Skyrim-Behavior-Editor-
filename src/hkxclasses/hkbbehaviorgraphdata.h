@@ -11,16 +11,6 @@ class hkbBehaviorGraphData: public HkxObject
     friend class BehaviorVariablesUI;
     friend class EventsUI;
 public:
-    enum hkVariableType {
-        VARIABLE_TYPE_BOOL,
-        VARIABLE_TYPE_INT8,
-        VARIABLE_TYPE_INT16,
-        VARIABLE_TYPE_INT32,
-        VARIABLE_TYPE_REAL,
-        VARIABLE_TYPE_POINTER,
-        VARIABLE_TYPE_VECTOR4,
-        VARIABLE_TYPE_QUATERNION
-    };
     hkbBehaviorGraphData(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
     virtual ~hkbBehaviorGraphData();
     bool readData(const HkxXmlReader & reader, long index);
@@ -29,7 +19,8 @@ public:
     QStringList getEventNames() const;
     bool evaulateDataValidity();
     static QString getClassname();
-    hkQuadVariable getQuadVariable(int index, bool *ok);
+    hkQuadVariable getQuadVariable(int index, bool *ok) const;
+    hkVariableType getVariableTypeAt(int index) const;
 private:
     hkbBehaviorGraphData& operator=(const hkbBehaviorGraphData&);
     hkbBehaviorGraphData(const hkbBehaviorGraphData &);

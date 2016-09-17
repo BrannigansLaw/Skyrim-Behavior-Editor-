@@ -1,7 +1,7 @@
 #include "hkxobject.h"
 #include "src/filetypes/hkxfile.h"
 #include "src/xml/hkxxmlreader.h"
-
+#include "src/hkxclasses/hkbvariablebindingset.h"
 
 /**
  * HkxObject
@@ -371,6 +371,18 @@ HkDynamicObject::HkDynamicObject(BehaviorFile *parent/*, long ref = 0*/)
     : HkxObject(parent/*, ref*/)
 {
     //
+}
+
+void HkDynamicObject::addBinding(const QString & path, int varIndex, bool isProperty){
+    static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->addBinding(path, varIndex, (hkbVariableBindingSet::hkBinding::BindingType)(isProperty));
+}
+
+void HkDynamicObject::removeBinding(const QString & path){
+    static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->removeBinding(path);
+}
+
+void HkDynamicObject::removeBinding(int varIndex){
+    static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->removeBinding(varIndex);
 }
 
 bool HkDynamicObject::linkVar(){

@@ -222,6 +222,30 @@ void hkbBehaviorGraphData::setEventFlagAt(int index, bool state){
     }
 }
 
+hkVariableType hkbBehaviorGraphData::getVariableTypeAt(int index) const{
+    if (variableInfos.size() > index && index > -1){
+        QString type = variableInfos.at(index).type;
+        if (type == "VARIABLE_TYPE_BOOL"){
+            return VARIABLE_TYPE_BOOL;
+        }else if (type == "VARIABLE_TYPE_INT8"){
+            return VARIABLE_TYPE_INT8;
+        }else if (type == "VARIABLE_TYPE_INT16"){
+            return VARIABLE_TYPE_INT16;
+        }else if (type == "VARIABLE_TYPE_INT32"){
+            return VARIABLE_TYPE_INT32;
+        }else if (type == "VARIABLE_TYPE_REAL"){
+            return VARIABLE_TYPE_REAL;
+        }else if (type == "VARIABLE_TYPE_POINTER"){
+            return VARIABLE_TYPE_POINTER;
+        }else if (type == "VARIABLE_TYPE_VECTOR4"){
+            return VARIABLE_TYPE_VECTOR4;
+        }else if (type == "VARIABLE_TYPE_QUATERNION"){
+            return VARIABLE_TYPE_QUATERNION;
+        }
+    }
+    return VARIABLE_TYPE_INT8;
+}
+
 void hkbBehaviorGraphData::setVariableNameAt(int index, const QString & name){
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (strData->variableNames.size() > index && index > -1){
@@ -256,7 +280,7 @@ void hkbBehaviorGraphData::setQuadVariableValueAt(int index, hkQuadVariable valu
     }
 }
 
-hkQuadVariable hkbBehaviorGraphData::getQuadVariable(int index, bool *ok){
+hkQuadVariable hkbBehaviorGraphData::getQuadVariable(int index, bool *ok) const{
     *ok = false;
     hkbVariableValueSet *variableValues = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
     if (variableValues->wordVariableValues.size() > index && variableInfos.size() > index){
@@ -465,7 +489,7 @@ QStringList hkbBehaviorGraphData::getVariableNames() const{
 }
 
 QStringList hkbBehaviorGraphData::getEventNames() const{
-    return static_cast<hkbBehaviorGraphStringData *>(stringData.data())->variableNames;
+    return static_cast<hkbBehaviorGraphStringData *>(stringData.data())->eventNames;
 }
 
 bool hkbBehaviorGraphData::evaulateDataValidity(){

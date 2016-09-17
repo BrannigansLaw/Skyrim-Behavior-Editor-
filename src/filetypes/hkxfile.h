@@ -50,11 +50,13 @@ public:
     HkxObjectExpSharedPtr * findGenerator(long ref);
     HkxObjectExpSharedPtr * findModifier(long ref);
     HkxObjectExpSharedPtr * findBehaviorGraph(long ref);
-    void removeData();
-    int getIndexOfGenerator(const HkxObjectExpSharedPtr & obj);
+    QVector<int> removeGeneratorData();
+    QVector<int> removeModifierData();
+    QVector<int> removeOtherData();
+    int getIndexOfGenerator(const HkxObjectExpSharedPtr & obj) const;
     bool setGeneratorData(HkxObjectExpSharedPtr & ptrToSet, int index);
     HkxObject * getGeneratorDataAt(int index);
-    int getIndexOfModifier(const HkxObjectExpSharedPtr & obj);
+    int getIndexOfModifier(const HkxObjectExpSharedPtr & obj) const;
     bool setModifierData(HkxObjectExpSharedPtr & ptrToSet, int index);
     HkxObject* getModifierDataAt(int index);
     QStringList getVariableNames() const;
@@ -62,6 +64,9 @@ public:
     QStringList getGeneratorNames();
     QStringList getModifierNames();
     HkxObject * getBehaviorGraphData() const;
+    void removeBindings(int varIndex);
+    hkVariableType getVariableTypeAt(int index) const;
+    template <typename T> bool addObjectToFile(T *obj, const QByteArray & temp = "-1");
 protected:
     bool parse();
     bool link();

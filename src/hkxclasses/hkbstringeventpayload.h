@@ -7,10 +7,12 @@ class hkbStringEventPayload: public HkxObject
 {
     friend class StateMachineUI;
 public:
-    hkbStringEventPayload(BehaviorFile *parent = NULL/*, long ref = 0*/);
+    hkbStringEventPayload(BehaviorFile *parent = NULL, const QString & string = "");
     virtual ~hkbStringEventPayload();
+    bool readData(const HkxXmlReader & reader, long index);
     bool evaulateDataValidity();
     static QString getClassname();
+    bool link(){return true;}
 protected:
 private:
     static uint refCount;

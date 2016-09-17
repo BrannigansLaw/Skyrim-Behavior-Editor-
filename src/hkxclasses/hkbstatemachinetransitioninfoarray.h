@@ -9,6 +9,7 @@ class hkbStateMachineTransitionInfoArray: public HkxObject
 {
     friend class hkbStateMachine;
     friend class hkbStateMachineStateInfo;
+    friend class StateMachineUI;
 public:
     hkbStateMachineTransitionInfoArray(BehaviorFile *parent = NULL, hkbStateMachine *parentSM = NULL);
     virtual ~hkbStateMachineTransitionInfoArray();

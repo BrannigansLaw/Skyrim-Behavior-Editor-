@@ -64,7 +64,9 @@ void EventsUI::setBoolVariableValue(int index){
 }
 
 void EventsUI::renameSelectedEvent(int index){
-    loadedData->setEventNameAt(index, qobject_cast<QLineEdit *>(table->cellWidget(index, 0))->text());
+    QString newName = qobject_cast<QLineEdit *>(table->cellWidget(index, 0))->text();
+    loadedData->setEventNameAt(index, newName);
+    emit eventNameChanged(newName, index);
 }
 
 void EventsUI::loadData(HkxObject *data){
@@ -109,11 +111,14 @@ void EventsUI::addEvent(){
     loadedData->addEvent();
     hkbBehaviorGraphStringData *events = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
     addEventToTable(events->eventNames.last(), loadedData->eventInfos.last());
+    emit eventAdded(events->eventNames.last());
 }
 
 void EventsUI::removeEvent(){
-    loadedData->removeEvent(table->currentRow());
-    removeEventFromTable(table->currentRow());
+    int index = table->currentRow();
+    loadedData->removeEvent(index);
+    removeEventFromTable(index);
+    emit eventRemoved(index);
 }
 
 void EventsUI::setHkDataUI(HkDataUI *ui){

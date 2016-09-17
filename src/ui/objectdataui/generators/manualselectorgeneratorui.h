@@ -28,15 +28,30 @@ public:
     ManualSelectorGeneratorUI();
     virtual ~ManualSelectorGeneratorUI(){}
     void loadData(HkxObject *data);
+signals:
+    void generatorNameChanged(const QString & newName, int index);
 private slots:
     void setName();
     void addNewGenerator();
-    void addExistingGenerator(int index);
+    void setGeneratorAt(int index);
     void removeGenerator();
-    void setSelectedGeneratorIndex(int value);
-    void setSelectedGeneratorIndexBoundVariable(int index);
-    void setCurrentGeneratorIndex(int value);
-    void setCurrentGeneratorIndexBoundVariable(int index);
+    void setSelectedGeneratorIndex();
+    void setSelectedGeneratorIndexBind(int index);
+    void setCurrentGeneratorIndex();
+    void setCurrentGeneratorIndexBind(int index);
+private:
+    //void addEventToLists(const QString & name);
+    //void removeEventFromLists(int index);
+    //void renameEventInLists(const QString & newName, int index);
+    void addVariableToLists(const QString & name);
+    void removeVariableFromLists(int index);
+    void renameVariableInLists(const QString & newName, int index);
+    void addGeneratorToLists(const QString & name);
+    void removeGeneratorFromLists(int index);
+    void renameGeneratorInLists(const QString & name, int index);
+    //void addModifierToLists(const QString & name);
+    //void removeModifierFromLists(int index);
+    //void renameModifierInLists(const QString & name, int index);
 private:
     enum Type {
         STATE_MACHINE = 0,
@@ -53,7 +68,7 @@ private:
         BEHAVIOR_REFERENCE_GENERATOR = 11
     };
 
-    static QStringList list;
+    static QStringList types;
     static QStringList headerLabels1;
     static QStringList headerLabels2;
     BehaviorGraphView *behaviorView;

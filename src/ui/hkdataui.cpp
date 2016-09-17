@@ -5,6 +5,8 @@
 #include "src/hkxclasses/generators/hkbgenerator.h"
 #include "src/filetypes/hkxfile.h"
 #include "src/ui/behaviorgraphui/behaviorgraphui.h"
+#include "src/ui/behaviorvariablesui.h"
+#include "src/ui/eventsui.h"
 #include "src/hkxclasses/generators/bsistatetagginggenerator.h"
 #include "src/hkxclasses/generators/hkbmodifiergenerator.h"
 #include "src/ui/objectdataui/generators/bsistatetagginggeneratorui.h"
@@ -15,13 +17,11 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QStackedLayout>
+#include <QCoreApplication>
 
-HkDataUI::HkDataUI(const QString &title/*, const QString &button1Name, const QString &button2Name*/)
+HkDataUI::HkDataUI(const QString &title)
     : behaviorView(NULL),
       verLyt(new QVBoxLayout),
-      //horLyt(new QHBoxLayout),
-      //button1(new QPushButton(button1Name)),
-      //button2(new QPushButton(button2Name)),
       stack(new QStackedLayout),
       loadedData(NULL),
       noDataL(new QLabel("No Data Selected!")),
@@ -36,44 +36,122 @@ HkDataUI::HkDataUI(const QString &title/*, const QString &button1Name, const QSt
     stack->addWidget(modGenUI);
     stack->addWidget(manSelGenUI);
     stack->addWidget(stateMachineUI);
-    //setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    //horLyt->addWidget(button1);
-    //horLyt->addWidget(button2);
-    //verLyt->addLayout(horLyt, 1);
     verLyt->addLayout(stack, 5);
-    //button1->setMaximumSize(QSize(200, 50));
-    //button2->setMaximumSize(QSize(200, 50));
     setLayout(verLyt);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+}
+
+void HkDataUI::setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *variables){
+    eventsUI = events;
+    variablesUI = variables;
+    connect(eventsUI, SIGNAL(eventAdded(QString)), this, SLOT(eventAdded(QString)));
+    connect(eventsUI, SIGNAL(eventRemoved(int)), this, SLOT(eventRemoved(int)));
+    connect(eventsUI, SIGNAL(eventNameChanged(QString,int)), this, SLOT(eventNameChanged(QString,int)));
+    connect(variablesUI, SIGNAL(variableAdded(QString)), this, SLOT(variableAdded(QString)));
+    connect(variablesUI, SIGNAL(variableRemoved(int)), this, SLOT(variableRemoved(int)));
+    connect(variablesUI, SIGNAL(variableNameChanged(QString,int)), this, SLOT(variableNameChanged(QString,int)));
+}
+
+void HkDataUI::modifierAdded(const QString & name){
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
+    modGenUI->addModifierToLists(name);
+    QCoreApplication::processEvents();
+}
+void HkDataUI::modifierNameChanged(const QString & newName, int index){
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
+    modGenUI->renameModifierInLists(newName, index);
+    QCoreApplication::processEvents();
+}
+
+void HkDataUI::generatorAdded(const QString & name){
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
+    iSTGUI->addGeneratorToLists(name);
+    modGenUI->addGeneratorToLists(name);
+    manSelGenUI->addGeneratorToLists(name);
+    QCoreApplication::processEvents();
+}
+
+void HkDataUI::generatorNameChanged(const QString & newName, int index){
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
+    iSTGUI->renameGeneratorInLists(newName, index);
+    modGenUI->renameGeneratorInLists(newName, index);
+    manSelGenUI->renameGeneratorInLists(newName, index);
+    QCoreApplication::processEvents();
+}
+
+void HkDataUI::eventNameChanged(const QString & newName, int index){
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
+    stateMachineUI->renameEventInLists(newName, index);
+    QCoreApplication::processEvents();
+}
+
+void HkDataUI::eventAdded(const QString & name){
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
+    stateMachineUI->addEventToLists(name);
+    QCoreApplication::processEvents();
+}
+
+void HkDataUI::eventRemoved(int index){
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
+    stateMachineUI->removeEventFromLists(index);
+    QCoreApplication::processEvents();
+}
+
+void HkDataUI::variableNameChanged(const QString & newName, int index){
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
+    iSTGUI->renameVariableInLists(newName, index);
+    manSelGenUI->renameVariableInLists(newName, index);
+    stateMachineUI->renameVariableInLists(newName, index);
+    QCoreApplication::processEvents();
+}
+
+void HkDataUI::variableAdded(const QString & name){
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
+    iSTGUI->addVariableToLists(name);
+    manSelGenUI->addVariableToLists(name);
+    stateMachineUI->addVariableToLists(name);
+    QCoreApplication::processEvents();
+}
+
+void HkDataUI::variableRemoved(int index){
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
+    iSTGUI->removeVariableFromLists(index);
+    manSelGenUI->removeVariableFromLists(index);
+    stateMachineUI->removeVariableFromLists(index);
+    behaviorView->behavior->removeBindings(index);
+    behaviorView->removeOtherData();
+    QCoreApplication::processEvents();
 }
 
 void HkDataUI::changeCurrentDataWidget(GeneratorIcon * icon){
     qulonglong sig;
     if (icon && icon->data.constData()){
+        HkxObject *oldData = loadedData;
         sig = icon->data.constData()->getSignature();
         loadedData = icon->data.data();
         switch (sig) {
         case BS_I_STATE_TAGGING_GENERATOR:
-            //if (loadedData != iSTGUI->bsData){
+            if (loadedData != oldData){
                 iSTGUI->loadData(loadedData);
-            //}
+            }
             stack->setCurrentIndex(BS_I_STATE_TAG_GEN);
             break;
         case HKB_MODIFIER_GENERATOR:
-            //if (loadedData != modGenUI->bsData){
+            if (loadedData != oldData){
                 modGenUI->loadData(loadedData);
-            //}
+            }
             stack->setCurrentIndex(MOD_GEN);
             break;
         case HKB_MANUAL_SELECTOR_GENERATOR:
-            //if (loadedData != modGenUI->bsData){
+            if (loadedData != oldData){
                 manSelGenUI->loadData(loadedData);
-            //}
+            }
             stack->setCurrentIndex(MSG);
             break;
         case HKB_STATE_MACHINE:
-            //if (loadedData != modGenUI->bsData){
+            if (loadedData != oldData){
                 stateMachineUI->loadData(loadedData);
-            //}
+            }
             stack->setCurrentIndex(SM);
             break;
         default:
@@ -86,10 +164,22 @@ void HkDataUI::changeCurrentDataWidget(GeneratorIcon * icon){
     }
 }
 
-void HkDataUI::setBehaviorView(BehaviorGraphView *view){
+BehaviorGraphView * HkDataUI::setBehaviorView(BehaviorGraphView *view){
+    BehaviorGraphView *oldView = behaviorView;
+    if (behaviorView && oldView){
+        disconnect(oldView, 0, this, 0);
+        connect(view, SIGNAL(addedGenerator(QString)), this, SLOT(generatorAdded(QString)));
+        connect(view, SIGNAL(addedModifier(QString)), this, SLOT(modifierAdded(QString)));
+    }
+    setMinimumSize(parentWidget()->size()*0.99);
     behaviorView = view;
     iSTGUI->behaviorView = view;
     modGenUI->behaviorView = view;
     manSelGenUI->behaviorView = view;
     stateMachineUI->behaviorView = view;
+    connect(iSTGUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
+    connect(modGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
+    connect(manSelGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
+    connect(stateMachineUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
+    return oldView;
 }

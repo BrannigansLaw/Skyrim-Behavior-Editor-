@@ -20,13 +20,17 @@ class BehaviorVariablesUI: public QGroupBox
 public:
     BehaviorVariablesUI(const QString & title);
     virtual ~BehaviorVariablesUI(){}
-public slots:
     void setHkDataUI(HkDataUI *ui);
     void loadData(HkxObject *data);
+private slots:
     void addVariable();
     void removeVariable();
     void setVariableValue(int index);
     void renameSelectedVariable(int index);
+signals:
+    void variableNameChanged(const QString & newName, int index);
+    void variableAdded(const QString & name);
+    void variableRemoved(int index);
 private:
     BehaviorVariablesUI& operator=(const BehaviorVariablesUI&);
     BehaviorVariablesUI(const BehaviorVariablesUI &);

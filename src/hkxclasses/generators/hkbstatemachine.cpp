@@ -42,15 +42,25 @@ QString hkbStateMachine::getName() const{
     return name;
 }
 
-QString hkbStateMachine::getStateName(int stateId){
+QString hkbStateMachine::getStateName(int stateId) const{
     hkbStateMachineStateInfo *state;
     for (int i = 0; i < states.size(); i++){
         state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
         if (state->stateId == stateId){
-            return name;
+            return state->name;
         }
     }
     return "";
+}
+
+QStringList hkbStateMachine::getStateNames() const{
+    QStringList list;
+    hkbStateMachineStateInfo *state;
+    for (int i = 0; i < states.size(); i++){
+        state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+        list.append(state->name);
+    }
+    return list;
 }
 
 bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){

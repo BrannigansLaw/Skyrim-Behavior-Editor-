@@ -18,13 +18,17 @@ class EventsUI: public QGroupBox
 public:
     EventsUI(const QString & title);
     virtual ~EventsUI(){}
-public slots:
     void setHkDataUI(HkDataUI *ui);
     void loadData(HkxObject *data);
+private slots:
     void addEvent();
     void removeEvent();
     void setBoolVariableValue(int index);
     void renameSelectedEvent(int index);
+signals:
+    void eventNameChanged(const QString & newName, int index);
+    void eventAdded(const QString & name);
+    void eventRemoved(int index);
 private:
     EventsUI& operator=(const EventsUI&);
     EventsUI(const EventsUI &);

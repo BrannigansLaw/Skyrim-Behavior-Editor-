@@ -60,7 +60,11 @@ SOURCES += \
     src/ui/objectdataui/generators/manualselectorgeneratorui.cpp \
     src/ui/behaviorvariablesui.cpp \
     src/ui/eventsui.cpp \
-    src/ui/objectdataui/generators/statemachineui.cpp
+    src/ui/objectdataui/generators/statemachineui.cpp \
+    src/ui/objectdataui/generators/stateui.cpp \
+    src/hkxclasses/hkbvariablebindingset.cpp \
+    src/ui/transitionsui.cpp \
+    src/ui/blendingtransitioneffectui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -104,4 +108,8 @@ HEADERS  += \
     src/ui/behaviorvariablesui.h \
     src/utility.h \
     src/ui/eventsui.h \
-    src/ui/objectdataui/generators/statemachineui.h
+    src/ui/objectdataui/generators/statemachineui.h \
+    src/ui/objectdataui/generators/stateui.h \
+    src/hkxclasses/hkbvariablebindingset.h \
+    src/ui/transitionsui.h \
+    src/ui/blendingtransitioneffectui.h

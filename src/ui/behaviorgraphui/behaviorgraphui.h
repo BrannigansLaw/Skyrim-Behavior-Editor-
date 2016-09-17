@@ -26,6 +26,7 @@ class BSBoneSwitchGenerator;
 class BSBoneSwitchGeneratorBoneData;
 class hkbGenerator;
 class HkDataUI;
+class GeneratorIcon;
 
 class BehaviorGraphView: public QGraphicsView
 {
@@ -33,8 +34,14 @@ class BehaviorGraphView: public QGraphicsView
     friend class GeneratorIcon;
     friend class HkDataUI;
     friend class ManualSelectorGeneratorUI;
+    friend class ModifierGeneratorUI;
+    friend class BSiStateTaggingGeneratorUI;
+    friend class StateMachineUI;
+    friend class StateUI;
 public:
     BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file);
+    virtual ~BehaviorGraphView();
+    void writeToLog(const QString & message, bool isError = false);
     bool drawBehaviorGraph();
     bool reconnectBranch(HkxObject *oldChild, HkxObject *newChild, GeneratorIcon *icon);
     QSize sizeHint() const Q_DECL_OVERRIDE{
@@ -43,12 +50,19 @@ public:
     GeneratorIcon* getSelectedItem() const{
         return selectedIcon;
     }
+    void removeGeneratorData();
+    void removeModifierData();
+    void removeOtherData();
 protected:
     void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 signals:
     void iconSelected(GeneratorIcon *icon);
+    void addedGenerator(const QString & name);
+    void addedModifier(const QString & name);
+    void removedGenerator(int index);
+    void removedModifier(int index);
 private slots:
     void appendStateMachine();
     void appendManualSelectorGenerator();

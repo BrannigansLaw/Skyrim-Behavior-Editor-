@@ -15,30 +15,41 @@ class ModifierGeneratorUI;
 class ManualSelectorGeneratorUI;
 class StateMachineUI;
 class GeneratorIcon;
+class BehaviorVariablesUI;
+class EventsUI;
+class MainWindow;
 
 class HkDataUI: public QGroupBox
 {
     Q_OBJECT
 public:
-    HkDataUI(const QString & title/*, const QString & button1Name = "Back", const QString & button2Name = "Forward"*/);
+    HkDataUI(const QString & title);
     virtual ~HkDataUI(){}
-    void setBehaviorView(BehaviorGraphView *view);
+    BehaviorGraphView * setBehaviorView(BehaviorGraphView *view);
+    void setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *variables);
 public slots:
     void changeCurrentDataWidget(GeneratorIcon *icon);
+    void modifierAdded(const QString & name);
+    void modifierNameChanged(const QString & newName, int index);
+    void generatorAdded(const QString & name);
+    void generatorNameChanged(const QString & newName, int index);
+    void eventNameChanged(const QString & newName, int index);
+    void eventAdded(const QString & name);
+    void eventRemoved(int index);
+    void variableNameChanged(const QString & newName, int index);
+    void variableAdded(const QString & name);
+    void variableRemoved(int index);
 private:
     HkDataUI& operator=(const HkDataUI&);
     HkDataUI(const HkDataUI &);
 private:
     enum {NO_DATA_SELECTED = 0, BS_I_STATE_TAG_GEN = 1, MOD_GEN = 2, MSG = 3, SM = 4};
+    EventsUI *eventsUI;
+    BehaviorVariablesUI *variablesUI;
     BehaviorGraphView *behaviorView;
     QVBoxLayout *verLyt;
-    //QHBoxLayout *horLyt;
-    //QPushButton *button1;
-    //QPushButton *button2;
     QStackedLayout *stack;
     HkxObject *loadedData;
-    //QList <HkxObject *> viewedData;
-    //All HkxObjectData UI's??
     QLabel *noDataL;
     BSiStateTaggingGeneratorUI *iSTGUI;
     ModifierGeneratorUI *modGenUI;
