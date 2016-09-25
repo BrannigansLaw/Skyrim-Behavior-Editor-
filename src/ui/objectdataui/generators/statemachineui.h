@@ -60,6 +60,7 @@ private:
     void addVariableToLists(const QString & name);
     void removeVariableFromLists(int index);
     void renameVariableInLists(const QString & newName, int index);
+    void loadComboBoxes();
 private:
     enum StateView {
         STATE_TABLE = 0,

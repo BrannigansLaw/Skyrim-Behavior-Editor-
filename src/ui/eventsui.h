@@ -11,6 +11,9 @@ class QPushButton;
 class QSignalMapper;
 class hkbBehaviorGraphData;
 class HkxObject;
+class QStackedLayout;
+class QLineEdit;
+class QCheckBox;
 
 class EventsUI: public QGroupBox
 {
@@ -23,8 +26,10 @@ public:
 private slots:
     void addEvent();
     void removeEvent();
-    void setBoolVariableValue(int index);
-    void renameSelectedEvent(int index);
+    void setBoolVariableValue();
+    void renameSelectedEvent();
+    void viewEvent(int row, int column);
+    void returnToTable();
 signals:
     void eventNameChanged(const QString & newName, int index);
     void eventAdded(const QString & name);
@@ -32,9 +37,11 @@ signals:
 private:
     EventsUI& operator=(const EventsUI&);
     EventsUI(const EventsUI &);
-    void addEventToTable(const QString & name, const QString &flags);
-    void removeEventFromTable(int row);
 private:
+    enum View {
+        TABLE_WIDGET = 0,
+        EVENT_WIDGET = 1
+    };
     static QStringList headerLabels;
     HkDataUI *dataUI;
     QVBoxLayout *verLyt;
@@ -43,8 +50,11 @@ private:
     QPushButton *addObjectPB;
     QPushButton *removeObjectPB;
     QHBoxLayout *buttonLyt;
-    QSignalMapper *flagsMapper;
-    QSignalMapper *nameMapper;
+    QLineEdit *eventName;
+    QCheckBox *flag;
+    QTableWidget *eventWidget;
+    QStackedLayout *stackLyt;
+    QPushButton *returnPB;
 };
 
 #endif // EVENTSUI_H

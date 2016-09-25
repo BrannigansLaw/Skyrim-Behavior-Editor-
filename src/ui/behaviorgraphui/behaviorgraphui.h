@@ -38,6 +38,7 @@ class BehaviorGraphView: public QGraphicsView
     friend class BSiStateTaggingGeneratorUI;
     friend class StateMachineUI;
     friend class StateUI;
+    friend class MainWindow;
 public:
     BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file);
     virtual ~BehaviorGraphView();
@@ -90,12 +91,14 @@ private slots:
     //void removeSelectedObject();
     void removeSelectedObjectBranchSlot();
 private:
-    void removeSelectedObjectBranch(GeneratorIcon *icon, GeneratorIcon *iconToKeep = NULL);
+    void removeSelectedObjectBranch(GeneratorIcon *icon, GeneratorIcon *iconToKeep = NULL, bool removeAll = true);
+    void removeIconFromGraph(GeneratorIcon *iconToRemove);
 private:
     HkDataUI *ui;
     BehaviorFile *behavior;
     QGraphicsScene *behaviorGS;
     GeneratorIcon *selectedIcon;
+    GeneratorIcon *rootIcon;
     QMenu *contextMenu;
     QMenu *appendGeneratorMenu;
     QAction *appendSMAct;

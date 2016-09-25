@@ -166,10 +166,8 @@ void HkDataUI::changeCurrentDataWidget(GeneratorIcon * icon){
 
 BehaviorGraphView * HkDataUI::setBehaviorView(BehaviorGraphView *view){
     BehaviorGraphView *oldView = behaviorView;
-    if (behaviorView && oldView){
+    if (oldView){
         disconnect(oldView, 0, this, 0);
-        connect(view, SIGNAL(addedGenerator(QString)), this, SLOT(generatorAdded(QString)));
-        connect(view, SIGNAL(addedModifier(QString)), this, SLOT(modifierAdded(QString)));
     }
     setMinimumSize(parentWidget()->size()*0.99);
     behaviorView = view;
@@ -177,6 +175,14 @@ BehaviorGraphView * HkDataUI::setBehaviorView(BehaviorGraphView *view){
     modGenUI->behaviorView = view;
     manSelGenUI->behaviorView = view;
     stateMachineUI->behaviorView = view;
+    if (behaviorView){
+        iSTGUI->loadComboBoxes();//Implement and change ->count() == 0){ code in all uis
+        modGenUI->loadComboBoxes();
+        manSelGenUI->loadComboBoxes();
+        stateMachineUI->loadComboBoxes();
+        connect(behaviorView, SIGNAL(addedGenerator(QString)), this, SLOT(generatorAdded(QString)));
+        connect(behaviorView, SIGNAL(addedModifier(QString)), this, SLOT(modifierAdded(QString)));
+    }
     connect(iSTGUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
     connect(modGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
     connect(manSelGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));

@@ -21,7 +21,7 @@ public:
         BindingType bindingType;
     };
 public:
-    hkbVariableBindingSet(BehaviorFile *parent = NULL);
+    hkbVariableBindingSet(BehaviorFile *parent);
     virtual ~hkbVariableBindingSet();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

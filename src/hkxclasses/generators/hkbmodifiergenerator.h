@@ -9,7 +9,7 @@ class hkbModifierGenerator: public hkbGenerator
     friend class BehaviorGraphView;
     friend class ModifierGeneratorUI;
 public:
-    hkbModifierGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbModifierGenerator(BehaviorFile *parent/*, qint16 ref = 0*/);
     virtual ~hkbModifierGenerator();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

@@ -7,7 +7,7 @@ class hkbBehaviorGraph: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
-    hkbBehaviorGraph(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbBehaviorGraph(BehaviorFile *parent/*, qint16 ref = 0*/);
     virtual ~hkbBehaviorGraph();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

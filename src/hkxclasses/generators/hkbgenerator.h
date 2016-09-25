@@ -24,7 +24,7 @@ public:
     QString getClassname() const;
     void updateIconNames();
 protected:
-    hkbGenerator(BehaviorFile *parent = NULL/*, long ref = 0*/);
+    hkbGenerator(BehaviorFile *parent/*, long ref = 0*/);
     void appendIcon(GeneratorIcon * icon);
 private:
     QList <GeneratorIcon *> icons;

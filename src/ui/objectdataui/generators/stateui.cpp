@@ -105,7 +105,7 @@ StateUI::StateUI()
     lyt->addLayout(stackLyt);
     setLayout(lyt);
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    connect(generator, SIGNAL(currentIndexChanged(int)), this, SLOT(setGenerator(int)));
+    connect(generator, SIGNAL(activated(int)), this, SLOT(setGenerator(int)));
     connect(stateId, SIGNAL(editingFinished()), this, SLOT(setStateId()));
     connect(probability, SIGNAL(editingFinished()), this, SLOT(setProbability()));
     connect(enable, SIGNAL(released()), this, SLOT(setEnable()));
@@ -124,13 +124,13 @@ StateUI::StateUI()
 void StateUI::addGeneratorToLists(const QString & name){
     disconnect(generator, 0, this, 0);
     generator->insertItem(generator->count(), name);
-    connect(generator, SIGNAL(currentIndexChanged(int)), this, SLOT(setGenerator(int)));
+    connect(generator, SIGNAL(activated(int)), this, SLOT(setGenerator(int)));
 }
 
 void StateUI::removeGeneratorFromLists(int index){
     disconnect(generator, 0, this, 0);
     generator->removeItem(index);
-    connect(generator, SIGNAL(currentIndexChanged(int)), this, SLOT(setGenerator(int)));
+    connect(generator, SIGNAL(activated(int)), this, SLOT(setGenerator(int)));
 }
 
 void StateUI::renameGeneratorInLists(const QString & name, int index){
@@ -230,7 +230,7 @@ void StateUI::setGenerator(int index){
                 i++;
                 disconnect(generator, 0, this, 0);
                 generator->setCurrentIndex(i);
-                connect(generator, SIGNAL(currentIndexChanged(int)), this, SLOT(setGenerator(int)));
+                connect(generator, SIGNAL(activated(int)), this, SLOT(setGenerator(int)));
                 return;
             }
         }
@@ -260,7 +260,7 @@ void StateUI::loadData(HkxObject *data){
                     if (index > -1 && index < comboBox->count()){
                         comboBox->setCurrentIndex(index);
                     }
-                    connect(comboBox, SIGNAL(currentIndexChanged(int)), signalMapper, SLOT(map()));
+                    connect(comboBox, SIGNAL(activated(int)), signalMapper, SLOT(map()));
                     signalMapper->setMapping(comboBox, i);
                 }else{
                     generators->setRowHidden(i, false);
@@ -293,6 +293,6 @@ void StateUI::loadData(HkxObject *data){
         }
         int index = bsData->getParentFile()->getIndexOfGenerator(bsData->generator) + 1;
         generator->setCurrentIndex(index);
-        connect(generator, SIGNAL(currentIndexChanged(int)), this, SLOT(setGenerator(int)));
+        connect(generator, SIGNAL(activated(int)), this, SLOT(setGenerator(int)));
     }
 }

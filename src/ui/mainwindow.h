@@ -40,7 +40,10 @@ private:
     QGridLayout *topLyt;
     QMenuBar *topMB;
     QAction *openA;
-    QMenu *openM;
+    QMenu *fileM;
+    QMenu *viewM;
+    QAction *expandA;
+    QAction *collapseA;
     FileSelectWindow *dirViewFSW;
     BehaviorFile *hkxFile;
     BehaviorGraphView *behaviorGraphViewIV;
@@ -58,6 +61,8 @@ private:
 private slots:
     void openDirView();
     void openHkxfile(QString name);
+    void expandBranches();
+    void collapseBranches();
 private:
     void setProgressData(const QString & message, int max, int min, int value);
     bool exitProgram();

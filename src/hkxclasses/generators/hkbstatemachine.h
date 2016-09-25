@@ -8,7 +8,7 @@ class hkbStateMachine: public hkbGenerator
     friend class BehaviorGraphView;
     friend class StateMachineUI;
 public:
-    hkbStateMachine(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbStateMachine(BehaviorFile *parent/*, qint16 ref = 0*/);
     virtual ~hkbStateMachine();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

@@ -52,6 +52,7 @@ private:
     //void addModifierToLists(const QString & name);
     //void removeModifierFromLists(int index);
     //void renameModifierInLists(const QString & name, int index);
+    void loadComboBoxes();
 private:
     enum Type {
         STATE_MACHINE = 0,

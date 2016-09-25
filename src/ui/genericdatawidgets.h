@@ -288,7 +288,7 @@ public:
         lyt->addWidget(boundVariable, 1, 5, 1, 2, Qt::AlignLeft);
         lyt->addWidget(pointers, 1, 3, 1, 2, Qt::AlignLeft);
         setLayout(lyt);
-        connect(pointers, SIGNAL(currentIndexChanged(int)), this, SIGNAL(editingDone(int)));
+        connect(pointers, SIGNAL(activated(int)), this, SIGNAL(editingDone(int)));
     }
 
     QSize sizeHint() const{
@@ -338,11 +338,11 @@ public:
     }
 
     void silence(){
-        disconnect(pointers, SIGNAL(currentIndexChanged(int)), this, SIGNAL(editingDone(int)));
+        disconnect(pointers, SIGNAL(activated(int)), this, SIGNAL(editingDone(int)));
     }
 
     void reconnect(){
-        connect(pointers, SIGNAL(currentIndexChanged(int)), this, SIGNAL(editingDone(int)));
+        connect(pointers, SIGNAL(activated(int)), this, SIGNAL(editingDone(int)));
     }
 
     virtual ~PointerWidget(){}

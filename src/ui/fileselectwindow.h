@@ -18,6 +18,9 @@ public:
     FileSelectWindow(QString windowName);
     virtual ~FileSelectWindow();
     QString getSelectedFilename();
+    QSize sizeHint() const Q_DECL_OVERRIDE;
+protected:
+    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 private:
     QGridLayout *topLyt;
     QFormLayout *fileInfoLyt;
@@ -31,6 +34,8 @@ signals:
 private slots:
     void select();
     void cancel();
+    void readSettings();
+    void writeSettings();
 };
 
 #endif // FILESELECTWINDOW_H

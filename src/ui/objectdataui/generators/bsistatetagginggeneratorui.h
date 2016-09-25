@@ -42,6 +42,7 @@ private:
     //void addModifierToLists(const QString & name);
     //void removeModifierFromLists(int index);
     //void renameModifierInLists(const QString & name, int index);
+    void loadComboBoxes();
 private:
     static QStringList headerLabels1;
     BehaviorGraphView *behaviorView;

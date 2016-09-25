@@ -104,18 +104,18 @@ ManualSelectorGeneratorUI::ManualSelectorGeneratorUI()
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(setGeneratorAt(int)));
     connect(removeObjectPB, SIGNAL(released()), this, SLOT(removeGenerator()));
     connect(selectedGeneratorIndex, SIGNAL(editingFinished()), this, SLOT(setSelectedGeneratorIndex(int)));
-    connect(selectedGeneratorIndexBind, SIGNAL(currentIndexChanged(int)), this, SLOT(setSelectedGeneratorIndexBind(int)));
+    connect(selectedGeneratorIndexBind, SIGNAL(activated(int)), this, SLOT(setSelectedGeneratorIndexBind(int)));
     connect(currentGeneratorIndex, SIGNAL(editingFinished()), this, SLOT(setCurrentGeneratorIndex(int)));
-    connect(currentGeneratorIndexBind, SIGNAL(currentIndexChanged(int)), this, SLOT(setCurrentGeneratorIndexBind(int)));
+    connect(currentGeneratorIndexBind, SIGNAL(activated(int)), this, SLOT(setCurrentGeneratorIndexBind(int)));
 }
 
 void ManualSelectorGeneratorUI::addVariableToLists(const QString & name){
-    disconnect(selectedGeneratorIndexBind, 0, this, 0);
-    disconnect(currentGeneratorIndexBind, 0, this, 0);
+    //dis//connect(selectedGeneratorIndexBind, 0, this, 0);
+    //dis//connect(currentGeneratorIndexBind, 0, this, 0);
     selectedGeneratorIndexBind->insertItem(selectedGeneratorIndexBind->count(), name);
     currentGeneratorIndexBind->insertItem(currentGeneratorIndexBind->count(), name);
-    connect(selectedGeneratorIndexBind, SIGNAL(currentIndexChanged(int)), this, SLOT(setSelectedGeneratorIndexBind(int)));
-    connect(currentGeneratorIndexBind, SIGNAL(currentIndexChanged(int)), this, SLOT(setCurrentGeneratorIndexBind(int)));
+    //connect(selectedGeneratorIndexBind, SIGNAL(activated(int)), this, SLOT(setSelectedGeneratorIndexBind(int)));
+    //connect(currentGeneratorIndexBind, SIGNAL(activated(int)), this, SLOT(setCurrentGeneratorIndexBind(int)));
 }
 
 void ManualSelectorGeneratorUI::removeVariableFromLists(int index){
@@ -140,9 +140,9 @@ void ManualSelectorGeneratorUI::addGeneratorToLists(const QString & name){
     QComboBox *temp;
     for (int i = 0; i < generators->rowCount(); i++){
         temp = qobject_cast<QComboBox *>(generators->cellWidget(i, 2));
-        disconnect(temp, 0, this, 0);
+        //dis//connect(temp, 0, this, 0);
         temp->insertItem(temp->count(), name);
-        connect(temp, SIGNAL(currentIndexChanged(int)), signalMapper, SLOT(map()));
+        //connect(temp, SIGNAL(activated(int)), signalMapper, SLOT(map()));
     }
 }
 
@@ -150,9 +150,9 @@ void ManualSelectorGeneratorUI::removeGeneratorFromLists(int index){
     QComboBox *temp;
     for (int i = 0; i < generators->rowCount(); i++){
         temp = qobject_cast<QComboBox *>(generators->cellWidget(i, 2));
-        disconnect(temp, 0, this, 0);
+        //dis//connect(temp, 0, this, 0);
         temp->removeItem(index);
-        connect(temp, SIGNAL(currentIndexChanged(int)), signalMapper, SLOT(map()));
+        //connect(temp, SIGNAL(activated(int)), signalMapper, SLOT(map()));
     }
 }
 
@@ -176,6 +176,13 @@ void ManualSelectorGeneratorUI::setName(){
     }
 }
 
+void ManualSelectorGeneratorUI::loadComboBoxes(){
+    QStringList varList = behaviorView->behavior->getVariableNames();
+    varList.prepend("None");
+    selectedGeneratorIndexBind->insertItems(0, varList);
+    currentGeneratorIndexBind->insertItems(0, varList);
+}
+
 void ManualSelectorGeneratorUI::loadData(HkxObject *data){
     if (data && data->getSignature() == HKB_MANUAL_SELECTOR_GENERATOR){
         bsData = static_cast<hkbManualSelectorGenerator *>(data);
@@ -184,14 +191,14 @@ void ManualSelectorGeneratorUI::loadData(HkxObject *data){
         QStringList genList = bsData->getParentFile()->getGeneratorNames();
         genList.prepend("None");
         int index;
-        disconnect(selectedGeneratorIndexBind, 0, this, 0);
-        disconnect(currentGeneratorIndexBind, 0, this, 0);
-        if (selectedGeneratorIndexBind->count() == 0){
+        //dis//connect(selectedGeneratorIndexBind, 0, this, 0);
+        //dis//connect(currentGeneratorIndexBind, 0, this, 0);
+        /*if (selectedGeneratorIndexBind->count() == 0){
             QStringList varList = bsData->getParentFile()->getVariableNames();
             varList.prepend("None");
             selectedGeneratorIndexBind->insertItems(0, varList);
             currentGeneratorIndexBind->insertItems(0, varList);
-        }
+        }*/
         hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
         if (varBind){
             int ind = varBind->getVariableIndexOfBinding("selectedGeneratorIndex");
@@ -210,8 +217,8 @@ void ManualSelectorGeneratorUI::loadData(HkxObject *data){
             selectedGeneratorIndexBind->setCurrentIndex(0);
             currentGeneratorIndexBind->setCurrentIndex(0);
         }
-        connect(selectedGeneratorIndexBind, SIGNAL(currentIndexChanged(int)), this, SLOT(setSelectedGeneratorIndexBind(int)));
-        connect(currentGeneratorIndexBind, SIGNAL(currentIndexChanged(int)), this, SLOT(setCurrentGeneratorIndexBind(int)));
+        //connect(selectedGeneratorIndexBind, SIGNAL(activated(int)), this, SLOT(setSelectedGeneratorIndexBind(int)));
+        //connect(currentGeneratorIndexBind, SIGNAL(activated(int)), this, SLOT(setCurrentGeneratorIndexBind(int)));
         name->setText(bsData->name);
         for (int i = 0; i < bsData->generators.size(); i++){
             gen = static_cast<hkbGenerator *>(bsData->generators.at(i).data());
@@ -227,7 +234,7 @@ void ManualSelectorGeneratorUI::loadData(HkxObject *data){
                     if (index > -1 && index < comboBox->count()){
                         comboBox->setCurrentIndex(index);
                     }
-                    connect(comboBox, SIGNAL(currentIndexChanged(int)), signalMapper, SLOT(map()));
+                    connect(comboBox, SIGNAL(activated(int)), signalMapper, SLOT(map()));
                     signalMapper->setMapping(comboBox, i);
                 }else{
                     generators->setRowHidden(i, false);
@@ -236,9 +243,9 @@ void ManualSelectorGeneratorUI::loadData(HkxObject *data){
                     comboBox = qobject_cast<QComboBox *>(generators->cellWidget(i, 2));
                     index = bsData->getParentFile()->getIndexOfGenerator(bsData->generators.at(i)) + 1;
                     if (index > -1 && index < comboBox->count()){
-                        disconnect(signalMapper, 0, this, 0);
+                        //dis//connect(signalMapper, 0, this, 0);
                         comboBox->setCurrentIndex(index);
-                        connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(setGeneratorAt(int)));
+                        //connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(setGeneratorAt(int)));
                     }
                     signalMapper->setMapping(comboBox, i);
                 }
@@ -266,7 +273,7 @@ void ManualSelectorGeneratorUI::setCurrentGeneratorIndex(){
 
 void ManualSelectorGeneratorUI::setSelectedGeneratorIndexBind(int index){
     if (bsData){
-        disconnect(selectedGeneratorIndexBind, 0, this, 0);
+        //dis//connect(selectedGeneratorIndexBind, 0, this, 0);
         hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
         if (behaviorView->behavior->getVariableTypeAt(index - 1) == VARIABLE_TYPE_INT32){
             if (!varBind){
@@ -280,20 +287,20 @@ void ManualSelectorGeneratorUI::setSelectedGeneratorIndexBind(int index){
             msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
             msg.exec();
             if (varBind){
-                disconnect(selectedGeneratorIndexBind, 0, this, 0);
+                //dis//connect(selectedGeneratorIndexBind, 0, this, 0);
                 int ind = varBind->getVariableIndexOfBinding("selectedGeneratorIndex");
                 if (ind > -1 && ind < selectedGeneratorIndexBind->count()){
                     selectedGeneratorIndexBind->setCurrentIndex(ind + 1);
                 }
             }
         }
-        connect(selectedGeneratorIndexBind, SIGNAL(currentIndexChanged(int)), this, SLOT(setSelectedGeneratorIndexBind(int)));
+        //connect(selectedGeneratorIndexBind, SIGNAL(activated(int)), this, SLOT(setSelectedGeneratorIndexBind(int)));
     }
 }
 
 void ManualSelectorGeneratorUI::setCurrentGeneratorIndexBind(int index){
     if (bsData){
-        disconnect(currentGeneratorIndexBind, 0, this, 0);
+        //dis//connect(currentGeneratorIndexBind, 0, this, 0);
         hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
         if (behaviorView->behavior->getVariableTypeAt(index - 1) == VARIABLE_TYPE_INT32){
             if (!varBind){
@@ -307,41 +314,39 @@ void ManualSelectorGeneratorUI::setCurrentGeneratorIndexBind(int index){
             msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
             msg.exec();
             if (varBind){
-                disconnect(currentGeneratorIndexBind, 0, this, 0);
+                //dis//connect(currentGeneratorIndexBind, 0, this, 0);
                 int ind = varBind->getVariableIndexOfBinding("currentGeneratorIndex");
                 if (ind > -1 && ind < currentGeneratorIndexBind->count()){
                     currentGeneratorIndexBind->setCurrentIndex(ind + 1);
                 }
             }
         }
-        connect(currentGeneratorIndexBind, SIGNAL(currentIndexChanged(int)), this, SLOT(setCurrentGeneratorIndexBind(int)));
+        //connect(currentGeneratorIndexBind, SIGNAL(activated(int)), this, SLOT(setCurrentGeneratorIndexBind(int)));
     }
 }
 
 void ManualSelectorGeneratorUI::setGeneratorAt(int index){
     if (behaviorView && index > -1 && index < bsData->generators.size() && index < generators->rowCount()){
-        behaviorView->removeSelectedObjectBranch(behaviorView->selectedIcon->getChildIcon(bsData->generators.at(index).data()));
+        //behaviorView->removeSelectedObjectBranch(behaviorView->selectedIcon->getChildIcon(bsData->generators.at(index).data()));
         QComboBox *comboBox = qobject_cast<QComboBox *>(generators->cellWidget(index, 2));
         HkxObject *ptr = bsData->getParentFile()->getGeneratorDataAt(comboBox->currentIndex() - 1);
         if (!behaviorView->selectedIcon->getChildIcon(ptr)){
-            if (/*index < 1 || */!ptr || ptr == bsData || !behaviorView->reconnectBranch(NULL, ptr, behaviorView->getSelectedItem())){
+            if (!ptr || ptr == bsData || !behaviorView->reconnectBranch(bsData->generators.at(index).data(), ptr, behaviorView->getSelectedItem())){
                 QMessageBox msg;
                 msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!");
                 msg.exec();
                 int i = bsData->getParentFile()->getIndexOfGenerator(bsData->generators.at(index));
                 i++;
-                disconnect(signalMapper, 0, this, 0);
+                //dis//connect(signalMapper, 0, this, 0);
                 comboBox->setCurrentIndex(i);
-                connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(setGeneratorAt(int)));
+                //connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(setGeneratorAt(int)));
                 return;
             }
         }
-        if (index > 0){
-            bsData->generators.insert(index, HkxObjectExpSharedPtr(ptr));
-            behaviorView->removeGeneratorData();
-            generators->item(index, 0)->setText(static_cast<hkbGenerator *>(ptr)->getName());
-            generators->item(index, 1)->setText(static_cast<hkbGenerator *>(ptr)->getClassname());
-        }
+        bsData->generators.insert(index, HkxObjectExpSharedPtr(ptr));
+        behaviorView->removeGeneratorData();
+        generators->item(index, 0)->setText(static_cast<hkbGenerator *>(ptr)->getName());
+        generators->item(index, 1)->setText(static_cast<hkbGenerator *>(ptr)->getClassname());
     }
 }
 
@@ -353,8 +358,8 @@ void ManualSelectorGeneratorUI::addNewGenerator(){
     QStringList genList = bsData->getParentFile()->getGeneratorNames();
     genList.prepend("None");
     genSelector->insertItems(0, genList);
-    //connect(genSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setGeneratorAt(int)));
-    connect(genSelector, SIGNAL(currentIndexChanged(int)), signalMapper, SLOT(map()));
+    //connect(genSelector, SIGNAL(activated(int)), this, SLOT(setGeneratorAt(int)));
+    connect(genSelector, SIGNAL(activated(int)), signalMapper, SLOT(map()));
     signalMapper->setMapping(genSelector, bsData->generators.size());
     Type typeEnum = static_cast<Type>(typeSelectorCB->currentIndex());
     switch (typeEnum){
@@ -413,7 +418,7 @@ void ManualSelectorGeneratorUI::removeGenerator(){
     }
     GeneratorIcon *tempIcon = behaviorView->selectedIcon->getChildIcon(bsData->generators.at(index).data());
     if (bsData->generators.count(bsData->generators.at(index)) == 1){
-        behaviorView->removeSelectedObjectBranch(tempIcon);
+        behaviorView->removeSelectedObjectBranch(tempIcon, NULL, false);
     }else{
         bsData->generators.removeAt(index);
     }

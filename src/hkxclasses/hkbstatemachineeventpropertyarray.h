@@ -6,7 +6,7 @@
 class hkbStateMachineEventPropertyArray: public HkxObject
 {
 public:
-    hkbStateMachineEventPropertyArray(BehaviorFile *parent = NULL);
+    hkbStateMachineEventPropertyArray(BehaviorFile *parent);
     virtual ~hkbStateMachineEventPropertyArray();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

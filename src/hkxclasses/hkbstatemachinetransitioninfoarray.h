@@ -11,7 +11,7 @@ class hkbStateMachineTransitionInfoArray: public HkxObject
     friend class hkbStateMachineStateInfo;
     friend class StateMachineUI;
 public:
-    hkbStateMachineTransitionInfoArray(BehaviorFile *parent = NULL, hkbStateMachine *parentSM = NULL);
+    hkbStateMachineTransitionInfoArray(BehaviorFile *parent, hkbStateMachine *parentSM = NULL);
     virtual ~hkbStateMachineTransitionInfoArray();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

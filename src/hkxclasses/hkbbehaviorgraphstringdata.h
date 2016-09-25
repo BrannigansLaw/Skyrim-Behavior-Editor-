@@ -14,7 +14,7 @@ class hkbBehaviorGraphStringData: public HkxObject
     friend class BehaviorVariablesUI;
     friend class EventsUI;
 public:
-    hkbBehaviorGraphStringData(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbBehaviorGraphStringData(BehaviorFile *parent/*, qint16 ref = 0*/);
     virtual ~hkbBehaviorGraphStringData();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

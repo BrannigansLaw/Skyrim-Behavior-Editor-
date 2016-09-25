@@ -200,6 +200,8 @@ StateMachineUI::StateMachineUI()
     typeSelectorCB->insertItems(0, types);
     typeTransitionCB->insertItem(0, "hkbStateMachineTransitionInfoArray");
 
+    startStateMode->insertItems(0, bsData->StartStateMode);
+    selfTransitionMode->insertItems(0, bsData->SelfTransitionMode);
     /*table->setVisible(false);
     table->resizeColumnsToContents();
     table->setVisible(true);
@@ -217,19 +219,19 @@ StateMachineUI::StateMachineUI()
     lyt->addLayout(transitionStackLyt);
     setLayout(lyt);
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    connect(id, SIGNAL(currentIndexChanged(int)), this, SLOT(setEventToSendWhenStateOrTransitionChanges(int)));
+    connect(id, SIGNAL(activated(int)), this, SLOT(setEventToSendWhenStateOrTransitionChanges(int)));
     connect(payload, SIGNAL(editingFinished()), this, SLOT(setPayload()));
-    connect(startStateId, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateId(int)));
-    connect(startStateIdBind, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateIdBind(int)));
-    connect(returnToPreviousStateEventId, SIGNAL(currentIndexChanged(int)), this, SLOT(setReturnToPreviousStateEventId(int)));
-    connect(randomTransitionEventId, SIGNAL(currentIndexChanged(int)), this, SLOT(setRandomTransitionEventId(int)));
-    connect(transitionToNextHigherStateEventId, SIGNAL(currentIndexChanged(int)), this, SLOT(setTransitionToNextHigherStateEventId(int)));
-    connect(transitionToNextLowerStateEventId, SIGNAL(currentIndexChanged(int)), this, SLOT(setTransitionToNextLowerStateEventId(int)));
-    connect(syncVariableIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setSyncVariableIndex(int)));
+    connect(startStateId, SIGNAL(activated(int)), this, SLOT(setStartStateId(int)));
+    connect(startStateIdBind, SIGNAL(activated(int)), this, SLOT(setStartStateIdBind(int)));
+    connect(returnToPreviousStateEventId, SIGNAL(activated(int)), this, SLOT(setReturnToPreviousStateEventId(int)));
+    connect(randomTransitionEventId, SIGNAL(activated(int)), this, SLOT(setRandomTransitionEventId(int)));
+    connect(transitionToNextHigherStateEventId, SIGNAL(activated(int)), this, SLOT(setTransitionToNextHigherStateEventId(int)));
+    connect(transitionToNextLowerStateEventId, SIGNAL(activated(int)), this, SLOT(setTransitionToNextLowerStateEventId(int)));
+    connect(syncVariableIndex, SIGNAL(activated(int)), this, SLOT(setSyncVariableIndex(int)));
     connect(wrapAroundStateId, SIGNAL(clicked(bool)), this, SLOT(setWrapAroundStateId(bool)));
     connect(maxSimultaneousTransitions, SIGNAL(editingFinished()), this, SLOT(setMaxSimultaneousTransitions()));
-    connect(startStateMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateMode(int)));
-    connect(selfTransitionMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setSelfTransitionMode(int)));
+    connect(startStateMode, SIGNAL(activated(int)), this, SLOT(setStartStateMode(int)));
+    connect(selfTransitionMode, SIGNAL(activated(int)), this, SLOT(setSelfTransitionMode(int)));
     connect(states, SIGNAL(cellClicked(int,int)), this, SLOT(viewState(int,int)));
     connect(stateWidget, SIGNAL(returnToParent()), this, SLOT(viewStateTable()));
     connect(wildcardTransitions, SIGNAL(cellClicked(int,int)), this, SLOT(viewTransition(int,int)));
@@ -241,30 +243,30 @@ StateMachineUI::StateMachineUI()
 }
 
 void StateMachineUI::addEventToLists(const QString & name){
-    disconnect(id, 0, this, 0);
-    disconnect(returnToPreviousStateEventId, 0, this, 0);
-    disconnect(randomTransitionEventId, 0, this, 0);
-    disconnect(transitionToNextHigherStateEventId, 0, this, 0);
-    disconnect(transitionToNextLowerStateEventId, 0, this, 0);
+    //dis//connect(id, 0, this, 0);
+    //dis//connect(returnToPreviousStateEventId, 0, this, 0);
+    //dis//connect(randomTransitionEventId, 0, this, 0);
+    //dis//connect(transitionToNextHigherStateEventId, 0, this, 0);
+    //dis//connect(transitionToNextLowerStateEventId, 0, this, 0);
     id->insertItem(id->count(), name);
     returnToPreviousStateEventId->insertItem(returnToPreviousStateEventId->count(), name);
     randomTransitionEventId->insertItem(randomTransitionEventId->count(), name);
     transitionToNextHigherStateEventId->insertItem(transitionToNextHigherStateEventId->count(), name);
     transitionToNextLowerStateEventId->insertItem(transitionToNextLowerStateEventId->count(), name);
-    connect(id, SIGNAL(currentIndexChanged(int)), this, SLOT(setEventToSendWhenStateOrTransitionChanges(int)));
-    connect(returnToPreviousStateEventId, SIGNAL(currentIndexChanged(int)), this, SLOT(setReturnToPreviousStateEventId(int)));
-    connect(randomTransitionEventId, SIGNAL(currentIndexChanged(int)), this, SLOT(setRandomTransitionEventId(int)));
-    connect(transitionToNextHigherStateEventId, SIGNAL(currentIndexChanged(int)), this, SLOT(setTransitionToNextHigherStateEventId(int)));
-    connect(transitionToNextLowerStateEventId, SIGNAL(currentIndexChanged(int)), this, SLOT(setTransitionToNextLowerStateEventId(int)));
+    //connect(id, SIGNAL(activated(int)), this, SLOT(setEventToSendWhenStateOrTransitionChanges(int)));
+    //connect(returnToPreviousStateEventId, SIGNAL(activated(int)), this, SLOT(setReturnToPreviousStateEventId(int)));
+    //connect(randomTransitionEventId, SIGNAL(activated(int)), this, SLOT(setRandomTransitionEventId(int)));
+    //connect(transitionToNextHigherStateEventId, SIGNAL(activated(int)), this, SLOT(setTransitionToNextHigherStateEventId(int)));
+    //connect(transitionToNextLowerStateEventId, SIGNAL(activated(int)), this, SLOT(setTransitionToNextLowerStateEventId(int)));
 }
 
 void StateMachineUI::removeEventFromLists(int index){
     index++;
-    disconnect(id, 0, this, 0);
-    disconnect(returnToPreviousStateEventId, 0, this, 0);
-    disconnect(randomTransitionEventId, 0, this, 0);
-    disconnect(transitionToNextHigherStateEventId, 0, this, 0);
-    disconnect(transitionToNextLowerStateEventId, 0, this, 0);
+    //dis//connect(id, 0, this, 0);
+    //dis//connect(returnToPreviousStateEventId, 0, this, 0);
+    //dis//connect(randomTransitionEventId, 0, this, 0);
+    //dis//connect(transitionToNextHigherStateEventId, 0, this, 0);
+    //dis//connect(transitionToNextLowerStateEventId, 0, this, 0);
     if (id->currentIndex() == index){
         id->setCurrentIndex(0);
     }
@@ -285,11 +287,11 @@ void StateMachineUI::removeEventFromLists(int index){
         transitionToNextLowerStateEventId->setCurrentIndex(0);
     }
     transitionToNextLowerStateEventId->removeItem(index);
-    connect(id, SIGNAL(currentIndexChanged(int)), this, SLOT(setEventToSendWhenStateOrTransitionChanges(int)));
-    connect(returnToPreviousStateEventId, SIGNAL(currentIndexChanged(int)), this, SLOT(setReturnToPreviousStateEventId(int)));
-    connect(randomTransitionEventId, SIGNAL(currentIndexChanged(int)), this, SLOT(setRandomTransitionEventId(int)));
-    connect(transitionToNextHigherStateEventId, SIGNAL(currentIndexChanged(int)), this, SLOT(setTransitionToNextHigherStateEventId(int)));
-    connect(transitionToNextLowerStateEventId, SIGNAL(currentIndexChanged(int)), this, SLOT(setTransitionToNextLowerStateEventId(int)));
+    //connect(id, SIGNAL(activated(int)), this, SLOT(setEventToSendWhenStateOrTransitionChanges(int)));
+    //connect(returnToPreviousStateEventId, SIGNAL(activated(int)), this, SLOT(setReturnToPreviousStateEventId(int)));
+    //connect(randomTransitionEventId, SIGNAL(activated(int)), this, SLOT(setRandomTransitionEventId(int)));
+    //connect(transitionToNextHigherStateEventId, SIGNAL(activated(int)), this, SLOT(setTransitionToNextHigherStateEventId(int)));
+    //connect(transitionToNextLowerStateEventId, SIGNAL(activated(int)), this, SLOT(setTransitionToNextLowerStateEventId(int)));
 }
 
 void StateMachineUI::renameEventInLists(const QString & newName, int index){
@@ -302,14 +304,14 @@ void StateMachineUI::renameEventInLists(const QString & newName, int index){
 }
 
 void StateMachineUI::addVariableToLists(const QString & name){
-    disconnect(startStateIdBind, 0, this, 0);
+    //dis//connect(startStateIdBind, 0, this, 0);
     startStateIdBind->insertItem(startStateIdBind->count(), name);
-    connect(startStateIdBind, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateIdBind(int)));
+    //connect(startStateIdBind, SIGNAL(activated(int)), this, SLOT(setStartStateIdBind(int)));
 }
 
 void StateMachineUI::removeVariableFromLists(int index){
     index++;
-    disconnect(startStateIdBind, 0, this, 0);
+    //dis//connect(startStateIdBind, 0, this, 0);
     if (startStateIdBind->currentIndex() == index){
         startStateIdBind->setCurrentIndex(0);
     }
@@ -318,7 +320,7 @@ void StateMachineUI::removeVariableFromLists(int index){
         syncVariableIndex->setCurrentIndex(0);
     }
     syncVariableIndex->removeItem(index);
-    connect(startStateIdBind, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateIdBind(int)));
+    //connect(startStateIdBind, SIGNAL(activated(int)), this, SLOT(setStartStateIdBind(int)));
 }
 
 void StateMachineUI::renameVariableInLists(const QString & newName, int index){
@@ -352,7 +354,7 @@ void StateMachineUI::setStartStateId(int index){
 
 void StateMachineUI::setStartStateIdBind(int index){
     if (bsData){
-        disconnect(startStateIdBind, 0, this, 0);
+        //dis//connect(startStateIdBind, 0, this, 0);
         hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
         if (behaviorView->behavior->getVariableTypeAt(index - 1) == VARIABLE_TYPE_INT32){
             if (!varBind){
@@ -366,14 +368,14 @@ void StateMachineUI::setStartStateIdBind(int index){
             msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
             msg.exec();
             if (varBind){
-                disconnect(startStateIdBind, 0, this, 0);
+                //dis//connect(startStateIdBind, 0, this, 0);
                 int ind = varBind->getVariableIndexOfBinding("startStateId");
                 if (ind > -1 && ind < startStateIdBind->count()){
                     startStateIdBind->setCurrentIndex(ind + 1);
                 }
             }
         }
-        connect(startStateIdBind, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateIdBind(int)));
+        //connect(startStateIdBind, SIGNAL(activated(int)), this, SLOT(setStartStateIdBind(int)));
     }
 }
 
@@ -513,7 +515,7 @@ void StateMachineUI::removeStateWithGenerator(){
         }
         GeneratorIcon *tempIcon = behaviorView->selectedIcon->getChildIcon(bsData->states.at(index).data());
         if (bsData->states.count(bsData->states.at(index)) == 1){
-            behaviorView->removeSelectedObjectBranch(tempIcon);
+            behaviorView->removeSelectedObjectBranch(tempIcon, NULL, false);
         }else{
             bsData->states.removeAt(index);
         }
@@ -540,6 +542,21 @@ void StateMachineUI::setName(){
     }
 }
 
+void StateMachineUI::loadComboBoxes(){
+    QStringList varList = behaviorView->behavior->getVariableNames();
+    varList.prepend("None");
+    QStringList eventList = behaviorView->behavior->getEventNames();
+    eventList.prepend("None");
+    id->insertItems(0, eventList);
+    startStateIdBind->insertItems(0, varList);
+    returnToPreviousStateEventId->insertItems(0, eventList);
+    randomTransitionEventId->insertItems(0, eventList);
+    transitionToNextHigherStateEventId->insertItems(0, eventList);
+    transitionToNextLowerStateEventId->insertItems(0, eventList);
+    syncVariableIndex->insertItems(0, varList);
+
+}
+
 void StateMachineUI::loadData(HkxObject *data){
     if (data && data->getSignature() == HKB_STATE_MACHINE){
         bsData = static_cast<hkbStateMachine *>(data);
@@ -552,23 +569,23 @@ void StateMachineUI::loadData(HkxObject *data){
         name->setText(bsData->name);
         stateStackLyt->setCurrentIndex(STATE_TABLE);
         transitionStackLyt->setCurrentIndex(TRANSITION_TABLE);
-        if (id->count() == 0){
+        /*if (id->count() == 0){
             id->insertItems(0, eventList);
-        }
+        }*/
         id->setCurrentIndex(bsData->id + 1);
         payload->clear();
         if (bsData->payload.data()){
             payload->setText(static_cast<hkbStringEventPayload *>(bsData->payload.data())->data);
         }
-        disconnect(startStateId, 0, this, 0);
+        //dis//connect(startStateId, 0, this, 0);
         startStateId->clear();
         startStateId->insertItems(0, bsData->getStateNames());
         startStateId->setCurrentIndex(startStateId->findText(bsData->getStateName(bsData->startStateId), Qt::MatchCaseSensitive));
-        connect(startStateId, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateId(int)));
-        disconnect(startStateIdBind, 0, this, 0);
-        if (startStateIdBind->count() == 0){
+        //connect(startStateId, SIGNAL(activated(int)), this, SLOT(setStartStateId(int)));
+        //dis//connect(startStateIdBind, 0, this, 0);
+        /*if (startStateIdBind->count() == 0){
             startStateIdBind->insertItems(0, varList);
-        }
+        }*/
         hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
         if (varBind){
             int ind = varBind->getVariableIndexOfBinding("startStateId");
@@ -580,35 +597,35 @@ void StateMachineUI::loadData(HkxObject *data){
         }else{
             startStateIdBind->setCurrentIndex(0);
         }
-        connect(startStateIdBind, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateIdBind(int)));
-        if (returnToPreviousStateEventId->count() == 0){
+        //connect(startStateIdBind, SIGNAL(activated(int)), this, SLOT(setStartStateIdBind(int)));
+        /*if (returnToPreviousStateEventId->count() == 0){
             returnToPreviousStateEventId->insertItems(0, eventList);
-        }
+        }*/
         returnToPreviousStateEventId->setCurrentIndex(bsData->returnToPreviousStateEventId + 1);
-        if (randomTransitionEventId->count() == 0){
+        /*if (randomTransitionEventId->count() == 0){
             randomTransitionEventId->insertItems(0, eventList);
-        }
+        }*/
         randomTransitionEventId->setCurrentIndex(bsData->randomTransitionEventId + 1);
-        if (transitionToNextHigherStateEventId->count() == 0){
+        /*if (transitionToNextHigherStateEventId->count() == 0){
             transitionToNextHigherStateEventId->insertItems(0, eventList);
-        }
+        }*/
         transitionToNextHigherStateEventId->setCurrentIndex(bsData->transitionToNextHigherStateEventId + 1);
-        if (transitionToNextLowerStateEventId->count() == 0){
+        /*if (transitionToNextLowerStateEventId->count() == 0){
             transitionToNextLowerStateEventId->insertItems(0, eventList);
-        }
+        }*/
         transitionToNextLowerStateEventId->setCurrentIndex(bsData->transitionToNextLowerStateEventId + 1);
-        if (syncVariableIndex->count() == 0){
+        /*if (syncVariableIndex->count() == 0){
             syncVariableIndex->insertItems(0, varList);
-        }
+        }*/
         syncVariableIndex->setCurrentIndex(bsData->syncVariableIndex + 1);
         maxSimultaneousTransitions->setValue(bsData->maxSimultaneousTransitions);
-        if (startStateMode->count() == 0){
+        /*if (startStateMode->count() == 0){
             startStateMode->insertItems(0, bsData->StartStateMode);
-        }
+        }*/
         startStateMode->setCurrentText(bsData->startStateMode);
-        if (selfTransitionMode->count() == 0){
+        /*if (selfTransitionMode->count() == 0){
             selfTransitionMode->insertItems(0, bsData->SelfTransitionMode);
-        }
+        }*/
         selfTransitionMode->setCurrentText(bsData->selfTransitionMode);
         for (int i = 0; i < bsData->states.size(); i++){
             gen = static_cast<hkbStateMachineStateInfo *>(bsData->states.at(i).data());

@@ -24,7 +24,7 @@ public:
     virtual bool link() = 0;
     virtual void unlink();
 protected:
-    HkxObject(BehaviorFile *parent = NULL/*, long ref = 0*/);
+    HkxObject(BehaviorFile *parent/*, long ref = 0*/);
     BehaviorFile * getParentFile() const;
     void setDataValidity(bool isValid);
     void setType(HkxSignature sig, HkxType type);
@@ -69,7 +69,7 @@ public:
     void removeBinding(const QString & path);
     void removeBinding(int varIndex);
 protected:
-    HkDynamicObject(BehaviorFile *parent = NULL/*, long ref = 0*/);
+    HkDynamicObject(BehaviorFile *parent/*, long ref = 0*/);
 protected:
     HkxObjectExpSharedPtr variableBindingSet;
 protected:

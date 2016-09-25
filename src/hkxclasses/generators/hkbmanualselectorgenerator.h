@@ -8,7 +8,7 @@ class hkbManualSelectorGenerator: public hkbGenerator
     friend class BehaviorGraphView;
     friend class ManualSelectorGeneratorUI;
 public:
-    hkbManualSelectorGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbManualSelectorGenerator(BehaviorFile *parent/*, qint16 ref = 0*/);
     virtual ~hkbManualSelectorGenerator();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

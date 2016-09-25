@@ -57,6 +57,8 @@ GeneratorIcon::GeneratorIcon(const HkxObjectExpSharedPtr & d, const QString & s,
 {
     if (data->getType() == HkxObject::TYPE_GENERATOR){
         static_cast<hkbGenerator *>(data.data())->icons.append(this);
+    }else if (data->getType() == HkxObject::TYPE_MODIFIER){
+        //static_cast<hkbModifier *>(data.data())->icons.append(this);
     }
     pen = QPen(QBrush(Qt::black), 2);
     textPen.setColor(Qt::white);

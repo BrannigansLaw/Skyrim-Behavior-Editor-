@@ -13,6 +13,11 @@ class hkbBehaviorGraphData;
 class HkxObject;
 class QCheckBox;
 class QComboBox;
+class QLineEdit;
+class QStackedLayout;
+class QSpinBox;
+class QDoubleSpinBox;
+class QuadVariableWidget;
 
 class BehaviorVariablesUI: public QGroupBox
 {
@@ -25,8 +30,10 @@ public:
 private slots:
     void addVariable();
     void removeVariable();
-    void setVariableValue(int index);
-    void renameSelectedVariable(int index);
+    void setVariableValue(int type);
+    void renameSelectedVariable(int type);
+    void viewVariable(int row, int column);
+    void returnToTable();
 signals:
     void variableNameChanged(const QString & newName, int index);
     void variableAdded(const QString & name);
@@ -34,10 +41,18 @@ signals:
 private:
     BehaviorVariablesUI& operator=(const BehaviorVariablesUI&);
     BehaviorVariablesUI(const BehaviorVariablesUI &);
-    template <typename T, typename W> void addVariableToTable(const QString & name, const QString & type, const T & value, W *widget);
-    template <typename T> void addVariableToTable(const QString & name, const QString & type, const T & value, QCheckBox *widget);
+    void loadVariable(QCheckBox *variableWid);
+    void loadVariable(QSpinBox *variableWid);
+    void loadVariable(QDoubleSpinBox *variableWid);
+    void loadVariable(QuadVariableWidget *variableWid);
+    void addVariableToTable(const QString & name, const QString & type);
     void removeVariableFromTable(int row);
+    void hideOtherVariables(int indexToView);
 private:
+    enum View {
+        TABLE_WIDGET = 0,
+        VARIABLE_WIDGET = 1
+    };
     enum hkTypes {
         VARIABLE_TYPE_BOOL = 0,
         VARIABLE_TYPE_INT32 = 1,
@@ -55,9 +70,23 @@ private:
     QPushButton *addObjectPB;
     QPushButton *removeObjectPB;
     QHBoxLayout *buttonLyt;
-    QSignalMapper *valueMapper;
-    QSignalMapper *nameMapper;
+    QLineEdit *boolName;
+    QLineEdit *intName;
+    QLineEdit *doubleName;
+    QLineEdit *quadName;
+    QCheckBox *boolCB;
+    QSpinBox *intSB;
+    QDoubleSpinBox *doubleSB;
+    QuadVariableWidget *quadWidget;
+    QTableWidget *variableWidget;
+    QStackedLayout *stackLyt;
+    QPushButton *returnBoolPB;
+    QPushButton *returnIntPB;
+    QPushButton *returnDoublePB;
+    QPushButton *returnQuadPB;
     QComboBox *typeSelector;
+    QSignalMapper *nameMapper;
+    QSignalMapper *valueMapper;
 };
 
 #endif // BEHAVIORVARIABLESUI_H

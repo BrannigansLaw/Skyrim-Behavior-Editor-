@@ -9,7 +9,7 @@ public:
     virtual ~hkbModifier();
     bool link();
 protected:
-    hkbModifier(BehaviorFile *parent = NULL/*, long ref = 0*/);
+    hkbModifier(BehaviorFile *parent/*, long ref = 0*/);
 };
 
 #endif // HKBMODIFIER_H

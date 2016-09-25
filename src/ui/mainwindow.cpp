@@ -15,7 +15,10 @@ MainWindow::MainWindow()
       topMB(new QMenuBar(this)),
       debugLog(new QPlainTextEdit(this)),
       openA(new QAction("Open Project", this)),
-      openM(new QMenu("File", this)),
+      fileM(new QMenu("File", this)),
+      viewM(new QMenu("View", this)),
+      expandA(new QAction("Expand All", this)),
+      collapseA(new QAction("Collapse All", this)),
       behaviorGraphViewIV(NULL),
       dirViewFSW(new FileSelectWindow("Select a hkx file to open!")),
       hkxFile(NULL),
@@ -34,9 +37,16 @@ MainWindow::MainWindow()
     logGB->setMinimumWidth(300);
     openA->setStatusTip("Open a hkx project file!");
     openA->setShortcut(QKeySequence::Open);
-    openM->addAction(openA);
+    fileM->addAction(openA);
+    expandA->setStatusTip("Expand all branches!");
+    expandA->setShortcut(QKeySequence::ZoomIn);
+    viewM->addAction(expandA);
+    collapseA->setStatusTip("Collapse all branches!");
+    collapseA->setShortcut(QKeySequence::ZoomOut);
+    viewM->addAction(collapseA);
     topMB->setMaximumHeight(50);
-    topMB->addMenu(openM);
+    topMB->addMenu(fileM);
+    topMB->addMenu(viewM);
     logGBLyt->addWidget(debugLog);
     logGB->setLayout(logGBLyt);
     eventsWid->setHkDataUI(objectDataWid);
@@ -57,11 +67,25 @@ MainWindow::MainWindow()
     eventsWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
     //logGB->setMaximumSize(size().width()*0.4, size().height()*0.25);
     connect(openA, SIGNAL(triggered(bool)), this, SLOT(openDirView()));
+    connect(expandA, SIGNAL(triggered(bool)), this, SLOT(expandBranches()));
+    connect(collapseA, SIGNAL(triggered(bool)), this, SLOT(collapseBranches()));
     connect(dirViewFSW, SIGNAL(selectFile(QString)), this, SLOT(openHkxfile(QString)));
 }
 
 MainWindow::~MainWindow(){
     //
+}
+
+void MainWindow::expandBranches(){
+    if (behaviorGraphViewIV){
+        behaviorGraphViewIV->expandBranch(behaviorGraphViewIV->rootIcon, true);
+    }
+}
+
+void MainWindow::collapseBranches(){
+    if (behaviorGraphViewIV){
+        behaviorGraphViewIV->contractBranch(behaviorGraphViewIV->rootIcon, true);
+    }
 }
 
 void MainWindow::setProgressData(const QString & message, int max, int min, int value){
@@ -112,6 +136,7 @@ void MainWindow::openHkxfile(QString name){
         delete progressD;
     }
     progressD = new QProgressDialog(this);
+    progressD->setMinimumSize(QSize(800, 200));
     progressD->setWindowModality(Qt::WindowModal);
     setProgressData("Opening file...", 0, 100, 0);
     drawGraph = true;
@@ -136,6 +161,7 @@ void MainWindow::openHkxfile(QString name){
         setProgressData("Deleting previously loaded Behavior Graph...", 0);
         delete hkxFile;
         delete behaviorGraphViewIV;
+        hkxFile = NULL;
         behaviorGraphViewIV = NULL;
         behaviorGraphViewGB->setTitle(name);
         setProgressData("Beginning XML parse...", 5);

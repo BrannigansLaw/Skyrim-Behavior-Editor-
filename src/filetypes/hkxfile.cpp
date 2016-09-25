@@ -29,6 +29,7 @@
 #include "src/hkxclasses/hkbvariablebindingset.h"
 #include "src/hkxclasses/hkrootlevelcontainer.h"
 
+#include <QStringList>
 /**
  * Class: HkxFile
  *
@@ -404,6 +405,48 @@ QStringList BehaviorFile::getGeneratorNames(){
             sig = generators.at(i).constData()->getSignature();
             switch (sig){
             case HKB_STATE_MACHINE:
+                list.last().prepend("StateMachine: --> ");
+                break;
+            case HKB_MANUAL_SELECTOR_GENERATOR:
+                list.last().prepend("ManSelGen: --> ");
+                break;
+            case HKB_BLENDER_GENERATOR:
+                list.last().prepend("BlendGen: --> ");
+                break;
+            case BS_I_STATE_TAGGING_GENERATOR:
+                list.last().prepend("IStateTagGen: --> ");
+                break;
+            case BS_BONE_SWITCH_GENERATOR:
+                list.last().prepend("BoneSwitchGen: --> ");
+                break;
+            case BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+                list.last().prepend("CyclicBlendTransGen: --> ");
+                break;
+            case BS_SYNCHRONIZED_CLIP_GENERATOR:
+                list.last().prepend("SyncClipGen: --> ");
+                break;
+            case HKB_MODIFIER_GENERATOR:
+                list.last().prepend("ModGen: --> ");
+                break;
+            case BS_OFFSET_ANIMATION_GENERATOR:
+                list.last().prepend("OffAnimGen: --> ");
+                break;
+            case HKB_POSE_MATCHING_GENERATOR:
+                list.last().prepend("PoseMatchGen: --> ");
+                break;
+            case HKB_CLIP_GENERATOR:
+                list.last().prepend("ClipGen: --> ");
+                break;
+            case HKB_BEHAVIOR_REFERENCE_GENERATOR:
+                list.last().prepend("BehaviorRefGen: --> ");
+                break;
+            default:
+                writeToLog("BehaviorFile: getGeneratorNames() failed!\n'generators' contains an invalid type!\n", true);
+                break;
+            }
+            /*sig = generators.at(i).constData()->getSignature();
+            switch (sig){
+            case HKB_STATE_MACHINE:
                 list.last().append(" Type: hkbStateMachine");
                 break;
             case HKB_MANUAL_SELECTOR_GENERATOR:
@@ -442,7 +485,7 @@ QStringList BehaviorFile::getGeneratorNames(){
             default:
                 writeToLog("BehaviorFile: getGeneratorNames() failed!\n'generators' contains an invalid type!\n", true);
                 break;
-            }
+            }*/
         }
     }
     return list;

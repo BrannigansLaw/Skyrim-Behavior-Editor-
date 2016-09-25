@@ -7,6 +7,8 @@
 #include <QTreeView>
 #include <QPushButton>
 #include <QLineEdit>
+#include <QSettings>
+#include <QCloseEvent>
 
 FileSelectWindow::FileSelectWindow(QString windowName){
     setWindowTitle(windowName);
@@ -23,6 +25,7 @@ FileSelectWindow::FileSelectWindow(QString windowName){
     fileSysFSM->setNameFilterDisables(false);
     openPB = new QPushButton("Open");
     cancelPB = new QPushButton("Cancel");
+    readSettings();
     topLyt->addWidget(dirViewTV, 0, 0, 8, 10);
     topLyt->addLayout(fileInfoLyt, 8, 0, 1, 10);
     topLyt->addWidget(openPB, 9, 6, 1, 2);
@@ -34,6 +37,10 @@ FileSelectWindow::FileSelectWindow(QString windowName){
 
 FileSelectWindow::~FileSelectWindow(){
     //
+}
+
+QSize FileSelectWindow::sizeHint() const{
+    return QSize(800, 800);
 }
 
 QString FileSelectWindow::getSelectedFilename(){
@@ -48,4 +55,30 @@ void FileSelectWindow::select(){
 
 void FileSelectWindow::cancel(){
     hide();
+}
+
+void FileSelectWindow::readSettings()
+{
+    QSettings settings("QtProject", "Skyrim Behavior Editor");
+    settings.beginGroup("File Select Window");
+    QPoint pos = settings.value("pos", QPoint(500, 500)).toPoint();
+    QSize size = settings.value("size", QSize(900, 900)).toSize();
+    resize(size);
+    move(pos);
+    settings.endGroup();
+}
+
+void FileSelectWindow::writeSettings()
+{
+    QSettings settings("QtProject", "Skyrim Behavior Editor");
+    settings.beginGroup("File Select Window");
+    settings.setValue("pos", pos());
+    settings.setValue("size", size());
+    settings.endGroup();
+}
+
+void FileSelectWindow::closeEvent(QCloseEvent *event)
+{
+    writeSettings();
+    event->accept();
 }

@@ -7,7 +7,7 @@ class hkbBlenderGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
-    hkbBlenderGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbBlenderGenerator(BehaviorFile *parent/*, qint16 ref = 0*/);
     virtual ~hkbBlenderGenerator();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

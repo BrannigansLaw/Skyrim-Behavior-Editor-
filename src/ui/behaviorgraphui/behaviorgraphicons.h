@@ -13,6 +13,7 @@ class GeneratorIcon: public QGraphicsItem
 {
     friend class HkDataUI;
     friend class BehaviorGraphView;
+    friend class ModifierGeneratorUI;
 public:
     GeneratorIcon(const HkxObjectExpSharedPtr & d, const QString & s, GeneratorIcon *par = NULL);
 
@@ -121,21 +122,30 @@ public:
         }
     }
 
-    GeneratorIcon* setParent(GeneratorIcon *newParent){
+    GeneratorIcon* setParent(GeneratorIcon *newParent){//If data is the same replace icon???
         if (!newParent){
             return NULL;
         }
         GeneratorIcon *oldParent = parent;
+        GeneratorIcon *newIcon;
         int i;
         if (parent){
             i = parent->children.indexOf(this);
+            if (children.isEmpty()){
+                newIcon = new GeneratorIcon(HkxObjectExpSharedPtr(data.data()), static_cast<hkbGenerator *>(data.data())->getName(), parent);
+                parent->children.move(parent->children.size() - 1, i);
+                if (scene()){
+                    scene()->addItem(newIcon);
+                    scene()->addItem(newIcon->linkToParent);
+                }
+            }
             parent->children.removeAll(this);
         }
         int index = newParent->children.indexOf(this);
         if (index == -1){
             if (i >= 0){
                 newParent->children.insert(i, this);
-            }else{
+            }else if (!newParent->getChildIcon(this->data.data())){
                 newParent->children.append(this);
             }
         }else{

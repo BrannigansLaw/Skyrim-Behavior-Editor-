@@ -7,7 +7,7 @@ class BSBoneSwitchGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
-    BSBoneSwitchGenerator(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    BSBoneSwitchGenerator(BehaviorFile *parent/*, qint16 ref = 0*/);
     virtual ~BSBoneSwitchGenerator();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

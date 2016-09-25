@@ -7,7 +7,7 @@ class hkRootLevelContainer: public HkxObject
 {
     friend class BehaviorGraphView;
 public:
-    hkRootLevelContainer(BehaviorFile *parent = NULL/*, long ref = 0*/);
+    hkRootLevelContainer(BehaviorFile *parent/*, long ref = 0*/);
     virtual ~hkRootLevelContainer();
     bool link();
     bool readData(const HkxXmlReader & reader, int index);

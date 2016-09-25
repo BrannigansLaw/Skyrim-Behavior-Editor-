@@ -11,7 +11,7 @@ class hkbVariableValueSet: public HkxObject
     friend class BehaviorGraphView;
     friend class BehaviorVariablesUI;
 public:
-    hkbVariableValueSet(BehaviorFile *parent = NULL/*, qint16 ref = 0*/);
+    hkbVariableValueSet(BehaviorFile *parent/*, qint16 ref = 0*/);
     virtual ~hkbVariableValueSet();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
