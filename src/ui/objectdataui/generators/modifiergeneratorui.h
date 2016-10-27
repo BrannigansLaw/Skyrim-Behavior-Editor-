@@ -7,9 +7,9 @@ class HkxObject;
 class BehaviorGraphView;
 class hkbModifierGenerator;
 class QVBoxLayout;
-class QTableWidget;
+class TableWidget;
 class QLineEdit;
-class QComboBox;
+class ComboBox;
 
 class ModifierGeneratorUI: public QGroupBox
 {
@@ -44,10 +44,10 @@ private:
     BehaviorGraphView *behaviorView;
     hkbModifierGenerator *bsData;
     QVBoxLayout *lyt;
-    QTableWidget *table;
+    TableWidget *table;
     QLineEdit *name;
-    QComboBox *modifier;
-    QComboBox *generator;
+    ComboBox *modifier;
+    ComboBox *generator;
 };
 
 #endif // MODIFIERGENERATORUI_H

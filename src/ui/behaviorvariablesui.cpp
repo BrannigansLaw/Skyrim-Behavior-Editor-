@@ -45,7 +45,7 @@ BehaviorVariablesUI::BehaviorVariablesUI(const QString &title)
     : dataUI(NULL),
       verLyt(new QVBoxLayout),
       loadedData(NULL),
-      table(new QTableWidget),
+      table(new TableWidget),
       addObjectPB(new QPushButton("Add Variable")),
       removeObjectPB(new QPushButton("Remove Selected Variable")),
       buttonLyt(new QHBoxLayout),
@@ -54,24 +54,21 @@ BehaviorVariablesUI::BehaviorVariablesUI(const QString &title)
       doubleName(new QLineEdit),
       quadName(new QLineEdit),
       boolCB(new QCheckBox),
-      intSB(new QSpinBox),
-      doubleSB(new QDoubleSpinBox),
+      intSB(new SpinBox),
+      doubleSB(new DoubleSpinBox),
       quadWidget(new QuadVariableWidget),
-      variableWidget(new QTableWidget),
+      variableWidget(new TableWidget()),
       stackLyt(new QStackedLayout),
       returnBoolPB(new QPushButton("Return To Parent")),
       returnIntPB(new QPushButton("Return To Parent")),
       returnDoublePB(new QPushButton("Return To Parent")),
       returnQuadPB(new QPushButton("Return To Parent")),
-      typeSelector(new QComboBox),
+      typeSelector(new ComboBox),
       nameMapper(new QSignalMapper),
       valueMapper(new QSignalMapper)
 {
     setTitle(title);
-    intSB->setMaximum(std::numeric_limits<int>::max());
-    intSB->setMinimum(std::numeric_limits<int>::min());
-    doubleSB->setMaximum(std::numeric_limits<double>::max());
-    doubleSB->setMinimum(std::numeric_limits<double>::min());
+    //setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     stackLyt->addWidget(table);
     stackLyt->addWidget(variableWidget);
     stackLyt->setCurrentIndex(TABLE_WIDGET);
@@ -79,14 +76,11 @@ BehaviorVariablesUI::BehaviorVariablesUI(const QString &title)
     buttonLyt->addWidget(addObjectPB, 1);
     buttonLyt->addWidget(typeSelector, 2);
     buttonLyt->addWidget(removeObjectPB, 1);
+    //table->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     table->setColumnCount(3);
     table->setHorizontalHeaderLabels(headerLabels);
     verLyt->addLayout(buttonLyt, 1);
     verLyt->addLayout(stackLyt, 10);
-    table->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    table->setSelectionBehavior(QAbstractItemView::SelectRows);
     variableWidget->setRowCount(4);
     variableWidget->setColumnCount(3);
     variableWidget->setCellWidget(0, 0, boolName);
@@ -117,10 +111,6 @@ BehaviorVariablesUI::BehaviorVariablesUI(const QString &title)
     connect(intSB, SIGNAL(editingFinished()), valueMapper, SLOT(map()));
     connect(doubleSB, SIGNAL(editingFinished()), valueMapper, SLOT(map()));
     connect(quadWidget, SIGNAL(editingFinished()), valueMapper, SLOT(map()));
-    variableWidget->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-    variableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    variableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    variableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     setLayout(verLyt);
     connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeVariable()));
     connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addVariable()));
@@ -132,6 +122,10 @@ BehaviorVariablesUI::BehaviorVariablesUI(const QString &title)
     connect(returnDoublePB, SIGNAL(released()), this, SLOT(returnToTable()));
     connect(returnQuadPB, SIGNAL(released()), this, SLOT(returnToTable()));
 }
+
+/*QSize BehaviorVariablesUI::sizeHint() const{
+    return QSize(300, 300);
+}*/
 
 void BehaviorVariablesUI::setVariableValue(int type){
     int index = table->currentRow();
@@ -187,7 +181,7 @@ void BehaviorVariablesUI::loadVariable(QCheckBox *variableWid){
     }
 }
 
-void BehaviorVariablesUI::loadVariable(QSpinBox *variableWid){
+void BehaviorVariablesUI::loadVariable(SpinBox *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
         hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
@@ -202,7 +196,7 @@ void BehaviorVariablesUI::loadVariable(QSpinBox *variableWid){
     }
 }
 
-void BehaviorVariablesUI::loadVariable(QDoubleSpinBox *variableWid){
+void BehaviorVariablesUI::loadVariable(DoubleSpinBox *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
         hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());

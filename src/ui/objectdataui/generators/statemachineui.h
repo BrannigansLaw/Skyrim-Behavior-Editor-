@@ -5,11 +5,11 @@
 
 class HkxObject;
 class BehaviorGraphView;
-class QTableWidget;
+class TableWidget;
 class QTableWidgetItem;
-class QSpinBox;
+class SpinBox;
 class QLineEdit;
-class QComboBox;
+class ComboBox;
 class QPushButton;
 class QHBoxLayout;
 class QSignalMapper;
@@ -19,6 +19,9 @@ class QStackedLayout;
 class QCheckBox;
 class StateUI;
 class TransitionsUI;
+class QScrollArea;
+class HkTransition;
+class hkbStateMachineStateInfo;
 
 class StateMachineUI: public QGroupBox
 {
@@ -30,6 +33,8 @@ public:
     void loadData(HkxObject *data);
 signals:
     void generatorNameChanged(const QString & newName, int index);
+    void viewState(hkbStateMachineStateInfo *state);
+    void viewTransition(hkbStateMachine *parent, HkTransition *transition);
 private slots:
     void setName();
     void setEventToSendWhenStateOrTransitionChanges(int index);
@@ -49,10 +54,8 @@ private slots:
     void removeStateWithGenerator();
     void addNewTransition();
     void removeTransition();
-    void viewState(int row, int column);
-    void viewStateTable();
-    void viewTransition(int row, int column);
-    void viewTransitionTable();
+    void stateSelected(int row, int column);
+    void transitionSelected(int row, int column);
 private:
     void addEventToLists(const QString & name);
     void removeEventFromLists(int index);
@@ -62,14 +65,6 @@ private:
     void renameVariableInLists(const QString & newName, int index);
     void loadComboBoxes();
 private:
-    enum StateView {
-        STATE_TABLE = 0,
-        STATE_WIDGET = 1
-    };
-    enum TransitionView {
-        TRANSITION_TABLE = 0,
-        TRANSITION_WIDGET = 1
-    };
     enum Type {
         STATE_MACHINE = 0,
         MANUAL_SELECTOR_GENERATOR = 1,
@@ -89,38 +84,34 @@ private:
     static QStringList headerLabels2;
     BehaviorGraphView *behaviorView;
     hkbStateMachine *bsData;
-    QTableWidget *table;
+    TableWidget *table;
     QPushButton *addStatePB;
     QPushButton *removeStatePB;
-    QComboBox *typeSelectorCB;
+    ComboBox *typeSelectorCB;
     QSignalMapper *stateSignalMapper;
     QHBoxLayout *stateButtonLyt;
     QPushButton *addTransitionPB;
     QPushButton *removeTransitionPB;
-    QComboBox *typeTransitionCB;
+    ComboBox *typeTransitionCB;
     QSignalMapper *transitionSignalMapper;
     QHBoxLayout *transitionButtonLyt;
     QVBoxLayout *lyt;
     QLineEdit *name;
-    QComboBox *id;
+    ComboBox *id;
     QLineEdit *payload;
-    QComboBox *startStateId;
-    QComboBox *startStateIdBind;
-    QComboBox *returnToPreviousStateEventId;
-    QComboBox *randomTransitionEventId;
-    QComboBox *transitionToNextHigherStateEventId;
-    QComboBox *transitionToNextLowerStateEventId;
-    QComboBox *syncVariableIndex;
+    ComboBox *startStateId;
+    ComboBox *startStateIdBind;
+    ComboBox *returnToPreviousStateEventId;
+    ComboBox *randomTransitionEventId;
+    ComboBox *transitionToNextHigherStateEventId;
+    ComboBox *transitionToNextLowerStateEventId;
+    ComboBox *syncVariableIndex;
     QCheckBox *wrapAroundStateId;
-    QSpinBox *maxSimultaneousTransitions;
-    QComboBox *startStateMode;
-    QComboBox *selfTransitionMode;
-    QTableWidget *states;
-    QTableWidget *wildcardTransitions;
-    StateUI *stateWidget;
-    TransitionsUI *transitionWidget;
-    QStackedLayout *stateStackLyt;
-    QStackedLayout *transitionStackLyt;
+    SpinBox *maxSimultaneousTransitions;
+    ComboBox *startStateMode;
+    ComboBox *selfTransitionMode;
+    TableWidget *states;
+    TableWidget *wildcardTransitions;
 };
 
 #endif // STATEMACHINEUI_H

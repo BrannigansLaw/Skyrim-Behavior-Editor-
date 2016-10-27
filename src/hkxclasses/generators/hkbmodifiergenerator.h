@@ -8,6 +8,7 @@ class hkbModifierGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
     friend class ModifierGeneratorUI;
+    friend class hkbStateMachine;
 public:
     hkbModifierGenerator(BehaviorFile *parent/*, qint16 ref = 0*/);
     virtual ~hkbModifierGenerator();

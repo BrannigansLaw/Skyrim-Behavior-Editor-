@@ -46,11 +46,11 @@ private:
     bool dataValid;
 };
 
-//Don't implement == operator!!!
 class HkxObjectExpSharedPtr: public QExplicitlySharedDataPointer <HkxObject>
 {
 public:
     HkxObjectExpSharedPtr(HkxObject *obj = NULL, long ref = -1);
+    bool operator==(const HkxObjectExpSharedPtr & other) const;
     void setReference(long ref);
     long getReference() const;
     bool readReference(long index, const HkxXmlReader & reader);

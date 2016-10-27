@@ -361,10 +361,29 @@ HkxObjectExpSharedPtr * BehaviorFile::findBehaviorGraph(long ref){
 
 QVector<int> BehaviorFile::removeGeneratorData(){
     QVector<int> removedIndices;
+    HkxObject *obj = NULL;
     for (int i = generators.size() - 1; i >= 0; i--){
-        if (generators.at(i).constData() && generators.at(i).constData()->ref < 2){
-            generators.removeAt(i);
-            removedIndices.append(i);
+        obj = generators.at(i).data();
+        if (obj){
+            if (obj->ref < 2){
+                generators.removeAt(i);
+                removedIndices.append(i);
+            }else if (obj->getSignature() == HKB_STATE_MACHINE){
+                if (obj->ref <= static_cast<hkbStateMachine *>(obj)->getNumberOfStates() + 1){
+                    generators.removeAt(i);
+                    removedIndices.append(i);
+                }
+            }/*else if (obj->getSignature() == HKB_BLENDER_GENERATOR){
+                if (obj->ref <= static_cast<hkbBlenderGenerator *>(obj)->getNumberOfChildren() + 1){
+                    generators.removeAt(i);
+                    removedIndices.append(i);
+                }
+            }else if (obj->getSignature() == HKB_POSE_MATCHING_GENERATOR){
+                if (obj->ref <= static_cast<hkbPoseMatchingGenerator *>(obj)->getNumberOfChildren() + 1){
+                    generators.removeAt(i);
+                    removedIndices.append(i);
+                }
+            }*/
         }
     }
     return removedIndices;

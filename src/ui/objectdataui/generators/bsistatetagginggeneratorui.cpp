@@ -29,13 +29,13 @@ BSiStateTaggingGeneratorUI::BSiStateTaggingGeneratorUI()
     : behaviorView(NULL),
       bsData(NULL),
       lyt(new QVBoxLayout),
-      table(new QTableWidget),
+      table(new TableWidget),
       name(new QLineEdit),
-      pDefaultGenerator(new QComboBox),
-      iStateToSetAs(new QSpinBox),
-      iStateToSetAsBind(new QComboBox),
-      iPriority(new QSpinBox),
-      iPriorityBind(new QComboBox)
+      pDefaultGenerator(new ComboBox),
+      iStateToSetAs(new SpinBox),
+      iStateToSetAsBind(new ComboBox),
+      iPriority(new SpinBox),
+      iPriorityBind(new ComboBox)
 {
     setTitle("BSiStateTaggingGenerator");
     table->setRowCount(4);
@@ -56,27 +56,19 @@ BSiStateTaggingGeneratorUI::BSiStateTaggingGeneratorUI()
     table->setItem(3, 1, new QTableWidgetItem("Int"));
     table->setCellWidget(3, 2, iPriorityBind);
     table->setCellWidget(3, 3, iPriority);
-    table->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    table->setSelectionBehavior(QAbstractItemView::SelectRows);
     lyt->addWidget(table);
     setLayout(lyt);
-    //connect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    //connect(pDefaultGenerator, SIGNAL(activated(int)), this, SLOT(setDefaultGenerator(int)));
-    //connect(iStateToSetAs, SIGNAL(editingFinished()), this, SLOT(setIStateToSetAs()));
-    //connect(iPriority, SIGNAL(editingFinished()), this, SLOT(setIPriority()));
-    //connect(iStateToSetAsBind, SIGNAL(activated(int)), this, SLOT(setIStateToSetAsBind(int)));
-    //connect(iPriorityBind, SIGNAL(activated(int)), this, SLOT(setIPriorityBind(int)));
+    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
+    connect(pDefaultGenerator, SIGNAL(activated(int)), this, SLOT(setDefaultGenerator(int)));
+    connect(iStateToSetAs, SIGNAL(editingFinished()), this, SLOT(setIStateToSetAs()));
+    connect(iPriority, SIGNAL(editingFinished()), this, SLOT(setIPriority()));
+    connect(iStateToSetAsBind, SIGNAL(activated(int)), this, SLOT(setIStateToSetAsBind(int)));
+    connect(iPriorityBind, SIGNAL(activated(int)), this, SLOT(setIPriorityBind(int)));
 }
 
 void BSiStateTaggingGeneratorUI::addVariableToLists(const QString & name){
-    //dis//connect(iStateToSetAsBind, 0, this, 0);
-    //dis//connect(iPriorityBind, 0, this, 0);
     iStateToSetAsBind->insertItem(iStateToSetAsBind->count(), name);
     iPriorityBind->insertItem(iPriorityBind->count(), name);
-    //connect(iStateToSetAsBind, SIGNAL(activated(int)), this, SLOT(setIStateToSetAsBind(int)));
-    //connect(iPriorityBind, SIGNAL(activated(int)), this, SLOT(setIPriorityBind(int)));
 }
 
 void BSiStateTaggingGeneratorUI::removeVariableFromLists(int index){
@@ -98,15 +90,11 @@ void BSiStateTaggingGeneratorUI::renameVariableInLists(const QString & newName, 
 }
 
 void BSiStateTaggingGeneratorUI::addGeneratorToLists(const QString & name){
-    //dis//connect(pDefaultGenerator, 0, this, 0);
     pDefaultGenerator->insertItem(pDefaultGenerator->count(), name);
-    //connect(pDefaultGenerator, SIGNAL(activated(int)), this, SLOT(setDefaultGenerator(int)));
 }
 
 void BSiStateTaggingGeneratorUI::removeGeneratorFromLists(int index){
-    //dis//connect(pDefaultGenerator, 0, this, 0);
     pDefaultGenerator->removeItem(index);
-    //connect(pDefaultGenerator, SIGNAL(activated(int)), this, SLOT(setDefaultGenerator(int)));
 }
 
 void BSiStateTaggingGeneratorUI::renameGeneratorInLists(const QString & name, int index){
@@ -136,7 +124,6 @@ void BSiStateTaggingGeneratorUI::setIPriority(){
 
 void BSiStateTaggingGeneratorUI::setIStateToSetAsBind(int index){
     if (bsData){
-        //dis//connect(iStateToSetAsBind, 0, this, 0);
         hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
         if (behaviorView->behavior->getVariableTypeAt(index - 1) == VARIABLE_TYPE_INT32){
             if (!varBind){
@@ -150,20 +137,17 @@ void BSiStateTaggingGeneratorUI::setIStateToSetAsBind(int index){
             msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
             msg.exec();
             if (varBind){
-                //dis//connect(iStateToSetAsBind, 0, this, 0);
                 int ind = varBind->getVariableIndexOfBinding("iStateToSetAs");
                 if (ind > -1 && ind < iStateToSetAsBind->count()){
                     iStateToSetAsBind->setCurrentIndex(ind + 1);
                 }
             }
         }
-        //connect(iStateToSetAsBind, SIGNAL(activated(int)), this, SLOT(setIStateToSetAsBind(int)));
     }
 }
 
 void BSiStateTaggingGeneratorUI::setIPriorityBind(int index){
     if (bsData){
-        //dis//connect(iPriorityBind, 0, this, 0);
         hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
         if (behaviorView->behavior->getVariableTypeAt(index - 1) == VARIABLE_TYPE_INT32){
             if (!varBind){
@@ -177,14 +161,12 @@ void BSiStateTaggingGeneratorUI::setIPriorityBind(int index){
             msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
             msg.exec();
             if (varBind){
-                //dis//connect(iPriorityBind, 0, this, 0);
                 int ind = varBind->getVariableIndexOfBinding("iPriority");
                 if (ind > -1 && ind < iPriorityBind->count()){
                     iPriorityBind->setCurrentIndex(ind + 1);
                 }
             }
         }
-        //connect(iPriorityBind, SIGNAL(activated(int)), this, SLOT(setIPriorityBind(int)));
     }
 }
 
@@ -197,9 +179,7 @@ void BSiStateTaggingGeneratorUI::setDefaultGenerator(int index){
             msg.exec();
             int i = bsData->getParentFile()->getIndexOfGenerator(bsData->pDefaultGenerator);
             i++;
-            //dis//connect(pDefaultGenerator, 0, this, 0);
             pDefaultGenerator->setCurrentIndex(i);
-            //connect(pDefaultGenerator, SIGNAL(activated(int)), this, SLOT(setGenerator(int)));
             return;
         }
         if (index > 0){
@@ -219,14 +199,7 @@ void BSiStateTaggingGeneratorUI::loadData(HkxObject *data){
     if (data && data->getSignature() == BS_I_STATE_TAGGING_GENERATOR){
         bsData = static_cast<BSiStateTaggingGenerator *>(data);
         name->setText(bsData->name);
-        //dis//connect(pDefaultGenerator, 0, this, 0);
-        /*if (pDefaultGenerator->count() == 0){
-            QStringList genList = bsData->getParentFile()->getGeneratorNames();
-            genList.prepend("None");
-            pDefaultGenerator->insertItems(0, genList);
-        }*/
         int index = bsData->getParentFile()->getIndexOfGenerator(bsData->pDefaultGenerator) + 1;
         pDefaultGenerator->setCurrentIndex(index);
-        //connect(pDefaultGenerator, SIGNAL(activated(int)), this, SLOT(setGenerator(int)));
     }
 }

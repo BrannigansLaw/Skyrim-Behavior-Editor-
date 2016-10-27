@@ -27,10 +27,10 @@ ModifierGeneratorUI::ModifierGeneratorUI()
     : behaviorView(NULL),
       bsData(NULL),
       lyt(new QVBoxLayout),
-      table(new QTableWidget),
+      table(new TableWidget),
       name(new QLineEdit),
-      modifier(new QComboBox),
-      generator(new QComboBox)
+      modifier(new ComboBox),
+      generator(new ComboBox)
 {
     setTitle("hkbModifierGenerator");
     table->setRowCount(3);
@@ -46,10 +46,6 @@ ModifierGeneratorUI::ModifierGeneratorUI()
     table->setItem(2, 0, new QTableWidgetItem("generator"));
     table->setItem(2, 1, new QTableWidgetItem("hkbGenerator"));
     table->setCellWidget(2, 2, generator);
-    table->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    table->setSelectionBehavior(QAbstractItemView::SelectRows);
     lyt->addWidget(table);
     setLayout(lyt);
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
@@ -58,15 +54,11 @@ ModifierGeneratorUI::ModifierGeneratorUI()
 }
 
 void ModifierGeneratorUI::addModifierToLists(const QString & name){
-    //dis//connect(modifier, 0, this, 0);
     modifier->insertItem(modifier->count(), name);
-    //connect(modifier, SIGNAL(activated(int)), this, SLOT(setModifier(int)));
 }
 
 void ModifierGeneratorUI::removeModifierFromLists(int index){
-    //dis//connect(modifier, 0, this, 0);
     modifier->removeItem(index);
-    //connect(modifier, SIGNAL(activated(int)), this, SLOT(setModifier(int)));
 }
 
 void ModifierGeneratorUI::renameModifierInLists(const QString & name, int index){
@@ -75,9 +67,7 @@ void ModifierGeneratorUI::renameModifierInLists(const QString & name, int index)
 }
 
 void ModifierGeneratorUI::addGeneratorToLists(const QString & name){
-    //dis//connect(generator, 0, this, 0);
     generator->insertItem(generator->count(), name);
-    //connect(generator, SIGNAL(activated(int)), this, SLOT(setGenerator(int)));
 }
 
 void ModifierGeneratorUI::removeGeneratorFromLists(int index){
@@ -106,9 +96,7 @@ void ModifierGeneratorUI::setModifier(int index){
             msg.exec();
             int i = bsData->getParentFile()->getIndexOfModifier(bsData->modifier);
             i++;
-            //dis//connect(modifier, 0, this, 0);
             modifier->setCurrentIndex(i);
-            //connect(modifier, SIGNAL(activated(int)), this, SLOT(setModifier(int)));
             return;
         }
         if (index > 0){
@@ -127,9 +115,7 @@ void ModifierGeneratorUI::setGenerator(int index){
             msg.exec();
             int i = bsData->getParentFile()->getIndexOfGenerator(bsData->generator);
             i++;
-            //dis//connect(generator, 0, this, 0);
             generator->setCurrentIndex(i);
-            //connect(generator, SIGNAL(activated(int)), this, SLOT(setGenerator(int)));
             return;
         }
         if (index > 0){
@@ -152,25 +138,9 @@ void ModifierGeneratorUI::loadData(HkxObject *data){
     if (data && data->getSignature() == HKB_MODIFIER_GENERATOR){
         bsData = static_cast<hkbModifierGenerator *>(data);
         name->setText(bsData->name);
-        //dis//connect(modifier, 0, this, 0);
-        //dis//connect(generator, 0, this, 0);
-        /*if (modifier->count() == 0){
-            QStringList modList = bsData->getParentFile()->getModifierNames();
-            modList.prepend("None");
-            modifier->insertItems(0, modList);
-        }
-        if (generator->count() == 0){
-            QStringList genList = bsData->getParentFile()->getGeneratorNames();
-            genList.prepend("None");
-            generator->insertItems(0, genList);
-        }*/
         int index = bsData->getParentFile()->getIndexOfModifier(bsData->modifier) + 1;
-        //dis//connect(modifier, 0, this, 0);
         modifier->setCurrentIndex(index);
-        //connect(modifier, SIGNAL(activated(int)), this, SLOT(setModifier(int)));
         index = bsData->getParentFile()->getIndexOfGenerator(bsData->generator) + 1;
-        //dis//connect(generator, 0, this, 0);
         generator->setCurrentIndex(index);
-        //connect(generator, SIGNAL(activated(int)), this, SLOT(setGenerator(int)));
     }
 }

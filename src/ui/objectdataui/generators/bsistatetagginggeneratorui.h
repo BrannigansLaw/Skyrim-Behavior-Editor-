@@ -4,13 +4,13 @@
 #include <QGroupBox>
 
 class BehaviorGraphView;
-class QTableWidget;
+class TableWidget;
 class QLineEdit;
-class QComboBox;
+class ComboBox;
 class BSiStateTaggingGenerator;
 class QVBoxLayout;
 class HkxObject;
-class QSpinBox;
+class SpinBox;
 
 class BSiStateTaggingGeneratorUI: public QGroupBox
 {
@@ -48,13 +48,13 @@ private:
     BehaviorGraphView *behaviorView;
     BSiStateTaggingGenerator *bsData;
     QVBoxLayout *lyt;
-    QTableWidget *table;
+    TableWidget *table;
     QLineEdit *name;
-    QComboBox *pDefaultGenerator;
-    QSpinBox *iStateToSetAs;
-    QComboBox *iStateToSetAsBind;
-    QSpinBox *iPriority;
-    QComboBox *iPriorityBind;
+    ComboBox *pDefaultGenerator;
+    SpinBox *iStateToSetAs;
+    ComboBox *iStateToSetAsBind;
+    SpinBox *iPriority;
+    ComboBox *iPriorityBind;
 };
 
 #endif // BSISTATETAGGINGGENERATORUI_H

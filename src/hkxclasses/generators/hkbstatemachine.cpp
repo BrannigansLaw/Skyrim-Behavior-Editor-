@@ -1,6 +1,8 @@
 #include "hkbstatemachine.h"
 #include "hkbstatemachinestateinfo.h"
 #include "src/hkxclasses/hkbstatemachinetransitioninfoarray.h"
+#include "src/hkxclasses/generators/hkbmodifiergenerator.h"
+#include "src/hkxclasses/generators/bsistatetagginggenerator.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/hkxfile.h"
 /*
@@ -42,6 +44,10 @@ QString hkbStateMachine::getName() const{
     return name;
 }
 
+int hkbStateMachine::getNumberOfStates() const{
+    return states.size();
+}
+
 QString hkbStateMachine::getStateName(int stateId) const{
     hkbStateMachineStateInfo *state;
     for (int i = 0; i < states.size(); i++){
@@ -61,6 +67,74 @@ QStringList hkbStateMachine::getStateNames() const{
         list.append(state->name);
     }
     return list;
+}
+
+QString hkbStateMachine::getNestedStateName(int stateId, int nestedStateId) const{
+    hkbStateMachine *ptr = getNestedStateMachine(stateId);
+    if (ptr){
+        return ptr->getStateName(nestedStateId);
+    }
+    return "";
+}
+
+QStringList hkbStateMachine::getNestedStateNames(int stateId) const{
+    hkbStateMachine *ptr = getNestedStateMachine(stateId);
+    if (ptr){
+        return ptr->getStateNames();
+    }
+    return QStringList();
+}
+
+int hkbStateMachine::getNumberOfNestedStates(int stateId) const{
+    hkbStateMachine *ptr = getNestedStateMachine(stateId);
+    if (ptr){
+        return ptr->getNumberOfStates();
+    }
+    return -1;
+}
+
+hkbStateMachine * hkbStateMachine::getNestedStateMachine(int stateId) const{
+    hkbGenerator *gen = NULL;
+    hkbStateMachineStateInfo *state = NULL;
+    qlonglong sig = 0;
+    for (int i = 0; i < states.size(); i++){
+        state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+        if (state && state->stateId == stateId){
+            gen = static_cast<hkbGenerator *>(static_cast<hkbStateMachineStateInfo *>(states.at(i).data())->generator.data());
+            while (gen){
+                sig = gen->getSignature();
+                switch (sig){
+                case HKB_STATE_MACHINE:
+                    return static_cast<hkbStateMachine *>(gen);
+                case HKB_MODIFIER_GENERATOR:
+                    gen = static_cast<hkbGenerator *>(static_cast<hkbModifierGenerator *>(gen)->generator.data());
+                    break;
+                case BS_I_STATE_TAGGING_GENERATOR:
+                    gen = static_cast<hkbGenerator *>(static_cast<BSiStateTaggingGenerator *>(gen)->pDefaultGenerator.data());
+                    break;
+                default:
+                    return NULL;
+                }
+            }
+        }
+    }
+    return NULL;
+}
+
+void hkbStateMachine::removeState(int index){
+    if (index < states.size()){
+        hkbStateMachineTransitionInfoArray *trans = static_cast<hkbStateMachineTransitionInfoArray *>(wildcardTransitions.data());
+        hkbStateMachineStateInfo *state = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
+        int stateId = state->stateId;
+        trans->removeTransitionToState(stateId);
+        for (int i = 0; i < states.size(); i++){
+            state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+            trans = static_cast<hkbStateMachineTransitionInfoArray *>(state->transitions.data());
+            if (trans){
+                trans->removeTransitionToState(stateId);
+            }
+        }
+    }
 }
 
 bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){

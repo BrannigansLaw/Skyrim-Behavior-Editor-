@@ -34,13 +34,13 @@ EventsUI::EventsUI(const QString &title)
     : dataUI(NULL),
       verLyt(new QVBoxLayout),
       loadedData(NULL),
-      table(new QTableWidget),
+      table(new TableWidget),
       addObjectPB(new QPushButton("Add Event")),
       removeObjectPB(new QPushButton("Remove Selected Event")),
       buttonLyt(new QHBoxLayout),
       eventName(new QLineEdit),
       flag(new QCheckBox("Flag As Sync Point")),
-      eventWidget(new QTableWidget),
+      eventWidget(new TableWidget),
       stackLyt(new QStackedLayout),
       returnPB(new QPushButton("Return To Parent"))
 {
@@ -60,14 +60,6 @@ EventsUI::EventsUI(const QString &title)
     table->setHorizontalHeaderLabels(headerLabels);
     verLyt->addLayout(buttonLyt, 1);
     verLyt->addLayout(stackLyt, 10);
-    table->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    table->setSelectionBehavior(QAbstractItemView::SelectRows);
-    eventWidget->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-    eventWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    eventWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    eventWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     setLayout(verLyt);
     connect(flag, SIGNAL(released()), this, SLOT(setBoolVariableValue()));
     connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeEvent()));

@@ -36,6 +36,10 @@ QString hkbBlenderGenerator::getName() const{
     return name;
 }
 
+int hkbBlenderGenerator::getNumberOfChildren() const{
+    return children.size();
+}
+
 bool hkbBlenderGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);

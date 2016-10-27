@@ -6,31 +6,55 @@
 #include "src/hkxclasses/hkbstatemachinetransitioninfoarray.h"
 
 class BehaviorGraphView;
-class QTableWidget;
+class TableWidget;
 class QLineEdit;
-class QComboBox;
+class ComboBox;
 class hkbStateMachineTransitionInfoArray;
 class QVBoxLayout;
 class HkxObject;
-class QSpinBox;
-class QDoubleSpinBox;
+class SpinBox;
+class DoubleSpinBox;
 class QCheckBox;
 class BlendingTransitionEffectUI;
 class QStackedLayout;
 class QPushButton;
+class HkTransition;
+class hkbGenerator;
 
 class TransitionsUI: public QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
+    friend class StateMachineUI;
+    friend class StateUI;
 public:
     TransitionsUI();
     virtual ~TransitionsUI(){}
-    void loadData(const hkbStateMachineTransitionInfoArray::HkTransition & data);
+    void loadData(hkbStateMachine *parent, HkTransition *data);
 signals:
     void returnToParent();
 private slots:
-    void setName();
+    void setTriggerIntervalEnterEventId();
+    void setTriggerIntervalExitEventId();
+    void setTriggerIntervalEnterTime();
+    void setTriggerIntervalExitTime();
+    void setInitiateIntervalEnterEventId();
+    void setInitiateIntervalExitEventId();
+    void setInitiateIntervalEnterTime();
+    void setInitiateIntervalExitTime();
+    void viewTransition();
+    void setCondition();
+    void setEventId();
+    void setToStateId();
+    void setFromNestedStateId();
+    void setToNestedStateId();
+    void setPriority();
+    void toggleWildcardFlag();
+    void toggleLocalFlag();
+    void toggleUseNestedStateFlag();
+    void toggleDisallowRandomTransitionFlag();
+    void toggleDisallowReturnToStateFlag();
+    void toggleAbutEndStateFlag();
 private:
     void addEventToLists(const QString & name);
     void removeEventFromLists(int index);
@@ -38,36 +62,34 @@ private:
     void addVariableToLists(const QString & name);
     void removeVariableFromLists(int index);
     void renameVariableInLists(const QString & newName, int index);
-    //void addGeneratorToLists(const QString & name);
-    //void removeGeneratorFromLists(int index);
-    //void renameGeneratorInLists(const QString & name, int index);
-    //void addModifierToLists(const QString & name);
-    //void removeModifierFromLists(int index);
-    //void renameModifierInLists(const QString & name, int index);
+    void loadComboBoxes();
 private:
+    enum TransitionEffectView {
+        TRANSITION_WIDGET = 0,
+        TRANSITION_EFFECT_WIDGET = 1
+    };
     static QStringList headerLabels1;
     BehaviorGraphView *behaviorView;
-    hkbStateMachineTransitionInfoArray::HkTransition bsData;
+    hkbStateMachine *parentObj;
+    hkbStateMachineTransitionInfoArray::HkTransition *bsData;
     QPushButton *returnToParentPB;
     QVBoxLayout *lyt;
-    QTableWidget *table;
-    QGroupBox *triggerIntervalGB;
-    QComboBox *enterEventIdTI;
-    QComboBox *exitEventIdTI;
-    QDoubleSpinBox *enterTimeTI;
-    QDoubleSpinBox *exitTimeTI;
-    QGroupBox *initiateIntervalGB;
-    QComboBox *enterEventIdII;
-    QComboBox *exitEventIdII;
-    QDoubleSpinBox *enterTimeII;
-    QDoubleSpinBox *exitTimeII;
-    BlendingTransitionEffectUI *transition;
+    TableWidget *table;
+    QPushButton *returnPB;
+    ComboBox *enterEventIdTI;
+    ComboBox *exitEventIdTI;
+    DoubleSpinBox *enterTimeTI;
+    DoubleSpinBox *exitTimeTI;
+    ComboBox *enterEventIdII;
+    ComboBox *exitEventIdII;
+    DoubleSpinBox *enterTimeII;
+    DoubleSpinBox *exitTimeII;
     QLineEdit *condition;
-    QComboBox *eventId;
-    QComboBox *toStateId;
-    QComboBox *fromNestedStateId;
-    QComboBox *toNestedStateId;
-    QSpinBox *priority;
+    ComboBox *eventId;
+    ComboBox *toStateId;
+    ComboBox *fromNestedStateId;
+    ComboBox *toNestedStateId;
+    SpinBox *priority;
     QCheckBox *flagWildcard;
     QCheckBox *flagLocal;
     QCheckBox *flagUseNestedState;

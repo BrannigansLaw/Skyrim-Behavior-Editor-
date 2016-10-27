@@ -7,6 +7,7 @@ class BSiStateTaggingGenerator: public hkbGenerator
 {
     friend class BSiStateTaggingGeneratorUI;
     friend class BehaviorGraphView;
+    friend class hkbStateMachine;
 public:
     BSiStateTaggingGenerator(BehaviorFile *parent/*, qint16 ref = 0*/);
     virtual ~BSiStateTaggingGenerator();

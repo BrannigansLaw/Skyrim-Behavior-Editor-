@@ -64,7 +64,8 @@ SOURCES += \
     src/ui/objectdataui/generators/stateui.cpp \
     src/hkxclasses/hkbvariablebindingset.cpp \
     src/ui/transitionsui.cpp \
-    src/ui/blendingtransitioneffectui.cpp
+    src/ui/blendingtransitioneffectui.cpp \
+    src/hkxclasses/hkbexpressioncondition.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -112,4 +113,5 @@ HEADERS  += \
     src/ui/objectdataui/generators/stateui.h \
     src/hkxclasses/hkbvariablebindingset.h \
     src/ui/transitionsui.h \
-    src/ui/blendingtransitioneffectui.h
+    src/ui/blendingtransitioneffectui.h \
+    src/hkxclasses/hkbexpressioncondition.h

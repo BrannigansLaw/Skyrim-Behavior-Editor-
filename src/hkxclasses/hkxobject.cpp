@@ -337,6 +337,12 @@ HkxObjectExpSharedPtr::HkxObjectExpSharedPtr(HkxObject *obj, long ref)
     //
 }
 
+bool HkxObjectExpSharedPtr::operator==(const HkxObjectExpSharedPtr & other) const{
+    if (data() == other.data()){
+        return true;
+    }
+    return false;
+}
 void HkxObjectExpSharedPtr::setReference(long ref){
     reference = ref;
 }

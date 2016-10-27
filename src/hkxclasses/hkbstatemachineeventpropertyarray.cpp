@@ -20,6 +20,26 @@ QString hkbStateMachineEventPropertyArray::getClassname(){
     return classname;
 }
 
+void hkbStateMachineEventPropertyArray::addEvent(const HkEvent & event){
+    events.append(event);
+}
+
+void hkbStateMachineEventPropertyArray::setEventId(int index, int id){
+    if (events.size() > index){
+        events[index].id = id;
+    }
+}
+
+void hkbStateMachineEventPropertyArray::removeEvent(int index){
+    if (events.size() > index){
+        events.removeAt(index);
+    }
+}
+
+int hkbStateMachineEventPropertyArray::getLastEventIndex() const{
+    return events.size() - 1;
+}
+
 bool hkbStateMachineEventPropertyArray::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray text;
@@ -48,6 +68,7 @@ bool hkbStateMachineEventPropertyArray::readData(const HkxXmlReader &reader, lon
                     index++;
                 }
             }
+            return true;
         }
         index++;
     }

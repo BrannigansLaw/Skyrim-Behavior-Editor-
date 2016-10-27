@@ -7,16 +7,16 @@ class HkDataUI;
 class QVBoxLayout;
 class QHBoxLayout;
 class QSignalMapper;
-class QTableWidget;
+class TableWidget;
 class QPushButton;
 class hkbBehaviorGraphData;
 class HkxObject;
 class QCheckBox;
-class QComboBox;
+class ComboBox;
 class QLineEdit;
 class QStackedLayout;
-class QSpinBox;
-class QDoubleSpinBox;
+class SpinBox;
+class DoubleSpinBox;
 class QuadVariableWidget;
 
 class BehaviorVariablesUI: public QGroupBox
@@ -27,6 +27,7 @@ public:
     virtual ~BehaviorVariablesUI(){}
     void setHkDataUI(HkDataUI *ui);
     void loadData(HkxObject *data);
+    //QSize sizeHint() const Q_DECL_OVERRIDE;
 private slots:
     void addVariable();
     void removeVariable();
@@ -42,8 +43,8 @@ private:
     BehaviorVariablesUI& operator=(const BehaviorVariablesUI&);
     BehaviorVariablesUI(const BehaviorVariablesUI &);
     void loadVariable(QCheckBox *variableWid);
-    void loadVariable(QSpinBox *variableWid);
-    void loadVariable(QDoubleSpinBox *variableWid);
+    void loadVariable(SpinBox *variableWid);
+    void loadVariable(DoubleSpinBox *variableWid);
     void loadVariable(QuadVariableWidget *variableWid);
     void addVariableToTable(const QString & name, const QString & type);
     void removeVariableFromTable(int row);
@@ -66,7 +67,7 @@ private:
     HkDataUI *dataUI;
     QVBoxLayout *verLyt;
     hkbBehaviorGraphData *loadedData;
-    QTableWidget *table;
+    TableWidget *table;
     QPushButton *addObjectPB;
     QPushButton *removeObjectPB;
     QHBoxLayout *buttonLyt;
@@ -75,16 +76,16 @@ private:
     QLineEdit *doubleName;
     QLineEdit *quadName;
     QCheckBox *boolCB;
-    QSpinBox *intSB;
-    QDoubleSpinBox *doubleSB;
+    SpinBox *intSB;
+    DoubleSpinBox *doubleSB;
     QuadVariableWidget *quadWidget;
-    QTableWidget *variableWidget;
+    TableWidget *variableWidget;
     QStackedLayout *stackLyt;
     QPushButton *returnBoolPB;
     QPushButton *returnIntPB;
     QPushButton *returnDoublePB;
     QPushButton *returnQuadPB;
-    QComboBox *typeSelector;
+    ComboBox *typeSelector;
     QSignalMapper *nameMapper;
     QSignalMapper *valueMapper;
 };

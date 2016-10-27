@@ -6,7 +6,7 @@
 class HkDataUI;
 class QVBoxLayout;
 class QHBoxLayout;
-class QTableWidget;
+class TableWidget;
 class QPushButton;
 class QSignalMapper;
 class hkbBehaviorGraphData;
@@ -46,13 +46,13 @@ private:
     HkDataUI *dataUI;
     QVBoxLayout *verLyt;
     hkbBehaviorGraphData *loadedData;
-    QTableWidget *table;
+    TableWidget *table;
     QPushButton *addObjectPB;
     QPushButton *removeObjectPB;
     QHBoxLayout *buttonLyt;
     QLineEdit *eventName;
     QCheckBox *flag;
-    QTableWidget *eventWidget;
+    TableWidget *eventWidget;
     QStackedLayout *stackLyt;
     QPushButton *returnPB;
 };

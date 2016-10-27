@@ -47,6 +47,10 @@ QString hkbPoseMatchingGenerator::getName() const{
     return name;
 }
 
+int hkbPoseMatchingGenerator::getNumberOfChildren() const{
+    return children.size();
+}
+
 bool hkbPoseMatchingGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);

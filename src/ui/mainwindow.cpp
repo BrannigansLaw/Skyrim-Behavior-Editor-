@@ -6,6 +6,7 @@
 #include "src/ui/hkdataui.h"
 #include "src/ui/behaviorvariablesui.h"
 #include "src/ui/eventsui.h"
+#include "src/ui/behaviorgraphui/behaviorgraphicons.h"
 
 #include <QtWidgets>
 
@@ -33,8 +34,8 @@ MainWindow::MainWindow()
       drawGraph(true),
       progressD(/*new QProgressDialog(this)*/NULL)
 {
-    logGB->setMinimumHeight(300);
-    logGB->setMinimumWidth(300);
+    //logGB->setMinimumHeight(300);
+    //logGB->setMinimumWidth(300);
     openA->setStatusTip("Open a hkx project file!");
     openA->setShortcut(QKeySequence::Open);
     fileM->addAction(openA);
@@ -55,9 +56,10 @@ MainWindow::MainWindow()
     topLyt->addWidget(topMB, 0, 0, 1, 10);
     topLyt->addWidget(behaviorGraphViewGB, 1, 0, 6, 6);
     //topLyt->addWidget(objectDataGB, 1, 6, 6, 4);
+    objectDataSA->setWidgetResizable(true);
     topLyt->addWidget(objectDataSA, 1, 6, 6, 4);
-    topLyt->addWidget(eventsWid, 7, 0, 3, 3);
-    topLyt->addWidget(variablesWid, 7, 3, 3, 3);
+    topLyt->addWidget(eventsWid, 7, 0, 4, 3);
+    topLyt->addWidget(variablesWid, 7, 3, 4, 3);
     topLyt->addWidget(logGB, 7, 6, 3, 4);
     //progressD->hide();
     readSettings();
@@ -65,7 +67,7 @@ MainWindow::MainWindow()
     objectDataSA->setWidget(objectDataWid);
     variablesWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
     eventsWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
-    //logGB->setMaximumSize(size().width()*0.4, size().height()*0.25);
+    logGB->setMaximumSize(size().width()*0.4, size().height()*0.25);
     connect(openA, SIGNAL(triggered(bool)), this, SLOT(openDirView()));
     connect(expandA, SIGNAL(triggered(bool)), this, SLOT(expandBranches()));
     connect(collapseA, SIGNAL(triggered(bool)), this, SLOT(collapseBranches()));
@@ -85,6 +87,7 @@ void MainWindow::expandBranches(){
 void MainWindow::collapseBranches(){
     if (behaviorGraphViewIV){
         behaviorGraphViewIV->contractBranch(behaviorGraphViewIV->rootIcon, true);
+        behaviorGraphViewIV->rootIcon->setSelected();
     }
 }
 

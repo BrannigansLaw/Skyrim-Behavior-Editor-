@@ -18,7 +18,13 @@ public:
     static QString getClassname();
     QString getStateName(int stateId) const;
     QStringList getStateNames() const;
+    int getNumberOfStates() const;
+    QString getNestedStateName(int stateId, int nestedStateId) const;
+    QStringList getNestedStateNames(int stateId) const;
+    int getNumberOfNestedStates(int stateId) const;
+    void removeState(int index);
 private:
+    hkbStateMachine * getNestedStateMachine(int stateId) const;
     hkbStateMachine& operator=(const hkbStateMachine&);
     hkbStateMachine(const hkbStateMachine &);
 private:

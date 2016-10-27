@@ -38,6 +38,7 @@ class BehaviorGraphView: public QGraphicsView
     friend class BSiStateTaggingGeneratorUI;
     friend class StateMachineUI;
     friend class StateUI;
+    friend class TransitionsUI;
     friend class MainWindow;
 public:
     BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file);
@@ -51,6 +52,7 @@ public:
     GeneratorIcon* getSelectedItem() const{
         return selectedIcon;
     }
+    QStringList getEventNames() const;
     void removeGeneratorData();
     void removeModifierData();
     void removeOtherData();

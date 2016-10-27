@@ -127,11 +127,12 @@ public:
             return NULL;
         }
         GeneratorIcon *oldParent = parent;
-        GeneratorIcon *newIcon;
+        GeneratorIcon *newIcon = NULL;
+        GeneratorIcon *temp = NULL;
         int i;
         if (parent){
             i = parent->children.indexOf(this);
-            if (children.isEmpty()){
+            if (children.isEmpty() && i > -1 && i < parent->children.size()){
                 newIcon = new GeneratorIcon(HkxObjectExpSharedPtr(data.data()), static_cast<hkbGenerator *>(data.data())->getName(), parent);
                 parent->children.move(parent->children.size() - 1, i);
                 if (scene()){
@@ -141,15 +142,11 @@ public:
             }
             parent->children.removeAll(this);
         }
-        int index = newParent->children.indexOf(this);
-        if (index == -1){
-            if (i >= 0){
-                newParent->children.insert(i, this);
-            }else if (!newParent->getChildIcon(this->data.data())){
-                newParent->children.append(this);
-            }
+        temp = newParent->getChildIcon(this->data.data());
+        if (!temp){
+            newParent->children.append(this);
         }else{
-            newParent->children.replace(index, this);
+            newParent->children.replace(newParent->children.indexOf(temp), this);
         }
         parent = newParent;
         QLineF line(parent->pos().x() + 1.0*parent->boundingRect().width(), parent->pos().y() + 1.0*parent->boundingRect().height(),\
@@ -160,6 +157,43 @@ public:
             linkToParent = new QGraphicsLineItem(line);
         }
         return oldParent;
+    }
+
+    GeneratorIcon* setParentReturnDuplicate(GeneratorIcon *newParent){//If data is the same replace icon???
+        if (!newParent){
+            return NULL;
+        }
+        //GeneratorIcon *oldParent = parent;
+        GeneratorIcon *newIcon = NULL;
+        GeneratorIcon *temp = NULL;
+        int i;
+        if (parent){
+            i = parent->children.indexOf(this);
+            if (i > -1 && i < parent->children.size()){
+                newIcon = new GeneratorIcon(HkxObjectExpSharedPtr(data.data()), static_cast<hkbGenerator *>(data.data())->getName(), parent);
+                parent->children.move(parent->children.size() - 1, i);
+                if (scene()){
+                    scene()->addItem(newIcon);
+                    scene()->addItem(newIcon->linkToParent);
+                }
+            }
+            parent->children.removeAll(this);
+        }
+        temp = newParent->getChildIcon(this->data.data());
+        if (!temp){
+            newParent->children.append(this);
+        }else{
+            newParent->children.replace(newParent->children.indexOf(temp), this);
+        }
+        parent = newParent;
+        QLineF line(parent->pos().x() + 1.0*parent->boundingRect().width(), parent->pos().y() + 1.0*parent->boundingRect().height(),\
+                    parent->pos().x() + 1.5*parent->boundingRect().width(), parent->boundingRect().height());
+        if (linkToParent){
+            linkToParent->setLine(line);
+        }else{
+            linkToParent = new QGraphicsLineItem(line);
+        }
+        return newIcon;
     }
 
     void replaceChild(GeneratorIcon *childToReplace, GeneratorIcon *replacementChild){

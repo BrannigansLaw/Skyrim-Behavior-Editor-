@@ -47,21 +47,38 @@ int hkbStateMachineTransitionInfoArray::getNumTransitions() const{
     return transitions.size();
 }
 
+void hkbStateMachineTransitionInfoArray::addTransition(){
+    transitions.append(HkTransition());
+}
+
+void hkbStateMachineTransitionInfoArray::removeTransition(int index){
+    if (transitions.size() > index){
+        transitions.removeAt(index);
+    }
+}
+
+void hkbStateMachineTransitionInfoArray::removeTransitionToState(uint stateId){
+    for (int i = transitions.size() - 1; i >= 0; i--){
+        if (transitions.at(i).toStateId == stateId){
+            transitions.removeAt(i);
+        }
+    }
+}
+
 QString hkbStateMachineTransitionInfoArray::getTransitionNameAt(int index){
     if (index > -1 && index < transitions.size()){
-        if (transitions.at(index).flags.contains("FLAG_TO_NESTED_STATE_ID_IS_VALID")){
-            //
-        }else{
-            if (parent.data()){
-                hkbStateMachine *stateMachine;
-                if (parent.data()->getSignature() == HKB_STATE_MACHINE){
-                    stateMachine = static_cast<hkbStateMachine *>(parent.data());
-                }else if (parent.data()->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
-                    stateMachine = static_cast<hkbStateMachineStateInfo *>(parent.data())->getParentStateMachine();
+        if (parent.data()){
+            hkbStateMachine *stateMachine;
+            if (parent.data()->getSignature() == HKB_STATE_MACHINE){
+                stateMachine = static_cast<hkbStateMachine *>(parent.data());
+            }else if (parent.data()->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
+                stateMachine = static_cast<hkbStateMachineStateInfo *>(parent.data())->getParentStateMachine();
+            }
+            if (stateMachine){
+                if (transitions.at(index).flags.contains("FLAG_TO_NESTED_STATE_ID_IS_VALID")){
+                    return "to_"+stateMachine->getNestedStateName(transitions.at(index).toStateId, transitions.at(index).toNestedStateId)+"_Via_"+stateMachine->getStateName(transitions.at(index).toStateId);
                 }
-                if (stateMachine){
-                    return "to"+stateMachine->getStateName(transitions.at(index).toStateId);
-                }
+                return "to_"+stateMachine->getStateName(transitions.at(index).toStateId);
             }
         }
     }
@@ -72,6 +89,7 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
+    INTERVAL_TYPE intervalType = NONE;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "transitions"){
@@ -82,7 +100,48 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
             for (int j = 0; j < numtrans; j++){
                 transitions.append(HkTransition());
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-                    if (reader.getNthAttributeValueAt(index, 0) == "transition"){
+                    QString test = reader.getNthAttributeValueAt(index, 0);
+                    if (reader.getNthAttributeValueAt(index, 0) == "triggerInterval"){
+                        intervalType = TRIGGER;
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "initiateInterval"){
+                        intervalType = INITIATE;
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "enterEventId"){
+                        if (intervalType == TRIGGER){
+                            transitions.last().triggerInterval.enterEventId = reader.getElementValueAt(index).toInt(&ok);
+                        }else if (intervalType == INITIATE){
+                            transitions.last().initiateInterval.enterEventId = reader.getElementValueAt(index).toInt(&ok);
+                        }
+                        if (!ok){
+                            writeToLog("hkbStateMachineTransitionInfoArray: readData()!\nFailed to properly read 'enterEventId' data field!\nObject Reference: "+ref);
+                        }
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "exitEventId"){
+                        if (intervalType == TRIGGER){
+                            transitions.last().triggerInterval.exitEventId = reader.getElementValueAt(index).toInt(&ok);
+                        }else if (intervalType == INITIATE){
+                            transitions.last().initiateInterval.exitEventId = reader.getElementValueAt(index).toInt(&ok);
+                        }
+                        if (!ok){
+                            writeToLog("hkbStateMachineTransitionInfoArray: readData()!\nFailed to properly read 'exitEventId' data field!\nObject Reference: "+ref);
+                        }
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "enterTime"){
+                        if (intervalType == TRIGGER){
+                            transitions.last().triggerInterval.enterTime = reader.getElementValueAt(index).toDouble(&ok);
+                        }else if (intervalType == INITIATE){
+                            transitions.last().initiateInterval.enterTime = reader.getElementValueAt(index).toDouble(&ok);
+                        }
+                        if (!ok){
+                            writeToLog("hkbStateMachineTransitionInfoArray: readData()!\nFailed to properly read 'enterTime' data field!\nObject Reference: "+ref);
+                        }
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "exitTime"){
+                        if (intervalType == TRIGGER){
+                            transitions.last().triggerInterval.exitTime = reader.getElementValueAt(index).toDouble(&ok);
+                        }else if (intervalType == INITIATE){
+                            transitions.last().initiateInterval.exitTime = reader.getElementValueAt(index).toDouble(&ok);
+                        }
+                        if (!ok){
+                            writeToLog("hkbStateMachineTransitionInfoArray: readData()!\nFailed to properly read 'exitTime' data field!\nObject Reference: "+ref);
+                        }
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "transition"){
                         if (!transitions.last().transition.readReference(index, reader)){
                             writeToLog("hkbStateMachineTransitionInfoArray: readData()!\nFailed to properly read 'transition' data field!\nObject Reference: "+ref);
                         }
@@ -115,7 +174,7 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
                         if (!ok){
                             writeToLog("hkbStateMachineTransitionInfoArray: readData()!\nFailed to properly read 'priority' data field!\nObject Reference: "+ref);
                         }
-                    }else if(reader.getNthAttributeValueAt(index, 0) == "flags"){
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "flags"){
                         transitions.last().flags = reader.getElementValueAt(index);
                         QStringList list = transitions.last().flags.split('|');
                         for (int k = 0; k < list.size(); k++){
@@ -123,11 +182,13 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
                                 writeToLog("hkbStateMachineTransitionInfoArray: readData()!\n'flags' data field contains an invalid string!\nObject Reference: "+ref);
                             }
                         }
+                        index++;
                         break;
                     }
                     index++;
                 }
             }
+            return true;
         }
         index++;
     }
