@@ -24,11 +24,11 @@ QStringList hkbBehaviorGraphData::Type = {
     "VARIABLE_TYPE_QUATERNION"
 };
 
-hkbBehaviorGraphData::hkbBehaviorGraphData(BehaviorFile *parent/*, qint16 ref*/)
-    : HkxObject(parent/*, ref*/)
+hkbBehaviorGraphData::hkbBehaviorGraphData(BehaviorFile *parent, long ref)
+    : HkxObject(parent, ref)
 {
     setType(HKB_BEHAVIOR_GRAPH_DATA, TYPE_OTHER);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
 }
 
 QString hkbBehaviorGraphData::getClassname(){

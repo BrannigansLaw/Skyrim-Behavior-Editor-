@@ -12,8 +12,8 @@ QString hkbClipGenerator::classname = "hkbClipGenerator";
 QStringList hkbClipGenerator::PlaybackMode = {"MODE_SINGLE_PLAY", "MODE_LOOPING", "MODE_USER_CONTROLLED", "MODE_PING_PONG", "MODE_COUNT"};
 QStringList hkbClipGenerator::ClipFlags = {"0", "FLAG_CONTINUE_MOTION_AT_END", "FLAG_SYNC_HALF_CYCLE_IN_PING_PONG_MODE", "FLAG_MIRROR", "FLAG_FORCE_DENSE_POSE", "FLAG_DONT_CONVERT_ANNOTATIONS_TO_TRIGGERS", "FLAG_IGNORE_MOTION"};
 
-hkbClipGenerator::hkbClipGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    : hkbGenerator(parent/*, ref*/),
+hkbClipGenerator::hkbClipGenerator(BehaviorFile *parent, long ref)
+    : hkbGenerator(parent, ref),
       userData(0),
       cropStartAmountLocalTime(0),
       cropEndAmountLocalTime(0),
@@ -26,7 +26,7 @@ hkbClipGenerator::hkbClipGenerator(BehaviorFile *parent/*, qint16 ref*/)
       flags(ClipFlags.first())
 {
     setType(HKB_CLIP_GENERATOR, TYPE_GENERATOR);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
     name = "Clip Generator "+QString::number(refCount);
 }
 

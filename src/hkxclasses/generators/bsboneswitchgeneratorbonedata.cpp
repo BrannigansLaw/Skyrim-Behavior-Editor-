@@ -10,11 +10,11 @@ uint BSBoneSwitchGeneratorBoneData::refCount = 0;
 
 QString BSBoneSwitchGeneratorBoneData::classname = "BSBoneSwitchGeneratorBoneData";
 
-BSBoneSwitchGeneratorBoneData::BSBoneSwitchGeneratorBoneData(BehaviorFile *parent/*, qint16 ref*/)
-    : hkbGenerator(parent/*, ref*/)
+BSBoneSwitchGeneratorBoneData::BSBoneSwitchGeneratorBoneData(BehaviorFile *parent, long ref)
+    : hkbGenerator(parent, ref)
 {
-    refCount++;
     setType(BS_BONE_SWITCH_GENERATOR_BONE_DATA, TYPE_GENERATOR);
+    getParentFile()->addObjectToFile(this, ref);refCount++;
 }
 
 QString BSBoneSwitchGeneratorBoneData::getClassname(){

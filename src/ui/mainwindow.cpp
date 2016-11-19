@@ -17,6 +17,7 @@ MainWindow::MainWindow()
       debugLog(new QPlainTextEdit(this)),
       openA(new QAction("Open Project", this)),
       fileM(new QMenu("File", this)),
+      saveA(new QAction("Save", this)),
       viewM(new QMenu("View", this)),
       expandA(new QAction("Expand All", this)),
       collapseA(new QAction("Collapse All", this)),
@@ -38,7 +39,10 @@ MainWindow::MainWindow()
     //logGB->setMinimumWidth(300);
     openA->setStatusTip("Open a hkx project file!");
     openA->setShortcut(QKeySequence::Open);
+    saveA->setStatusTip("Save file!");
+    saveA->setShortcut(QKeySequence::Save);
     fileM->addAction(openA);
+    fileM->addAction(saveA);
     expandA->setStatusTip("Expand all branches!");
     expandA->setShortcut(QKeySequence::ZoomIn);
     viewM->addAction(expandA);
@@ -69,6 +73,7 @@ MainWindow::MainWindow()
     eventsWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
     logGB->setMaximumSize(size().width()*0.4, size().height()*0.25);
     connect(openA, SIGNAL(triggered(bool)), this, SLOT(openDirView()));
+    connect(saveA, SIGNAL(triggered(bool)), this, SLOT(save()));
     connect(expandA, SIGNAL(triggered(bool)), this, SLOT(expandBranches()));
     connect(collapseA, SIGNAL(triggered(bool)), this, SLOT(collapseBranches()));
     connect(dirViewFSW, SIGNAL(selectFile(QString)), this, SLOT(openHkxfile(QString)));
@@ -88,6 +93,12 @@ void MainWindow::collapseBranches(){
     if (behaviorGraphViewIV){
         behaviorGraphViewIV->contractBranch(behaviorGraphViewIV->rootIcon, true);
         behaviorGraphViewIV->rootIcon->setSelected();
+    }
+}
+
+void MainWindow::save(){
+    if (hkxFile){
+        hkxFile->write();
     }
 }
 

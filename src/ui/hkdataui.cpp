@@ -28,15 +28,20 @@ HkDataUI::HkDataUI(const QString &title)
       verLyt(new QVBoxLayout),
       stack(new QStackedLayout),
       loadedData(NULL),
+      //generatorsTable(new HkxObjectTableWidget("Select a hkbGenerator!")),
+      //modifiersTable(new HkxObjectTableWidget("Select a hkbModifier!")),
       noDataL(new QLabel("No Data Selected!")),
       iSTGUI(new BSiStateTaggingGeneratorUI),
-      modGenUI(new ModifierGeneratorUI),
+      modGenUI(new ModifierGeneratorUI(NULL, NULL)),
       manSelGenUI(new ManualSelectorGeneratorUI),
       stateMachineUI(new StateMachineUI),
       stateUI(new StateUI),
       transitionUI(new TransitionsUI)
 {
     setTitle(title);
+    //stateUI->setGeneratorTable(generatorsTable);
+    //manSelGenUI->setGeneratorTable(generatorsTable);
+    //generatorsTable->hide();
     stack->addWidget(noDataL);
     stack->addWidget(iSTGUI);
     stack->addWidget(modGenUI);
@@ -83,30 +88,28 @@ void HkDataUI::setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *varia
 
 void HkDataUI::modifierAdded(const QString & name){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    modGenUI->addModifierToLists(name);
+    //modifiersTable->addItem(name, "");
     QCoreApplication::processEvents();
 }
 void HkDataUI::modifierNameChanged(const QString & newName, int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    modGenUI->renameModifierInLists(newName, index);
+    //modifiersTable->renameItem(index, newName);
     QCoreApplication::processEvents();
 }
 
 void HkDataUI::generatorAdded(const QString & name){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    iSTGUI->addGeneratorToLists(name);
-    modGenUI->addGeneratorToLists(name);
-    manSelGenUI->addGeneratorToLists(name);
-    stateUI->addGeneratorToLists(name);
+    manSelGenUI->generatorTable->addItem(name, "");
+    stateUI->generatorTable->addItem(name, "");
+    //generatorsTable->addItem(name, "");
     QCoreApplication::processEvents();
 }
 
 void HkDataUI::generatorNameChanged(const QString & newName, int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    iSTGUI->renameGeneratorInLists(newName, index);
-    modGenUI->renameGeneratorInLists(newName, index);
-    manSelGenUI->renameGeneratorInLists(newName, index);
-    stateUI->renameGeneratorInLists(newName, index);
+    manSelGenUI->generatorTable->renameItem(index, newName);
+    stateUI->generatorTable->renameItem(index, newName);
+    //generatorsTable->renameItem(index, newName);
     QCoreApplication::processEvents();
 }
 
@@ -146,50 +149,15 @@ void HkDataUI::variableAdded(const QString & name){
 
 void HkDataUI::generatorRemoved(int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    iSTGUI->removeGeneratorFromLists(index);
-    manSelGenUI->removeGeneratorFromLists(index);
-    modGenUI->removeGeneratorFromLists(index);
-    stateUI->removeGeneratorFromLists(index);
-    switch (stack->currentIndex()) {
-    case BS_I_STATE_TAGGING_GENERATOR:
-        iSTGUI->loadData(loadedData);
-        break;
-    case HKB_MODIFIER_GENERATOR:
-        modGenUI->loadData(loadedData);
-        break;
-    case HKB_MANUAL_SELECTOR_GENERATOR:
-        manSelGenUI->loadData(loadedData);
-        break;
-    case HKB_STATE_MACHINE:
-        stateMachineUI->loadData(loadedData);
-        break;
-    default:
-        stack->setCurrentIndex(NO_DATA_SELECTED);
-        break;
-    }
+    manSelGenUI->generatorTable->removeItem(index);
+    stateUI->generatorTable->removeItem(index);
+    //generatorsTable->removeItem(index);
     QCoreApplication::processEvents();
 }
 
 void HkDataUI::modifierRemoved(int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    modGenUI->removeModifierFromLists(index);
-    /*switch (stack->currentIndex()) {
-    case BS_I_STATE_TAGGING_GENERATOR:
-        iSTGUI->loadData(loadedData);
-        break;
-    case HKB_MODIFIER_GENERATOR:
-        modGenUI->loadData(loadedData);
-        break;
-    case HKB_MANUAL_SELECTOR_GENERATOR:
-        manSelGenUI->loadData(loadedData);
-        break;
-    case HKB_STATE_MACHINE:
-        stateMachineUI->loadData(loadedData);
-        break;
-    default:
-        stack->setCurrentIndex(NO_DATA_SELECTED);
-        break;
-    }*/
+    //modifiersTable->removeItem(index);
     QCoreApplication::processEvents();
 }
 
@@ -259,11 +227,11 @@ BehaviorGraphView * HkDataUI::setBehaviorView(BehaviorGraphView *view){
     transitionUI->behaviorView = view;
     if (behaviorView){
         iSTGUI->loadComboBoxes();//Implement and change ->count() == 0){ code in all uis
-        modGenUI->loadComboBoxes();
         manSelGenUI->loadComboBoxes();
         stateMachineUI->loadComboBoxes();
-        stateUI->loadComboBoxes();
         transitionUI->loadComboBoxes();
+        //generatorsTable->loadTable(behaviorView->behavior);
+        //generatorsTable->show();
         connect(behaviorView, SIGNAL(addedGenerator(QString)), this, SLOT(generatorAdded(QString)));
         connect(behaviorView, SIGNAL(addedModifier(QString)), this, SLOT(modifierAdded(QString)));
         connect(behaviorView, SIGNAL(removedGenerator(int)), this, SLOT(generatorRemoved(int)));

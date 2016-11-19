@@ -9,12 +9,12 @@ uint hkbBehaviorReferenceGenerator::refCount = 0;
 
 QString hkbBehaviorReferenceGenerator::classname = "hkbBehaviorReferenceGenerator";
 
-hkbBehaviorReferenceGenerator::hkbBehaviorReferenceGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    : hkbGenerator(parent/*, ref*/),
+hkbBehaviorReferenceGenerator::hkbBehaviorReferenceGenerator(BehaviorFile *parent, long ref)
+    : hkbGenerator(parent, ref),
       userData(0)
 {
     setType(HKB_BEHAVIOR_REFERENCE_GENERATOR, TYPE_GENERATOR);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
     name = "Behavior Reference Generator "+QString::number(refCount);
 }
 

@@ -554,7 +554,6 @@ void StateMachineUI::loadData(HkxObject *data){
                 }else{
                     states->setRowHidden(i, false);
                     states->item(i, 0)->setText(gen->getName());
-                    states->item(i, 1)->setText(gen->getClassname());
                 }
             }
         }
@@ -564,10 +563,15 @@ void StateMachineUI::loadData(HkxObject *data){
         trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->wildcardTransitions.data());
         if (trans){
             for (int i = 0; i < trans->getNumTransitions(); i++){
-                wildcardTransitions->setRowCount(wildcardTransitions->rowCount() + 1);
-                wildcardTransitions->setItem(i, 0, new QTableWidgetItem(trans->getTransitionNameAt(i)));
-                wildcardTransitions->setItem(i, 1, new QTableWidgetItem(trans->getClassname()));
-                wildcardTransitions->setItem(i, 2, new QTableWidgetItem("Edit"));
+                if (i >= wildcardTransitions->rowCount()){
+                    wildcardTransitions->setRowCount(wildcardTransitions->rowCount() + 1);
+                    wildcardTransitions->setItem(i, 0, new QTableWidgetItem(trans->getTransitionNameAt(i)));
+                    wildcardTransitions->setItem(i, 1, new QTableWidgetItem(trans->getClassname()));
+                    wildcardTransitions->setItem(i, 2, new QTableWidgetItem("Edit"));
+                }else{
+                    wildcardTransitions->setRowHidden(i, false);
+                    wildcardTransitions->item(i, 0)->setText(trans->getTransitionNameAt(i));
+                }
             }
             for (int j = trans->getNumTransitions(); j < wildcardTransitions->rowCount(); j++){
                 wildcardTransitions->setRowHidden(j, true);

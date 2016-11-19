@@ -7,7 +7,7 @@ class hkbPoseMatchingGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
-    hkbPoseMatchingGenerator(BehaviorFile *parent/*, qint16 ref = 0*/);
+    hkbPoseMatchingGenerator(BehaviorFile *parent, long ref = 0);
     virtual ~hkbPoseMatchingGenerator();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
@@ -16,6 +16,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     int getNumberOfChildren() const;
+    int getIndexToInsertIcon(HkxObject *child) const;
 private:
     hkbPoseMatchingGenerator& operator=(const hkbPoseMatchingGenerator&);
     hkbPoseMatchingGenerator(const hkbPoseMatchingGenerator &);

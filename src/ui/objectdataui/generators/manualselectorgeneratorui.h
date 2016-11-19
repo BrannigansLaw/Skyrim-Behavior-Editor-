@@ -18,7 +18,7 @@ class QLineEdit;
 class ComboBox;
 class QPushButton;
 class QHBoxLayout;
-class QSignalMapper;
+class HkxObjectTableWidget;
 
 class ManualSelectorGeneratorUI: public QGroupBox
 {
@@ -28,30 +28,24 @@ public:
     ManualSelectorGeneratorUI();
     virtual ~ManualSelectorGeneratorUI(){}
     void loadData(HkxObject *data);
+    //void setGeneratorTable(HkxObjectTableWidget *genTable);
 signals:
     void generatorNameChanged(const QString & newName, int index);
+    void viewGeneratorTable(int index);
 private slots:
     void setName();
     void addNewGenerator();
-    void setGeneratorAt(int index);
+    void setGenerator(int index);
     void removeGenerator();
     void setSelectedGeneratorIndex();
     void setSelectedGeneratorIndexBind(int index);
     void setCurrentGeneratorIndex();
     void setCurrentGeneratorIndexBind(int index);
+    void viewGenerators();
 private:
-    //void addEventToLists(const QString & name);
-    //void removeEventFromLists(int index);
-    //void renameEventInLists(const QString & newName, int index);
     void addVariableToLists(const QString & name);
     void removeVariableFromLists(int index);
     void renameVariableInLists(const QString & newName, int index);
-    void addGeneratorToLists(const QString & name);
-    void removeGeneratorFromLists(int index);
-    void renameGeneratorInLists(const QString & name, int index);
-    //void addModifierToLists(const QString & name);
-    //void removeModifierFromLists(int index);
-    //void renameModifierInLists(const QString & name, int index);
     void loadComboBoxes();
 private:
     enum Type {
@@ -72,6 +66,7 @@ private:
     static QStringList types;
     static QStringList headerLabels1;
     static QStringList headerLabels2;
+    HkxObjectTableWidget *generatorTable;
     BehaviorGraphView *behaviorView;
     hkbManualSelectorGenerator *bsData;
     QVBoxLayout *lyt;
@@ -81,7 +76,6 @@ private:
     QPushButton *addObjectPB;
     QPushButton *removeObjectPB;
     ComboBox *typeSelectorCB;
-    QSignalMapper *signalMapper;
     QHBoxLayout *buttonLyt;
     SpinBox *selectedGeneratorIndex;
     ComboBox *selectedGeneratorIndexBind;

@@ -3,6 +3,7 @@
 
 #include "src/utility.h"
 #include "src/xml/hkxxmlreader.h"
+#include "src/xml/hkxxmlwriter.h"
 #include "src/hkxclasses/hkxobject.h"
 //#include "generators.h"
 //#include "modifiers.h"
@@ -55,26 +56,32 @@ public:
     QVector<int> removeOtherData();
     int getIndexOfGenerator(const HkxObjectExpSharedPtr & obj) const;
     bool setGeneratorData(HkxObjectExpSharedPtr & ptrToSet, int index);
-    HkxObject * getGeneratorDataAt(int index);
+    hkbGenerator * getGeneratorDataAt(int index);
     int getIndexOfModifier(const HkxObjectExpSharedPtr & obj) const;
     bool setModifierData(HkxObjectExpSharedPtr & ptrToSet, int index);
     HkxObject* getModifierDataAt(int index);
     QStringList getVariableNames() const;
     QStringList getEventNames() const;
-    QStringList getGeneratorNames();
-    QStringList getModifierNames();
+    QStringList getGeneratorNamesAndTypeNames() const;
     HkxObject * getBehaviorGraphData() const;
     void removeBindings(int varIndex);
     hkVariableType getVariableTypeAt(int index) const;
-    template <typename T> bool addObjectToFile(T *obj, const QByteArray & temp = "-1");
+    //template <typename T> bool addObjectToFile(T *obj, const QByteArray & temp = "-1");
+    /*template <typename T> */bool addObjectToFile(HkxObject *obj, long ref = -1);
+    //
+    QStringList getGeneratorNames(){return QStringList();}
+    QStringList getModifierNames(){return QStringList();}
+    //
+    void write();
+    QString getRootObjectReferenceString();
 protected:
     bool parse();
     bool link();
-    //void read();
 private:
     void removeUnneededGenerators();
 private:
     HkxXmlReader reader;
+    HkxXMLWriter writer;
     HkxObjectExpSharedPtr behaviorGraph;
     HkxObjectExpSharedPtr stringData;
     HkxObjectExpSharedPtr variableValues;
@@ -82,6 +89,7 @@ private:
     QList <HkxObjectExpSharedPtr> generators;
     QList <HkxObjectExpSharedPtr> modifiers;
     QList <HkxObjectExpSharedPtr> otherTypes;
+    long largestRef;
 };
 
 #endif // HKXFILE_H

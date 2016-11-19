@@ -1,7 +1,7 @@
 #include "hkbmodifier.h"
 
-hkbModifier::hkbModifier(BehaviorFile *parent/*, long ref = 0*/)
-    : HkDynamicObject(parent/*, ref*/)
+hkbModifier::hkbModifier(BehaviorFile *parent, long ref)
+    : HkDynamicObject(parent, ref)
 {
     //
 }

@@ -9,11 +9,11 @@ uint hkbStateMachineEventPropertyArray::refCount = 0;
 
 QString hkbStateMachineEventPropertyArray::classname = "hkbStateMachineEventPropertyArray";
 
-hkbStateMachineEventPropertyArray::hkbStateMachineEventPropertyArray(BehaviorFile *parent)
-    : HkxObject(parent)
+hkbStateMachineEventPropertyArray::hkbStateMachineEventPropertyArray(BehaviorFile *parent, long ref)
+    : HkxObject(parent, ref)
 {
-    refCount++;
     setType(HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY, TYPE_OTHER);
+    getParentFile()->addObjectToFile(this, ref);refCount++;
 }
 
 QString hkbStateMachineEventPropertyArray::getClassname(){

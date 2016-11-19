@@ -9,7 +9,7 @@ class BSiStateTaggingGenerator: public hkbGenerator
     friend class BehaviorGraphView;
     friend class hkbStateMachine;
 public:
-    BSiStateTaggingGenerator(BehaviorFile *parent/*, qint16 ref = 0*/);
+    BSiStateTaggingGenerator(BehaviorFile *parent, long ref = 0);
     virtual ~BSiStateTaggingGenerator();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

@@ -7,7 +7,7 @@ class BSCyclicBlendTransitionGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
-    BSCyclicBlendTransitionGenerator(BehaviorFile *parent/*, qint16 ref = 0*/);
+    BSCyclicBlendTransitionGenerator(BehaviorFile *parent, long ref = 0);
     virtual ~BSCyclicBlendTransitionGenerator();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

@@ -12,12 +12,12 @@ QString hkbBehaviorGraph::classname = "hkbBehaviorGraph";
 
 QStringList hkbBehaviorGraph::VariableMode = {"VARIABLE_MODE_DISCARD_WHEN_INACTIVE", "VARIABLE_MODE_MAINTAIN_VALUES_WHEN_INACTIVE"};
 
-hkbBehaviorGraph::hkbBehaviorGraph(BehaviorFile *parent/*, qint16 ref*/)
-    : hkbGenerator(parent/*, ref*/),
+hkbBehaviorGraph::hkbBehaviorGraph(BehaviorFile *parent, long ref)
+    : hkbGenerator(parent, ref),
       userData(0)
 {
     setType(HKB_BEHAVIOR_GRAPH, TYPE_GENERATOR);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
     name = "Behavior Graph "+QString::number(refCount);
 }
 
@@ -27,6 +27,13 @@ QString hkbBehaviorGraph::getClassname(){
 
 QString hkbBehaviorGraph::getName() const{
     return name;
+}
+
+int hkbBehaviorGraph::getIndexToInsertIcon() const{
+    if (!rootGenerator.constData()){
+        return 0;
+    }
+    return -1;
 }
 
 bool hkbBehaviorGraph::readData(const HkxXmlReader &reader, long index){

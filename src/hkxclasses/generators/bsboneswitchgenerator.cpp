@@ -10,12 +10,12 @@ uint BSBoneSwitchGenerator::refCount = 0;
 
 QString BSBoneSwitchGenerator::classname = "BSBoneSwitchGenerator";
 
-BSBoneSwitchGenerator::BSBoneSwitchGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    : hkbGenerator(parent/*, ref*/),\
+BSBoneSwitchGenerator::BSBoneSwitchGenerator(BehaviorFile *parent, long ref)
+    : hkbGenerator(parent, ref),\
     userData(0)
 {
-    refCount++;
     setType(BS_BONE_SWITCH_GENERATOR, TYPE_GENERATOR);
+    getParentFile()->addObjectToFile(this, ref);refCount++;
     name = "BS Bone Switch Generator "+QString::number(refCount);
 }
 
@@ -25,6 +25,19 @@ QString BSBoneSwitchGenerator::getClassname(){
 
 QString BSBoneSwitchGenerator::getName() const{
     return name;
+}
+
+int BSBoneSwitchGenerator::getIndexToInsertIcon() const{
+    if (!pDefaultGenerator.constData()){    //Not sure... Need to determine source of change???
+        return 0;
+    }else{
+        for (int i = 0; i < ChildrenA.size(); i++){
+            if (!ChildrenA.at(i).constData()){
+                return 1 + i;
+            }
+        }
+    }
+    return -1;
 }
 
 bool BSBoneSwitchGenerator::readData(const HkxXmlReader &reader, long index){

@@ -31,12 +31,12 @@ QStringList hkbStateMachineTransitionInfoArray::transitionFlags = {
     "FLAG_ABUT_AT_END_OF_FROM_GENERATOR",
 };
 
-hkbStateMachineTransitionInfoArray::hkbStateMachineTransitionInfoArray(BehaviorFile *parent, hkbStateMachine *parentSM)
-    : HkxObject(parent),
+hkbStateMachineTransitionInfoArray::hkbStateMachineTransitionInfoArray(BehaviorFile *parent, hkbStateMachine *parentSM, long ref)
+    : HkxObject(parent, ref),
       parent(reinterpret_cast<HkxObject *>(parentSM))
 {
-    refCount++;
     setType(HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY, TYPE_OTHER);
+    getParentFile()->addObjectToFile(this, ref);refCount++;
 }
 
 QString hkbStateMachineTransitionInfoArray::getClassname(){

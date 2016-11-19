@@ -7,7 +7,7 @@ class BSOffsetAnimationGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
-    BSOffsetAnimationGenerator(BehaviorFile *parent/*, qint16 ref = 0*/);
+    BSOffsetAnimationGenerator(BehaviorFile *parent, long ref = 0);
     virtual ~BSOffsetAnimationGenerator();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
@@ -15,6 +15,7 @@ public:
     QString getName() const;
     bool evaulateDataValidity();
     static QString getClassname();
+    int getIndexToInsertIcon() const;
 private:
     BSOffsetAnimationGenerator& operator=(const BSOffsetAnimationGenerator&);
     BSOffsetAnimationGenerator(const BSOffsetAnimationGenerator &);

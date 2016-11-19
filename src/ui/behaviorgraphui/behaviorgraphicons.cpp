@@ -76,12 +76,18 @@ GeneratorIcon::GeneratorIcon(const HkxObjectExpSharedPtr & d, const QString & s,
     if (parent){
         qreal lastY = 0;
         getLastIconY(parent, lastY);
-        int index = parent->children.indexOf(this);
+        if (!parent->children.contains(this)){
+            int index = static_cast<hkbGenerator *>(parent->data.data())->getIndexToInsertIcon();
+            if (index > -1 && index < parent->children.size()){
+                parent->children.insert(index, this);
+            }else{
+                parent->children.append(this);
+            }
+        }
+        /*int index = parent->children.indexOf(this);
         if (index == -1){
             parent->children.append(this);
-        }else{
-            parent->children.replace(index, this);
-        }
+        }*/
         linkToParent = new QGraphicsLineItem(parent->pos().x() + 1.0*parent->boundingRect().width(), parent->pos().y() + 1.0*parent->boundingRect().height(),
                                              parent->pos().x() + 1.5*parent->boundingRect().width(), lastY + 2*boundingRect().height());
         setPos(parent->pos().x() + 1.5*parent->boundingRect().width(), lastY + 2*boundingRect().height());

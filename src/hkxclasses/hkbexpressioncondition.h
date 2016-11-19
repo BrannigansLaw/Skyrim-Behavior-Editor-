@@ -7,7 +7,7 @@ class hkbExpressionCondition: public HkxObject
 {
     friend class TransitionUI;
 public:
-    hkbExpressionCondition(BehaviorFile *parent, const QString & string = "");
+    hkbExpressionCondition(BehaviorFile *parent, const QString & string = "", long ref = -1);
     virtual ~hkbExpressionCondition();
     bool readData(const HkxXmlReader & reader, long index);
     bool evaulateDataValidity();

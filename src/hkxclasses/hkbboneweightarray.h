@@ -9,7 +9,7 @@ class hkbBoneWeightArray: public HkDynamicObject
 {
     friend class BehaviorGraphView;
 public:
-    hkbBoneWeightArray(BehaviorFile *parent/*, qint16 ref = 0*/);
+    hkbBoneWeightArray(BehaviorFile *parent, long ref = 0);
     virtual ~hkbBoneWeightArray();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

@@ -13,8 +13,8 @@ QStringList hkbPoseMatchingGenerator::Mode = {"MODE_MATCH", "MODE_PLAY"};
 //QStringList hkbPoseMatchingGenerator::Flags = {"0", "FLAG_SYNC", "FLAG_SMOOTH_GENERATOR_WEIGHTS", "FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS", "FLAG_PARAMETRIC_BLEND", "FLAG_IS_PARAMETRIC_BLEND_CYCLIC", "FLAG_FORCE_DENSE_POSE"};
 QStringList hkbPoseMatchingGenerator::Flags = {"0", "1", "2", "8", "16", "32", "64"};
 
-hkbPoseMatchingGenerator::hkbPoseMatchingGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    : hkbGenerator(parent/*, ref*/),
+hkbPoseMatchingGenerator::hkbPoseMatchingGenerator(BehaviorFile *parent, long ref)
+    : hkbGenerator(parent, ref),
     userData(0),
     referencePoseWeightThreshold(0),
     blendParameter(0),
@@ -35,7 +35,7 @@ hkbPoseMatchingGenerator::hkbPoseMatchingGenerator(BehaviorFile *parent/*, qint1
     pelvisIndex(-1)
 {
     setType(HKB_POSE_MATCHING_GENERATOR, TYPE_GENERATOR);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
     name = "Pose Matching Generator "+QString::number(refCount);
 }
 
@@ -49,6 +49,15 @@ QString hkbPoseMatchingGenerator::getName() const{
 
 int hkbPoseMatchingGenerator::getNumberOfChildren() const{
     return children.size();
+}
+
+int hkbPoseMatchingGenerator::getIndexToInsertIcon(HkxObject *child) const{
+    for (int i = 0; i < children.size(); i++){
+        if (children.at(i).constData() == child){
+            return i;
+        }
+    }
+    return -1;
 }
 
 bool hkbPoseMatchingGenerator::readData(const HkxXmlReader &reader, long index){

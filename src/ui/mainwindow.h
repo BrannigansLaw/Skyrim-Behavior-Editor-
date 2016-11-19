@@ -41,6 +41,7 @@ private:
     QMenuBar *topMB;
     QAction *openA;
     QMenu *fileM;
+    QAction *saveA;
     QMenu *viewM;
     QAction *expandA;
     QAction *collapseA;
@@ -63,6 +64,7 @@ private slots:
     void openHkxfile(QString name);
     void expandBranches();
     void collapseBranches();
+    void save();
 private:
     void setProgressData(const QString & message, int max, int min, int value);
     bool exitProgram();

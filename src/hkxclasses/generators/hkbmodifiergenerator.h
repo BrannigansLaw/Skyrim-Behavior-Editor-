@@ -10,7 +10,7 @@ class hkbModifierGenerator: public hkbGenerator
     friend class ModifierGeneratorUI;
     friend class hkbStateMachine;
 public:
-    hkbModifierGenerator(BehaviorFile *parent/*, qint16 ref = 0*/);
+    hkbModifierGenerator(BehaviorFile *parent, long ref = 0);
     virtual ~hkbModifierGenerator();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
@@ -18,6 +18,7 @@ public:
     QString getName() const;
     bool evaulateDataValidity();
     static QString getClassname();
+    int getIndexToInsertIcon(HkxObject *child) const;
 private:
     hkbModifierGenerator& operator=(const hkbModifierGenerator&);
     hkbModifierGenerator(const hkbModifierGenerator &);

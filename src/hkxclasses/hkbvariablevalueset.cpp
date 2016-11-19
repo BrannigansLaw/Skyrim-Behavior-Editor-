@@ -9,11 +9,11 @@ uint hkbVariableValueSet::refCount = 0;
 
 QString hkbVariableValueSet::classname = "hkbVariableValueSet";
 
-hkbVariableValueSet::hkbVariableValueSet(BehaviorFile *parent/*, qint16 ref*/)
-    : HkxObject(parent/*, ref*/)
+hkbVariableValueSet::hkbVariableValueSet(BehaviorFile *parent, long ref)
+    : HkxObject(parent, ref)
 {
     setType(HKB_VARIABLE_VALUE_SET, TYPE_OTHER);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
 }
 
 QString hkbVariableValueSet::getClassname(){

@@ -10,8 +10,8 @@ uint hkbStateMachineStateInfo::refCount = 0;
 
 QString hkbStateMachineStateInfo::classname = "hkbStateMachineStateInfo";
 
-hkbStateMachineStateInfo::hkbStateMachineStateInfo(BehaviorFile *parent/*, qint16 ref*/, hkbStateMachine *parentSM)
-    : hkbGenerator(parent/*, ref*/),
+hkbStateMachineStateInfo::hkbStateMachineStateInfo(BehaviorFile *parent, hkbStateMachine *parentSM, long ref)
+    : hkbGenerator(parent, ref),
       name("State"),
       stateId(0),
       probability(1),
@@ -19,7 +19,7 @@ hkbStateMachineStateInfo::hkbStateMachineStateInfo(BehaviorFile *parent/*, qint1
       parentSM(reinterpret_cast<HkxObject *>(parentSM))
 {
     setType(HKB_STATE_MACHINE_STATE_INFO, TYPE_GENERATOR);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
 }
 
 QString hkbStateMachineStateInfo::getClassname(){

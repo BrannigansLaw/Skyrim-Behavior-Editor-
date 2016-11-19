@@ -10,14 +10,14 @@ uint BSiStateTaggingGenerator::refCount = 0;
 
 QString BSiStateTaggingGenerator::classname = "BSiStateTaggingGenerator";
 
-BSiStateTaggingGenerator::BSiStateTaggingGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    : hkbGenerator(parent/*, ref*/),
+BSiStateTaggingGenerator::BSiStateTaggingGenerator(BehaviorFile *parent, long ref)
+    : hkbGenerator(parent, ref),
       userData(1),
       iStateToSetAs(-1),
       iPriority(0)
 {
     setType(BS_I_STATE_TAGGING_GENERATOR, TYPE_GENERATOR);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
     name = "BS iState Tagging Generator "+QString::number(refCount);
 }
 

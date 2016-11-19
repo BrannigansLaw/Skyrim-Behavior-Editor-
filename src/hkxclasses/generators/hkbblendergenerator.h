@@ -7,7 +7,7 @@ class hkbBlenderGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
-    hkbBlenderGenerator(BehaviorFile *parent/*, qint16 ref = 0*/);
+    hkbBlenderGenerator(BehaviorFile *parent, long ref = 0);
     virtual ~hkbBlenderGenerator();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
@@ -16,6 +16,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     int getNumberOfChildren() const;
+    int getIndexToInsertIcon() const;
 private:
     hkbBlenderGenerator& operator=(const hkbBlenderGenerator&);
     hkbBlenderGenerator(const hkbBlenderGenerator &);

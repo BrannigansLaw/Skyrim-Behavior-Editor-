@@ -8,7 +8,7 @@ class hkbManualSelectorGenerator: public hkbGenerator
     friend class BehaviorGraphView;
     friend class ManualSelectorGeneratorUI;
 public:
-    hkbManualSelectorGenerator(BehaviorFile *parent/*, qint16 ref = 0*/);
+    hkbManualSelectorGenerator(BehaviorFile *parent, long ref = 0);
     virtual ~hkbManualSelectorGenerator();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
@@ -16,6 +16,7 @@ public:
     QString getName() const;
     bool evaulateDataValidity();
     static QString getClassname();
+    int getIndexToInsertIcon(HkxObject *child) const;
 private:
     hkbManualSelectorGenerator& operator=(const hkbManualSelectorGenerator&);
     hkbManualSelectorGenerator(const hkbManualSelectorGenerator &);

@@ -10,11 +10,11 @@ uint hkbBehaviorGraphStringData::refCount = 0;
 
 QString hkbBehaviorGraphStringData::classname = "hkbBehaviorGraphStringData";
 
-hkbBehaviorGraphStringData::hkbBehaviorGraphStringData(BehaviorFile *parent/*, qint16 ref*/)
-    : HkxObject(parent/*, ref*/)
+hkbBehaviorGraphStringData::hkbBehaviorGraphStringData(BehaviorFile *parent, long ref)
+    : HkxObject(parent, ref)
 {
     setType(HKB_BEHAVIOR_GRAPH_STRING_DATA, TYPE_OTHER);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
 }
 
 QString hkbBehaviorGraphStringData::getClassname(){

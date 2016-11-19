@@ -25,6 +25,7 @@ class QStackedLayout;
 class HkTransition;
 class hkbStateMachineEventPropertyArray;
 class hkbStateMachine;
+class HkxObjectTableWidget;
 
 class StateUI: public QGroupBox
 {
@@ -35,10 +36,12 @@ public:
     StateUI();
     virtual ~StateUI(){}
     void loadData(HkxObject *data);
+    //void setGeneratorTable(HkxObjectTableWidget *genTable);
 signals:
     void stateNameChanged(const QString & newName, int index);
     void toParentStateMachine();
     void viewTransition(hkbStateMachine *parent, HkTransition *transition);
+    void viewGeneratorTable(int index);
 private slots:
     void setName();
     void setGenerator(int index);
@@ -56,27 +59,25 @@ private slots:
     void addTransition();
     void removeTransition();
     void transitionSelected(int row, int column);
+    void viewGenerators();
 private:
     void appendEnterEventTableRow(int index, hkbStateMachineEventPropertyArray *enterEvents, const QStringList &eventList);
     void appendExitEventTableRow(int index, hkbStateMachineEventPropertyArray *exitEvents, const QStringList &eventList);
-    void addGeneratorToLists(const QString & name);
-    void removeGeneratorFromLists(int index);
-    void renameGeneratorInLists(const QString & name, int index);
     void addEventToLists(const QString & name);
     void removeEventFromLists(int index);
     void renameEventInLists(const QString & newName, int index);
-    void loadComboBoxes();
 private:
     static QStringList headerLabels1;
     static QStringList headerLabels2;
     static QStringList headerLabels3;
+    HkxObjectTableWidget *generatorTable;
     BehaviorGraphView *behaviorView;
     hkbStateMachineStateInfo *bsData;
     QVBoxLayout *lyt;
     TableWidget *table;
     QPushButton *returnPB;
     QLineEdit *name;
-    ComboBox *generator;
+    QPushButton *generator;
     SpinBox *stateId;
     DoubleSpinBox *probability;
     QCheckBox *enable;

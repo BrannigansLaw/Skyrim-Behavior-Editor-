@@ -8,9 +8,11 @@
 class BehaviorFile;
 class HkxXmlReader;
 class HkxObjectExpSharedPtr;
+class HkxXMLWriter;
 
 class HkxObject: public QSharedData
 {
+    friend class BehaviorFile;
 public:
     enum HkxType {TYPE_OTHER=0, TYPE_GENERATOR=1, TYPE_MODIFIER=2};
 public:
@@ -23,8 +25,10 @@ public:
     bool isDataValid() const;
     virtual bool link() = 0;
     virtual void unlink();
+    virtual bool write(HkxXMLWriter *writer){return false;}
+    QString getReferenceString() const;
 protected:
-    HkxObject(BehaviorFile *parent/*, long ref = 0*/);
+    HkxObject(BehaviorFile *parent, long ref = -1);
     BehaviorFile * getParentFile() const;
     void setDataValidity(bool isValid);
     void setType(HkxSignature sig, HkxType type);
@@ -35,6 +39,10 @@ protected:
     bool readDoubles(const QByteArray &line, QVector<qreal> & doubles);
     hkVector3 readVector3(const QByteArray &lineIn, bool *ok);
     hkQuadVariable readVector4(const QByteArray &lineIn, bool *ok);
+    void setIsWritten(bool written = true);
+    bool getIsWritten() const;
+    void setReference(int ref);
+    long getReference() const;
 private:
     HkxObject(const HkxObject &obj);
     HkxObject& operator=(const HkxObject&);
@@ -44,6 +52,7 @@ private:
     HkxSignature signature;
     HkxType typeCheck;
     bool dataValid;
+    bool isWritten;
 };
 
 class HkxObjectExpSharedPtr: public QExplicitlySharedDataPointer <HkxObject>
@@ -69,7 +78,7 @@ public:
     void removeBinding(const QString & path);
     void removeBinding(int varIndex);
 protected:
-    HkDynamicObject(BehaviorFile *parent/*, long ref = 0*/);
+    HkDynamicObject(BehaviorFile *parent, long ref = -1);
 protected:
     HkxObjectExpSharedPtr variableBindingSet;
 protected:

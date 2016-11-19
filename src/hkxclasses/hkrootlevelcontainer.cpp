@@ -1,5 +1,6 @@
 #include "hkrootlevelcontainer.h"
 #include "src/xml/hkxxmlreader.h"
+#include "src/xml/hkxxmlwriter.h"
 #include "src/filetypes/hkxfile.h"
 
 /**
@@ -10,11 +11,11 @@ uint hkRootLevelContainer::refCount = 0;
 
 QString hkRootLevelContainer::classname = "hkRootLevelContainer";
 
-hkRootLevelContainer::hkRootLevelContainer(BehaviorFile *parent/*, long ref = 0*/)
-    : HkxObject(parent/*, ref*/)
+hkRootLevelContainer::hkRootLevelContainer(BehaviorFile *parent, long ref)
+    : HkxObject(parent, ref)
 {
-    refCount++;
     setType(HK_ROOT_LEVEL_CONTAINER, TYPE_OTHER);
+    getParentFile()->addObjectToFile(this, ref);refCount++;
 }
 
 QString hkRootLevelContainer::getClassname(){
@@ -24,6 +25,7 @@ QString hkRootLevelContainer::getClassname(){
 bool hkRootLevelContainer::readData(const HkxXmlReader &reader, int index){
     bool ok;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+
         if (reader.getNthAttributeValueAt(index, 0) == "namedVariants"){
             int numVariants = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
@@ -47,6 +49,34 @@ bool hkRootLevelContainer::readData(const HkxXmlReader &reader, int index){
             }
         }
         index++;
+    }
+    return true;
+}
+
+bool hkRootLevelContainer::write(HkxXMLWriter *writer){
+    if (!writer){
+        return false;
+    }
+    if (!getIsWritten()){
+        QStringList list1 = {writer->name, writer->clas, writer->signature};
+        QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
+        writer->writeLine(writer->object, list1, list2, "");
+        QStringList list3 = {writer->name, writer->numelements};
+        QStringList list4 = {"namedVariants", QString::number(namedVariants.size())};
+        writer->writeLine(writer->object, list3, list4, "");
+        for (int i = 0; i < namedVariants.size(); i++){
+            writer->writeLine(writer->object, true);
+            writer->writeLine(writer->object, QStringList(writer->name), QStringList("name"), namedVariants.at(i).name);
+            writer->writeLine(writer->object, QStringList(writer->name), QStringList("className"), namedVariants.at(i).className);
+            writer->writeLine(writer->object, QStringList(writer->name), QStringList("variant"), namedVariants.at(i).variant.data()->getReferenceString());
+            writer->writeLine(writer->object, false);
+        }
+        writer->writeLine(writer->object, false);
+        writer->writeLine(writer->object, false);
+        setIsWritten();
+        for (int i = 0; i < namedVariants.size(); i++){
+            namedVariants.at(i).variant.data()->write(writer);
+        }
     }
     return true;
 }

@@ -10,12 +10,12 @@ uint hkbExpressionCondition::refCount = 0;
 
 QString hkbExpressionCondition::classname = "hkbExpressionCondition";
 
-hkbExpressionCondition::hkbExpressionCondition(BehaviorFile *parent/*, long ref = 0*/, const QString &string)
-    : HkxObject(parent/*, ref*/),
+hkbExpressionCondition::hkbExpressionCondition(BehaviorFile *parent, const QString &string, long ref)
+    : HkxObject(parent, ref),
       expression(string)
 {
-    refCount++;
     setType(HKB_EXPRESSION_CONDITION, TYPE_OTHER);
+    getParentFile()->addObjectToFile(this, ref);refCount++;
 }
 
 QString hkbExpressionCondition::getClassname(){

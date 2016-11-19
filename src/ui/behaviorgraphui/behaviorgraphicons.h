@@ -37,6 +37,13 @@ public:
         }
     }
 
+    bool hasChildIcon(GeneratorIcon *child){
+        if (children.contains(child)){
+            return true;
+        }
+        return false;
+    }
+
     GeneratorIcon* getChildIcon(HkxObject *child){
         for (int i = 0; i < children.size(); i++){
             if (children.at(i)->data.data() == child){

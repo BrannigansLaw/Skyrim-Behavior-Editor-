@@ -7,7 +7,7 @@ class hkbClipGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
 public:
-    hkbClipGenerator(BehaviorFile *parent/*, qint16 ref = 0*/);
+    hkbClipGenerator(BehaviorFile *parent, long ref = 0);
     virtual ~hkbClipGenerator();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

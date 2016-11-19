@@ -8,7 +8,7 @@ class hkbStateMachine: public hkbGenerator
     friend class BehaviorGraphView;
     friend class StateMachineUI;
 public:
-    hkbStateMachine(BehaviorFile *parent/*, qint16 ref = 0*/);
+    hkbStateMachine(BehaviorFile *parent, long ref = 0);
     virtual ~hkbStateMachine();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
@@ -23,6 +23,7 @@ public:
     QStringList getNestedStateNames(int stateId) const;
     int getNumberOfNestedStates(int stateId) const;
     void removeState(int index);
+    int getIndexToInsertIcon() const;
 private:
     hkbStateMachine * getNestedStateMachine(int stateId) const;
     hkbStateMachine& operator=(const hkbStateMachine&);

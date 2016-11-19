@@ -11,6 +11,7 @@
 #include <QGroupBox>
 
 #include "src/utility.h"
+#include "src/filetypes/hkxfile.h"
 
 #include <QTableWidget>
 #include <QPushButton>
@@ -31,29 +32,6 @@ public:
         setSelectionBehavior(QAbstractItemView::SelectRows);
         setEditTriggers(QAbstractItemView::NoEditTriggers);
     }
-
-    /*QSize minimumSizeHint() const
-    {
-        QSize size(QTableWidget::sizeHint());
-        int width = 0;
-        for (int a = 0; a < columnCount(); ++a)
-        {
-            width += columnWidth(a);
-        }
-        size.setWidth(width + (columnCount() * 1));
-        int height = horizontalHeader()->height();
-        for (int a = 0; a < rowCount(); ++a)
-        {
-            height += rowHeight(a);
-        }
-        size.setHeight(height + (rowCount() * 1));
-        return size;
-    }*/
-
-    /*QSize sizeHint() const
-    {
-        return QSize(250, 250);
-    }*/
 };
 
 class SpinBox: public QSpinBox
@@ -174,6 +152,31 @@ private:
     DoubleSpinBox *spinBoxY;
     DoubleSpinBox *spinBoxZ;
     DoubleSpinBox *spinBoxW;
+};
+
+class HkxObjectTableWidget: public QWidget
+{
+    Q_OBJECT
+public:
+    HkxObjectTableWidget(const QString & title);
+    void loadTable(BehaviorFile *file, bool isGenerator = true);
+    void addItem(const QString & name, const QString & type);
+    void renameItem(int index, const QString & newname);
+    void removeItem(int index);
+    void setSelectedRow(int row);
+    int getNumRows() const;
+signals:
+    void elementSelected(int index);
+    void hideWindow();
+protected:
+private slots:
+    void itemSelected();
+private:
+    QGridLayout *lyt;
+    TableWidget *table;
+    QPushButton *selectPB;
+    QPushButton *cancelPB;
+    int lastVisableIndex;
 };
 
 #endif // DATAWIDGETS_H

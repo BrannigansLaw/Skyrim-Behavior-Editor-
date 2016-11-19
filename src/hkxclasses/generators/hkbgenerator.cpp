@@ -1,8 +1,9 @@
 #include "hkbgenerator.h"
 #include "src/ui/behaviorgraphui/behaviorgraphicons.h"
+#include "src/filetypes/hkxfile.h"
 
-hkbGenerator::hkbGenerator(BehaviorFile *parent/*, long ref = 0*/)
-    : HkDynamicObject(parent/*, ref*/)
+hkbGenerator::hkbGenerator(BehaviorFile *parent, long ref)
+    : HkDynamicObject(parent, ref)
 {
     //
 }

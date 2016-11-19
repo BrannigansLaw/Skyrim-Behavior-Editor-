@@ -9,13 +9,13 @@ uint hkbBlenderGeneratorChild::refCount = 0;
 
 QString hkbBlenderGeneratorChild::classname = "hkbBlenderGeneratorChild";
 
-hkbBlenderGeneratorChild::hkbBlenderGeneratorChild(BehaviorFile *parent/*, qint16 ref*/)
-    : hkbGenerator(parent/*, ref*/),
+hkbBlenderGeneratorChild::hkbBlenderGeneratorChild(BehaviorFile *parent, long ref)
+    : hkbGenerator(parent, ref),
       weight(0),
       worldFromModelWeight(0)
 {
     setType(HKB_BLENDER_GENERATOR_CHILD, TYPE_GENERATOR);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
 }
 
 QString hkbBlenderGeneratorChild::getClassname(){

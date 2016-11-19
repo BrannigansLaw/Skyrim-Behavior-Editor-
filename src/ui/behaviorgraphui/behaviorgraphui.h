@@ -138,7 +138,7 @@ private:
     const qreal scaleUpFactor;
     const qreal scaleDownFactor;
 private:
-    void fixIconPositions(GeneratorIcon *rootIcon);
+    //void fixIconPositions(GeneratorIcon *rootIcon);
     //bool removeData(const HkxObjectExpSharedPtr & smtptr);
     void expandBranchForIcon(GeneratorIcon *icon);
     //bool drawBranch(GeneratorIcon * rootIcon);

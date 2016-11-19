@@ -23,8 +23,11 @@ public:
     virtual QString getName() const;
     QString getClassname() const;
     void updateIconNames();
+    virtual int getIndexToInsertIcon() const{
+        return -1;
+    }
 protected:
-    hkbGenerator(BehaviorFile *parent/*, long ref = 0*/);
+    hkbGenerator(BehaviorFile *parent, long ref = -1);
     void appendIcon(GeneratorIcon * icon);
 private:
     QList <GeneratorIcon *> icons;

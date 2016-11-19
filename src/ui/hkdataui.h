@@ -23,6 +23,7 @@ class TransitionsUI;
 class HkTransition;
 class hkbStateMachineStateInfo;
 class hkbStateMachine;
+class HkxObjectTableWidget;
 
 class HkDataUI: public QGroupBox
 {
@@ -68,6 +69,8 @@ private:
     QVBoxLayout *verLyt;
     QStackedLayout *stack;
     HkxObject *loadedData;
+    //HkxObjectTableWidget *generatorsTable;
+    //HkxObjectTableWidget *modifiersTable;
     QLabel *noDataL;
     BSiStateTaggingGeneratorUI *iSTGUI;
     ModifierGeneratorUI *modGenUI;

@@ -9,14 +9,14 @@ uint hkbManualSelectorGenerator::refCount = 0;
 
 QString hkbManualSelectorGenerator::classname = "hkbManualSelectorGenerator";
 
-hkbManualSelectorGenerator::hkbManualSelectorGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    : hkbGenerator(parent/*, ref*/),
+hkbManualSelectorGenerator::hkbManualSelectorGenerator(BehaviorFile *parent, long ref)
+    : hkbGenerator(parent, ref),
       userData(0),
       selectedGeneratorIndex(0),
       currentGeneratorIndex(0)
 {
     setType(HKB_MANUAL_SELECTOR_GENERATOR, TYPE_GENERATOR);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
     name = "Manual Selector Generator "+QString::number(refCount);
 }
 
@@ -26,6 +26,15 @@ QString hkbManualSelectorGenerator::getClassname(){
 
 QString hkbManualSelectorGenerator::getName() const{
     return name;
+}
+
+int hkbManualSelectorGenerator::getIndexToInsertIcon(HkxObject *child) const{
+    for (int i = 0; i < generators.size(); i++){
+        if (generators.at(i).constData() == child){
+            return i;
+        }
+    }
+    return -1;
 }
 
 bool hkbManualSelectorGenerator::readData(const HkxXmlReader &reader, long index){

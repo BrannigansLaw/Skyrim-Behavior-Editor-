@@ -12,15 +12,15 @@ QString BSCyclicBlendTransitionGenerator::classname = "BSCyclicBlendTransitionGe
 
 QStringList BSCyclicBlendTransitionGenerator::BlendCurve = {"BLEND_CURVE_SMOOTH", "BLEND_CURVE_LINEAR", "BLEND_CURVE_LINEAR_TO_SMOOTH", "BLEND_CURVE_SMOOTH_TO_LINEAR"};
 
-BSCyclicBlendTransitionGenerator::BSCyclicBlendTransitionGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    :hkbGenerator(parent/*, ref*/),
+BSCyclicBlendTransitionGenerator::BSCyclicBlendTransitionGenerator(BehaviorFile *parent, long ref)
+    :hkbGenerator(parent, ref),
     userData(0),
     fBlendParameter(1),
     fTransitionDuration(0),
     eBlendCurve(BlendCurve.first())
 {
-    refCount++;
     setType(BS_CYCLIC_BLEND_TRANSITION_GENERATOR, TYPE_GENERATOR);
+    getParentFile()->addObjectToFile(this, ref);refCount++;
     name = "BS Cyclic Blend Transition Generator "+QString::number(refCount);
 }
 

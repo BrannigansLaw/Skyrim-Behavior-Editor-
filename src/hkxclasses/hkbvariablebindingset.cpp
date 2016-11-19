@@ -10,12 +10,12 @@ uint hkbVariableBindingSet::refCount = 0;
 
 QString hkbVariableBindingSet::classname = "hkbVariableBindingSet";
 
-hkbVariableBindingSet::hkbVariableBindingSet(BehaviorFile *parent)
-    : HkxObject(parent),
+hkbVariableBindingSet::hkbVariableBindingSet(BehaviorFile *parent, long ref)
+    : HkxObject(parent, ref),
       indexOfBindingToEnable(-1)
 {
     setType(HKB_VARIABLE_BINDING_SET, TYPE_OTHER);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
 }
 
 QString hkbVariableBindingSet::getClassname(){

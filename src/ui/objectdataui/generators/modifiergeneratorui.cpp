@@ -23,14 +23,16 @@ QStringList ModifierGeneratorUI::headerLabels1 = {
     "Value"
 };
 
-ModifierGeneratorUI::ModifierGeneratorUI()
-    : behaviorView(NULL),
+ModifierGeneratorUI::ModifierGeneratorUI(HkxObjectTableWidget *genTable, HkxObjectTableWidget *modTable)
+    : generatorTable(genTable),
+      modifiersTable(modTable),
+      behaviorView(NULL),
       bsData(NULL),
       lyt(new QVBoxLayout),
       table(new TableWidget),
       name(new QLineEdit),
-      modifier(new ComboBox),
-      generator(new ComboBox)
+      modifier(new QPushButton("NULL")),
+      generator(new QPushButton("NULL"))
 {
     setTitle("hkbModifierGenerator");
     table->setRowCount(3);
@@ -53,30 +55,36 @@ ModifierGeneratorUI::ModifierGeneratorUI()
     connect(generator, SIGNAL(activated(int)), this, SLOT(setGenerator(int)));
 }
 
-void ModifierGeneratorUI::addModifierToLists(const QString & name){
-    modifier->insertItem(modifier->count(), name);
+void ModifierGeneratorUI::setGeneratorTable(HkxObjectTableWidget *genTable){
+    if (genTable){
+        generatorTable = genTable;
+        connect(generatorTable, SIGNAL(elementSelected(int)), this, SLOT(setGenerator(int)));
+        connect(generatorTable, SIGNAL(hideWindow()), this, SLOT(viewGenerators()));
+    }
 }
 
-void ModifierGeneratorUI::removeModifierFromLists(int index){
-    modifier->removeItem(index);
+void ModifierGeneratorUI::setModifierTable(HkxObjectTableWidget *modTable){
+    if (modTable){
+        modifiersTable = modTable;
+        connect(modifiersTable, SIGNAL(elementSelected(int)), this, SLOT(setModifier(int)));
+        connect(modifiersTable, SIGNAL(hideWindow()), this, SLOT(viewModifiers()));
+    }
 }
 
-void ModifierGeneratorUI::renameModifierInLists(const QString & name, int index){
-    index++;
-    modifier->setItemText(index, name);
+void ModifierGeneratorUI::viewGenerators(){
+    if (!generatorTable->isVisible()){
+        generatorTable->show();
+    }else{
+        generatorTable->hide();
+    }
 }
 
-void ModifierGeneratorUI::addGeneratorToLists(const QString & name){
-    generator->insertItem(generator->count(), name);
-}
-
-void ModifierGeneratorUI::removeGeneratorFromLists(int index){
-    generator->removeItem(index);
-}
-
-void ModifierGeneratorUI::renameGeneratorInLists(const QString & name, int index){
-    index++;
-    generator->setItemText(index, name);
+void ModifierGeneratorUI::viewModifiers(){
+    if (!modifiersTable->isVisible()){
+        modifiersTable->show();
+    }else{
+        modifiersTable->hide();
+    }
 }
 
 void ModifierGeneratorUI::setName(){
@@ -88,59 +96,50 @@ void ModifierGeneratorUI::setName(){
 }
 
 void ModifierGeneratorUI::setModifier(int index){
-    if (behaviorView && index > -1 && index < modifier->count()){
-        HkxObject *ptr = bsData->getParentFile()->getModifierDataAt(index - 1);
-        if (!ptr || ptr == bsData || !behaviorView->reconnectBranch(bsData->modifier.data(), ptr, behaviorView->getSelectedItem())){
-            QMessageBox msg;
-            msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!");
-            msg.exec();
-            int i = bsData->getParentFile()->getIndexOfModifier(bsData->modifier);
-            i++;
-            modifier->setCurrentIndex(i);
-            return;
+    /*if (behaviorView && index > -1){
+        hkbModifier *ptr = bsData->getParentFile()->getModifierDataAt(index);
+        if (!behaviorView->selectedIcon->getChildIcon(ptr)){
+            if (!ptr || ptr == bsData || !behaviorView->reconnectBranch(bsData->modifier.data(), ptr, behaviorView->getSelectedItem())){
+                QMessageBox msg;
+                msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!");
+                msg.exec();
+                return;
+            }
         }
+        modifier->setText(ptr->getName());
         if (index > 0){
             bsData->modifier = HkxObjectExpSharedPtr(ptr);
-            behaviorView->removeModifierData();
+            behaviorView->removeGeneratorData();
         }
-    }
+    }*/
+    generatorTable->hide();
 }
 
 void ModifierGeneratorUI::setGenerator(int index){
-    if (behaviorView && index > -1 && index < generator->count()){
-        HkxObject *ptr = bsData->getParentFile()->getGeneratorDataAt(index - 1);
-        if (!ptr || ptr == bsData || !behaviorView->reconnectBranch(bsData->generator.data(), ptr, behaviorView->getSelectedItem())){
-            QMessageBox msg;
-            msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!");
-            msg.exec();
-            int i = bsData->getParentFile()->getIndexOfGenerator(bsData->generator);
-            i++;
-            generator->setCurrentIndex(i);
-            return;
+    if (behaviorView && index > -1){
+        hkbGenerator *ptr = bsData->getParentFile()->getGeneratorDataAt(index);
+        if (!behaviorView->selectedIcon->getChildIcon(ptr)){
+            if (!ptr || ptr == bsData || !behaviorView->reconnectBranch(bsData->generator.data(), ptr, behaviorView->getSelectedItem())){
+                QMessageBox msg;
+                msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!");
+                msg.exec();
+                return;
+            }
         }
+        generator->setText(ptr->getName());
         if (index > 0){
             bsData->generator = HkxObjectExpSharedPtr(ptr);
             behaviorView->removeGeneratorData();
         }
     }
-}
-
-void ModifierGeneratorUI::loadComboBoxes(){
-    QStringList modList = behaviorView->behavior->getModifierNames();
-    modList.prepend("None");
-    modifier->insertItems(0, modList);
-    QStringList genList = behaviorView->behavior->getGeneratorNames();
-    genList.prepend("None");
-    generator->insertItems(0, genList);
+    generatorTable->hide();
 }
 
 void ModifierGeneratorUI::loadData(HkxObject *data){
     if (data && data->getSignature() == HKB_MODIFIER_GENERATOR){
         bsData = static_cast<hkbModifierGenerator *>(data);
         name->setText(bsData->name);
-        int index = bsData->getParentFile()->getIndexOfModifier(bsData->modifier) + 1;
-        modifier->setCurrentIndex(index);
-        index = bsData->getParentFile()->getIndexOfGenerator(bsData->generator) + 1;
-        generator->setCurrentIndex(index);
+        //generator->setText(static_cast<hkbModifier *>(bsData->modifier.data())->getName());
+        generator->setText(static_cast<hkbGenerator *>(bsData->generator.data())->getName());
     }
 }

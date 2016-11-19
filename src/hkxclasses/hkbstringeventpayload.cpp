@@ -9,12 +9,12 @@ uint hkbStringEventPayload::refCount = 0;
 
 QString hkbStringEventPayload::classname = "hkbStringEventPayload";
 
-hkbStringEventPayload::hkbStringEventPayload(BehaviorFile *parent/*, long ref = 0*/, const QString &string)
-    : HkxObject(parent/*, ref*/),
+hkbStringEventPayload::hkbStringEventPayload(BehaviorFile *parent, const QString &string, long ref)
+    : HkxObject(parent, ref),
       data(string)
 {
-    refCount++;
     setType(HKB_STRING_EVENT_PAYLOAD, TYPE_OTHER);
+    getParentFile()->addObjectToFile(this, ref);refCount++;
 }
 
 QString hkbStringEventPayload::getClassname(){

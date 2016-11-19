@@ -16,8 +16,8 @@ QString hkbStateMachine::classname = "hkbStateMachine";
 QStringList hkbStateMachine::StartStateMode = {"START_STATE_MODE_DEFAULT", "START_STATE_MODE_SYNC", "START_STATE_MODE_RANDOM", "START_STATE_MODE_CHOOSER"};
 QStringList hkbStateMachine::SelfTransitionMode = {"SELF_TRANSITION_MODE_NO_TRANSITION", "SELF_TRANSITION_MODE_TRANSITION_TO_START_STATE", "SELF_TRANSITION_MODE_FORCE_TRANSITION_TO_START_STATE"};
 
-hkbStateMachine::hkbStateMachine(BehaviorFile *parent/*, qint16 ref*/)
-    : hkbGenerator(parent/*, ref*/),
+hkbStateMachine::hkbStateMachine(BehaviorFile *parent, long ref)
+    : hkbGenerator(parent, ref),
       userData(0),
       id(-1),
       startStateId(-1),
@@ -32,7 +32,7 @@ hkbStateMachine::hkbStateMachine(BehaviorFile *parent/*, qint16 ref*/)
       selfTransitionMode("SELF_TRANSITION_MODE_NO_TRANSITION")
 {
     setType(HKB_STATE_MACHINE, TYPE_GENERATOR);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
     name = "State Machine "+QString::number(refCount);
 }
 
@@ -46,6 +46,15 @@ QString hkbStateMachine::getName() const{
 
 int hkbStateMachine::getNumberOfStates() const{
     return states.size();
+}
+
+int hkbStateMachine::getIndexToInsertIcon() const{
+    for (int i = 0; i < states.size(); i++){
+        if (!static_cast<hkbStateMachineStateInfo *>(states.at(i).data())->generator.data()){
+            return i;
+        }
+    }
+    return -1;
 }
 
 QString hkbStateMachine::getStateName(int stateId) const{

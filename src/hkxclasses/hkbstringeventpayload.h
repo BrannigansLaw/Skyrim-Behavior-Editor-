@@ -8,7 +8,7 @@ class hkbStringEventPayload: public HkxObject
     friend class StateMachineUI;
     friend class StateUI;
 public:
-    hkbStringEventPayload(BehaviorFile *parent, const QString & string = "");
+    hkbStringEventPayload(BehaviorFile *parent, const QString & string = "", long ref = -1);
     virtual ~hkbStringEventPayload();
     bool readData(const HkxXmlReader & reader, long index);
     bool evaulateDataValidity();

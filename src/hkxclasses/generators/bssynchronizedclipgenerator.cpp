@@ -9,8 +9,8 @@ uint BSSynchronizedClipGenerator::refCount = 0;
 
 QString BSSynchronizedClipGenerator::classname = "BSSynchronizedClipGenerator";
 
-BSSynchronizedClipGenerator::BSSynchronizedClipGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    : hkbGenerator(parent/*, ref*/),
+BSSynchronizedClipGenerator::BSSynchronizedClipGenerator(BehaviorFile *parent, long ref)
+    : hkbGenerator(parent, ref),
     userData(0),
     bSyncClipIgnoreMarkPlacement(false),
     fGetToMarkTime(0),
@@ -20,8 +20,8 @@ BSSynchronizedClipGenerator::BSSynchronizedClipGenerator(BehaviorFile *parent/*,
     bApplyMotionFromRoot(false),
     sAnimationBindingIndex(-1)
 {
-    refCount++;
     setType(BS_SYNCHRONIZED_CLIP_GENERATOR, TYPE_GENERATOR);
+    getParentFile()->addObjectToFile(this, ref);refCount++;
     name = "BS Synchronized Clip Generator "+QString::number(refCount);
 }
 

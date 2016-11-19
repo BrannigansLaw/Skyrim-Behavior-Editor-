@@ -12,8 +12,8 @@ QString hkbBlenderGenerator::classname = "hkbBlenderGenerator";
 //QStringList hkbBlenderGenerator::Flags = {"0", "FLAG_SYNC", "FLAG_SMOOTH_GENERATOR_WEIGHTS", "FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS", "FLAG_PARAMETRIC_BLEND", "FLAG_IS_PARAMETRIC_BLEND_CYCLIC", "FLAG_FORCE_DENSE_POSE"};
 QStringList hkbBlenderGenerator::Flags = {"0", "1", "2", "8", "16", "32", "64"};
 
-hkbBlenderGenerator::hkbBlenderGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    : hkbGenerator(parent/*, ref*/),
+hkbBlenderGenerator::hkbBlenderGenerator(BehaviorFile *parent, long ref)
+    : hkbGenerator(parent, ref),
       userData(0),
       referencePoseWeightThreshold(0),
       blendParameter(1),
@@ -24,7 +24,7 @@ hkbBlenderGenerator::hkbBlenderGenerator(BehaviorFile *parent/*, qint16 ref*/)
       subtractLastChild(false)
 {
     setType(HKB_BLENDER_GENERATOR, TYPE_GENERATOR);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
     name = "Blender Generator "+QString::number(refCount);
 }
 
@@ -38,6 +38,15 @@ QString hkbBlenderGenerator::getName() const{
 
 int hkbBlenderGenerator::getNumberOfChildren() const{
     return children.size();
+}
+
+int hkbBlenderGenerator::getIndexToInsertIcon() const{
+    for (int i = 0; i < children.size(); i++){
+        if (!children.at(i).constData()){
+            return i;
+        }
+    }
+    return -1;
 }
 
 bool hkbBlenderGenerator::readData(const HkxXmlReader &reader, long index){

@@ -9,12 +9,12 @@ uint hkbModifierGenerator::refCount = 0;
 
 QString hkbModifierGenerator::classname = "hkbModifierGenerator";
 
-hkbModifierGenerator::hkbModifierGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    : hkbGenerator(parent/*, ref*/),
+hkbModifierGenerator::hkbModifierGenerator(BehaviorFile *parent, long ref)
+    : hkbGenerator(parent, ref),
       userData(0)
 {
     setType(HKB_MODIFIER_GENERATOR, TYPE_GENERATOR);
-    refCount++;
+    getParentFile()->addObjectToFile(this, ref);refCount++;
     name = "Modifier Generator "+QString::number(refCount);
 }
 
@@ -24,6 +24,15 @@ QString hkbModifierGenerator::getClassname(){
 
 QString hkbModifierGenerator::getName() const{
     return name;
+}
+
+int hkbModifierGenerator::getIndexToInsertIcon(HkxObject *child) const{
+    if (modifier.constData() == child){
+        return 0;
+    }else if (generator.constData() == child){
+        return 1;
+    }
+    return -1;
 }
 
 bool hkbModifierGenerator::readData(const HkxXmlReader &reader, long index){

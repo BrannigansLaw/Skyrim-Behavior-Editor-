@@ -9,15 +9,15 @@ uint BSOffsetAnimationGenerator::refCount = 0;
 
 QString BSOffsetAnimationGenerator::classname = "BSOffsetAnimationGenerator";
 
-BSOffsetAnimationGenerator::BSOffsetAnimationGenerator(BehaviorFile *parent/*, qint16 ref*/)
-    : hkbGenerator(parent/*, ref*/),
+BSOffsetAnimationGenerator::BSOffsetAnimationGenerator(BehaviorFile *parent, long ref)
+    : hkbGenerator(parent, ref),
       userData(0),
       fOffsetVariable(0),
       fOffsetRangeStart(0),
       fOffsetRangeEnd(0)
 {
-    refCount++;
     setType(BS_OFFSET_ANIMATION_GENERATOR, TYPE_GENERATOR);
+    getParentFile()->addObjectToFile(this, ref);refCount++;
     name = "BS Offset Animation Generator "+QString::number(refCount);
 }
 
@@ -27,6 +27,15 @@ QString BSOffsetAnimationGenerator::getClassname(){
 
 QString BSOffsetAnimationGenerator::getName() const{
     return name;
+}
+
+int BSOffsetAnimationGenerator::getIndexToInsertIcon() const{
+    if (!pDefaultGenerator.constData()){    //Not sure about this...
+        return 0;
+    }else if (!pOffsetClipGenerator.constData()){
+        return 1;
+    }
+    return -1;
 }
 
 bool BSOffsetAnimationGenerator::readData(const HkxXmlReader &reader, long index){

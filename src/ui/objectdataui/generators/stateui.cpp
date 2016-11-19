@@ -45,13 +45,14 @@ QStringList StateUI::headerLabels3 = {
 };
 
 StateUI::StateUI()
-    : behaviorView(NULL),
+    : generatorTable(new HkxObjectTableWidget("Select a hkbGenerator!")),
+      behaviorView(NULL),
       bsData(NULL),
       lyt(new QVBoxLayout),
       table(new TableWidget),
       returnPB(new QPushButton("Return")),
       name(new QLineEdit),
-      generator(new ComboBox),
+      generator(new QPushButton("NULL")),
       stateId(new SpinBox),
       probability(new DoubleSpinBox),
       enable(new QCheckBox),
@@ -76,6 +77,7 @@ StateUI::StateUI()
       transitionButtonLyt(new QHBoxLayout)
 {
     setTitle("hkbStateMachineStateInfo");
+    generatorTable->hide();
     enterEventButtonLyt->addWidget(addEnterEventPB, 1);
     enterEventButtonLyt->addWidget(typeEnterEventCB, 2);
     enterEventButtonLyt->addWidget(removeEnterEventPB, 1);
@@ -95,6 +97,7 @@ StateUI::StateUI()
     table->setItem(2, 0, new QTableWidgetItem("generator"));
     table->setItem(2, 1, new QTableWidgetItem("hkbGenerator"));
     table->setCellWidget(2, 2, generator);
+    table->setItem(2, 2, new QTableWidgetItem("NULL"));
     table->setItem(3, 0, new QTableWidgetItem("stateId"));
     table->setItem(3, 1, new QTableWidgetItem("Int"));
     table->setCellWidget(3, 2, stateId);
@@ -119,7 +122,9 @@ StateUI::StateUI()
     setLayout(lyt);
     connect(returnPB, SIGNAL(released()), this, SIGNAL(toParentStateMachine()));
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    connect(generator, SIGNAL(activated(int)), this, SLOT(setGenerator(int)));
+    connect(generator, SIGNAL(released()), this, SLOT(viewGenerators()));
+    connect(generatorTable, SIGNAL(elementSelected(int)), this, SLOT(setGenerator(int)));
+    connect(generatorTable, SIGNAL(hideWindow()), this, SLOT(viewGenerators()));
     connect(stateId, SIGNAL(editingFinished()), this, SLOT(setStateId()));
     connect(probability, SIGNAL(editingFinished()), this, SLOT(setProbability()));
     connect(enable, SIGNAL(released()), this, SLOT(setEnable()));
@@ -136,7 +141,25 @@ StateUI::StateUI()
     connect(transitions, SIGNAL(cellClicked(int,int)), this, SLOT(transitionSelected(int,int)));
 }
 
-void StateUI::addGeneratorToLists(const QString & name){
+/*void StateUI::setGeneratorTable(HkxObjectTableWidget *genTable){
+    if (genTable){
+        generatorTable = genTable;
+        connect(generatorTable, SIGNAL(elementSelected(int)), this, SLOT(setGenerator(int)));
+        connect(generatorTable, SIGNAL(hideWindow()), this, SLOT(viewGenerators()));
+    }
+}*/
+
+void StateUI::viewGenerators(){
+    if (!generatorTable->isVisible()){
+        generatorTable->show();
+        //connect(generatorTable, SIGNAL(elementSelected(int)), this, SLOT(setGenerator(int)));
+    }else{
+        generatorTable->hide();
+        //disconnect(generatorTable, SIGNAL(elementSelected(int)), this, SLOT(setGenerator(int)));
+    }
+}
+
+/*void StateUI::addGeneratorToLists(const QString & name){
     generator->insertItem(generator->count(), name);
 }
 
@@ -147,7 +170,7 @@ void StateUI::removeGeneratorFromLists(int index){
 void StateUI::renameGeneratorInLists(const QString & name, int index){
     index++;
     generator->setItemText(index, name);
-}
+}*/
 
 void StateUI::addEventToLists(const QString & name){
     QComboBox *eventList = NULL;
@@ -371,32 +394,25 @@ void StateUI::transitionSelected(int row, int column){
 }
 
 void StateUI::setGenerator(int index){
-    if (behaviorView && index > -1 && index < generator->count()){
-        HkxObject *ptr = bsData->getParentFile()->getGeneratorDataAt(generator->currentIndex() - 1);
-        if (!behaviorView->selectedIcon->getChildIcon(ptr)){
-            if (/*index < 1 || */!ptr || ptr == bsData || !behaviorView->reconnectBranch(NULL, ptr, behaviorView->getSelectedItem())){
+    if (behaviorView && index > -1){
+        hkbGenerator *ptr = bsData->getParentFile()->getGeneratorDataAt(index);
+        if (!behaviorView->getSelectedItem()->getChildIcon(ptr)){
+            if (!ptr || ptr == bsData || !behaviorView->reconnectBranch(bsData->generator.data(), ptr, behaviorView->getSelectedItem())){
                 QMessageBox msg;
                 msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!");
                 msg.exec();
-                int i = bsData->getParentFile()->getIndexOfGenerator(bsData->generator);
-                i++;
-                generator->blockSignals(true);
-                generator->setCurrentIndex(i);
-                generator->blockSignals(false);
                 return;
             }
+        }else{
+            behaviorView->removeSelectedObjectBranch(behaviorView->getSelectedItem()->getChildIcon(bsData->generator.data()), NULL, false);
         }
+        generator->setText(ptr->getName());
         if (index > 0){
             bsData->generator = HkxObjectExpSharedPtr(ptr);
             behaviorView->removeGeneratorData();
         }
     }
-}
-
-void StateUI::loadComboBoxes(){
-    QStringList genList = behaviorView->behavior->getGeneratorNames();
-    genList.prepend("None");
-    generator->insertItems(0, genList);
+    generatorTable->hide();
 }
 
 void StateUI::appendEnterEventTableRow(int index, hkbStateMachineEventPropertyArray *enterEvents, const QStringList & eventList){
@@ -477,6 +493,9 @@ void StateUI::loadData(HkxObject *data){
         hkbStateMachineTransitionInfoArray *trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
         QStringList eventList = bsData->getParentFile()->getEventNames();
         eventList.prepend("None");
+        if (generatorTable->getNumRows() < 1){
+            generatorTable->loadTable(bsData->getParentFile());
+        }
         if (enterEvents){
             for (int i = 0; i < enterEvents->events.size(); i++){
                 appendEnterEventTableRow(i, enterEvents, eventList);
@@ -526,9 +545,6 @@ void StateUI::loadData(HkxObject *data){
         stateId->setValue(bsData->stateId);
         probability->setValue(bsData->probability);
         enable->setChecked(bsData->enable);
-        generator->blockSignals(true);
-        int index = bsData->getParentFile()->getIndexOfGenerator(bsData->generator) + 1;
-        generator->setCurrentIndex(index);
-        generator->blockSignals(false);
+        generator->setText(static_cast<hkbGenerator *>(bsData->generator.data())->getName());
     }
 }

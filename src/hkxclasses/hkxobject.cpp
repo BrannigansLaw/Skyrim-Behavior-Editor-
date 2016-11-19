@@ -7,17 +7,39 @@
  * HkxObject
  */
 
-HkxObject::HkxObject(BehaviorFile *parent/*, long ref = 0*/)
+HkxObject::HkxObject(BehaviorFile *parent, long ref)
     : parentFile(parent),
-      reference(0),
-      dataValid(true)
-    /*, reference(ref)*/
+      dataValid(true),
+      isWritten(false),
+      reference(ref)
 {
     //
 }
 
 qulonglong HkxObject::getSignature() const{
     return signature;
+}
+
+void HkxObject::setReference(int ref){
+    reference = ref;
+}
+
+long HkxObject::getReference() const{
+    return reference;
+}
+
+QString HkxObject::getReferenceString() const{
+    QString referenceString;
+    if (reference > 999){
+        referenceString = "#";
+    }else if (reference > 99){
+        referenceString = "#0";
+    }else if (reference > 9){
+        referenceString = "#00";
+    }else{
+        referenceString = "#000";
+    }
+    return referenceString+QString::number(reference);
 }
 
 HkxObject::HkxType HkxObject::getType() const{
@@ -35,6 +57,14 @@ bool HkxObject::isDataValid()const{
 bool HkxObject::evaulateDataValidity(){
     //isDataValid = true;
     return true;
+}
+
+void HkxObject::setIsWritten(bool written){
+    isWritten = written;
+}
+
+bool HkxObject::getIsWritten() const{
+    return isWritten;
 }
 
 void HkxObject::unlink(){
@@ -373,8 +403,8 @@ bool HkxObjectExpSharedPtr::readReference(long index, const HkxXmlReader & reade
  * HkDynamicObject
  */
 
-HkDynamicObject::HkDynamicObject(BehaviorFile *parent/*, long ref = 0*/)
-    : HkxObject(parent/*, ref*/)
+HkDynamicObject::HkDynamicObject(BehaviorFile *parent, long ref)
+    : HkxObject(parent, ref)
 {
     //
 }
