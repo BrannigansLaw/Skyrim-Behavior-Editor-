@@ -29,7 +29,7 @@ bool hkRootLevelContainer::readData(const HkxXmlReader &reader, int index){
         if (reader.getNthAttributeValueAt(index, 0) == "namedVariants"){
             int numVariants = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog("hkRootLevelContainer: readData()!\nAttempt to read the number of variants failed!");
+                writeToLog(getClassname()+": readData()!\nAttempt to read the number of variants failed!");
                 //return false;
             }
             for (int j = 0; j < numVariants; j++){
@@ -58,24 +58,35 @@ bool hkRootLevelContainer::write(HkxXMLWriter *writer){
         return false;
     }
     if (!getIsWritten()){
+        QString refString;
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        QStringList list3 = {writer->name, writer->numelements};
-        QStringList list4 = {"namedVariants", QString::number(namedVariants.size())};
-        writer->writeLine(writer->object, list3, list4, "");
+        list1 = {writer->name, writer->numelements};
+        list2 = {"namedVariants", QString::number(namedVariants.size())};
+        writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < namedVariants.size(); i++){
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->object, QStringList(writer->name), QStringList("name"), namedVariants.at(i).name);
-            writer->writeLine(writer->object, QStringList(writer->name), QStringList("className"), namedVariants.at(i).className);
-            writer->writeLine(writer->object, QStringList(writer->name), QStringList("variant"), namedVariants.at(i).variant.data()->getReferenceString());
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), namedVariants.at(i).name);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("className"), namedVariants.at(i).className);
+            if (namedVariants.at(i).variant.data()){
+                refString = namedVariants.at(i).variant.data()->getReferenceString();
+            }else{
+                refString = "null";
+            }
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variant"), refString);
             writer->writeLine(writer->object, false);
         }
-        writer->writeLine(writer->object, false);
+        if (namedVariants.size() > 0){
+            writer->writeLine(writer->parameter, false);
+        }
         writer->writeLine(writer->object, false);
         setIsWritten();
+        writer->writeLine("\n");
         for (int i = 0; i < namedVariants.size(); i++){
-            namedVariants.at(i).variant.data()->write(writer);
+            if (namedVariants.at(i).variant.data() && !namedVariants.at(i).variant.data()->write(writer)){
+                getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write variant at "+QString::number(i), true);
+            }
         }
     }
     return true;
@@ -86,12 +97,12 @@ bool hkRootLevelContainer::link(){
         return false;
     }
     for (int i = 0; i < namedVariants.size(); i++){
-        HkxObjectExpSharedPtr *ptr = getParentFile()->findBehaviorGraph(namedVariants.at(i).variant.getReference());//getParentFile()->findGenerator(namedVariants.at(i).variant.getReference());
+        HkxObjectExpSharedPtr *ptr = getParentFile()->findBehaviorGraph(namedVariants.at(i).variant.getReference());
         if (!ptr){
-            writeToLog("hkRootLevelContainer: link()!\nUnable to link variant reference "+QString::number(namedVariants.at(i).variant.getReference())+"!");
+            writeToLog(getClassname()+": link()!\nUnable to link variant reference "+QString::number(namedVariants.at(i).variant.getReference())+"!");
             setDataValidity(false);
         }else if ((*ptr)->getSignature() != HKB_BEHAVIOR_GRAPH){
-            writeToLog("hkRootLevelContainer: link()!\nThe linked object is not a HKB_BEHAVIOR_GRAPH!");
+            writeToLog(getClassname()+": link()!\nThe linked object is not a HKB_BEHAVIOR_GRAPH!");
             setDataValidity(false);
             namedVariants[i].variant = *ptr;
         }else{

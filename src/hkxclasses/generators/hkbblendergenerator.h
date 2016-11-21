@@ -17,6 +17,7 @@ public:
     static QString getClassname();
     int getNumberOfChildren() const;
     int getIndexToInsertIcon() const;
+    bool write(HkxXMLWriter *writer);
 private:
     hkbBlenderGenerator& operator=(const hkbBlenderGenerator&);
     hkbBlenderGenerator(const hkbBlenderGenerator &);

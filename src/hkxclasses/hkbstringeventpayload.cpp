@@ -29,10 +29,26 @@ bool hkbStringEventPayload::readData(const HkxXmlReader & reader, long index){
         if (text == "data"){
             data = reader.getElementValueAt(index);
             if (data == ""){
-                writeToLog("hkbStringEventPayload: readData()!\nFailed to properly read 'data' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'data' data field!\nObject Reference: "+ref);
             }
         }
         index++;
+    }
+    return true;
+}
+
+bool hkbStringEventPayload::write(HkxXMLWriter *writer){
+    if (!writer){
+        return false;
+    }
+    if (!getIsWritten()){
+        QStringList list1 = {writer->name, writer->clas, writer->signature};
+        QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
+        writer->writeLine(writer->object, list1, list2, "");
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("data"), data);
+        writer->writeLine(writer->object, false);
+        setIsWritten();
+        writer->writeLine("\n");
     }
     return true;
 }

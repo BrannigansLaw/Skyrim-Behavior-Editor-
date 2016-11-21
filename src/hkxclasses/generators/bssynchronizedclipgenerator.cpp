@@ -41,17 +41,17 @@ bool BSSynchronizedClipGenerator::readData(const HkxXmlReader &reader, long inde
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pClipGenerator"){
             if (!pClipGenerator.readReference(index, reader)){
@@ -60,45 +60,84 @@ bool BSSynchronizedClipGenerator::readData(const HkxXmlReader &reader, long inde
         }else if (text == "SyncAnimPrefix"){
             SyncAnimPrefix = reader.getElementValueAt(index);
             if (SyncAnimPrefix == ""){
-                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'SyncAnimPrefix' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'SyncAnimPrefix' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bSyncClipIgnoreMarkPlacement"){
             bSyncClipIgnoreMarkPlacement = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'bSyncClipIgnoreMarkPlacement' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'bSyncClipIgnoreMarkPlacement' data field!\nObject Reference: "+ref);
             }
         }else if (text == "fGetToMarkTime"){
             fGetToMarkTime = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'fGetToMarkTime' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'fGetToMarkTime' data field!\nObject Reference: "+ref);
             }
         }else if (text == "fMarkErrorThreshold"){
             fMarkErrorThreshold = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'fMarkErrorThreshold' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'fMarkErrorThreshold' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bLeadCharacter"){
             bLeadCharacter = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'bLeadCharacter' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'bLeadCharacter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bReorientSupportChar"){
             bReorientSupportChar = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'bReorientSupportChar' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'bReorientSupportChar' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bApplyMotionFromRoot"){
             bApplyMotionFromRoot = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'bApplyMotionFromRoot' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'bApplyMotionFromRoot' data field!\nObject Reference: "+ref);
             }
         }else if (text == "sAnimationBindingIndex"){
             sAnimationBindingIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog("BSSynchronizedClipGenerator: readData()!\nFailed to properly read 'sAnimationBindingIndex' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'sAnimationBindingIndex' data field!\nObject Reference: "+ref);
             }
         }
         index++;
+    }
+    return true;
+}
+
+bool BSSynchronizedClipGenerator::write(HkxXMLWriter *writer){
+    if (!writer){
+        return false;
+    }
+    if (!getIsWritten()){
+        QString refString = "null";
+        QStringList list1 = {writer->name, writer->clas, writer->signature};
+        QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
+        writer->writeLine(writer->object, list1, list2, "");
+        if (variableBindingSet.data()){
+            refString = variableBindingSet.data()->getReferenceString();
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
+        if (pClipGenerator.data()){
+            refString = pClipGenerator.data()->getReferenceString();
+        }else{
+            refString = "null";
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pClipGenerator"), refString);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("SyncAnimPrefix"), SyncAnimPrefix);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bSyncClipIgnoreMarkPlacement"), getBoolAsString(bSyncClipIgnoreMarkPlacement));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fGetToMarkTime"), getDoubleAsString(fGetToMarkTime));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fMarkErrorThreshold"), getDoubleAsString(fMarkErrorThreshold));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bLeadCharacter"), getBoolAsString(bLeadCharacter));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bReorientSupportChar"), getBoolAsString(bReorientSupportChar));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bApplyMotionFromRoot"), getBoolAsString(bApplyMotionFromRoot));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sAnimationBindingIndex"), QString::number(sAnimationBindingIndex));
+        writer->writeLine(writer->object, false);
+        setIsWritten();
+        writer->writeLine("\n");
+        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
+            getParentFile()->writeToLog("hkbClipGenerator: write()!\nUnable to write 'variableBindingSet'!!!", true);
+        }
     }
     return true;
 }
@@ -109,15 +148,15 @@ bool BSSynchronizedClipGenerator::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        writeToLog("BSSynchronizedClipGenerator: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     //pClipGenerator
     HkxObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pClipGenerator.getReference());
     if (!ptr){
-        writeToLog("BSSynchronizedClipGenerator: link()!\nFailed to properly link 'pClipGenerator' data field!\nObject Name: "+name);
+        writeToLog(getClassname()+": link()!\nFailed to properly link 'pClipGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
     }else if ((*ptr)->getSignature() != HKB_CLIP_GENERATOR){
-        writeToLog("BSSynchronizedClipGenerator: link()!\n'pClipGenerator' data field is linked to invalid child!\nObject Name: "+name);
+        writeToLog(getClassname()+": link()!\n'pClipGenerator' data field is linked to invalid child!\nObject Name: "+name);
         setDataValidity(false);
         pClipGenerator = *ptr;
     }else{

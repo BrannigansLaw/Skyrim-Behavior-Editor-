@@ -17,6 +17,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     int getIndexToInsertIcon(HkxObject *child) const;
+    bool write(HkxXMLWriter *writer);
 private:
     hkbManualSelectorGenerator& operator=(const hkbManualSelectorGenerator&);
     hkbManualSelectorGenerator(const hkbManualSelectorGenerator &);

@@ -43,14 +43,19 @@ bool HkxXMLWriter::writeToXMLFile(){
         }
         stream.setDevice(&newfile);
         writeHeader(version, encoding);
+        //writeLine("\n");
         QStringList list1 = {"classversion", "contentsversion", "toplevelobject"};
         QStringList list2 = {classversion, contentsversion, hkxXmlFile->getRootObjectReferenceString()};
         writeLine(filetype, list1, list2, "");
+        writeLine("\n");
         writeLine(section, QStringList(name), QStringList("__data__"), "");
+        writeLine("\n");
         if (hkxXmlFile->getRootObject().data()->write(this)){
             isGood = true;
         }
+        //writeLine("\n");
         writeLine(section, false);
+        writeLine("\n");
         writeLine(filetype, false);
         newfile.close();
         return isGood;
@@ -77,8 +82,13 @@ bool HkxXMLWriter::writeLine(const QString & tag, const QStringList & attribs, c
         stream << " "+attribs.at(j)+"=\""+attribValues.at(j)+"\"";
     }
     if (value == ""){
-        nestLevel++;
-        stream << ">\n";
+        bool ok;
+        if (attribValues.last().toInt(&ok) == 0 && attribValues.size() == 2 && ok){
+            stream << "></"+tag+">\n";
+        }else{
+            nestLevel++;
+            stream << ">\n";
+        }
     }else{
         stream << ">"+value+"</"+tag+">\n";
     }
@@ -105,6 +115,26 @@ bool HkxXMLWriter::writeLine(const QString & tag, bool opening){
             text.append("\t");
         }
         stream << text+"</"+tag+">\n";
+    }
+    return true;
+}
+
+bool HkxXMLWriter::writeLine(const QString & value){
+    if (value == "\n"){
+        stream << "\n";
+    }else{
+        QString text;
+        for (uint i = 0; i < nestLevel; i++){
+            text.append("\t");
+        }
+        QStringList list = value.split('\n', QString::SkipEmptyParts);
+        if (list.isEmpty()){
+            stream << text+value+"\n";
+        }else{
+            for (uint i = 0; i < list.size(); i++){
+                stream << text+list.at(i)+"\n";
+            }
+        }
     }
     return true;
 }

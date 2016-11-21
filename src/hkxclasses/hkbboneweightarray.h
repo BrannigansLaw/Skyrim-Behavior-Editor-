@@ -15,6 +15,7 @@ public:
     bool link();
     //bool evaulateDataValidity();
     static QString getClassname();
+    bool write(HkxXMLWriter *writer);
 private:
     hkbBoneWeightArray& operator=(const hkbBoneWeightArray&);
     hkbBoneWeightArray(const hkbBoneWeightArray &);

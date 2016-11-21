@@ -24,6 +24,7 @@ public:
     int getNumberOfNestedStates(int stateId) const;
     void removeState(int index);
     int getIndexToInsertIcon() const;
+    bool write(HkxXMLWriter *writer);
 private:
     hkbStateMachine * getNestedStateMachine(int stateId) const;
     hkbStateMachine& operator=(const hkbStateMachine&);
@@ -35,6 +36,7 @@ private:
     static QString classname;
     ulong userData;
     QString name;
+    //startStateChooser
     //HkxObjectExpSharedPtr eventToSendWhenStateOrTransitionChanges;
     int id;
     HkxObjectExpSharedPtr payload;

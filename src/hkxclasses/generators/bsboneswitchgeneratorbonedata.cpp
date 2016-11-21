@@ -44,6 +44,47 @@ bool BSBoneSwitchGeneratorBoneData::readData(const HkxXmlReader &reader, long in
     return true;
 }
 
+bool BSBoneSwitchGeneratorBoneData::write(HkxXMLWriter *writer){
+    if (!writer){
+        return false;
+    }
+    if (!getIsWritten()){
+        QString refString = "null";
+        QStringList list1 = {writer->name, writer->clas, writer->signature};
+        QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
+        writer->writeLine(writer->object, list1, list2, "");
+        if (variableBindingSet.data()){
+            refString = variableBindingSet.data()->getReferenceString();
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
+        if (pGenerator.data()){
+            refString = pGenerator.data()->getReferenceString();
+        }else{
+            refString = "null";
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pGenerator"), refString);
+        if (spBoneWeight.data()){
+            refString = spBoneWeight.data()->getReferenceString();
+        }else{
+            refString = "null";
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("spBoneWeight"), refString);
+        writer->writeLine(writer->object, false);
+        setIsWritten();
+        writer->writeLine("\n");
+        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
+            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+        }
+        if (pGenerator.data() && !pGenerator.data()->write(writer)){
+            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'pGenerator'!!!", true);
+        }
+        if (spBoneWeight.data() && !spBoneWeight.data()->write(writer)){
+            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'spBoneWeight'!!!", true);
+        }
+    }
+    return true;
+}
+
 bool BSBoneSwitchGeneratorBoneData::link(){
     if (!getParentFile()){
         return false;

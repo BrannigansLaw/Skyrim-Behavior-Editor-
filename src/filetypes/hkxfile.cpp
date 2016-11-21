@@ -140,13 +140,12 @@ bool BehaviorFile::addObjectToFile(T *obj, const QByteArray & temp){
 
 //template <typename T>
 bool BehaviorFile::addObjectToFile(HkxObject *obj, long ref){
-    bool ok;
     if (ref > largestRef){
         largestRef = ref;
     }else{
         largestRef++;
-        ref = largestRef;
     }
+    obj->setReference(largestRef);
     if (obj->getType() == HkxObject::TYPE_GENERATOR){
         generators.append(HkxObjectExpSharedPtr(obj, ref));
     }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
@@ -155,9 +154,6 @@ bool BehaviorFile::addObjectToFile(HkxObject *obj, long ref){
         otherTypes.append(HkxObjectExpSharedPtr(obj, ref));
     }else{
         writeToLog("BehaviorFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16), true);
-        return false;
-    }
-    if (!ok){
         return false;
     }
     return true;

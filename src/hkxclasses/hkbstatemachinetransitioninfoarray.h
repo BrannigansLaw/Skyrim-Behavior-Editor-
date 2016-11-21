@@ -23,6 +23,7 @@ public:
     void addTransition();
     void removeTransition(int index);
     void removeTransitionToState(uint stateId);
+    bool write(HkxXMLWriter *writer);
     struct HkTransition
     {
         HkTransition(): eventId(-1), toStateId(0), fromNestedStateId(0), toNestedStateId(0), priority(0){}

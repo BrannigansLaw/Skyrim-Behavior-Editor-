@@ -25,8 +25,10 @@ public:
     bool isDataValid() const;
     virtual bool link() = 0;
     virtual void unlink();
-    virtual bool write(HkxXMLWriter *writer){return false;}
+    virtual bool write(HkxXMLWriter *writer);
     QString getReferenceString() const;
+    QString getBoolAsString(bool b) const;
+    QString getDoubleAsString(qreal num) const;
 protected:
     HkxObject(BehaviorFile *parent, long ref = -1);
     BehaviorFile * getParentFile() const;

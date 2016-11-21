@@ -2,6 +2,8 @@
 #define UTILITY_H
 
 #include <QtGlobal>
+#include <QString>
+#include <QStringBuilder>
 
 #define MAX_HKXXML_LINE_LENGTH 512
 
@@ -26,7 +28,17 @@ struct hkVector3
 
 struct hkQuadVariable
 {
-    hkQuadVariable(qreal x = 0, qreal y = 0, qreal z = 0, qreal w = 0): x(x), y(y), z(z), w(w){}
+    hkQuadVariable(qreal x = 0, qreal y = 0, qreal z = 0, qreal w = 0)
+        : x(x),
+          y(y),
+          z(z),
+          w(w)
+    {
+        //
+    }
+    QString getValueAsString(){
+        return "("+QString::number(x)+".000000 "+QString::number(y)+".000000 "+QString::number(z)+".000000 "+QString::number(w)+".000000)";
+    }
     qreal x;
     qreal y;
     qreal z;

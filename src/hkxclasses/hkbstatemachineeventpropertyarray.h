@@ -14,6 +14,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     int getLastEventIndex() const;
+    bool write(HkxXMLWriter *writer);
 protected:
 private:
     struct HkEvent

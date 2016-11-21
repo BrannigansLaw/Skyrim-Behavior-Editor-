@@ -14,6 +14,7 @@ public:
     static QString getClassname();
     bool link(){return true;}
     QString getExpression() const;
+    bool write(HkxXMLWriter *writer);
 protected:
 private:
     static uint refCount;

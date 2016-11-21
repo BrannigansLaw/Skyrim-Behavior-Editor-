@@ -21,6 +21,7 @@ public:
     void writeHeader(const QString & version, const QString & encoding);
     bool writeLine(const QString & tag, const QStringList & attribs, const QStringList & attribValues, const QString & value);
     bool writeLine(const QString & tag, bool opening);
+    bool writeLine(const QString & value);
 public:
     const QString version;
     const QString encoding;

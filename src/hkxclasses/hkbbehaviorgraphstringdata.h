@@ -20,6 +20,7 @@ public:
     bool link();
     bool evaulateDataValidity();
     static QString getClassname();
+    bool write(HkxXMLWriter *writer);
 private:
     hkbBehaviorGraphStringData& operator=(const hkbBehaviorGraphStringData&);
     hkbBehaviorGraphStringData(const hkbBehaviorGraphStringData &);

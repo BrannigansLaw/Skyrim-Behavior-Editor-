@@ -15,6 +15,7 @@ public:
     QString getName() const;
     bool evaulateDataValidity();
     static QString getClassname();
+    bool write(HkxXMLWriter *writer);
 private:
     BSSynchronizedClipGenerator& operator=(const BSSynchronizedClipGenerator&);
     BSSynchronizedClipGenerator(const BSSynchronizedClipGenerator &);

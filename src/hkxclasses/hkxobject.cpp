@@ -42,6 +42,28 @@ QString HkxObject::getReferenceString() const{
     return referenceString+QString::number(reference);
 }
 
+QString HkxObject::getBoolAsString(bool b) const{
+    if (b){
+        return "true";
+    }else{
+        return "false";
+    }
+}
+
+QString HkxObject::getDoubleAsString(qreal num) const{
+    QString real = QString::number(num);
+    int index = real.indexOf('.');
+    if (index != -1){
+        index = real.size() - index;
+        for (int i = 0; i < index && index < 6; i++){
+            real.append("0");
+        }
+    }else{
+        real.append(".000000");
+    }
+    return real;
+}
+
 HkxObject::HkxType HkxObject::getType() const{
     return typeCheck;
 }
@@ -69,6 +91,10 @@ bool HkxObject::getIsWritten() const{
 
 void HkxObject::unlink(){
     //
+}
+
+bool HkxObject::write(HkxXMLWriter *writer){
+    return false;
 }
 
 BehaviorFile * HkxObject::getParentFile() const{

@@ -16,6 +16,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     int getIndexToInsertIcon() const;
+    bool write(HkxXMLWriter *writer);
 private:
     BSOffsetAnimationGenerator& operator=(const BSOffsetAnimationGenerator&);
     BSOffsetAnimationGenerator(const BSOffsetAnimationGenerator &);

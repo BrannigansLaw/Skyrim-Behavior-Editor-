@@ -16,6 +16,7 @@ public:
     QString getName() const;
     bool evaulateDataValidity();
     static QString getClassname();
+    bool write(HkxXMLWriter *writer);
 private:
     hkbClipGenerator& operator=(const hkbClipGenerator&);
     hkbClipGenerator(const hkbClipGenerator &);

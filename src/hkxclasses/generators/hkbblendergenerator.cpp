@@ -114,6 +114,57 @@ bool hkbBlenderGenerator::readData(const HkxXmlReader &reader, long index){
     return true;
 }
 
+bool hkbBlenderGenerator::write(HkxXMLWriter *writer){
+    if (!writer){
+        return false;
+    }
+    if (!getIsWritten()){
+        QString refString = "null";
+        QStringList list1 = {writer->name, writer->clas, writer->signature};
+        QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
+        writer->writeLine(writer->object, list1, list2, "");
+        if (variableBindingSet.data()){
+            refString = variableBindingSet.data()->getReferenceString();
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("referencePoseWeightThreshold"), getDoubleAsString(referencePoseWeightThreshold));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendParameter"), getDoubleAsString(blendParameter));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minCyclicBlendParameter"), getDoubleAsString(minCyclicBlendParameter));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxCyclicBlendParameter"), getDoubleAsString(maxCyclicBlendParameter));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("indexOfSyncMasterChild"), QString::number(indexOfSyncMasterChild));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("flags"), flags);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("subtractLastChild"), getBoolAsString(subtractLastChild));
+        refString = "";
+        list1 = {writer->name, writer->numelements};
+        list2 = {"children", QString::number(children.size())};
+        writer->writeLine(writer->parameter, list1, list2, "");
+        for (int i = 0; i < children.size(); i++){
+            refString = refString+" "+children.at(i).data()->getReferenceString();
+            if (i > 0 && i % 16 == 0){
+                refString = refString+"\n";
+            }
+        }
+        if (children.size() > 0){
+            writer->writeLine(refString);
+            writer->writeLine(writer->parameter, false);
+        }
+        writer->writeLine(writer->object, false);
+        setIsWritten();
+        writer->writeLine("\n");
+        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
+            getParentFile()->writeToLog("hkbBlenderGenerator: write()!\nUnable to write 'variableBindingSet'!!!", true);
+        }
+        for (int i = 0; i < children.size(); i++){
+            if (children.at(i).data() && !children.at(i).data()->write(writer)){
+                getParentFile()->writeToLog("hkbBlenderGenerator: write()!\nUnable to write 'children' at: "+QString::number(i)+"!!!", true);
+            }
+        }
+    }
+    return true;
+}
+
 bool hkbBlenderGenerator::link(){
     if (!getParentFile()){
         return false;

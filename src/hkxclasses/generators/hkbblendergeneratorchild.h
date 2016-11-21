@@ -14,6 +14,7 @@ public:
     void unlink();
     bool evaulateDataValidity();
     static QString getClassname();
+    bool write(HkxXMLWriter *writer);
 private:
     hkbBlenderGeneratorChild& operator=(const hkbBlenderGeneratorChild&);
     hkbBlenderGeneratorChild(const hkbBlenderGeneratorChild &);

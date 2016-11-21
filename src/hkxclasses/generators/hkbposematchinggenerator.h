@@ -17,6 +17,7 @@ public:
     static QString getClassname();
     int getNumberOfChildren() const;
     int getIndexToInsertIcon(HkxObject *child) const;
+    bool write(HkxXMLWriter *writer);
 private:
     hkbPoseMatchingGenerator& operator=(const hkbPoseMatchingGenerator&);
     hkbPoseMatchingGenerator(const hkbPoseMatchingGenerator &);

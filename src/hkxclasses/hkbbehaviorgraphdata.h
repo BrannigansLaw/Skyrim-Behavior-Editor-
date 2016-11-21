@@ -21,6 +21,7 @@ public:
     static QString getClassname();
     hkQuadVariable getQuadVariable(int index, bool *ok) const;
     hkVariableType getVariableTypeAt(int index) const;
+    bool write(HkxXMLWriter *writer);
 private:
     hkbBehaviorGraphData& operator=(const hkbBehaviorGraphData&);
     hkbBehaviorGraphData(const hkbBehaviorGraphData &);

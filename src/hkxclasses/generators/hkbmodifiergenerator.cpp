@@ -43,28 +43,70 @@ bool hkbModifierGenerator::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                writeToLog("hkbModifierGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog("hkbModifierGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog("hkbModifierGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "modifier"){
             if (!modifier.readReference(index, reader)){
-                writeToLog("hkbModifierGenerator: readData()!\nFailed to properly read 'modifier' reference!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'modifier' reference!\nObject Reference: "+ref);
             }
         }else if (text == "generator"){
             if (!generator.readReference(index, reader)){
-                writeToLog("hkbModifierGenerator: readData()!\nFailed to properly read 'generator' reference!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'generator' reference!\nObject Reference: "+ref);
             }
         }
         index++;
+    }
+    return true;
+}
+
+bool hkbModifierGenerator::write(HkxXMLWriter *writer){
+    if (!writer){
+        return false;
+    }
+    if (!getIsWritten()){
+        QString refString = "null";
+        QStringList list1 = {writer->name, writer->clas, writer->signature};
+        QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
+        writer->writeLine(writer->object, list1, list2, "");
+        if (variableBindingSet.data()){
+            refString = variableBindingSet.data()->getReferenceString();
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
+        if (modifier.data()){
+            refString = modifier.data()->getReferenceString();
+        }else{
+            refString = "null";
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("modifier"), refString);
+        if (generator.data()){
+            refString = generator.data()->getReferenceString();
+        }else{
+            refString = "null";
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("generator"), refString);
+        writer->writeLine(writer->object, false);
+        setIsWritten();
+        writer->writeLine("\n");
+        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
+            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+        }
+        if (modifier.data() && !modifier.data()->write(writer)){
+            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'modifier'!!!", true);
+        }
+        if (generator.data() && !generator.data()->write(writer)){
+            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'generator'!!!", true);
+        }
     }
     return true;
 }
@@ -75,7 +117,7 @@ bool hkbModifierGenerator::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        writeToLog("hkbModifierGenerator: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     //enterNotifyEvents
     HkxObjectExpSharedPtr *ptr;
@@ -83,7 +125,7 @@ bool hkbModifierGenerator::link(){
     ptr = getParentFile()->findModifier(modifier.getReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_MODIFIER){
-            writeToLog("hkbModifierGenerator: link()!\n'modifier' data field is linked to invalid child!\nObject Name: "+name);
+            writeToLog(getClassname()+": link()!\n'modifier' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
         }
         modifier = *ptr;
@@ -91,10 +133,10 @@ bool hkbModifierGenerator::link(){
     //generator
     ptr = getParentFile()->findGenerator(generator.getReference());
     if (!ptr){
-        writeToLog("hkbModifierGenerator: link()!\nFailed to properly link 'generator' data field!\nObject Name: "+name);
+        writeToLog(getClassname()+": link()!\nFailed to properly link 'generator' data field!\nObject Name: "+name);
         setDataValidity(false);
     }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        writeToLog("hkbModifierGenerator: link()!\n'generator' data field is linked to invalid child!\nObject Name: "+name);
+        writeToLog(getClassname()+": link()!\n'generator' data field is linked to invalid child!\nObject Name: "+name);
         setDataValidity(false);
         generator = *ptr;
     }else{

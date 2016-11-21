@@ -18,6 +18,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     //hkQuadVariable getQuadVariable(int index);
+    bool write(HkxXMLWriter *writer);
 private:
     hkbVariableValueSet& operator=(const hkbVariableValueSet&);
     hkbVariableValueSet(const hkbVariableValueSet &);

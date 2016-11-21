@@ -75,6 +75,44 @@ bool hkbStateMachineEventPropertyArray::readData(const HkxXmlReader &reader, lon
     return true;
 }
 
+bool hkbStateMachineEventPropertyArray::write(HkxXMLWriter *writer){
+    if (!writer){
+        return false;
+    }
+    if (!getIsWritten()){
+        QString refString;
+        QStringList list1 = {writer->name, writer->clas, writer->signature};
+        QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
+        writer->writeLine(writer->object, list1, list2, "");
+        list1 = {writer->name, writer->numelements};
+        list2 = {"events", QString::number(events.size())};
+        writer->writeLine(writer->parameter, list1, list2, "");
+        for (int i = 0; i < events.size(); i++){
+            writer->writeLine(writer->object, true);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(events.at(i).id));
+            if (events.at(i).payload.data()){
+                refString = events.at(i).payload.data()->getReferenceString();
+            }else{
+                refString = "null";
+            }
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
+            writer->writeLine(writer->object, false);
+        }
+        if (events.size() > 0){
+            writer->writeLine(writer->parameter, false);
+        }
+        writer->writeLine(writer->object, false);
+        setIsWritten();
+        writer->writeLine("\n");
+        for (int i = 0; i < events.size(); i++){
+            if (events.at(i).payload.data() && !events.at(i).payload.data()->write(writer)){
+                getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!", true);
+            }
+        }
+    }
+    return true;
+}
+
 bool hkbStateMachineEventPropertyArray::link(){
     if (!getParentFile()){
         return false;

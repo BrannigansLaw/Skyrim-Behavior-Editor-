@@ -77,6 +77,49 @@ bool hkbManualSelectorGenerator::readData(const HkxXmlReader &reader, long index
     return true;
 }
 
+bool hkbManualSelectorGenerator::write(HkxXMLWriter *writer){
+    if (!writer){
+        return false;
+    }
+    if (!getIsWritten()){
+        QString refString = "null";
+        QStringList list1 = {writer->name, writer->clas, writer->signature};
+        QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
+        writer->writeLine(writer->object, list1, list2, "");
+        if (variableBindingSet.data()){
+            refString = variableBindingSet.data()->getReferenceString();
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
+        refString = "";
+        list1 = {writer->name, writer->numelements};
+        list2 = {"generators", QString::number(generators.size())};
+        writer->writeLine(writer->parameter, list1, list2, "");
+        for (int i = 0; i < generators.size(); i++){
+            refString = refString+" "+generators.at(i).data()->getReferenceString();
+            if (i > 0 && i % 16 == 0){
+                refString = refString+"\n";
+            }
+        }
+        if (generators.size() > 0){
+            writer->writeLine(refString);
+            writer->writeLine(writer->parameter, false);
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("selectedGeneratorIndex"), QString::number(selectedGeneratorIndex));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("currentGeneratorIndex"), QString::number(currentGeneratorIndex));
+        writer->writeLine(writer->object, false);
+        setIsWritten();
+        writer->writeLine("\n");
+        for (int i = 0; i < generators.size(); i++){
+            if (generators.at(i).data() && !generators.at(i).data()->write(writer)){
+                getParentFile()->writeToLog("hkbManualSelectorGenerator: write()!\nUnable to write 'generators' at: "+QString::number(i)+"!!!", true);
+            }
+        }
+    }
+    return true;
+}
+
 bool hkbManualSelectorGenerator::link(){
     if (!getParentFile()){
         return false;

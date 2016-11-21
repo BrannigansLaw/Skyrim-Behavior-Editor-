@@ -309,146 +309,235 @@ bool hkbBehaviorGraphData::readData(const HkxXmlReader &reader, long index){
         if (text == "variableInfos"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref, true);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref, true);
                 return false;
             }
             for (int i = 0; i < numElems; i++){
                 index += 4;
                 if (index >= reader.getNumElements()){
-                    writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref, true);
+                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref, true);
                     return false;
                 }
                 hkVariableInfo temp;
                 temp.role.role = reader.getElementValueAt(index);
                 index++;
                 if (index >= reader.getNumElements()){
-                    writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref, true);
+                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref, true);
                     return false;
                 }
                 temp.role.flags = reader.getElementValueAt(index);
                 index++;
                 if (index >= reader.getNumElements()){
-                    writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref, true);
+                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref, true);
                     return false;
                 }
                 temp.type = reader.getElementValueAt(index);
                 variableInfos.append(temp);
                 if (!Type.contains(temp.type)){
-                    writeToLog("hkbBehaviorGraphData: readData()!\nInvalid variable type read!\nObject Reference: "+ref, true);
+                    writeToLog(getClassname()+": readData()!\nInvalid variable type read!\nObject Reference: "+ref, true);
                     return false;
                 }
             }
         }else if (text == "characterPropertyInfos"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref, true);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref, true);
                 return false;
             }
             for (int i = 0; i < numElems; i++){
                 index += 4;
                 if (index >= reader.getNumElements()){
-                    writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref, true);
+                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref, true);
                     return false;
                 }
                 hkVariableInfo temp;
                 temp.role.role = reader.getElementValueAt(index);
                 index++;
                 if (index >= reader.getNumElements()){
-                    writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref, true);
+                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref, true);
                     return false;
                 }
                 temp.role.flags = reader.getElementValueAt(index);
                 index++;
                 if (index >= reader.getNumElements()){
-                    writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref, true);
+                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref, true);
                     return false;
                 }
                 temp.type = reader.getElementValueAt(index);
                 characterPropertyInfos.append(temp);
                 if (!Type.contains(temp.type)){
-                    writeToLog("hkbBehaviorGraphData: readData()!\nInvalid variable type read!\nObject Reference: "+ref, true);
+                    writeToLog(getClassname()+": readData()!\nInvalid variable type read!\nObject Reference: "+ref, true);
                     return false;
                 }
             }
         }else if (text == "eventInfos"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref, true);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref, true);
                 return false;
             }
             /*index++;
             if (index >= reader.getNumElements()){
-                writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref, true);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref, true);
                 return false;
             }*/
             for (int i = 0; i < numElems; i++){
                 index += 2;
                 if (index >= reader.getNumElements()){
-                    writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref, true);
+                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref, true);
                     return false;
                 }
                 eventInfos.append(reader.getElementValueAt(index));
                 if (eventInfos.last() == ""){
-                    writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref, true);
+                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref, true);
                     return false;
                 }
             }
         }else if (text == "wordMinVariableValues"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'wordMinVariableValues' data!\nObject Reference: "+ref, true);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'wordMinVariableValues' data!\nObject Reference: "+ref, true);
                 return false;
             }
             index++;
             if (index >= reader.getNumElements()){
-                writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref, true);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref, true);
                 return false;
             }
             for (int i = 0; i < numElems; i++){
                 index++;
                 if (index >= reader.getNumElements()){
-                    writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'wordMinVariableValues' data!\nObject Reference: "+ref, true);
+                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'wordMinVariableValues' data!\nObject Reference: "+ref, true);
                     return false;
                 }
                 wordMinVariableValues.append(reader.getElementValueAt(index).toInt(&ok));
                 if (!ok){
-                    writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'wordMinVariableValues' data!\nObject Reference: "+ref, true);
+                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'wordMinVariableValues' data!\nObject Reference: "+ref, true);
                     return false;
                 }
             }
         }else if (text == "wordMaxVariableValues"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'wordMaxVariableValues' data!\nObject Reference: "+ref, true);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'wordMaxVariableValues' data!\nObject Reference: "+ref, true);
                 return false;
             }
             index++;
             if (index >= reader.getNumElements()){
-                writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref, true);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref, true);
                 return false;
             }
             for (int i = 0; i < numElems; i++){
                 index++;
                 if (index >= reader.getNumElements()){
-                    writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'wordMaxVariableValues' data!\nObject Reference: "+ref, true);
+                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'wordMaxVariableValues' data!\nObject Reference: "+ref, true);
                     return false;
                 }
                 wordMaxVariableValues.append(reader.getElementValueAt(index).toInt(&ok));
                 if (!ok){
-                    writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'wordMaxVariableValues' data!\nObject Reference: "+ref, true);
+                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'wordMaxVariableValues' data!\nObject Reference: "+ref, true);
                     return false;
                 }
             }
         }else if (text == "variableInitialValues"){
             if (!variableInitialValues.readReference(index, reader)){
-                writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'variableInitialValues' reference!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableInitialValues' reference!\nObject Reference: "+ref);
             }
         }else if (text == "stringData"){
             if (!stringData.readReference(index, reader)){
-                writeToLog("hkbBehaviorGraphData: readData()!\nFailed to properly read 'stringData' reference!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'stringData' reference!\nObject Reference: "+ref);
             }
         }
         index++;
+    }
+    return true;
+}
+
+bool hkbBehaviorGraphData::write(HkxXMLWriter *writer){
+    if (!writer){
+        return false;
+    }
+    if (!getIsWritten()){
+        QString refString;
+        QStringList list1 = {writer->name, writer->clas, writer->signature};
+        QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
+        writer->writeLine(writer->object, list1, list2, "");
+        list1 = {writer->name, writer->numelements};
+        list2 = {"attributeDefaults", QString::number(/*attributeDefaults.size()*/0)};
+        writer->writeLine(writer->object, list1, list2, "");
+        /*for (int i = 0; i < attributeDefaults.size(); i++){
+            //???
+        }
+        if (attributeDefaults.size() > 0){
+            writer->writeLine(writer->object, false);
+        }
+        writer->writeLine(writer->object, false);*/
+        list1 = {writer->name, writer->numelements};
+        list2 = {"variableInfos", QString::number(variableInfos.size())};
+        writer->writeLine(writer->parameter, list1, list2, "");
+        for (int i = 0; i < variableInfos.size(); i++){
+            writer->writeLine(writer->object, true);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("role"), "");
+            writer->writeLine(writer->object, true);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("role"), variableInfos.at(i).role.role);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("flags"), variableInfos.at(i).role.flags);
+            writer->writeLine(writer->object, false);
+            writer->writeLine(writer->parameter, false);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("type"), variableInfos.at(i).type);
+            writer->writeLine(writer->object, false);
+        }
+        if (variableInfos.size() > 0){
+            writer->writeLine(writer->parameter, false);
+        }
+        list1 = {writer->name, writer->numelements};
+        list2 = {"characterPropertyInfos", QString::number(characterPropertyInfos.size())};
+        writer->writeLine(writer->parameter, list1, list2, "");
+        for (int i = 0; i < characterPropertyInfos.size(); i++){
+            writer->writeLine(writer->object, true);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("role"), "");
+            writer->writeLine(writer->object, true);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("role"), characterPropertyInfos.at(i).role.role);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("flags"), characterPropertyInfos.at(i).role.flags);
+            writer->writeLine(writer->object, false);
+            writer->writeLine(writer->parameter, false);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("type"), characterPropertyInfos.at(i).type);
+            writer->writeLine(writer->object, false);
+        }
+        if (characterPropertyInfos.size() > 0){
+            writer->writeLine(writer->parameter, false);
+        }
+        list1 = {writer->name, writer->numelements};
+        list2 = {"eventInfos", QString::number(eventInfos.size())};
+        writer->writeLine(writer->parameter, list1, list2, "");
+        for (int i = 0; i < eventInfos.size(); i++){
+            writer->writeLine(writer->object, true);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("flags"), eventInfos.at(i));
+            writer->writeLine(writer->object, false);
+        }
+        if (eventInfos.size() > 0){
+            writer->writeLine(writer->parameter, false);
+        }
+        if (variableInitialValues.data()){
+            refString = variableInitialValues.data()->getReferenceString();
+        }else{
+            refString = "null";
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableInitialValues"), refString);
+        if (stringData.data()){
+            refString = stringData.data()->getReferenceString();
+        }else{
+            refString = "null";
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("stringData"), refString);
+        writer->writeLine(writer->object, false);
+        setIsWritten();
+        writer->writeLine("\n");
+        if (!variableInitialValues.data()->write(writer)){
+            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableInitialValues'!!!", true);
+        }
+        if (!stringData.data()->write(writer)){
+            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'stringData'!!!", true);
+        }
     }
     return true;
 }
@@ -460,10 +549,10 @@ bool hkbBehaviorGraphData::link(){
     //variableInitialValues
     HkxObjectExpSharedPtr *ptr = &getParentFile()->variableValues;
     if (!ptr){
-        writeToLog("hkbBehaviorGraphData: link()!\nFailed to properly link 'variableInitialValues' data field!\n");
+        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableInitialValues' data field!\n");
         setDataValidity(false);
     }else if ((*ptr)->getSignature() != HKB_VARIABLE_VALUE_SET){
-        writeToLog("hkbBehaviorGraphData: link()!\n'variableInitialValues' data field is linked to invalid child!\n");
+        writeToLog(getClassname()+": link()!\n'variableInitialValues' data field is linked to invalid child!\n");
         setDataValidity(false);
         variableInitialValues = *ptr;
     }else{
@@ -472,10 +561,10 @@ bool hkbBehaviorGraphData::link(){
     //stringData
     ptr = &getParentFile()->stringData;
     if (!ptr){
-        writeToLog("hkbBehaviorGraphData: link()!\nFailed to properly link 'stringData' data field!\n");
+        writeToLog(getClassname()+": link()!\nFailed to properly link 'stringData' data field!\n");
         setDataValidity(false);
     }else if ((*ptr)->getSignature() != HKB_BEHAVIOR_GRAPH_STRING_DATA){
-        writeToLog("hkbBehaviorGraphData: link()!\n'stringData' data field is linked to invalid child!\n");
+        writeToLog(getClassname()+": link()!\n'stringData' data field is linked to invalid child!\n");
         setDataValidity(false);
         stringData = *ptr;
     }else{

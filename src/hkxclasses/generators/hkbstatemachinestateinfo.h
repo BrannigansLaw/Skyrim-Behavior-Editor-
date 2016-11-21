@@ -21,6 +21,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     hkbStateMachine * getParentStateMachine() const;
+    bool write(HkxXMLWriter *writer);
 private:
     hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&);
     hkbStateMachineStateInfo(const hkbStateMachineStateInfo &);

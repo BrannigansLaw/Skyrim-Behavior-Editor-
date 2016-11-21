@@ -14,6 +14,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool link(){return true;}
+    bool write(HkxXMLWriter *writer);
 protected:
 private:
     static uint refCount;

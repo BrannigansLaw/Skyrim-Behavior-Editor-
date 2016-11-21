@@ -75,6 +75,50 @@ bool hkbBehaviorGraph::readData(const HkxXmlReader &reader, long index){
     return true;
 }
 
+bool hkbBehaviorGraph::write(HkxXMLWriter *writer){
+    if (!writer){
+        return false;
+    }
+    if (!getIsWritten()){
+        QString refString = "null";
+        QStringList list1 = {writer->name, writer->clas, writer->signature};
+        QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
+        writer->writeLine(writer->object, list1, list2, "");
+        if (variableBindingSet.data()){
+            refString = variableBindingSet.data()->getReferenceString();
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableMode"), variableMode);
+        if (rootGenerator.data()){
+            refString = rootGenerator.data()->getReferenceString();
+        }else{
+            refString = "null";
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("rootGenerator"), refString);
+        if (data.data()){
+            refString = data.data()->getReferenceString();
+        }else{
+            refString = "null";
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("data"), refString);
+        writer->writeLine(writer->object, false);
+        setIsWritten();
+        writer->writeLine("\n");
+        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
+            getParentFile()->writeToLog("hkbBehaviorGraph: write()!\nUnable to write 'variableBindingSet'!!!", true);
+        }
+        if (rootGenerator.data() && !rootGenerator.data()->write(writer)){
+            getParentFile()->writeToLog("hkbBehaviorGraph: write()!\nUnable to write 'rootGenerator'!!!", true);
+        }
+        if (data.data() && !data.data()->write(writer)){
+            getParentFile()->writeToLog("hkbBehaviorGraph: write()!\nUnable to write 'data'!!!", true);
+        }
+    }
+    return true;
+}
+
 bool hkbBehaviorGraph::link(){
     if (!getParentFile()){
         return false;

@@ -81,17 +81,17 @@ bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long index){
                     if (reader.getNthAttributeValueAt(index, 0) == "memberPath"){
                         bindings.last().memberPath = reader.getElementValueAt(index);
                         if (bindings.last().memberPath == ""){
-                            writeToLog("hkbVariableBindingSet: readData()!\nFailed to properly read 'memberPath' data field!\nObject Reference: "+ref);
+                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'memberPath' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "variableIndex"){
                         bindings.last().variableIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog("hkbVariableBindingSet: readData()!\nFailed to properly read 'variableIndex' data field!\nObject Reference: "+ref);
+                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "bitIndex"){
                         bindings.last().bitIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog("hkbVariableBindingSet: readData()!\nFailed to properly read 'bitIndex' data field!\nObject Reference: "+ref);
+                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'bitIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if(reader.getNthAttributeValueAt(index, 0) == "bindingType"){
                         if (reader.getElementValueAt(index) == "BINDING_TYPE_VARIABLE"){
@@ -99,7 +99,7 @@ bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long index){
                         }else if (reader.getElementValueAt(index) == "BINDING_TYPE_CHARACTER_PROPERTY"){
                             bindings.last().bindingType = hkBinding::BINDING_TYPE_CHARACTER_PROPERTY;
                         }else{
-                            writeToLog("hkbVariableBindingSet: readData()!\n'bindingType' data field contains an invalid string!\nObject Reference: "+ref);
+                            writeToLog(getClassname()+": readData()!\n'bindingType' data field contains an invalid string!\nObject Reference: "+ref);
                         }
                         break;
                     }
@@ -109,10 +109,46 @@ bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long index){
         }else if (text == "indexOfBindingToEnable"){
             indexOfBindingToEnable = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog("hkbVariableBindingSet: readData()!\nFailed to properly read 'indexOfBindingToEnable' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'indexOfBindingToEnable' data field!\nObject Reference: "+ref);
             }
         }
         index++;
+    }
+    return true;
+}
+
+bool hkbVariableBindingSet::write(HkxXMLWriter *writer){
+    if (!writer){
+        return false;
+    }
+    if (!getIsWritten()){
+        QString string;
+        QStringList list1 = {writer->name, writer->clas, writer->signature};
+        QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
+        writer->writeLine(writer->object, list1, list2, "");
+        list1 = {writer->name, writer->numelements};
+        list2 = {"bindings", QString::number(bindings.size())};
+        writer->writeLine(writer->parameter, list1, list2, "");
+        for (int i = 0; i < bindings.size(); i++){
+            writer->writeLine(writer->object, true);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("memberPath"), bindings.at(i).memberPath);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableIndex"), QString::number(bindings.at(i).variableIndex));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bitIndex"), QString::number(bindings.at(i).bitIndex));
+            if (bindings.at(i).bindingType == hkBinding::BINDING_TYPE_VARIABLE){
+                string = "BINDING_TYPE_VARIABLE";
+            }else{
+                string = "BINDING_TYPE_CHARACTER_PROPERTY";
+            }
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bindingType"), string);
+            writer->writeLine(writer->object, false);
+        }
+        if (bindings.size() > 0){
+            writer->writeLine(writer->parameter, false);
+        }
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("indexOfBindingToEnable"), QString::number(indexOfBindingToEnable));
+        writer->writeLine(writer->object, false);
+        setIsWritten();
+        writer->writeLine("\n");
     }
     return true;
 }

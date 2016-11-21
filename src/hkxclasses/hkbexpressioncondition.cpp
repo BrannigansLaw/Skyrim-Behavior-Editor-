@@ -34,10 +34,26 @@ bool hkbExpressionCondition::readData(const HkxXmlReader & reader, long index){
         if (text == "expression"){
             expression = reader.getElementValueAt(index);
             if (expression == ""){
-                writeToLog("hkbExpressionCondition: readData()!\nFailed to properly read 'expression' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'expression' data field!\nObject Reference: "+ref);
             }
         }
         index++;
+    }
+    return true;
+}
+
+bool hkbExpressionCondition::write(HkxXMLWriter *writer){
+    if (!writer){
+        return false;
+    }
+    if (!getIsWritten()){
+        QStringList list1 = {writer->name, writer->clas, writer->signature};
+        QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
+        writer->writeLine(writer->object, list1, list2, "");
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("expression"), expression);
+        writer->writeLine(writer->object, false);
+        setIsWritten();
+        writer->writeLine("\n");
     }
     return true;
 }
