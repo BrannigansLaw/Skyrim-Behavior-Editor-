@@ -146,7 +146,7 @@ bool BSBoneSwitchGenerator::link(){
     }
     for (int i = 0; i < ChildrenA.size(); i++){
         //ChildrenA
-        ptr = getParentFile()->findGenerator(ChildrenA.at(i).getReference());
+        ptr = getParentFile()->findGeneratorChild(ChildrenA.at(i).getReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'ChildrenA' data field!");
             setDataValidity(false);

@@ -49,6 +49,7 @@ public:
     virtual ~BehaviorFile();
     HkxObjectExpSharedPtr * findHkxObject(long ref);
     HkxObjectExpSharedPtr * findGenerator(long ref);
+    HkxObjectExpSharedPtr * findGeneratorChild(long ref);
     HkxObjectExpSharedPtr * findModifier(long ref);
     HkxObjectExpSharedPtr * findBehaviorGraph(long ref);
     QVector<int> removeGeneratorData();
@@ -78,7 +79,7 @@ protected:
     bool parse();
     bool link();
 private:
-    void removeUnneededGenerators();
+    //void removeUnneededGenerators();
 private:
     HkxXmlReader reader;
     HkxXMLWriter writer;
@@ -87,6 +88,7 @@ private:
     HkxObjectExpSharedPtr variableValues;
     HkxObjectExpSharedPtr graphData;
     QList <HkxObjectExpSharedPtr> generators;
+    QList <HkxObjectExpSharedPtr> generatorChildren;
     QList <HkxObjectExpSharedPtr> modifiers;
     QList <HkxObjectExpSharedPtr> otherTypes;
     long largestRef;

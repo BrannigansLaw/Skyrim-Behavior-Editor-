@@ -348,7 +348,7 @@ bool hkbStateMachine::link(){
     }
     for (int i = 0; i < states.size(); i++){
         //states
-        ptr = getParentFile()->findGenerator(states.at(i).getReference());
+        ptr = getParentFile()->findGeneratorChild(states.at(i).getReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'states' data field!\nObject Name: "+name);
             setDataValidity(false);

@@ -148,7 +148,15 @@ bool BehaviorFile::addObjectToFile(HkxObject *obj, long ref){
     }
     obj->setReference(largestRef);
     if (obj->getType() == HkxObject::TYPE_GENERATOR){
-        generators.append(HkxObjectExpSharedPtr(obj, ref));
+        if (obj->getSignature() == HKB_STATE_MACHINE_STATE_INFO ||
+            obj->getSignature() == HKB_BLENDER_GENERATOR_CHILD ||
+            obj->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA
+           )
+        {
+            generatorChildren.append(HkxObjectExpSharedPtr(obj, ref));
+        }else{
+            generators.append(HkxObjectExpSharedPtr(obj, ref));
+        }
     }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
         modifiers.append(HkxObjectExpSharedPtr(obj, ref));
     }else if (obj->getType() == HkxObject::TYPE_OTHER){
@@ -312,7 +320,7 @@ bool BehaviorFile::parse(){
         writeToLog("BehaviorFile: parse() failed because link() failed!", true);
         return false;
     }
-    removeUnneededGenerators();
+    //removeUnneededGenerators();
     return true;
 }
 
@@ -331,6 +339,12 @@ bool BehaviorFile::link(){
     for (int i = generators.size() - 1; i >= 0; i--){
         if (!static_cast<hkbGenerator * >(generators.at(i).data())->link()){
             writeToLog("BehaviorFile: link() failed!\nA generator failed to link to it's children!\nObject signature: "+QString::number(generators.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getReference()), true);
+            return false;
+        }
+    }
+    for (int i = generatorChildren.size() - 1; i >= 0; i--){
+        if (!static_cast<hkbGenerator * >(generatorChildren.at(i).data())->link()){
+            writeToLog("BehaviorFile: link() failed!\nA generator child failed to link to it's children!\nObject signature: "+QString::number(generators.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getReference()), true);
             return false;
         }
     }
@@ -367,6 +381,10 @@ void BehaviorFile::write(){
         generators.at(i).data()->setIsWritten(false);
         generators.at(i).data()->setReference(ref);
     }
+    for (int i = 0; i < generatorChildren.size(); i++, ref++){
+        generatorChildren.at(i).data()->setIsWritten(false);
+        generatorChildren.at(i).data()->setReference(ref);
+    }
     for (int i = 0; i < modifiers.size(); i++, ref++){
         modifiers.at(i).data()->setIsWritten(false);
         modifiers.at(i).data()->setReference(ref);
@@ -386,6 +404,18 @@ HkxObjectExpSharedPtr * BehaviorFile::findGenerator(long ref){
     for (int i = 0; i < generators.size(); i++){
         if (ref == generators.at(i).getReference()){
             return &generators[i];
+        }
+    }
+    return NULL;
+}
+
+HkxObjectExpSharedPtr * BehaviorFile::findGeneratorChild(long ref){
+    if (ref < 0){
+        return NULL;
+    }
+    for (int i = 0; i < generatorChildren.size(); i++){
+        if (ref == generatorChildren.at(i).getReference()){
+            return &generatorChildren[i];
         }
     }
     return NULL;
@@ -547,7 +577,7 @@ QStringList BehaviorFile::getEventNames() const{
     return static_cast<hkbBehaviorGraphData *>(graphData.data())->getEventNames();
 }
 
-void BehaviorFile::removeUnneededGenerators(){
+/*void BehaviorFile::removeUnneededGenerators(){
     for (int i = generators.size() - 1; i >= 0; i--){
         if (generators.at(i).constData()->getSignature() == HKB_STATE_MACHINE_STATE_INFO ||
             generators.at(i).constData()->getSignature() == HKB_BLENDER_GENERATOR_CHILD ||
@@ -558,7 +588,7 @@ void BehaviorFile::removeUnneededGenerators(){
             generators.removeAt(i);
         }
     }
-}
+}*/
 
 BehaviorFile::~BehaviorFile(){
     //

@@ -260,7 +260,7 @@ bool hkbPoseMatchingGenerator::link(){
     HkxObjectExpSharedPtr *ptr;
     for (int i = 0; i < children.size(); i++){
         //generators
-        ptr = getParentFile()->findGenerator(children.at(i).getReference());
+        ptr = getParentFile()->findGeneratorChild(children.at(i).getReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
             setDataValidity(false);

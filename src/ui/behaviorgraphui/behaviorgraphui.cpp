@@ -711,7 +711,7 @@ HkxObjectExpSharedPtr * BehaviorGraphView::getFirstChildSmartPointer(HkxObject *
         case HKB_STATE_MACHINE:
         {
             hkbStateMachine *ptr = static_cast<hkbStateMachine *>(obj);
-            if (!ptr->states.isEmpty()){
+            if (!ptr->states.isEmpty()){    //Check for NULL here below?????????????????????????????????????????????????????????????
                 return &static_cast<hkbStateMachineStateInfo *>(ptr->states.first().data())->generator;
             }else{
                 //behavior->generators.append(HkxObjectExpSharedPtr(new hkbStateMachineStateInfo(behavior, ptr)));
@@ -1329,7 +1329,7 @@ void BehaviorGraphView::wrapObject(T *obj, GeneratorIcon *parentObjIcon){
         delete obj;
         return;
     }
-    behavior->generators.append(HkxObjectExpSharedPtr(obj));
+    //behavior->generators.append(HkxObjectExpSharedPtr(obj));
     newIcon->setSelected();
 }
 
@@ -1756,8 +1756,10 @@ bool BehaviorGraphView::drawBehaviorGraph(){
             result = initializeIcons(ptr, objects, parentIcons, objectChildCount);
             if (result == 0){
                 for (int i = ptr->states.size() - 1; i >= 0; i--){
-                    objects.append(static_cast<hkbStateMachineStateInfo *>(ptr->states.at(i).data())->generator);
-                    objectChildCount.last()++;
+                    if (ptr->states.at(i).data()){
+                        objects.append(static_cast<hkbStateMachineStateInfo *>(ptr->states.at(i).data())->generator);
+                        objectChildCount.last()++;
+                    }
                 }
             }else if (result == -1){
                 return false;
@@ -1796,8 +1798,10 @@ bool BehaviorGraphView::drawBehaviorGraph(){
                 objects.append(ptr->pDefaultGenerator);
                 objectChildCount.last()++;
                 for (int i = ptr->ChildrenA.size() - 1; i >= 0; i--){
-                    objects.append(static_cast<BSBoneSwitchGeneratorBoneData *>(ptr->ChildrenA.at(i).data())->pGenerator);
-                    objectChildCount.last()++;
+                    if (ptr->ChildrenA.at(i).data()){
+                        objects.append(static_cast<BSBoneSwitchGeneratorBoneData *>(ptr->ChildrenA.at(i).data())->pGenerator);
+                        objectChildCount.last()++;
+                    }
                 }
             }else if (result == -1){
                 return false;
@@ -1824,8 +1828,10 @@ bool BehaviorGraphView::drawBehaviorGraph(){
             result = initializeIcons(ptr, objects, parentIcons, objectChildCount);
             if (result == 0){
                 for (int i = ptr->children.size() - 1; i >= 0; i--){
-                    objects.append(static_cast<hkbBlenderGeneratorChild *>(ptr->children.at(i).data())->generator);
-                    objectChildCount.last()++;
+                    if (ptr->children.at(i).data()){
+                        objects.append(static_cast<hkbBlenderGeneratorChild *>(ptr->children.at(i).data())->generator);
+                        objectChildCount.last()++;
+                    }
                 }
             }else if (result == -1){
                 return false;
@@ -1838,8 +1844,10 @@ bool BehaviorGraphView::drawBehaviorGraph(){
             result = initializeIcons(ptr, objects, parentIcons, objectChildCount);
             if (result == 0){
                 for (int i = ptr->children.size() - 1; i >= 0; i--){
-                    objects.append(static_cast<hkbBlenderGeneratorChild *>(ptr->children.at(i).data())->generator);
-                    objectChildCount.last()++;
+                    if (ptr->children.at(i).data()){
+                        objects.append(static_cast<hkbBlenderGeneratorChild *>(ptr->children.at(i).data())->generator);
+                        objectChildCount.last()++;
+                    }
                 }
             }else if (result == -1){
                 return false;
