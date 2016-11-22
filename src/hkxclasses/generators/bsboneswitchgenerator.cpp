@@ -112,6 +112,9 @@ bool BSBoneSwitchGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
+        if (pDefaultGenerator.data() && !pDefaultGenerator.data()->write(writer)){
+            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'pDefaultGenerator'!!!", true);
+        }
         for (int i = 0; i < ChildrenA.size(); i++){
             if (ChildrenA.at(i).data() && !ChildrenA.at(i).data()->write(writer)){
                 getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'ChildrenA' at: "+QString::number(i)+"!!!", true);

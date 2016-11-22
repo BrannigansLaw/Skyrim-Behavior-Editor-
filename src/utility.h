@@ -36,8 +36,21 @@ struct hkQuadVariable
     {
         //
     }
+    QString convertDoubleString(qreal num){
+        QString real = QString::number(num);
+        int index = real.indexOf('.');
+        if (index != -1){
+            index = real.size() - index;
+            for (int i = 0; i < index && index < 6; i++){
+                real.append("0");
+            }
+        }else{
+            real.append(".000000");
+        }
+        return real;
+    }
     QString getValueAsString(){
-        return "("+QString::number(x)+".000000 "+QString::number(y)+".000000 "+QString::number(z)+".000000 "+QString::number(w)+".000000)";
+        return "("+convertDoubleString(x)+" "+convertDoubleString(y)+" "+convertDoubleString(z)+" "+convertDoubleString(w)+")";
     }
     qreal x;
     qreal y;

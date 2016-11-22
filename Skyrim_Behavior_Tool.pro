@@ -67,7 +67,8 @@ SOURCES += \
     src/ui/blendingtransitioneffectui.cpp \
     src/hkxclasses/hkbexpressioncondition.cpp \
     src/ui/genericdatawidgets.cpp \
-    src/xml/hkxxmlwriter.cpp
+    src/xml/hkxxmlwriter.cpp \
+    src/hkxclasses/hkbcliptriggerarray.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -117,4 +118,5 @@ HEADERS  += \
     src/ui/transitionsui.h \
     src/ui/blendingtransitioneffectui.h \
     src/hkxclasses/hkbexpressioncondition.h \
-    src/xml/hkxxmlwriter.h
+    src/xml/hkxxmlwriter.h \
+    src/hkxclasses/hkbcliptriggerarray.h
