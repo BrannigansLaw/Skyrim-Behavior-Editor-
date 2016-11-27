@@ -152,7 +152,7 @@ bool hkbClipTriggerArray::link(){
         //payload
         ptr = getParentFile()->findHkxObject(triggers.at(i).payload.getReference());
         if (ptr){
-            if ((*ptr)->getType() != HKB_STRING_EVENT_PAYLOAD){
+            if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 return false;
             }
             triggers[i].payload = *ptr;

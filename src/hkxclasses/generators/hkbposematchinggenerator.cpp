@@ -1,4 +1,5 @@
 #include "hkbposematchinggenerator.h"
+#include "hkbblendergeneratorchild.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/hkxfile.h"
 /*
@@ -58,6 +59,98 @@ int hkbPoseMatchingGenerator::getIndexToInsertIcon(HkxObject *child) const{
         }
     }
     return -1;
+}
+
+bool hkbPoseMatchingGenerator::setChildAt(HkxObject *newChild, ushort index){
+    if (newChild && newChild->getType() != TYPE_GENERATOR){
+        return false;
+    }
+    hkbBlenderGeneratorChild *child = NULL;
+    if (!children.isEmpty()){
+        if (index < children.size()){
+            child = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
+            if (child){
+                child->generator = HkxObjectExpSharedPtr(newChild);
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }else{
+        child = new hkbBlenderGeneratorChild(getParentFile());
+        child->generator = HkxObjectExpSharedPtr(newChild);
+        children.append(HkxObjectExpSharedPtr(child));
+        return true;
+    }
+}
+
+bool hkbPoseMatchingGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    bool wasReplaced = false;
+    hkbBlenderGeneratorChild *child;
+    for (int i = 0; i < children.size(); i++){
+        child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
+        if (child->generator.data() == childToReplace){
+            if (!objToInject->setChildAt(child->generator.data())){
+                return false;
+            }
+            child->generator = HkxObjectExpSharedPtr(objToInject);
+            wasReplaced = true;
+        }
+    }
+    return wasReplaced;
+}
+
+bool hkbPoseMatchingGenerator::appendObject(hkbGenerator *objToAppend){
+    hkbBlenderGeneratorChild *objChild = new hkbBlenderGeneratorChild(getParentFile(), -1);
+    children.append(HkxObjectExpSharedPtr(objChild));
+    objChild->generator = HkxObjectExpSharedPtr(objToAppend);
+    return true;
+}
+
+bool hkbPoseMatchingGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+    if (removeAll){
+        hkbBlenderGeneratorChild *child;
+        for (int i = 0; i < children.size(); i++){
+            child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
+            if (child->generator.data() == objToRemove){
+                child->generator = HkxObjectExpSharedPtr();
+            }
+        }
+        return true;
+    }else{
+        hkbBlenderGeneratorChild *child;
+        for (int i = 0; i < children.size(); i++){
+            child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
+            if (child->generator.data() == objToRemove){
+                child->generator = HkxObjectExpSharedPtr();
+                return true;
+            }
+        }
+        return true;
+    }
+    return true;
+}
+
+int hkbPoseMatchingGenerator::addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder){
+    int objectChildCount = 0;
+    if (reverseOrder){
+        for (int i = children.size() - 1; i >= 0; i--){
+            if (children.at(i).data() && static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->generator.data()){
+                list.append(static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->generator);
+                objectChildCount++;
+            }
+        }
+    }else{
+        for (int i = 0; i < children.size(); i++){
+            if (children.at(i).data() && static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->generator.data()){
+                list.append(static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->generator);
+                objectChildCount++;
+            }
+        }
+    }
+    return objectChildCount;
 }
 
 bool hkbPoseMatchingGenerator::readData(const HkxXmlReader &reader, long index){

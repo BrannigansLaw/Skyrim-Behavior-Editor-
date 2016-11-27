@@ -3,11 +3,17 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbModifier: public HkDynamicObject
+class GeneratorIcon;
+
+class hkbModifier: public DataIconManager
 {
+    friend class BehaviorGraphView;
+    friend class GeneratorIcon;
 public:
     virtual ~hkbModifier();
     bool link();
+    virtual QString getName() const;
+    QString getClassname() const;
 protected:
     hkbModifier(BehaviorFile *parent, long ref = -1);
 };

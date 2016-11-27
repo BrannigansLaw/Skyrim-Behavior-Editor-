@@ -36,6 +36,51 @@ int hkbBehaviorGraph::getIndexToInsertIcon() const{
     return -1;
 }
 
+bool hkbBehaviorGraph::setChildAt(HkxObject *newChild, ushort index){
+    if (index == 0 && (!newChild || newChild->getSignature() == HKB_STATE_MACHINE)){
+        rootGenerator = HkxObjectExpSharedPtr(newChild);
+        return true;
+    }else{
+        return false;
+    }
+}
+
+bool hkbBehaviorGraph::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    if (rootGenerator.data() == childToReplace && (!objToInject || objToInject->getSignature() == HKB_STATE_MACHINE)){
+        if (!objToInject->setChildAt(rootGenerator.data())){
+            return false;
+        }
+        rootGenerator = HkxObjectExpSharedPtr(objToInject);
+        return true;
+    }
+    return false;
+}
+
+bool hkbBehaviorGraph::appendObject(hkbGenerator *objToAppend){
+    if (objToAppend->getSignature() == HKB_STATE_MACHINE){
+        rootGenerator = HkxObjectExpSharedPtr(objToAppend);
+        return true;
+    }
+    return false;
+}
+
+bool hkbBehaviorGraph::removeObject(hkbGenerator *objToRemove, bool removeAll){
+    if (rootGenerator.data() == objToRemove){
+        rootGenerator = HkxObjectExpSharedPtr();
+        return true;
+    }
+    return false;
+}
+
+int hkbBehaviorGraph::addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder){
+    int objectChildCount = 0;
+    if (rootGenerator.data()){
+        list.append(rootGenerator);
+        objectChildCount++;
+    }
+    return objectChildCount;
+}
+
 bool hkbBehaviorGraph::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);

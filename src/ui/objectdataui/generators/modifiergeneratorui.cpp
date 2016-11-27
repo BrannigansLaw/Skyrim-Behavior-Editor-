@@ -140,6 +140,8 @@ void ModifierGeneratorUI::loadData(HkxObject *data){
         bsData = static_cast<hkbModifierGenerator *>(data);
         name->setText(bsData->name);
         //generator->setText(static_cast<hkbModifier *>(bsData->modifier.data())->getName());
-        generator->setText(static_cast<hkbGenerator *>(bsData->generator.data())->getName());
+        if (bsData->generator.data()){
+            generator->setText(static_cast<hkbGenerator *>(bsData->generator.data())->getName());
+        }
     }
 }

@@ -102,6 +102,99 @@ int hkbStateMachine::getNumberOfNestedStates(int stateId) const{
     return -1;
 }
 
+bool hkbStateMachine::setChildAt(HkxObject *newChild, ushort index){
+    if (newChild && newChild->getType() != TYPE_GENERATOR){
+        return false;
+    }
+    hkbStateMachineStateInfo *state = NULL;
+    if (!states.isEmpty()){
+        if (index < states.size()){
+            state = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
+            if (state){
+                state->generator = HkxObjectExpSharedPtr(newChild);
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }else{
+        state = new hkbStateMachineStateInfo(getParentFile(), this, 0);
+        state->generator = HkxObjectExpSharedPtr(newChild);
+        states.append(HkxObjectExpSharedPtr(state));
+        return true;
+    }
+}
+
+bool hkbStateMachine::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    bool wasReplaced = false;
+    hkbStateMachineStateInfo *state;
+    for (int i = 0; i < states.size(); i++){
+        state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+        if (state->generator.data() == childToReplace){
+            if (!objToInject->setChildAt(state->generator.data())){
+                return false;
+            }
+            state->generator = HkxObjectExpSharedPtr(objToInject);
+            wasReplaced = true;
+        }
+    }
+    return wasReplaced;
+}
+
+bool hkbStateMachine::appendObject(hkbGenerator *objToAppend){
+    hkbStateMachineStateInfo *objChild = new hkbStateMachineStateInfo(getParentFile(), this, -1);
+    states.append(HkxObjectExpSharedPtr(objChild));
+    objChild->generator = HkxObjectExpSharedPtr(objToAppend);
+    return true;
+}
+
+bool hkbStateMachine::removeObject(hkbGenerator *objToRemove, bool removeAll){
+    bool b = false;
+    if (removeAll){
+        hkbStateMachineStateInfo *child;
+        for (int i = 0; i < states.size(); i++){
+            child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+            if (child->generator.data() == objToRemove){
+                child->generator = HkxObjectExpSharedPtr();
+                b = true;
+            }
+        }
+        return b;
+    }else{
+        hkbStateMachineStateInfo *child;
+        for (int i = 0; i < states.size(); i++){
+            child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+            if (child->generator.data() == objToRemove){
+                child->generator = HkxObjectExpSharedPtr();
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+int hkbStateMachine::addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder){
+    int objectChildCount = 0;
+    if (reverseOrder){
+        for (int i = states.size() - 1; i >= 0; i--){
+            if (states.at(i).data() && static_cast<hkbStateMachineStateInfo *>(states.at(i).data())->generator.data()){
+                list.append(static_cast<hkbStateMachineStateInfo *>(states.at(i).data())->generator);
+                objectChildCount++;
+            }
+        }
+    }else{
+        for (int i = 0; i < states.size(); i++){
+            if (states.at(i).data() && static_cast<hkbStateMachineStateInfo *>(states.at(i).data())->generator.data()){
+                list.append(static_cast<hkbStateMachineStateInfo *>(states.at(i).data())->generator);
+                objectChildCount++;
+            }
+        }
+    }
+    return objectChildCount;
+}
+
 hkbStateMachine * hkbStateMachine::getNestedStateMachine(int stateId) const{
     hkbGenerator *gen = NULL;
     hkbStateMachineStateInfo *state = NULL;
@@ -216,26 +309,12 @@ bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){
             }
         }else if (text == "startStateMode"){
             startStateMode = reader.getElementValueAt(index);
-            ok = false;
-            for (int i = 0; i < StartStateMode.size(); i++){
-                if (StartStateMode.at(i) == startStateMode){
-                    ok = true;
-                    i = StartStateMode.size();
-                }
-            }
-            if (!ok){
+            if (!SelfTransitionMode.contains(selfTransitionMode)){
                 writeToLog(getClassname()+": readData()!\nInvalid 'startStateMode' data!\nObject Reference: "+ref);
             }
         }else if (text == "selfTransitionMode"){
             selfTransitionMode = reader.getElementValueAt(index);
-            ok = false;
-            for (int i = 0; i < SelfTransitionMode.size(); i++){
-                if (SelfTransitionMode.at(i) == startStateMode){
-                    ok = true;
-                    i = SelfTransitionMode.size();
-                }
-            }
-            if (!ok){
+            if (!SelfTransitionMode.contains(selfTransitionMode)){
                 writeToLog(getClassname()+": readData()!\nInvalid 'selfTransitionMode' data!\nObject Reference: "+ref);
             }
         }else if (text == "states"){

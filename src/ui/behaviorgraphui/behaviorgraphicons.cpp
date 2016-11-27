@@ -48,8 +48,8 @@ void GeneratorIcon::updateStaticMembers(){
                           boundingRectangle.height() * 0.1);
 }
 
-GeneratorIcon::GeneratorIcon(const HkxObjectExpSharedPtr & d, const QString & s, GeneratorIcon * par)
-    : data(d),
+GeneratorIcon::GeneratorIcon(HkxObject *d, const QString & s, GeneratorIcon * par)
+    : data(HkxObjectExpSharedPtr(d)),
       name(s),
       isExpanded(true),
       parent(par),

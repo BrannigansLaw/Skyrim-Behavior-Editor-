@@ -1,4 +1,5 @@
 #include "hkbblendergenerator.h"
+#include "hkbblendergeneratorchild.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/hkxfile.h"
 /*
@@ -49,6 +50,98 @@ int hkbBlenderGenerator::getIndexToInsertIcon() const{
     return -1;
 }
 
+bool hkbBlenderGenerator::setChildAt(HkxObject *newChild, ushort index){
+    if (newChild && newChild->getType() != TYPE_GENERATOR){
+        return false;
+    }
+    hkbBlenderGeneratorChild *child = NULL;
+    if (!children.isEmpty()){
+        if (index < children.size()){
+            child = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
+            if (child){
+                child->generator = HkxObjectExpSharedPtr(newChild);
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }else{
+        child = new hkbBlenderGeneratorChild(getParentFile());
+        child->generator = HkxObjectExpSharedPtr(newChild);
+        children.append(HkxObjectExpSharedPtr(child));
+        return true;
+    }
+}
+
+bool hkbBlenderGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    bool wasReplaced = false;
+    hkbBlenderGeneratorChild *child;
+    for (int i = 0; i < children.size(); i++){
+        child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
+        if (child->generator.data() == childToReplace){
+            if (!objToInject->setChildAt(child->generator.data())){
+                return false;
+            }
+            child->generator = HkxObjectExpSharedPtr(objToInject);
+            wasReplaced = true;
+        }
+    }
+    return wasReplaced;
+}
+
+bool hkbBlenderGenerator::appendObject(hkbGenerator *objToAppend){
+    hkbBlenderGeneratorChild *objChild = new hkbBlenderGeneratorChild(getParentFile(), -1);
+    children.append(HkxObjectExpSharedPtr(objChild));
+    objChild->generator = HkxObjectExpSharedPtr(objToAppend);
+    return true;
+}
+
+bool hkbBlenderGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+    if (removeAll){
+        hkbBlenderGeneratorChild *child;
+        for (int i = 0; i < children.size(); i++){
+            child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
+            if (child->generator.data() == objToRemove){
+                child->generator = HkxObjectExpSharedPtr();
+            }
+        }
+        return true;
+    }else{
+        hkbBlenderGeneratorChild *child;
+        for (int i = 0; i < children.size(); i++){
+            child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
+            if (child->generator.data() == objToRemove){
+                child->generator = HkxObjectExpSharedPtr();
+                return true;
+            }
+        }
+        return true;
+    }
+    return true;
+}
+
+int hkbBlenderGenerator::addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder){
+    int objectChildCount = 0;
+    if (reverseOrder){
+        for (int i = children.size() - 1; i >= 0; i--){
+            if (children.at(i).data() && static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->generator.data()){
+                list.append(static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->generator);
+                objectChildCount++;
+            }
+        }
+    }else{
+        for (int i = 0; i < children.size(); i++){
+            if (children.at(i).data() && static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->generator.data()){
+                list.append(static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->generator);
+                objectChildCount++;
+            }
+        }
+    }
+    return objectChildCount;
+}
+
 bool hkbBlenderGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
@@ -57,56 +150,56 @@ bool hkbBlenderGenerator::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "referencePoseWeightThreshold"){
             referencePoseWeightThreshold = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'referencePoseWeightThreshold' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'referencePoseWeightThreshold' data field!\nObject Reference: "+ref);
             }
         }else if (text == "blendParameter"){
             blendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'blendParameter' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'blendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minCyclicBlendParameter"){
             minCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'minCyclicBlendParameter' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'minCyclicBlendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "maxCyclicBlendParameter"){
             maxCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'maxCyclicBlendParameter' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'maxCyclicBlendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "indexOfSyncMasterChild"){
             indexOfSyncMasterChild = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'indexOfSyncMasterChild' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'indexOfSyncMasterChild' data field!\nObject Reference: "+ref);
             }
         }else if (text == "flags"){
             flags = reader.getElementValueAt(index);
             if (flags == ""){
-                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
             }
         }else if (text == "subtractLastChild"){
             subtractLastChild = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'subtractLastChild' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'subtractLastChild' data field!\nObject Reference: "+ref);
             }
         }else if (text == "children"){
             if (!readReferences(reader.getElementValueAt(index), children)){
-                writeToLog("hkbBlenderGenerator: readData()!\nFailed to properly read 'children' references!\nObject Reference: "+ref);
+                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'children' references!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -154,11 +247,11 @@ bool hkbBlenderGenerator::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog("hkbBlenderGenerator: write()!\nUnable to write 'variableBindingSet'!!!", true);
+            getParentFile()->writeToLog(getClassname()+":  write()!\nUnable to write 'variableBindingSet'!!!", true);
         }
         for (int i = 0; i < children.size(); i++){
             if (children.at(i).data() && !children.at(i).data()->write(writer)){
-                getParentFile()->writeToLog("hkbBlenderGenerator: write()!\nUnable to write 'children' at: "+QString::number(i)+"!!!", true);
+                getParentFile()->writeToLog(getClassname()+":  write()!\nUnable to write 'children' at: "+QString::number(i)+"!!!", true);
             }
         }
     }
@@ -171,7 +264,7 @@ bool hkbBlenderGenerator::link(){
     }
     //variableBindingSet
     if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        writeToLog("hkbBlenderGenerator: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        writeToLog(getClassname()+":  link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     //children
     HkxObjectExpSharedPtr *ptr;
@@ -179,10 +272,10 @@ bool hkbBlenderGenerator::link(){
         //generators
         ptr = getParentFile()->findGeneratorChild(children.at(i).getReference());
         if (!ptr){
-            writeToLog("hkbBlenderGenerator: link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
+            writeToLog(getClassname()+":  link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
-            writeToLog("hkbBlenderGenerator: link()!\n'children' data field is linked to invalid child!\nObject Name: "+name);
+            writeToLog(getClassname()+":  link()!\n'children' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             children[i] = *ptr;
         }else{

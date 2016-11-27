@@ -33,6 +33,51 @@ QString BSSynchronizedClipGenerator::getName() const{
     return name;
 }
 
+bool BSSynchronizedClipGenerator::setChildAt(HkxObject *newChild, ushort index){
+    if (index == 0 && (!newChild || newChild->getSignature() == BS_SYNCHRONIZED_CLIP_GENERATOR)){
+        pClipGenerator = HkxObjectExpSharedPtr(newChild);
+        return true;
+    }else{
+        return false;
+    }
+}
+
+bool BSSynchronizedClipGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    if (pClipGenerator.data() == childToReplace){
+        if (!objToInject->setChildAt(pClipGenerator.data())){
+            return false;
+        }
+        pClipGenerator = HkxObjectExpSharedPtr(objToInject);
+        return true;
+    }
+    return false;
+}
+
+bool BSSynchronizedClipGenerator::appendObject(hkbGenerator *objToAppend){
+    if (objToAppend->getSignature() == HKB_CLIP_GENERATOR){
+        pClipGenerator = HkxObjectExpSharedPtr(objToAppend);
+        return true;
+    }
+    return false;
+}
+
+bool BSSynchronizedClipGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+    if (pClipGenerator.data() == objToRemove){
+        pClipGenerator = HkxObjectExpSharedPtr();
+        return true;
+    }
+    return false;
+}
+
+int BSSynchronizedClipGenerator::addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder){
+    int objectChildCount = 0;
+    if (pClipGenerator.data()){
+        list.append(pClipGenerator);
+        objectChildCount++;
+    }
+    return objectChildCount;
+}
+
 bool BSSynchronizedClipGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);

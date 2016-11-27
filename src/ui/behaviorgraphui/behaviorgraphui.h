@@ -90,7 +90,6 @@ private slots:
     void wrapOffsetAnimationGenerator();
     void wrapCyclicBlendTransitionGenerator();
     void wrapBoneSwitchGenerator();
-    //void removeSelectedObject();
     void removeSelectedObjectBranchSlot();
 private:
     void removeSelectedObjectBranch(GeneratorIcon *icon, GeneratorIcon *iconToKeep = NULL, bool removeAll = true);
@@ -128,7 +127,6 @@ private:
     QMenu *wrapBlenderMenu;
     QAction *wrapBGAct;
     QAction *wrapBSBSGAct;
-    //QAction *removeObjAct;
     QAction *removeObjBranchAct;
     const qreal minScale;
     const qreal maxScale;
@@ -138,30 +136,24 @@ private:
     const qreal scaleUpFactor;
     const qreal scaleDownFactor;
 private:
-    //void fixIconPositions(GeneratorIcon *rootIcon);
-    //bool removeData(const HkxObjectExpSharedPtr & smtptr);
     void expandBranchForIcon(GeneratorIcon *icon);
-    //bool drawBranch(GeneratorIcon * rootIcon);
-    //void removeIcon(GeneratorIcon *iconToRemove);
     void removeChildIcons(GeneratorIcon *parent, GeneratorIcon *iconToKeep = NULL);
     void repositionIcons(GeneratorIcon * icon, bool updateNonVisable = false);
     void popUpMenuRequested(const QPoint &pos, GeneratorIcon *icon);
     void expandBranch(GeneratorIcon * icon, bool expandAll = false);
     void contractBranch(GeneratorIcon * icon, bool contractAll = false);
-    HkxObject * getFirstChild(const HkxObjectExpSharedPtr &obj);
-    HkxObjectExpSharedPtr * getFirstChildSmartPointer(HkxObject *obj);
     int manageIcons();
     bool positionIcon(GeneratorIcon * icon);
     void createIconBranch(QList <GeneratorIcon *> & icons, GeneratorIcon *parent);
     void deleteSelectedBranch(GeneratorIcon *icon, GeneratorIcon *iconToKeep = NULL);
 
-    template <typename T> bool appendObject(T * ptr, GeneratorIcon *parentObjIcon);
-    template <typename T> void wrapObject(T *obj, GeneratorIcon *parentObjIcon);
-    template<typename T> int initializeIconsForNewBranch(const T & ptr, QList<HkxObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount);
-    template<typename T> int initializeIcons(const T & ptr, QList<HkxObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount);
-    template<typename T> GeneratorIcon * addIconToGraph(const HkxObjectExpSharedPtr & obj, const T & type, GeneratorIcon * parentIcon);
-    template<typename T> GeneratorIcon * initalizeInjectedIcon(const HkxObjectExpSharedPtr & obj, const T & type, GeneratorIcon * parentIcon, GeneratorIcon * selected);
-    template<typename T> GeneratorIcon * initalizeAppendedIcon(const HkxObjectExpSharedPtr & obj, const T & type, GeneratorIcon * parentIcon);
+    bool appendObject(hkbGenerator * ptr, GeneratorIcon *parentObjIcon);
+    void wrapObject(hkbGenerator *obj, GeneratorIcon *parentObjIcon);
+    int initializeIconsForNewBranch(hkbGenerator *ptr, QList<HkxObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount);
+    int initializeIcons(hkbGenerator *ptr, QList<HkxObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount);
+    GeneratorIcon * addIconToGraph(hkbGenerator *obj, GeneratorIcon * parentIcon);
+    GeneratorIcon * initalizeInjectedIcon(hkbGenerator *obj, GeneratorIcon * parentIcon, GeneratorIcon * selected);
+    GeneratorIcon * initalizeAppendedIcon(hkbGenerator *obj, GeneratorIcon * parentIcon);
 };
 
 #endif // BEHAVIORGRAPHUI_H

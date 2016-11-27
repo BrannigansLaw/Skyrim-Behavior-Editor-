@@ -32,6 +32,51 @@ QString BSCyclicBlendTransitionGenerator::getName() const{
     return name;
 }
 
+bool BSCyclicBlendTransitionGenerator::setChildAt(HkxObject *newChild, ushort index){
+    if (index == 0 && (!newChild || newChild->getSignature() == HKB_BLENDER_GENERATOR)){
+        pBlenderGenerator = HkxObjectExpSharedPtr(newChild);
+        return true;
+    }else{
+        return false;
+    }
+}
+
+bool BSCyclicBlendTransitionGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    if (pBlenderGenerator.data() == childToReplace){
+        if (!objToInject->setChildAt(pBlenderGenerator.data())){
+            return false;
+        }
+        pBlenderGenerator = HkxObjectExpSharedPtr(objToInject);
+        return true;
+    }
+    return false;
+}
+
+bool BSCyclicBlendTransitionGenerator::appendObject(hkbGenerator *objToAppend){
+    if (objToAppend->getSignature() == HKB_BLENDER_GENERATOR){
+        pBlenderGenerator = HkxObjectExpSharedPtr(objToAppend);
+        return true;
+    }
+    return false;
+}
+
+bool BSCyclicBlendTransitionGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+    if (pBlenderGenerator.data() == objToRemove){
+        pBlenderGenerator = HkxObjectExpSharedPtr();
+        return true;
+    }
+    return false;
+}
+
+int BSCyclicBlendTransitionGenerator::addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder){
+    int objectChildCount = 0;
+    if (pBlenderGenerator.data()){
+        list.append(pBlenderGenerator);
+        objectChildCount++;
+    }
+    return objectChildCount;
+}
+
 bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);

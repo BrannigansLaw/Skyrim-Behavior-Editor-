@@ -15,7 +15,8 @@ hkbExpressionCondition::hkbExpressionCondition(BehaviorFile *parent, const QStri
       expression(string)
 {
     setType(HKB_EXPRESSION_CONDITION, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
 }
 
 QString hkbExpressionCondition::getClassname(){

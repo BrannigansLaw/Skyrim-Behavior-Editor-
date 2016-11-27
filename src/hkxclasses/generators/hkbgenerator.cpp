@@ -3,7 +3,7 @@
 #include "src/filetypes/hkxfile.h"
 
 hkbGenerator::hkbGenerator(BehaviorFile *parent, long ref)
-    : HkDynamicObject(parent, ref)
+    : DataIconManager(parent, ref)
 {
     //
 }
@@ -14,13 +14,6 @@ bool hkbGenerator::link(){
 
 QString hkbGenerator::getName() const{
     return "";
-}
-
-void hkbGenerator::updateIconNames(){
-    icons.first()->scene()->update();
-    /*for (int i = 0; i < icons.size(); i++){
-        icons.at(i)->update(QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size())));
-    }*/
 }
 
 QString hkbGenerator::getClassname() const{
@@ -52,10 +45,6 @@ QString hkbGenerator::getClassname() const{
     default:
         return "";
     }
-}
-
-void hkbGenerator::appendIcon(GeneratorIcon *icon){
-    icons.append(icon);
 }
 
 hkbGenerator::~hkbGenerator(){

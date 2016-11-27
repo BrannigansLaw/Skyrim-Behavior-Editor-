@@ -1,14 +1,14 @@
-#ifndef BSBONESWITCHGENERATOR_H
-#define BSBONESWITCHGENERATOR_H
+#ifndef HKBMODIFIERLIST_H
+#define HKBMODIFIERLIST_H
 
-#include "hkbgenerator.h"
+#include "hkbmodifier.h"
 
-class BSBoneSwitchGenerator: public hkbGenerator
+class hkbModifierList: public DataIconManager
 {
     friend class BehaviorGraphView;
 public:
-    BSBoneSwitchGenerator(BehaviorFile *parent, long ref = 0);
-    virtual ~BSBoneSwitchGenerator();
+    hkbModifierList(BehaviorFile *parent, long ref = 0);
+    virtual ~hkbModifierList();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
     void unlink();
@@ -18,20 +18,20 @@ public:
     int getIndexToInsertIcon() const;
     bool write(HkxXMLWriter *writer);
 private:
-    bool wrapObject(hkbGenerator *objToInject, hkbGenerator *childToReplace);
+    bool wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace);
     bool setChildAt(HkxObject *newChild, ushort index = 0);
     bool appendObject(hkbGenerator *objToAppend);
     bool removeObject(hkbGenerator *objToRemove, bool removeAll = true);
     int addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder = true);
-    BSBoneSwitchGenerator& operator=(const BSBoneSwitchGenerator&);
-    BSBoneSwitchGenerator(const BSBoneSwitchGenerator &);
+    hkbModifierList& operator=(const hkbModifierList&);
+    hkbModifierList(const hkbModifierList &);
 private:
     static uint refCount;
     static QString classname;
     long userData;
     QString name;
-    HkxObjectExpSharedPtr pDefaultGenerator;
-    QList <HkxObjectExpSharedPtr> ChildrenA;
+    bool enable;
+    QList <HkxObjectExpSharedPtr> modifiers;
 };
 
-#endif // BSBONESWITCHGENERATOR_H
+#endif // HKBMODIFIERLIST_H

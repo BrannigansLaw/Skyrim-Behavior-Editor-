@@ -122,7 +122,7 @@ bool hkbStateMachineEventPropertyArray::link(){
         //payload
         ptr = getParentFile()->findHkxObject(events.at(i).payload.getReference());
         if (ptr){
-            if ((*ptr)->getType() != HKB_STRING_EVENT_PAYLOAD){
+            if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 return false;
             }
             events[i].payload = *ptr;

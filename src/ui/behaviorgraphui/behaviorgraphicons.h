@@ -15,7 +15,7 @@ class GeneratorIcon: public QGraphicsItem
     friend class BehaviorGraphView;
     friend class ModifierGeneratorUI;
 public:
-    GeneratorIcon(const HkxObjectExpSharedPtr & d, const QString & s, GeneratorIcon *par = NULL);
+    GeneratorIcon(HkxObject *d, const QString & s, GeneratorIcon *par = NULL);
 
     virtual ~GeneratorIcon(){
         //
@@ -140,7 +140,7 @@ public:
         if (parent){
             i = parent->children.indexOf(this);
             if (children.isEmpty() && i > -1 && i < parent->children.size()){
-                newIcon = new GeneratorIcon(HkxObjectExpSharedPtr(data.data()), static_cast<hkbGenerator *>(data.data())->getName(), parent);
+                newIcon = new GeneratorIcon(data.data(), static_cast<hkbGenerator *>(data.data())->getName(), parent);
                 parent->children.move(parent->children.size() - 1, i);
                 if (scene()){
                     scene()->addItem(newIcon);
@@ -177,7 +177,7 @@ public:
         if (parent){
             i = parent->children.indexOf(this);
             if (i > -1 && i < parent->children.size()){
-                newIcon = new GeneratorIcon(HkxObjectExpSharedPtr(data.data()), static_cast<hkbGenerator *>(data.data())->getName(), parent);
+                newIcon = new GeneratorIcon(data.data(), static_cast<hkbGenerator *>(data.data())->getName(), parent);
                 parent->children.move(parent->children.size() - 1, i);
                 if (scene()){
                     scene()->addItem(newIcon);

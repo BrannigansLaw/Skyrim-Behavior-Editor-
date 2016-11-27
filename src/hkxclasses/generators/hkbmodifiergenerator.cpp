@@ -35,6 +35,83 @@ int hkbModifierGenerator::getIndexToInsertIcon(HkxObject *child) const{
     return -1;
 }
 
+bool hkbModifierGenerator::setChildAt(HkxObject *newChild, ushort index){
+    if (index == 0 && (!newChild || newChild->getType() == TYPE_GENERATOR)){
+        generator = HkxObjectExpSharedPtr(newChild);
+        return true;
+    }else if (index == 1 && (!newChild || newChild->getType() == TYPE_MODIFIER)){
+        modifier = HkxObjectExpSharedPtr(newChild);
+        return true;
+    }else{
+        return false;
+    }
+}
+
+bool hkbModifierGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    if (generator.data() == childToReplace){
+        if (!objToInject->setChildAt(generator.data())){
+            return false;
+        }
+        generator = HkxObjectExpSharedPtr(objToInject);
+        return true;
+    }
+    return false;
+}
+
+bool hkbModifierGenerator::appendObject(hkbGenerator *objToAppend){
+    generator = HkxObjectExpSharedPtr(objToAppend);
+    return true;
+}
+
+bool hkbModifierGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+    bool b = false;
+    if (removeAll){
+        if (generator.data() == objToRemove){
+            generator = HkxObjectExpSharedPtr();
+            b = true;
+        }
+        if (modifier.data() == objToRemove){
+            modifier = HkxObjectExpSharedPtr();
+            b = true;
+        }
+        return b;
+    }else{
+        if (generator.data() == objToRemove){
+            generator = HkxObjectExpSharedPtr();
+            return true;
+        }
+        if (modifier.data() == objToRemove){
+            modifier = HkxObjectExpSharedPtr();
+            return true;
+        }
+    }
+    return false;
+}
+
+int hkbModifierGenerator::addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder){
+    int objectChildCount = 0;
+    if (reverseOrder){
+        if (generator.data()){
+            list.append(generator);
+            objectChildCount++;
+        }
+        if (modifier.data()){
+            list.append(modifier);
+            objectChildCount++;
+        }
+    }else{
+        if (modifier.data()){
+            list.append(modifier);
+            objectChildCount++;
+        }
+        if (generator.data()){
+            list.append(generator);
+            objectChildCount++;
+        }
+    }
+    return objectChildCount;
+}
+
 bool hkbModifierGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);

@@ -19,6 +19,11 @@ public:
     int getIndexToInsertIcon(HkxObject *child) const;
     bool write(HkxXMLWriter *writer);
 private:
+    bool wrapObject(hkbGenerator *objToInject, hkbGenerator *childToReplace);
+    bool setChildAt(HkxObject *newChild, ushort index = 0);
+    bool appendObject(hkbGenerator *objToAppend);
+    bool removeObject(hkbGenerator *objToRemove, bool removeAll = true);
+    int addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder = true);
     hkbManualSelectorGenerator& operator=(const hkbManualSelectorGenerator&);
     hkbManualSelectorGenerator(const hkbManualSelectorGenerator &);
 private:

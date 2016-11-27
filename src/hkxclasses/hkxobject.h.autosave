@@ -101,7 +101,7 @@ public:
     void updateIconNames();
     virtual int getIndexToInsertIcon() const;
 protected:
-    virtual bool wrapObject(hkbGenerator *objToInject, hkbGenerator *childToReplace);
+    virtual bool wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace);
     virtual bool appendObject(hkbGenerator *objToAppend);
     virtual bool removeObject(hkbGenerator *objToRemove, bool removeAll = true);
     virtual int addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder = true);

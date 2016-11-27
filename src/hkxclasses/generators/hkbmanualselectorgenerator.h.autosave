@@ -1,17 +1,15 @@
-#ifndef HKBMODIFIERGENERATOR_H
-#define HKBMODIFIERGENERATOR_H
+#ifndef HKBMANUALSELECTORGENERATOR_H
+#define HKBMANUALSELECTORGENERATOR_H
 
 #include "hkbgenerator.h"
 
-//Do not allow variables to be bound to this class in the editor...
-class hkbModifierGenerator: public hkbGenerator
+class hkbManualSelectorGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
-    friend class ModifierGeneratorUI;
-    friend class hkbStateMachine;
+    friend class ManualSelectorGeneratorUI;
 public:
-    hkbModifierGenerator(BehaviorFile *parent, long ref = 0);
-    virtual ~hkbModifierGenerator();
+    hkbManualSelectorGenerator(BehaviorFile *parent, long ref = 0);
+    virtual ~hkbManualSelectorGenerator();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
     void unlink();
@@ -26,16 +24,16 @@ private:
     bool appendObject(hkbGenerator *objToAppend);
     bool removeObject(hkbGenerator *objToRemove, bool removeAll = true);
     int addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder = true);
-    hkbModifierGenerator& operator=(const hkbModifierGenerator&);
-    hkbModifierGenerator(const hkbModifierGenerator &);
+    hkbManualSelectorGenerator& operator=(const hkbManualSelectorGenerator&);
+    hkbManualSelectorGenerator(const hkbManualSelectorGenerator &);
 private:
     static uint refCount;
     static QString classname;
     long userData;
     QString name;
-    HkxObjectExpSharedPtr modifier;
-    HkxObjectExpSharedPtr generator;
+    QList <HkxObjectExpSharedPtr> generators;
+    qint8 selectedGeneratorIndex;
+    qint8 currentGeneratorIndex;
 };
 
-
-#endif // HKBMODIFIERGENERATOR_H
+#endif // HKBMANUALSELECTORGENERATOR_H

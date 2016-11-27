@@ -131,7 +131,7 @@ bool HkxXMLWriter::writeLine(const QString & value){
         if (list.isEmpty()){
             stream << text+value+"\n";
         }else{
-            for (uint i = 0; i < list.size(); i++){
+            for (int i = 0; i < list.size(); i++){
                 stream << text+list.at(i)+"\n";
             }
         }

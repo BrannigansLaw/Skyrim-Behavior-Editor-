@@ -23,6 +23,8 @@
 #include "src/hkxclasses/generators/hkbbehaviorreferencegenerator.h"
 #include "src/hkxclasses/hkbstatemachinetransitioninfoarray.h"
 #include "src/hkxclasses/hkbstatemachineeventpropertyarray.h"
+#include "src/hkxclasses/hkbblendingtransitioneffect.h"
+#include "src/hkxclasses/hkbexpressioncondition.h"
 #include "src/hkxclasses/generators/hkbbehaviorgraph.h"
 #include "src/hkxclasses/hkbcliptriggerarray.h"
 #include "src/hkxclasses/hkbstringeventpayload.h"
@@ -245,6 +247,14 @@ bool BehaviorFile::parse(){
                     if (!appendAndReadData(index, new hkbBlenderGenerator(this, ref))){
                         return false;
                     }
+                }else if (signature == HKB_BLENDING_TRANSITION_EFFECT){
+                    if (!appendAndReadData(index, new hkbBlendingTransitionEffect(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_EXPRESSION_CONDITION){
+                    if (!appendAndReadData(index, new hkbExpressionCondition(this, "", ref))){
+                        return false;
+                    }
                 }else if (signature == BS_OFFSET_ANIMATION_GENERATOR){
                     if (!appendAndReadData(index, new BSOffsetAnimationGenerator(this, ref))){
                         return false;
@@ -320,7 +330,6 @@ bool BehaviorFile::parse(){
         writeToLog("BehaviorFile: parse() failed because link() failed!", true);
         return false;
     }
-    //removeUnneededGenerators();
     return true;
 }
 
@@ -332,31 +341,37 @@ bool BehaviorFile::link(){
         writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16), true);
         return false;
     }
-    if (!static_cast<hkRootLevelContainer * >(getRootObject().data())->link()){
+    if (!getRootObject().data()->link()){
         writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file failed to link to it's children!", true);
         return false;
     }
     for (int i = generators.size() - 1; i >= 0; i--){
-        if (!static_cast<hkbGenerator * >(generators.at(i).data())->link()){
+        if (!generators.at(i).data()->link()){
             writeToLog("BehaviorFile: link() failed!\nA generator failed to link to it's children!\nObject signature: "+QString::number(generators.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getReference()), true);
             return false;
         }
     }
     for (int i = generatorChildren.size() - 1; i >= 0; i--){
-        if (!static_cast<hkbGenerator * >(generatorChildren.at(i).data())->link()){
+        if (!generatorChildren.at(i).data()->link()){
             writeToLog("BehaviorFile: link() failed!\nA generator child failed to link to it's children!\nObject signature: "+QString::number(generators.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getReference()), true);
             return false;
         }
     }
-    if (!static_cast<hkbBehaviorGraph * >(behaviorGraph.data())->link()){
+    for (int i = otherTypes.size() - 1; i >= 0; i--){
+        if (!otherTypes.at(i).data()->link()){
+            writeToLog("BehaviorFile: link() failed!\nA generator child failed to link to it's children!\nObject signature: "+QString::number(generators.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getReference()), true);
+            return false;
+        }
+    }
+    if (!behaviorGraph.data()->link()){
         writeToLog("BehaviorFile: link() failed!\nhkbBehaviorGraph failed to link to it's children!\n", true);
         return false;
     }
-    if (!static_cast<hkbVariableValueSet * >(variableValues.data())->link()){
+    if (!variableValues.data()->link()){
         writeToLog("BehaviorFile: link() failed!\nhkbVariableValueSet failed to link to it's children!\n", true);
         return false;
     }
-    if (!static_cast<hkbBehaviorGraphData * >(graphData.data())->link()){
+    if (!graphData.data()->link()){
         writeToLog("BehaviorFile: link() failed!\nhkbBehaviorGraphData failed to link to it's children!\n", true);
         return false;
     }

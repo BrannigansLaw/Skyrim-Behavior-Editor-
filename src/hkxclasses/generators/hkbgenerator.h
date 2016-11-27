@@ -5,15 +5,7 @@
 
 class GeneratorIcon;
 
-/**
- * Adding new generator classes:
- *
- * Need to add to hkbGenerator::link()
- * Need to add to MainWindow::drawBehaviorGraph()
- * Need to add to BehaviorFile::parse()
- */
-
-class hkbGenerator: public HkDynamicObject
+class hkbGenerator: public DataIconManager
 {
     friend class BehaviorGraphView;
     friend class GeneratorIcon;
@@ -22,16 +14,8 @@ public:
     bool link();
     virtual QString getName() const;
     QString getClassname() const;
-    void updateIconNames();
-    virtual int getIndexToInsertIcon() const{
-        return -1;
-    }
 protected:
     hkbGenerator(BehaviorFile *parent, long ref = -1);
-    void appendIcon(GeneratorIcon * icon);
-private:
-    QList <GeneratorIcon *> icons;
 };
-
 
 #endif // HKBGENERATOR_H

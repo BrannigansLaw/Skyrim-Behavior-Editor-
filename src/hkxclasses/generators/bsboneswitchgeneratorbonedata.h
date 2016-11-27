@@ -6,6 +6,7 @@
 class BSBoneSwitchGeneratorBoneData: public hkbGenerator
 {
     friend class BehaviorGraphView;
+    friend class BSBoneSwitchGenerator;
 public:
     BSBoneSwitchGeneratorBoneData(BehaviorFile *parent, long ref = 0);
     virtual ~BSBoneSwitchGeneratorBoneData();

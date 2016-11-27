@@ -36,7 +36,8 @@ hkbStateMachineTransitionInfoArray::hkbStateMachineTransitionInfoArray(BehaviorF
       parent(reinterpret_cast<HkxObject *>(parentSM))
 {
     setType(HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
 }
 
 QString hkbStateMachineTransitionInfoArray::getClassname(){
@@ -272,7 +273,7 @@ bool hkbStateMachineTransitionInfoArray::link(){
         //transition
         ptr = getParentFile()->findHkxObject(transitions.at(i).transition.getReference());
         if (ptr){
-            if ((*ptr)->getType() != HKB_BLENDING_TRANSITION_EFFECT || (*ptr)->getType() != HKB_GENERATOR_TRANSITION_EFFECT){
+            if ((*ptr)->getSignature() != HKB_BLENDING_TRANSITION_EFFECT && (*ptr)->getSignature() != HKB_GENERATOR_TRANSITION_EFFECT){
                 writeToLog(getClassname()+": link()!\n'transition' data field is linked to invalid child!");
             }
             transitions[i].transition = *ptr;

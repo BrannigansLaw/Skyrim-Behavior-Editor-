@@ -2,6 +2,7 @@
 #include "src/filetypes/hkxfile.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/hkxclasses/hkbvariablebindingset.h"
+#include "src/ui/behaviorgraphui/behaviorgraphicons.h"
 
 /**
  * HkxObject
@@ -62,6 +63,10 @@ QString HkxObject::getDoubleAsString(qreal num) const{
         real.append(".000000");
     }
     return real;
+}
+
+bool HkxObject::setChildAt(HkxObject *newChild, ushort index){
+    return false;
 }
 
 HkxObject::HkxType HkxObject::getType() const{
@@ -477,5 +482,50 @@ bool HkDynamicObject::evaulateDataValidity(){
 }
 
 HkDynamicObject::~HkDynamicObject(){
+    //
+}
+
+/**
+ * DataIconManager
+*/
+
+DataIconManager::DataIconManager(BehaviorFile *parent, long ref)
+    : HkDynamicObject(parent, ref)
+{
+    //
+}
+
+void DataIconManager::updateIconNames(){
+    icons.first()->scene()->update();
+    /*for (int i = 0; i < icons.size(); i++){
+        icons.at(i)->update(QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size())));
+    }*/
+}
+
+bool DataIconManager::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    return false;
+}
+
+bool DataIconManager::appendObject(hkbGenerator *objToAppend){
+    return false;
+}
+
+bool DataIconManager::removeObject(hkbGenerator *objToRemove, bool removeAll){
+    return false;
+}
+
+int DataIconManager::addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder){
+    return 0;
+}
+
+int DataIconManager::getIndexToInsertIcon() const{
+    return -1;
+}
+
+void DataIconManager::appendIcon(GeneratorIcon *icon){
+    icons.append(icon);
+}
+
+DataIconManager::~DataIconManager(){
     //
 }

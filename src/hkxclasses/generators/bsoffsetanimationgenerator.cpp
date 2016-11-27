@@ -38,6 +38,83 @@ int BSOffsetAnimationGenerator::getIndexToInsertIcon() const{
     return -1;
 }
 
+bool BSOffsetAnimationGenerator::setChildAt(HkxObject *newChild, ushort index){
+    if (index == 0 && (!newChild || newChild->getType() == TYPE_GENERATOR)){
+        pDefaultGenerator = HkxObjectExpSharedPtr(newChild);
+        return true;
+    }else if (index == 1 && (!newChild || newChild->getSignature() == HKB_CLIP_GENERATOR)){
+        pOffsetClipGenerator = HkxObjectExpSharedPtr(newChild);
+        return true;
+    }else{
+        return false;
+    }
+}
+
+bool BSOffsetAnimationGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    if (pDefaultGenerator.data() == childToReplace){
+        if (!objToInject->setChildAt(pDefaultGenerator.data())){
+            return false;
+        }
+        pDefaultGenerator = HkxObjectExpSharedPtr(objToInject);
+        return true;
+    }
+    return false;
+}
+
+bool BSOffsetAnimationGenerator::appendObject(hkbGenerator *objToAppend){
+    pDefaultGenerator = HkxObjectExpSharedPtr(objToAppend);
+    return true;
+}
+
+bool BSOffsetAnimationGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+    bool b = false;
+    if (removeAll){
+        if (pDefaultGenerator.data() == objToRemove){
+            pDefaultGenerator = HkxObjectExpSharedPtr();
+            b = true;
+        }
+        if (pOffsetClipGenerator.data() == objToRemove){
+            pOffsetClipGenerator = HkxObjectExpSharedPtr();
+            b = true;
+        }
+        return b;
+    }else{
+        if (pDefaultGenerator.data() == objToRemove){
+            pDefaultGenerator = HkxObjectExpSharedPtr();
+            return true;
+        }
+        if (pOffsetClipGenerator.data() == objToRemove){
+            pOffsetClipGenerator = HkxObjectExpSharedPtr();
+            return true;
+        }
+    }
+    return false;
+}
+
+int BSOffsetAnimationGenerator::addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder){
+    int objectChildCount = 0;
+    if (reverseOrder){
+        if (pDefaultGenerator.data()){
+            list.append(pDefaultGenerator);
+            objectChildCount++;
+        }
+        if (pOffsetClipGenerator.data()){
+            list.append(pOffsetClipGenerator);
+            objectChildCount++;
+        }
+    }else{
+        if (pOffsetClipGenerator.data()){
+            list.append(pOffsetClipGenerator);
+            objectChildCount++;
+        }
+        if (pDefaultGenerator.data()){
+            list.append(pDefaultGenerator);
+            objectChildCount++;
+        }
+    }
+    return objectChildCount;
+}
+
 bool BSOffsetAnimationGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);

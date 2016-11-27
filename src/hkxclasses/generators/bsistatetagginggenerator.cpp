@@ -29,6 +29,48 @@ QString BSiStateTaggingGenerator::getName() const{
     return name;
 }
 
+bool BSiStateTaggingGenerator::setChildAt(HkxObject *newChild, ushort index){
+    if (index == 0 && (!newChild || newChild->getType() == TYPE_GENERATOR)){
+        pDefaultGenerator = HkxObjectExpSharedPtr(newChild);
+        return true;
+    }else{
+        return false;
+    }
+}
+
+bool BSiStateTaggingGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    if (pDefaultGenerator.data() == childToReplace){
+        if (!objToInject->setChildAt(pDefaultGenerator.data())){
+            return false;
+        }
+        pDefaultGenerator = HkxObjectExpSharedPtr(objToInject);
+        return true;
+    }
+    return false;
+}
+
+bool BSiStateTaggingGenerator::appendObject(hkbGenerator *objToAppend){
+    pDefaultGenerator = HkxObjectExpSharedPtr(objToAppend);
+    return true;
+}
+
+bool BSiStateTaggingGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+    if (pDefaultGenerator.data() == objToRemove){
+        pDefaultGenerator = HkxObjectExpSharedPtr();
+        return true;
+    }
+    return false;
+}
+
+int BSiStateTaggingGenerator::addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder){
+    int objectChildCount = 0;
+    if (pDefaultGenerator.data()){
+        list.append(pDefaultGenerator);
+        objectChildCount++;
+    }
+    return objectChildCount;
+}
+
 bool BSiStateTaggingGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);

@@ -6,6 +6,8 @@
 class hkbBlenderGeneratorChild: public hkbGenerator
 {
     friend class BehaviorGraphView;
+    friend class hkbBlenderGenerator;
+    friend class hkbPoseMatchingGenerator;
 public:
     hkbBlenderGeneratorChild(BehaviorFile *parent, long ref = 0);
     virtual ~hkbBlenderGeneratorChild();

@@ -545,6 +545,8 @@ void StateUI::loadData(HkxObject *data){
         stateId->setValue(bsData->stateId);
         probability->setValue(bsData->probability);
         enable->setChecked(bsData->enable);
-        generator->setText(static_cast<hkbGenerator *>(bsData->generator.data())->getName());
+        if (bsData->generator.data()){
+            generator->setText(static_cast<hkbGenerator *>(bsData->generator.data())->getName());
+        }
     }
 }
