@@ -21,6 +21,10 @@
 #include "src/hkxclasses/generators/hkbposematchinggenerator.h"
 #include "src/hkxclasses/generators/hkbclipgenerator.h"
 #include "src/hkxclasses/generators/hkbbehaviorreferencegenerator.h"
+
+#include "src/hkxclasses/modifiers/hkbmodifierlist.h"
+#include "src/hkxclasses/modifiers/hkbtwistmodifier.h"
+
 #include "src/hkxclasses/hkbstatemachinetransitioninfoarray.h"
 #include "src/hkxclasses/hkbstatemachineeventpropertyarray.h"
 #include "src/hkxclasses/hkbblendingtransitioneffect.h"
@@ -106,14 +110,6 @@ BehaviorFile::BehaviorFile(MainWindow *window, const QString & name)
 
 template <typename T>
 bool BehaviorFile::appendAndReadData(int index, T * obj){
-    /*QByteArray temp = reader.getNthAttributeValueAt(index, 0);
-    if (temp.at(0) == '#'){
-        temp.remove(0, 1);
-    }
-    if (!addObjectToFile(obj, temp)){
-        writeToLog("BehaviorFile: appendAndReadData() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!", true);
-        return false;
-    }*/
     //Skip the current line.
     index++;
     if (!obj->readData(reader, index)){
@@ -121,25 +117,6 @@ bool BehaviorFile::appendAndReadData(int index, T * obj){
     }
     return true;
 }
-
-/*template <typename T>
-bool BehaviorFile::addObjectToFile(T *obj, const QByteArray & temp){
-    bool ok;
-    if (obj->getType() == HkxObject::TYPE_GENERATOR){
-        generators.append(HkxObjectExpSharedPtr(obj, temp.toLong(&ok)));
-    }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
-        modifiers.append(HkxObjectExpSharedPtr(obj, temp.toLong(&ok)));
-    }else if (obj->getType() == HkxObject::TYPE_OTHER){
-        otherTypes.append(HkxObjectExpSharedPtr(obj, temp.toLong(&ok)));
-    }else{
-        writeToLog("BehaviorFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16), true);
-        return false;
-    }
-    if (!ok){
-        return false;
-    }
-    return true;
-}*/
 
 //template <typename T>
 bool BehaviorFile::addObjectToFile(HkxObject *obj, long ref){
@@ -243,6 +220,10 @@ bool BehaviorFile::parse(){
                     if (!appendAndReadData(index, new hkbBoneWeightArray(this, ref))){
                         return false;
                     }
+                }else if (signature == HKB_MODIFIER_LIST){
+                    if (!appendAndReadData(index, new hkbModifierList(this, ref))){
+                        return false;
+                    }
                 }else if (signature == HKB_BLENDER_GENERATOR){
                     if (!appendAndReadData(index, new hkbBlenderGenerator(this, ref))){
                         return false;
@@ -257,6 +238,10 @@ bool BehaviorFile::parse(){
                     }
                 }else if (signature == BS_OFFSET_ANIMATION_GENERATOR){
                     if (!appendAndReadData(index, new BSOffsetAnimationGenerator(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_TWIST_MODIFIER){
+                    if (!appendAndReadData(index, new hkbTwistModifier(this, ref))){
                         return false;
                     }
                 }else if (signature == HKB_POSE_MATCHING_GENERATOR){
@@ -351,15 +336,21 @@ bool BehaviorFile::link(){
             return false;
         }
     }
+    for (int i = modifiers.size() - 1; i >= 0; i--){
+        if (!modifiers.at(i).data()->link()){
+            writeToLog("BehaviorFile: link() failed!\nA modifier failed to link to it's children!\nObject signature: "+QString::number(modifiers.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getReference()), true);
+            return false;
+        }
+    }
     for (int i = generatorChildren.size() - 1; i >= 0; i--){
         if (!generatorChildren.at(i).data()->link()){
-            writeToLog("BehaviorFile: link() failed!\nA generator child failed to link to it's children!\nObject signature: "+QString::number(generators.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getReference()), true);
+            writeToLog("BehaviorFile: link() failed!\nA generator child failed to link to it's children!\nObject signature: "+QString::number(generatorChildren.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getReference()), true);
             return false;
         }
     }
     for (int i = otherTypes.size() - 1; i >= 0; i--){
         if (!otherTypes.at(i).data()->link()){
-            writeToLog("BehaviorFile: link() failed!\nA generator child failed to link to it's children!\nObject signature: "+QString::number(generators.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getReference()), true);
+            writeToLog("BehaviorFile: link() failed!\nA generator child failed to link to it's children!\nObject signature: "+QString::number(otherTypes.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getReference()), true);
             return false;
         }
     }
@@ -591,19 +582,6 @@ QStringList BehaviorFile::getVariableNames() const{
 QStringList BehaviorFile::getEventNames() const{
     return static_cast<hkbBehaviorGraphData *>(graphData.data())->getEventNames();
 }
-
-/*void BehaviorFile::removeUnneededGenerators(){
-    for (int i = generators.size() - 1; i >= 0; i--){
-        if (generators.at(i).constData()->getSignature() == HKB_STATE_MACHINE_STATE_INFO ||
-            generators.at(i).constData()->getSignature() == HKB_BLENDER_GENERATOR_CHILD ||
-            generators.at(i).constData()->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA ||
-            generators.at(i).constData()->getSignature() == HKB_BONE_WEIGHT_ARRAY
-           )
-        {
-            generators.removeAt(i);
-        }
-    }
-}*/
 
 BehaviorFile::~BehaviorFile(){
     //

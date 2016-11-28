@@ -143,14 +143,14 @@ bool hkbStateMachine::wrapObject(DataIconManager *objToInject, DataIconManager *
     return wasReplaced;
 }
 
-bool hkbStateMachine::appendObject(hkbGenerator *objToAppend){
+bool hkbStateMachine::appendObject(DataIconManager *objToAppend){
     hkbStateMachineStateInfo *objChild = new hkbStateMachineStateInfo(getParentFile(), this, -1);
     states.append(HkxObjectExpSharedPtr(objChild));
     objChild->generator = HkxObjectExpSharedPtr(objToAppend);
     return true;
 }
 
-bool hkbStateMachine::removeObject(hkbGenerator *objToRemove, bool removeAll){
+bool hkbStateMachine::removeObject(DataIconManager *objToRemove, bool removeAll){
     bool b = false;
     if (removeAll){
         hkbStateMachineStateInfo *child;
@@ -170,6 +170,17 @@ bool hkbStateMachine::removeObject(hkbGenerator *objToRemove, bool removeAll){
                 child->generator = HkxObjectExpSharedPtr();
                 return true;
             }
+        }
+    }
+    return false;
+}
+
+bool hkbStateMachine::hasChildren() const{
+    hkbStateMachineStateInfo *child;
+    for (int i = 0; i < states.size(); i++){
+        child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+        if (child->generator.data()){
+            return true;
         }
     }
     return false;
@@ -413,11 +424,9 @@ bool hkbStateMachine::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    //payload
     HkxObjectExpSharedPtr *ptr = getParentFile()->findHkxObject(payload.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
@@ -426,7 +435,6 @@ bool hkbStateMachine::link(){
         payload = *ptr;
     }
     for (int i = 0; i < states.size(); i++){
-        //states
         ptr = getParentFile()->findGeneratorChild(states.at(i).getReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'states' data field!\nObject Name: "+name);

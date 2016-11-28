@@ -58,12 +58,12 @@ bool hkbModifierGenerator::wrapObject(DataIconManager *objToInject, DataIconMana
     return false;
 }
 
-bool hkbModifierGenerator::appendObject(hkbGenerator *objToAppend){
+bool hkbModifierGenerator::appendObject(DataIconManager *objToAppend){
     generator = HkxObjectExpSharedPtr(objToAppend);
     return true;
 }
 
-bool hkbModifierGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+bool hkbModifierGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
     bool b = false;
     if (removeAll){
         if (generator.data() == objToRemove){
@@ -84,6 +84,16 @@ bool hkbModifierGenerator::removeObject(hkbGenerator *objToRemove, bool removeAl
             modifier = HkxObjectExpSharedPtr();
             return true;
         }
+    }
+    return false;
+}
+
+bool hkbModifierGenerator::hasChildren() const{
+    if (generator.data()){
+        return true;
+    }
+    if (modifier.data()){
+        return true;
     }
     return false;
 }
@@ -192,13 +202,10 @@ bool hkbModifierGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    //enterNotifyEvents
     HkxObjectExpSharedPtr *ptr;
-    //modifier
     ptr = getParentFile()->findModifier(modifier.getReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_MODIFIER){
@@ -207,7 +214,6 @@ bool hkbModifierGenerator::link(){
         }
         modifier = *ptr;
     }
-    //generator
     ptr = getParentFile()->findGenerator(generator.getReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'generator' data field!\nObject Name: "+name);

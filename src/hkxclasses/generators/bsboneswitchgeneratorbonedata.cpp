@@ -89,11 +89,9 @@ bool BSBoneSwitchGeneratorBoneData::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
         writeToLog("BSBoneSwitchGeneratorBoneData: link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
-    //pGenerator
     HkxObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pGenerator.getReference());
     if (!ptr){
         writeToLog("BSBoneSwitchGeneratorBoneData: link()!\nFailed to properly link 'pGenerator' data field!");
@@ -105,7 +103,6 @@ bool BSBoneSwitchGeneratorBoneData::link(){
     }else{
         pGenerator = *ptr;
     }
-    //spBoneWeight
     ptr = getParentFile()->findHkxObject(spBoneWeight.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){

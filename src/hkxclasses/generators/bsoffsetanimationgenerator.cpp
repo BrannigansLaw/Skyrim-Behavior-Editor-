@@ -61,12 +61,12 @@ bool BSOffsetAnimationGenerator::wrapObject(DataIconManager *objToInject, DataIc
     return false;
 }
 
-bool BSOffsetAnimationGenerator::appendObject(hkbGenerator *objToAppend){
+bool BSOffsetAnimationGenerator::appendObject(DataIconManager *objToAppend){
     pDefaultGenerator = HkxObjectExpSharedPtr(objToAppend);
     return true;
 }
 
-bool BSOffsetAnimationGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+bool BSOffsetAnimationGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
     bool b = false;
     if (removeAll){
         if (pDefaultGenerator.data() == objToRemove){
@@ -87,6 +87,16 @@ bool BSOffsetAnimationGenerator::removeObject(hkbGenerator *objToRemove, bool re
             pOffsetClipGenerator = HkxObjectExpSharedPtr();
             return true;
         }
+    }
+    return false;
+}
+
+bool BSOffsetAnimationGenerator::hasChildren() const{
+    if (pDefaultGenerator.data()){
+        return true;
+    }
+    if (pOffsetClipGenerator.data()){
+        return true;
     }
     return false;
 }
@@ -214,11 +224,9 @@ bool BSOffsetAnimationGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    //pDefaultGenerator
     HkxObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pDefaultGenerator.getReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pDefaultGenerator' data field!\nObject Name: "+name);
@@ -230,7 +238,6 @@ bool BSOffsetAnimationGenerator::link(){
     }else{
         pDefaultGenerator = *ptr;
     }
-    //pOffsetClipGenerator
     ptr = getParentFile()->findGenerator(pOffsetClipGenerator.getReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pOffsetClipGenerator' data field!\nObject Name: "+name);

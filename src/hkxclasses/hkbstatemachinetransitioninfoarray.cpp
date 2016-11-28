@@ -270,7 +270,6 @@ bool hkbStateMachineTransitionInfoArray::link(){
     }
     HkxObjectExpSharedPtr *ptr;
     for (int i = 0; i < transitions.size(); i++){
-        //transition
         ptr = getParentFile()->findHkxObject(transitions.at(i).transition.getReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_BLENDING_TRANSITION_EFFECT && (*ptr)->getSignature() != HKB_GENERATOR_TRANSITION_EFFECT){
@@ -278,7 +277,6 @@ bool hkbStateMachineTransitionInfoArray::link(){
             }
             transitions[i].transition = *ptr;
         }
-        //condition
         ptr = getParentFile()->findHkxObject(transitions.at(i).condition.getReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_EXPRESSION_CONDITION){

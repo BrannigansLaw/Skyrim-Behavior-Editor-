@@ -147,13 +147,13 @@ private:
     void createIconBranch(QList <GeneratorIcon *> & icons, GeneratorIcon *parent);
     void deleteSelectedBranch(GeneratorIcon *icon, GeneratorIcon *iconToKeep = NULL);
 
-    bool appendObject(hkbGenerator * ptr, GeneratorIcon *parentObjIcon);
-    void wrapObject(hkbGenerator *obj, GeneratorIcon *parentObjIcon);
-    int initializeIconsForNewBranch(hkbGenerator *ptr, QList<HkxObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount);
-    int initializeIcons(hkbGenerator *ptr, QList<HkxObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount);
-    GeneratorIcon * addIconToGraph(hkbGenerator *obj, GeneratorIcon * parentIcon);
-    GeneratorIcon * initalizeInjectedIcon(hkbGenerator *obj, GeneratorIcon * parentIcon, GeneratorIcon * selected);
-    GeneratorIcon * initalizeAppendedIcon(hkbGenerator *obj, GeneratorIcon * parentIcon);
+    bool appendObject(DataIconManager * ptr, GeneratorIcon *parentObjIcon);
+    void wrapObject(DataIconManager *obj, GeneratorIcon *parentObjIcon);
+    int initializeIconsForNewBranch(DataIconManager *ptr, QList<HkxObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount);
+    int initializeIcons(DataIconManager *ptr, QList<HkxObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount);
+    GeneratorIcon * addIconToGraph(DataIconManager *obj, GeneratorIcon * parentIcon);
+    GeneratorIcon * initalizeInjectedIcon(DataIconManager *obj, GeneratorIcon * parentIcon, GeneratorIcon * selected);
+    GeneratorIcon * initalizeAppendedIcon(DataIconManager *obj, GeneratorIcon * parentIcon);
 };
 
 #endif // BEHAVIORGRAPHUI_H

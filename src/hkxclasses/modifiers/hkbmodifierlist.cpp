@@ -11,8 +11,8 @@ uint hkbModifierList::refCount = 0;
 QString hkbModifierList::classname = "hkbModifierList";
 
 hkbModifierList::hkbModifierList(BehaviorFile *parent, long ref)
-    : DataIconManager(parent, ref),\
-    userData(0)
+    : hkbModifier(parent, ref),
+      userData(0)
 {
     setType(HKB_MODIFIER_LIST, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
@@ -72,18 +72,27 @@ bool hkbModifierList::wrapObject(DataIconManager *objToInject, DataIconManager *
     return wasReplaced;
 }
 
-bool hkbModifierList::appendObject(hkbGenerator *objToAppend){
+bool hkbModifierList::appendObject(DataIconManager *objToAppend){
     modifiers.append(HkxObjectExpSharedPtr(objToAppend));
     return true;
 }
 
-bool hkbModifierList::removeObject(hkbGenerator *objToRemove, bool removeAll){
+bool hkbModifierList::removeObject(DataIconManager *objToRemove, bool removeAll){
     if (removeAll){
         if (modifiers.removeAll(HkxObjectExpSharedPtr(objToRemove))){
             return true;
         }
     }else{
         if (modifiers.removeOne(HkxObjectExpSharedPtr(objToRemove))){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool hkbModifierList::hasChildren() const{
+    for (int i = 0; i < modifiers.size(); i++){
+        if (modifiers.at(i).data()){
             return true;
         }
     }
@@ -178,6 +187,9 @@ bool hkbModifierList::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
+        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
+            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+        }
         for (int i = 0; i < modifiers.size(); i++){
             if (modifiers.at(i).data() && !modifiers.at(i).data()->write(writer)){
                 getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'modifiers' at: "+QString::number(i)+"!!!", true);
@@ -191,14 +203,11 @@ bool hkbModifierList::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    //generators
     HkxObjectExpSharedPtr *ptr;
     for (int i = 0; i < modifiers.size(); i++){
-        //generators
         ptr = getParentFile()->findModifier(modifiers.at(i).getReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'modifiers' data field!\nObject Name: "+name);

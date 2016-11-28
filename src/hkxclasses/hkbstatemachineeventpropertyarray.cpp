@@ -119,7 +119,6 @@ bool hkbStateMachineEventPropertyArray::link(){
     }
     HkxObjectExpSharedPtr *ptr;
     for (int i = 0; i < events.size(); i++){
-        //payload
         ptr = getParentFile()->findHkxObject(events.at(i).payload.getReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){

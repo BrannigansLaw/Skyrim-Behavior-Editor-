@@ -103,11 +103,9 @@ bool hkbBlenderGeneratorChild::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
-    //boneWeights
     HkxObjectExpSharedPtr *ptr = getParentFile()->findHkxObject(boneWeights.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
@@ -116,7 +114,6 @@ bool hkbBlenderGeneratorChild::link(){
         }
         boneWeights = *ptr;
     }
-    //generator
     ptr = getParentFile()->findGenerator(generator.getReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'generator' data field!");

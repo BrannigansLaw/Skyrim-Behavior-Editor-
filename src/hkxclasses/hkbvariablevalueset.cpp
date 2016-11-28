@@ -126,10 +126,8 @@ bool hkbVariableValueSet::link(){
     if (!getParentFile()){
         return false;
     }
-    //variantVariableValues
     HkxObjectExpSharedPtr *ptr = NULL;
     for (int i = 0; i < variantVariableValues.size(); i++){
-        //variantVariableValues
         ptr = getParentFile()->findHkxObject(variantVariableValues.at(i).getReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");

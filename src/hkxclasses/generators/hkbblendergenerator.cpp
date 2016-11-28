@@ -91,14 +91,14 @@ bool hkbBlenderGenerator::wrapObject(DataIconManager *objToInject, DataIconManag
     return wasReplaced;
 }
 
-bool hkbBlenderGenerator::appendObject(hkbGenerator *objToAppend){
+bool hkbBlenderGenerator::appendObject(DataIconManager *objToAppend){
     hkbBlenderGeneratorChild *objChild = new hkbBlenderGeneratorChild(getParentFile(), -1);
     children.append(HkxObjectExpSharedPtr(objChild));
     objChild->generator = HkxObjectExpSharedPtr(objToAppend);
     return true;
 }
 
-bool hkbBlenderGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+bool hkbBlenderGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
     if (removeAll){
         hkbBlenderGeneratorChild *child;
         for (int i = 0; i < children.size(); i++){
@@ -120,6 +120,17 @@ bool hkbBlenderGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll
         return true;
     }
     return true;
+}
+
+bool hkbBlenderGenerator::hasChildren() const{
+    hkbBlenderGeneratorChild *child;
+    for (int i = 0; i < children.size(); i++){
+        child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
+        if (child->generator.data()){
+            return true;
+        }
+    }
+    return false;
 }
 
 int hkbBlenderGenerator::addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder){
@@ -262,14 +273,11 @@ bool hkbBlenderGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
         writeToLog(getClassname()+":  link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    //children
     HkxObjectExpSharedPtr *ptr;
     for (int i = 0; i < children.size(); i++){
-        //generators
         ptr = getParentFile()->findGeneratorChild(children.at(i).getReference());
         if (!ptr){
             writeToLog(getClassname()+":  link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);

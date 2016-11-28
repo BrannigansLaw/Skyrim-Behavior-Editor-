@@ -17,11 +17,12 @@ public:
     static QString getClassname();
     int getIndexToInsertIcon() const;
     bool write(HkxXMLWriter *writer);
+    bool hasChildren() const;
 private:
-    bool wrapObject(hkbGenerator *objToInject, hkbGenerator *childToReplace);
+    bool wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace);
     bool setChildAt(HkxObject *newChild, ushort index = 0);
-    bool appendObject(hkbGenerator *objToAppend);
-    bool removeObject(hkbGenerator *objToRemove, bool removeAll = true);
+    bool appendObject(DataIconManager *objToAppend);
+    bool removeObject(DataIconManager *objToRemove, bool removeAll = true);
     int addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder = true);
     BSBoneSwitchGenerator& operator=(const BSBoneSwitchGenerator&);
     BSBoneSwitchGenerator(const BSBoneSwitchGenerator &);

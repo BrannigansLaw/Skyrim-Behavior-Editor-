@@ -53,7 +53,7 @@ bool BSSynchronizedClipGenerator::wrapObject(DataIconManager *objToInject, DataI
     return false;
 }
 
-bool BSSynchronizedClipGenerator::appendObject(hkbGenerator *objToAppend){
+bool BSSynchronizedClipGenerator::appendObject(DataIconManager *objToAppend){
     if (objToAppend->getSignature() == HKB_CLIP_GENERATOR){
         pClipGenerator = HkxObjectExpSharedPtr(objToAppend);
         return true;
@@ -61,7 +61,7 @@ bool BSSynchronizedClipGenerator::appendObject(hkbGenerator *objToAppend){
     return false;
 }
 
-bool BSSynchronizedClipGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+bool BSSynchronizedClipGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
     if (pClipGenerator.data() == objToRemove){
         pClipGenerator = HkxObjectExpSharedPtr();
         return true;
@@ -76,6 +76,13 @@ int BSSynchronizedClipGenerator::addChildrenToList(QList <HkxObjectExpSharedPtr>
         objectChildCount++;
     }
     return objectChildCount;
+}
+
+bool BSSynchronizedClipGenerator::hasChildren() const{
+    if (pClipGenerator.data()){
+        return true;
+    }
+    return false;
 }
 
 bool BSSynchronizedClipGenerator::readData(const HkxXmlReader &reader, long index){
@@ -183,6 +190,9 @@ bool BSSynchronizedClipGenerator::write(HkxXMLWriter *writer){
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
             getParentFile()->writeToLog("hkbClipGenerator: write()!\nUnable to write 'variableBindingSet'!!!", true);
         }
+        if (pClipGenerator.data() && !pClipGenerator.data()->write(writer)){
+            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'pClipGenerator'!!!", true);
+        }
     }
     return true;
 }
@@ -191,11 +201,9 @@ bool BSSynchronizedClipGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    //pClipGenerator
     HkxObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pClipGenerator.getReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pClipGenerator' data field!\nObject Name: "+name);

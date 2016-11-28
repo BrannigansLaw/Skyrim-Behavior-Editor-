@@ -3,6 +3,7 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/hkxclasses/hkbvariablebindingset.h"
 #include "src/ui/behaviorgraphui/behaviorgraphicons.h"
+#include "src/hkxclasses/modifiers/hkbmodifier.h"
 
 /**
  * HkxObject
@@ -502,15 +503,28 @@ void DataIconManager::updateIconNames(){
     }*/
 }
 
+QString DataIconManager::getName() const{
+    if (getType() == TYPE_GENERATOR){
+        return static_cast<const hkbGenerator * const>(this)->getName();
+    }else if (getType() == TYPE_MODIFIER){
+        return static_cast<const hkbModifier * const>(this)->getName();
+    }
+    return "";
+}
+
 bool DataIconManager::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
     return false;
 }
 
-bool DataIconManager::appendObject(hkbGenerator *objToAppend){
+bool DataIconManager::appendObject(DataIconManager *objToAppend){
     return false;
 }
 
-bool DataIconManager::removeObject(hkbGenerator *objToRemove, bool removeAll){
+bool DataIconManager::removeObject(DataIconManager *objToRemove, bool removeAll){
+    return false;
+}
+
+bool DataIconManager::hasChildren() const{
     return false;
 }
 

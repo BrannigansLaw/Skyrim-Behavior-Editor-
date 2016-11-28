@@ -52,7 +52,7 @@ bool BSCyclicBlendTransitionGenerator::wrapObject(DataIconManager *objToInject, 
     return false;
 }
 
-bool BSCyclicBlendTransitionGenerator::appendObject(hkbGenerator *objToAppend){
+bool BSCyclicBlendTransitionGenerator::appendObject(DataIconManager *objToAppend){
     if (objToAppend->getSignature() == HKB_BLENDER_GENERATOR){
         pBlenderGenerator = HkxObjectExpSharedPtr(objToAppend);
         return true;
@@ -60,9 +60,16 @@ bool BSCyclicBlendTransitionGenerator::appendObject(hkbGenerator *objToAppend){
     return false;
 }
 
-bool BSCyclicBlendTransitionGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+bool BSCyclicBlendTransitionGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
     if (pBlenderGenerator.data() == objToRemove){
         pBlenderGenerator = HkxObjectExpSharedPtr();
+        return true;
+    }
+    return false;
+}
+
+bool BSCyclicBlendTransitionGenerator::hasChildren() const{
+    if (pBlenderGenerator.data()){
         return true;
     }
     return false;
@@ -225,11 +232,9 @@ bool BSCyclicBlendTransitionGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    //pBlenderGenerator
     HkxObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pBlenderGenerator.getReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pBlenderGenerator' data field!\nObject Name: "+name);

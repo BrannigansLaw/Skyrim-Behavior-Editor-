@@ -79,6 +79,9 @@ bool hkbBoneWeightArray::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
+        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
+            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+        }
     }
     return true;
 }
@@ -87,7 +90,6 @@ bool hkbBoneWeightArray::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
     if (!this->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\n");
     }

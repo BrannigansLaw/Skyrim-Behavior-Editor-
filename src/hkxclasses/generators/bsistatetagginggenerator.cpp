@@ -49,14 +49,21 @@ bool BSiStateTaggingGenerator::wrapObject(DataIconManager *objToInject, DataIcon
     return false;
 }
 
-bool BSiStateTaggingGenerator::appendObject(hkbGenerator *objToAppend){
+bool BSiStateTaggingGenerator::appendObject(DataIconManager *objToAppend){
     pDefaultGenerator = HkxObjectExpSharedPtr(objToAppend);
     return true;
 }
 
-bool BSiStateTaggingGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+bool BSiStateTaggingGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
     if (pDefaultGenerator.data() == objToRemove){
         pDefaultGenerator = HkxObjectExpSharedPtr();
+        return true;
+    }
+    return false;
+}
+
+bool BSiStateTaggingGenerator::hasChildren() const{
+    if (pDefaultGenerator.data()){
         return true;
     }
     return false;
@@ -150,11 +157,9 @@ bool BSiStateTaggingGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    //pDefaultGenerator
     HkxObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pDefaultGenerator.getReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pDefaultGenerator' data field!\nObject Name: "+name);

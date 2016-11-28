@@ -546,7 +546,6 @@ bool hkbBehaviorGraphData::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableInitialValues
     HkxObjectExpSharedPtr *ptr = &getParentFile()->variableValues;
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableInitialValues' data field!\n");
@@ -558,7 +557,6 @@ bool hkbBehaviorGraphData::link(){
     }else{
         variableInitialValues = *ptr;
     }
-    //stringData
     ptr = &getParentFile()->stringData;
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'stringData' data field!\n");

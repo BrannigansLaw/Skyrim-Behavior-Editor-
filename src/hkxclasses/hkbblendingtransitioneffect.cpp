@@ -132,7 +132,6 @@ bool hkbBlendingTransitionEffect::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+":  link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }

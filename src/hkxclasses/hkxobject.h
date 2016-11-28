@@ -100,10 +100,12 @@ public:
     virtual ~DataIconManager();
     void updateIconNames();
     virtual int getIndexToInsertIcon() const;
+    QString getName() const;
+    virtual bool hasChildren() const;
 protected:
-    virtual bool wrapObject(hkbGenerator *objToInject, hkbGenerator *childToReplace);
-    virtual bool appendObject(hkbGenerator *objToAppend);
-    virtual bool removeObject(hkbGenerator *objToRemove, bool removeAll = true);
+    virtual bool wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace);
+    virtual bool appendObject(DataIconManager *objToAppend);
+    virtual bool removeObject(DataIconManager *objToRemove, bool removeAll = true);
     virtual int addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder = true);
     DataIconManager(BehaviorFile *parent, long ref = -1);
     void appendIcon(GeneratorIcon * icon);

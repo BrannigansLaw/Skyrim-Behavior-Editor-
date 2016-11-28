@@ -58,7 +58,7 @@ bool hkbManualSelectorGenerator::setChildAt(HkxObject *newChild, ushort index){
     }
 }
 
-bool hkbManualSelectorGenerator::wrapObject(hkbGenerator *objToInject, hkbGenerator *childToReplace){
+bool hkbManualSelectorGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
     bool wasReplaced = false;
     for (int i = 0; i < generators.size(); i++){
         if (generators.at(i).data() == childToReplace){
@@ -72,12 +72,12 @@ bool hkbManualSelectorGenerator::wrapObject(hkbGenerator *objToInject, hkbGenera
     return wasReplaced;
 }
 
-bool hkbManualSelectorGenerator::appendObject(hkbGenerator *objToAppend){
+bool hkbManualSelectorGenerator::appendObject(DataIconManager *objToAppend){
     generators.append(HkxObjectExpSharedPtr(objToAppend));
     return true;
 }
 
-bool hkbManualSelectorGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+bool hkbManualSelectorGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
     if (removeAll){
         if (generators.removeAll(HkxObjectExpSharedPtr(objToRemove))){
             return true;
@@ -110,6 +110,15 @@ int hkbManualSelectorGenerator::addChildrenToList(QList <HkxObjectExpSharedPtr> 
     return objectChildCount;
 }
 
+bool hkbManualSelectorGenerator::hasChildren() const{
+    for (int i = 0; i < generators.size(); i++){
+        if (generators.at(i).data()){
+            return true;
+        }
+    }
+    return false;
+}
+
 bool hkbManualSelectorGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
@@ -118,31 +127,31 @@ bool hkbManualSelectorGenerator::readData(const HkxXmlReader &reader, long index
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readReference(index, reader)){
-                writeToLog("hkbManualSelectorGenerator: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog("hkbManualSelectorGenerator: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog("hkbManualSelectorGenerator: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "generators"){
             if (!readReferences(reader.getElementValueAt(index), generators)){
-                writeToLog("hkbManualSelectorGenerator: readData()!\nFailed to properly read 'generators' references!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'generators' references!\nObject Reference: "+ref);
             }
         }else if (text == "selectedGeneratorIndex"){
             selectedGeneratorIndex = reader.getElementValueAt(index).toShort(&ok);
             if (!ok){
-                writeToLog("hkbManualSelectorGenerator: readData()!\nFailed to properly read 'selectedGeneratorIndex' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'selectedGeneratorIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "currentGeneratorIndex"){
             currentGeneratorIndex = reader.getElementValueAt(index).toShort(&ok);
             if (!ok){
-                writeToLog("hkbManualSelectorGenerator: readData()!\nFailed to properly read 'currentGeneratorIndex' data field!\nObject Reference: "+ref);
+                writeToLog(getClassname()+": readData()!\nFailed to properly read 'currentGeneratorIndex' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -184,9 +193,12 @@ bool hkbManualSelectorGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
+        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
+            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+        }
         for (int i = 0; i < generators.size(); i++){
             if (generators.at(i).data() && !generators.at(i).data()->write(writer)){
-                getParentFile()->writeToLog("hkbManualSelectorGenerator: write()!\nUnable to write 'generators' at: "+QString::number(i)+"!!!", true);
+                getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'generators' at: "+QString::number(i)+"!!!", true);
             }
         }
     }
@@ -197,20 +209,17 @@ bool hkbManualSelectorGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
-        writeToLog("hkbManualSelectorGenerator: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
+        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    //generators
     HkxObjectExpSharedPtr *ptr;
     for (int i = 0; i < generators.size(); i++){
-        //generators
         ptr = getParentFile()->findGenerator(generators.at(i).getReference());
         if (!ptr){
-            writeToLog("hkbManualSelectorGenerator: link()!\nFailed to properly link 'generators' data field!\nObject Name: "+name);
+            writeToLog(getClassname()+": link()!\nFailed to properly link 'generators' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-            writeToLog("hkbManualSelectorGenerator: link()!\n'generators' data field is linked to invalid child!\nObject Name: "+name);
+            writeToLog(getClassname()+": link()!\n'generators' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             generators[i] = *ptr;
         }else{

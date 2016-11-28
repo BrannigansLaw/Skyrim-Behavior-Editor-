@@ -235,7 +235,7 @@ void BehaviorGraphView::removeChildIcons(GeneratorIcon *parent, GeneratorIcon *i
     }
     GeneratorIcon *icon;
     GeneratorIcon *oldParent = parent->parent;
-    hkbGenerator *gen;
+    DataIconManager *gen;
     qreal lastY = 0;
     QList <GeneratorIcon *> icons;
     QList <GeneratorIcon *> branch;
@@ -243,7 +243,7 @@ void BehaviorGraphView::removeChildIcons(GeneratorIcon *parent, GeneratorIcon *i
     int index = 0;
     for (int j = 0; j < icons.size(); j++){ //Add search function for icons by name!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if (icons.at(j) == iconToKeep && !iconToKeep->children.isEmpty()){
-            gen = static_cast<hkbGenerator *>(iconToKeep->data.data());
+            gen = static_cast<DataIconManager *>(iconToKeep->data.data());
             if (gen){
                 for (int x = 0; x < gen->icons.size(); x++){
                     if (icons.contains(gen->icons.at(x))){
@@ -259,7 +259,7 @@ void BehaviorGraphView::removeChildIcons(GeneratorIcon *parent, GeneratorIcon *i
                 }
             }
         }else if (icons.at(j)->children.size() > 0){
-            gen = static_cast<hkbGenerator *>(icons.at(j)->data.data());
+            gen = static_cast<DataIconManager *>(icons.at(j)->data.data());
             if (gen){
                 for (int x = 0; x < gen->icons.size(); x++){
                     if (!icons.contains(gen->icons.at(x))){
@@ -304,7 +304,7 @@ void BehaviorGraphView::removeChildIcons(GeneratorIcon *parent, GeneratorIcon *i
 }
 
 void BehaviorGraphView::removeIconFromGraph(GeneratorIcon *iconToRemove){
-    hkbGenerator *gen = static_cast<hkbGenerator *>(iconToRemove->data.data());
+    DataIconManager *gen = static_cast<DataIconManager *>(iconToRemove->data.data());
     if (iconToRemove->parent && !iconToRemove->parent->children.isEmpty()){
         iconToRemove->parent->children.removeAll(iconToRemove);
     }
@@ -322,8 +322,8 @@ void BehaviorGraphView::removeIconFromGraph(GeneratorIcon *iconToRemove){
 void BehaviorGraphView::deleteSelectedBranch(GeneratorIcon *icon, GeneratorIcon *iconToKeep){
     if (icon && icon->data.constData() && icon->parent && icon->parent->data.constData()){
         if (icon->children.isEmpty() && iconToKeep != icon){
-            static_cast<hkbGenerator *>(icon->data.data())->icons.removeAll(icon);
-            if (static_cast<hkbGenerator *>(icon->data.data())->icons.isEmpty()){
+            static_cast<DataIconManager *>(icon->data.data())->icons.removeAll(icon);
+            if (static_cast<DataIconManager *>(icon->data.data())->icons.isEmpty()){
                 icon->data.data()->unlink();
             }
             icon->parent->children.removeAll(icon);
@@ -347,7 +347,7 @@ bool BehaviorGraphView::reconnectBranch(HkxObject *oldChild, HkxObject *newChild
     }
     GeneratorIcon *oldChildIcon = NULL;
     GeneratorIcon *newChildIcon = NULL;
-    hkbGenerator *gen = static_cast<hkbGenerator *>(newChild);
+    DataIconManager *gen = static_cast<DataIconManager *>(newChild);
     for (int i = 0; i < icon->children.size(); i++){
         if (icon->children.at(i)->data.data() == oldChild){
             oldChildIcon = icon->children.at(i);
@@ -371,10 +371,10 @@ bool BehaviorGraphView::reconnectBranch(HkxObject *oldChild, HkxObject *newChild
                 gen->icons.first()->parent = icon;
             }
         }else{
-            initalizeAppendedIcon(static_cast<hkbGenerator *>(newChild), icon);
+            initalizeAppendedIcon(static_cast<DataIconManager *>(newChild), icon);
         }
     }else if (!icon->hasChildIcon(newChildIcon)){
-        initalizeAppendedIcon(static_cast<hkbGenerator *>(newChild), icon);
+        initalizeAppendedIcon(static_cast<DataIconManager *>(newChild), icon);
     }
     if (behaviorGS && !behaviorGS->items(Qt::AscendingOrder).isEmpty()){
         GeneratorIcon *behaviorGraphIcon = static_cast<GeneratorIcon *>(scene()->items(Qt::AscendingOrder).first());
@@ -406,7 +406,7 @@ void BehaviorGraphView::removeSelectedObjectBranchSlot(){
 
 void BehaviorGraphView::removeSelectedObjectBranch(GeneratorIcon *icon, GeneratorIcon *iconToKeep, bool removeAll){
     if (icon && icon->parent && icon->parent->data.constData()){
-        if (!(static_cast<hkbGenerator *>(icon->parent->data.data())->removeObject(static_cast<hkbGenerator *>(icon->data.data()), removeAll))){
+        if (!(static_cast<DataIconManager *>(icon->parent->data.data())->removeObject(static_cast<DataIconManager *>(icon->data.data()), removeAll))){
             return;
         }
         deleteSelectedBranch(icon, iconToKeep);
@@ -418,11 +418,11 @@ void BehaviorGraphView::removeSelectedObjectBranch(GeneratorIcon *icon, Generato
     }
 }
 
-bool BehaviorGraphView::appendObject(hkbGenerator *ptr, GeneratorIcon *parentObjIcon){
+bool BehaviorGraphView::appendObject(DataIconManager *ptr, GeneratorIcon *parentObjIcon){
     if (!ptr || !parentObjIcon || !parentObjIcon->data.constData()){
         return false;
     }
-    hkbGenerator *selectedData = static_cast<hkbGenerator *>(parentObjIcon->data.data());
+    DataIconManager *selectedData = static_cast<DataIconManager *>(parentObjIcon->data.data());
     if (!selectedData->appendObject(ptr)){
         return false;
     }
@@ -609,11 +609,11 @@ void BehaviorGraphView::appendBehaviorReferenceGenerator(){
     }
 }
 
-void BehaviorGraphView::wrapObject(hkbGenerator *obj, GeneratorIcon *parentObjIcon){
+void BehaviorGraphView::wrapObject(DataIconManager *obj, GeneratorIcon *parentObjIcon){
     if (!obj || !parentObjIcon || !parentObjIcon->parent || !parentObjIcon->parent->data.constData()){
         return;
     }
-    if (!static_cast<hkbGenerator *>(parentObjIcon->parent->data.data())->wrapObject(obj, static_cast<hkbGenerator *>(parentObjIcon->data.data()))){
+    if (!static_cast<DataIconManager *>(parentObjIcon->parent->data.data())->wrapObject(obj, static_cast<DataIconManager *>(parentObjIcon->data.data()))){
         delete obj;
         obj = NULL;
         return;
@@ -900,7 +900,7 @@ void BehaviorGraphView::mouseReleaseEvent(QMouseEvent *event){
     QGraphicsView::mouseReleaseEvent(event);
 }
 
-int BehaviorGraphView::initializeIconsForNewBranch(hkbGenerator *ptr, QList<HkxObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount){
+int BehaviorGraphView::initializeIconsForNewBranch(DataIconManager *ptr, QList<HkxObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount){
     if (parentIcons.isEmpty() || objects.isEmpty() || objectChildCount.isEmpty()){
         return -1;
     }
@@ -909,7 +909,7 @@ int BehaviorGraphView::initializeIconsForNewBranch(hkbGenerator *ptr, QList<HkxO
     if (!icon){
         return -1;
     }
-    if (ptr->getSignature() != HKB_CLIP_GENERATOR && ptr->getSignature() != HKB_BEHAVIOR_REFERENCE_GENERATOR){
+    if (ptr->hasChildren()){
         isBranchTip = false;
     }
     objects.removeLast();
@@ -925,7 +925,7 @@ int BehaviorGraphView::initializeIconsForNewBranch(hkbGenerator *ptr, QList<HkxO
     return 0;
 }
 
-int BehaviorGraphView::initializeIcons(hkbGenerator *ptr, QList<HkxObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount){
+int BehaviorGraphView::initializeIcons(DataIconManager *ptr, QList<HkxObjectExpSharedPtr> & objects, QList<GeneratorIcon *> & parentIcons, QVector <short> & objectChildCount){
     if (parentIcons.isEmpty() || objects.isEmpty() || objectChildCount.isEmpty()){
         return -1;
     }
@@ -945,7 +945,7 @@ int BehaviorGraphView::initializeIcons(hkbGenerator *ptr, QList<HkxObjectExpShar
     if (!icon){
         return -1;
     }
-    if (ptr->getSignature() != HKB_CLIP_GENERATOR && ptr->getSignature() != HKB_BEHAVIOR_REFERENCE_GENERATOR){
+    if (ptr->hasChildren()){
         isBranchTip = false;
         if (ptr->icons.size() > 1){
             objects.removeLast();
@@ -970,7 +970,7 @@ int BehaviorGraphView::initializeIcons(hkbGenerator *ptr, QList<HkxObjectExpShar
     return 0;
 }
 
-GeneratorIcon * BehaviorGraphView::addIconToGraph(hkbGenerator *obj, GeneratorIcon * parentIcon){
+GeneratorIcon * BehaviorGraphView::addIconToGraph(DataIconManager *obj, GeneratorIcon * parentIcon){
     if (!parentIcon || !obj){
         return NULL;
     }
@@ -981,7 +981,7 @@ GeneratorIcon * BehaviorGraphView::addIconToGraph(hkbGenerator *obj, GeneratorIc
     return icon;
 }
 
-GeneratorIcon * BehaviorGraphView::initalizeInjectedIcon(hkbGenerator *obj, GeneratorIcon * parentIcon, GeneratorIcon * selected){
+GeneratorIcon * BehaviorGraphView::initalizeInjectedIcon(DataIconManager *obj, GeneratorIcon * parentIcon, GeneratorIcon * selected){
     if (!parentIcon){
         return NULL;
     }
@@ -993,7 +993,7 @@ GeneratorIcon * BehaviorGraphView::initalizeInjectedIcon(hkbGenerator *obj, Gene
     return icon;
 }
 
-GeneratorIcon * BehaviorGraphView::initalizeAppendedIcon(hkbGenerator *obj, GeneratorIcon * parentIcon){
+GeneratorIcon * BehaviorGraphView::initalizeAppendedIcon(DataIconManager *obj, GeneratorIcon * parentIcon){
     if (!parentIcon){
         return NULL;
     }
@@ -1008,7 +1008,7 @@ bool BehaviorGraphView::drawBehaviorGraph(){
     QList <HkxObjectExpSharedPtr> objects;
     QList <GeneratorIcon *> parentIcons;
     QVector <short> objectChildCount;
-    hkbGenerator *gen = NULL;
+    DataIconManager *gen = NULL;
     int result;
     hkRootLevelContainer *root = static_cast<hkRootLevelContainer *>(behavior->getRootObject().data());
     hkbBehaviorGraph *graph = NULL;
@@ -1027,7 +1027,7 @@ bool BehaviorGraphView::drawBehaviorGraph(){
         if (!objects.last().data()){
             return false;
         }
-        gen = static_cast<hkbGenerator *>(objects.last().data());
+        gen = static_cast<DataIconManager *>(objects.last().data());
         result = initializeIcons(gen, objects, parentIcons, objectChildCount);
         if (result == 0){
             if (!objectChildCount.isEmpty()){

@@ -70,7 +70,8 @@ SOURCES += \
     src/xml/hkxxmlwriter.cpp \
     src/hkxclasses/hkbcliptriggerarray.cpp \
     src/hkxclasses/hkbblendingtransitioneffect.cpp \
-    src/hkxclasses/modifiers/hkbmodifierlist.cpp
+    src/hkxclasses/modifiers/hkbmodifierlist.cpp \
+    src/hkxclasses/modifiers/hkbtwistmodifier.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -123,4 +124,5 @@ HEADERS  += \
     src/xml/hkxxmlwriter.h \
     src/hkxclasses/hkbcliptriggerarray.h \
     src/hkxclasses/hkbblendingtransitioneffect.h \
-    src/hkxclasses/modifiers/hkbmodifierlist.h
+    src/hkxclasses/modifiers/hkbmodifierlist.h \
+    src/hkxclasses/modifiers/hkbtwistmodifier.h

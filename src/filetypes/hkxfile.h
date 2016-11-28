@@ -67,9 +67,8 @@ public:
     HkxObject * getBehaviorGraphData() const;
     void removeBindings(int varIndex);
     hkVariableType getVariableTypeAt(int index) const;
-    //template <typename T> bool addObjectToFile(T *obj, const QByteArray & temp = "-1");
-    /*template <typename T> */bool addObjectToFile(HkxObject *obj, long ref = -1);
-    //
+    bool addObjectToFile(HkxObject *obj, long ref = -1);
+    //For compatability for now... will be removed later...
     QStringList getGeneratorNames(){return QStringList();}
     QStringList getModifierNames(){return QStringList();}
     //
@@ -78,8 +77,6 @@ public:
 protected:
     bool parse();
     bool link();
-private:
-    //void removeUnneededGenerators();
 private:
     HkxXmlReader reader;
     HkxXMLWriter writer;

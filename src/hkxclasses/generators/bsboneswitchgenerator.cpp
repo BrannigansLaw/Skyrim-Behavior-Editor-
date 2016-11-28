@@ -71,7 +71,7 @@ bool BSBoneSwitchGenerator::setChildAt(HkxObject *newChild, ushort index){
     }
 }
 
-bool BSBoneSwitchGenerator::wrapObject(hkbGenerator *objToInject, hkbGenerator *childToReplace){
+bool BSBoneSwitchGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
     bool wasReplaced = false;
     if (pDefaultGenerator.data() == childToReplace){
         if (!objToInject->setChildAt(pDefaultGenerator.data())){
@@ -94,14 +94,28 @@ bool BSBoneSwitchGenerator::wrapObject(hkbGenerator *objToInject, hkbGenerator *
     return wasReplaced;
 }
 
-bool BSBoneSwitchGenerator::appendObject(hkbGenerator *objToAppend){
+bool BSBoneSwitchGenerator::appendObject(DataIconManager *objToAppend){
     BSBoneSwitchGeneratorBoneData *objChild = new BSBoneSwitchGeneratorBoneData(getParentFile(), -1);
     ChildrenA.append(HkxObjectExpSharedPtr(objChild));
     objChild->pGenerator = HkxObjectExpSharedPtr(objToAppend);
     return true;
 }
 
-bool BSBoneSwitchGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+bool BSBoneSwitchGenerator::hasChildren() const{
+    if (pDefaultGenerator.data()){
+        return true;
+    }
+    BSBoneSwitchGeneratorBoneData *child;
+    for (int i = 0; i < ChildrenA.size(); i++){
+        child = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data());
+        if (child->pGenerator.data()){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool BSBoneSwitchGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
     if (removeAll){
         if (pDefaultGenerator.data() == objToRemove){
             pDefaultGenerator = HkxObjectExpSharedPtr();
@@ -226,6 +240,9 @@ bool BSBoneSwitchGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
+        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
+            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+        }
         if (pDefaultGenerator.data() && !pDefaultGenerator.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'pDefaultGenerator'!!!", true);
         }
@@ -242,11 +259,9 @@ bool BSBoneSwitchGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
-    //pDefaultGenerator
     HkxObjectExpSharedPtr *ptr = getParentFile()->findGenerator(pDefaultGenerator.getReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pDefaultGenerator' data field!");
@@ -259,7 +274,6 @@ bool BSBoneSwitchGenerator::link(){
         pDefaultGenerator = *ptr;
     }
     for (int i = 0; i < ChildrenA.size(); i++){
-        //ChildrenA
         ptr = getParentFile()->findGeneratorChild(ChildrenA.at(i).getReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'ChildrenA' data field!");

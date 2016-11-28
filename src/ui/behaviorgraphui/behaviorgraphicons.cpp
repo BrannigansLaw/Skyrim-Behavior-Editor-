@@ -2,6 +2,7 @@
 #include "src/ui/fileselectwindow.h"
 #include "src/filetypes/hkxfile.h"
 #include "src/hkxclasses/generators/hkbgenerator.h"
+#include "src/hkxclasses/modifiers/hkbmodifier.h"
 #include "behaviorgraphui.h"
 #include "src/hkxclasses/hkxobject.h"
 #include "behaviorgraphicons.h"
@@ -58,7 +59,7 @@ GeneratorIcon::GeneratorIcon(HkxObject *d, const QString & s, GeneratorIcon * pa
     if (data->getType() == HkxObject::TYPE_GENERATOR){
         static_cast<hkbGenerator *>(data.data())->icons.append(this);
     }else if (data->getType() == HkxObject::TYPE_MODIFIER){
-        //static_cast<hkbModifier *>(data.data())->icons.append(this);
+        static_cast<hkbModifier *>(data.data())->icons.append(this);
     }
     pen = QPen(QBrush(Qt::black), 2);
     textPen.setColor(Qt::white);

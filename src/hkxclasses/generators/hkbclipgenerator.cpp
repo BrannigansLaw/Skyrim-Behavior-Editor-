@@ -166,11 +166,9 @@ bool hkbClipGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    //triggers
     HkxObjectExpSharedPtr *ptr = getParentFile()->findHkxObject(triggers.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_CLIP_TRIGGER_ARRAY){

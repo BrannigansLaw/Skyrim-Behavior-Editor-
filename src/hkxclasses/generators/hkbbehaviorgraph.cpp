@@ -56,7 +56,7 @@ bool hkbBehaviorGraph::wrapObject(DataIconManager *objToInject, DataIconManager 
     return false;
 }
 
-bool hkbBehaviorGraph::appendObject(hkbGenerator *objToAppend){
+bool hkbBehaviorGraph::appendObject(DataIconManager *objToAppend){
     if (objToAppend->getSignature() == HKB_STATE_MACHINE){
         rootGenerator = HkxObjectExpSharedPtr(objToAppend);
         return true;
@@ -64,9 +64,16 @@ bool hkbBehaviorGraph::appendObject(hkbGenerator *objToAppend){
     return false;
 }
 
-bool hkbBehaviorGraph::removeObject(hkbGenerator *objToRemove, bool removeAll){
+bool hkbBehaviorGraph::removeObject(DataIconManager *objToRemove, bool removeAll){
     if (rootGenerator.data() == objToRemove){
         rootGenerator = HkxObjectExpSharedPtr();
+        return true;
+    }
+    return false;
+}
+
+bool hkbBehaviorGraph::hasChildren() const{
+    if (rootGenerator.data()){
         return true;
     }
     return false;
@@ -168,7 +175,7 @@ bool hkbBehaviorGraph::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
         writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxObjectExpSharedPtr *ptr = getParentFile()->findGenerator(rootGenerator.getReference());

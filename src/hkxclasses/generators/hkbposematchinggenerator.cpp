@@ -102,14 +102,14 @@ bool hkbPoseMatchingGenerator::wrapObject(DataIconManager *objToInject, DataIcon
     return wasReplaced;
 }
 
-bool hkbPoseMatchingGenerator::appendObject(hkbGenerator *objToAppend){
+bool hkbPoseMatchingGenerator::appendObject(DataIconManager *objToAppend){
     hkbBlenderGeneratorChild *objChild = new hkbBlenderGeneratorChild(getParentFile(), -1);
     children.append(HkxObjectExpSharedPtr(objChild));
     objChild->generator = HkxObjectExpSharedPtr(objToAppend);
     return true;
 }
 
-bool hkbPoseMatchingGenerator::removeObject(hkbGenerator *objToRemove, bool removeAll){
+bool hkbPoseMatchingGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
     if (removeAll){
         hkbBlenderGeneratorChild *child;
         for (int i = 0; i < children.size(); i++){
@@ -131,6 +131,17 @@ bool hkbPoseMatchingGenerator::removeObject(hkbGenerator *objToRemove, bool remo
         return true;
     }
     return true;
+}
+
+bool hkbPoseMatchingGenerator::hasChildren() const{
+    hkbBlenderGeneratorChild *child;
+    for (int i = 0; i < children.size(); i++){
+        child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
+        if (child->generator.data()){
+            return true;
+        }
+    }
+    return false;
 }
 
 int hkbPoseMatchingGenerator::addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder){
@@ -345,14 +356,11 @@ bool hkbPoseMatchingGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    //variableBindingSet
-    if (!static_cast<hkbGenerator *>(this)->linkVar()){
+    if (!static_cast<DataIconManager *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    //children
     HkxObjectExpSharedPtr *ptr;
     for (int i = 0; i < children.size(); i++){
-        //generators
         ptr = getParentFile()->findGeneratorChild(children.at(i).getReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
