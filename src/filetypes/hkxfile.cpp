@@ -1,10 +1,9 @@
 #include "hkxfile.h"
-#include "src/hkxclasses/hkxobject.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/xml/hkxxmlwriter.h"
-//#include "src/hkxclasses/modifiers.h"
-#include "src/hkxclasses/generators/hkbgenerator.h"
 #include "src/ui/mainwindow.h"
+
+#include "src/hkxclasses/generators/hkbgenerator.h"
 #include "src/hkxclasses/generators/hkbstatemachinestateinfo.h"
 #include "src/hkxclasses/generators/hkbstatemachine.h"
 #include "src/hkxclasses/generators/hkbmodifiergenerator.h"
@@ -15,16 +14,43 @@
 #include "src/hkxclasses/generators/bssynchronizedclipgenerator.h"
 #include "src/hkxclasses/generators/hkbmanualselectorgenerator.h"
 #include "src/hkxclasses/generators/hkbblendergeneratorchild.h"
-#include "src/hkxclasses/hkbboneweightarray.h"
 #include "src/hkxclasses/generators/hkbblendergenerator.h"
 #include "src/hkxclasses/generators/bsoffsetanimationgenerator.h"
 #include "src/hkxclasses/generators/hkbposematchinggenerator.h"
 #include "src/hkxclasses/generators/hkbclipgenerator.h"
 #include "src/hkxclasses/generators/hkbbehaviorreferencegenerator.h"
 
+#include "src/hkxclasses/modifiers/bsisactivemodifier.h"
+#include "src/hkxclasses/modifiers/bslimbikmodifier.h"
+#include "src/hkxclasses/modifiers/bsspeedsamplermodifier.h"
+#include "src/hkxclasses/modifiers/bslookatmodifier.h"
+#include "src/hkxclasses/modifiers/bsmodifyoncemodifier.h"
+#include "src/hkxclasses/modifiers/bseventonfalsetotruemodifier.h"
+#include "src/hkxclasses/modifiers/bseventondeactivatemodifier.h"
+#include "src/hkxclasses/modifiers/bsragdollcontactlistenermodifier.h"
+#include "src/hkxclasses/modifiers/bsdirectatmodifier.h"
+
 #include "src/hkxclasses/modifiers/hkbmodifierlist.h"
 #include "src/hkxclasses/modifiers/hkbtwistmodifier.h"
+#include "src/hkxclasses/modifiers/hkbeventdrivenmodifier.h"
+#include "src/hkxclasses/modifiers/hkbfootikcontrolsmodifier.h"
+#include "src/hkxclasses/modifiers/hkbevaluateexpressionmodifier.h"
+#include "src/hkxclasses/modifiers/hkbrotatecharactermodifier.h"
+#include "src/hkxclasses/modifiers/hkbdampingmodifier.h"
+#include "src/hkxclasses/modifiers/hkbkeyframebonesmodifier.h"
+#include "src/hkxclasses/modifiers/hkbpoweredragdollcontrolsmodifier.h"
+#include "src/hkxclasses/modifiers/hkbtimermodifier.h"
+#include "src/hkxclasses/modifiers/hkbrigidbodyragdollcontrolsmodifier.h"
+#include "src/hkxclasses/modifiers/hkbgetupmodifier.h"
+#include "src/hkxclasses/modifiers/hkbcomputedirectionmodifier.h"
+#include "src/hkxclasses/modifiers/hkbevaluatehandlemodifier.h"
+#include "src/hkxclasses/modifiers/hkbgethandleonbonemodifier.h"
+#include "src/hkxclasses/modifiers/hkbsensehandlemodifier.h"
 
+#include "src/hkxclasses/hkxobject.h"
+#include "src/hkxclasses/hkbboneweightarray.h"
+#include "src/hkxclasses/hkbboneindexarray.h"
+#include "src/hkxclasses/hkbexpressiondataarray.h"
 #include "src/hkxclasses/hkbstatemachinetransitioninfoarray.h"
 #include "src/hkxclasses/hkbstatemachineeventpropertyarray.h"
 #include "src/hkxclasses/hkbblendingtransitioneffect.h"
@@ -39,6 +65,7 @@
 #include "src/hkxclasses/hkrootlevelcontainer.h"
 
 #include <QStringList>
+
 /**
  * Class: HkxFile
  *
@@ -244,6 +271,98 @@ bool BehaviorFile::parse(){
                     if (!appendAndReadData(index, new hkbTwistModifier(this, ref))){
                         return false;
                     }
+                }else if (signature == HKB_EVENT_DRIVEN_MODIFIER){
+                    if (!appendAndReadData(index, new hkbEventDrivenModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == BS_IS_ACTIVE_MODIFIER){
+                    if (!appendAndReadData(index, new BSIsActiveModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == BS_LIMB_IK_MODIFIER){
+                    if (!appendAndReadData(index, new BSLimbIKModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_FOOT_IK_CONTROLS_MODIFIER){
+                    if (!appendAndReadData(index, new hkbFootIkControlsModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_GET_HANDLE_ON_BONE_MODIFIER){
+                    if (!appendAndReadData(index, new hkbGetHandleOnBoneModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_SENSE_HANDLE_MODIFIER){
+                    if (!appendAndReadData(index, new hkbSenseHandleModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_EVALUATE_EXPRESSION_MODIFIER){
+                    if (!appendAndReadData(index, new hkbEvaluateExpressionModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_EVALUATE_HANDLE_MODIFIER){
+                    if (!appendAndReadData(index, new hkbEvaluateHandleModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == BS_MODIFY_ONCE_MODIFIER){
+                    if (!appendAndReadData(index, new BSModifyOnceModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == BS_EVENT_ON_DEACTIVATE_MODIFIER){
+                    if (!appendAndReadData(index, new BSEventOnDeactivateModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == BS_RAGDOLL_CONTACT_LISTENER_MODIFIER){
+                    if (!appendAndReadData(index, new BSRagdollContactListenerModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER){
+                    if (!appendAndReadData(index, new hkbPoweredRagdollControlsModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER){
+                    if (!appendAndReadData(index, new BSEventOnFalseToTrueModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == BS_DIRECT_AT_MODIFIER){
+                    if (!appendAndReadData(index, new BSDirectAtModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_TIMER_MODIFIER){
+                    if (!appendAndReadData(index, new hkbTimerModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_ROTATE_CHARACTER_MODIFIER){
+                    if (!appendAndReadData(index, new hkbRotateCharacterModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_DAMPING_MODIFIER){
+                    if (!appendAndReadData(index, new hkbDampingModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_GET_UP_MODIFIER){
+                    if (!appendAndReadData(index, new hkbGetUpModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_EXPRESSION_DATA_ARRAY){
+                    if (!appendAndReadData(index, new hkbExpressionDataArray(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_BONE_INDEX_ARRAY){
+                    if (!appendAndReadData(index, new hkbBoneIndexArray(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_KEY_FRAME_BONES_MODIFIER){
+                    if (!appendAndReadData(index, new hkbKeyframeBonesModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_COMPUTE_DIRECTION_MODIFIER){
+                    if (!appendAndReadData(index, new hkbComputeDirectionModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER){
+                    if (!appendAndReadData(index, new hkbRigidBodyRagdollControlsModifier(this, ref))){
+                        return false;
+                    }
                 }else if (signature == HKB_POSE_MATCHING_GENERATOR){
                     if (!appendAndReadData(index, new hkbPoseMatchingGenerator(this, ref))){
                         return false;
@@ -270,6 +389,14 @@ bool BehaviorFile::parse(){
                     }
                 }else if (signature == HKB_STRING_EVENT_PAYLOAD){
                     if (!appendAndReadData(index, new hkbStringEventPayload(this, "", ref))){
+                        return false;
+                    }
+                }else if (signature == BS_SPEED_SAMPLER_MODIFIER){
+                    if (!appendAndReadData(index, new BSSpeedSamplerModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == BS_LOOK_AT_MODIFIER){
+                    if (!appendAndReadData(index, new BSLookAtModifier(this, ref))){
                         return false;
                     }
                 }else if (signature == HKB_BEHAVIOR_GRAPH){

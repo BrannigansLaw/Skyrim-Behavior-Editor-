@@ -13,7 +13,8 @@ hkbStateMachineEventPropertyArray::hkbStateMachineEventPropertyArray(BehaviorFil
     : HkxObject(parent, ref)
 {
     setType(HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
 }
 
 QString hkbStateMachineEventPropertyArray::getClassname(){
@@ -128,6 +129,12 @@ bool hkbStateMachineEventPropertyArray::link(){
         }
     }
     return true;
+}
+
+void hkbStateMachineEventPropertyArray::unlink(){
+    for (int i = 0; i < events.size(); i++){
+        events[i].payload = HkxObjectExpSharedPtr();
+    }
 }
 
 bool hkbStateMachineEventPropertyArray::evaulateDataValidity(){

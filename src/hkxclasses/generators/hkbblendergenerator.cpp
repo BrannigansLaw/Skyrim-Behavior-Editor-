@@ -25,8 +25,9 @@ hkbBlenderGenerator::hkbBlenderGenerator(BehaviorFile *parent, long ref)
       subtractLastChild(false)
 {
     setType(HKB_BLENDER_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
-    name = "Blender Generator "+QString::number(refCount);
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
+    name = "hkbBlenderGenerator"+QString::number(refCount);
 }
 
 QString hkbBlenderGenerator::getClassname(){

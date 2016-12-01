@@ -13,7 +13,8 @@ hkbBoneWeightArray::hkbBoneWeightArray(BehaviorFile *parent, long ref)
     : HkDynamicObject(parent, ref)
 {
     setType(HKB_BONE_WEIGHT_ARRAY, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
 }
 
 QString hkbBoneWeightArray::getClassname(){

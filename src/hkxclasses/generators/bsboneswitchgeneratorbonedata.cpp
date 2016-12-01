@@ -14,7 +14,8 @@ BSBoneSwitchGeneratorBoneData::BSBoneSwitchGeneratorBoneData(BehaviorFile *paren
     : hkbGenerator(parent, ref)
 {
     setType(BS_BONE_SWITCH_GENERATOR_BONE_DATA, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
 }
 
 QString BSBoneSwitchGeneratorBoneData::getClassname(){

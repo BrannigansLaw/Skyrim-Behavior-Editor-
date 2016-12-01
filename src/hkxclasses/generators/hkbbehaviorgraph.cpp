@@ -14,11 +14,13 @@ QStringList hkbBehaviorGraph::VariableMode = {"VARIABLE_MODE_DISCARD_WHEN_INACTI
 
 hkbBehaviorGraph::hkbBehaviorGraph(BehaviorFile *parent, long ref)
     : hkbGenerator(parent, ref),
-      userData(0)
+      userData(0),
+      variableMode(VariableMode.first())
 {
     setType(HKB_BEHAVIOR_GRAPH, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
-    name = "Behavior Graph "+QString::number(refCount);
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
+    name = "hkbBehaviorGraph"+QString::number(refCount);
 }
 
 QString hkbBehaviorGraph::getClassname(){

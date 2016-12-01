@@ -28,12 +28,13 @@ hkbStateMachine::hkbStateMachine(BehaviorFile *parent, long ref)
       syncVariableIndex(-1),
       wrapAroundStateId(false),
       maxSimultaneousTransitions(32), //Max 32, min 0.
-      startStateMode("START_STATE_MODE_DEFAULT"),
-      selfTransitionMode("SELF_TRANSITION_MODE_NO_TRANSITION")
+      startStateMode(StartStateMode.first()),
+      selfTransitionMode(SelfTransitionMode.first())
 {
     setType(HKB_STATE_MACHINE, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
-    name = "State Machine "+QString::number(refCount);
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
+    name = "hkbStateMachine"+QString::number(refCount);
 }
 
 QString hkbStateMachine::getClassname(){
@@ -359,7 +360,7 @@ bool hkbStateMachine::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("eventToSendWhenStateOrTransitionChanges"), "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(id));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(id));
         if (payload.data()){
             refString = payload.data()->getReferenceString();
         }else{

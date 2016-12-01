@@ -13,7 +13,8 @@ hkbVariableValueSet::hkbVariableValueSet(BehaviorFile *parent, long ref)
     : HkxObject(parent, ref)
 {
     setType(HKB_VARIABLE_VALUE_SET, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
 }
 
 QString hkbVariableValueSet::getClassname(){

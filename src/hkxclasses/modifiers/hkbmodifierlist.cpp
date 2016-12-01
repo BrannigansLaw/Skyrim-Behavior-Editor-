@@ -12,7 +12,8 @@ QString hkbModifierList::classname = "hkbModifierList";
 
 hkbModifierList::hkbModifierList(BehaviorFile *parent, long ref)
     : hkbModifier(parent, ref),
-      userData(0)
+      userData(0),
+      enable(true)
 {
     setType(HKB_MODIFIER_LIST, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);

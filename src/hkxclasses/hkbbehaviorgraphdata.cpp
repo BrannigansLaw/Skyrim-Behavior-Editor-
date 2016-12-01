@@ -28,7 +28,8 @@ hkbBehaviorGraphData::hkbBehaviorGraphData(BehaviorFile *parent, long ref)
     : HkxObject(parent, ref)
 {
     setType(HKB_BEHAVIOR_GRAPH_DATA, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
 }
 
 QString hkbBehaviorGraphData::getClassname(){

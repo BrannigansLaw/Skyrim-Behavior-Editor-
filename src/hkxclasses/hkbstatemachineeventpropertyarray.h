@@ -11,6 +11,7 @@ public:
     virtual ~hkbStateMachineEventPropertyArray();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
+    void unlink();
     bool evaulateDataValidity();
     static QString getClassname();
     int getLastEventIndex() const;

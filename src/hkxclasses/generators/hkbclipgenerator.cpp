@@ -26,8 +26,9 @@ hkbClipGenerator::hkbClipGenerator(BehaviorFile *parent, long ref)
       flags(ClipFlags.first())
 {
     setType(HKB_CLIP_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
-    name = "Clip Generator "+QString::number(refCount);
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
+    name = "hkbClipGenerator"+QString::number(refCount);
 }
 
 QString hkbClipGenerator::getClassname(){

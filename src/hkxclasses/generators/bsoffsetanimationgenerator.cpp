@@ -17,8 +17,9 @@ BSOffsetAnimationGenerator::BSOffsetAnimationGenerator(BehaviorFile *parent, lon
       fOffsetRangeEnd(0)
 {
     setType(BS_OFFSET_ANIMATION_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
-    name = "BS Offset Animation Generator "+QString::number(refCount);
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
+    name = "BSOffsetAnimationGenerator"+QString::number(refCount);
 }
 
 QString BSOffsetAnimationGenerator::getClassname(){

@@ -14,7 +14,8 @@ hkbStringEventPayload::hkbStringEventPayload(BehaviorFile *parent, const QString
       data(string)
 {
     setType(HKB_STRING_EVENT_PAYLOAD, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
 }
 
 QString hkbStringEventPayload::getClassname(){

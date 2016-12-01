@@ -14,8 +14,9 @@ hkbBehaviorReferenceGenerator::hkbBehaviorReferenceGenerator(BehaviorFile *paren
       userData(0)
 {
     setType(HKB_BEHAVIOR_REFERENCE_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
-    name = "Behavior Reference Generator "+QString::number(refCount);
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
+    name = "hkbBehaviorReferenceGenerator"+QString::number(refCount);
 }
 
 QString hkbBehaviorReferenceGenerator::getClassname(){

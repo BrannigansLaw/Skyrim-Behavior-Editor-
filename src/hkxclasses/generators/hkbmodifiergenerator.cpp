@@ -14,8 +14,9 @@ hkbModifierGenerator::hkbModifierGenerator(BehaviorFile *parent, long ref)
       userData(0)
 {
     setType(HKB_MODIFIER_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
-    name = "Modifier Generator "+QString::number(refCount);
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
+    name = "hkbModifierGenerator"+QString::number(refCount);
 }
 
 QString hkbModifierGenerator::getClassname(){

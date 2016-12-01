@@ -15,12 +15,13 @@ QStringList hkbTwistModifier::RotationAxisCoordinates = {"ROTATION_AXIS_IN_MODEL
 
 hkbTwistModifier::hkbTwistModifier(BehaviorFile *parent, long ref)
     : hkbModifier(parent, ref),
-      userData(0)
+      userData(0),
+      enable(true)
 {
     setType(HKB_TWIST_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "TwistModifier"+QString::number(refCount);
+    name = "hkbTwistModifier"+QString::number(refCount);
 }
 
 QString hkbTwistModifier::getClassname(){

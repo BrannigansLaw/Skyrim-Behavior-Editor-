@@ -17,8 +17,9 @@ BSiStateTaggingGenerator::BSiStateTaggingGenerator(BehaviorFile *parent, long re
       iPriority(0)
 {
     setType(BS_I_STATE_TAGGING_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
-    name = "BS iState Tagging Generator "+QString::number(refCount);
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
+    name = "BSiStateTaggingGenerator"+QString::number(refCount);
 }
 
 QString BSiStateTaggingGenerator::getClassname(){

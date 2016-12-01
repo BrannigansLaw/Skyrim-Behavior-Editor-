@@ -19,7 +19,8 @@ hkbStateMachineStateInfo::hkbStateMachineStateInfo(BehaviorFile *parent, hkbStat
       parentSM(reinterpret_cast<HkxObject *>(parentSM))
 {
     setType(HKB_STATE_MACHINE_STATE_INFO, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
 }
 
 QString hkbStateMachineStateInfo::getClassname(){

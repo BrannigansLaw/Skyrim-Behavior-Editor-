@@ -15,7 +15,8 @@ hkbVariableBindingSet::hkbVariableBindingSet(BehaviorFile *parent, long ref)
       indexOfBindingToEnable(-1)
 {
     setType(HKB_VARIABLE_BINDING_SET, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
 }
 
 QString hkbVariableBindingSet::getClassname(){
@@ -101,6 +102,7 @@ bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long index){
                         }else{
                             writeToLog(getClassname()+": readData()!\n'bindingType' data field contains an invalid string!\nObject Reference: "+ref);
                         }
+                        index++;
                         break;
                     }
                     index++;

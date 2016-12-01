@@ -16,8 +16,9 @@ BSBoneSwitchGenerator::BSBoneSwitchGenerator(BehaviorFile *parent, long ref)
     userData(0)
 {
     setType(BS_BONE_SWITCH_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
-    name = "BS Bone Switch Generator "+QString::number(refCount);
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
+    name = "BSBoneSwitchGenerator"+QString::number(refCount);
 }
 
 QString BSBoneSwitchGenerator::getClassname(){

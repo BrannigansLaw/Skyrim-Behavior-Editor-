@@ -71,7 +71,32 @@ SOURCES += \
     src/hkxclasses/hkbcliptriggerarray.cpp \
     src/hkxclasses/hkbblendingtransitioneffect.cpp \
     src/hkxclasses/modifiers/hkbmodifierlist.cpp \
-    src/hkxclasses/modifiers/hkbtwistmodifier.cpp
+    src/hkxclasses/modifiers/hkbtwistmodifier.cpp \
+    src/hkxclasses/modifiers/hkbeventdrivenmodifier.cpp \
+    src/hkxclasses/modifiers/bsisactivemodifier.cpp \
+    src/hkxclasses/modifiers/bslimbikmodifier.cpp \
+    src/hkxclasses/modifiers/bsspeedsamplermodifier.cpp \
+    src/hkxclasses/modifiers/bslookatmodifier.cpp \
+    src/hkxclasses/modifiers/hkbfootikcontrolsmodifier.cpp \
+    src/hkxclasses/modifiers/hkbevaluateexpressionmodifier.cpp \
+    src/hkxclasses/hkbexpressiondataarray.cpp \
+    src/hkxclasses/modifiers/bsmodifyoncemodifier.cpp \
+    src/hkxclasses/modifiers/hkbrotatecharactermodifier.cpp \
+    src/hkxclasses/modifiers/bseventondeactivatemodifier.cpp \
+    src/hkxclasses/modifiers/hkbdampingmodifier.cpp \
+    src/hkxclasses/modifiers/bseventonfalsetotruemodifier.cpp \
+    src/hkxclasses/modifiers/hkbkeyframebonesmodifier.cpp \
+    src/hkxclasses/hkbboneindexarray.cpp \
+    src/hkxclasses/modifiers/bsragdollcontactlistenermodifier.cpp \
+    src/hkxclasses/modifiers/hkbpoweredragdollcontrolsmodifier.cpp \
+    src/hkxclasses/modifiers/hkbtimermodifier.cpp \
+    src/hkxclasses/modifiers/hkbrigidbodyragdollcontrolsmodifier.cpp \
+    src/hkxclasses/modifiers/hkbgetupmodifier.cpp \
+    src/hkxclasses/modifiers/bsdirectatmodifier.cpp \
+    src/hkxclasses/modifiers/hkbcomputedirectionmodifier.cpp \
+    src/hkxclasses/modifiers/hkbevaluatehandlemodifier.cpp \
+    src/hkxclasses/modifiers/hkbgethandleonbonemodifier.cpp \
+    src/hkxclasses/modifiers/hkbsensehandlemodifier.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -125,4 +150,29 @@ HEADERS  += \
     src/hkxclasses/hkbcliptriggerarray.h \
     src/hkxclasses/hkbblendingtransitioneffect.h \
     src/hkxclasses/modifiers/hkbmodifierlist.h \
-    src/hkxclasses/modifiers/hkbtwistmodifier.h
+    src/hkxclasses/modifiers/hkbtwistmodifier.h \
+    src/hkxclasses/modifiers/hkbeventdrivenmodifier.h \
+    src/hkxclasses/modifiers/bsisactivemodifier.h \
+    src/hkxclasses/modifiers/bslimbikmodifier.h \
+    src/hkxclasses/modifiers/bsspeedsamplermodifier.h \
+    src/hkxclasses/modifiers/bslookatmodifier.h \
+    src/hkxclasses/modifiers/hkbfootikcontrolsmodifier.h \
+    src/hkxclasses/modifiers/hkbevaluateexpressionmodifier.h \
+    src/hkxclasses/hkbexpressiondataarray.h \
+    src/hkxclasses/modifiers/bsmodifyoncemodifier.h \
+    src/hkxclasses/modifiers/hkbrotatecharactermodifier.h \
+    src/hkxclasses/modifiers/bseventondeactivatemodifier.h \
+    src/hkxclasses/modifiers/hkbdampingmodifier.h \
+    src/hkxclasses/modifiers/bseventonfalsetotruemodifier.h \
+    src/hkxclasses/modifiers/hkbkeyframebonesmodifier.h \
+    src/hkxclasses/hkbboneindexarray.h \
+    src/hkxclasses/modifiers/bsragdollcontactlistenermodifier.h \
+    src/hkxclasses/modifiers/hkbpoweredragdollcontrolsmodifier.h \
+    src/hkxclasses/modifiers/hkbtimermodifier.h \
+    src/hkxclasses/modifiers/hkbrigidbodyragdollcontrolsmodifier.h \
+    src/hkxclasses/modifiers/hkbgetupmodifier.h \
+    src/hkxclasses/modifiers/bsdirectatmodifier.h \
+    src/hkxclasses/modifiers/hkbcomputedirectionmodifier.h \
+    src/hkxclasses/modifiers/hkbevaluatehandlemodifier.h \
+    src/hkxclasses/modifiers/hkbgethandleonbonemodifier.h \
+    src/hkxclasses/modifiers/hkbsensehandlemodifier.h

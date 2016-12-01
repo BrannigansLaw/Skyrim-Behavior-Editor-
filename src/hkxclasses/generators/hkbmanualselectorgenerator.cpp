@@ -16,8 +16,9 @@ hkbManualSelectorGenerator::hkbManualSelectorGenerator(BehaviorFile *parent, lon
       currentGeneratorIndex(0)
 {
     setType(HKB_MANUAL_SELECTOR_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
-    name = "Manual Selector Generator "+QString::number(refCount);
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
+    name = "hkbManualSelectorGenerator"+QString::number(refCount);
 }
 
 QString hkbManualSelectorGenerator::getClassname(){

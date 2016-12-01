@@ -15,7 +15,8 @@ hkRootLevelContainer::hkRootLevelContainer(BehaviorFile *parent, long ref)
     : HkxObject(parent, ref)
 {
     setType(HK_ROOT_LEVEL_CONTAINER, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
 }
 
 QString hkRootLevelContainer::getClassname(){
@@ -43,6 +44,8 @@ bool hkRootLevelContainer::readData(const HkxXmlReader &reader, int index){
                         if (!namedVariants.last().variant.readReference(index, reader)){
                             return false;
                         }
+                        index++;
+                        break;
                     }
                     index++;
                 }

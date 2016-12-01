@@ -15,7 +15,8 @@ hkbBlenderGeneratorChild::hkbBlenderGeneratorChild(BehaviorFile *parent, long re
       worldFromModelWeight(0)
 {
     setType(HKB_BLENDER_GENERATOR_CHILD, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
 }
 
 QString hkbBlenderGeneratorChild::getClassname(){

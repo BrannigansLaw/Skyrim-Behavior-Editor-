@@ -33,11 +33,13 @@ hkbPoseMatchingGenerator::hkbPoseMatchingGenerator(BehaviorFile *parent, long re
     rootBoneIndex(-1),
     otherBoneIndex(-1),
     anotherBoneIndex(-1),
-    pelvisIndex(-1)
+    pelvisIndex(-1),
+    mode(Mode.first())
 {
     setType(HKB_POSE_MATCHING_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);refCount++;
-    name = "Pose Matching Generator "+QString::number(refCount);
+    getParentFile()->addObjectToFile(this, ref);
+    refCount++;
+    name = "hkbPoseMatchingGenerator"+QString::number(refCount);
 }
 
 QString hkbPoseMatchingGenerator::getClassname(){

@@ -18,8 +18,13 @@ QStringList hkbBlendingTransitionEffect::BlendCurve = {"BLEND_CURVE_SMOOTH", "BL
 hkbBlendingTransitionEffect::hkbBlendingTransitionEffect(BehaviorFile *parent, long ref)
     : HkDynamicObject(parent, ref),
       userData(0),
+      selfTransitionMode(SelfTransitionMode.first()),
+      eventMode(EventMode.first()),
       duration(1),
-      toGeneratorStartTimeFraction(0)
+      toGeneratorStartTimeFraction(0),
+      flags(Flags.first()),
+      endMode(EndMode.first()),
+      blendCurve(BlendCurve.first())
 {
     setType(HKB_BLENDING_TRANSITION_EFFECT, TYPE_OTHER);
     getParentFile()->addObjectToFile(this, ref);
