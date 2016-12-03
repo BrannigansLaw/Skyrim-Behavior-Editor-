@@ -89,6 +89,9 @@ bool hkbPoseMatchingGenerator::setChildAt(HkxObject *newChild, ushort index){
 }
 
 bool hkbPoseMatchingGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    if (!objToInject || objToInject->getType() != TYPE_GENERATOR){
+        return false;
+    }
     bool wasReplaced = false;
     hkbBlenderGeneratorChild *child;
     for (int i = 0; i < children.size(); i++){
@@ -105,6 +108,9 @@ bool hkbPoseMatchingGenerator::wrapObject(DataIconManager *objToInject, DataIcon
 }
 
 bool hkbPoseMatchingGenerator::appendObject(DataIconManager *objToAppend){
+    if (!objToAppend || objToAppend->getType() != TYPE_GENERATOR){
+        return false;
+    }
     hkbBlenderGeneratorChild *objChild = new hkbBlenderGeneratorChild(getParentFile(), -1);
     children.append(HkxObjectExpSharedPtr(objChild));
     objChild->generator = HkxObjectExpSharedPtr(objToAppend);
@@ -306,10 +312,10 @@ bool hkbPoseMatchingGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("referencePoseWeightThreshold"), getDoubleAsString(referencePoseWeightThreshold));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendParameter"), getDoubleAsString(blendParameter));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minCyclicBlendParameter"), getDoubleAsString(minCyclicBlendParameter));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxCyclicBlendParameter"), getDoubleAsString(maxCyclicBlendParameter));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("referencePoseWeightThreshold"), QString::number(referencePoseWeightThreshold));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendParameter"), QString::number(blendParameter));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minCyclicBlendParameter"), QString::number(minCyclicBlendParameter));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxCyclicBlendParameter"), QString::number(maxCyclicBlendParameter));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("indexOfSyncMasterChild"), QString::number(indexOfSyncMasterChild));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("flags"), flags);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("subtractLastChild"), getBoolAsString(subtractLastChild));
@@ -328,10 +334,10 @@ bool hkbPoseMatchingGenerator::write(HkxXMLWriter *writer){
             writer->writeLine(writer->parameter, false);
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("worldFromModelRotation"), worldFromModelRotation.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendSpeed"), getDoubleAsString(blendSpeed));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minSpeedToSwitch"), getDoubleAsString(minSpeedToSwitch));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minSwitchTimeNoError"), getDoubleAsString(minSwitchTimeNoError));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minSwitchTimeFullError"), getDoubleAsString(minSwitchTimeFullError));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendSpeed"), QString::number(blendSpeed));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minSpeedToSwitch"), QString::number(minSpeedToSwitch));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minSwitchTimeNoError"), QString::number(minSwitchTimeNoError));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minSwitchTimeFullError"), QString::number(minSwitchTimeFullError));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("startPlayingEventId"), QString::number(startPlayingEventId));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("startMatchingEventId"), QString::number(startMatchingEventId));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("rootBoneIndex"), QString::number(rootBoneIndex));

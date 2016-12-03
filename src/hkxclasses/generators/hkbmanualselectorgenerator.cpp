@@ -60,6 +60,9 @@ bool hkbManualSelectorGenerator::setChildAt(HkxObject *newChild, ushort index){
 }
 
 bool hkbManualSelectorGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    if (!objToInject || objToInject->getType() != TYPE_GENERATOR){
+        return false;
+    }
     bool wasReplaced = false;
     for (int i = 0; i < generators.size(); i++){
         if (generators.at(i).data() == childToReplace){
@@ -74,6 +77,9 @@ bool hkbManualSelectorGenerator::wrapObject(DataIconManager *objToInject, DataIc
 }
 
 bool hkbManualSelectorGenerator::appendObject(DataIconManager *objToAppend){
+    if (!objToAppend || objToAppend->getType() != TYPE_GENERATOR){
+        return false;
+    }
     generators.append(HkxObjectExpSharedPtr(objToAppend));
     return true;
 }

@@ -60,6 +60,9 @@ bool hkbModifierList::setChildAt(HkxObject *newChild, ushort index){
 }
 
 bool hkbModifierList::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    if (!objToInject || objToInject->getType() != TYPE_MODIFIER){
+        return false;
+    }
     bool wasReplaced = false;
     for (int i = 0; i < modifiers.size(); i++){
         if (modifiers.at(i).data() == childToReplace){
@@ -74,6 +77,9 @@ bool hkbModifierList::wrapObject(DataIconManager *objToInject, DataIconManager *
 }
 
 bool hkbModifierList::appendObject(DataIconManager *objToAppend){
+    if (!objToAppend || objToAppend->getType() != TYPE_MODIFIER){
+        return false;
+    }
     modifiers.append(HkxObjectExpSharedPtr(objToAppend));
     return true;
 }

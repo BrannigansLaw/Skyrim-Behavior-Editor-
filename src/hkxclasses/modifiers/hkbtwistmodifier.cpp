@@ -115,7 +115,7 @@ bool hkbTwistModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("axisOfRotation"), axisOfRotation.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("twistAngle"), getDoubleAsString(twistAngle));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("twistAngle"), QString::number(twistAngle));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("startBoneIndex"), QString::number(startBoneIndex));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("endBoneIndex"), QString::number(endBoneIndex));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("setAngleMethod"), setAngleMethod);

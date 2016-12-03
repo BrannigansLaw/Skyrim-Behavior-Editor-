@@ -44,6 +44,9 @@ bool BSSynchronizedClipGenerator::setChildAt(HkxObject *newChild, ushort index){
 }
 
 bool BSSynchronizedClipGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    if (!objToInject || objToInject->getSignature() != HKB_CLIP_GENERATOR){
+        return false;
+    }
     if (pClipGenerator.data() == childToReplace){
         if (!objToInject->setChildAt(pClipGenerator.data())){
             return false;
@@ -179,8 +182,8 @@ bool BSSynchronizedClipGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pClipGenerator"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("SyncAnimPrefix"), SyncAnimPrefix);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bSyncClipIgnoreMarkPlacement"), getBoolAsString(bSyncClipIgnoreMarkPlacement));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fGetToMarkTime"), getDoubleAsString(fGetToMarkTime));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fMarkErrorThreshold"), getDoubleAsString(fMarkErrorThreshold));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fGetToMarkTime"), QString::number(fGetToMarkTime));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fMarkErrorThreshold"), QString::number(fMarkErrorThreshold));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bLeadCharacter"), getBoolAsString(bLeadCharacter));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bReorientSupportChar"), getBoolAsString(bReorientSupportChar));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bApplyMotionFromRoot"), getBoolAsString(bApplyMotionFromRoot));

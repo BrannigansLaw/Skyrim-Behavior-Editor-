@@ -29,6 +29,115 @@ QString BSModifyOnceModifier::getName() const{
     return name;
 }
 
+bool BSModifyOnceModifier::setChildAt(HkxObject *newChild, ushort index){
+    if (index == 0 && (!newChild || newChild->getType() == TYPE_MODIFIER)){
+        pOnActivateModifier = HkxObjectExpSharedPtr(newChild);
+        return true;
+    }else if (index == 1 && (!newChild || newChild->getType() == TYPE_MODIFIER)){
+        pOnDeactivateModifier = HkxObjectExpSharedPtr(newChild);
+        return true;
+    }else{
+        return false;
+    }
+}
+
+int BSModifyOnceModifier::getIndexToInsertIcon() const{
+    if (!pOnActivateModifier.constData()){    //Not sure about this...
+        return 0;
+    }else if (!pOnDeactivateModifier.constData()){
+        return 1;
+    }
+    return -1;
+}
+
+bool BSModifyOnceModifier::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    if (objToInject->getType() != TYPE_MODIFIER){
+        return false;
+    }
+    if (pOnActivateModifier.data() == childToReplace){
+        if (!objToInject->setChildAt(pOnActivateModifier.data())){
+            return false;
+        }
+        pOnActivateModifier = HkxObjectExpSharedPtr(objToInject);
+        return true;
+    }else if (pOnDeactivateModifier.data() == childToReplace){
+        if (!objToInject->setChildAt(pOnDeactivateModifier.data(), 1)){
+            return false;
+        }
+        pOnDeactivateModifier = HkxObjectExpSharedPtr(objToInject);
+        return true;
+    }
+    return false;
+}
+
+bool BSModifyOnceModifier::appendObject(DataIconManager *objToAppend){
+    if (objToAppend->getType() != TYPE_MODIFIER){
+        return false;
+    }
+    pOnActivateModifier = HkxObjectExpSharedPtr(objToAppend);
+    return true;
+}
+
+bool BSModifyOnceModifier::removeObject(DataIconManager *objToRemove, bool removeAll){
+    bool b = false;
+    if (removeAll){
+        if (pOnActivateModifier.data() == objToRemove){
+            pOnActivateModifier = HkxObjectExpSharedPtr();
+            b = true;
+        }
+        if (pOnDeactivateModifier.data() == objToRemove){
+            pOnDeactivateModifier = HkxObjectExpSharedPtr();
+            b = true;
+        }
+        return b;
+    }else{
+        if (pOnDeactivateModifier.data() == objToRemove){
+            pOnDeactivateModifier = HkxObjectExpSharedPtr();
+            return true;
+        }
+        if (pOnActivateModifier.data() == objToRemove){
+            pOnActivateModifier = HkxObjectExpSharedPtr();
+            return true;
+        }
+    }
+    return false;
+}
+
+bool BSModifyOnceModifier::hasChildren() const{
+    if (pOnActivateModifier.data()){
+        return true;
+    }
+    if (pOnDeactivateModifier.data()){
+        return true;
+    }
+    return false;
+}
+
+int BSModifyOnceModifier::addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder){
+    int objectChildCount = 0;
+    if (reverseOrder){
+        if (pOnActivateModifier.data()){
+            list.append(pOnActivateModifier);
+            objectChildCount++;
+        }
+        if (pOnDeactivateModifier.data()){
+            list.append(pOnDeactivateModifier);
+            objectChildCount++;
+        }
+    }else{
+        if (pOnDeactivateModifier.data()){
+            list.append(pOnDeactivateModifier);
+            objectChildCount++;
+        }
+        if (pOnActivateModifier.data()){
+            list.append(pOnActivateModifier);
+            objectChildCount++;
+        }
+    }
+    return objectChildCount;
+}
+
+
 bool BSModifyOnceModifier::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);

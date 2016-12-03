@@ -48,7 +48,7 @@ bool hkbBehaviorGraph::setChildAt(HkxObject *newChild, ushort index){
 }
 
 bool hkbBehaviorGraph::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (rootGenerator.data() == childToReplace && (!objToInject || objToInject->getSignature() == HKB_STATE_MACHINE)){
+    if (rootGenerator.data() == childToReplace && (!objToInject && objToInject->getSignature() == HKB_STATE_MACHINE)){
         if (!objToInject->setChildAt(rootGenerator.data())){
             return false;
         }

@@ -82,8 +82,8 @@ bool hkbBlenderGeneratorChild::write(HkxXMLWriter *writer){
             refString = "null";
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("boneWeights"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("weight"), getDoubleAsString(weight));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("worldFromModelWeight"), getDoubleAsString(worldFromModelWeight));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("weight"), QString::number(weight));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("worldFromModelWeight"), QString::number(worldFromModelWeight));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");

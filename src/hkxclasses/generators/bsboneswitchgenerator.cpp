@@ -73,6 +73,9 @@ bool BSBoneSwitchGenerator::setChildAt(HkxObject *newChild, ushort index){
 }
 
 bool BSBoneSwitchGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    if (!objToInject || objToInject->getType() != TYPE_GENERATOR){
+        return false;
+    }
     bool wasReplaced = false;
     if (pDefaultGenerator.data() == childToReplace){
         if (!objToInject->setChildAt(pDefaultGenerator.data())){

@@ -49,18 +49,28 @@ bool hkbModifierGenerator::setChildAt(HkxObject *newChild, ushort index){
 }
 
 bool hkbModifierGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (generator.data() == childToReplace){
+    if (generator.data() == childToReplace && childToReplace->getType() == TYPE_GENERATOR){
         if (!objToInject->setChildAt(generator.data())){
             return false;
         }
         generator = HkxObjectExpSharedPtr(objToInject);
+        return true;
+    }else if (modifier.data() == childToReplace && childToReplace->getType() == TYPE_MODIFIER){
+        if (!objToInject->setChildAt(modifier.data())){
+            return false;
+        }
+        modifier = HkxObjectExpSharedPtr(objToInject);
         return true;
     }
     return false;
 }
 
 bool hkbModifierGenerator::appendObject(DataIconManager *objToAppend){
-    generator = HkxObjectExpSharedPtr(objToAppend);
+    if (objToAppend->getType() == TYPE_GENERATOR){
+        generator = HkxObjectExpSharedPtr(objToAppend);
+    }else if (objToAppend->getType() == TYPE_MODIFIER){
+        modifier = HkxObjectExpSharedPtr(objToAppend);
+    }
     return true;
 }
 

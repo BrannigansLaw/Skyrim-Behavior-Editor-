@@ -15,6 +15,7 @@ class hkbGenerator;
 class HkxObject: public QSharedData
 {
     friend class BehaviorFile;
+    friend class BSIStateManagerModifier;
 public:
     enum HkxType {TYPE_OTHER=0, TYPE_GENERATOR=1, TYPE_MODIFIER=2};
 public:
@@ -30,7 +31,6 @@ public:
     virtual bool write(HkxXMLWriter *writer);
     QString getReferenceString() const;
     QString getBoolAsString(bool b) const;
-    QString getDoubleAsString(qreal num) const;
     virtual bool setChildAt(HkxObject *newChild, ushort index = 0);
 protected:
     HkxObject(BehaviorFile *parent, long ref = -1);

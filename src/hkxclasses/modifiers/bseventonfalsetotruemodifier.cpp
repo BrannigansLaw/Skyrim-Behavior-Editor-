@@ -162,6 +162,9 @@ bool BSEventOnFalseToTrueModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bEnableEvent1"), getBoolAsString(bEnableEvent1));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bVariableToTest1"), getBoolAsString(bVariableToTest1));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("EventToSend1"), "");
         writer->writeLine(writer->object, true);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventToSend1.id));
@@ -173,6 +176,8 @@ bool BSEventOnFalseToTrueModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bEnableEvent2"), getBoolAsString(bEnableEvent2));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bVariableToTest2"), getBoolAsString(bVariableToTest2));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("EventToSend2"), "");
         writer->writeLine(writer->object, true);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventToSend2.id));
@@ -183,7 +188,10 @@ bool BSEventOnFalseToTrueModifier::write(HkxXMLWriter *writer){
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
         writer->writeLine(writer->object, false);
-        writer->writeLine(writer->parameter, false);writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("EventToSend3"), "");
+        writer->writeLine(writer->parameter, false);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bEnableEvent3"), getBoolAsString(bEnableEvent3));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bVariableToTest3"), getBoolAsString(bVariableToTest3));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("EventToSend3"), "");
         writer->writeLine(writer->object, true);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventToSend3.id));
         if (eventToSend3.payload.data()){

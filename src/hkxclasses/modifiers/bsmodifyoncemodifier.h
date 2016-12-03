@@ -16,6 +16,14 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    int getIndexToInsertIcon() const;
+    bool hasChildren() const;
+protected:
+    bool wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace);
+    bool setChildAt(HkxObject *newChild, ushort index);
+    bool appendObject(DataIconManager *objToAppend);
+    bool removeObject(DataIconManager *objToRemove, bool removeAll = true);
+    int addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder = true);
 private:
     BSModifyOnceModifier& operator=(const BSModifyOnceModifier&);
     BSModifyOnceModifier(const BSModifyOnceModifier &);

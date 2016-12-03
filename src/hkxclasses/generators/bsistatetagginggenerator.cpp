@@ -40,6 +40,9 @@ bool BSiStateTaggingGenerator::setChildAt(HkxObject *newChild, ushort index){
 }
 
 bool BSiStateTaggingGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    if (!objToInject || objToInject->getType() != TYPE_GENERATOR){
+        return false;
+    }
     if (pDefaultGenerator.data() == childToReplace){
         if (!objToInject->setChildAt(pDefaultGenerator.data())){
             return false;

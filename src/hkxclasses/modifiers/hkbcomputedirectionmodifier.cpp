@@ -142,9 +142,9 @@ bool hkbComputeDirectionModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pointIn"), pointIn.getValueAsString());
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pointOut"), pointOut.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("groundAngleOut"), getDoubleAsString(groundAngleOut));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("upAngleOut"), getDoubleAsString(upAngleOut));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("verticalOffset"), getDoubleAsString(verticalOffset));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("groundAngleOut"), QString::number(groundAngleOut));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("upAngleOut"), QString::number(upAngleOut));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("verticalOffset"), QString::number(verticalOffset));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("reverseGroundAngle"), getBoolAsString(reverseGroundAngle));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("reverseUpAngle"), getBoolAsString(reverseUpAngle));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("projectPoint"), getBoolAsString(projectPoint));

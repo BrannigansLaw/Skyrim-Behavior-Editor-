@@ -137,6 +137,7 @@ bool BSEventOnDeactivateModifier::evaulateDataValidity(){    //Check if event id
     if (!HkDynamicObject::evaulateDataValidity()){
         return false;
     }else if (name == ""){
+    }else if (payload.data() && payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
     }else{
         setDataValidity(true);
         return true;

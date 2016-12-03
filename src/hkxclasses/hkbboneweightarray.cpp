@@ -68,7 +68,7 @@ bool hkbBoneWeightArray::write(HkxXMLWriter *writer){
         list2 = {"boneWeights", QString::number(boneWeights.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < boneWeights.size(); i++){
-            bones = bones+" "+getDoubleAsString(boneWeights.at(i));
+            bones = bones+" "+QString::number(boneWeights.at(i));
             if (i > 0 && i % 16 == 0){
                 bones = bones+"\n";
             }

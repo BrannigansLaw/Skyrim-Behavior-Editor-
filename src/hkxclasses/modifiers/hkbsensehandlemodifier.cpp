@@ -232,9 +232,9 @@ bool hkbSenseHandleModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("handleIn"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("localFrameName"), localFrameName);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensorLocalFrameName"), sensorLocalFrameName);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minDistance"), getDoubleAsString(minDistance));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxDistance"), getDoubleAsString(maxDistance));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("distanceOut"), getDoubleAsString(distanceOut));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minDistance"), QString::number(minDistance));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxDistance"), QString::number(maxDistance));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("distanceOut"), QString::number(distanceOut));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("collisionFilterInfo"), QString::number(collisionFilterInfo));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensorRagdollBoneIndex"), QString::number(sensorRagdollBoneIndex));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensorAnimationBoneIndex"), QString::number(sensorAnimationBoneIndex));

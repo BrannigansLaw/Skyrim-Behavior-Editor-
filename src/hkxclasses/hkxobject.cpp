@@ -52,20 +52,6 @@ QString HkxObject::getBoolAsString(bool b) const{
     }
 }
 
-QString HkxObject::getDoubleAsString(qreal num) const{
-    QString real = QString::number(num);
-    int index = real.indexOf('.');
-    if (index != -1){
-        index = real.size() - index;
-        for (int i = 0; i < index && index < 6; i++){
-            real.append("0");
-        }
-    }else{
-        real.append(".000000");
-    }
-    return real;
-}
-
 bool HkxObject::setChildAt(HkxObject *newChild, ushort index){
     return false;
 }

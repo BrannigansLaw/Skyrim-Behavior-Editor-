@@ -96,7 +96,35 @@ SOURCES += \
     src/hkxclasses/modifiers/hkbcomputedirectionmodifier.cpp \
     src/hkxclasses/modifiers/hkbevaluatehandlemodifier.cpp \
     src/hkxclasses/modifiers/hkbgethandleonbonemodifier.cpp \
-    src/hkxclasses/modifiers/hkbsensehandlemodifier.cpp
+    src/hkxclasses/modifiers/hkbsensehandlemodifier.cpp \
+    src/hkxclasses/modifiers/hkbdelayedmodifier.cpp \
+    src/hkxclasses/modifiers/hkbdetectclosetogroundmodifier.cpp \
+    src/hkxclasses/modifiers/bsdecomposevectormodifier.cpp \
+    src/hkxclasses/generators/bgsgamebryosequencegenerator.cpp \
+    src/hkxclasses/modifiers/bscomputeaddboneanimmodifier.cpp \
+    src/hkxclasses/modifiers/bsdisttriggermodifier.cpp \
+    src/hkxclasses/modifiers/bseventeveryneventsmodifier.cpp \
+    src/hkxclasses/modifiers/bsgettimestepmodifier.cpp \
+    src/hkxclasses/modifiers/bsinterpvaluemodifier.cpp \
+    src/hkxclasses/modifiers/bspassbytargettriggermodifier.cpp \
+    src/hkxclasses/modifiers/bstimermodifier.cpp \
+    src/hkxclasses/modifiers/bstweenermodifier.cpp \
+    src/hkxclasses/modifiers/hkbattachmentmodifier.cpp \
+    src/hkxclasses/modifiers/hkbattributemodifier.cpp \
+    src/hkxclasses/modifiers/hkbcombinetransformsmodifier.cpp \
+    src/hkxclasses/modifiers/hkbcomputerotationfromaxisanglemodifier.cpp \
+    src/hkxclasses/modifiers/hkbcomputerotationtotargetmodifier.cpp \
+    src/hkxclasses/modifiers/hkbeventsfromrangemodifier.cpp \
+    src/hkxclasses/hkbeventrangedataarray.cpp \
+    src/hkxclasses/modifiers/hkbextractragdollposemodifier.cpp \
+    src/hkxclasses/hkbgeneratortransitioneffect.cpp \
+    src/hkxclasses/modifiers/hkbgetworldfrommodelmodifier.cpp \
+    src/hkxclasses/modifiers/hkblookatmodifier.cpp \
+    src/hkxclasses/modifiers/hkbmirrormodifier.cpp \
+    src/hkxclasses/modifiers/hkbmovecharactermodifier.cpp \
+    src/hkxclasses/modifiers/hkbtransformvectormodifier.cpp \
+    src/hkxclasses/modifiers/hkbproxymodifier.cpp \
+    src/hkxclasses/modifiers/bsistatemanagermodifier.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -175,4 +203,32 @@ HEADERS  += \
     src/hkxclasses/modifiers/hkbcomputedirectionmodifier.h \
     src/hkxclasses/modifiers/hkbevaluatehandlemodifier.h \
     src/hkxclasses/modifiers/hkbgethandleonbonemodifier.h \
-    src/hkxclasses/modifiers/hkbsensehandlemodifier.h
+    src/hkxclasses/modifiers/hkbsensehandlemodifier.h \
+    src/hkxclasses/modifiers/hkbdelayedmodifier.h \
+    src/hkxclasses/modifiers/hkbdetectclosetogroundmodifier.h \
+    src/hkxclasses/modifiers/bsdecomposevectormodifier.h \
+    src/hkxclasses/generators/bgsgamebryosequencegenerator.h \
+    src/hkxclasses/modifiers/bscomputeaddboneanimmodifier.h \
+    src/hkxclasses/modifiers/bsdisttriggermodifier.h \
+    src/hkxclasses/modifiers/bseventeveryneventsmodifier.h \
+    src/hkxclasses/modifiers/bsgettimestepmodifier.h \
+    src/hkxclasses/modifiers/bsinterpvaluemodifier.h \
+    src/hkxclasses/modifiers/bspassbytargettriggermodifier.h \
+    src/hkxclasses/modifiers/bstimermodifier.h \
+    src/hkxclasses/modifiers/bstweenermodifier.h \
+    src/hkxclasses/modifiers/hkbattachmentmodifier.h \
+    src/hkxclasses/modifiers/hkbattributemodifier.h \
+    src/hkxclasses/modifiers/hkbcombinetransformsmodifier.h \
+    src/hkxclasses/modifiers/hkbcomputerotationfromaxisanglemodifier.h \
+    src/hkxclasses/modifiers/hkbcomputerotationtotargetmodifier.h \
+    src/hkxclasses/modifiers/hkbeventsfromrangemodifier.h \
+    src/hkxclasses/hkbeventrangedataarray.h \
+    src/hkxclasses/modifiers/hkbextractragdollposemodifier.h \
+    src/hkxclasses/hkbgeneratortransitioneffect.h \
+    src/hkxclasses/modifiers/hkbgetworldfrommodelmodifier.h \
+    src/hkxclasses/modifiers/hkblookatmodifier.h \
+    src/hkxclasses/modifiers/hkbmirrormodifier.h \
+    src/hkxclasses/modifiers/hkbmovecharactermodifier.h \
+    src/hkxclasses/modifiers/hkbtransformvectormodifier.h \
+    src/hkxclasses/modifiers/hkbproxymodifier.h \
+    src/hkxclasses/modifiers/bsistatemanagermodifier.h

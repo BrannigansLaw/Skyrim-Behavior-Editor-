@@ -129,6 +129,9 @@ bool hkbStateMachine::setChildAt(HkxObject *newChild, ushort index){
 }
 
 bool hkbStateMachine::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
+    if (!objToInject || objToInject->getType() != TYPE_GENERATOR){
+        return false;
+    }
     bool wasReplaced = false;
     hkbStateMachineStateInfo *state;
     for (int i = 0; i < states.size(); i++){
@@ -145,6 +148,9 @@ bool hkbStateMachine::wrapObject(DataIconManager *objToInject, DataIconManager *
 }
 
 bool hkbStateMachine::appendObject(DataIconManager *objToAppend){
+    if (!objToAppend || objToAppend->getType() != TYPE_GENERATOR){
+        return false;
+    }
     hkbStateMachineStateInfo *objChild = new hkbStateMachineStateInfo(getParentFile(), this, -1);
     states.append(HkxObjectExpSharedPtr(objChild));
     objChild->generator = HkxObjectExpSharedPtr(objToAppend);

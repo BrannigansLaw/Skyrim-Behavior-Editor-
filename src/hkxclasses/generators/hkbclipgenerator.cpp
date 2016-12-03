@@ -141,12 +141,12 @@ bool hkbClipGenerator::write(HkxXMLWriter *writer){
             refString = "null";
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("triggers"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("cropStartAmountLocalTime"), getDoubleAsString(cropStartAmountLocalTime));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("cropEndAmountLocalTime"), getDoubleAsString(cropEndAmountLocalTime));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("startTime"), getDoubleAsString(startTime));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("playbackSpeed"), getDoubleAsString(playbackSpeed));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enforcedDuration"), getDoubleAsString(enforcedDuration));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userControlledTimeFraction"), getDoubleAsString(userControlledTimeFraction));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("cropStartAmountLocalTime"), QString::number(cropStartAmountLocalTime));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("cropEndAmountLocalTime"), QString::number(cropEndAmountLocalTime));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("startTime"), QString::number(startTime));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("playbackSpeed"), QString::number(playbackSpeed));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enforcedDuration"), QString::number(enforcedDuration));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userControlledTimeFraction"), QString::number(userControlledTimeFraction));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("animationBindingIndex"), QString::number(animationBindingIndex));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("mode"), mode);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("flags"), flags);

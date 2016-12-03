@@ -62,12 +62,12 @@ bool hkbBlendingTransitionEffect::readData(const HkxXmlReader &reader, long inde
             }
         }else if (text == "selfTransitionMode"){
             selfTransitionMode = reader.getElementValueAt(index);
-            if (selfTransitionMode == ""){
+            if (!SelfTransitionMode.contains(selfTransitionMode)){
                 writeToLog(getClassname()+":  readData()!\nFailed to properly read 'selfTransitionMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "eventMode"){
             eventMode = reader.getElementValueAt(index);
-            if (eventMode == ""){
+            if (!EventMode.contains(eventMode)){
                 writeToLog(getClassname()+":  readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "duration"){
@@ -118,8 +118,8 @@ bool hkbBlendingTransitionEffect::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("selfTransitionMode"), selfTransitionMode);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("eventMode"), eventMode);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("duration"), getDoubleAsString(duration));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("toGeneratorStartTimeFraction"), getDoubleAsString(toGeneratorStartTimeFraction));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("duration"), QString::number(duration));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("toGeneratorStartTimeFraction"), QString::number(toGeneratorStartTimeFraction));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("flags"), flags);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("endMode"), endMode);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendCurve"), blendCurve);

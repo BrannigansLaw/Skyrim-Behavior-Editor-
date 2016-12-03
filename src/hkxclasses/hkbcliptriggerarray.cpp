@@ -111,7 +111,7 @@ bool hkbClipTriggerArray::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < triggers.size(); i++){
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("localTime"), getDoubleAsString(triggers.at(i).localTime));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("localTime"), QString::number(triggers.at(i).localTime));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("event"), "");
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(triggers.at(i).id));

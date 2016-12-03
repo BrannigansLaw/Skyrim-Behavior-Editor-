@@ -36,21 +36,9 @@ struct hkQuadVariable
     {
         //
     }
-    QString convertDoubleString(qreal num){
-        QString real = QString::number(num);
-        int index = real.indexOf('.');
-        if (index != -1){
-            index = real.size() - index;
-            for (int i = 0; i < index && index < 6; i++){
-                real.append("0");
-            }
-        }else{
-            real.append(".000000");
-        }
-        return real;
-    }
+
     QString getValueAsString(){
-        return "("+convertDoubleString(x)+" "+convertDoubleString(y)+" "+convertDoubleString(z)+" "+convertDoubleString(w)+")";
+        return "("+QString::number(x)+" "+QString::number(y)+" "+QString::number(z)+" "+QString::number(w)+")";
     }
     qreal x;
     qreal y;
@@ -89,6 +77,10 @@ enum HkxSignature: unsigned long long {
     HKA_SKELETON = 0x366e8220,
     HK_SIMPLE_LOCAL_FRAME = 0xe758f63c,
     //Behavior
+    HKB_GET_WORLD_FROM_MODEL_MODIFIER = 0x873fc6f7,
+    HKB_EVENT_RANGE_DATA_ARRAY = 0x330a56ee,
+    BS_DIST_TRIGGER_MODIFER = 0xb34d2bbd,
+    BGS_GAMEBYRO_SEQUENCE_GENERATOR = 0xc8df2d77,
     HKB_BONE_INDEX_ARRAY = 0xaa8619,
     HKB_FOOT_IK_CONTROLS_MODIFIER = 0xe5b6f544,
     HKB_VARIABLE_BINDING_SET = 0x338ad4ff,
