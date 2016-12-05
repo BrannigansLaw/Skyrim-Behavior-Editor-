@@ -7,7 +7,7 @@
 #include <QFile>
 #include <QTextStream>
 
-class BehaviorFile;
+class HkxFile;
 
 class HkxXMLWriter
 {
@@ -17,7 +17,7 @@ public:
     virtual ~HkxXMLWriter();
     bool writeToXMLFile();
 //private:
-    void setBehaviorFile(BehaviorFile *file);
+    void setFile(HkxFile *file);
     void writeHeader(const QString & version, const QString & encoding);
     bool writeLine(const QString & tag, const QStringList & attribs, const QStringList & attribValues, const QString & value);
     bool writeLine(const QString & tag, bool opening);
@@ -38,7 +38,7 @@ public:
     const QString signature;
     const QString numelements;
 private:
-    BehaviorFile *hkxXmlFile;
+    HkxFile *hkxXmlFile;
     QFile newfile;
     QTextStream stream;
     ulong nestLevel;

@@ -1,7 +1,7 @@
 #include "hkxxmlreader.h"
-#include "src/filetypes/hkxfile.h"
+#include "src/filetypes/behaviorfile.h"
 
-HkxXmlReader::HkxXmlReader(BehaviorFile *file)
+HkxXmlReader::HkxXmlReader(HkxFile *file)
     :
       hkxXmlFile(file),
       isEOF(false),
@@ -434,7 +434,7 @@ QByteArray HkxXmlReader::getNthAttributeValueAt(int index, int nth) const{
     }
 }
 
-void HkxXmlReader::setBehaviorFile(BehaviorFile *file){
+void HkxXmlReader::setFile(HkxFile *file){
     hkxXmlFile = file;
 }
 bool HkxXmlReader::atEnd() const{

@@ -11,7 +11,7 @@
 #include <QGroupBox>
 
 #include "src/utility.h"
-#include "src/filetypes/hkxfile.h"
+#include "src/filetypes/behaviorfile.h"
 
 #include <QTableWidget>
 #include <QPushButton>
@@ -176,6 +176,8 @@ private:
     TableWidget *table;
     QPushButton *selectPB;
     QPushButton *cancelPB;
+    QPushButton *newPB;
+    ComboBox *typeSelector;
     int lastVisableIndex;
 };
 

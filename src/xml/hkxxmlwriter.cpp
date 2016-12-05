@@ -1,5 +1,5 @@
 #include "hkxxmlwriter.h"
-#include "src/filetypes/hkxfile.h"
+#include "src/filetypes/behaviorfile.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -29,7 +29,7 @@ HkxXMLWriter::~HkxXMLWriter(){
     //
 }
 
-void HkxXMLWriter::setBehaviorFile(BehaviorFile *file){
+void HkxXMLWriter::setFile(HkxFile *file){
     hkxXmlFile = file;
 }
 

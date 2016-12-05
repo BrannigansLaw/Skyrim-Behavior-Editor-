@@ -1,15 +1,15 @@
-#include "hkxobject.h"
-#include "src/filetypes/hkxfile.h"
+#include "src/hkxclasses/hkxobject.h"
+#include "src/filetypes/behaviorfile.h"
 #include "src/xml/hkxxmlreader.h"
-#include "src/hkxclasses/hkbvariablebindingset.h"
-#include "src/ui/behaviorgraphui/behaviorgraphicons.h"
-#include "src/hkxclasses/modifiers/hkbmodifier.h"
+#include "src/hkxclasses/behavior/hkbvariablebindingset.h"
+#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/hkxclasses/behavior/modifiers/hkbmodifier.h"
 
 /**
  * HkxObject
  */
 
-HkxObject::HkxObject(BehaviorFile *parent, long ref)
+HkxObject::HkxObject(HkxFile *parent, long ref)
     : parentFile(parent),
       dataValid(true),
       isWritten(false),
@@ -85,11 +85,15 @@ void HkxObject::unlink(){
     //
 }
 
+bool HkxObject::readData(const HkxXmlReader & reader, long index){
+    return false;
+}
+
 bool HkxObject::write(HkxXMLWriter *writer){
     return false;
 }
 
-BehaviorFile * HkxObject::getParentFile() const{
+HkxFile * HkxObject::getParentFile() const{
     return parentFile;
 }
 
@@ -421,7 +425,7 @@ bool HkxObjectExpSharedPtr::readReference(long index, const HkxXmlReader & reade
  * HkDynamicObject
  */
 
-HkDynamicObject::HkDynamicObject(BehaviorFile *parent, long ref)
+HkDynamicObject::HkDynamicObject(HkxFile *parent, long ref)
     : HkxObject(parent, ref)
 {
     //
@@ -443,7 +447,7 @@ bool HkDynamicObject::linkVar(){
     if (!getParentFile()){
         return false;
     }
-    HkxObjectExpSharedPtr *ptr = getParentFile()->findHkxObject(variableBindingSet.getReference());
+    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variableBindingSet.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_VARIABLE_BINDING_SET){
             getParentFile()->writeToLog("HkDynamicObject: linkVar()!\nThe linked object is not a HKB_VARIABLE_BINDING_SET!\nRemoving the link to the invalid object!");
@@ -476,7 +480,7 @@ HkDynamicObject::~HkDynamicObject(){
  * DataIconManager
 */
 
-DataIconManager::DataIconManager(BehaviorFile *parent, long ref)
+DataIconManager::DataIconManager(HkxFile *parent, long ref)
     : HkDynamicObject(parent, ref)
 {
     //
@@ -514,7 +518,7 @@ bool DataIconManager::hasChildren() const{
     return false;
 }
 
-int DataIconManager::addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder){
+int DataIconManager::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
     return 0;
 }
 
@@ -522,7 +526,7 @@ int DataIconManager::getIndexToInsertIcon() const{
     return -1;
 }
 
-void DataIconManager::appendIcon(GeneratorIcon *icon){
+void DataIconManager::appendIcon(CustomTreeGraphicsViewIcon *icon){
     icons.append(icon);
 }
 

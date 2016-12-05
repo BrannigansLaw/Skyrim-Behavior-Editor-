@@ -5,19 +5,26 @@
 
 #include "src/utility.h"
 
-class BehaviorFile;
+class HkxFile;
 class HkxXmlReader;
 class HkxObjectExpSharedPtr;
 class HkxXMLWriter;
-class GeneratorIcon;
+class CustomTreeGraphicsViewIcon;
 class hkbGenerator;
 
 class HkxObject: public QSharedData
 {
     friend class BehaviorFile;
+    friend class ProjectFile;
+    friend class CharacterFile;
+    friend class SkeletonFile;
     friend class BSIStateManagerModifier;
 public:
-    enum HkxType {TYPE_OTHER=0, TYPE_GENERATOR=1, TYPE_MODIFIER=2};
+    enum HkxType {
+        TYPE_OTHER=0,
+        TYPE_GENERATOR=1,
+        TYPE_MODIFIER=2
+    };
 public:
     virtual ~HkxObject();
     void writeToLog(const QString & message, bool isError = false);
@@ -29,12 +36,13 @@ public:
     virtual bool link() = 0;
     virtual void unlink();
     virtual bool write(HkxXMLWriter *writer);
+    virtual bool readData(const HkxXmlReader & reader, long index);
     QString getReferenceString() const;
     QString getBoolAsString(bool b) const;
     virtual bool setChildAt(HkxObject *newChild, ushort index = 0);
 protected:
-    HkxObject(BehaviorFile *parent, long ref = -1);
-    BehaviorFile * getParentFile() const;
+    HkxObject(HkxFile *parent, long ref = -1);
+    HkxFile * getParentFile() const;
     void setDataValidity(bool isValid);
     void setType(HkxSignature sig, HkxType type);
     bool readMultipleVector4(const QByteArray &lineIn,  QVector <hkQuadVariable> & vectors);
@@ -52,7 +60,7 @@ private:
     HkxObject(const HkxObject &obj);
     HkxObject& operator=(const HkxObject&);
 private:
-    BehaviorFile *parentFile;
+    HkxFile *parentFile;
     long reference;
     HkxSignature signature;
     HkxType typeCheck;
@@ -83,7 +91,7 @@ public:
     void removeBinding(const QString & path);
     void removeBinding(int varIndex);
 protected:
-    HkDynamicObject(BehaviorFile *parent, long ref = -1);
+    HkDynamicObject(HkxFile *parent, long ref = -1);
 protected:
     HkxObjectExpSharedPtr variableBindingSet;
 private:
@@ -94,8 +102,9 @@ private:
 
 class DataIconManager: public HkDynamicObject
 {
-    friend class BehaviorGraphView;
-    friend class GeneratorIcon;
+    friend class CustomTreeGraphicsView;
+    friend class CustomTreeGraphicsViewIcon;
+    friend class BehaviorFile;
 public:
     virtual ~DataIconManager();
     void updateIconNames();
@@ -106,11 +115,11 @@ protected:
     virtual bool wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace);
     virtual bool appendObject(DataIconManager *objToAppend);
     virtual bool removeObject(DataIconManager *objToRemove, bool removeAll = true);
-    virtual int addChildrenToList(QList <HkxObjectExpSharedPtr> & list, bool reverseOrder = true);
-    DataIconManager(BehaviorFile *parent, long ref = -1);
-    void appendIcon(GeneratorIcon * icon);
+    virtual int addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder = true);
+    DataIconManager(HkxFile *parent, long ref = -1);
+    void appendIcon(CustomTreeGraphicsViewIcon * icon);
 private:
-    QList <GeneratorIcon *> icons;
+    QList <CustomTreeGraphicsViewIcon *> icons;
 };
 
 #endif // HKXOBJECT_H

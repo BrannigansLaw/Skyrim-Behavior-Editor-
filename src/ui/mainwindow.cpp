@@ -1,12 +1,13 @@
 #include "mainwindow.h"
-#include "fileselectwindow.h"
-#include "src/filetypes/hkxfile.h"
-#include "src/hkxclasses/generators/hkbgenerator.h"
-#include "src/ui/behaviorgraphui/behaviorgraphui.h"
-#include "src/ui/hkdataui.h"
-#include "src/ui/behaviorvariablesui.h"
-#include "src/ui/eventsui.h"
-#include "src/ui/behaviorgraphui/behaviorgraphicons.h"
+#include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/generators/hkbgenerator.h"
+#include "src/hkxclasses/hkxobject.h"
+#include "src/ui/behaviorgraphui/behaviorgraphview.h"
+#include "src/ui/hkxclassesui/hkdataui.h"
+#include "src/ui/hkxclassesui/behaviorui/behaviorvariablesui.h"
+#include "src/ui/hkxclassesui/behaviorui/eventsui.h"
+#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/hkxclasses/behavior/generators/hkbbehaviorgraph.h"
 
 #include <QtWidgets>
 
@@ -15,15 +16,17 @@ MainWindow::MainWindow()
       topLyt(new QGridLayout(this)),
       topMB(new QMenuBar(this)),
       debugLog(new QPlainTextEdit(this)),
-      openA(new QAction("Open Project", this)),
+      openProjectA(new QAction("Open Project", this)),
+      openBehaviorA(new QAction("Open Behavior", this)),
       fileM(new QMenu("File", this)),
       saveA(new QAction("Save", this)),
       viewM(new QMenu("View", this)),
       expandA(new QAction("Expand All", this)),
       collapseA(new QAction("Collapse All", this)),
-      behaviorGraphViewIV(NULL),
-      dirViewFSW(new FileSelectWindow("Select a hkx file to open!")),
-      hkxFile(NULL),
+      tabs(new QTabWidget),
+      projectFile(NULL),
+      characterFile(NULL),
+      skeletonFile(NULL),
       iconGBLyt(new QVBoxLayout(this)),
       behaviorGraphViewGB(new QGroupBox("Behavior Graph")),
       objectDataSA(new QScrollArea),
@@ -37,11 +40,14 @@ MainWindow::MainWindow()
 {
     //logGB->setMinimumHeight(300);
     //logGB->setMinimumWidth(300);
-    openA->setStatusTip("Open a hkx project file!");
-    openA->setShortcut(QKeySequence::Open);
+    openProjectA->setStatusTip("Open a hkx project file!");
+    openProjectA->setShortcut(QKeySequence::Open);
+    openBehaviorA->setStatusTip("Open a hkx behavior file!");
+    openBehaviorA->setShortcut(QKeySequence::Paste);
     saveA->setStatusTip("Save file!");
     saveA->setShortcut(QKeySequence::Save);
-    fileM->addAction(openA);
+    fileM->addAction(openProjectA);
+    fileM->addAction(openBehaviorA);
     fileM->addAction(saveA);
     expandA->setStatusTip("Expand all branches!");
     expandA->setShortcut(QKeySequence::ZoomIn);
@@ -57,9 +63,10 @@ MainWindow::MainWindow()
     eventsWid->setHkDataUI(objectDataWid);
     variablesWid->setHkDataUI(objectDataWid);
     objectDataWid->setEventsVariablesUI(eventsWid, variablesWid);
+    iconGBLyt->addWidget(tabs);
+    behaviorGraphViewGB->setLayout(iconGBLyt);
     topLyt->addWidget(topMB, 0, 0, 1, 10);
     topLyt->addWidget(behaviorGraphViewGB, 1, 0, 6, 6);
-    //topLyt->addWidget(objectDataGB, 1, 6, 6, 4);
     objectDataSA->setWidgetResizable(true);
     topLyt->addWidget(objectDataSA, 1, 6, 6, 4);
     topLyt->addWidget(eventsWid, 7, 0, 4, 3);
@@ -72,39 +79,68 @@ MainWindow::MainWindow()
     variablesWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
     eventsWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
     logGB->setMaximumSize(size().width()*0.4, size().height()*0.25);
-    connect(openA, SIGNAL(triggered(bool)), this, SLOT(openDirView()));
+    connect(openProjectA, SIGNAL(triggered(bool)), this, SLOT(openProject()));
+    connect(openBehaviorA, SIGNAL(triggered(bool)), this, SLOT(openBehavior()));
     connect(saveA, SIGNAL(triggered(bool)), this, SLOT(save()));
     connect(expandA, SIGNAL(triggered(bool)), this, SLOT(expandBranches()));
     connect(collapseA, SIGNAL(triggered(bool)), this, SLOT(collapseBranches()));
-    connect(dirViewFSW, SIGNAL(selectFile(QString)), this, SLOT(openHkxfile(QString)));
+    connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(changedTabs(int)));
 }
 
 MainWindow::~MainWindow(){
     //
 }
 
+void MainWindow::changedTabs(int index){
+    if (index >= 0 && index < behaviorFiles.size() && index < behaviorGraphs.size()){
+        objectDataWid->setBehaviorView(behaviorGraphs.at(index));
+        objectDataWid->changeCurrentDataWidget(NULL);
+        if (progressD){
+            delete progressD;
+        }
+        progressD = new QProgressDialog(this);
+        progressD->setMinimumSize(QSize(800, 200));
+        progressD->setWindowModality(Qt::WindowModal);
+        setProgressData("Loading Variables...", 0);
+        variablesWid->loadData(behaviorFiles.at(index)->getBehaviorGraphData());
+        setProgressData("Loading Events...", 50);
+        eventsWid->loadData(behaviorFiles.at(index)->getBehaviorGraphData());
+        progressD->setValue(100);
+        progressD->done(0);
+        progressD->close();
+    }else{
+        writeToLog("MainWindow: changedTabs() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!", true);
+    }
+}
+
 void MainWindow::expandBranches(){
-    if (behaviorGraphViewIV){
-        behaviorGraphViewIV->expandBranch(behaviorGraphViewIV->rootIcon, true);
+    if (tabs->currentIndex() >= 0 && tabs->currentIndex() < behaviorFiles.size() && tabs->currentIndex() < behaviorGraphs.size()){
+        behaviorGraphs.at(tabs->currentIndex())->expandBranch(behaviorGraphs.at(tabs->currentIndex())->rootIcon, true);
+    }else{
+        writeToLog("MainWindow: collapseBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!", true);
     }
 }
 
 void MainWindow::collapseBranches(){
-    if (behaviorGraphViewIV){
-        behaviorGraphViewIV->contractBranch(behaviorGraphViewIV->rootIcon, true);
-        behaviorGraphViewIV->rootIcon->setSelected();
+    if (tabs->currentIndex() >= 0 && tabs->currentIndex() < behaviorFiles.size() && tabs->currentIndex() < behaviorGraphs.size()){
+        behaviorGraphs.at(tabs->currentIndex())->contractBranch(behaviorGraphs.at(tabs->currentIndex())->rootIcon, true);
+        behaviorGraphs.at(tabs->currentIndex())->rootIcon->setSelected();
+    }else{
+        writeToLog("MainWindow: collapseBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!", true);
     }
 }
 
 void MainWindow::save(){
-    if (hkxFile){
-        hkxFile->write();
+    if (tabs->currentIndex() >= 0 && tabs->currentIndex() < behaviorFiles.size()){
+        behaviorFiles.at(tabs->currentIndex())->write();
+    }else{
+        writeToLog("MainWindow: save() failed!\nThe tab index is out of sync with the behavior files!", true);
     }
 }
 
 void MainWindow::setProgressData(const QString & message, int max, int min, int value){
     if (progressD){
-        progressD->setWindowTitle("Opening "+dirViewFSW->getSelectedFilename());
+        //progressD->setWindowTitle("Opening "+dirViewFSW->getSelectedFilename());
         progressD->setLabelText(message);
         progressD->setMaximum(max);
         progressD->setMinimum(min);
@@ -139,11 +175,15 @@ void MainWindow::writeToLog(const QString &message, bool isError){
     debugLog->setTextCursor(tempTC);
 }
 
-void MainWindow::openDirView(){
-    dirViewFSW->show();
+void MainWindow::openProject(){
+    //
 }
 
-void MainWindow::openHkxfile(QString name){
+void MainWindow::openBehavior(){
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open hkx file"), "C:/", tr("hkx Files (*.hkx)"));
+    if (fileName == ""){
+        return;
+    }
     QTime t;
     t.start();
     if (progressD){
@@ -154,56 +194,31 @@ void MainWindow::openHkxfile(QString name){
     progressD->setWindowModality(Qt::WindowModal);
     setProgressData("Opening file...", 0, 100, 0);
     drawGraph = true;
-    if (!hkxFile){
-        setProgressData("Beginning XML parse...", 5);
-        hkxFile = new BehaviorFile(this, name);
-        if (!drawGraph){
-            delete hkxFile;
-            hkxFile = NULL;
-            return;
-        }
-        if (!behaviorGraphViewIV){
-            behaviorGraphViewIV = new BehaviorGraphView(objectDataWid, hkxFile);
-        }
-        //behaviorGraphViewIV->setBehaviorFile(hkxFile);
-        behaviorGraphViewGB->setTitle(name);
-        setProgressData("Drawing Behavior Graph...", 60);
-        if (!behaviorGraphViewIV->drawBehaviorGraph()){
-            writeToLog("MainWindow: drawBehaviorGraph() failed!\nThe behavior graph was drawn incorrectly!", true);
-        }
-    }else{
-        setProgressData("Deleting previously loaded Behavior Graph...", 0);
-        delete hkxFile;
-        delete behaviorGraphViewIV;
-        hkxFile = NULL;
-        behaviorGraphViewIV = NULL;
-        behaviorGraphViewGB->setTitle(name);
-        setProgressData("Beginning XML parse...", 5);
-        hkxFile = new BehaviorFile(this, name);
-        if (!drawGraph){
-            delete hkxFile;
-            hkxFile = NULL;
-            return;
-        }
-        if (!behaviorGraphViewIV){
-            behaviorGraphViewIV = new BehaviorGraphView(objectDataWid, hkxFile);
-        }
-        //behaviorGraphViewIV->setBehaviorFile(hkxFile);
-        setProgressData("Drawing Behavior Graph...", 90);
-        if (!behaviorGraphViewIV->drawBehaviorGraph()){
-            writeToLog("MainWindow: drawBehaviorGraph() failed!\nThe behavior graph was drawn incorrectly!", true);
-        }
+    objectDataWid->changeCurrentDataWidget(NULL);
+    setProgressData("Beginning XML parse...", 5);
+    behaviorFiles.append(new BehaviorFile(this, fileName));
+    behaviorGraphs.append(new BehaviorGraphView(objectDataWid, behaviorFiles.last()));
+    if (!drawGraph){
+        delete behaviorFiles.last();
+        behaviorFiles.removeLast();
+        delete behaviorGraphs.last();
+        behaviorGraphs.removeLast();
+        progressD->close();
+        return;
+    }
+    tabs->addTab(behaviorGraphs.last(), fileName);
+    setProgressData("Drawing Behavior Graph...", 60);
+    if (!behaviorGraphs.last()->draw(static_cast<DataIconManager *>(behaviorFiles.last()->getBehaviorGraph()), static_cast<DataIconManager *>(behaviorFiles.last()->getRootStateMachine()))){
+        writeToLog("MainWindow: drawBehaviorGraph() failed!\nThe behavior graph was drawn incorrectly!", true);
     }
     setProgressData("Loading Variables...", 95);
-    variablesWid->loadData(hkxFile->getBehaviorGraphData());
+    variablesWid->loadData(behaviorFiles.last()->getBehaviorGraphData());
     setProgressData("Loading Events...", 99);
-    eventsWid->loadData(hkxFile->getBehaviorGraphData());
-    iconGBLyt->addWidget(behaviorGraphViewIV);
-    behaviorGraphViewGB->setLayout(iconGBLyt);
+    eventsWid->loadData(behaviorFiles.last()->getBehaviorGraphData());
     progressD->setValue(100);
     progressD->done(0);
     progressD->close();
-    debugLog->appendPlainText("\n-------------------------\nTime taken to open file \""+dirViewFSW->getSelectedFilename()+"\" is approximately "+QString::number(t.elapsed()/1000)+" seconds\n-------------------------\n");
+    debugLog->appendPlainText("\n-------------------------\nTime taken to open file \""+fileName+"\" is approximately "+QString::number(t.elapsed()/1000)+" seconds\n-------------------------\n");
 }
 
 void MainWindow::readSettings()

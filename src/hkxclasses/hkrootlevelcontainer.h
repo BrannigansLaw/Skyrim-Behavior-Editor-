@@ -1,16 +1,17 @@
 #ifndef HKROOTLEVELCONTAINER_H
 #define HKROOTLEVELCONTAINER_H
 
-#include "hkxobject.h"
+#include "src/hkxclasses/hkxobject.h"
 
 class hkRootLevelContainer: public HkxObject
 {
     friend class BehaviorGraphView;
+    friend class BehaviorFile;
 public:
-    hkRootLevelContainer(BehaviorFile *parent, long ref = -1);
+    hkRootLevelContainer(HkxFile *parent, long ref = -1);
     virtual ~hkRootLevelContainer();
     bool link();
-    bool readData(const HkxXmlReader & reader, int index);
+    bool readData(const HkxXmlReader & reader, long index);
     void unlink();
     bool evaulateDataValidity();
     static QString getClassname();

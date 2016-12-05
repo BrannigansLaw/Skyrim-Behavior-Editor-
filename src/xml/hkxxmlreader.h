@@ -7,7 +7,7 @@
 
 #include "src/utility.h"
 
-class BehaviorFile;
+class HkxFile;
 
 class HkxXmlReader
 {
@@ -31,10 +31,10 @@ public:
         MalformedEndElementTag = 14,
         UnknownError = 50
     };
-    HkxXmlReader(BehaviorFile *file = NULL);
+    HkxXmlReader(HkxFile *file = NULL);
     bool parse();
     virtual ~HkxXmlReader();
-    void setBehaviorFile(BehaviorFile *file);
+    void setFile(HkxFile *file);
     bool atEnd() const;
     int getLastElementIndex() const;
     int getNumElements() const;
@@ -58,7 +58,7 @@ private:
         QList <Attribute> attributeList;
         bool isContainedOnOneLine;
     };
-    BehaviorFile *hkxXmlFile;
+    HkxFile *hkxXmlFile;
     QList <Element> elementList;
     bool isEOF;
     QVector <long> indexOfElemTags;

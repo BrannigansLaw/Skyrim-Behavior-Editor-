@@ -9,7 +9,7 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class FileSelectWindow;
+//class FileSelectWindow;
 class QVBoxLayout;
 class QMenuBar;
 class QMenu;
@@ -17,17 +17,24 @@ class QFile;
 class QGraphicsScene;
 class QGroupBox;
 class QHBoxLayout;
-class BehaviorFile;
 class BehaviorGraphView;
 class QPlainTextEdit;
 class HkDataUI;
 class BehaviorVariablesUI;
 class EventsUI;
+class ProjectFile;
+class BehaviorFile;
+class CharacterFile;
+class ProjectFile;
+class SkeletonFile;
 
 class MainWindow : public QWidget
 {
     Q_OBJECT
     friend class BehaviorFile;
+    friend class ProjectFile;
+    friend class CharacterFile;
+    friend class SkeletonFile;
 public:
     MainWindow();
     virtual ~MainWindow();
@@ -39,18 +46,21 @@ private:
     QPlainTextEdit *debugLog;
     QGridLayout *topLyt;
     QMenuBar *topMB;
-    QAction *openA;
+    QAction *openProjectA;
+    QAction *openBehaviorA;
     QMenu *fileM;
     QAction *saveA;
     QMenu *viewM;
     QAction *expandA;
     QAction *collapseA;
-    FileSelectWindow *dirViewFSW;
-    BehaviorFile *hkxFile;
-    BehaviorGraphView *behaviorGraphViewIV;
+    QTabWidget *tabs;
+    ProjectFile *projectFile;
+    CharacterFile *characterFile;
+    SkeletonFile *skeletonFile;
+    QList <BehaviorFile *> behaviorFiles;
+    QList <BehaviorGraphView *> behaviorGraphs;
     QGroupBox *behaviorGraphViewGB;
     QVBoxLayout *iconGBLyt;
-    //QGroupBox *objectDataGB;
     HkDataUI *objectDataWid;
     QScrollArea *objectDataSA;
     BehaviorVariablesUI *variablesWid;
@@ -60,11 +70,12 @@ private:
     QProgressDialog *progressD;
     bool drawGraph;
 private slots:
-    void openDirView();
-    void openHkxfile(QString name);
+    void openProject();
+    void openBehavior();
     void expandBranches();
     void collapseBranches();
     void save();
+    void changedTabs(int index);
 private:
     void setProgressData(const QString & message, int max, int min, int value);
     bool exitProgram();
