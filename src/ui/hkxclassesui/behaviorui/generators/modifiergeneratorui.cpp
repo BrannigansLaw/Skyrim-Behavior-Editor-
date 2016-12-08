@@ -97,10 +97,10 @@ void ModifierGeneratorUI::setName(){
 }
 
 void ModifierGeneratorUI::setModifier(int index){
-    /*if (behaviorView && index > -1){
-        hkbModifier *ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getModifierDataAt(index);
+    if (behaviorView && index > -1){
+        DataIconManager *ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getModifierDataAt(index);
         if (!behaviorView->selectedIcon->getChildIcon(ptr)){
-            if (!ptr || ptr == bsData || !behaviorView->reconnectBranch(bsData->modifier.data(), ptr, behaviorView->getSelectedItem())){
+            if (!ptr || ptr == bsData || !behaviorView->reconnectBranch(static_cast<DataIconManager *>(bsData->modifier.data()), ptr, behaviorView->getSelectedItem())){
                 QMessageBox msg;
                 msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!");
                 msg.exec();
@@ -110,10 +110,10 @@ void ModifierGeneratorUI::setModifier(int index){
         modifier->setText(ptr->getName());
         if (index > 0){
             bsData->modifier = HkxObjectExpSharedPtr(ptr);
-            behaviorView->removeGeneratorData();
+            behaviorView->removeModifierData();
         }
-    }*/
-    generatorTable->hide();
+    }
+    modifiersTable->hide();
 }
 
 void ModifierGeneratorUI::setGenerator(int index){
@@ -140,7 +140,7 @@ void ModifierGeneratorUI::loadData(HkxObject *data){
     if (data && data->getSignature() == HKB_MODIFIER_GENERATOR){
         bsData = static_cast<hkbModifierGenerator *>(data);
         name->setText(bsData->name);
-        if (bsData->generator.data()){
+        if (bsData->modifier.data()){
             modifier->setText(static_cast<hkbModifier *>(bsData->modifier.data())->getName());
         }
         if (bsData->generator.data()){

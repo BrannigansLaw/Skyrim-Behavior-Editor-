@@ -429,10 +429,11 @@ void StateMachineUI::addNewStateWithGenerator(){
             return;
         }
         if (!bsData->states.isEmpty() && bsData->states.last().data()){
-            states->setRowCount(states->rowCount() + 1);
-            states->setItem(states->rowCount(), 0, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->states.last().data())->getName()));
-            states->setItem(states->rowCount(), 1, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->states.last().data())->getClassname()));
-            states->setItem(states->rowCount(), 2, new QTableWidgetItem("Click To Edit"));
+            int index = states->rowCount();
+            states->setRowCount(index + 1);
+            states->setItem(index, 0, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->states.last().data())->getName()));
+            states->setItem(index, 1, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->states.last().data())->getClassname()));
+            states->setItem(index, 2, new QTableWidgetItem("Click To Edit"));
         }
     }
 }

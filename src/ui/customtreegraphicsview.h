@@ -78,7 +78,6 @@ private:
     void expandBranchForIcon(CustomTreeGraphicsViewIcon *icon);
     void removeChildIcons(CustomTreeGraphicsViewIcon *parent, CustomTreeGraphicsViewIcon *iconToKeep = NULL);
     void repositionIcons(CustomTreeGraphicsViewIcon * icon, bool updateNonVisable = false);
-    void popUpMenuRequested(const QPoint &pos);
     void expandBranch(CustomTreeGraphicsViewIcon * icon, bool expandAll = false);
     void contractBranch(CustomTreeGraphicsViewIcon * icon, bool contractAll = false);
     bool positionIcon(CustomTreeGraphicsViewIcon * icon);

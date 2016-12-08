@@ -1,5 +1,6 @@
 #include "hkbstatemachinestateinfo.h"
 #include "src/hkxclasses/behavior/hkbstatemachinetransitioninfoarray.h"
+#include "src/hkxclasses/behavior/generators/hkbstatemachine.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 /*
@@ -12,14 +13,18 @@ QString hkbStateMachineStateInfo::classname = "hkbStateMachineStateInfo";
 
 hkbStateMachineStateInfo::hkbStateMachineStateInfo(HkxFile *parent, hkbStateMachine *parentSM, long ref)
     : hkbGenerator(parent, ref),
-      name("State"),
-      stateId(0),
       probability(1),
+      stateId(0),
       enable(true),
-      parentSM(reinterpret_cast<HkxObject *>(parentSM))
+      parentSM(parentSM)
 {
     setType(HKB_STATE_MACHINE_STATE_INFO, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
+    if (parentSM){
+        name = "State"+QString::number(parentSM->generateValidStateId());
+    }else{
+        name = "State"+QString::number(refCount);
+    }
     refCount++;
 }
 

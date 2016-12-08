@@ -5,30 +5,96 @@
 #include "src/ui/behaviorgraphui/behaviorgraphview.h"
 #include "src/hkxclasses/hkxobject.h"
 #include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
-#include "src/ui//hkxclassesui/hkdataui.h"
+#include "src/ui/hkxclassesui/hkdataui.h"
 
-#include "src/hkxclasses/behavior/generators/hkbstatemachinestateinfo.h"
-#include "src/hkxclasses/behavior/generators/hkbstatemachine.h"
-#include "src/hkxclasses/behavior/generators/hkbmodifiergenerator.h"
 #include "src/hkxclasses/behavior/generators/bsistatetagginggenerator.h"
 #include "src/hkxclasses/behavior/generators/bscyclicblendtransitiongenerator.h"
 #include "src/hkxclasses/behavior/generators/bsboneswitchgenerator.h"
 #include "src/hkxclasses/behavior/generators/bsboneswitchgeneratorbonedata.h"
 #include "src/hkxclasses/behavior/generators/bssynchronizedclipgenerator.h"
+#include "src/hkxclasses/behavior/generators/bsoffsetanimationgenerator.h"
+#include "src/hkxclasses/behavior/generators/bgsgamebryosequencegenerator.h"
+
+#include "src/hkxclasses/behavior/generators/hkbgenerator.h"
+#include "src/hkxclasses/behavior/generators/hkbstatemachinestateinfo.h"
+#include "src/hkxclasses/behavior/generators/hkbstatemachine.h"
+#include "src/hkxclasses/behavior/generators/hkbmodifiergenerator.h"
 #include "src/hkxclasses/behavior/generators/hkbmanualselectorgenerator.h"
 #include "src/hkxclasses/behavior/generators/hkbblendergeneratorchild.h"
-#include "src/hkxclasses/behavior/hkbboneweightarray.h"
 #include "src/hkxclasses/behavior/generators/hkbblendergenerator.h"
-#include "src/hkxclasses/behavior/generators/bsoffsetanimationgenerator.h"
 #include "src/hkxclasses/behavior/generators/hkbposematchinggenerator.h"
 #include "src/hkxclasses/behavior/generators/hkbclipgenerator.h"
 #include "src/hkxclasses/behavior/generators/hkbbehaviorreferencegenerator.h"
+
+#include "src/hkxclasses/behavior/modifiers/bsisactivemodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bslimbikmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bsspeedsamplermodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bslookatmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bsmodifyoncemodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bseventonfalsetotruemodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bseventondeactivatemodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bsragdollcontactlistenermodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bsdirectatmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bsdecomposevectormodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bscomputeaddboneanimmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bsdisttriggermodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bseventeveryneventsmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bsinterpvaluemodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bspassbytargettriggermodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bstimermodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bstweenermodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bsistatemanagermodifier.h"
+#include "src/hkxclasses/behavior/modifiers/bsgettimestepmodifier.h"
+
+#include "src/hkxclasses/behavior/modifiers/hkbmodifierlist.h"
+#include "src/hkxclasses/behavior/modifiers/hkbtwistmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbeventdrivenmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbfootikcontrolsmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbevaluateexpressionmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbrotatecharactermodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbdampingmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbkeyframebonesmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbpoweredragdollcontrolsmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbtimermodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbrigidbodyragdollcontrolsmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbgetupmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbcomputedirectionmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbevaluatehandlemodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbgethandleonbonemodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbsensehandlemodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbdelayedmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbdetectclosetogroundmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbattachmentmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbattributemodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbcombinetransformsmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbcomputerotationfromaxisanglemodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbcomputerotationtotargetmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbeventsfromrangemodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbextractragdollposemodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbgetworldfrommodelmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkblookatmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbmirrormodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbmovecharactermodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbtransformvectormodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbproxymodifier.h"
+
+#include "src/hkxclasses/hkxobject.h"
+#include "src/hkxclasses/behavior/hkbgeneratortransitioneffect.h"
+#include "src/hkxclasses/behavior/hkbeventrangedataarray.h"
+#include "src/hkxclasses/behavior/hkbboneweightarray.h"
+#include "src/hkxclasses/behavior/hkbboneindexarray.h"
+#include "src/hkxclasses/behavior/hkbexpressiondataarray.h"
 #include "src/hkxclasses/behavior/hkbstatemachinetransitioninfoarray.h"
 #include "src/hkxclasses/behavior/hkbstatemachineeventpropertyarray.h"
+#include "src/hkxclasses/behavior/hkbblendingtransitioneffect.h"
+#include "src/hkxclasses/behavior/hkbexpressioncondition.h"
 #include "src/hkxclasses/behavior/generators/hkbbehaviorgraph.h"
+#include "src/hkxclasses/behavior/hkbcliptriggerarray.h"
+#include "src/hkxclasses/behavior/hkbstringeventpayload.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphstringdata.h"
 #include "src/hkxclasses/behavior/hkbvariablevalueset.h"
+#include "src/hkxclasses/behavior/hkbvariablebindingset.h"
 #include "src/hkxclasses/hkrootlevelcontainer.h"
 
 #include <QBoxLayout>
@@ -50,92 +116,259 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
       behavior(file),
       contextMenu(new QMenu(this)),
       appendGeneratorMenu(new QMenu("Append Generator:", contextMenu)),
-      appendSMAct(new QAction("State Machine", appendGeneratorMenu)),
-      appendMSGAct(new QAction("Manual Selector Generator", appendGeneratorMenu)),
-      appendMGAct(new QAction("Modifier Generator", appendGeneratorMenu)),
-      appendBSISTGAct(new QAction("BS iState Tagging Generator", appendGeneratorMenu)),
-      appendBSSCGAct(new QAction("BS Synchronized Clip Generator", appendGeneratorMenu)),
-      appendBSOAGAct(new QAction("BS Offset Animation Generator", appendGeneratorMenu)),
-      appendBSCBTGAct(new QAction("BS Cyclic Blend Transition Generator", appendGeneratorMenu)),
-      appendPMGAct(new QAction("Pose Matching Generator", appendGeneratorMenu)),
-      appendCGAct(new QAction("Clip Generator", appendGeneratorMenu)),
-      appendBRGAct(new QAction("Behavior Reference Generator", appendGeneratorMenu)),
+      appendStateMachineAct(new QAction("State Machine", appendGeneratorMenu)),
+      appendManualSelectorGeneratorAct(new QAction("Manual Selector Generator", appendGeneratorMenu)),
+      appendModifierGeneratorAct(new QAction("Modifier Generator", appendGeneratorMenu)),
+      appendBSIStateTaggingGeneratorAct(new QAction("BS iState Tagging Generator", appendGeneratorMenu)),
+      appendBSSynchronizedClipGeneratorAct(new QAction("BS Synchronized Clip Generator", appendGeneratorMenu)),
+      appendBSOffsetAnimationGeneratorAct(new QAction("BS Offset Animation Generator", appendGeneratorMenu)),
+      appendBSCyclicBlendTransitionGeneratorAct(new QAction("BS Cyclic Blend Transition Generator", appendGeneratorMenu)),
+      appendPoseMatchingGeneratorAct(new QAction("Pose Matching Generator", appendGeneratorMenu)),
+      appendClipGeneratorAct(new QAction("Clip Generator", appendGeneratorMenu)),
+      appendBehaviorReferenceGeneratorAct(new QAction("Behavior Reference Generator", appendGeneratorMenu)),
+      appendBGSGamebryoSequenceGeneratorAct(new QAction("BGS Gamebryo Sequence Generator", appendGeneratorMenu)),
       appendBlenderMenu(new QMenu("Append Blend:", contextMenu)),
-      appendBGAct(new QAction("Blender Generator", appendBlenderMenu)),
-      appendBSBSGAct(new QAction("BS Bone Switch Generator", appendBlenderMenu)),
+      appendBlenderGeneratorAct(new QAction("Blender Generator", appendBlenderMenu)),
+      appendBSBoneSwitchGeneratorAct(new QAction("BS Bone Switch Generator", appendBlenderMenu)),
       wrapGeneratorMenu(new QMenu("Wrap inside Generator:", contextMenu)),
-      wrapSMAct(new QAction("State Machine", wrapGeneratorMenu)),
-      wrapMSGAct(new QAction("Manual Selector Generator", wrapGeneratorMenu)),
-      wrapMGAct(new QAction("Modifier Generator", wrapGeneratorMenu)),
-      wrapBSISTGAct(new QAction("BS iState Tagging Generator", wrapGeneratorMenu)),
-      wrapBSSCGAct(new QAction("BS Synchronized Clip Generator", wrapGeneratorMenu)),
-      wrapBSOAGAct(new QAction("BS Offset Animation Generator", wrapGeneratorMenu)),
-      wrapBSCBTGAct(new QAction("BS Cyclic Blend Transition Generator", wrapGeneratorMenu)),
-      wrapPMGAct(new QAction("Pose Matching Generator", wrapGeneratorMenu)),
+      wrapStateMachineAct(new QAction("State Machine", wrapGeneratorMenu)),
+      wrapManualSelectorGeneratorAct(new QAction("Manual Selector Generator", wrapGeneratorMenu)),
+      wrapModifierGeneratorAct(new QAction("Modifier Generator", wrapGeneratorMenu)),
+      wrapBSIStateTaggingGeneratorAct(new QAction("BS iState Tagging Generator", wrapGeneratorMenu)),
+      wrapBSSynchronizedClipGeneratorAct(new QAction("BS Synchronized Clip Generator", wrapGeneratorMenu)),
+      wrapBSOffsetAnimationGeneratorAct(new QAction("BS Offset Animation Generator", wrapGeneratorMenu)),
+      wrapBSCyclicBlendTransitionGeneratorAct(new QAction("BS Cyclic Blend Transition Generator", wrapGeneratorMenu)),
+      wrapPoseMatchingGeneratorAct(new QAction("Pose Matching Generator", wrapGeneratorMenu)),
       wrapBlenderMenu(new QMenu("Wrap inside Blend:", contextMenu)),
-      wrapBGAct(new QAction("Blender Generator", wrapBlenderMenu)),
-      wrapBSBSGAct(new QAction("BS Bone Switch Generator", wrapBlenderMenu)),
+      wrapBlenderGeneratorAct(new QAction("Blender Generator", wrapBlenderMenu)),
+      wrapBSBoneSwitchGeneratorAct(new QAction("BS Bone Switch Generator", wrapBlenderMenu)),
+      appendModifierMenu(new QMenu("Append Modifier:", contextMenu)),
+      appendModifierListAct(new QAction("Modifier List", appendModifierMenu)),
+      appendTwistModifierAct(new QAction("Twist Modifier", appendModifierMenu)),
+      appendEventDrivenModifierAct(new QAction("Event Driven Modifier", appendModifierMenu)),
+      appendIsActiveModifierAct(new QAction("BS Is Active Modifier", appendModifierMenu)),
+      appendLimbIKModifierAct(new QAction("BS Limb IK Modifier", appendModifierMenu)),
+      appendInterpValueModifierAct(new QAction("BS Interp Value Modifier", appendModifierMenu)),
+      appendGetTimeStepModifierAct(new QAction("BS Get Time Step Modifier", appendModifierMenu)),
+      appendFootIkControlsModifierAct(new QAction("Foot IK Controls Modifier", appendModifierMenu)),
+      appendGetHandleOnBoneModifierAct(new QAction("Get Handle On Bone Modifier", appendModifierMenu)),
+      appendTransformVectorModifierAct(new QAction("Transform Vector Modifier", appendModifierMenu)),
+      appendProxyModifierAct(new QAction("Proxy Modifier", appendModifierMenu)),
+      appendLookAtModifierAct(new QAction("Look At Modifier", appendModifierMenu)),
+      appendMirrorModifierAct(new QAction("Mirror Modifier", appendModifierMenu)),
+      appendGetWorldFromModelModifierAct(new QAction("Get World From Model Modifier", appendModifierMenu)),
+      appendSenseHandleModifierAct(new QAction("Sense Handle Modifier", appendModifierMenu)),
+      appendEvaluateExpressionModifierAct(new QAction("Evaluate Expression Modifier", appendModifierMenu)),
+      appendEvaluateHandleModifierAct(new QAction("Evaluate Handle Modifier", appendModifierMenu)),
+      appendAttachmentModifierAct(new QAction("Attachment Modifier", appendModifierMenu)),
+      appendAttributeModifierAct(new QAction("AttributeModifier", appendModifierMenu)),
+      appendCombineTransformsModifierAct(new QAction("Combine Transforms Modifier", appendModifierMenu)),
+      appendComputeRotationFromAxisAngleModifierAct(new QAction("Compute Rotation From Axis Angle Modifier", appendModifierMenu)),
+      appendComputeRotationToTargetModifierAct(new QAction("Compute Rotation To Target Modifier", appendModifierMenu)),
+      appendEventsFromRangeModifierAct(new QAction("Events From Range Modifier", appendModifierMenu)),
+      appendMoveCharacterModifierAct(new QAction("Move Character Modifier", appendModifierMenu)),
+      appendExtractRagdollPoseModifierAct(new QAction("Extract Ragdoll Pose Modifier", appendModifierMenu)),
+      appendModifyOnceModifierAct(new QAction("BS Modify Once Modifier", appendModifierMenu)),
+      appendEventOnDeactivateModifierAct(new QAction("BS Event On Deactivate Modifier", appendModifierMenu)),
+      appendEventEveryNEventsModifierAct(new QAction("BS Event Every N Events Modifier", appendModifierMenu)),
+      appendRagdollContactListenerModifierAct(new QAction("Ragdoll Contact Listener Modifier", appendModifierMenu)),
+      appendPoweredRagdollControlsModifierAct(new QAction("Powered Ragdoll Controls Modifier", appendModifierMenu)),
+      appendEventOnFalseToTrueModifierAct(new QAction("BS Event On False To True Modifier", appendModifierMenu)),
+      appendDirectAtModifierAct(new QAction("BS Direct At Modifier", appendModifierMenu)),
+      appendDistTriggerModifierAct(new QAction("BS Dist Trigger Modifier", appendModifierMenu)),
+      appendDecomposeVectorModifierAct(new QAction("BS Decompose Vector Modifier", appendModifierMenu)),
+      appendComputeAddBoneAnimModifierAct(new QAction("BS Compute Add Bone Anim Modifier", appendModifierMenu)),
+      appendTweenerModifierAct(new QAction("BS Tweener Modifier", appendModifierMenu)),
+      appendBSIStateManagerModifierAct(new QAction("BS I State Manager Modifier", appendModifierMenu)),
+      appendTimerModifierAct(new QAction("Timer Modifier", appendModifierMenu)),
+      appendRotateCharacterModifierAct(new QAction("Rotate Character Modifier", appendModifierMenu)),
+      appendDampingModifierAct(new QAction("Damping Modifier", appendModifierMenu)),
+      appendDelayedModifierAct(new QAction("Delayed Modifier", appendModifierMenu)),
+      appendGetUpModifierAct(new QAction("Get Up Modifier", appendModifierMenu)),
+      appendKeyframeBonesModifierAct(new QAction("Keyframe Bones Modifier", appendModifierMenu)),
+      appendComputeDirectionModifierAct(new QAction("Compute Direction Modifier", appendModifierMenu)),
+      appendRigidBodyRagdollControlsModifierAct(new QAction("Rigid Body Ragdoll Controls Modifier", appendModifierMenu)),
+      appendBSSpeedSamplerModifierAct(new QAction("BS Speed Sampler Modifier", appendModifierMenu)),
+      appendDetectCloseToGroundModifierAct(new QAction("Detect Close To Ground Modifier", appendModifierMenu)),
+      appendBSTimerModifierAct(new QAction("BS Timer Modifier", appendModifierMenu)),
+      appendBSLookAtModifierAct(new QAction("BS Look At Modifier", appendModifierMenu)),
+      appendBSPassByTargetTriggerModifierAct(new QAction("BS Pass By Target Trigger Modifier", appendModifierMenu)),
       removeObjBranchAct(new QAction("Remove Selected Object and Children", contextMenu))
 {
     contextMenu->addMenu(appendGeneratorMenu);
-    appendGeneratorMenu->addAction(appendSMAct);
-    appendGeneratorMenu->addAction(appendMSGAct);
-    appendGeneratorMenu->addAction(appendMGAct);
-    appendGeneratorMenu->addAction(appendBSISTGAct);
-    appendGeneratorMenu->addAction(appendBSSCGAct);
-    appendGeneratorMenu->addAction(appendBSOAGAct);
-    appendGeneratorMenu->addAction(appendBSCBTGAct);
-    appendGeneratorMenu->addAction(appendPMGAct);
-    appendGeneratorMenu->addAction(appendCGAct);
-    appendGeneratorMenu->addAction(appendBRGAct);
+    appendGeneratorMenu->addAction(appendStateMachineAct);
+    appendGeneratorMenu->addAction(appendManualSelectorGeneratorAct);
+    appendGeneratorMenu->addAction(appendModifierGeneratorAct);
+    appendGeneratorMenu->addAction(appendBSIStateTaggingGeneratorAct);
+    appendGeneratorMenu->addAction(appendBSSynchronizedClipGeneratorAct);
+    appendGeneratorMenu->addAction(appendBSOffsetAnimationGeneratorAct);
+    appendGeneratorMenu->addAction(appendBSCyclicBlendTransitionGeneratorAct);
+    appendGeneratorMenu->addAction(appendPoseMatchingGeneratorAct);
+    appendGeneratorMenu->addAction(appendClipGeneratorAct);
+    appendGeneratorMenu->addAction(appendBehaviorReferenceGeneratorAct);
+    appendGeneratorMenu->addAction(appendBGSGamebryoSequenceGeneratorAct);
     contextMenu->addMenu(appendBlenderMenu);
-    appendBlenderMenu->addAction(appendBGAct);
-    appendBlenderMenu->addAction(appendBSBSGAct);
+    appendBlenderMenu->addAction(appendBlenderGeneratorAct);
+    appendBlenderMenu->addAction(appendBSBoneSwitchGeneratorAct);
     contextMenu->addMenu(wrapGeneratorMenu);
-    wrapGeneratorMenu->addAction(wrapSMAct);
-    wrapGeneratorMenu->addAction(wrapMSGAct);
-    wrapGeneratorMenu->addAction(wrapMGAct);
-    wrapGeneratorMenu->addAction(wrapBSISTGAct);
-    wrapGeneratorMenu->addAction(wrapBSSCGAct);
-    wrapGeneratorMenu->addAction(wrapBSOAGAct);
-    wrapGeneratorMenu->addAction(wrapBSCBTGAct);
-    wrapGeneratorMenu->addAction(wrapPMGAct);
+    wrapGeneratorMenu->addAction(wrapStateMachineAct);
+    wrapGeneratorMenu->addAction(wrapManualSelectorGeneratorAct);
+    wrapGeneratorMenu->addAction(wrapModifierGeneratorAct);
+    wrapGeneratorMenu->addAction(wrapBSIStateTaggingGeneratorAct);
+    wrapGeneratorMenu->addAction(wrapBSSynchronizedClipGeneratorAct);
+    wrapGeneratorMenu->addAction(wrapBSOffsetAnimationGeneratorAct);
+    wrapGeneratorMenu->addAction(wrapBSCyclicBlendTransitionGeneratorAct);
+    wrapGeneratorMenu->addAction(wrapPoseMatchingGeneratorAct);
     contextMenu->addMenu(wrapBlenderMenu);
-    wrapBlenderMenu->addAction(wrapBGAct);
-    wrapBlenderMenu->addAction(wrapBSBSGAct);
+    wrapBlenderMenu->addAction(wrapBlenderGeneratorAct);
+    wrapBlenderMenu->addAction(wrapBSBoneSwitchGeneratorAct);
+    contextMenu->addMenu(appendModifierMenu);
+    appendModifierMenu->addAction(appendModifierListAct);
+    appendModifierMenu->addAction(appendTwistModifierAct);
+    appendModifierMenu->addAction(appendEventDrivenModifierAct);
+    appendModifierMenu->addAction(appendIsActiveModifierAct);
+    appendModifierMenu->addAction(appendLimbIKModifierAct);
+    appendModifierMenu->addAction(appendInterpValueModifierAct);
+    appendModifierMenu->addAction(appendGetTimeStepModifierAct);
+    appendModifierMenu->addAction(appendFootIkControlsModifierAct);
+    appendModifierMenu->addAction(appendGetHandleOnBoneModifierAct);
+    appendModifierMenu->addAction(appendTransformVectorModifierAct);
+    appendModifierMenu->addAction(appendProxyModifierAct);
+    appendModifierMenu->addAction(appendLookAtModifierAct);
+    appendModifierMenu->addAction(appendMirrorModifierAct);
+    appendModifierMenu->addAction(appendGetWorldFromModelModifierAct);
+    appendModifierMenu->addAction(appendSenseHandleModifierAct);
+    appendModifierMenu->addAction(appendEvaluateExpressionModifierAct);
+    appendModifierMenu->addAction(appendEvaluateHandleModifierAct);
+    appendModifierMenu->addAction(appendAttachmentModifierAct);
+    appendModifierMenu->addAction(appendAttributeModifierAct);
+    appendModifierMenu->addAction(appendCombineTransformsModifierAct);
+    appendModifierMenu->addAction(appendComputeRotationFromAxisAngleModifierAct);
+    appendModifierMenu->addAction(appendComputeRotationToTargetModifierAct);
+    appendModifierMenu->addAction(appendEventsFromRangeModifierAct);
+    appendModifierMenu->addAction(appendMoveCharacterModifierAct);
+    appendModifierMenu->addAction(appendExtractRagdollPoseModifierAct);
+    appendModifierMenu->addAction(appendModifyOnceModifierAct);
+    appendModifierMenu->addAction(appendEventOnDeactivateModifierAct);
+    appendModifierMenu->addAction(appendEventEveryNEventsModifierAct);
+    appendModifierMenu->addAction(appendRagdollContactListenerModifierAct);
+    appendModifierMenu->addAction(appendPoweredRagdollControlsModifierAct);
+    appendModifierMenu->addAction(appendEventOnFalseToTrueModifierAct);
+    appendModifierMenu->addAction(appendDirectAtModifierAct);
+    appendModifierMenu->addAction(appendDistTriggerModifierAct);
+    appendModifierMenu->addAction(appendDecomposeVectorModifierAct);
+    appendModifierMenu->addAction(appendComputeAddBoneAnimModifierAct);
+    appendModifierMenu->addAction(appendTweenerModifierAct);
+    appendModifierMenu->addAction(appendBSIStateManagerModifierAct);
+    appendModifierMenu->addAction(appendTimerModifierAct);
+    appendModifierMenu->addAction(appendRotateCharacterModifierAct);
+    appendModifierMenu->addAction(appendDampingModifierAct);
+    appendModifierMenu->addAction(appendDelayedModifierAct);
+    appendModifierMenu->addAction(appendGetUpModifierAct);
+    appendModifierMenu->addAction(appendKeyframeBonesModifierAct);
+    appendModifierMenu->addAction(appendComputeDirectionModifierAct);
+    appendModifierMenu->addAction(appendRigidBodyRagdollControlsModifierAct);
+    appendModifierMenu->addAction(appendBSSpeedSamplerModifierAct);
+    appendModifierMenu->addAction(appendDetectCloseToGroundModifierAct);
+    appendModifierMenu->addAction(appendBSTimerModifierAct);
+    appendModifierMenu->addAction(appendBSLookAtModifierAct);
+    appendModifierMenu->addAction(appendBSPassByTargetTriggerModifierAct);
     contextMenu->addAction(removeObjBranchAct);
     setContextMenu(contextMenu);
-    connect(appendSMAct, SIGNAL(triggered()), this, SLOT(appendStateMachine()));
-    connect(appendMSGAct, SIGNAL(triggered()), this, SLOT(appendManualSelectorGenerator()));
-    connect(appendMGAct, SIGNAL(triggered()), this, SLOT(appendModifierGenerator()));
-    connect(appendBSISTGAct, SIGNAL(triggered()), this, SLOT(appendIStateTaggingGenerator()));
-    connect(appendBSSCGAct, SIGNAL(triggered()), this, SLOT(appendSynchronizedClipGenerator()));
-    connect(appendBSOAGAct, SIGNAL(triggered()), this, SLOT(appendOffsetAnimationGenerator()));
-    connect(appendBSCBTGAct, SIGNAL(triggered()), this, SLOT(appendCyclicBlendTransitionGenerator()));
-    connect(appendPMGAct, SIGNAL(triggered()), this, SLOT(appendPoseMatchingGenerator()));
-    connect(appendBGAct, SIGNAL(triggered()), this, SLOT(appendBlenderGenerator()));
-    connect(appendBSBSGAct, SIGNAL(triggered()), this, SLOT(appendBoneSwitchGenerator()));
-    connect(appendCGAct, SIGNAL(triggered()), this, SLOT(appendClipGenerator()));
-    connect(appendBRGAct, SIGNAL(triggered()), this, SLOT(appendBehaviorReferenceGenerator()));
-    connect(wrapMSGAct, SIGNAL(triggered()), this, SLOT(wrapManualSelectorGenerator()));
-    connect(wrapMGAct, SIGNAL(triggered()), this, SLOT(wrapModifierGenerator()));
-    connect(wrapBSISTGAct, SIGNAL(triggered()), this, SLOT(wrapIStateTaggingGenerator()));
-    connect(wrapBSSCGAct, SIGNAL(triggered()), this, SLOT(wrapSynchronizedClipGenerator()));
-    connect(wrapBSOAGAct, SIGNAL(triggered()), this, SLOT(wrapOffsetAnimationGenerator()));
-    connect(wrapBSCBTGAct, SIGNAL(triggered()), this, SLOT(wrapCyclicBlendTransitionGenerator()));
-    connect(wrapBSBSGAct, SIGNAL(triggered()), this, SLOT(wrapBoneSwitchGenerator()));
-    connect(wrapSMAct, SIGNAL(triggered()), this, SLOT(wrapStateMachine()));
-    connect(wrapBGAct, SIGNAL(triggered()), this, SLOT(wrapBlenderGenerator()));
-    connect(wrapPMGAct, SIGNAL(triggered()), this, SLOT(wrapPoseMatchingGenerator()));
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(appendStateMachineAct, SIGNAL(triggered()), this, SLOT(appendStateMachine()));
+    connect(appendManualSelectorGeneratorAct, SIGNAL(triggered()), this, SLOT(appendManualSelectorGenerator()));
+    connect(appendModifierGeneratorAct, SIGNAL(triggered()), this, SLOT(appendModifierGenerator()));
+    connect(appendBSIStateTaggingGeneratorAct, SIGNAL(triggered()), this, SLOT(appendIStateTaggingGenerator()));
+    connect(appendBSSynchronizedClipGeneratorAct, SIGNAL(triggered()), this, SLOT(appendSynchronizedClipGenerator()));
+    connect(appendBSOffsetAnimationGeneratorAct, SIGNAL(triggered()), this, SLOT(appendOffsetAnimationGenerator()));
+    connect(appendBSCyclicBlendTransitionGeneratorAct, SIGNAL(triggered()), this, SLOT(appendCyclicBlendTransitionGenerator()));
+    connect(appendPoseMatchingGeneratorAct, SIGNAL(triggered()), this, SLOT(appendPoseMatchingGenerator()));
+    connect(appendBlenderGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBlenderGenerator()));
+    connect(appendBSBoneSwitchGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBoneSwitchGenerator()));
+    connect(appendClipGeneratorAct, SIGNAL(triggered()), this, SLOT(appendClipGenerator()));
+    connect(appendBehaviorReferenceGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBehaviorReferenceGenerator()));
+    connect(appendBGSGamebryoSequenceGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBGSGamebryoSequenceGenerator()));
+    connect(wrapManualSelectorGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapManualSelectorGenerator()));
+    connect(wrapModifierGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapModifierGenerator()));
+    connect(wrapBSIStateTaggingGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapIStateTaggingGenerator()));
+    connect(wrapBSSynchronizedClipGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapSynchronizedClipGenerator()));
+    connect(wrapBSOffsetAnimationGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapOffsetAnimationGenerator()));
+    connect(wrapBSCyclicBlendTransitionGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapCyclicBlendTransitionGenerator()));
+    connect(wrapBSBoneSwitchGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapBoneSwitchGenerator()));
+    connect(wrapStateMachineAct, SIGNAL(triggered()), this, SLOT(wrapStateMachine()));
+    connect(wrapBlenderGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapBlenderGenerator()));
+    connect(wrapPoseMatchingGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapPoseMatchingGenerator()));
+    connect(appendModifierListAct, SIGNAL(triggered()), this, SLOT(appendModifierList()));
+    connect(appendTwistModifierAct, SIGNAL(triggered()), this, SLOT(appendTwistModifier()));
+    connect(appendEventDrivenModifierAct, SIGNAL(triggered()), this, SLOT(appendEventDrivenModifier()));
+    connect(appendIsActiveModifierAct, SIGNAL(triggered()), this, SLOT(appendIsActiveModifier()));
+    connect(appendLimbIKModifierAct, SIGNAL(triggered()), this, SLOT(appendLimbIKModifier()));
+    connect(appendInterpValueModifierAct, SIGNAL(triggered()), this, SLOT(appendInterpValueModifier()));
+    connect(appendGetTimeStepModifierAct, SIGNAL(triggered()), this, SLOT(appendGetTimeStepModifier()));
+    connect(appendFootIkControlsModifierAct, SIGNAL(triggered()), this, SLOT(appendFootIkControlsModifier()));
+    connect(appendGetHandleOnBoneModifierAct, SIGNAL(triggered()), this, SLOT(appendGetHandleOnBoneModifier()));
+    connect(appendTransformVectorModifierAct, SIGNAL(triggered()), this, SLOT(appendTransformVectorModifier()));
+    connect(appendProxyModifierAct, SIGNAL(triggered()), this, SLOT(appendProxyModifier()));
+    connect(appendLookAtModifierAct, SIGNAL(triggered()), this, SLOT(appendLookAtModifier()));
+    connect(appendMirrorModifierAct, SIGNAL(triggered()), this, SLOT(appendMirrorModifier()));
+    connect(appendGetWorldFromModelModifierAct, SIGNAL(triggered()), this, SLOT(appendGetWorldFromModelModifier()));
+    connect(appendSenseHandleModifierAct, SIGNAL(triggered()), this, SLOT(appendSenseHandleModifier()));
+    connect(appendEvaluateExpressionModifierAct, SIGNAL(triggered()), this, SLOT(appendEvaluateExpressionModifier()));
+    connect(appendEvaluateHandleModifierAct, SIGNAL(triggered()), this, SLOT(appendEvaluateHandleModifier()));
+    connect(appendAttachmentModifierAct, SIGNAL(triggered()), this, SLOT(appendAttachmentModifier()));
+    connect(appendAttributeModifierAct, SIGNAL(triggered()), this, SLOT(appendAttributeModifier()));
+    connect(appendCombineTransformsModifierAct, SIGNAL(triggered()), this, SLOT(appendCombineTransformsModifier()));
+    connect(appendComputeRotationFromAxisAngleModifierAct, SIGNAL(triggered()), this, SLOT(appendComputeRotationFromAxisAngleModifier()));
+    connect(appendComputeRotationToTargetModifierAct, SIGNAL(triggered()), this, SLOT(appendComputeRotationToTargetModifier()));
+    connect(appendEventsFromRangeModifierAct, SIGNAL(triggered()), this, SLOT(appendEventsFromRangeModifier()));
+    connect(appendMoveCharacterModifierAct, SIGNAL(triggered()), this, SLOT(appendMoveCharacterModifier()));
+    connect(appendExtractRagdollPoseModifierAct, SIGNAL(triggered()), this, SLOT(appendExtractRagdollPoseModifier()));
+    connect(appendModifyOnceModifierAct, SIGNAL(triggered()), this, SLOT(appendModifyOnceModifier()));
+    connect(appendEventOnDeactivateModifierAct, SIGNAL(triggered()), this, SLOT(appendEventOnDeactivateModifier()));
+    connect(appendEventEveryNEventsModifierAct, SIGNAL(triggered()), this, SLOT(appendEventEveryNEventsModifier()));
+    connect(appendRagdollContactListenerModifierAct, SIGNAL(triggered()), this, SLOT(appendRagdollContactListenerModifier()));
+    connect(appendPoweredRagdollControlsModifierAct, SIGNAL(triggered()), this, SLOT(appendPoweredRagdollControlsModifier()));
+    connect(appendEventOnFalseToTrueModifierAct, SIGNAL(triggered()), this, SLOT(appendEventOnFalseToTrueModifier()));
+    connect(appendDirectAtModifierAct, SIGNAL(triggered()), this, SLOT(appendDirectAtModifier()));
+    connect(appendDistTriggerModifierAct, SIGNAL(triggered()), this, SLOT(appendDistTriggerModifier()));
+    connect(appendDecomposeVectorModifierAct, SIGNAL(triggered()), this, SLOT(appendDecomposeVectorModifier()));
+    connect(appendComputeAddBoneAnimModifierAct, SIGNAL(triggered()), this, SLOT(appendComputeAddBoneAnimModifier()));
+    connect(appendTweenerModifierAct, SIGNAL(triggered()), this, SLOT(appendTweenerModifier()));
+    connect(appendBSIStateManagerModifierAct, SIGNAL(triggered()), this, SLOT(appendBSIStateManagerModifier()));
+    connect(appendTimerModifierAct, SIGNAL(triggered()), this, SLOT(appendTimerModifier()));
+    connect(appendRotateCharacterModifierAct, SIGNAL(triggered()), this, SLOT(appendRotateCharacterModifier()));
+    connect(appendDampingModifierAct, SIGNAL(triggered()), this, SLOT(appendDampingModifier()));
+    connect(appendDelayedModifierAct, SIGNAL(triggered()), this, SLOT(appendDelayedModifier()));
+    connect(appendGetUpModifierAct, SIGNAL(triggered()), this, SLOT(appendGetUpModifier()));
+    connect(appendKeyframeBonesModifierAct, SIGNAL(triggered()), this, SLOT(appendKeyframeBonesModifier()));
+    connect(appendComputeDirectionModifierAct, SIGNAL(triggered()), this, SLOT(appendComputeDirectionModifier()));
+    connect(appendRigidBodyRagdollControlsModifierAct, SIGNAL(triggered()), this, SLOT(appendRigidBodyRagdollControlsModifier()));
+    connect(appendBSSpeedSamplerModifierAct, SIGNAL(triggered()), this, SLOT(appendBSSpeedSamplerModifier()));
+    connect(appendDetectCloseToGroundModifierAct, SIGNAL(triggered()), this, SLOT(appendDetectCloseToGroundModifier()));
+    connect(appendBSTimerModifierAct, SIGNAL(triggered()), this, SLOT(appendBSTimerModifier()));
+    connect(appendBSLookAtModifierAct, SIGNAL(triggered()), this, SLOT(appendBSLookAtModifier()));
     connect(removeObjBranchAct, SIGNAL(triggered()), this, SLOT(deleteSelectedObjectBranchSlot()));
+    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(popUpMenuRequested(QPoint)));
     if (ui){
         ui->setBehaviorView(this);
-        //connect(this, SIGNAL(iconSelected(BehaviorGraphViewIcon *)), ui, SLOT(changeCurrentDataWidget(BehaviorGraphViewIcon *)));
+        connect(this, SIGNAL(iconSelected(BehaviorGraphViewIcon *)), ui, SLOT(changeCurrentDataWidget(BehaviorGraphViewIcon *)));
     }
 }
 
 void BehaviorGraphView::writeToLog(const QString &message, bool isError){
     behavior->writeToLog(message, isError);
+}
+
+bool BehaviorGraphView::confirmationDialogue(const QString & message, QWidget *parent){
+    QMessageBox::StandardButton ret;
+    ret = QMessageBox::warning(parent, "Skyrim Behavior Tool", message, QMessageBox::Yes | QMessageBox::Cancel);
+    if (ret == QMessageBox::Yes){
+        return true;
+    }else if (ret == QMessageBox::Cancel){
+        return false;
+    }
+    return false;
 }
 
 QStringList BehaviorGraphView::getEventNames() const{
@@ -169,10 +402,25 @@ void BehaviorGraphView::deleteSelectedObjectBranchSlot(){
     behavior->removeOtherData();
 }
 
-void BehaviorGraphView::appendStateMachine(){
-    if (selectedIcon && selectedIcon->data.constData()){
-        hkbStateMachine *obj = new hkbStateMachine(behavior);
-        obj->evaulateDataValidity();
+template <typename T>
+void BehaviorGraphView::append(T *obj){
+    if (selectedIcon && selectedIcon->data.constData() && !selectedIcon->children.isEmpty()){
+        qulonglong sig = selectedIcon->data->getSignature();
+        if (sig != HKB_STATE_MACHINE && sig != HKB_BLENDER_GENERATOR && sig != BS_BONE_SWITCH_GENERATOR && sig != HKB_POSE_MATCHING_GENERATOR && sig != HKB_MODIFIER_LIST){
+            if (!confirmationDialogue("WARNING! THIS WILL REPLACE THE CURRENT GENERATOR/MODIFIER!!!\n\nARE YOU SURE YOU WANT TO DO THIS?", this)){
+                delete obj;
+                return;
+            }
+            if (selectedIcon->data->getSignature() == HKB_MODIFIER_GENERATOR && obj->getType() == HkxObject::TYPE_GENERATOR){
+                if (selectedIcon->children.size() == 2){
+                    removeSelectedObjectBranch(selectedIcon->children.at(1));
+                }else{
+                    removeSelectedObjectBranch(selectedIcon->children.first());
+                }
+            }else{
+                removeSelectedObjectBranch(selectedIcon->children.first());
+            }
+        }
         if (!appendObject(obj, selectedIcon)){
             delete obj;
         }
@@ -180,395 +428,415 @@ void BehaviorGraphView::appendStateMachine(){
             selectedIcon->parent->data.data()->evaulateDataValidity();
         }
         selectedIcon->data.data()->evaulateDataValidity();
-        emit addedGenerator(obj->getName());
+        emit addedGenerator(obj->getName(), obj->getClassname());
+    }else{
+        delete obj;
     }
+}
+
+void BehaviorGraphView::appendStateMachine(){
+    append(new hkbStateMachine(behavior));
 }
 
 void BehaviorGraphView::appendManualSelectorGenerator(){
-    if (selectedIcon && selectedIcon->data.constData()){
-        hkbManualSelectorGenerator *obj = new hkbManualSelectorGenerator(behavior);
-        obj->evaulateDataValidity();
-        if (!appendObject(obj, selectedIcon)){
-            delete obj;
-        }
-        if (selectedIcon->parent && selectedIcon->parent->data.data()){
-            selectedIcon->parent->data.data()->evaulateDataValidity();
-        }
-        selectedIcon->data.data()->evaulateDataValidity();
-        emit addedGenerator(obj->getName());
-    }
+    append(new hkbManualSelectorGenerator(behavior));
 }
 
 void BehaviorGraphView::appendModifierGenerator(){
-    if (selectedIcon && selectedIcon->data.constData()){
-        hkbModifierGenerator *obj = new hkbModifierGenerator(behavior);
-        obj->evaulateDataValidity();
-        if (!appendObject(obj, selectedIcon)){
-            delete obj;
-        }
-        if (selectedIcon->parent && selectedIcon->parent->data.data()){
-            selectedIcon->parent->data.data()->evaulateDataValidity();
-        }
-        selectedIcon->data.data()->evaulateDataValidity();
-        emit addedGenerator(obj->getName());
-    }
+    append(new hkbModifierGenerator(behavior));
 }
 
 void BehaviorGraphView::appendIStateTaggingGenerator(){
-    if (selectedIcon && selectedIcon->data.constData()){
-        BSiStateTaggingGenerator *obj = new BSiStateTaggingGenerator(behavior);
-        obj->evaulateDataValidity();
-        if (!appendObject(obj, selectedIcon)){
-            delete obj;
-        }
-        if (selectedIcon->parent && selectedIcon->parent->data.data()){
-            selectedIcon->parent->data.data()->evaulateDataValidity();
-        }
-        selectedIcon->data.data()->evaulateDataValidity();
-        emit addedGenerator(obj->getName());
-    }
+    append(new BSiStateTaggingGenerator(behavior));
 }
 
 void BehaviorGraphView::appendSynchronizedClipGenerator(){
-    if (selectedIcon && selectedIcon->data.constData()){
-        BSSynchronizedClipGenerator *obj = new BSSynchronizedClipGenerator(behavior);
-        obj->evaulateDataValidity();
-        if (!appendObject(obj, selectedIcon)){
-            delete obj;
-        }
-        if (selectedIcon->parent && selectedIcon->parent->data.data()){
-            selectedIcon->parent->data.data()->evaulateDataValidity();
-        }
-        selectedIcon->data.data()->evaulateDataValidity();
-        emit addedGenerator(obj->getName());
-    }
+    append(new BSSynchronizedClipGenerator(behavior));
 }
 
 void BehaviorGraphView::appendOffsetAnimationGenerator(){
-    if (selectedIcon && selectedIcon->data.constData()){
-        BSOffsetAnimationGenerator *obj = new BSOffsetAnimationGenerator(behavior);
-        obj->evaulateDataValidity();
-        if (!appendObject(obj, selectedIcon)){
-            delete obj;
-        }
-        if (selectedIcon->parent && selectedIcon->parent->data.data()){
-            selectedIcon->parent->data.data()->evaulateDataValidity();
-        }
-        selectedIcon->data.data()->evaulateDataValidity();
-        emit addedGenerator(obj->getName());
-    }
+    append(new BSOffsetAnimationGenerator(behavior));
 }
 
 void BehaviorGraphView::appendCyclicBlendTransitionGenerator(){
-    if (selectedIcon && selectedIcon->data.constData()){
-        BSCyclicBlendTransitionGenerator *obj = new BSCyclicBlendTransitionGenerator(behavior);
-        obj->evaulateDataValidity();
-        if (!appendObject(obj, selectedIcon)){
-            delete obj;
-        }
-        if (selectedIcon->parent && selectedIcon->parent->data.data()){
-            selectedIcon->parent->data.data()->evaulateDataValidity();
-        }
-        selectedIcon->data.data()->evaulateDataValidity();
-        emit addedGenerator(obj->getName());
-    }
+    append(new BSCyclicBlendTransitionGenerator(behavior));
 }
 
 void BehaviorGraphView::appendPoseMatchingGenerator(){
-    if (selectedIcon && selectedIcon->data.constData()){
-        hkbPoseMatchingGenerator *obj = new hkbPoseMatchingGenerator(behavior);
-        obj->evaulateDataValidity();
-        if (!appendObject(obj, selectedIcon)){
-            delete obj;
-        }
-        if (selectedIcon->parent && selectedIcon->parent->data.data()){
-            selectedIcon->parent->data.data()->evaulateDataValidity();
-        }
-        selectedIcon->data.data()->evaulateDataValidity();
-        emit addedGenerator(obj->getName());
-    }
+    append(new hkbPoseMatchingGenerator(behavior));
 }
 
 void BehaviorGraphView::appendBlenderGenerator(){
-    if (selectedIcon && selectedIcon->data.constData()){
-        hkbBlenderGenerator *obj = new hkbBlenderGenerator(behavior);
-        obj->evaulateDataValidity();
-        if (!appendObject(obj, selectedIcon)){
-            delete obj;
-        }
-        if (selectedIcon->parent && selectedIcon->parent->data.data()){
-            selectedIcon->parent->data.data()->evaulateDataValidity();
-        }
-        selectedIcon->data.data()->evaulateDataValidity();
-        emit addedGenerator(obj->getName());
-    }
+    append(new hkbBlenderGenerator(behavior));
 }
 
 void BehaviorGraphView::appendBoneSwitchGenerator(){
-    if (selectedIcon && selectedIcon->data.constData()){
-        BSBoneSwitchGenerator *obj = new BSBoneSwitchGenerator(behavior);
-        obj->evaulateDataValidity();
-        if (!appendObject(obj, selectedIcon)){
-            delete obj;
-        }
-        if (selectedIcon->parent && selectedIcon->parent->data.data()){
-            selectedIcon->parent->data.data()->evaulateDataValidity();
-        }
-        selectedIcon->data.data()->evaulateDataValidity();
-        emit addedGenerator(obj->getName());
-    }
+    append(new BSBoneSwitchGenerator(behavior));
 }
 
 void BehaviorGraphView::appendClipGenerator(){
-    if (selectedIcon && selectedIcon->data.constData()){
-        hkbClipGenerator *obj = new hkbClipGenerator(behavior);
-        if (!appendObject(obj, selectedIcon)){
-            delete obj;
-        }
-        if (selectedIcon->parent && selectedIcon->parent->data.data()){
-            selectedIcon->parent->data.data()->evaulateDataValidity();
-        }
-        selectedIcon->data.data()->evaulateDataValidity();
-        emit addedGenerator(obj->getName());
-    }
+    append(new hkbClipGenerator(behavior));
 }
 
 void BehaviorGraphView::appendBehaviorReferenceGenerator(){
-    if (selectedIcon && selectedIcon->data.constData()){
-        hkbBehaviorReferenceGenerator *obj = new hkbBehaviorReferenceGenerator(behavior);
-        if (!appendObject(obj, selectedIcon)){
-            delete obj;
-        }
-        if (selectedIcon->parent && selectedIcon->parent->data.data()){
-            selectedIcon->parent->data.data()->evaulateDataValidity();
-        }
-        selectedIcon->data.data()->evaulateDataValidity();
-        emit addedGenerator(obj->getName());
+    append(new hkbBehaviorReferenceGenerator(behavior));
+}
+
+void BehaviorGraphView::appendBGSGamebryoSequenceGenerator(){
+    append(new BGSGamebryoSequenceGenerator(behavior));
+}
+
+void BehaviorGraphView::appendModifierList(){
+    append(new hkbModifierList(behavior));
+}
+
+void BehaviorGraphView::appendTwistModifier(){
+    append(new hkbTwistModifier(behavior));
+}
+
+void BehaviorGraphView::appendEventDrivenModifier(){
+    append(new hkbEventDrivenModifier(behavior));
+}
+
+void BehaviorGraphView::appendIsActiveModifier(){
+    append(new BSIsActiveModifier(behavior));
+}
+
+void BehaviorGraphView::appendLimbIKModifier(){
+    append(new BSLimbIKModifier(behavior));
+}
+
+void BehaviorGraphView::appendInterpValueModifier(){
+    append(new BSInterpValueModifier(behavior));
+}
+
+void BehaviorGraphView::appendGetTimeStepModifier(){
+    append(new BSGetTimeStepModifier(behavior));
+}
+
+void BehaviorGraphView::appendFootIkControlsModifier(){
+    append(new hkbFootIkControlsModifier(behavior));
+}
+
+void BehaviorGraphView::appendGetHandleOnBoneModifier(){
+    append(new hkbGetHandleOnBoneModifier(behavior));
+}
+
+void BehaviorGraphView::appendTransformVectorModifier(){
+    append(new hkbTransformVectorModifier(behavior));
+}
+
+void BehaviorGraphView::appendProxyModifier(){
+    append(new hkbProxyModifier(behavior));
+}
+
+void BehaviorGraphView::appendLookAtModifier(){
+    append(new hkbLookAtModifier(behavior));
+}
+
+void BehaviorGraphView::appendMirrorModifier(){
+    append(new hkbMirrorModifier(behavior));
+}
+
+void BehaviorGraphView::appendGetWorldFromModelModifier(){
+    append(new hkbGetWorldFromModelModifier(behavior));
+}
+
+void BehaviorGraphView::appendSenseHandleModifier(){
+    append(new hkbSenseHandleModifier(behavior));
+}
+
+void BehaviorGraphView::appendEvaluateExpressionModifier(){
+    append(new hkbEvaluateExpressionModifier(behavior));
+}
+
+void BehaviorGraphView::appendEvaluateHandleModifier(){
+    append(new hkbEvaluateHandleModifier(behavior));
+}
+
+void BehaviorGraphView::appendAttachmentModifier(){
+    append(new hkbAttachmentModifier(behavior));
+}
+
+void BehaviorGraphView::appendAttributeModifier(){
+    append(new hkbAttributeModifier(behavior));
+}
+
+void BehaviorGraphView::appendCombineTransformsModifier(){
+    append(new hkbCombineTransformsModifier(behavior));
+}
+
+void BehaviorGraphView::appendComputeRotationFromAxisAngleModifier(){
+    append(new hkbComputeRotationFromAxisAngleModifier(behavior));
+}
+
+void BehaviorGraphView::appendComputeRotationToTargetModifier(){
+    append(new hkbComputeRotationToTargetModifier(behavior));
+}
+
+void BehaviorGraphView::appendEventsFromRangeModifier(){
+    append(new hkbEventsFromRangeModifier(behavior));
+}
+
+void BehaviorGraphView::appendMoveCharacterModifier(){
+    append(new hkbMoveCharacterModifier(behavior));
+}
+
+void BehaviorGraphView::appendExtractRagdollPoseModifier(){
+    append(new hkbExtractRagdollPoseModifier(behavior));
+}
+
+void BehaviorGraphView::appendModifyOnceModifier(){
+    append(new BSModifyOnceModifier(behavior));
+}
+
+void BehaviorGraphView::appendEventOnDeactivateModifier(){
+    append(new BSEventOnDeactivateModifier(behavior));
+}
+
+void BehaviorGraphView::appendEventEveryNEventsModifier(){
+    append(new BSEventEveryNEventsModifier(behavior));
+}
+
+void BehaviorGraphView::appendRagdollContactListenerModifier(){
+    append(new BSRagdollContactListenerModifier(behavior));
+}
+
+void BehaviorGraphView::appendPoweredRagdollControlsModifier(){
+    append(new hkbPoweredRagdollControlsModifier(behavior));
+}
+
+void BehaviorGraphView::appendEventOnFalseToTrueModifier(){
+    append(new BSEventOnFalseToTrueModifier(behavior));
+}
+
+void BehaviorGraphView::appendDirectAtModifier(){
+    append(new BSDirectAtModifier(behavior));
+}
+
+void BehaviorGraphView::appendDistTriggerModifier(){
+    append(new BSDistTriggerModifier(behavior));
+}
+
+void BehaviorGraphView::appendDecomposeVectorModifier(){
+    append(new BSDecomposeVectorModifier(behavior));
+}
+
+void BehaviorGraphView::appendComputeAddBoneAnimModifier(){
+    append(new BSComputeAddBoneAnimModifier(behavior));
+}
+
+void BehaviorGraphView::appendTweenerModifier(){
+    append(new BSTweenerModifier(behavior));
+}
+
+void BehaviorGraphView::appendBSIStateManagerModifier(){
+    append(new BSIStateManagerModifier(behavior));
+}
+
+void BehaviorGraphView::appendTimerModifier(){
+    append(new hkbTimerModifier(behavior));
+}
+
+void BehaviorGraphView::appendRotateCharacterModifier(){
+    append(new hkbRotateCharacterModifier(behavior));
+}
+
+void BehaviorGraphView::appendDampingModifier(){
+    append(new hkbDampingModifier(behavior));
+}
+
+void BehaviorGraphView::appendDelayedModifier(){
+    append(new hkbDelayedModifier(behavior));
+}
+
+void BehaviorGraphView::appendGetUpModifier(){
+    append(new hkbGetUpModifier(behavior));
+}
+
+void BehaviorGraphView::appendKeyframeBonesModifier(){
+    append(new hkbKeyframeBonesModifier(behavior));
+}
+
+void BehaviorGraphView::appendComputeDirectionModifier(){
+    append(new hkbComputeDirectionModifier(behavior));
+}
+
+void BehaviorGraphView::appendRigidBodyRagdollControlsModifier(){
+    append(new hkbRigidBodyRagdollControlsModifier(behavior));
+}
+
+void BehaviorGraphView::appendBSSpeedSamplerModifier(){
+    append(new BSSpeedSamplerModifier(behavior));
+}
+
+void BehaviorGraphView::appendDetectCloseToGroundModifier(){
+    append(new hkbDetectCloseToGroundModifier(behavior));
+}
+
+void BehaviorGraphView::appendBSTimerModifier(){
+    append(new BSTimerModifier(behavior));
+}
+
+void BehaviorGraphView::appendBSLookAtModifier(){
+    append(new BSLookAtModifier(behavior));
+}
+
+void BehaviorGraphView::appendBSPassByTargetTriggerModifier(){
+    append(new BSPassByTargetTriggerModifier(behavior));
+}
+
+template <typename T>
+void BehaviorGraphView::wrap(T *obj){
+    if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
+        wrapObject(obj, selectedIcon);
+        emit addedGenerator(obj->getName(), obj->getClassname());
+    }
+}
+
+void BehaviorGraphView::wrap(hkbStateMachine *obj){
+    if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
+        hkbStateMachineStateInfo *state = new hkbStateMachineStateInfo(behavior, obj);
+        obj->states.append(HkxObjectExpSharedPtr(state));
+        wrapObject(obj, selectedIcon);
+        emit addedGenerator(obj->getName(), obj->getClassname());
+    }
+}
+
+void BehaviorGraphView::wrap(hkbBlenderGenerator *obj){
+    if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
+        hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior);
+        obj->children.append(HkxObjectExpSharedPtr(blendChild));
+        wrapObject(obj, selectedIcon);
+        emit addedGenerator(obj->getName(), obj->getClassname());
+    }
+}
+
+void BehaviorGraphView::wrap(hkbPoseMatchingGenerator *obj){
+    if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
+        hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior);
+        obj->children.append(HkxObjectExpSharedPtr(blendChild));
+        wrapObject(obj, selectedIcon);
+        emit addedGenerator(obj->getName(), obj->getClassname());
     }
 }
 
 void BehaviorGraphView::wrapManualSelectorGenerator(){
-    if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
-        hkbManualSelectorGenerator *obj = new hkbManualSelectorGenerator(behavior);
-        wrapObject(obj, selectedIcon);
-        emit addedGenerator(obj->getName());
-    }
+    wrap(new hkbManualSelectorGenerator(behavior));
 }
 
 void BehaviorGraphView::wrapModifierGenerator(){
-    if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
-        hkbModifierGenerator *obj = new hkbModifierGenerator(behavior);
-        wrapObject(obj, selectedIcon);
-        emit addedGenerator(obj->getName());
-    }
+    wrap(new hkbModifierGenerator(behavior));
 }
 
 void BehaviorGraphView::wrapIStateTaggingGenerator(){
-    if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
-        BSiStateTaggingGenerator *obj = new BSiStateTaggingGenerator(behavior);
-        wrapObject(obj, selectedIcon);
-        emit addedGenerator(obj->getName());
-    }
+    wrap(new BSiStateTaggingGenerator(behavior));
 }
 
 void BehaviorGraphView::wrapSynchronizedClipGenerator(){
-    if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
-        BSSynchronizedClipGenerator *obj = new BSSynchronizedClipGenerator(behavior);
-        wrapObject(obj, selectedIcon);
-        emit addedGenerator(obj->getName());
-    }
+    wrap(new BSSynchronizedClipGenerator(behavior));
 }
 
 void BehaviorGraphView::wrapOffsetAnimationGenerator(){
-    if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
-        BSOffsetAnimationGenerator *obj = new BSOffsetAnimationGenerator(behavior);
-        wrapObject(obj, selectedIcon);
-        emit addedGenerator(obj->getName());
-    }
+    wrap(new BSOffsetAnimationGenerator(behavior));
 }
 
 void BehaviorGraphView::wrapCyclicBlendTransitionGenerator(){
-    if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
-        BSCyclicBlendTransitionGenerator *obj = new BSCyclicBlendTransitionGenerator(behavior);
-        wrapObject(obj, selectedIcon);
-        emit addedGenerator(obj->getName());
-    }
+    wrap(new BSCyclicBlendTransitionGenerator(behavior));
 }
 
 void BehaviorGraphView::wrapBoneSwitchGenerator(){
-    if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
-        BSBoneSwitchGenerator *obj = new BSBoneSwitchGenerator(behavior);
-        obj->evaulateDataValidity();
-        wrapObject(obj, selectedIcon);
-        emit addedGenerator(obj->getName());
-    }
+    wrap(new BSBoneSwitchGenerator(behavior));
 }
 
 void BehaviorGraphView::wrapStateMachine(){
-    if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
-        hkbStateMachine *obj = new hkbStateMachine(behavior);
-        hkbStateMachineStateInfo *state = new hkbStateMachineStateInfo(behavior, obj);
-        obj->states.append(HkxObjectExpSharedPtr(state));
-        wrapObject(obj, selectedIcon);
-        emit addedGenerator(obj->getName());
-    }
+    wrap(new hkbStateMachine(behavior));
 }
 
 void BehaviorGraphView::wrapBlenderGenerator(){
-    if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
-        hkbBlenderGenerator *obj = new hkbBlenderGenerator(behavior);
-        hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior);
-        obj->children.append(HkxObjectExpSharedPtr(blendChild));
-        wrapObject(obj, selectedIcon);
-        emit addedGenerator(obj->getName());
-    }
+    wrap(new hkbBlenderGenerator(behavior));
 }
 
 void BehaviorGraphView::wrapPoseMatchingGenerator(){
-    if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
-        hkbPoseMatchingGenerator *obj = new hkbPoseMatchingGenerator(behavior);
-        hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior);
-        obj->children.append(HkxObjectExpSharedPtr(blendChild));
-        wrapObject(obj, selectedIcon);
-        emit addedGenerator(obj->getName());
+    wrap(new hkbPoseMatchingGenerator(behavior));
+}
+
+void BehaviorGraphView::enableAllMenuActions(QMenu *menu){
+    QList <QAction *> actions = menu->actions();
+    for (int i = 0; i < actions.size(); i++){
+        actions.at(i)->setDisabled(false);
     }
 }
 
-void BehaviorGraphView::popUpMenuRequested(const QPoint &pos, CustomTreeGraphicsViewIcon *icon){
-    qulonglong sig = icon->data.constData()->getSignature();
-    if (sig == HKB_BLENDER_GENERATOR){
-        wrapBSCBTGAct->setVisible(true);
+void BehaviorGraphView::disableAllMenuActions(QMenu *menu){
+    QList <QAction *> actions = menu->actions();
+    for (int i = 0; i < actions.size(); i++){
+        actions.at(i)->setDisabled(true);
+    }
+}
 
-        appendSMAct->setVisible(true);
-        appendMSGAct->setVisible(true);
-        appendMGAct->setVisible(true);
-        appendBSISTGAct->setVisible(true);
-        appendBSSCGAct->setVisible(true);
-        appendBSOAGAct->setVisible(true);
-        appendBSCBTGAct->setVisible(true);
-        appendPMGAct->setVisible(true);
-        appendBGAct->setVisible(true);
-        appendBSBSGAct->setVisible(true);
-        appendCGAct->setVisible(true);
-        appendBRGAct->setVisible(true);
-
-        if (icon->parent && icon->parent->data.constData()->getSignature() == HKB_BEHAVIOR_GRAPH){
-            wrapMSGAct->setVisible(false);
-            wrapMGAct->setVisible(false);
-            wrapBSISTGAct->setVisible(false);
-            wrapBSSCGAct->setVisible(false);
-            wrapBSOAGAct->setVisible(false);
-            wrapBSCBTGAct->setVisible(false);
-            wrapPMGAct->setVisible(false);
-            wrapBGAct->setVisible(false);
-            wrapBSBSGAct->setVisible(false);
+void BehaviorGraphView::popUpMenuRequested(const QPoint &pos){
+    if (!selectedIcon || !selectedIcon->data.constData()){
+        return;
+    }
+    qulonglong sig = selectedIcon->data.constData()->getSignature();
+    qulonglong parentSig = 0;
+    if (selectedIcon->parent){
+        parentSig = selectedIcon->parent->data.constData()->getSignature();
+    }
+    HkxObject::HkxType type = selectedIcon->data.constData()->getType();
+    removeObjBranchAct->setDisabled(false);
+    if (type == HkxObject::TYPE_MODIFIER){
+        appendGeneratorMenu->menuAction()->setDisabled(true);
+        appendBlenderMenu->menuAction()->setDisabled(true);
+        wrapGeneratorMenu->menuAction()->setDisabled(true);
+        wrapBlenderMenu->menuAction()->setDisabled(true);
+        appendModifierMenu->menuAction()->setDisabled(false);
+    }else if (type == HkxObject::TYPE_GENERATOR){
+        appendGeneratorMenu->menuAction()->setDisabled(false);
+        enableAllMenuActions(appendGeneratorMenu);
+        appendBlenderMenu->menuAction()->setDisabled(false);
+        enableAllMenuActions(appendBlenderMenu);
+        wrapGeneratorMenu->menuAction()->setDisabled(false);
+        enableAllMenuActions(wrapGeneratorMenu);
+        wrapBlenderMenu->menuAction()->setDisabled(false);
+        enableAllMenuActions(wrapBlenderMenu);
+        appendModifierMenu->menuAction()->setDisabled(true);
+        if (sig == HKB_BLENDER_GENERATOR){
+            enableAllMenuActions(appendGeneratorMenu);
+            disableAllMenuActions(wrapGeneratorMenu);
+            wrapBSCyclicBlendTransitionGeneratorAct->setDisabled(false);
+        }else if (sig == HKB_CLIP_GENERATOR || sig == HKB_BEHAVIOR_REFERENCE_GENERATOR|| sig == BGS_GAMEBYRO_SEQUENCE_GENERATOR){
+            appendGeneratorMenu->menuAction()->setDisabled(true);
+            appendBlenderMenu->menuAction()->setDisabled(true);
+            enableAllMenuActions(wrapGeneratorMenu);
+        }else if (sig == BS_CYCLIC_BLEND_TRANSITION_GENERATOR){
+            disableAllMenuActions(appendGeneratorMenu);
+            appendBlenderGeneratorAct->setDisabled(false);
+        }else if (sig == BS_SYNCHRONIZED_CLIP_GENERATOR){
+            disableAllMenuActions(appendGeneratorMenu);
+            appendClipGeneratorAct->setDisabled(false);
+        }else if (sig == HKB_MODIFIER_GENERATOR){
+            appendModifierMenu->menuAction()->setDisabled(false);
+        }else if (sig == HKB_BEHAVIOR_GRAPH){
+            disableAllMenuActions(appendGeneratorMenu);
+            wrapGeneratorMenu->menuAction()->setDisabled(true);
+            appendBlenderMenu->menuAction()->setDisabled(true);
+            wrapBlenderMenu->menuAction()->setDisabled(true);
+            appendStateMachineAct->setDisabled(false);
+            removeObjBranchAct->setDisabled(true);
         }
-
-        removeObjBranchAct->setVisible(true);
-    }else if (sig == HKB_CLIP_GENERATOR){
-
-        appendSMAct->setVisible(false);
-        appendMSGAct->setVisible(false);
-        appendMGAct->setVisible(false);
-        appendBSISTGAct->setVisible(false);
-        appendBSSCGAct->setVisible(false);
-        appendBSOAGAct->setVisible(false);
-        appendBSCBTGAct->setVisible(false);
-        appendPMGAct->setVisible(false);
-        appendBGAct->setVisible(false);
-        appendBSBSGAct->setVisible(false);
-        appendCGAct->setVisible(false);
-        appendBRGAct->setVisible(false);
-
-        if (icon->parent && icon->parent->data.constData()->getSignature() == BS_SYNCHRONIZED_CLIP_GENERATOR || icon->parent->data.constData()->getSignature() == BS_OFFSET_ANIMATION_GENERATOR){
-            wrapBSSCGAct->setVisible(false);
-            wrapBSOAGAct->setVisible(false);
-        }else{
-            wrapBSSCGAct->setVisible(true);
-            wrapBSOAGAct->setVisible(true);
+        if (parentSig == BS_SYNCHRONIZED_CLIP_GENERATOR || parentSig == BS_OFFSET_ANIMATION_GENERATOR){
+            wrapGeneratorMenu->menuAction()->setDisabled(true);
+            wrapBlenderMenu->menuAction()->setDisabled(true);
+        }else if (parentSig == BS_CYCLIC_BLEND_TRANSITION_GENERATOR){
+            wrapGeneratorMenu->menuAction()->setDisabled(true);
+            wrapBlenderGeneratorAct->setDisabled(false);
+            wrapBSBoneSwitchGeneratorAct->setDisabled(true);
+        }else if (parentSig == HKB_BEHAVIOR_GRAPH){
+            wrapGeneratorMenu->menuAction()->setDisabled(true);
+            wrapBlenderMenu->menuAction()->setDisabled(true);
         }
-        removeObjBranchAct->setVisible(true);
-    }else if (sig == BS_CYCLIC_BLEND_TRANSITION_GENERATOR){
-
-        appendSMAct->setVisible(false);
-        appendMSGAct->setVisible(false);
-        appendMGAct->setVisible(false);
-        appendBSISTGAct->setVisible(false);
-        appendBSSCGAct->setVisible(false);
-        appendBSOAGAct->setVisible(false);
-        appendBSCBTGAct->setVisible(false);
-        appendPMGAct->setVisible(false);
-        appendBSBSGAct->setVisible(false);
-        appendCGAct->setVisible(false);
-        appendBRGAct->setVisible(false);
-        removeObjBranchAct->setVisible(true);
-    }else if (sig == BS_SYNCHRONIZED_CLIP_GENERATOR){
-
-        appendSMAct->setVisible(false);
-        appendMSGAct->setVisible(false);
-        appendMGAct->setVisible(false);
-        appendBSISTGAct->setVisible(false);
-        appendBSSCGAct->setVisible(false);
-        appendBSOAGAct->setVisible(false);
-        appendBSCBTGAct->setVisible(false);
-        appendPMGAct->setVisible(false);
-        appendBGAct->setVisible(false);
-        appendBSBSGAct->setVisible(false);
-        appendBRGAct->setVisible(false);
-        removeObjBranchAct->setVisible(true);
-    }else if (sig == HKB_BEHAVIOR_GRAPH){
-
-        appendMSGAct->setVisible(false);
-        appendMGAct->setVisible(false);
-        appendBSISTGAct->setVisible(false);
-        appendBSSCGAct->setVisible(false);
-        appendBSOAGAct->setVisible(false);
-        appendBSCBTGAct->setVisible(false);
-        appendPMGAct->setVisible(false);
-        appendBGAct->setVisible(false);
-        appendBSBSGAct->setVisible(false);
-        appendCGAct->setVisible(false);
-        appendBRGAct->setVisible(false);
-
-        wrapSMAct->setVisible(false);
-        wrapMSGAct->setVisible(false);
-        wrapMGAct->setVisible(false);
-        wrapBSISTGAct->setVisible(false);
-        wrapBSSCGAct->setVisible(false);
-        wrapBSOAGAct->setVisible(false);
-        wrapBSCBTGAct->setVisible(false);
-        wrapPMGAct->setVisible(false);
-        wrapBGAct->setVisible(false);
-        wrapBSBSGAct->setVisible(false);
-
-        removeObjBranchAct->setVisible(false);
-    }else{
-
-        appendSMAct->setVisible(true);
-        appendMSGAct->setVisible(true);
-        appendMGAct->setVisible(true);
-        appendBSISTGAct->setVisible(true);
-        appendBSSCGAct->setVisible(true);
-        appendBSOAGAct->setVisible(true);
-        appendBSCBTGAct->setVisible(true);
-        appendPMGAct->setVisible(true);
-        appendBGAct->setVisible(true);
-        appendBSBSGAct->setVisible(true);
-        appendCGAct->setVisible(true);
-        appendBRGAct->setVisible(true);
-
-        wrapMSGAct->setVisible(true);
-        wrapMGAct->setVisible(true);
-        wrapBSISTGAct->setVisible(true);
-        wrapPMGAct->setVisible(true);
-        wrapBGAct->setVisible(true);
-        wrapBSBSGAct->setVisible(true);
-
-        removeObjBranchAct->setVisible(true);
-
-        wrapBSCBTGAct->setVisible(false);
-        wrapBSSCGAct->setVisible(false);
-        wrapBSOAGAct->setVisible(false);
     }
     contextMenu->popup(viewport()->mapToGlobal(pos));
 }

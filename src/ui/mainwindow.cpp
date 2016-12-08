@@ -72,7 +72,7 @@ MainWindow::MainWindow()
     topLyt->addWidget(eventsWid, 7, 0, 4, 3);
     topLyt->addWidget(variablesWid, 7, 3, 4, 3);
     topLyt->addWidget(logGB, 7, 6, 3, 4);
-    //progressD->hide();
+    tabs->setTabsClosable(true);
     readSettings();
     setLayout(topLyt);
     objectDataSA->setWidget(objectDataWid);

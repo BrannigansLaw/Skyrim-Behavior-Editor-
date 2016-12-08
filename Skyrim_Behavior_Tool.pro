@@ -130,7 +130,9 @@ SOURCES += \
     src/hkxclasses/behavior/hkbprojectstringdata.cpp \
     src/ui/customtreegraphicsview.cpp \
     src/ui/behaviorgraphui/behaviorgraphview.cpp \
-    src/ui/behaviorgraphui/customtreegraphicsviewicon.cpp
+    src/ui/behaviorgraphui/customtreegraphicsviewicon.cpp \
+    src/hkxclasses/behavior/hkbmirroredskeletoninfo.cpp \
+    src/hkxclasses/behavior/hkbcharacterstringdata.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -243,4 +245,6 @@ HEADERS  += \
     src/hkxclasses/behavior/hkbprojectstringdata.h \
     src/ui/customtreegraphicsview.h \
     src/ui/behaviorgraphui/behaviorgraphview.h \
-    src/ui/behaviorgraphui/customtreegraphicsviewicon.h
+    src/ui/behaviorgraphui/customtreegraphicsviewicon.h \
+    src/hkxclasses/behavior/hkbmirroredskeletoninfo.h \
+    src/hkxclasses/behavior/hkbcharacterstringdata.h

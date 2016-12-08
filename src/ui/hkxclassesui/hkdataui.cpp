@@ -23,13 +23,80 @@
 #include <QStackedLayout>
 #include <QCoreApplication>
 
+QStringList HkDataUI::generatorTypes = {
+        "hkbStateMachine",
+        "hkbManualSelectorGenerator",
+        "hkbBlenderGenerator",
+        "BSiStateTaggingGenerator",
+        "BSBoneSwitchGenerator",
+        "BSCyclicBlendTransitionGenerator",
+        "BSSynchronizedClipGenerator",
+        "hkbModifierGenerator",
+        "BSOffsetAnimationGenerator",
+        "hkbPoseMatchingGenerator",
+        "hkbClipGenerator",
+        "hkbBehaviorReferenceGenerator"
+};
+
+QStringList HkDataUI::modifierTypes = {
+    "hkbModifierList",
+    "hkbTwistModifier",
+    "hkbEventDrivenModifier",
+    "BSIsActiveModifier",
+    "BSLimbIKModifier",
+    "BSInterpValueModifier",
+    "BSGetTimeStepModifier",
+    "hkbFootIkControlsModifier",
+    "hkbGetHandleOnBoneModifier",
+    "hkbTransformVectorModifier",
+    "hkbProxyModifier",
+    "hkbLookAtModifier",
+    "hkbMirrorModifier",
+    "hkbGetWorldFromModelModifier",
+    "hkbSenseHandleModifier",
+    "hkbEvaluateExpressionModifier",
+    "hkbEvaluateHandleModifier",
+    "hkbAttachmentModifier",
+    "hkbAttributeModifier",
+    "hkbCombineTransformsModifier",
+    "hkbComputeRotationFromAxisAngleModifier",
+    "hkbComputeRotationToTargetModifier",
+    "hkbEventsFromRangeModifier",
+    "hkbMoveCharacterModifier",
+    "hkbExtractRagdollPoseModifier",
+    "BSModifyOnceModifier",
+    "BSEventOnDeactivateModifier",
+    "BSEventEveryNEventsModifier",
+    "BSRagdollContactListenerModifier",
+    "hkbPoweredRagdollControlsModifier",
+    "BSEventOnFalseToTrueModifier",
+    "BSDirectAtModifier",
+    "BSDistTriggerModifier",
+    "BSDecomposeVectorModifier",
+    "BSComputeAddBoneAnimModifier",
+    "BSTweenerModifier",
+    "BSIStateManagerModifier",
+    "hkbTimerModifier",
+    "hkbRotateCharacterModifier",
+    "hkbDampingModifier",
+    "hkbDelayedModifier",
+    "hkbGetUpModifier",
+    "hkbKeyframeBonesModifier",
+    "hkbComputeDirectionModifier",
+    "hkbRigidBodyRagdollControlsModifier",
+    "BSSpeedSamplerModifier",
+    "hkbDetectCloseToGroundModifier",
+    "BSLookAtModifier",
+    "BSTimerModifier"
+};
+
 HkDataUI::HkDataUI(const QString &title)
     : behaviorView(NULL),
       verLyt(new QVBoxLayout),
       stack(new QStackedLayout),
       loadedData(NULL),
-      //generatorsTable(new HkxObjectTableWidget("Select a hkbGenerator!")),
-      //modifiersTable(new HkxObjectTableWidget("Select a hkbModifier!")),
+      generatorsTable(new HkxObjectTableWidget("Select a hkbGenerator!")),
+      modifiersTable(new HkxObjectTableWidget("Select a hkbModifier!")),
       noDataL(new QLabel("No Data Selected!")),
       iSTGUI(new BSiStateTaggingGeneratorUI),
       modGenUI(new ModifierGeneratorUI(NULL, NULL)),
@@ -39,9 +106,10 @@ HkDataUI::HkDataUI(const QString &title)
       transitionUI(new TransitionsUI)
 {
     setTitle(title);
-    //stateUI->setGeneratorTable(generatorsTable);
-    //manSelGenUI->setGeneratorTable(generatorsTable);
-    //generatorsTable->hide();
+    generatorsTable->setTypes(generatorTypes);
+    modifiersTable->setTypes(modifierTypes);
+    modGenUI->setGeneratorTable(generatorsTable);
+    modGenUI->setModifierTable(modifiersTable);
     stack->addWidget(noDataL);
     stack->addWidget(iSTGUI);
     stack->addWidget(modGenUI);
@@ -57,6 +125,14 @@ HkDataUI::HkDataUI(const QString &title)
     connect(stateUI, SIGNAL(viewTransition(hkbStateMachine*,HkTransition*)), this, SLOT(viewTransition(hkbStateMachine*,HkTransition*)));
     connect(transitionUI, SIGNAL(returnToParent()), this, SLOT(viewStateMachine()));
     connect(stateUI, SIGNAL(toParentStateMachine()), this, SLOT(viewStateMachine()));
+
+    connect(iSTGUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
+    connect(modGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
+    connect(manSelGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
+    connect(stateMachineUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
+    connect(stateUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
+
+    connect(generatorsTable, SIGNAL(elementAdded(int)), this, SLOT());
 }
 
 void HkDataUI::viewState(hkbStateMachineStateInfo *state){
@@ -86,9 +162,9 @@ void HkDataUI::setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *varia
     connect(variablesUI, SIGNAL(variableNameChanged(QString,int)), this, SLOT(variableNameChanged(QString,int)));
 }
 
-void HkDataUI::modifierAdded(const QString & name){
+void HkDataUI::modifierAdded(const QString & name, const QString & type){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    //modifiersTable->addItem(name, "");
+    modifiersTable->addItem(name, type);
     QCoreApplication::processEvents();
 }
 void HkDataUI::modifierNameChanged(const QString & newName, int index){
@@ -97,11 +173,11 @@ void HkDataUI::modifierNameChanged(const QString & newName, int index){
     QCoreApplication::processEvents();
 }
 
-void HkDataUI::generatorAdded(const QString & name){
+void HkDataUI::generatorAdded(const QString & name, const QString & type){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    manSelGenUI->generatorTable->addItem(name, "");
-    stateUI->generatorTable->addItem(name, "");
-    //generatorsTable->addItem(name, "");
+    manSelGenUI->generatorTable->addItem(name, type);
+    stateUI->generatorTable->addItem(name, type);
+    //generatorsTable->addItem(name, type);
     QCoreApplication::processEvents();
 }
 
@@ -230,17 +306,12 @@ BehaviorGraphView *HkDataUI::setBehaviorView(BehaviorGraphView *view){
         manSelGenUI->loadComboBoxes();
         stateMachineUI->loadComboBoxes();
         transitionUI->loadComboBoxes();
-        //generatorsTable->loadTable(behaviorView->behavior);
-        //generatorsTable->show();
+        generatorsTable->loadTable(behaviorView->behavior);
+        modifiersTable->loadTable(behaviorView->behavior);
         connect(behaviorView, SIGNAL(addedGenerator(QString)), this, SLOT(generatorAdded(QString)));
         connect(behaviorView, SIGNAL(addedModifier(QString)), this, SLOT(modifierAdded(QString)));
         connect(behaviorView, SIGNAL(removedGenerator(int)), this, SLOT(generatorRemoved(int)));
         connect(behaviorView, SIGNAL(removedModifier(int)), this, SLOT(modifierRemoved(int)));
     }
-    connect(iSTGUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
-    connect(modGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
-    connect(manSelGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
-    connect(stateMachineUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
-    connect(stateUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
     return oldView;
 }

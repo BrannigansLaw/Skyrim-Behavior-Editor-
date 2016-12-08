@@ -522,7 +522,7 @@ int DataIconManager::addChildrenToList(QList<DataIconManager *> & list, bool rev
     return 0;
 }
 
-int DataIconManager::getIndexToInsertIcon() const{
+int DataIconManager::getIndexToInsertIcon(HkxObject *child) const{
     return -1;
 }
 

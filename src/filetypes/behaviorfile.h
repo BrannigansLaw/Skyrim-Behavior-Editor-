@@ -26,10 +26,11 @@ public:
     hkbGenerator * getGeneratorDataAt(int index);
     int getIndexOfModifier(const HkxObjectExpSharedPtr & obj) const;
     bool setModifierData(HkxObjectExpSharedPtr & ptrToSet, int index);
-    HkxObject* getModifierDataAt(int index);
+    hkbModifier * getModifierDataAt(int index);
     QStringList getVariableNames() const;
     QStringList getEventNames() const;
     QStringList getGeneratorNamesAndTypeNames() const;
+    QStringList getModifierNamesAndTypeNames() const;
     HkxObject * getBehaviorGraphData() const;
     hkbBehaviorGraph * getBehaviorGraph() const;
     HkxObject * getRootStateMachine() const;

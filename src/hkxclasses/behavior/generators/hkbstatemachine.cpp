@@ -45,6 +45,22 @@ QString hkbStateMachine::getName() const{
     return name;
 }
 
+int hkbStateMachine::generateValidStateId(){
+    int stateId = 0;
+    int prev = 0;
+    hkbStateMachineStateInfo *ptr = NULL;
+    for (int i = 0; i < states.size(); i++){
+        ptr = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+        stateId = ptr->stateId;
+        if (stateId <= prev){
+            prev = prev + 1;
+        }else if (stateId > prev){
+            prev = stateId + 1;
+        }
+    }
+    return prev;
+}
+
 int hkbStateMachine::getNumberOfStates() const{
     return states.size();
 }

@@ -89,7 +89,7 @@ CustomTreeGraphicsViewIcon::CustomTreeGraphicsViewIcon(DataIconManager *d, const
         qreal lastY = 0;
         getLastIconY(parent, lastY);
         if (!parent->children.contains(this)){
-            int index = static_cast<DataIconManager *>(parent->data.data())->getIndexToInsertIcon();
+            int index = static_cast<DataIconManager *>(parent->data.data())->getIndexToInsertIcon(data.data());
             if (index > -1 && index < parent->children.size()){
                 parent->children.insert(index, this);
             }else{
@@ -190,7 +190,13 @@ void CustomTreeGraphicsViewIcon::setSelected(QGraphicsSceneMouseEvent *event){
         firstSceneIcon = static_cast<CustomTreeGraphicsViewIcon *>(scene()->items(Qt::AscendingOrder).first());
         if (view->selectedIcon != this){
             if (view->selectedIcon){
-                view->selectedIcon->rGrad.setColorAt(1.0, Qt::black);
+                if (view->selectedIcon->data->getType() == HkxObject::TYPE_GENERATOR){
+                    view->selectedIcon->rGrad.setColorAt(0.0, Qt::white);
+                    view->selectedIcon->rGrad.setColorAt(1.0, Qt::black);
+                }else if (view->selectedIcon->data->getType() == HkxObject::TYPE_MODIFIER){
+                    view->selectedIcon->rGrad.setColorAt(0.0, Qt::white);
+                    view->selectedIcon->rGrad.setColorAt(1.0, Qt::blue);
+                }
                 view->selectedIcon->textPen.setColor(Qt::white);
             }
             view->selectedIcon = this;
@@ -228,9 +234,6 @@ void CustomTreeGraphicsViewIcon::setSelected(QGraphicsSceneMouseEvent *event){
                 view->repositionIcons(firstSceneIcon);
             }
         }
-        if (event->button() == Qt::RightButton){
-            view->popUpMenuRequested(view->mapFromScene(event->scenePos()));
-        }
     }else{
         view->expandBranch(firstSceneIcon);
         view->repositionIcons(firstSceneIcon, true);
@@ -245,7 +248,8 @@ void CustomTreeGraphicsViewIcon::unselect(){
         view = static_cast<CustomTreeGraphicsView *>(scene()->views().first());
         firstSceneIcon = static_cast<CustomTreeGraphicsViewIcon *>(scene()->items(Qt::AscendingOrder).first());
         if (view->selectedIcon == this){
-            if (view->selectedIcon){if (data->getType() == HkxObject::TYPE_GENERATOR){
+            if (view->selectedIcon){
+                if (data->getType() == HkxObject::TYPE_GENERATOR){
                     rGrad.setColorAt(0.0, Qt::white);
                     rGrad.setColorAt(1.0, Qt::black);
                 }else if (data->getType() == HkxObject::TYPE_MODIFIER){

@@ -26,6 +26,7 @@ public:
     int getIndexToInsertIcon() const;
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
+    int generateValidStateId();
 private:
     bool wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace);
     bool setChildAt(HkxObject *newChild, ushort index = 0);

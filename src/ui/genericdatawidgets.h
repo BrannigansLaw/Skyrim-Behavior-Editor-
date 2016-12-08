@@ -165,12 +165,15 @@ public:
     void removeItem(int index);
     void setSelectedRow(int row);
     int getNumRows() const;
+    void setTypes(const QStringList & typeNames);
 signals:
     void elementSelected(int index);
     void hideWindow();
+    void elementAdded(int index);
 protected:
 private slots:
     void itemSelected();
+    void itemAdded();
 private:
     QGridLayout *lyt;
     TableWidget *table;
@@ -178,7 +181,6 @@ private:
     QPushButton *cancelPB;
     QPushButton *newPB;
     ComboBox *typeSelector;
-    int lastVisableIndex;
 };
 
 #endif // DATAWIDGETS_H

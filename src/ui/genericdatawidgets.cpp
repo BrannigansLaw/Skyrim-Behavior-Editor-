@@ -4,7 +4,9 @@ HkxObjectTableWidget::HkxObjectTableWidget(const QString & title)
     : lyt(new QGridLayout),
       table(new TableWidget),
       selectPB(new QPushButton("Select")),
-      cancelPB(new QPushButton("Cancel"))
+      cancelPB(new QPushButton("Cancel")),
+      newPB(new QPushButton("New")),
+      typeSelector(new ComboBox)
 {
     setWindowTitle(title);
     setWindowModality(Qt::WindowModal);
@@ -12,27 +14,33 @@ HkxObjectTableWidget::HkxObjectTableWidget(const QString & title)
     table->setColumnCount(2);
     table->setHorizontalHeaderLabels(list);
     lyt->addWidget(table, 0, 0, 8, 10);
-    lyt->addWidget(selectPB, 8, 5, 1, 2);
+    lyt->addWidget(selectPB, 8, 2, 1, 2);
     lyt->addWidget(cancelPB, 8, 7, 1, 2);
+    lyt->addWidget(newPB, 9, 2, 1, 2);
+    lyt->addWidget(typeSelector, 9, 5, 1, 4);
     setLayout(lyt);
     connect(selectPB, SIGNAL(released()), this, SLOT(itemSelected()));
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(itemSelected()));
     connect(cancelPB, SIGNAL(released()), this, SIGNAL(hideWindow()));
+    connect(newPB, SIGNAL(released()), this, SLOT(itemAdded()));
 }
 
 void HkxObjectTableWidget::loadTable(BehaviorFile *file, bool isGenerator){
     if (file){
+        QStringList list;
         if (isGenerator){
-            QStringList list = file->getGeneratorNamesAndTypeNames();
-            for (int i = 0, j = 0, k = 1; i < list.size(), j < list.size(), k < list.size(); i++, j+=2, k+=2){
-                if (i < table->rowCount()){
-                    table->itemAt(i, 0)->setText(list.at(j));
-                    table->itemAt(i, 1)->setText(list.at(k));
-                }else{
-                    table->setRowCount(table->rowCount() + 1);
-                    table->setItem(i, 0, new QTableWidgetItem(list.at(j)));
-                    table->setItem(i, 1, new QTableWidgetItem(list.at(k)));
-                }
+            list = file->getGeneratorNamesAndTypeNames();
+        }else{
+            list = file->getModifierNamesAndTypeNames();
+        }
+        for (int i = 0, j = 0, k = 1; i < list.size(), j < list.size(), k < list.size(); i++, j+=2, k+=2){
+            if (i < table->rowCount()){
+                table->itemAt(i, 0)->setText(list.at(j));
+                table->itemAt(i, 1)->setText(list.at(k));
+            }else{
+                table->setRowCount(table->rowCount() + 1);
+                table->setItem(i, 0, new QTableWidgetItem(list.at(j)));
+                table->setItem(i, 1, new QTableWidgetItem(list.at(k)));
             }
         }
     }
@@ -47,6 +55,7 @@ void HkxObjectTableWidget::addItem(const QString & name, const QString & type){
     table->setRowCount(table->rowCount() + 1);
     table->setItem(i, 0, new QTableWidgetItem(name));
     table->setItem(i, 1, new QTableWidgetItem(type));
+    table->setCurrentCell(table->rowCount() - 1, 0);
 }
 
 void HkxObjectTableWidget::renameItem(int index, const QString & newname){
@@ -57,8 +66,6 @@ void HkxObjectTableWidget::renameItem(int index, const QString & newname){
 
 void HkxObjectTableWidget::removeItem(int index){
     if (index < table->rowCount()){
-        //delete table->itemAt(index, 0);
-        //delete table->itemAt(index, 1);
         table->removeRow(index);
     }
 }
@@ -67,14 +74,17 @@ void HkxObjectTableWidget::setSelectedRow(int row){
     table->setCurrentCell(row, 0);
 }
 
-/*void HkxObjectTableWidget::showWidget(){
-    setVisible(true);
+void HkxObjectTableWidget::itemAdded(){
+    addItem("New"+typeSelector->currentText(), typeSelector->currentText());
+    emit elementAdded(table->rowCount() - 1);
 }
-
-void HkxObjectTableWidget::hideWidget(){
-    hide();
-}*/
 
 void HkxObjectTableWidget::itemSelected(){
     emit elementSelected(table->currentRow());
 }
+
+void HkxObjectTableWidget::setTypes(const QStringList & typeNames){
+    typeSelector->clear();
+    typeSelector->addItems(typeNames);
+}
+

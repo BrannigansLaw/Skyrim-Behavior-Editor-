@@ -755,6 +755,17 @@ QStringList BehaviorFile::getGeneratorNamesAndTypeNames() const{
     return list;
 }
 
+QStringList BehaviorFile::getModifierNamesAndTypeNames() const{
+    QStringList list;
+    for (int i = 0; i < modifiers.size(); i++){
+        if (modifiers.at(i).constData()->getType() == HkxObject::TYPE_MODIFIER){
+            list.append(static_cast<hkbGenerator *>(modifiers.at(i).data())->getName());
+            list.append(static_cast<hkbGenerator *>(modifiers.at(i).data())->getClassname());
+        }
+    }
+    return list;
+}
+
 HkxObject * BehaviorFile::getBehaviorGraphData() const{
     return graphData.data();
 }
@@ -790,9 +801,9 @@ bool BehaviorFile::setModifierData(HkxObjectExpSharedPtr & ptrToSet, int index){
     return false;
 }
 
-HkxObject* BehaviorFile::getModifierDataAt(int index){
+hkbModifier* BehaviorFile::getModifierDataAt(int index){
     if (index >= 0 && index < modifiers.size()){
-        return modifiers[index].data();
+        return static_cast<hkbModifier *>(modifiers[index].data());
     }
     return NULL;
 }

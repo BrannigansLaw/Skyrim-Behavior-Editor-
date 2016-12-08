@@ -36,7 +36,6 @@ CustomTreeGraphicsView::CustomTreeGraphicsView(QMenu *contextMenu, CustomTreeGra
     setMinimumHeight(200);
     setMinimumWidth(200);
     setScene(behaviorGS);
-    setContextMenuPolicy(Qt::CustomContextMenu);
     CustomTreeGraphicsViewIcon::updateStaticMembers();
 }
 
@@ -210,7 +209,6 @@ bool CustomTreeGraphicsView::reconnectBranch(DataIconManager *oldChild, DataIcon
     }
     CustomTreeGraphicsViewIcon *oldChildIcon = NULL;
     CustomTreeGraphicsViewIcon *newChildIcon = NULL;
-    DataIconManager *gen = static_cast<DataIconManager *>(newChild);
     for (int i = 0; i < icon->children.size(); i++){
         if (icon->children.at(i)->data.data() == oldChild){
             oldChildIcon = icon->children.at(i);
@@ -291,7 +289,6 @@ bool CustomTreeGraphicsView::appendObject(DataIconManager *ptr, CustomTreeGraphi
     return true;
 }
 
-
 void CustomTreeGraphicsView::wrapObject(DataIconManager *obj, CustomTreeGraphicsViewIcon *parentObjIcon){
     if (!obj || !parentObjIcon || !parentObjIcon->parent || !parentObjIcon->parent->data.constData()){
         return;
@@ -303,10 +300,6 @@ void CustomTreeGraphicsView::wrapObject(DataIconManager *obj, CustomTreeGraphics
     }
     CustomTreeGraphicsViewIcon *newIcon = initalizeInjectedIcon(obj, parentObjIcon->parent, selectedIcon);
     newIcon->setSelected();
-}
-
-void CustomTreeGraphicsView::popUpMenuRequested(const QPoint &pos){
-    popUpMenu->popup(viewport()->mapToGlobal(pos));
 }
 
 void CustomTreeGraphicsView::repositionIcons(CustomTreeGraphicsViewIcon *icon, bool updateNonVisable){

@@ -38,10 +38,10 @@ public slots:
     void viewTransition(hkbStateMachine *parent, HkTransition *transition);
     void viewStateMachine();
     void changeCurrentDataWidget(CustomTreeGraphicsViewIcon *icon);
-    void modifierAdded(const QString & name);
+    void modifierAdded(const QString & name, const QString & type);
     void modifierNameChanged(const QString & newName, int index);
     void modifierRemoved(int index);
-    void generatorAdded(const QString & name);
+    void generatorAdded(const QString & name, const QString & type);
     void generatorNameChanged(const QString & newName, int index);
     void generatorRemoved(int index);
     void eventNameChanged(const QString & newName, int index);
@@ -63,14 +63,16 @@ private:
         STATE = 5,
         TRANSITION = 6
     };
+    static QStringList generatorTypes;
+    static QStringList modifierTypes;
     EventsUI *eventsUI;
     BehaviorVariablesUI *variablesUI;
     BehaviorGraphView *behaviorView;
     QVBoxLayout *verLyt;
     QStackedLayout *stack;
     HkxObject *loadedData;
-    //HkxObjectTableWidget *generatorsTable;
-    //HkxObjectTableWidget *modifiersTable;
+    HkxObjectTableWidget *generatorsTable;
+    HkxObjectTableWidget *modifiersTable;
     QLabel *noDataL;
     BSiStateTaggingGeneratorUI *iSTGUI;
     ModifierGeneratorUI *modGenUI;

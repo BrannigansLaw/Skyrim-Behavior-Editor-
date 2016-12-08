@@ -108,7 +108,7 @@ class DataIconManager: public HkDynamicObject
 public:
     virtual ~DataIconManager();
     void updateIconNames();
-    virtual int getIndexToInsertIcon() const;
+    virtual int getIndexToInsertIcon(HkxObject *child) const;
     QString getName() const;
     virtual bool hasChildren() const;
 protected:
