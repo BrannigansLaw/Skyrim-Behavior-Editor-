@@ -85,6 +85,7 @@
 #include "src/hkxclasses/behavior/hkbstatemachineeventpropertyarray.h"
 #include "src/hkxclasses/behavior/hkbblendingtransitioneffect.h"
 #include "src/hkxclasses/behavior/hkbexpressioncondition.h"
+#include "src/hkxclasses/behavior/hkbstringcondition.h"
 #include "src/hkxclasses/behavior/generators/hkbbehaviorgraph.h"
 #include "src/hkxclasses/behavior/hkbcliptriggerarray.h"
 #include "src/hkxclasses/behavior/hkbstringeventpayload.h"
@@ -105,13 +106,7 @@ BehaviorFile::BehaviorFile(MainWindow *window, const QString & name)
     : HkxFile(window, name),
       largestRef(0)
 {
-    //setFileType(HKX_BEHAVIOR);
     getReader().setFile(this);
-    if (!parse()){
-        writeToLog("MainWindow: parse() failed!");
-        getUI()->drawGraph = false;
-    }
-    getReader().clear();
 }
 
 HkxObject * BehaviorFile::getRootStateMachine() const{
@@ -171,7 +166,7 @@ bool BehaviorFile::parse(){
     }
     int index = 2;
     bool ok = true;
-    qulonglong signature;
+    HkxSignature signature;
     QByteArray value;
     long ref = 0;
     setProgressData("Creating HKX objects...", 60);
@@ -185,7 +180,7 @@ bool BehaviorFile::parse(){
                     writeToLog("BehaviorFile: parse() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!", true);
                     return false;
                 }
-                signature = value.toULongLong(&ok, 16);
+                signature = (HkxSignature)value.toULongLong(&ok, 16);
                 if (!ok){
                     writeToLog("BehaviorFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!", true);
                     return false;
@@ -254,6 +249,10 @@ bool BehaviorFile::parse(){
                     if (!appendAndReadData(index, new hkbExpressionCondition(this, "", ref))){
                         return false;
                     }
+                }else if (signature == HKB_STRING_CONDITION){
+                    if (!appendAndReadData(index, new hkbStringCondition(this, "", ref))){
+                        return false;
+                    }
                 }else if (signature == BS_OFFSET_ANIMATION_GENERATOR){
                     if (!appendAndReadData(index, new BSOffsetAnimationGenerator(this, ref))){
                         return false;
@@ -300,6 +299,10 @@ bool BehaviorFile::parse(){
                     }
                 }else if (signature == HKB_LOOK_AT_MODIFIER){
                     if (!appendAndReadData(index, new hkbLookAtModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_EVENT_RANGE_DATA_ARRAY){
+                    if (!appendAndReadData(index, new hkbEventRangeDataArray(this, ref))){
                         return false;
                     }
                 }else if (signature == HKB_MIRROR_MODIFIER){
@@ -536,6 +539,7 @@ bool BehaviorFile::parse(){
         index++;
     }
     closeFile();
+    getReader().clear();
     setProgressData("Linking HKX objects...", 80);
     if (!link()){
         writeToLog("BehaviorFile: parse() failed because link() failed!", true);
@@ -761,6 +765,20 @@ QStringList BehaviorFile::getModifierNamesAndTypeNames() const{
         if (modifiers.at(i).constData()->getType() == HkxObject::TYPE_MODIFIER){
             list.append(static_cast<hkbGenerator *>(modifiers.at(i).data())->getName());
             list.append(static_cast<hkbGenerator *>(modifiers.at(i).data())->getClassname());
+        }
+    }
+    return list;
+}
+
+QStringList BehaviorFile::getAllReferencedBehaviorFilePaths() const{
+    QStringList list;
+    hkbBehaviorReferenceGenerator *ptr = NULL;
+    for (int i = 0; i < generators.size(); i++){
+        if (generators.at(i).constData() && generators.at(i)->getSignature() == HKB_BEHAVIOR_REFERENCE_GENERATOR){
+            ptr = static_cast<hkbBehaviorReferenceGenerator *>(generators.at(i).data());
+            if (ptr->behaviorName != ""){
+                list.append(ptr->behaviorName);
+            }
         }
     }
     return list;

@@ -38,7 +38,7 @@ private:
     qreal blendParameter;
     qreal minCyclicBlendParameter;
     qreal maxCyclicBlendParameter;
-    qint16 indexOfSyncMasterChild;
+    int indexOfSyncMasterChild;
     QString flags;
     bool subtractLastChild;
     QList <HkxObjectExpSharedPtr> children;

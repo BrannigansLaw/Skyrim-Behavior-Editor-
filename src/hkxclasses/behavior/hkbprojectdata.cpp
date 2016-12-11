@@ -82,7 +82,7 @@ bool hkbProjectData::link(){
     HkxObjectExpSharedPtr *ptr;
     ProjectFile *file = dynamic_cast<ProjectFile *>(getParentFile());
     if (file){
-        ptr = file->findProjectData(stringData.getReference());
+        ptr = file->findProjectStringData(stringData.getReference());
     }else{
         writeToLog(getClassname()+": link()!\nParent file type is invalid!!!", true);
     }

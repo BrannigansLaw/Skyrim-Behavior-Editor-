@@ -6,6 +6,7 @@
 class ProjectFile: public HkxFile
 {
     friend class hkbProjectData;
+    friend class MainWindow;
 public:
     ProjectFile(MainWindow *window, const QString & name);
     virtual ~ProjectFile();
@@ -13,6 +14,8 @@ public:
     void write();
     QString getRootObjectReferenceString();
     HkxObjectExpSharedPtr * findProjectData(long ref);
+    HkxObjectExpSharedPtr * findProjectStringData(long ref);
+    QString getCharacterFilePathAt(int index) const;
 protected:
     bool parse();
     bool link();

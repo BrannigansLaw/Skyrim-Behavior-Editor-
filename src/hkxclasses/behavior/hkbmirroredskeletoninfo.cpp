@@ -34,7 +34,7 @@ bool hkbMirroredSkeletonInfo::readData(const HkxXmlReader &reader, long index){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'mirrorAxis' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bonePairMap"){
-            numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            int numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'bonePairMap' data!\nObject Reference: "+ref, true);
                 return false;
@@ -58,7 +58,7 @@ bool hkbMirroredSkeletonInfo::write(HkxXMLWriter *writer){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("worldUpWS"), worldUpWS.getValueAsString());
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("mirrorAxis"), mirrorAxis.getValueAsString());
         list1 = {writer->name, writer->numelements};
         list2 = {"bonePairMap", QString::number(bonePairMap.size())};
         writer->writeLine(writer->parameter, list1, list2, "");

@@ -3,6 +3,8 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
+#include <QVector>
+
 class BehaviorFile;
 
 class hkbMirroredSkeletonInfo: public HkxObject

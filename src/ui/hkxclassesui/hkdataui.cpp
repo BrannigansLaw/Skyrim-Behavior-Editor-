@@ -87,7 +87,7 @@ QStringList HkDataUI::modifierTypes = {
     "BSSpeedSamplerModifier",
     "hkbDetectCloseToGroundModifier",
     "BSLookAtModifier",
-    "BSTimerModifier"
+    "BSTimerModifier", "BSPassByTargetTriggerModifier"
 };
 
 HkDataUI::HkDataUI(const QString &title)
@@ -248,7 +248,7 @@ void HkDataUI::variableRemoved(int index){
 }
 
 void HkDataUI::changeCurrentDataWidget(CustomTreeGraphicsViewIcon * icon){
-    qulonglong sig;
+    HkxSignature sig;
     if (icon && icon->data.constData()){
         HkxObject *oldData = loadedData;
         sig = icon->data.constData()->getSignature();

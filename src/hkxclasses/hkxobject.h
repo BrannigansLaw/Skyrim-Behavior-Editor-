@@ -29,7 +29,7 @@ public:
     virtual ~HkxObject();
     void writeToLog(const QString & message, bool isError = false);
     void setProgressData(const QString & message, int value);
-    qulonglong getSignature() const;
+    HkxSignature getSignature() const;
     HkxType getType() const;
     virtual bool evaulateDataValidity();
     bool isDataValid() const;
@@ -47,7 +47,7 @@ protected:
     void setType(HkxSignature sig, HkxType type);
     bool readMultipleVector4(const QByteArray &lineIn,  QVector <hkQuadVariable> & vectors);
     bool readReferences(const QByteArray &line, QList <HkxObjectExpSharedPtr> & children);
-    bool readIntegers(const QByteArray &line, QVector<qint16> & ints);
+    bool readIntegers(const QByteArray &line, QVector<int> & ints);
     bool toBool(const QByteArray &line, bool *ok);
     bool readDoubles(const QByteArray &line, QVector<qreal> & doubles);
     hkVector3 readVector3(const QByteArray &lineIn, bool *ok);

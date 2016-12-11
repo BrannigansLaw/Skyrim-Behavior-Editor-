@@ -1,6 +1,8 @@
 #include "hkbvariablevalueset.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/filetypes/characterfile.h"
+
 /*
  * CLASS: hkbVariableValueSet
 */
@@ -119,6 +121,11 @@ bool hkbVariableValueSet::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
+        for (int i = 0; i < variantVariableValues.size(); i++){
+            if (variantVariableValues.at(i).data()){
+                variantVariableValues.at(i).data()->write(writer);
+            }
+        }
     }
     return true;
 }
@@ -128,17 +135,36 @@ bool hkbVariableValueSet::link(){
         return false;
     }
     HkxObjectExpSharedPtr *ptr = NULL;
+    HkxFile *file = NULL;
     for (int i = 0; i < variantVariableValues.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variantVariableValues.at(i).getReference());
-        if (!ptr){
-            writeToLog(getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
-            setDataValidity(false);
-        }else if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-            writeToLog(getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
-            setDataValidity(false);
-            variantVariableValues[i] = *ptr;
+        file = dynamic_cast<BehaviorFile *>(getParentFile());
+        if (file){
+            ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variantVariableValues.at(i).getReference());
+            if (!ptr){
+                writeToLog(getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
+                setDataValidity(false);
+            }else if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
+                writeToLog(getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
+                setDataValidity(false);
+                variantVariableValues[i] = *ptr;
+            }else{
+                variantVariableValues[i] = *ptr;
+            }
         }else{
-            variantVariableValues[i] = *ptr;
+            file = dynamic_cast<CharacterFile *>(getParentFile());
+            if (file){
+                ptr = static_cast<CharacterFile *>(getParentFile())->findCharacterPropertyValues(variantVariableValues.at(i).getReference());
+                if (!ptr){
+                    writeToLog(getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
+                    setDataValidity(false);
+                }else if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
+                    writeToLog(getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
+                    setDataValidity(false);
+                    variantVariableValues[i] = *ptr;
+                }else{
+                    variantVariableValues[i] = *ptr;
+                }
+            }
         }
     }
     return true;

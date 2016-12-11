@@ -22,7 +22,7 @@ private:
 private:
     static uint refCount;
     static QString classname;
-    QVector <qint16> boneIndices;
+    QVector <int> boneIndices;
 };
 
 #endif // HKBBONEINDEXARRAY_H

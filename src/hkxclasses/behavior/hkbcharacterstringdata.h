@@ -10,6 +10,8 @@ class HkxFile;
 class hkbCharacterStringData: public HkxObject
 {
     friend class BehaviorGraphView;
+    friend class hkbCharacterData;
+    friend class CharacterFile;
 public:
     hkbCharacterStringData(HkxFile *parent, long ref = 0);
     virtual ~hkbCharacterStringData();

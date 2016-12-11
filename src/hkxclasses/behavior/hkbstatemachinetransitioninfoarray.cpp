@@ -279,7 +279,7 @@ bool hkbStateMachineTransitionInfoArray::link(){
         }
         ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(transitions.at(i).condition.getReference());
         if (ptr){
-            if ((*ptr)->getSignature() != HKB_EXPRESSION_CONDITION){
+            if ((*ptr)->getSignature() != HKB_EXPRESSION_CONDITION && (*ptr)->getSignature() != HKB_STRING_CONDITION){
                 writeToLog(getClassname()+": link()!\n'condition' data field is linked to invalid child!");
             }
             transitions[i].condition = *ptr;
@@ -290,7 +290,7 @@ bool hkbStateMachineTransitionInfoArray::link(){
 
 bool hkbStateMachineTransitionInfoArray::evaulateDataValidity(){
     for (int i = 0; i < transitions.size(); i++){
-        if (transitions.at(i).condition.data() && transitions.at(i).condition.data()->getSignature() != HKB_EXPRESSION_CONDITION){
+        if (transitions.at(i).condition.data() && transitions.at(i).condition.data()->getSignature() != HKB_EXPRESSION_CONDITION && transitions.at(i).condition.data()->getSignature() != HKB_STRING_CONDITION){
             setDataValidity(false);
             return false;
         }else if (transitions.at(i).transition.data() && (transitions.at(i).transition.data()->getSignature() != HKB_BLENDING_TRANSITION_EFFECT || transitions.at(i).transition.data()->getSignature() != HKB_GENERATOR_TRANSITION_EFFECT)){

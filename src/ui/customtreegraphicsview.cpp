@@ -484,7 +484,7 @@ bool CustomTreeGraphicsView::draw(DataIconManager *root, DataIconManager *firstC
         if (!objects.last()){
             return false;
         }
-        gen = static_cast<DataIconManager *>(objects.last());
+        gen = objects.last();
         result = initializeIcons(gen, objects, parentIcons, objectChildCount);
         if (result == 0){
             if (!objectChildCount.isEmpty()){

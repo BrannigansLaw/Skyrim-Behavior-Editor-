@@ -18,7 +18,7 @@ HkxObject::HkxObject(HkxFile *parent, long ref)
     //
 }
 
-qulonglong HkxObject::getSignature() const{
+HkxSignature HkxObject::getSignature() const{
     return signature;
 }
 
@@ -114,10 +114,10 @@ void HkxObject::setProgressData(const QString & message, int value){
 }
 
 bool HkxObject::readReferences(const QByteArray &line, QList <HkxObjectExpSharedPtr> & children){
-    qint16 size = 0;
-    qint16 start;
+    int size = 0;
+    int start;
     bool ok = false;
-    for (qint16 i = 0; i < line.size(); i++){
+    for (int i = 0; i < line.size(); i++){
         if (line.at(i) == '#'){
             i++;
             start = i;
@@ -127,7 +127,7 @@ bool HkxObject::readReferences(const QByteArray &line, QList <HkxObjectExpShared
                 i++;
             }while (i < line.size() && line.at(i) != ' ' && line.at(i) != '\n' && line.at(i) != '\r');
             QByteArray value(size, '\0');
-            for (qint16 j = 0; j < size; j++){
+            for (int j = 0; j < size; j++){
                 value[j] = line[start];
                 start++;
             }
@@ -143,7 +143,7 @@ bool HkxObject::readReferences(const QByteArray &line, QList <HkxObjectExpShared
                 i++;
             }while (i < line.size() && line.at(i) != ' ' && line.at(i) != '\n' && line.at(i) != '\r');
             QByteArray value(size, '\0');
-            for (qint16 j = 0; j < size; j++){
+            for (int j = 0; j < size; j++){
                 value[j] = line[start];
                 start++;
             }
@@ -157,11 +157,11 @@ bool HkxObject::readReferences(const QByteArray &line, QList <HkxObjectExpShared
     return ok;
 }
 
-bool HkxObject::readIntegers(const QByteArray &line, QVector<qint16> & ints){
-    qint16 size = 0;
-    qint16 start;
+bool HkxObject::readIntegers(const QByteArray &line, QVector<int> & ints){
+    int size = 0;
+    int start;
     bool ok = true;
-    for (qint16 i = 0; i < line.size(); i++){
+    for (int i = 0; i < line.size(); i++){
         if ((line.at(i) >= '0' && line.at(i) <= '9') || (line.at(i) == '-')){
             start = i;
             size = 0;
@@ -170,7 +170,7 @@ bool HkxObject::readIntegers(const QByteArray &line, QVector<qint16> & ints){
                 i++;
             }while (i < line.size() && line.at(i) != ' ' && line.at(i) != '\n' && line.at(i) != '\r');
             QByteArray value(size, '\0');
-            for (qint16 j = 0; j < size; j++){
+            for (int j = 0; j < size; j++){
                 value[j] = line[start];
                 start++;
             }
@@ -196,10 +196,10 @@ bool HkxObject::toBool(const QByteArray &line, bool *ok){
 }
 
 bool HkxObject::readDoubles(const QByteArray &line, QVector<qreal> & doubles){
-    qint16 size = 0;
-    qint16 start;
+    int size = 0;
+    int start;
     bool ok = false;
-    for (qint16 i = 0; i < line.size(); i++){
+    for (int i = 0; i < line.size(); i++){
         if ((line.at(i) >= '0' && line.at(i) <= '9') || (line.at(i) == '-')){
             start = i;
             size = 0;
@@ -208,7 +208,7 @@ bool HkxObject::readDoubles(const QByteArray &line, QVector<qreal> & doubles){
                 i++;
             }while (i < line.size() && line.at(i) != ' ' && line.at(i) != '\n' && line.at(i) != '\r');
             QByteArray value(size, '\0');
-            for (qint16 j = 0; j < size; j++){
+            for (int j = 0; j < size; j++){
                 value[j] = line[start];
                 start++;
             }
@@ -223,11 +223,11 @@ bool HkxObject::readDoubles(const QByteArray &line, QVector<qreal> & doubles){
 
 hkVector3 HkxObject::readVector3(const QByteArray &lineIn, bool *ok){
     enum {X = 1, Y = 2, Z = 3};
-    qint16 size = 0;
-    qint16 start;
+    int size = 0;
+    int start;
     ushort axisVar = 0;
     hkVector3 vector3;
-    for (qint16 i = 0; i < lineIn.size(); i++){
+    for (int i = 0; i < lineIn.size(); i++){
         if ((lineIn.at(i) >= '0' && lineIn.at(i) <= '9') || (lineIn.at(i) == '-')){
             start = i;
             size = 0;
@@ -236,7 +236,7 @@ hkVector3 HkxObject::readVector3(const QByteArray &lineIn, bool *ok){
                 i++;
             }while (i < lineIn.size() && lineIn.at(i) != ' ' && lineIn.at(i) != ')');
             QByteArray value(size, '\0');
-            for (qint16 j = 0; j < size; j++){
+            for (int j = 0; j < size; j++){
                 value[j] = lineIn[start];
                 start++;
             }
@@ -269,11 +269,11 @@ hkVector3 HkxObject::readVector3(const QByteArray &lineIn, bool *ok){
 
 hkQuadVariable HkxObject::readVector4(const QByteArray &lineIn, bool *ok){
     enum {X = 1, Y = 2, Z = 3, W = 4};
-    qint16 size = 0;
-    qint16 start;
+    int size = 0;
+    int start;
     ushort axisVar = 0;
     hkQuadVariable vector;
-    for (qint16 i = 0; i < lineIn.size(); i++){
+    for (int i = 0; i < lineIn.size(); i++){
         if ((lineIn.at(i) >= '0' && lineIn.at(i) <= '9') || (lineIn.at(i) == '-')){
             start = i;
             size = 0;
@@ -282,7 +282,7 @@ hkQuadVariable HkxObject::readVector4(const QByteArray &lineIn, bool *ok){
                 i++;
             }while (i < lineIn.size() && lineIn.at(i) != ' ' && lineIn.at(i) != ')');
             QByteArray value(size, '\0');
-            for (qint16 j = 0; j < size; j++){
+            for (int j = 0; j < size; j++){
                 value[j] = lineIn[start];
                 start++;
             }
@@ -318,13 +318,13 @@ hkQuadVariable HkxObject::readVector4(const QByteArray &lineIn, bool *ok){
 
 bool HkxObject::readMultipleVector4(const QByteArray &lineIn,  QVector <hkQuadVariable> & vectors){
     enum {X = 1, Y = 2, Z = 3, W = 4};
-    qint16 size = 0;
-    qint16 start;
+    int size = 0;
+    int start;
     ushort axisVar = 0;
     hkQuadVariable vector;
     bool ok = false;
     bool loop = false;
-    for (qint16 i = 0; i < lineIn.size(); i++){
+    for (int i = 0; i < lineIn.size(); i++){
         if (lineIn.at(i) == '('){
             loop = true;
             i++;
@@ -337,7 +337,7 @@ bool HkxObject::readMultipleVector4(const QByteArray &lineIn,  QVector <hkQuadVa
                         i++;
                     }while (i < lineIn.size() && lineIn.at(i) != ' ' && lineIn.at(i) != ')');
                     QByteArray value(size, '\0');
-                    for (qint16 j = 0; j < size; j++){
+                    for (int j = 0; j < size; j++){
                         value[j] = lineIn[start];
                         start++;
                     }

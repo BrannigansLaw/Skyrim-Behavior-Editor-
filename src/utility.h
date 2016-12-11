@@ -77,6 +77,7 @@ enum HkxSignature: unsigned long long {
     HKA_SKELETON = 0x366e8220,
     HK_SIMPLE_LOCAL_FRAME = 0xe758f63c,
     //Behavior
+    HKB_STRING_CONDITION = 0x5ab50487,
     HKB_GET_WORLD_FROM_MODEL_MODIFIER = 0x873fc6f7,
     HKB_EVENT_RANGE_DATA_ARRAY = 0x330a56ee,
     BS_DIST_TRIGGER_MODIFER = 0xb34d2bbd,

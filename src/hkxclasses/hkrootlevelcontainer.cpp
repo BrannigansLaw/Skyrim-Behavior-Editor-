@@ -3,6 +3,8 @@
 #include "src/xml/hkxxmlwriter.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/filetypes/projectfile.h"
+#include "src/filetypes/characterfile.h"
+#include "src/filetypes/skeletonfile.h"
 
 /**
  * hkRootLevelContainer
@@ -102,36 +104,25 @@ bool hkRootLevelContainer::link(){
     for (int i = 0; i < namedVariants.size(); i++){
         HkxObjectExpSharedPtr *ptr = NULL;
         HkxFile *file = dynamic_cast<BehaviorFile *>(getParentFile());
-        /*if (getParentFile()->getFiletype() == HkxFile::HKX_BEHAVIOR){
-            ptr = static_cast<BehaviorFile *>(getParentFile())->findBehaviorGraph(namedVariants.at(i).variant.getReference());
-        }else if (getParentFile()->getFiletype() == HkxFile::HKX_PROJECT){
-            ptr = static_cast<ProjectFile *>(getParentFile())->findProjectData(namedVariants.at(i).variant.getReference());
-        }else if (getParentFile()->getFiletype() == HkxFile::HKX_CHARACTER){
-            //ptr = static_cast<CharacterFile *>(getParentFile())->findCharacterData(namedVariants.at(i).variant.getReference());
-        }else if (getParentFile()->getFiletype() == HkxFile::HKX_SKELETON){
-            //ptr = static_cast<SkeletonFile *>(getParentFile())->findHkxObject(namedVariants.at(i).variant.getReference());
-        }else{
-            writeToLog(getClassname()+": link()!\nParent file type is invalid!!!", true);
-        }*/
         if (file){
             ptr = static_cast<BehaviorFile *>(getParentFile())->findBehaviorGraph(namedVariants.at(i).variant.getReference());
         }else{
             file = dynamic_cast<ProjectFile *>(getParentFile());
             if (file){
                 ptr = static_cast<ProjectFile *>(getParentFile())->findProjectData(namedVariants.at(i).variant.getReference());
-            }/*else{
+            }else{
                 file = dynamic_cast<CharacterFile *>(getParentFile());
                 if (file){
-                    ptr = static_cast<CharacterFile *>(getParentFile())->findBehaviorGraph(namedVariants.at(i).variant.getReference());
-                }
-            }else{
-                file = dynamic_cast<SkeletonFile *>(getParentFile());
-                if (file){
-                    ptr = static_cast<SkeletonFile *>(getParentFile())->findBehaviorGraph(namedVariants.at(i).variant.getReference());
+                    ptr = static_cast<CharacterFile *>(getParentFile())->findCharacterData(namedVariants.at(i).variant.getReference());
                 }else{
-                    writeToLog(getClassname()+": link()!\nParent file type is invalid!!!", true);
+                    //file = dynamic_cast<SkeletonFile *>(getParentFile());
+                    if (file){
+                        //ptr = static_cast<SkeletonFile *>(getParentFile())->findBehaviorGraph(namedVariants.at(i).variant.getReference());
+                    }else{
+                        writeToLog(getClassname()+": link()!\nParent file type is invalid!!!", true);
+                    }
                 }
-            }*/
+            }
         }
         if (!ptr){
             writeToLog(getClassname()+": link()!\nUnable to link variant reference "+QString::number(namedVariants.at(i).variant.getReference())+"!");

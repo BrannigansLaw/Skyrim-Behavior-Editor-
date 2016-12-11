@@ -12,16 +12,25 @@ ProjectFile::ProjectFile(MainWindow *window, const QString & name)
       largestRef(0)
 {
     getReader().setFile(this);
-    if (!parse()){
-        writeToLog("MainWindow: parse() failed!");
-        getUI()->drawGraph = false;
+}
+
+QString ProjectFile::getCharacterFilePathAt(int index) const{
+    if (!stringData.data()){
+        return "";
     }
-    getReader().clear();
+    return static_cast<hkbProjectStringData *>(stringData.data())->getCharacterFilePathAt(index);
 }
 
 HkxObjectExpSharedPtr * ProjectFile::findProjectData(long ref){
     if (projectData.getReference() == ref){
         return &projectData;
+    }
+    return NULL;
+}
+
+HkxObjectExpSharedPtr * ProjectFile::findProjectStringData(long ref){
+    if (stringData.getReference() == ref){
+        return &stringData;
     }
     return NULL;
 }
@@ -52,7 +61,7 @@ bool ProjectFile::parse(){
     }
     int index = 2;
     bool ok = true;
-    qulonglong signature;
+    HkxSignature signature;
     QByteArray value;
     long ref = 0;
     setProgressData("Creating HKX objects...", 60);
@@ -66,7 +75,7 @@ bool ProjectFile::parse(){
                     writeToLog("ProjectFile: parse() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!", true);
                     return false;
                 }
-                signature = value.toULongLong(&ok, 16);
+                signature = (HkxSignature)value.toULongLong(&ok, 16);
                 if (!ok){
                     writeToLog("ProjectFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!", true);
                     return false;
@@ -91,6 +100,7 @@ bool ProjectFile::parse(){
         index++;
     }
     closeFile();
+    getReader().clear();
     setProgressData("Linking HKX objects...", 80);
     if (!link()){
         writeToLog("ProjectFile: parse() failed because link() failed!", true);
@@ -101,14 +111,14 @@ bool ProjectFile::parse(){
 
 bool ProjectFile::link(){
     if (!getRootObject().constData()){
-        writeToLog("ProjectFile: link() failed!\nThe root object of this behavior file is NULL!", true);
+        writeToLog("ProjectFile: link() failed!\nThe root object of this project file is NULL!", true);
         return false;
     }else if (getRootObject()->getSignature() != HK_ROOT_LEVEL_CONTAINER){
-        writeToLog("ProjectFile: link() failed!\nThe root object of this behavior file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16), true);
+        writeToLog("ProjectFile: link() failed!\nThe root object of this project file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16), true);
         return false;
     }
     if (!getRootObject().data()->link()){
-        writeToLog("ProjectFile: link() failed!\nThe root object of this behavior file failed to link to it's children!", true);
+        writeToLog("ProjectFile: link() failed!\nThe root object of this project file failed to link to it's children!", true);
         return false;
     }
     if (!projectData.data()->link()){

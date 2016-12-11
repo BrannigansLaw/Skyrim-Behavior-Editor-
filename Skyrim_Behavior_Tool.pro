@@ -132,7 +132,11 @@ SOURCES += \
     src/ui/behaviorgraphui/behaviorgraphview.cpp \
     src/ui/behaviorgraphui/customtreegraphicsviewicon.cpp \
     src/hkxclasses/behavior/hkbmirroredskeletoninfo.cpp \
-    src/hkxclasses/behavior/hkbcharacterstringdata.cpp
+    src/hkxclasses/behavior/hkbcharacterstringdata.cpp \
+    src/hkxclasses/behavior/hkbcharacterdata.cpp \
+    src/hkxclasses/behavior/hkbfootikdriverinfo.cpp \
+    src/hkxclasses/behavior/hkbhandikdriverinfo.cpp \
+    src/hkxclasses/behavior/hkbstringcondition.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -247,4 +251,8 @@ HEADERS  += \
     src/ui/behaviorgraphui/behaviorgraphview.h \
     src/ui/behaviorgraphui/customtreegraphicsviewicon.h \
     src/hkxclasses/behavior/hkbmirroredskeletoninfo.h \
-    src/hkxclasses/behavior/hkbcharacterstringdata.h
+    src/hkxclasses/behavior/hkbcharacterstringdata.h \
+    src/hkxclasses/behavior/hkbcharacterdata.h \
+    src/hkxclasses/behavior/hkbfootikdriverinfo.h \
+    src/hkxclasses/behavior/hkbhandikdriverinfo.h \
+    src/hkxclasses/behavior/hkbstringcondition.h

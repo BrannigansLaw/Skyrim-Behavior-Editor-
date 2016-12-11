@@ -31,10 +31,6 @@ class SkeletonFile;
 class MainWindow : public QWidget
 {
     Q_OBJECT
-    friend class BehaviorFile;
-    friend class ProjectFile;
-    friend class CharacterFile;
-    friend class SkeletonFile;
 public:
     MainWindow();
     virtual ~MainWindow();
@@ -68,15 +64,15 @@ private:
     QGroupBox *logGB;
     QVBoxLayout *logGBLyt;
     QProgressDialog *progressD;
-    bool drawGraph;
 private slots:
     void openProject();
-    void openBehavior();
+    void openBehaviorFile();
     void expandBranches();
     void collapseBranches();
     void save();
     void changedTabs(int index);
 private:
+    bool openBehavior(const QString & filename, QProgressDialog *dialog);
     void setProgressData(const QString & message, int max, int min, int value);
     bool exitProgram();
     //void drawIcons();

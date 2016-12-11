@@ -10,6 +10,7 @@ class BehaviorFile: public HkxFile
     friend class hkbBehaviorGraphData;
     friend class BehaviorGraphView;
     friend class hkbBehaviorGraph;
+    friend class MainWindow;
 public:
     BehaviorFile(MainWindow *window, const QString & name);
     virtual ~BehaviorFile();
@@ -43,6 +44,7 @@ public:
     //
     void write();
     CustomTreeGraphicsViewIcon * getRootIcon() const;
+    QStringList getAllReferencedBehaviorFilePaths() const;
 protected:
     bool parse();
     bool link();
@@ -55,6 +57,7 @@ private:
     QList <HkxObjectExpSharedPtr> generatorChildren;
     QList <HkxObjectExpSharedPtr> modifiers;
     QList <HkxObjectExpSharedPtr> otherTypes;
+    QStringList referencedBehaviors;
     long largestRef;
 };
 

@@ -1,7 +1,6 @@
 #ifndef SKELETONFILE_H
 #define SKELETONFILE_H
 
-
 class SkeletonFile
 {
 public:

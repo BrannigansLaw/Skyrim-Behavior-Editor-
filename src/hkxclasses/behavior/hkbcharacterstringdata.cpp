@@ -272,10 +272,10 @@ bool hkbCharacterStringData::write(HkxXMLWriter *writer){
         if (mirroredSyncPointSubstringsB.size() > 0){
             writer->writeLine(writer->parameter, false);
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("animationPath"), animationPath);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("behaviorPath"), behaviorPath);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("characterPath"), characterPath);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fullPathToSource"), fullPathToSource);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("rigName"), rigName);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("ragdollName"), ragdollName);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("behaviorFilename"), behaviorFilename);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");

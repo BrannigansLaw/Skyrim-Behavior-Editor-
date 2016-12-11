@@ -1,30 +1,30 @@
-#ifndef HKBBEHAVIORGRAPHDATA_H
-#define HKBBEHAVIORGRAPHDATA_H
+#ifndef HKBCHARACTERDATA_H
+#define HKBCHARACTERDATA_H
 
 #include <QVector>
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbBehaviorGraphData: public HkxObject
+class hkbCharacterData: public HkxObject
 {
     friend class BehaviorGraphView;
     friend class BehaviorVariablesUI;
     friend class EventsUI;
 public:
-    hkbBehaviorGraphData(HkxFile *parent, long ref = 0);
-    virtual ~hkbBehaviorGraphData();
+    hkbCharacterData(HkxFile *parent, long ref = 0);
+    virtual ~hkbCharacterData();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
     QStringList getVariableNames() const;
-    QStringList getEventNames() const;
     bool evaulateDataValidity();
     static QString getClassname();
     hkQuadVariable getQuadVariable(int index, bool *ok) const;
     hkVariableType getVariableTypeAt(int index) const;
     bool write(HkxXMLWriter *writer);
+    QStringList getCharacterPropertyNames() const;
 private:
-    hkbBehaviorGraphData& operator=(const hkbBehaviorGraphData&);
-    hkbBehaviorGraphData(const hkbBehaviorGraphData &);
+    hkbCharacterData& operator=(const hkbCharacterData&);
+    hkbCharacterData(const hkbCharacterData &);
 private:
     void addVariable(hkVariableType type, const QString & name);
     void addVariable(hkVariableType type);
@@ -32,11 +32,6 @@ private:
     void setVariableNameAt(int index, const QString & name);
     void setWordVariableValueAt(int index, int value);
     void setQuadVariableValueAt(int index, hkQuadVariable value);
-    void addEvent(const QString &name);
-    void addEvent();
-    void removeEvent(int index);
-    void setEventNameAt(int index, const QString & name);
-    void setEventFlagAt(int index, bool state);
 private:
     static QStringList Type;    //See hkVariableType...
     struct hkVariableInfo
@@ -52,16 +47,28 @@ private:
         QString type;
     };
 
+    struct hkCharacterControllerInfo{
+        hkCharacterControllerInfo(): capsuleHeight(0), capsuleRadius(0), collisionFilterInfo(0){}
+        qreal capsuleHeight;
+        qreal capsuleRadius;
+        int collisionFilterInfo;
+        HkxObjectExpSharedPtr characterControllerCinfo;
+    };
+
     static uint refCount;
     static QString classname;
-    //QVector <??> attributeDefaults;
-    QVector <hkVariableInfo> variableInfos;
+    hkCharacterControllerInfo characterControllerInfo;
+    hkQuadVariable modelUpMS;
+    hkQuadVariable modelForwardMS;
+    hkQuadVariable modelRightMS;
     QVector <hkVariableInfo> characterPropertyInfos;
-    QStringList eventInfos;
-    QVector <int> wordMinVariableValues;
-    QVector <int> wordMaxVariableValues;
-    HkxObjectExpSharedPtr variableInitialValues;
+    QVector <int> numBonesPerLod;
+    HkxObjectExpSharedPtr characterPropertyValues;
+    HkxObjectExpSharedPtr footIkDriverInfo;
+    HkxObjectExpSharedPtr handIkDriverInfo;
     HkxObjectExpSharedPtr stringData;
+    HkxObjectExpSharedPtr mirroredSkeletonInfo;
+    qreal scale;
 };
 
-#endif // HKBBEHAVIORGRAPHDATA_H
+#endif // HKBCHARACTERDATA_H

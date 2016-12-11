@@ -1,4 +1,7 @@
 #include "mainwindow.h"
+#include "src/filetypes/projectfile.h"
+#include "src/filetypes/characterfile.h"
+#include "src/filetypes/skeletonfile.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/generators/hkbgenerator.h"
 #include "src/hkxclasses/hkxobject.h"
@@ -10,6 +13,8 @@
 #include "src/hkxclasses/behavior/generators/hkbbehaviorgraph.h"
 
 #include <QtWidgets>
+
+#define MAX_REFERENCED_BEHAVIOR_FILES 30
 
 MainWindow::MainWindow()
     :
@@ -35,7 +40,6 @@ MainWindow::MainWindow()
       objectDataWid(new HkDataUI("Object Data")),
       logGB(new QGroupBox("Debug Log")),
       logGBLyt(new QVBoxLayout(this)),
-      drawGraph(true),
       progressD(/*new QProgressDialog(this)*/NULL)
 {
     //logGB->setMinimumHeight(300);
@@ -80,7 +84,7 @@ MainWindow::MainWindow()
     eventsWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
     logGB->setMaximumSize(size().width()*0.4, size().height()*0.25);
     connect(openProjectA, SIGNAL(triggered(bool)), this, SLOT(openProject()));
-    connect(openBehaviorA, SIGNAL(triggered(bool)), this, SLOT(openBehavior()));
+    connect(openBehaviorA, SIGNAL(triggered(bool)), this, SLOT(openBehaviorFile()));
     connect(saveA, SIGNAL(triggered(bool)), this, SLOT(save()));
     connect(expandA, SIGNAL(triggered(bool)), this, SLOT(expandBranches()));
     connect(collapseA, SIGNAL(triggered(bool)), this, SLOT(collapseBranches()));
@@ -176,12 +180,8 @@ void MainWindow::writeToLog(const QString &message, bool isError){
 }
 
 void MainWindow::openProject(){
-    //
-}
-
-void MainWindow::openBehavior(){
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open hkx file"), "C:/", tr("hkx Files (*.hkx)"));
-    if (fileName == ""){
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open hkx project file..."), "C:/", tr("hkx Files (*.hkx)"));
+    if (filename == ""){
         return;
     }
     QTime t;
@@ -192,21 +192,102 @@ void MainWindow::openBehavior(){
     progressD = new QProgressDialog(this);
     progressD->setMinimumSize(QSize(800, 200));
     progressD->setWindowModality(Qt::WindowModal);
-    setProgressData("Opening file...", 0, 100, 0);
-    drawGraph = true;
+    setProgressData("Opening project...", 0, 100, 0);
     objectDataWid->changeCurrentDataWidget(NULL);
     setProgressData("Beginning XML parse...", 5);
-    behaviorFiles.append(new BehaviorFile(this, fileName));
-    behaviorGraphs.append(new BehaviorGraphView(objectDataWid, behaviorFiles.last()));
-    if (!drawGraph){
-        delete behaviorFiles.last();
-        behaviorFiles.removeLast();
-        delete behaviorGraphs.last();
-        behaviorGraphs.removeLast();
+    projectFile = new ProjectFile(this, filename);
+    if (!projectFile->parse()){
+        delete projectFile;
+        projectFile = NULL;
         progressD->close();
         return;
     }
-    tabs->addTab(behaviorGraphs.last(), fileName);
+    setProgressData("Loading project data...", 15);
+    QString path = filename;
+    int temp = filename.lastIndexOf("/");
+    path.remove(temp, path.size() - temp);
+    characterFile = new CharacterFile(this, path+"\\"+projectFile->getCharacterFilePathAt(0));
+    if (!characterFile->parse()){
+        delete projectFile;
+        projectFile = NULL;
+        delete characterFile;
+        characterFile = NULL;
+        progressD->close();
+        return;
+    }
+    setProgressData("Loading behavior files...", 10);
+    int progress = 10;
+    bool failed = false;
+    QStringList behaviors(characterFile->getRootBehaviorPath());
+    QStringList behaviorsOpened;
+    QString opened;
+    for (int i = 0; i < behaviors.size(), i < MAX_REFERENCED_BEHAVIOR_FILES; i++){
+        if (i >= behaviors.size()){
+            break;
+        }
+        opened = path+"/"+behaviors.at(i);
+        if (!behaviorsOpened.contains(opened)){
+            if (openBehavior(opened, progressD)){
+                behaviorsOpened.append(opened);
+                behaviors = behaviors + behaviorFiles.last()->getAllReferencedBehaviorFilePaths();
+                behaviors.removeDuplicates();
+                setProgressData("Behavior file"+behaviors.at(i)+" loaded...", progress += 3);
+                debugLog->appendPlainText("\n-------------------------\nTime taken to open file \""+opened+
+                                          "\" is approximately "+QString::number(t.elapsed()/1000)+" seconds\n-------------------------\n");
+            }else{
+                failed = true;
+            }
+        }
+    }
+    if (behaviorFiles.isEmpty() || failed){
+        delete projectFile;
+        projectFile = NULL;
+        delete characterFile;
+        characterFile = NULL;
+        progressD->close();
+        for (int j = 0; j < behaviorFiles.size(); j++){
+            if (behaviorFiles.at(j)){
+                delete behaviorFiles.at(j);
+            }
+            if (j < behaviorGraphs.size()){
+                if (behaviorFiles.at(j)){
+                    delete behaviorGraphs.at(j);
+                }
+            }
+        }
+        behaviorFiles.clear();
+        behaviorGraphs.clear();
+        return;
+    }
+    setProgressData("Loading Variables...", 98);
+    variablesWid->loadData(behaviorFiles.last()->getBehaviorGraphData());
+    setProgressData("Loading Events...", 99);
+    eventsWid->loadData(behaviorFiles.last()->getBehaviorGraphData());
+    progressD->setValue(100);
+    progressD->done(0);
+    progressD->close();
+    debugLog->appendPlainText("\n-------------------------\nTime taken to open project \""+filename+
+                              "\" is approximately "+QString::number(t.elapsed()/1000)+" seconds\n-------------------------\n");
+}
+
+bool MainWindow::openBehavior(const QString & filename, QProgressDialog *dialog){
+    if (filename == "" || !dialog){
+        return false;
+    }
+    QTime t;
+    t.start();
+    setProgressData("Opening file...", 0, 100, 0);
+    objectDataWid->changeCurrentDataWidget(NULL);
+    setProgressData("Beginning XML parse...", 5);
+    behaviorFiles.append(new BehaviorFile(this, filename));
+    if (!behaviorFiles.last()->parse()){
+        delete behaviorFiles.last();
+        behaviorFiles.removeLast();
+        progressD->close();
+        return false;
+    }
+    behaviorGraphs.append(new BehaviorGraphView(objectDataWid, behaviorFiles.last()));
+    tabs->addTab(behaviorGraphs.last(), filename.split("/").last());
     setProgressData("Drawing Behavior Graph...", 60);
     if (!behaviorGraphs.last()->draw(static_cast<DataIconManager *>(behaviorFiles.last()->getBehaviorGraph()), static_cast<DataIconManager *>(behaviorFiles.last()->getRootStateMachine()))){
         writeToLog("MainWindow: drawBehaviorGraph() failed!\nThe behavior graph was drawn incorrectly!", true);
@@ -215,10 +296,16 @@ void MainWindow::openBehavior(){
     variablesWid->loadData(behaviorFiles.last()->getBehaviorGraphData());
     setProgressData("Loading Events...", 99);
     eventsWid->loadData(behaviorFiles.last()->getBehaviorGraphData());
-    progressD->setValue(100);
-    progressD->done(0);
-    progressD->close();
-    debugLog->appendPlainText("\n-------------------------\nTime taken to open file \""+fileName+"\" is approximately "+QString::number(t.elapsed()/1000)+" seconds\n-------------------------\n");
+    dialog->setValue(100);
+    dialog->done(0);
+    dialog->close();
+    debugLog->appendPlainText("\n-------------------------\nTime taken to open file \""+filename+"\" is approximately "+QString::number(t.elapsed()/1000)+" seconds\n-------------------------\n");
+    return true;
+}
+
+void MainWindow::openBehaviorFile(){
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open hkx behavior file..."), "C:/", tr("hkx Files (*.hkx)"));
+    openBehavior(fileName, progressD);
 }
 
 void MainWindow::readSettings()

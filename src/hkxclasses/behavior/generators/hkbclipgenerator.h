@@ -35,7 +35,7 @@ private:
     qreal playbackSpeed;
     qreal enforcedDuration;
     qreal userControlledTimeFraction;
-    qint16 animationBindingIndex;
+    int animationBindingIndex;
     QString mode;
     QString flags;
 };

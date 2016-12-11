@@ -22,6 +22,13 @@ QString hkbProjectStringData::getClassname(){
     return classname;
 }
 
+QString hkbProjectStringData::getCharacterFilePathAt(int index) const{
+    if (index < characterFilenames.size()){
+        return characterFilenames.at(index);
+    }
+    return "";
+}
+
 bool hkbProjectStringData::readData(const HkxXmlReader &reader, long index){
     bool ok;
     int numElems = 0;

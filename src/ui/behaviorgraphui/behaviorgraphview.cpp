@@ -405,7 +405,7 @@ void BehaviorGraphView::deleteSelectedObjectBranchSlot(){
 template <typename T>
 void BehaviorGraphView::append(T *obj){
     if (selectedIcon && selectedIcon->data.constData() && !selectedIcon->children.isEmpty()){
-        qulonglong sig = selectedIcon->data->getSignature();
+        HkxSignature sig = selectedIcon->data->getSignature();
         if (sig != HKB_STATE_MACHINE && sig != HKB_BLENDER_GENERATOR && sig != BS_BONE_SWITCH_GENERATOR && sig != HKB_POSE_MATCHING_GENERATOR && sig != HKB_MODIFIER_LIST){
             if (!confirmationDialogue("WARNING! THIS WILL REPLACE THE CURRENT GENERATOR/MODIFIER!!!\n\nARE YOU SURE YOU WANT TO DO THIS?", this)){
                 delete obj;
@@ -779,8 +779,8 @@ void BehaviorGraphView::popUpMenuRequested(const QPoint &pos){
     if (!selectedIcon || !selectedIcon->data.constData()){
         return;
     }
-    qulonglong sig = selectedIcon->data.constData()->getSignature();
-    qulonglong parentSig = 0;
+    HkxSignature sig = selectedIcon->data.constData()->getSignature();
+    HkxSignature parentSig = NULL_SIGNATURE;
     if (selectedIcon->parent){
         parentSig = selectedIcon->parent->data.constData()->getSignature();
     }

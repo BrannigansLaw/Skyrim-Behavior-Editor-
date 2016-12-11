@@ -18,6 +18,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    QString getCharacterFilePathAt(int index) const;
 private:
     hkbProjectStringData& operator=(const hkbProjectStringData&);
     hkbProjectStringData(const hkbProjectStringData &);

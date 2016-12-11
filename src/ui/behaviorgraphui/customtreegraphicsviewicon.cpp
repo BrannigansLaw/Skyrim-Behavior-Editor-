@@ -273,7 +273,7 @@ bool CustomTreeGraphicsViewIcon::getLastIconY(CustomTreeGraphicsViewIcon *parent
     if (parent != this && parent->isVisible()){
         QPointF temp = parent->pos();
         lastIconY = temp.y() + parent->boundingRect().height();
-        for (qint16 i = 0; i < parent->children.size(); i++){
+        for (int i = 0; i < parent->children.size(); i++){
             if (getLastIconY(parent->children.at(i), lastIconY)){
                 i = parent->children.size();
             }

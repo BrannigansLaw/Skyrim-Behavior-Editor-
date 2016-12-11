@@ -35,8 +35,16 @@ void HkxObjectTableWidget::loadTable(BehaviorFile *file, bool isGenerator){
         }
         for (int i = 0, j = 0, k = 1; i < list.size(), j < list.size(), k < list.size(); i++, j+=2, k+=2){
             if (i < table->rowCount()){
-                table->itemAt(i, 0)->setText(list.at(j));
-                table->itemAt(i, 1)->setText(list.at(k));
+                if (table->itemAt(i, 0)){
+                    table->itemAt(i, 0)->setText(list.at(j));
+                }else{
+                    table->setItem(i, 0, new QTableWidgetItem(list.at(j)));
+                }
+                if (table->itemAt(i, 1)){
+                    table->itemAt(i, 1)->setText(list.at(k));
+                }else{
+                    table->setItem(i, 1, new QTableWidgetItem(list.at(k)));
+                }
             }else{
                 table->setRowCount(table->rowCount() + 1);
                 table->setItem(i, 0, new QTableWidgetItem(list.at(j)));
