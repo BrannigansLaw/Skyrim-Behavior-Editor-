@@ -1,5 +1,5 @@
-#ifndef BEHAVIORVARIABLESUI_H
-#define BEHAVIORVARIABLESUI_H
+#ifndef CHARACTERPROPERTIESUI_H
+#define CHARACTERPROPERTIESUI_H
 
 #include <QGroupBox>
 
@@ -9,7 +9,7 @@ class QHBoxLayout;
 class QSignalMapper;
 class TableWidget;
 class QPushButton;
-class hkbBehaviorGraphData;
+class hkbCharacterData;
 class HkxObject;
 class QCheckBox;
 class ComboBox;
@@ -20,12 +20,12 @@ class DoubleSpinBox;
 class QuadVariableWidget;
 class BoneWeightArrayUI;
 
-class BehaviorVariablesUI: public QGroupBox
+class CharacterPropertiesUI: public QGroupBox
 {
     Q_OBJECT
 public:
-    BehaviorVariablesUI(const QString & title);
-    virtual ~BehaviorVariablesUI(){}
+    CharacterPropertiesUI(const QString & title);
+    virtual ~CharacterPropertiesUI(){}
     void setHkDataUI(HkDataUI *ui);
     void loadData(HkxObject *data);
     //QSize sizeHint() const Q_DECL_OVERRIDE;
@@ -41,8 +41,8 @@ signals:
     void variableAdded(const QString & name);
     void variableRemoved(int index);
 private:
-    BehaviorVariablesUI& operator=(const BehaviorVariablesUI&);
-    BehaviorVariablesUI(const BehaviorVariablesUI &);
+    CharacterPropertiesUI& operator=(const CharacterPropertiesUI&);
+    CharacterPropertiesUI(const CharacterPropertiesUI &);
     void loadVariable(QCheckBox *variableWid);
     void loadVariable(SpinBox *variableWid);
     void loadVariable(DoubleSpinBox *variableWid);
@@ -68,7 +68,7 @@ private:
     static QStringList headerLabels;
     HkDataUI *dataUI;
     QVBoxLayout *verLyt;
-    hkbBehaviorGraphData *loadedData;
+    hkbCharacterData *loadedData;
     TableWidget *table;
     QPushButton *addObjectPB;
     QPushButton *removeObjectPB;
@@ -93,4 +93,4 @@ private:
     QSignalMapper *valueMapper;
 };
 
-#endif // BEHAVIORVARIABLESUI_H
+#endif // CHARACTERPROPERTIESUI_H

@@ -8,6 +8,7 @@
 class hkbBoneWeightArray: public HkDynamicObject
 {
     friend class BehaviorGraphView;
+    friend class BoneWeightArrayUI;
 public:
     hkbBoneWeightArray(HkxFile *parent, long ref = 0);
     virtual ~hkbBoneWeightArray();

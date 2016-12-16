@@ -114,6 +114,7 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     : CustomTreeGraphicsView(),
       ui(mainUI),
       behavior(file),
+      changed(false),
       contextMenu(new QMenu(this)),
       appendGeneratorMenu(new QMenu("Append Generator:", contextMenu)),
       appendStateMachineAct(new QAction("State Machine", appendGeneratorMenu)),
@@ -360,6 +361,14 @@ void BehaviorGraphView::writeToLog(const QString &message, bool isError){
     behavior->writeToLog(message, isError);
 }
 
+bool BehaviorGraphView::getIsChanged() const{
+    return changed;
+}
+
+void BehaviorGraphView::toggleChanged(bool wasEdited){
+    changed = wasEdited;
+}
+
 bool BehaviorGraphView::confirmationDialogue(const QString & message, QWidget *parent){
     QMessageBox::StandardButton ret;
     ret = QMessageBox::warning(parent, "Skyrim Behavior Tool", message, QMessageBox::Yes | QMessageBox::Cancel);
@@ -395,6 +404,7 @@ void BehaviorGraphView::removeOtherData(){
 }
 
 void BehaviorGraphView::deleteSelectedObjectBranchSlot(){
+    changed = true;
     removeSelectedObjectBranchSlot();
     ui->changeCurrentDataWidget(NULL);
     removeGeneratorData();
@@ -428,6 +438,7 @@ void BehaviorGraphView::append(T *obj){
             selectedIcon->parent->data.data()->evaulateDataValidity();
         }
         selectedIcon->data.data()->evaulateDataValidity();
+        changed = true;
         emit addedGenerator(obj->getName(), obj->getClassname());
     }else{
         delete obj;
@@ -690,6 +701,7 @@ template <typename T>
 void BehaviorGraphView::wrap(T *obj){
     if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
         wrapObject(obj, selectedIcon);
+        changed = true;
         emit addedGenerator(obj->getName(), obj->getClassname());
     }
 }
@@ -699,6 +711,7 @@ void BehaviorGraphView::wrap(hkbStateMachine *obj){
         hkbStateMachineStateInfo *state = new hkbStateMachineStateInfo(behavior, obj);
         obj->states.append(HkxObjectExpSharedPtr(state));
         wrapObject(obj, selectedIcon);
+        changed = true;
         emit addedGenerator(obj->getName(), obj->getClassname());
     }
 }
@@ -708,6 +721,7 @@ void BehaviorGraphView::wrap(hkbBlenderGenerator *obj){
         hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior);
         obj->children.append(HkxObjectExpSharedPtr(blendChild));
         wrapObject(obj, selectedIcon);
+        changed = true;
         emit addedGenerator(obj->getName(), obj->getClassname());
     }
 }
@@ -717,6 +731,7 @@ void BehaviorGraphView::wrap(hkbPoseMatchingGenerator *obj){
         hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior);
         obj->children.append(HkxObjectExpSharedPtr(blendChild));
         wrapObject(obj, selectedIcon);
+        changed = true;
         emit addedGenerator(obj->getName(), obj->getClassname());
     }
 }

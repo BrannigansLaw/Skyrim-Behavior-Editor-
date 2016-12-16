@@ -136,7 +136,13 @@ SOURCES += \
     src/hkxclasses/behavior/hkbcharacterdata.cpp \
     src/hkxclasses/behavior/hkbfootikdriverinfo.cpp \
     src/hkxclasses/behavior/hkbhandikdriverinfo.cpp \
-    src/hkxclasses/behavior/hkbstringcondition.cpp
+    src/hkxclasses/behavior/hkbstringcondition.cpp \
+    src/ui/hkxclassesui/projectui.cpp \
+    src/hkxclasses/animation/hkaanimationcontainer.cpp \
+    src/hkxclasses/hksimplelocalframe.cpp \
+    src/hkxclasses/animation/hkaskeleton.cpp \
+    src/ui/hkxclassesui/behaviorui/boneweightarrayui.cpp \
+    src/ui/hkxclassesui/behaviorui/characterpropertiesui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -255,4 +261,10 @@ HEADERS  += \
     src/hkxclasses/behavior/hkbcharacterdata.h \
     src/hkxclasses/behavior/hkbfootikdriverinfo.h \
     src/hkxclasses/behavior/hkbhandikdriverinfo.h \
-    src/hkxclasses/behavior/hkbstringcondition.h
+    src/hkxclasses/behavior/hkbstringcondition.h \
+    src/ui/hkxclassesui/projectui.h \
+    src/hkxclasses/animation/hkaanimationcontainer.h \
+    src/hkxclasses/hksimplelocalframe.h \
+    src/hkxclasses/animation/hkaskeleton.h \
+    src/ui/hkxclassesui/behaviorui/boneweightarrayui.h \
+    src/ui/hkxclassesui/behaviorui/characterpropertiesui.h

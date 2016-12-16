@@ -27,6 +27,7 @@ class BehaviorFile;
 class CharacterFile;
 class ProjectFile;
 class SkeletonFile;
+class CharacterPropertiesUI;
 
 class MainWindow : public QWidget
 {
@@ -43,7 +44,7 @@ private:
     QGridLayout *topLyt;
     QMenuBar *topMB;
     QAction *openProjectA;
-    QAction *openBehaviorA;
+    //QAction *openBehaviorA;
     QMenu *fileM;
     QAction *saveA;
     QMenu *viewM;
@@ -55,6 +56,7 @@ private:
     SkeletonFile *skeletonFile;
     QList <BehaviorFile *> behaviorFiles;
     QList <BehaviorGraphView *> behaviorGraphs;
+    CharacterPropertiesUI *characterPropertiesWid;
     QGroupBox *behaviorGraphViewGB;
     QVBoxLayout *iconGBLyt;
     HkDataUI *objectDataWid;
@@ -64,13 +66,18 @@ private:
     QGroupBox *logGB;
     QVBoxLayout *logGBLyt;
     QProgressDialog *progressD;
+    QString lastFileSelected;
 private slots:
     void openProject();
-    void openBehaviorFile();
+    //void openBehaviorFile();
     void expandBranches();
     void collapseBranches();
     void save();
+    void saveAll();
+    //void saveAs();
+    //void exit();
     void changedTabs(int index);
+    void closeTab(int index);
 private:
     bool openBehavior(const QString & filename, QProgressDialog *dialog);
     void setProgressData(const QString & message, int max, int min, int value);
@@ -78,6 +85,9 @@ private:
     //void drawIcons();
     void readSettings();
     void writeSettings();
+    QMessageBox::StandardButton closeAllDialogue();
+    QMessageBox::StandardButton closeFileDialogue();
+    bool closeAll();
 };
 
 #endif // MAINWINDOW_H

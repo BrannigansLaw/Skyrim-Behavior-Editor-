@@ -115,9 +115,9 @@ bool hkRootLevelContainer::link(){
                 if (file){
                     ptr = static_cast<CharacterFile *>(getParentFile())->findCharacterData(namedVariants.at(i).variant.getReference());
                 }else{
-                    //file = dynamic_cast<SkeletonFile *>(getParentFile());
+                    file = dynamic_cast<SkeletonFile *>(getParentFile());
                     if (file){
-                        //ptr = static_cast<SkeletonFile *>(getParentFile())->findBehaviorGraph(namedVariants.at(i).variant.getReference());
+                        ptr = static_cast<SkeletonFile *>(getParentFile())->findSkeleton(namedVariants.at(i).variant.getReference());
                     }else{
                         writeToLog(getClassname()+": link()!\nParent file type is invalid!!!", true);
                     }

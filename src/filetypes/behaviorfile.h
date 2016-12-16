@@ -4,6 +4,7 @@
 #include "src/filetypes/hkxfile.h"
 
 class hkbBehaviorGraph;
+class CharacterFile;
 
 class BehaviorFile: public HkxFile
 {
@@ -12,7 +13,7 @@ class BehaviorFile: public HkxFile
     friend class hkbBehaviorGraph;
     friend class MainWindow;
 public:
-    BehaviorFile(MainWindow *window, const QString & name);
+    BehaviorFile(MainWindow *window, CharacterFile *characterData, const QString & name);
     virtual ~BehaviorFile();
     HkxObjectExpSharedPtr * findHkxObject(long ref);
     HkxObjectExpSharedPtr * findGenerator(long ref);
@@ -45,10 +46,13 @@ public:
     void write();
     CustomTreeGraphicsViewIcon * getRootIcon() const;
     QStringList getAllReferencedBehaviorFilePaths() const;
+    QStringList getRagdollBoneNames() const;
+    QStringList getRigBoneNames() const;
 protected:
     bool parse();
     bool link();
 private:
+    CharacterFile *character;
     HkxObjectExpSharedPtr behaviorGraph;
     HkxObjectExpSharedPtr stringData;
     HkxObjectExpSharedPtr variableValues;

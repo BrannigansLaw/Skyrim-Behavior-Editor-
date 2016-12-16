@@ -1,4 +1,4 @@
-#include "behaviorvariablesui.h"
+#include "characterpropertiesui.h"
 
 #include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
 #include "src/ui/hkxclassesui/behaviorui/boneweightarrayui.h"
@@ -12,8 +12,8 @@
 #include "src/ui/hkxclassesui/behaviorui/generators/modifiergeneratorui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/manualselectorgeneratorui.h"
 
-#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
-#include "src/hkxclasses/behavior/hkbbehaviorgraphstringdata.h"
+#include "src/hkxclasses/behavior/hkbcharacterdata.h"
+#include "src/hkxclasses/behavior/hkbcharacterstringdata.h"
 #include "src/hkxclasses/behavior/hkbvariablevalueset.h"
 
 #include <QPushButton>
@@ -27,7 +27,7 @@
 #include <QSpinBox>
 #include <QStackedLayout>
 
-QStringList BehaviorVariablesUI::types = {
+QStringList CharacterPropertiesUI::types = {
     "VARIABLE_TYPE_BOOL",
     "VARIABLE_TYPE_INT32",
     "VARIABLE_TYPE_REAL",
@@ -36,13 +36,13 @@ QStringList BehaviorVariablesUI::types = {
     "VARIABLE_TYPE_QUATERNION"
 };
 
-QStringList BehaviorVariablesUI::headerLabels = {
+QStringList CharacterPropertiesUI::headerLabels = {
     "Name",
     "Type",
     "Value"
 };
 
-BehaviorVariablesUI::BehaviorVariablesUI(const QString &title)
+CharacterPropertiesUI::CharacterPropertiesUI(const QString &title)
     : dataUI(NULL),
       verLyt(new QVBoxLayout),
       loadedData(NULL),
@@ -127,11 +127,11 @@ BehaviorVariablesUI::BehaviorVariablesUI(const QString &title)
     connect(boneWeightArrayWidget, SIGNAL(returnToParent()), this, SLOT(returnToTable()));
 }
 
-/*QSize BehaviorVariablesUI::sizeHint() const{
+/*QSize CharacterPropertiesUI::sizeHint() const{
     return QSize(300, 300);
 }*/
 
-void BehaviorVariablesUI::setVariableValue(int type){
+void CharacterPropertiesUI::setVariableValue(int type){
     int index = table->currentRow();
     if (type == 0){
         loadedData->setWordVariableValueAt(index, boolCB->isChecked());
@@ -146,7 +146,7 @@ void BehaviorVariablesUI::setVariableValue(int type){
     }
 }
 
-void BehaviorVariablesUI::renameSelectedVariable(int type){
+void CharacterPropertiesUI::renameSelectedVariable(int type){
     QString newName;
     if (type == 0){
         newName = boolName->text();
@@ -164,20 +164,20 @@ void BehaviorVariablesUI::renameSelectedVariable(int type){
     emit variableNameChanged(newName, table->currentRow());
 }
 
-void BehaviorVariablesUI::removeVariableFromTable(int row){
+void CharacterPropertiesUI::removeVariableFromTable(int row){
     if (row < table->rowCount()){
         table->removeRow(row);
     }
 }
 
-void BehaviorVariablesUI::loadVariable(QCheckBox *variableWid){
+void CharacterPropertiesUI::loadVariable(QCheckBox *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
-        hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->variableInitialValues.data());
+        hkbCharacterStringData *varNames = static_cast<hkbCharacterStringData *>(loadedData->stringData.data());
+        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->characterPropertyValues.data());
         int index = table->currentRow();
-        if (varValues->wordVariableValues.size() > index && varNames->variableNames.size() > index){
-            boolName->setText(varNames->variableNames.at(index));
+        if (varValues->wordVariableValues.size() > index && varNames->characterPropertyNames.size() > index){
+            boolName->setText(varNames->characterPropertyNames.at(index));
             variableWid->setChecked(varValues->wordVariableValues.at(index));
         }
         hideOtherVariables(0);
@@ -185,14 +185,14 @@ void BehaviorVariablesUI::loadVariable(QCheckBox *variableWid){
     }
 }
 
-void BehaviorVariablesUI::loadVariable(SpinBox *variableWid){
+void CharacterPropertiesUI::loadVariable(SpinBox *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
-        hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->variableInitialValues.data());
+        hkbCharacterStringData *varNames = static_cast<hkbCharacterStringData *>(loadedData->stringData.data());
+        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->characterPropertyValues.data());
         int index = table->currentRow();
-        if (varValues->wordVariableValues.size() > index && varNames->variableNames.size() > index){
-            intName->setText(varNames->variableNames.at(index));
+        if (varValues->wordVariableValues.size() > index && varNames->characterPropertyNames.size() > index){
+            intName->setText(varNames->characterPropertyNames.at(index));
             variableWid->setValue(varValues->wordVariableValues.at(index));
         }
         hideOtherVariables(1);
@@ -200,14 +200,14 @@ void BehaviorVariablesUI::loadVariable(SpinBox *variableWid){
     }
 }
 
-void BehaviorVariablesUI::loadVariable(DoubleSpinBox *variableWid){
+void CharacterPropertiesUI::loadVariable(DoubleSpinBox *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
-        hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->variableInitialValues.data());
+        hkbCharacterStringData *varNames = static_cast<hkbCharacterStringData *>(loadedData->stringData.data());
+        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->characterPropertyValues.data());
         int index = table->currentRow();
-        if (varValues->wordVariableValues.size() > index && varNames->variableNames.size() > index){
-            doubleName->setText(varNames->variableNames.at(index));
+        if (varValues->wordVariableValues.size() > index && varNames->characterPropertyNames.size() > index){
+            doubleName->setText(varNames->characterPropertyNames.at(index));
             variableWid->setValue(varValues->wordVariableValues.at(index));
         }
         hideOtherVariables(2);
@@ -215,15 +215,15 @@ void BehaviorVariablesUI::loadVariable(DoubleSpinBox *variableWid){
     }
 }
 
-void BehaviorVariablesUI::loadVariable(QuadVariableWidget *variableWid){
+void CharacterPropertiesUI::loadVariable(QuadVariableWidget *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
         bool ok;
-        hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->variableInitialValues.data());
+        hkbCharacterStringData *varNames = static_cast<hkbCharacterStringData *>(loadedData->stringData.data());
+        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->characterPropertyValues.data());
         int index = table->currentRow();
-        if (varValues->wordVariableValues.size() > index && varNames->variableNames.size() > index){
-            quadName->setText(varNames->variableNames.at(index));
+        if (varValues->wordVariableValues.size() > index && varNames->characterPropertyNames.size() > index){
+            quadName->setText(varNames->characterPropertyNames.at(index));
             variableWid->setValue(loadedData->getQuadVariable(index, &ok));
             if (!ok){
                 //
@@ -234,7 +234,7 @@ void BehaviorVariablesUI::loadVariable(QuadVariableWidget *variableWid){
     }
 }
 
-void BehaviorVariablesUI::hideOtherVariables(int indexToView){
+void CharacterPropertiesUI::hideOtherVariables(int indexToView){
     for (int i = 0; i < variableWidget->rowCount(); i++){
         if (i == indexToView){
             variableWidget->setRowHidden(i, false);
@@ -244,7 +244,7 @@ void BehaviorVariablesUI::hideOtherVariables(int indexToView){
     }
 }
 
-void BehaviorVariablesUI::viewVariable(int row, int column){
+void CharacterPropertiesUI::viewVariable(int row, int column){
     if (column == 2 && loadedData){
         QString type = table->item(row, 1)->text();
         if (type == "VARIABLE_TYPE_BOOL"){
@@ -268,11 +268,11 @@ void BehaviorVariablesUI::viewVariable(int row, int column){
     }
 }
 
-void BehaviorVariablesUI::returnToTable(){
+void CharacterPropertiesUI::returnToTable(){
     stackLyt->setCurrentIndex(TABLE_WIDGET);
 }
 
-void BehaviorVariablesUI::addVariableToTable(const QString & name, const QString & type){
+void CharacterPropertiesUI::addVariableToTable(const QString & name, const QString & type){
     int row = table->rowCount();
     table->setRowCount(row + 1);
     table->setItem(row, 0, new QTableWidgetItem(name));
@@ -285,75 +285,75 @@ void BehaviorVariablesUI::addVariableToTable(const QString & name, const QString
     //emit variableAdded(name);
 }
 
-void BehaviorVariablesUI::loadData(HkxObject *data){
-    if (data && data->getSignature() == HKB_BEHAVIOR_GRAPH_DATA){
-        loadedData = static_cast<hkbBehaviorGraphData *>(data);
+void CharacterPropertiesUI::loadData(HkxObject *data){
+    if (data && data->getSignature() == HKB_CHARACTER_DATA){
+        loadedData = static_cast<hkbCharacterData *>(data);
         int row;
-        hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        for (int i = 0; i < varNames->variableNames.size(); i++){
+        hkbCharacterStringData *varNames = static_cast<hkbCharacterStringData *>(loadedData->stringData.data());
+        for (int i = 0; i < varNames->characterPropertyNames.size(); i++){
             row = table->rowCount();
             if (table->rowCount() > i){
                 table->setRowHidden(i, false);
                 if (table->item(row, 0)){
-                    table->item(row, 0)->setText(varNames->variableNames.at(i));
+                    table->item(row, 0)->setText(varNames->characterPropertyNames.at(i));
                 }else{
-                    table->setItem(row, 0, new QTableWidgetItem(varNames->variableNames.at(i)));
+                    table->setItem(row, 0, new QTableWidgetItem(varNames->characterPropertyNames.at(i)));
                 }
             }else{
                 table->setRowCount(row + 1);
-                table->setItem(row, 0, new QTableWidgetItem(varNames->variableNames.at(i)));
-                table->setItem(row, 1, new QTableWidgetItem(loadedData->variableInfos.at(i).type));
+                table->setItem(row, 0, new QTableWidgetItem(varNames->characterPropertyNames.at(i)));
+                table->setItem(row, 1, new QTableWidgetItem(loadedData->characterPropertyInfos.at(i).type));
                 table->setItem(row, 2, new QTableWidgetItem("Click To Edit"));
             }
         }
-        for (int j = varNames->variableNames.size(); j < table->rowCount(); j++){
+        for (int j = varNames->characterPropertyNames.size(); j < table->rowCount(); j++){
             table->setRowHidden(j, true);
         }
     }
 }
 
-void BehaviorVariablesUI::addVariable(){
+void CharacterPropertiesUI::addVariable(){
     int type = typeSelector->currentIndex();
     hkVariableType varType;
-    hkbBehaviorGraphStringData *vars = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
+    hkbCharacterStringData *vars = static_cast<hkbCharacterStringData *>(loadedData->stringData.data());
     switch (type){
     case VARIABLE_TYPE_BOOL:
         varType = hkVariableType::VARIABLE_TYPE_BOOL;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_BOOL");
+        addVariableToTable(vars->characterPropertyNames.last(), "VARIABLE_TYPE_BOOL");
         break;
     case VARIABLE_TYPE_INT32:
         varType = hkVariableType::VARIABLE_TYPE_INT32;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_INT32");
+        addVariableToTable(vars->characterPropertyNames.last(), "VARIABLE_TYPE_INT32");
         break;
     case VARIABLE_TYPE_REAL:
         varType = hkVariableType::VARIABLE_TYPE_REAL;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_REAL");
+        addVariableToTable(vars->characterPropertyNames.last(), "VARIABLE_TYPE_REAL");
         break;
     case VARIABLE_TYPE_POINTER:
         varType = hkVariableType::VARIABLE_TYPE_POINTER;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_POINTER");
+        addVariableToTable(vars->characterPropertyNames.last(), "VARIABLE_TYPE_POINTER");
         break;
     case VARIABLE_TYPE_VECTOR4:
         varType = hkVariableType::VARIABLE_TYPE_VECTOR4;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_VECTOR4");
+        addVariableToTable(vars->characterPropertyNames.last(), "VARIABLE_TYPE_VECTOR4");
         break;
     case VARIABLE_TYPE_QUATERNION:
         varType = hkVariableType::VARIABLE_TYPE_QUATERNION;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_QUATERNION");
+        addVariableToTable(vars->characterPropertyNames.last(), "VARIABLE_TYPE_QUATERNION");
         break;
     default:
         return;
     }
-    emit variableAdded(vars->variableNames.last());
+    emit variableAdded(vars->characterPropertyNames.last());
 }
 
-void BehaviorVariablesUI::removeVariable(){
+void CharacterPropertiesUI::removeVariable(){
     int index = table->currentRow();
     loadedData->removeVariable(index);
     if (index < table->rowCount()){
@@ -365,6 +365,6 @@ void BehaviorVariablesUI::removeVariable(){
     emit variableRemoved(index);
 }
 
-void BehaviorVariablesUI::setHkDataUI(HkDataUI *ui){
+void CharacterPropertiesUI::setHkDataUI(HkDataUI *ui){
     dataUI = ui;
 }

@@ -35,6 +35,22 @@ QString hkbCharacterData::getClassname(){
     return classname;
 }
 
+HkxObject * hkbCharacterData::getVariantVariable(int index) const{
+    hkbVariableValueSet *variableValues = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
+    if (variableValues->wordVariableValues.size() > index && characterPropertyInfos.size() > index){
+        int count = -1;
+        for (int i = 0; i <= index; i++){
+            if (characterPropertyInfos.at(i).type == "VARIABLE_TYPE_POINTER"){
+                count++;
+            }
+        }
+        if (count < variableValues->variantVariableValues.size() && count > -1){
+            return variableValues->variantVariableValues.at(count).data();
+        }
+    }
+    return NULL;
+}
+
 void hkbCharacterData::addVariable(hkVariableType type, const QString & name){
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());

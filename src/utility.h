@@ -74,6 +74,7 @@ enum HkxSignature: unsigned long long {
     HKB_CHARACTER_DATA = 0x300d6808,
     HKB_HAND_IK_DRIVER_INFO = 0xc299090a,
     //Skeleton
+    HKA_ANIMATION_CONTAINER = 0x8dc20333,
     HKA_SKELETON = 0x366e8220,
     HK_SIMPLE_LOCAL_FRAME = 0xe758f63c,
     //Behavior

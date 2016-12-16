@@ -1,4 +1,5 @@
 #include "characterfile.h"
+#include "skeletonfile.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/xml/hkxxmlwriter.h"
 #include "src/ui/mainwindow.h"
@@ -13,6 +14,7 @@
 
 CharacterFile::CharacterFile(MainWindow *window, const QString & name)
     : HkxFile(window, name),
+      skeleton(NULL),
       largestRef(0)
 {
     getReader().setFile(this);
@@ -26,7 +28,7 @@ HkxObjectExpSharedPtr * CharacterFile::findCharacterData(long ref){
 }
 
 HkxObjectExpSharedPtr * CharacterFile::findCharacterPropertyValues(long ref){
-    for (int i; i < boneWeightArrays.size(); i++){
+    for (int i = 0; i < boneWeightArrays.size(); i++){
         if (boneWeightArrays.at(i).data() && boneWeightArrays.at(i).getReference() == ref){
             return &boneWeightArrays[i];
         }
@@ -50,12 +52,44 @@ QString CharacterFile::getRigName() const{
     return "";
 }
 
+hkbCharacterData * CharacterFile::getCharacterData() const{
+    if (characterData.data() && characterData->getSignature() == HKB_CHARACTER_DATA){
+        return static_cast<hkbCharacterData *>(characterData.data());
+    }
+    return NULL;
+}
+
+QStringList CharacterFile::getRigBoneNames() const{
+    if (skeleton){
+        return skeleton->getBonesFromSkeletonAt(0);
+    }
+    return QStringList();
+}
+
 QString CharacterFile::getRagdollName() const{
     hkbCharacterStringData *ptr = static_cast<hkbCharacterStringData *>(stringData.data());
     if (ptr){
         return ptr->ragdollName;
     }
     return "";
+}
+
+QStringList CharacterFile::getRagdollBoneNames() const{
+    if (skeleton){
+        return skeleton->getBonesFromSkeletonAt(1);
+    }
+    return QStringList();
+}
+
+QStringList CharacterFile::getAnimationNames() const{
+    if (stringData.data() && stringData->getSignature() == HKB_CHARACTER_STRING_DATA){
+        return static_cast<hkbCharacterStringData *>(stringData.data())->getAnimationNames();
+    }
+    return QStringList();
+}
+
+void CharacterFile::setSkeletonFile(SkeletonFile *skel){
+    skeleton = skel;
 }
 
 bool CharacterFile::addObjectToFile(HkxObject *obj, long ref){
@@ -176,8 +210,12 @@ bool CharacterFile::link(){
         writeToLog("CharacterFile: link() failed!\nThe root object of this character file failed to link to it's children!", true);
         return false;
     }
-    if (!characterData.data()->link()){
+    if (!characterData.data() || !characterData.data()->link()){
         writeToLog("CharacterFile: link() failed!\ncharacterData failed to link to it's children!\n", true);
+        return false;
+    }
+    if (!characterPropertyValues.data() || !characterPropertyValues.data()->link()){
+        writeToLog("CharacterFile: link() failed!\ncharacterPropertyValues failed to link to it's children!\n", true);
         return false;
     }
     return true;

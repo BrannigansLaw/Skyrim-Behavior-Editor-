@@ -152,6 +152,9 @@ void HkDataUI::viewStateMachine(){
 }
 
 void HkDataUI::setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *variables){
+    if (!events || !variables){
+        return;
+    }
     eventsUI = events;
     variablesUI = variables;
     connect(eventsUI, SIGNAL(eventAdded(QString)), this, SLOT(eventAdded(QString)));

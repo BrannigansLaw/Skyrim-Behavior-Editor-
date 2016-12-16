@@ -92,6 +92,7 @@ void ModifierGeneratorUI::setName(){
     if (bsData){
         bsData->name = name->text();
         bsData->updateIconNames();
+        behaviorView->toggleChanged(true);
         emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
     }
 }
@@ -111,6 +112,7 @@ void ModifierGeneratorUI::setModifier(int index){
         if (index > 0){
             bsData->modifier = HkxObjectExpSharedPtr(ptr);
             behaviorView->removeModifierData();
+            behaviorView->toggleChanged(true);
         }
     }
     modifiersTable->hide();
@@ -131,6 +133,7 @@ void ModifierGeneratorUI::setGenerator(int index){
         if (index > 0){
             bsData->generator = HkxObjectExpSharedPtr(ptr);
             behaviorView->removeGeneratorData();
+            behaviorView->toggleChanged(true);
         }
     }
     generatorTable->hide();

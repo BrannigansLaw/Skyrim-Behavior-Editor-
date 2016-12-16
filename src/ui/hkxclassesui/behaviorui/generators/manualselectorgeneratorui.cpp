@@ -212,12 +212,14 @@ void ManualSelectorGeneratorUI::loadData(HkxObject *data){
 void ManualSelectorGeneratorUI::setSelectedGeneratorIndex(){
     if (bsData){
         bsData->selectedGeneratorIndex = selectedGeneratorIndex->value();
+        behaviorView->toggleChanged(true);
     }
 }
 
 void ManualSelectorGeneratorUI::setCurrentGeneratorIndex(){
     if (bsData){
         bsData->currentGeneratorIndex = currentGeneratorIndex->value();
+        behaviorView->toggleChanged(true);
     }
 }
 
@@ -231,6 +233,7 @@ void ManualSelectorGeneratorUI::setSelectedGeneratorIndexBind(int index){
                 behaviorView->behavior->addObjectToFile(varBind);
             }
             varBind->addBinding("selectedGeneratorIndex", index - 1);
+            behaviorView->toggleChanged(true);
         }else{
             QMessageBox msg;
             msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
@@ -255,6 +258,7 @@ void ManualSelectorGeneratorUI::setCurrentGeneratorIndexBind(int index){
                 behaviorView->behavior->addObjectToFile(varBind);
             }
             varBind->addBinding("currentGeneratorIndex", index - 1);
+            behaviorView->toggleChanged(true);
         }else{
             QMessageBox msg;
             msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
@@ -288,6 +292,7 @@ void ManualSelectorGeneratorUI::setGenerator(int index){
         if (row > 0/* && row < bsData->generators.size()*/){
             bsData->generators[row] = HkxObjectExpSharedPtr(ptr);
             behaviorView->removeGeneratorData();
+            behaviorView->toggleChanged(true);
         }
     }
     generatorTable->hide();
@@ -343,6 +348,7 @@ void ManualSelectorGeneratorUI::addNewGenerator(){
         generators->setItem(generators->rowCount(), 0, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->generators.last().data())->getName()));
         generators->setItem(generators->rowCount(), 1, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->generators.last().data())->getClassname()));
         generators->setItem(generators->rowCount(), 2, new QTableWidgetItem("Edit"));
+        behaviorView->toggleChanged(true);
     }
 }
 
@@ -361,4 +367,5 @@ void ManualSelectorGeneratorUI::removeGenerator(){
     generators->removeCellWidget(index, 2);
     generators->removeRow(index);
     behaviorView->removeGeneratorData();
+    behaviorView->toggleChanged(true);
 }

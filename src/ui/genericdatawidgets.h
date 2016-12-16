@@ -30,6 +30,7 @@ public:
         horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         setSelectionBehavior(QAbstractItemView::SelectRows);
+        setSelectionMode(QAbstractItemView::SingleSelection);
         setEditTriggers(QAbstractItemView::NoEditTriggers);
     }
 };

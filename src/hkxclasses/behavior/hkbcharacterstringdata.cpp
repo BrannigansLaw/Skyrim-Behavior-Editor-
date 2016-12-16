@@ -22,6 +22,10 @@ QString hkbCharacterStringData::getClassname(){
     return classname;
 }
 
+QStringList hkbCharacterStringData::getAnimationNames() const{
+    return QStringList(animationNames);
+}
+
 bool hkbCharacterStringData::readData(const HkxXmlReader &reader, long index){
     bool ok;
     int numElems = 0;

@@ -37,6 +37,8 @@ class BehaviorGraphView: public CustomTreeGraphicsView
     friend class StateUI;
     friend class TransitionsUI;
     friend class CustomTreeGraphicsViewIcon;
+
+    friend class MainWindow;
 public:
     BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file);
     virtual ~BehaviorGraphView();
@@ -45,6 +47,7 @@ public:
     void removeGeneratorData();
     void removeModifierData();
     void removeOtherData();
+    bool getIsChanged() const;
 signals:
     void addedGenerator(const QString & name, const QString & type);
     void addedModifier(const QString & name, const QString & type);
@@ -137,9 +140,11 @@ private:
     void enableAllMenuActions(QMenu *menu);
     void disableAllMenuActions(QMenu *menu);
     bool confirmationDialogue(const QString & message, QWidget *parent);
+    void toggleChanged(bool wasEdited);
 private:
     HkDataUI *ui;
     BehaviorFile *behavior;
+    bool changed;
     QMenu *contextMenu;
     QMenu *appendGeneratorMenu;
     QAction *appendStateMachineAct;

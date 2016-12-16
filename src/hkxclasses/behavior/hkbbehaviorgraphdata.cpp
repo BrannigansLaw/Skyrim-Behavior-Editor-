@@ -299,6 +299,21 @@ hkQuadVariable hkbBehaviorGraphData::getQuadVariable(int index, bool *ok) const{
     return hkQuadVariable();
 }
 
+HkxObject * hkbBehaviorGraphData::getVariantVariable(int index) const{
+    hkbVariableValueSet *variableValues = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    if (variableValues->wordVariableValues.size() > index && variableInfos.size() > index){
+        int count = -1;
+        for (int i = 0; i <= index; i++){
+            if (variableInfos.at(i).type == "VARIABLE_TYPE_POINTER"){
+                count++;
+            }
+        }
+        if (count < variableValues->variantVariableValues.size() && count > -1){
+            return variableValues->variantVariableValues.at(count).data();
+        }
+    }
+    return NULL;
+}
 
 bool hkbBehaviorGraphData::readData(const HkxXmlReader &reader, long index){
     bool ok;

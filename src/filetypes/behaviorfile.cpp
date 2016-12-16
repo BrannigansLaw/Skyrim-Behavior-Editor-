@@ -1,4 +1,5 @@
 #include "behaviorfile.h"
+#include "characterfile.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/xml/hkxxmlwriter.h"
 #include "src/ui/mainwindow.h"
@@ -102,8 +103,9 @@
  *
  */
 
-BehaviorFile::BehaviorFile(MainWindow *window, const QString & name)
+BehaviorFile::BehaviorFile(MainWindow *window, CharacterFile *characterData, const QString & name)
     : HkxFile(window, name),
+      character(characterData),
       largestRef(0)
 {
     getReader().setFile(this);
@@ -115,6 +117,20 @@ HkxObject * BehaviorFile::getRootStateMachine() const{
 
 hkbBehaviorGraph * BehaviorFile::getBehaviorGraph() const{
     return static_cast<hkbBehaviorGraph *>(behaviorGraph.data());
+}
+
+QStringList BehaviorFile::getRigBoneNames() const{
+    if (character){
+        return character->getRigBoneNames();
+    }
+    return QStringList();
+}
+
+QStringList BehaviorFile::getRagdollBoneNames() const{
+    if (character){
+        return character->getRagdollBoneNames();
+    }
+    return QStringList();
 }
 
 CustomTreeGraphicsViewIcon * BehaviorFile::getRootIcon() const{

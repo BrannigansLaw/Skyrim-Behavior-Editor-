@@ -10,6 +10,7 @@ class hkbCharacterData: public HkxObject
     friend class BehaviorGraphView;
     friend class BehaviorVariablesUI;
     friend class EventsUI;
+    friend class CharacterPropertiesUI;
 public:
     hkbCharacterData(HkxFile *parent, long ref = 0);
     virtual ~hkbCharacterData();
@@ -19,6 +20,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     hkQuadVariable getQuadVariable(int index, bool *ok) const;
+    HkxObject * getVariantVariable(int index) const;
     hkVariableType getVariableTypeAt(int index) const;
     bool write(HkxXMLWriter *writer);
     QStringList getCharacterPropertyNames() const;

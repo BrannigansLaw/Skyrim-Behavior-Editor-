@@ -20,6 +20,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     hkQuadVariable getQuadVariable(int index, bool *ok) const;
+    HkxObject * getVariantVariable(int index) const;
     hkVariableType getVariableTypeAt(int index) const;
     bool write(HkxXMLWriter *writer);
 private:
