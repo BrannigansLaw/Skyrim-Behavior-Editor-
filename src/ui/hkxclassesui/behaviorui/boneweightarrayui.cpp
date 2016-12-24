@@ -4,29 +4,23 @@
 #include "src/hkxclasses/behavior/hkbboneweightarray.h"
 #include "src/ui/genericdatawidgets.h"
 
-#include <QCoreApplication>
+#include <QSignalMapper>
 
 BoneWeightArrayUI::BoneWeightArrayUI()
     : bsData(NULL),
       lyt(new QVBoxLayout(this)),
       backPB(new QPushButton("Return")),
       bones(new TableWidget),
-      //spinBox(new DoubleSpinBox),
-      previousRow(-1)
+      mapper(new QSignalMapper)
 {
+    setTitle("hkbBoneWeightArray");
     QStringList list = {"Name", "Value"};
     bones->setColumnCount(2);
     bones->setHorizontalHeaderLabels(list);
-    /*spinBox->setDecimals(6);
-    spinBox->setMinimum(0);
-    spinBox->setMaximum(1);
-    spinBox->setSingleStep(0.1);*/
-    bones->setEditTriggers(QAbstractItemView::DoubleClicked);
-    lyt->addWidget(backPB);
-    lyt->addWidget(bones);
+    lyt->addWidget(backPB, 2);
+    lyt->addWidget(bones, 8);
     setLayout(lyt);
-    //connect(bones, SIGNAL(cellClicked(int,int)), this, SLOT(selectionChanged(int,int)));
-    connect(spinBox, SIGNAL(editingFinished()), this, SLOT(setBoneWeight()));
+    connect(mapper, SIGNAL(mapped(int)), this, SLOT(setBoneWeight(int)));
     connect(backPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
 }
 
@@ -38,7 +32,7 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
     if (data && data->getSignature() == HKB_BONE_WEIGHT_ARRAY){
         bsData = static_cast<hkbBoneWeightArray *>(data);
         HkxFile *file = dynamic_cast<BehaviorFile *>(bsData->getParentFile());
-        int row = 0;
+        int rowCount = 0;
         QStringList boneNames;
         if (file){
             if (isRagdoll){
@@ -59,23 +53,27 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
             }
         }
         for (int i = 0; i < bsData->boneWeights.size(), i < boneNames.size(); i++){
-            row = bones->rowCount();
-            if (bones->rowCount() > i){
+            rowCount = bones->rowCount();
+            if (rowCount > i){
                 bones->setRowHidden(i, false);
-                if (bones->item(row, 0)){
-                    bones->item(row, 0)->setText(boneNames.at(i));
+                if (bones->item(i, 0)){
+                    bones->item(i, 0)->setText(boneNames.at(i));
                 }else{
-                    bones->setItem(row, 0, new QTableWidgetItem(boneNames.at(i)));
+                    bones->setItem(i, 0, new QTableWidgetItem(boneNames.at(i)));
                 }
-                if (bones->item(row, 1)){
-                    bones->item(row, 1)->setText(QString::number(bsData->boneWeights.at(i), 'g', 6));
+                if (bones->cellWidget(i, 1)){
+                    static_cast<DoubleSpinBox *>(bones->cellWidget(i, 1))->setValue(bsData->boneWeights.at(i));
                 }else{
-                    bones->setItem(row, 1, new QTableWidgetItem(QString::number(bsData->boneWeights.at(i), 'g', 6)));
+                    bones->setCellWidget(i, 1, new DoubleSpinBox(NULL, bsData->boneWeights.at(i), 6, 0.1, 1, 0));
+                    mapper->setMapping(bones->cellWidget(i, 1), i);
+                    connect(static_cast<DoubleSpinBox *>(bones->cellWidget(i, 1)), SIGNAL(editingFinished()), mapper, SLOT(map()));
                 }
             }else{
-                bones->setRowCount(row + 1);
-                bones->setItem(row, 0, new QTableWidgetItem(boneNames.at(i)));
-                bones->setItem(row, 1, new QTableWidgetItem(QString::number(bsData->boneWeights.at(i), 'g', 6)));
+                bones->setRowCount(rowCount + 1);
+                bones->setItem(rowCount, 0, new QTableWidgetItem(boneNames.at(i)));
+                bones->setCellWidget(rowCount, 1, new DoubleSpinBox(NULL, bsData->boneWeights.at(i), 6, 0.1, 1, 0));
+                mapper->setMapping(bones->cellWidget(rowCount, 1), i);
+                connect(static_cast<DoubleSpinBox *>(bones->cellWidget(i, 1)), SIGNAL(editingFinished()), mapper, SLOT(map()));
             }
         }
         for (int j = bsData->boneWeights.size(); j < bones->rowCount(); j++){
@@ -84,42 +82,11 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
     }
 }
 
-/*void BoneWeightArrayUI::selectionChanged(int row, int column){
-    if (column != 1){
-        return;
-    }
-    bones->blockSignals(true);
-    QWidget *wid = NULL;
-    if (previousRow >= 0){
-        wid = bones->cellWidget(previousRow, column);
-    }
-    if (wid){
-        bones->removeCellWidget(row, column);
-    }else{
-        for (int i = 0; i < bones->rowCount(); i++){
-            wid = bones->cellWidget(i, column);
-            if (wid){
-                bones->removeCellWidget(i, column);
-                break;
-            }
-        }
-    }
-    bones->setCellWidget(row, column, spinBox);
-    if (bsData->boneWeights.size() > row && row >= 0){
-        spinBox->setValue(bsData->boneWeights.at(row));
-    }
-    previousRow = row;
-    bones->blockSignals(false);
-}*/
-
-void BoneWeightArrayUI::setBoneWeight(){
+void BoneWeightArrayUI::setBoneWeight(int row){
     if (bsData){
-        if (bsData->boneWeights.size() > bones->currentRow() && bones->currentRow() >= 0 && bones->cellWidget(bones->currentRow(), 1) == spinBox){
-            bsData->boneWeights[bones->currentRow()] = spinBox->value();
-            if (bones->item(bones->currentRow(), 1)){
-                bones->item(bones->currentRow(), 1)->setText(QString::number(bsData->boneWeights.at(bones->currentRow())));
-            }else{
-                bones->setItem(bones->currentRow(), 1, new QTableWidgetItem(QString::number(bsData->boneWeights.at(bones->currentRow()), 'g', 6)));
+        if (bsData->boneWeights.size() > row && row >= 0){
+            if (bones->cellWidget(row, 1)){
+                bsData->boneWeights[row] = static_cast<DoubleSpinBox *>(bones->cellWidget(row, 1))->value();
             }
         }
     }

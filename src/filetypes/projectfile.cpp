@@ -14,6 +14,10 @@ ProjectFile::ProjectFile(MainWindow *window, const QString & name)
     getReader().setFile(this);
 }
 
+void ProjectFile::setCharacterFile(CharacterFile *file){
+    character = file;
+}
+
 QString ProjectFile::getCharacterFilePathAt(int index) const{
     if (!stringData.data()){
         return "";

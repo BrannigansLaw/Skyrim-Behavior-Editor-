@@ -15,21 +15,21 @@ public:
     enum HkxXmlParseLine {
         NoError = 0,
         //NullPointerArgs,
-        EmptyLineEndFile = 1,
-        OrphanedCharacter = 2,
-        InvalidElementName = 3,
-        InvalidElementValue = 4,
-        //ElementValueSplitOnMutipleLines = 5,
-        InvalidAttributeName = 6,
-        InvalidAttributeValue = 7,
-        DuplicateAttribute = 8,
-        OrphanedAttribute = 9,
-        OrphanedElementTag = 10,
-        MalformedComment = 11,
-        UnexpectedNewlineCharacter = 12,
-        EmptyLine = 13,
-        MalformedEndElementTag = 14,
-        UnknownError = 50
+        EmptyLineEndFile = -1,
+        OrphanedCharacter = -2,
+        InvalidElementName = -3,
+        InvalidElementValue = -4,
+        //ElementValueSplitOnMutipleLines = -5,
+        InvalidAttributeName = -6,
+        InvalidAttributeValue = -7,
+        OrphanedAttribute = -8,
+        MalformedAttribute = -9,
+        OrphanedElementTag = -10,
+        MalformedComment = -11,
+        UnexpectedNewlineCharacter = -12,
+        EmptyLine = -13,
+        MalformedEndElementTag = -14,
+        UnknownError = -50
     };
     HkxXmlReader(HkxFile *file = NULL);
     bool parse();
@@ -46,13 +46,18 @@ public:
     HkxXmlParseLine readNextLine();
     void clear();
 private:
+    int skipComment(const QByteArray & line, int index);
+    int readValue(const QByteArray & line, int startIndex, bool isSplitOnMultipleLines);
+    int readAttribute(const QByteArray & line, int startIndex);
+    int readElementTag(const QByteArray & line, int startIndex, bool isIsolatedEndElemTag, bool isEndTag);
+private:
     struct Attribute{
         Attribute(const QByteArray & elem): name(elem){}
         QByteArray name;
         QByteArray value;
     };
     struct Element{
-        Element(const QByteArray & elem): name(elem), isContainedOnOneLine(false)/*, isClosed(false)*/{}
+        Element(const QByteArray & elem): name(elem), isContainedOnOneLine(true)/*, isClosed(false)*/{}
         QByteArray name;
         QByteArray value;
         QList <Attribute> attributeList;

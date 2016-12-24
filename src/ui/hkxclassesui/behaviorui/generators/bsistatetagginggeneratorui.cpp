@@ -208,5 +208,7 @@ void BSiStateTaggingGeneratorUI::loadData(HkxObject *data){
         name->setText(bsData->name);
         int index = static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pDefaultGenerator) + 1;
         pDefaultGenerator->setCurrentIndex(index);
+        iStateToSetAs->setValue(bsData->iStateToSetAs);
+        iPriority->setValue(bsData->iPriority);
     }
 }

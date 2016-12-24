@@ -27,7 +27,22 @@ class BehaviorFile;
 class CharacterFile;
 class ProjectFile;
 class SkeletonFile;
-class CharacterPropertiesUI;
+class ProjectUI;
+
+class PlainTextEdit: public QPlainTextEdit
+{
+    Q_OBJECT
+public:
+    PlainTextEdit(QWidget* parent = 0)
+        : QPlainTextEdit(parent)
+    {
+        //
+    }
+
+    QSize sizeHint() const{
+        return QSize(120, 40);
+    }
+};
 
 class MainWindow : public QWidget
 {
@@ -40,7 +55,7 @@ public:
 protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 private:
-    QPlainTextEdit *debugLog;
+    PlainTextEdit *debugLog;
     QGridLayout *topLyt;
     QMenuBar *topMB;
     QAction *openProjectA;
@@ -56,7 +71,7 @@ private:
     SkeletonFile *skeletonFile;
     QList <BehaviorFile *> behaviorFiles;
     QList <BehaviorGraphView *> behaviorGraphs;
-    CharacterPropertiesUI *characterPropertiesWid;
+    ProjectUI *projectUI;
     QGroupBox *behaviorGraphViewGB;
     QVBoxLayout *iconGBLyt;
     HkDataUI *objectDataWid;
@@ -67,9 +82,10 @@ private:
     QVBoxLayout *logGBLyt;
     QProgressDialog *progressD;
     QString lastFileSelected;
+    QString lastFileSelectedPath;
 private slots:
     void openProject();
-    //void openBehaviorFile();
+    void openBehaviorFile(const QModelIndex & index);
     void expandBranches();
     void collapseBranches();
     void save();

@@ -1,4 +1,5 @@
 #include "hkaskeleton.h"
+#include "src/hkxclasses/hksimplelocalframe.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/skeletonfile.h"
 
@@ -22,12 +23,56 @@ QString hkaSkeleton::getClassname(){
     return classname;
 }
 
-QStringList hkaSkeleton::getBoneNamess() const{
+QStringList hkaSkeleton::getBoneNames() const{
     QStringList list;
     for (int i = 0; i < bones.size(); i++){
         list.append(bones.at(i).name);
     }
     return list;
+}
+
+QString hkaSkeleton::getLocalFrameName(int boneIndex) const{
+    for (int i = 0; i < localFrames.size(); i++){
+        if (boneIndex == localFrames.at(i).boneIndex && localFrames.at(i).localFrame.data() && localFrames.at(i).localFrame->getSignature() == HK_SIMPLE_LOCAL_FRAME){
+            return static_cast<hkSimpleLocalFrame *>(localFrames.at(i).localFrame.data())->name;
+        }
+    }
+    return "";
+}
+
+bool hkaSkeleton::addLocalFrame(const QString & name){
+    for (int i = 0; i < localFrames.size(); i++){
+        if (localFrames.at(i).localFrame.data() && localFrames.at(i).localFrame->getSignature() == HK_SIMPLE_LOCAL_FRAME){
+            if (static_cast<hkSimpleLocalFrame *>(localFrames[i].localFrame.data())->name == name){
+                return false;
+            }
+        }
+    }
+    localFrames.append(hkLocalFrame());
+    localFrames.last().localFrame = HkxObjectExpSharedPtr(new hkSimpleLocalFrame(getParentFile(), name));
+    if (!getParentFile()->addObjectToFile(localFrames.last().localFrame.data(), ref)){
+        return false;
+    }
+    return true;
+}
+
+void hkaSkeleton::setLocalFrameName(int boneIndex, const QString & name){
+    for (int i = 0; i < localFrames.size(); i++){
+        if (boneIndex == localFrames.at(i).boneIndex && localFrames.at(i).localFrame.data() && localFrames.at(i).localFrame->getSignature() == HK_SIMPLE_LOCAL_FRAME){
+            static_cast<hkSimpleLocalFrame *>(localFrames[i].localFrame.data())->name = name;
+            return;
+        }
+    }
+}
+
+bool hkaSkeleton::removeLocalFrame(int boneIndex){
+    for (int i = 0; i < localFrames.size(); i++){
+        if (boneIndex == localFrames.at(i).boneIndex){
+            localFrames.removeAt(i);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){

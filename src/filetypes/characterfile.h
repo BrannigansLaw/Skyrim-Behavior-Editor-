@@ -10,6 +10,7 @@ class CharacterFile: public HkxFile
 {
     friend class hkbCharacterData;
     friend class MainWindow;
+    friend class ProjectUI;
 public:
     CharacterFile(MainWindow *window, const QString & name);
     virtual ~CharacterFile();

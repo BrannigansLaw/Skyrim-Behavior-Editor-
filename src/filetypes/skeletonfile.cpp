@@ -35,7 +35,7 @@ HkxObjectExpSharedPtr * SkeletonFile::findLocalFrame(long ref){
 QStringList SkeletonFile::getBonesFromSkeletonAt(int index) const{
     if (index < skeletons.size() && index >= 0){
         if (skeletons.at(index).data()){
-            return static_cast<hkaSkeleton *>(skeletons.at(index).data())->getBoneNamess();
+            return static_cast<hkaSkeleton *>(skeletons.at(index).data())->getBoneNames();
         }
     }
     return QStringList();

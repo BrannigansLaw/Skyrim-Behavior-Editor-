@@ -33,6 +33,10 @@ public:
         setSelectionMode(QAbstractItemView::SingleSelection);
         setEditTriggers(QAbstractItemView::NoEditTriggers);
     }
+
+    QSize sizeHint() const{
+        return QSize(100, 400);
+    }
 };
 
 class SpinBox: public QSpinBox
@@ -59,12 +63,14 @@ class DoubleSpinBox: public QDoubleSpinBox
 {
     Q_OBJECT
 public:
-    DoubleSpinBox(QWidget* parent = 0)
+    DoubleSpinBox(QWidget* parent = 0, qreal value = 0, int precision = 6, qreal step = 1.0, qreal max = std::numeric_limits<double>::max(), qreal min = std::numeric_limits<double>::min())
         : QDoubleSpinBox(parent)
     {
-        setMaximum(std::numeric_limits<double>::max());
-        setMinimum(std::numeric_limits<double>::min());
-        setDecimals(6);
+        setMaximum(max);
+        setMinimum(min);
+        setDecimals(precision);
+        setSingleStep(step);
+        setValue(value);
         setFocusPolicy(Qt::StrongFocus);
     }
 
@@ -100,7 +106,7 @@ class QuadVariableWidget: public QWidget
 public:
     QuadVariableWidget()
         : lyt(new QHBoxLayout),
-          spinBoxX(new DoubleSpinBox),
+          spinBoxX(new DoubleSpinBox()),
           spinBoxY(new DoubleSpinBox),
           spinBoxZ(new DoubleSpinBox),
           spinBoxW(new DoubleSpinBox)

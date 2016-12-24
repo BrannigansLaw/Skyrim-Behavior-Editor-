@@ -1,22 +1,39 @@
 #ifndef PROJECTUI_H
 #define PROJECTUI_H
 
-#include <QWidget>
+#include <QGroupBox>
 
-class ProjectUI: public QWidget
+class QGridLayout;
+class CharacterPropertiesUI;
+class SkeletonUI;
+class ProjectFile;
+class QFileSystemModel;
+class QListView;
+class FootIkDriverInfoUI;
+
+class ProjectUI: public QGroupBox
 {
+    Q_OBJECT
 public:
-    ProjectUI();
+    ProjectUI(ProjectFile *file);
     virtual ~ProjectUI();
+    void setProject(ProjectFile *file);
+    void loadData();
+    void setFilePath(const QString & path);
+signals:
+    void openFile(const QModelIndex & index);
 protected:
 private:
-    /*QGridLayout *lyt;
-    BehaviorVariablesUI *characterProperties;
-    QTableWidget *animations;
-    QTableWidget *skeletonsTable;
-    SkeletonWidget *skeleton;
-    FootIKDriverWidget *footIK;
-    HandIKDriverWidget *handIK;*/
+    ProjectFile *project;
+    QGridLayout *lyt;
+    CharacterPropertiesUI *characterProperties;
+    //AnimationsUI *animations;
+    SkeletonUI *skeleton;
+    FootIkDriverInfoUI *footIK;
+    //HandIKDriverUI *handIK;
+    QFileSystemModel *fileSys;
+    QListView *fileView;
+    QString lastFileSelectedPath;
 };
 
 #endif // PROJECTUI_H

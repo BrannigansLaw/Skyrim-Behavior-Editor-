@@ -294,9 +294,11 @@ void HkDataUI::changeCurrentDataWidget(CustomTreeGraphicsViewIcon * icon){
 BehaviorGraphView *HkDataUI::setBehaviorView(BehaviorGraphView *view){
     BehaviorGraphView *oldView = behaviorView;
     if (oldView){
-        disconnect(oldView, 0, this, 0);
+        //disconnect(oldView, 0, this, 0);
     }
-    setMinimumSize(parentWidget()->size()*0.99);
+    if (parentWidget()){
+        setMinimumSize(parentWidget()->size()*0.99);
+    }
     behaviorView = view;
     iSTGUI->behaviorView = view;
     modGenUI->behaviorView = view;

@@ -18,6 +18,10 @@ class HkxObject: public QSharedData
     friend class ProjectFile;
     friend class CharacterFile;
     friend class SkeletonFile;
+    friend class BehaviorUI;
+    friend class ProjectUI;
+    friend class CharacterUI;
+    friend class SkeletonUI;
     friend class BSIStateManagerModifier;
     friend class BoneWeightArrayUI;
 public:

@@ -9,6 +9,7 @@ class BehaviorFile;
 
 class hkaSkeleton: public HkxObject
 {
+    friend class SkeletonUI;
 public:
     hkaSkeleton(HkxFile *parent, long ref = 0);
     virtual ~hkaSkeleton();
@@ -18,7 +19,11 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
-    QStringList getBoneNamess() const;
+    QStringList getBoneNames() const;
+    QString getLocalFrameName(int boneIndex) const;
+    bool addLocalFrame(const QString & name);
+    bool removeLocalFrame(int boneIndex);
+    void setLocalFrameName(int boneIndex, const QString & name);
 private:
     hkaSkeleton& operator=(const hkaSkeleton&);
     hkaSkeleton(const hkaSkeleton &);

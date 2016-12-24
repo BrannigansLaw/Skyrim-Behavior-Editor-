@@ -11,6 +11,7 @@
 #include "src/ui/hkxclassesui/behaviorui/behaviorvariablesui.h"
 #include "src/ui/hkxclassesui/behaviorui/characterpropertiesui.h"
 #include "src/ui/hkxclassesui/behaviorui/eventsui.h"
+#include "src/ui/hkxclassesui/projectui.h"
 #include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
 #include "src/hkxclasses/behavior/generators/hkbbehaviorgraph.h"
 
@@ -24,7 +25,7 @@ MainWindow::MainWindow()
     :
       topLyt(new QGridLayout(this)),
       topMB(new QMenuBar(this)),
-      debugLog(new QPlainTextEdit(this)),
+      debugLog(new PlainTextEdit(this)),
       openProjectA(new QAction("Open Project", this)),
       //openBehaviorA(new QAction("Open Behavior", this)),
       fileM(new QMenu("File", this)),
@@ -36,7 +37,7 @@ MainWindow::MainWindow()
       projectFile(NULL),
       characterFile(NULL),
       skeletonFile(NULL),
-      characterPropertiesWid(new CharacterPropertiesUI("Character Properties")),
+      projectUI(new ProjectUI(NULL)),
       iconGBLyt(new QVBoxLayout(this)),
       behaviorGraphViewGB(new QGroupBox("Behavior Graph")),
       objectDataSA(new QScrollArea),
@@ -76,20 +77,20 @@ MainWindow::MainWindow()
     objectDataWid->setEventsVariablesUI(eventsWid, variablesWid);
     iconGBLyt->addWidget(tabs);
     behaviorGraphViewGB->setLayout(iconGBLyt);
-    topLyt->addWidget(topMB, 0, 0, 1, 10);
-    topLyt->addWidget(behaviorGraphViewGB, 1, 0, 6, 6);
     objectDataSA->setWidgetResizable(true);
+    topLyt->addWidget(topMB, 0, 0, 1, 10);
+    topLyt->addWidget(behaviorGraphViewGB, 1, 0, 9, 6);
     topLyt->addWidget(objectDataSA, 1, 6, 6, 4);
-    topLyt->addWidget(eventsWid, 7, 0, 4, 3);
-    topLyt->addWidget(variablesWid, 7, 3, 4, 3);
-    topLyt->addWidget(logGB, 7, 6, 3, 4);
+    topLyt->addWidget(eventsWid, 7, 6, 4, 2);
+    topLyt->addWidget(variablesWid, 7, 8, 4, 2);
+    topLyt->addWidget(logGB, 10, 0, 1, 6);
     tabs->setTabsClosable(true);
     readSettings();
     setLayout(topLyt);
     objectDataSA->setWidget(objectDataWid);
-    variablesWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
-    eventsWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
-    logGB->setMaximumSize(size().width()*0.4, size().height()*0.25);
+    //variablesWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
+    //eventsWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
+    logGB->setMaximumSize(size().width()*0.6, size().height()*0.1);
     connect(openProjectA, SIGNAL(triggered(bool)), this, SLOT(openProject()));
     //connect(openBehaviorA, SIGNAL(triggered(bool)), this, SLOT(openBehaviorFile()));
     connect(saveA, SIGNAL(triggered(bool)), this, SLOT(save()));
@@ -97,6 +98,7 @@ MainWindow::MainWindow()
     connect(collapseA, SIGNAL(triggered(bool)), this, SLOT(collapseBranches()));
     connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(changedTabs(int)));
     connect(tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
+    connect(projectUI, SIGNAL(openFile(QModelIndex)), this, SLOT(openBehaviorFile(QModelIndex)));
 }
 
 MainWindow::~MainWindow(){
@@ -122,47 +124,67 @@ QMessageBox::StandardButton MainWindow::closeFileDialogue(){
 }
 
 void MainWindow::changedTabs(int index){
-    if (index >= 0 && index < behaviorFiles.size() && index < behaviorGraphs.size()){
-        objectDataWid->setBehaviorView(behaviorGraphs.at(index));
+    index--;
+    if (index < behaviorFiles.size() && index < behaviorGraphs.size()){
         objectDataWid->changeCurrentDataWidget(NULL);
         progressD->open(this, "");
-        setProgressData("Loading Variables...", 0);
-        if (index == 0){
-            characterPropertiesWid->loadData(characterFile->getCharacterData());
-        }else{
+        if (index == -1){
+            variablesWid->hide();
+            eventsWid->hide();
+            objectDataSA->hide();
+            topLyt->removeWidget(objectDataSA);
+            topLyt->removeWidget(eventsWid);
+            topLyt->removeWidget(variablesWid);
+            topLyt->removeWidget(behaviorGraphViewGB);
+            topLyt->addWidget(behaviorGraphViewGB, 1, 0, 9, 10);
+        }else if (index >= 0){
+            objectDataWid->setBehaviorView(behaviorGraphs.at(index));
+            setProgressData("Loading Variables...", 0);
             variablesWid->loadData(behaviorFiles.at(index)->getBehaviorGraphData());
+            setProgressData("Loading Events...", 99);
+            eventsWid->loadData(behaviorFiles.at(index)->getBehaviorGraphData());
+            topLyt->removeWidget(behaviorGraphViewGB);
+            topLyt->addWidget(behaviorGraphViewGB, 1, 0, 9, 6);
+            topLyt->addWidget(objectDataSA, 1, 6, 6, 4);
+            topLyt->addWidget(eventsWid, 7, 6, 4, 2);
+            topLyt->addWidget(variablesWid, 7, 8, 4, 2);
+            variablesWid->show();
+            eventsWid->show();
+            objectDataSA->show();
+            progressD->setValue(100);
+            progressD->done(0);
+            progressD->close();
+            return;
         }
-        setProgressData("Loading Events...", 50);
-        eventsWid->loadData(behaviorFiles.at(index)->getBehaviorGraphData());
-        progressD->setValue(100);
-        progressD->done(0);
-        progressD->close();
-    }else{
-        writeToLog("MainWindow: changedTabs() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!", true);
     }
+    progressD->close();
+    writeToLog("MainWindow: changedTabs() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!", true);
 }
 
 void MainWindow::expandBranches(){
-    if (tabs->currentIndex() >= 0 && tabs->currentIndex() < behaviorFiles.size() && tabs->currentIndex() < behaviorGraphs.size()){
-        behaviorGraphs.at(tabs->currentIndex())->expandBranch(behaviorGraphs.at(tabs->currentIndex())->rootIcon, true);
+    int index = tabs->currentIndex() - 1;
+    if (index >= 0 && index < behaviorFiles.size() && index < behaviorGraphs.size()){
+        behaviorGraphs.at(index)->expandBranch(behaviorGraphs.at(index)->rootIcon, true);
     }else{
         writeToLog("MainWindow: collapseBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!", true);
     }
 }
 
 void MainWindow::collapseBranches(){
-    if (tabs->currentIndex() >= 0 && tabs->currentIndex() < behaviorFiles.size() && tabs->currentIndex() < behaviorGraphs.size()){
-        behaviorGraphs.at(tabs->currentIndex())->contractBranch(behaviorGraphs.at(tabs->currentIndex())->rootIcon, true);
-        behaviorGraphs.at(tabs->currentIndex())->rootIcon->setSelected();
+    int index = tabs->currentIndex() - 1;
+    if (index >= 0 && index < behaviorFiles.size() && index < behaviorGraphs.size()){
+        behaviorGraphs.at(index)->contractBranch(behaviorGraphs.at(index)->rootIcon, true);
+        behaviorGraphs.at(index)->rootIcon->setSelected();
     }else{
         writeToLog("MainWindow: collapseBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!", true);
     }
 }
 
 void MainWindow::save(){
-    if (tabs->currentIndex() >= 0 && tabs->currentIndex() < behaviorFiles.size() && tabs->currentIndex() < behaviorGraphs.size()){
-        behaviorFiles.at(tabs->currentIndex())->write();
-        behaviorGraphs.at(tabs->currentIndex())->toggleChanged(false);
+    int index = tabs->currentIndex() - 1;
+    if (index >= 0 && index < behaviorFiles.size() && index < behaviorGraphs.size()){
+        behaviorFiles.at(index )->write();
+        behaviorGraphs.at(index)->toggleChanged(false);
     }else{
         writeToLog("MainWindow: save() failed!\nThe tab index is out of sync with the behavior files!", true);
     }
@@ -183,7 +205,8 @@ void MainWindow::closeTab(int index){
     if (projectFile && index == 0){
         closeAll();
     }else{
-        if (index >= 0 && index < behaviorGraphs.size() && behaviorGraphs.at(index)->getIsChanged() && closeFileDialogue() != QMessageBox::Cancel){
+        index--;
+        if (index >= 0 && index < behaviorGraphs.size() && (!behaviorGraphs.at(index)->getIsChanged() || closeFileDialogue() != QMessageBox::Cancel)){
             if (index < behaviorFiles.size()){
                 if (behaviorGraphs.at(index)){
                     delete behaviorGraphs.at(index);
@@ -297,11 +320,12 @@ void MainWindow::openProject(){
     debugLog->appendPlainText("\n-------------------------\nTime taken to open file \""+filename+
                                "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
     setProgressData("Loading character data...", 1);
-    QString path = filename;
+    lastFileSelectedPath = filename;
     int temp = filename.lastIndexOf("/");
-    path.remove(temp, path.size() - temp);
+    lastFileSelectedPath.remove(temp, lastFileSelectedPath.size() - temp);
+    projectUI->setFilePath(lastFileSelectedPath);
     time = t.elapsed();
-    characterFile = new CharacterFile(this, path+"\\"+projectFile->getCharacterFilePathAt(0));
+    characterFile = new CharacterFile(this, lastFileSelectedPath+"\\"+projectFile->getCharacterFilePathAt(0));
     if (!characterFile->parse()){
         writeToLog("MainWindow: openProject() failed!!!\nThe character file "+projectFile->getCharacterFilePathAt(0)+" could not be parsed!!!", true);
         delete projectFile;
@@ -311,11 +335,12 @@ void MainWindow::openProject(){
         progressD->close();
         return;
     }
-    debugLog->appendPlainText("\n-------------------------\nTime taken to open file \""+path+"\\"+projectFile->getCharacterFilePathAt(0)+
+    projectFile->setCharacterFile(characterFile);
+    debugLog->appendPlainText("\n-------------------------\nTime taken to open file \""+lastFileSelectedPath+"\\"+projectFile->getCharacterFilePathAt(0)+
                                "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
     setProgressData("Loading skeleton data...", 6);
     time = t.elapsed();
-    skeletonFile = new SkeletonFile(this, path+"\\"+characterFile->getRigName());
+    skeletonFile = new SkeletonFile(this, lastFileSelectedPath+"\\"+characterFile->getRigName());
     if (!skeletonFile->parse()){
         writeToLog("MainWindow: openProject() failed!!!\nThe skeleton file "+characterFile->getRigName()+" could not be parsed!!!", true);
         delete projectFile;
@@ -328,12 +353,12 @@ void MainWindow::openProject(){
         return;
     }
     characterFile->setSkeletonFile(skeletonFile);
-    tabs->addTab(characterPropertiesWid, "Character Data");
-    characterPropertiesWid->loadData(characterFile->getCharacterData());
-    return;
-    debugLog->appendPlainText("\n-------------------------\nTime taken to open file \""+path+"\\"+characterFile->getRigName()+
+    tabs->addTab(projectUI, "Character Data");
+    projectUI->setProject(projectFile);
+    projectUI->loadData();
+    debugLog->appendPlainText("\n-------------------------\nTime taken to open file \""+lastFileSelectedPath+"\\"+characterFile->getRigName()+
                                "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
-    setProgressData("Loading behavior files...", 10);
+    /*setProgressData("Loading behavior files...", 10);
     int progress = 10;
     bool failed = false;
     QStringList behaviors(characterFile->getRootBehaviorPath());
@@ -379,10 +404,10 @@ void MainWindow::openProject(){
         behaviorGraphs.clear();
         return;
     }
-    setProgressData("Loading Variables...", 98);
-    variablesWid->loadData(behaviorFiles.last()->getBehaviorGraphData());
-    setProgressData("Loading Events...", 99);
-    eventsWid->loadData(behaviorFiles.last()->getBehaviorGraphData());
+    //setProgressData("Loading Variables...", 98);
+    //variablesWid->loadData(behaviorFiles.last()->getBehaviorGraphData());
+    //setProgressData("Loading Events...", 99);
+    //eventsWid->loadData(behaviorFiles.last()->getBehaviorGraphData());*/
     progressD->setValue(100);
     progressD->done(0);
     progressD->close();
@@ -411,28 +436,27 @@ bool MainWindow::openBehavior(const QString & filename, QProgressDialog *dialog)
     if (!behaviorGraphs.last()->draw(static_cast<DataIconManager *>(behaviorFiles.last()->getBehaviorGraph()), static_cast<DataIconManager *>(behaviorFiles.last()->getRootStateMachine()))){
         writeToLog("MainWindow: drawBehaviorGraph() failed!\nThe behavior graph was drawn incorrectly!", true);
     }
-    setProgressData("Loading Variables...", 95);
-    variablesWid->loadData(behaviorFiles.last()->getBehaviorGraphData());
-    setProgressData("Loading Events...", 99);
-    eventsWid->loadData(behaviorFiles.last()->getBehaviorGraphData());
+    //setProgressData("Loading Variables...", 95);
+    //variablesWid->loadData(behaviorFiles.last()->getBehaviorGraphData());
+    //setProgressData("Loading Events...", 99);
+    //eventsWid->loadData(behaviorFiles.last()->getBehaviorGraphData());
     dialog->setValue(100);
     dialog->done(0);
     dialog->close();
     return true;
 }
 
-/*void MainWindow::openBehaviorFile(){
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open hkx behavior file..."), lastFileSelected, tr("hkx Files (*.hkx)"));
-    lastFileSelected = fileName;
+void MainWindow::openBehaviorFile(const QModelIndex & index){
+    QString fileName = index.data().toString();
     QTime t;
     t.start();
-    if (openBehavior(fileName, progressD)){
+    if (openBehavior(lastFileSelectedPath+"\\behaviors\\"+fileName, progressD)){
         debugLog->appendPlainText("\n-------------------------\nTime taken to open behavior \""+fileName+
                               "\" is approximately "+QString::number(t.elapsed())+" milliseconds\n-------------------------\n");
     }else{
         writeToLog("MainWindow: openBehaviorFile() failed!\nThe behavior file "+fileName+" failded to open correctly!", true);
     }
-}*/
+}
 
 void MainWindow::readSettings()
 {

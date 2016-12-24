@@ -5,7 +5,7 @@
 
 class hkbFootIkDriverInfo: public HkxObject
 {
-    friend class BehaviorGraphView;
+    friend class FootIkDriverInfoUI;
 public:
     hkbFootIkDriverInfo(HkxFile *parent, long ref = 0);
     virtual ~hkbFootIkDriverInfo();

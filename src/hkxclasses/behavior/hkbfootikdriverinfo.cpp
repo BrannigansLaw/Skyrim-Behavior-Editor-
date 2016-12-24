@@ -47,6 +47,7 @@ bool hkbFootIkDriverInfo::readData(const HkxXmlReader &reader, long index){
             for (int j = 0; j < numlegs; j++){
                 legs.append(BsFootIkDriverLeg());
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+                    text = reader.getNthAttributeValueAt(index, 0);
                     if (text == "kneeAxisLS"){
                         legs.last().kneeAxisLS = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
@@ -113,6 +114,7 @@ bool hkbFootIkDriverInfo::readData(const HkxXmlReader &reader, long index){
                     index++;
                 }
             }
+            index--;
         }else if (text == "raycastDistanceUp"){
             raycastDistanceUp = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){

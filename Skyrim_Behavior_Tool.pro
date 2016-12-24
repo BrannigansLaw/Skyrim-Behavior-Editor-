@@ -142,7 +142,9 @@ SOURCES += \
     src/hkxclasses/hksimplelocalframe.cpp \
     src/hkxclasses/animation/hkaskeleton.cpp \
     src/ui/hkxclassesui/behaviorui/boneweightarrayui.cpp \
-    src/ui/hkxclassesui/behaviorui/characterpropertiesui.cpp
+    src/ui/hkxclassesui/behaviorui/characterpropertiesui.cpp \
+    src/ui/hkxclassesui/behaviorui/skeletonui.cpp \
+    src/ui/hkxclassesui/behaviorui/footikdriverinfoui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -267,4 +269,6 @@ HEADERS  += \
     src/hkxclasses/hksimplelocalframe.h \
     src/hkxclasses/animation/hkaskeleton.h \
     src/ui/hkxclassesui/behaviorui/boneweightarrayui.h \
-    src/ui/hkxclassesui/behaviorui/characterpropertiesui.h
+    src/ui/hkxclassesui/behaviorui/characterpropertiesui.h \
+    src/ui/hkxclassesui/behaviorui/skeletonui.h \
+    src/ui/hkxclassesui/behaviorui/footikdriverinfoui.h

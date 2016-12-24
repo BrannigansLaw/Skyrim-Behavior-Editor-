@@ -1,9 +1,9 @@
-#ifndef BONEWEIGHTARRAYUI_H
-#define BONEWEIGHTARRAYUI_H
+#ifndef SKELETONUI_H
+#define SKELETONUI_H
 
 #include <QGroupBox>
 
-class hkbBoneWeightArray;
+class hkaSkeleton;
 class QVBoxLayout;
 class DoubleSpinBox;
 class TableWidget;
@@ -11,24 +11,24 @@ class HkxObject;
 class QPushButton;
 class QSignalMapper;
 
-class BoneWeightArrayUI: public QGroupBox
+class SkeletonUI: public QGroupBox
 {
     Q_OBJECT
 public:
-    BoneWeightArrayUI();
-    virtual ~BoneWeightArrayUI();
+    SkeletonUI(const QString & title);
+    virtual ~SkeletonUI();
     void loadData(HkxObject *data, bool isRagdoll = false);
 protected:
 signals:
     void returnToParent();
 private slots:
-    void setBoneWeight(int row);
+    void setLocalFrame(int row);
 private:
-    hkbBoneWeightArray *bsData;
+    hkaSkeleton *bsData;
     QVBoxLayout *lyt;
     QPushButton *backPB;
     TableWidget *bones;
     QSignalMapper *mapper;
 };
 
-#endif // BONEWEIGHTARRAYUI_H
+#endif // SKELETONUI_H
