@@ -10,6 +10,8 @@ class ProjectFile;
 class QFileSystemModel;
 class QListView;
 class FootIkDriverInfoUI;
+class HandIkDriverInfoUI;
+class QCheckBox;
 
 class ProjectUI: public QGroupBox
 {
@@ -23,14 +25,19 @@ public:
 signals:
     void openFile(const QModelIndex & index);
 protected:
+private slots:
+    void toggleFootIK(bool toggle);
+    void toggleHandIK(bool toggle);
 private:
     ProjectFile *project;
     QGridLayout *lyt;
     CharacterPropertiesUI *characterProperties;
     //AnimationsUI *animations;
     SkeletonUI *skeleton;
+    QCheckBox *enableFootIKCB;
+    QCheckBox *enableHandIKCB;
     FootIkDriverInfoUI *footIK;
-    //HandIKDriverUI *handIK;
+    HandIkDriverInfoUI *handIK;
     QFileSystemModel *fileSys;
     QListView *fileView;
     QString lastFileSelectedPath;

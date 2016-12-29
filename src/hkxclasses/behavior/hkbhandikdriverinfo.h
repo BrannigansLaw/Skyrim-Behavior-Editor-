@@ -6,6 +6,8 @@
 class hkbHandIkDriverInfo: public HkxObject
 {
     friend class BehaviorGraphView;
+    friend class HandIkDriverInfoUI;
+    friend class HandIkDriverInfoHandUI;
 public:
     hkbHandIkDriverInfo(HkxFile *parent, long ref = 0);
     virtual ~hkbHandIkDriverInfo();
@@ -16,11 +18,13 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
+    void addHand();
+    void removeHandAt(int index);
     hkbHandIkDriverInfo& operator=(const hkbHandIkDriverInfo&);
     hkbHandIkDriverInfo(const hkbHandIkDriverInfo &);
 private:
-    struct BsHandIkDriverHand{
-        BsHandIkDriverHand()
+    struct hkbHandIkDriverInfoHand{
+        hkbHandIkDriverInfoHand()
             : maxElbowAngleDegrees(0),
               minElbowAngleDegrees(0),
               shoulderIndex(-1),
@@ -50,10 +54,12 @@ private:
         QString localFrameName;
     };
 
+    hkbHandIkDriverInfoHand * getHandAt(int index);
+
     static QStringList BlendCurve;  //BLEND_CURVE_SMOOTH=0;BLEND_CURVE_LINEAR=1;BLEND_CURVE_LINEAR_TO_SMOOTH=2;BLEND_CURVE_SMOOTH_TO_LINEAR=3
     static uint refCount;
     static QString classname;
-    QList <BsHandIkDriverHand> hands;
+    QList <hkbHandIkDriverInfoHand> hands;
     QString fadeInOutCurve;
 };
 

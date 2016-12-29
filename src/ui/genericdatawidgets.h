@@ -63,7 +63,7 @@ class DoubleSpinBox: public QDoubleSpinBox
 {
     Q_OBJECT
 public:
-    DoubleSpinBox(QWidget* parent = 0, qreal value = 0, int precision = 6, qreal step = 1.0, qreal max = std::numeric_limits<double>::max(), qreal min = std::numeric_limits<double>::min())
+    DoubleSpinBox(QWidget* parent = 0, qreal value = 0, int precision = 6, qreal step = 1.0, qreal max = std::numeric_limits<double>::max(), qreal min = -std::numeric_limits<double>::max())
         : QDoubleSpinBox(parent)
     {
         setMaximum(max);
@@ -117,13 +117,13 @@ public:
         spinBoxZ->setPrefix("Z: ");
         spinBoxW->setPrefix("W: ");
         spinBoxX->setMaximum(std::numeric_limits<double>::max());
-        spinBoxX->setMinimum(std::numeric_limits<double>::min());
+        spinBoxX->setMinimum(-std::numeric_limits<double>::max());
         spinBoxY->setMaximum(std::numeric_limits<double>::max());
-        spinBoxY->setMinimum(std::numeric_limits<double>::min());
+        spinBoxY->setMinimum(-std::numeric_limits<double>::max());
         spinBoxZ->setMaximum(std::numeric_limits<double>::max());
-        spinBoxZ->setMinimum(std::numeric_limits<double>::min());
+        spinBoxZ->setMinimum(-std::numeric_limits<double>::max());
         spinBoxW->setMaximum(std::numeric_limits<double>::max());
-        spinBoxW->setMinimum(std::numeric_limits<double>::min());
+        spinBoxW->setMinimum(-std::numeric_limits<double>::max());
         lyt->addWidget(spinBoxX);
         lyt->addWidget(spinBoxY);
         lyt->addWidget(spinBoxZ);

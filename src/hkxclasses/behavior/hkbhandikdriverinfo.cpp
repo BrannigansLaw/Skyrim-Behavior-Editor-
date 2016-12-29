@@ -25,6 +25,23 @@ QString hkbHandIkDriverInfo::getClassname(){
     return classname;
 }
 
+void hkbHandIkDriverInfo::addHand(){
+    hands.append(hkbHandIkDriverInfoHand());
+}
+
+void hkbHandIkDriverInfo::removeHandAt(int index){
+    if (index >= 0 && index < hands.size()){
+        hands.removeAt(index);
+    }
+}
+
+hkbHandIkDriverInfo::hkbHandIkDriverInfoHand * hkbHandIkDriverInfo::getHandAt(int index){
+    if (index >= 0 && index < hands.size()){
+        return &hands[index];
+    }
+    return NULL;
+}
+
 bool hkbHandIkDriverInfo::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
@@ -37,7 +54,7 @@ bool hkbHandIkDriverInfo::readData(const HkxXmlReader &reader, long index){
                 return false;
             }
             for (int j = 0; j < numhands; j++){
-                hands.append(BsHandIkDriverHand());
+                hands.append(hkbHandIkDriverInfoHand());
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                     if (text == "elbowAxisLS"){
                         hands.last().elbowAxisLS = readVector4(reader.getElementValueAt(index), &ok);

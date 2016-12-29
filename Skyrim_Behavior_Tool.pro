@@ -144,7 +144,12 @@ SOURCES += \
     src/ui/hkxclassesui/behaviorui/boneweightarrayui.cpp \
     src/ui/hkxclassesui/behaviorui/characterpropertiesui.cpp \
     src/ui/hkxclassesui/behaviorui/skeletonui.cpp \
-    src/ui/hkxclassesui/behaviorui/footikdriverinfoui.cpp
+    src/ui/hkxclassesui/behaviorui/footikdriverinfoui.cpp \
+    src/ui/hkxclassesui/behaviorui/footikdriverinfolegui.cpp \
+    src/ui/hkxclassesui/behaviorui/handikdriverinfoui.cpp \
+    src/ui/hkxclassesui/behaviorui/handikdriverinfohandui.cpp \
+    src/ui/hkxclassesui/behaviorui/generators/blendergeneratorui.cpp \
+    src/ui/hkxclassesui/behaviorui/generators/blendergeneratorchildui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -271,4 +276,9 @@ HEADERS  += \
     src/ui/hkxclassesui/behaviorui/boneweightarrayui.h \
     src/ui/hkxclassesui/behaviorui/characterpropertiesui.h \
     src/ui/hkxclassesui/behaviorui/skeletonui.h \
-    src/ui/hkxclassesui/behaviorui/footikdriverinfoui.h
+    src/ui/hkxclassesui/behaviorui/footikdriverinfoui.h \
+    src/ui/hkxclassesui/behaviorui/footikdriverinfolegui.h \
+    src/ui/hkxclassesui/behaviorui/handikdriverinfoui.h \
+    src/ui/hkxclassesui/behaviorui/handikdriverinfohandui.h \
+    src/ui/hkxclassesui/behaviorui/generators/blendergeneratorui.h \
+    src/ui/hkxclassesui/behaviorui/generators/blendergeneratorchildui.h

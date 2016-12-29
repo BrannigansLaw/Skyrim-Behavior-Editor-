@@ -7,6 +7,7 @@ class SkeletonFile: public HkxFile
 {
     friend class MainWindow;
     friend class ProjectUI;
+    friend class hkaSkeleton;
 public:
     SkeletonFile(MainWindow *window, const QString & name);
     virtual ~SkeletonFile();

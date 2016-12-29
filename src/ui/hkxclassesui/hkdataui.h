@@ -57,9 +57,9 @@ private:
     enum {
         NO_DATA_SELECTED = 0,
         BS_I_STATE_TAG_GEN = 1,
-        MOD_GEN = 2,
-        MSG = 3,
-        SM = 4,
+        MODIFIER_GENERATOR = 2,
+        MANUAL_SELECTOR_GENERATOR = 3,
+        STATE_MACHINE = 4,
         STATE = 5,
         TRANSITION = 6
     };

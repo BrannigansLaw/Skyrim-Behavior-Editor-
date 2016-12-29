@@ -232,6 +232,44 @@ void CharacterFile::write(){
     getWriter().writeToXMLFile();
 }
 
+void CharacterFile::addFootIK(){
+    if (characterData.data()){
+        if (!footIkDriverInfo.data() && !static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo.data()){
+            hkbFootIkDriverInfo *ptr = new hkbFootIkDriverInfo(this);
+            addObjectToFile(ptr);
+            footIkDriverInfo = HkxObjectExpSharedPtr(ptr);
+            static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo = HkxObjectExpSharedPtr(ptr);
+        }else{
+            static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo = footIkDriverInfo;
+        }
+    }
+}
+
+void CharacterFile::addHandIK(){
+    if (characterData.data()){
+        if (!handIkDriverInfo.data() && !static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo.data()){
+            hkbHandIkDriverInfo *ptr = new hkbHandIkDriverInfo(this);
+            addObjectToFile(ptr);
+            handIkDriverInfo = HkxObjectExpSharedPtr(ptr);
+            static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo = HkxObjectExpSharedPtr(ptr);
+        }else{
+            static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo = handIkDriverInfo;
+        }
+    }
+}
+
+void CharacterFile::disableFootIK(){
+    if (characterData.data() && !static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo.data()){
+        static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo = HkxObjectExpSharedPtr();
+    }
+}
+
+void CharacterFile::disableHandIK(){
+    if (characterData.data() && !static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo.data()){
+        static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo = HkxObjectExpSharedPtr();
+    }
+}
+
 CharacterFile::~CharacterFile(){
     //
 }

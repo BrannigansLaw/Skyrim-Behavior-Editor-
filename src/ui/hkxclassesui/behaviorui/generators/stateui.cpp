@@ -41,7 +41,7 @@ QStringList StateUI::headerLabels2 = {
 QStringList StateUI::headerLabels3 = {
     "To State",
     "Priority",
-    "Edit"
+    "Click to Edit"
 };
 
 StateUI::StateUI()
@@ -92,20 +92,20 @@ StateUI::StateUI()
     table->setHorizontalHeaderLabels(headerLabels1);
     table->setCellWidget(0, 1, returnPB);
     table->setCellWidget(1, 0, name);
-    table->setItem(1, 1, new QTableWidgetItem("String"));
+    table->setItem(1, 1, new QTableWidgetItem("hkStringPtr"));
     table->setItem(1, 2, new QTableWidgetItem("N/A"));
     table->setItem(2, 0, new QTableWidgetItem("generator"));
     table->setItem(2, 1, new QTableWidgetItem("hkbGenerator"));
     table->setCellWidget(2, 2, generator);
     table->setItem(2, 2, new QTableWidgetItem("NULL"));
     table->setItem(3, 0, new QTableWidgetItem("stateId"));
-    table->setItem(3, 1, new QTableWidgetItem("Int"));
+    table->setItem(3, 1, new QTableWidgetItem("hkInt32"));
     table->setCellWidget(3, 2, stateId);
     table->setItem(4, 0, new QTableWidgetItem("probability"));
-    table->setItem(4, 1, new QTableWidgetItem("Double"));
+    table->setItem(4, 1, new QTableWidgetItem("hkReal"));
     table->setCellWidget(4, 2, probability);
     table->setItem(5, 0, new QTableWidgetItem("enable"));
-    table->setItem(5, 1, new QTableWidgetItem("Bool"));
+    table->setItem(5, 1, new QTableWidgetItem("hkBool"));
     table->setCellWidget(5, 2, enable);
     enterNotifyEvents->setColumnCount(2);
     enterNotifyEvents->setHorizontalHeaderLabels(headerLabels2);
@@ -383,7 +383,7 @@ void StateUI::addTransition(){
         transitions->setRowCount(transitions->rowCount() + 1);
         transitions->setItem(i, 0, new QTableWidgetItem("New_Transition"));
         transitions->setItem(i, 1, new QTableWidgetItem(trans->getClassname()));
-        transitions->setItem(i, 2, new QTableWidgetItem("Edit"));
+        transitions->setItem(i, 2, new QTableWidgetItem("Click to Edit"));
         behaviorView->toggleChanged(true);
     }
 }
@@ -541,7 +541,7 @@ void StateUI::loadData(HkxObject *data){
                     transitions->setRowCount(transitions->rowCount() + 1);
                     transitions->setItem(i, 0, new QTableWidgetItem(trans->getTransitionNameAt(i)));
                     transitions->setItem(i, 1, new QTableWidgetItem(QString::number(trans->transitions.at(i).priority)));
-                    transitions->setItem(i, 2, new QTableWidgetItem("Edit"));
+                    transitions->setItem(i, 2, new QTableWidgetItem("Click to Edit"));
                 }else{
                     transitions->setRowHidden(i, false);
                     transitions->item(i, 0)->setText(trans->getTransitionNameAt(i));

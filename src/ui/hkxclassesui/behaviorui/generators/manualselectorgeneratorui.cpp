@@ -74,15 +74,15 @@ ManualSelectorGeneratorUI::ManualSelectorGeneratorUI()
     table->setColumnCount(4);
     table->setHorizontalHeaderLabels(headerLabels1);
     table->setCellWidget(0, 0, name);
-    table->setItem(0, 1, new QTableWidgetItem("String"));
+    table->setItem(0, 1, new QTableWidgetItem("hkStringPtr"));
     table->setItem(0, 2, new QTableWidgetItem("N/A"));
     table->setItem(0, 3, new QTableWidgetItem("N/A"));
     table->setItem(1, 0, new QTableWidgetItem("selectedGeneratorIndex"));
-    table->setItem(1, 1, new QTableWidgetItem("Int"));
+    table->setItem(1, 1, new QTableWidgetItem("hkInt32"));
     table->setCellWidget(1, 2, selectedGeneratorIndexBind);
     table->setCellWidget(1, 3, selectedGeneratorIndex);
     table->setItem(2, 0, new QTableWidgetItem("currentGeneratorIndex"));
-    table->setItem(2, 1, new QTableWidgetItem("Int"));
+    table->setItem(2, 1, new QTableWidgetItem("hkInt32"));
     table->setCellWidget(2, 2, currentGeneratorIndexBind);
     table->setCellWidget(2, 3, currentGeneratorIndex);
     generators->setColumnCount(3);
@@ -193,7 +193,7 @@ void ManualSelectorGeneratorUI::loadData(HkxObject *data){
                     generators->setRowCount(generators->rowCount() + 1);
                     generators->setItem(i, 0, new QTableWidgetItem(gen->getName()));
                     generators->setItem(i, 1, new QTableWidgetItem(gen->getClassname()));
-                    generators->setItem(i, 2, new QTableWidgetItem("Edit"));
+                    generators->setItem(i, 2, new QTableWidgetItem("Click to Edit"));
                 }else{
                     generators->setRowHidden(i, false);
                     generators->item(i, 0)->setText(gen->getName());
@@ -347,7 +347,7 @@ void ManualSelectorGeneratorUI::addNewGenerator(){
         generators->setRowCount(generators->rowCount() + 1);
         generators->setItem(generators->rowCount(), 0, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->generators.last().data())->getName()));
         generators->setItem(generators->rowCount(), 1, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->generators.last().data())->getClassname()));
-        generators->setItem(generators->rowCount(), 2, new QTableWidgetItem("Edit"));
+        generators->setItem(generators->rowCount(), 2, new QTableWidgetItem("Click to Edit"));
         behaviorView->toggleChanged(true);
     }
 }

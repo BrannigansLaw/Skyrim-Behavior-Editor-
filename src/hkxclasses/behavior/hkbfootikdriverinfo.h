@@ -6,6 +6,7 @@
 class hkbFootIkDriverInfo: public HkxObject
 {
     friend class FootIkDriverInfoUI;
+    friend class FootIkDriverInfoLegUI;
 public:
     hkbFootIkDriverInfo(HkxFile *parent, long ref = 0);
     virtual ~hkbFootIkDriverInfo();
@@ -16,11 +17,13 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
+    void addLeg();
+    void removeLegAt(int index);
     hkbFootIkDriverInfo& operator=(const hkbFootIkDriverInfo&);
     hkbFootIkDriverInfo(const hkbFootIkDriverInfo &);
 private:
-    struct BsFootIkDriverLeg{
-        BsFootIkDriverLeg()
+    struct hkbFootIkDriverInfoLeg{
+        hkbFootIkDriverInfoLeg()
             : footPlantedAnkleHeightMS(0),
               footRaisedAnkleHeightMS(0),
               maxAnkleHeightMS(0),
@@ -49,9 +52,11 @@ private:
         int ankleIndex;
     };
 
+    hkbFootIkDriverInfoLeg * getLegAt(int index);
+
     static uint refCount;
     static QString classname;
-    QList <BsFootIkDriverLeg> legs;
+    QList <hkbFootIkDriverInfoLeg> legs;
     qreal raycastDistanceUp;
     qreal raycastDistanceDown;
     qreal originalGroundHeightMS;

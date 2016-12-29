@@ -30,18 +30,12 @@ private slots:
     void setIStateToSetAsBind(int index);
     void setIPriorityBind(int index);
 private:
-    //void addEventToLists(const QString & name);
-    //void removeEventFromLists(int index);
-    //void renameEventInLists(const QString & newName, int index);
     void addVariableToLists(const QString & name);
     void removeVariableFromLists(int index);
     void renameVariableInLists(const QString & newName, int index);
     void addGeneratorToLists(const QString & name);
     void removeGeneratorFromLists(int index);
     void renameGeneratorInLists(const QString & name, int index);
-    //void addModifierToLists(const QString & name);
-    //void removeModifierFromLists(int index);
-    //void renameModifierInLists(const QString & name, int index);
     void loadComboBoxes();
 private:
     static QStringList headerLabels1;

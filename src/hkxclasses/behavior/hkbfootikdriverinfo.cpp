@@ -33,6 +33,23 @@ QString hkbFootIkDriverInfo::getClassname(){
     return classname;
 }
 
+void hkbFootIkDriverInfo::addLeg(){
+    legs.append(hkbFootIkDriverInfoLeg());
+}
+
+void hkbFootIkDriverInfo::removeLegAt(int index){
+    if (index >= 0 && index < legs.size()){
+        legs.removeAt(index);
+    }
+}
+
+hkbFootIkDriverInfo::hkbFootIkDriverInfoLeg * hkbFootIkDriverInfo::getLegAt(int index){
+    if (index >= 0 && index < legs.size()){
+        return &legs[index];
+    }
+    return NULL;
+}
+
 bool hkbFootIkDriverInfo::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
@@ -45,7 +62,7 @@ bool hkbFootIkDriverInfo::readData(const HkxXmlReader &reader, long index){
                 return false;
             }
             for (int j = 0; j < numlegs; j++){
-                legs.append(BsFootIkDriverLeg());
+                legs.append(hkbFootIkDriverInfoLeg());
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                     text = reader.getNthAttributeValueAt(index, 0);
                     if (text == "kneeAxisLS"){

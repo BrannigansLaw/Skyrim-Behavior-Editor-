@@ -40,7 +40,7 @@ ModifierGeneratorUI::ModifierGeneratorUI(HkxObjectTableWidget *genTable, HkxObje
     table->setColumnCount(3);
     table->setHorizontalHeaderLabels(headerLabels1);
     table->setCellWidget(0, 0, name);
-    table->setItem(0, 1, new QTableWidgetItem("String"));
+    table->setItem(0, 1, new QTableWidgetItem("hkStringPtr"));
     table->setItem(0, 2, new QTableWidgetItem("N/A"));
     table->setItem(0, 3, new QTableWidgetItem("N/A"));
     table->setItem(1, 0, new QTableWidgetItem("modifier"));

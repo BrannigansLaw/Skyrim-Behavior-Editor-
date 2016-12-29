@@ -59,7 +59,12 @@ bool hkaSkeleton::addLocalFrame(const QString & name){
 void hkaSkeleton::setLocalFrameName(int boneIndex, const QString & name){
     for (int i = 0; i < localFrames.size(); i++){
         if (boneIndex == localFrames.at(i).boneIndex && localFrames.at(i).localFrame.data() && localFrames.at(i).localFrame->getSignature() == HK_SIMPLE_LOCAL_FRAME){
-            static_cast<hkSimpleLocalFrame *>(localFrames[i].localFrame.data())->name = name;
+            if (name == ""){
+                static_cast<SkeletonFile *>(getParentFile())->localFrames.removeAll(localFrames.at(i).localFrame);
+                localFrames.removeAt(i);
+            }else{
+                static_cast<hkSimpleLocalFrame *>(localFrames[i].localFrame.data())->name = name;
+            }
             return;
         }
     }
@@ -68,6 +73,7 @@ void hkaSkeleton::setLocalFrameName(int boneIndex, const QString & name){
 bool hkaSkeleton::removeLocalFrame(int boneIndex){
     for (int i = 0; i < localFrames.size(); i++){
         if (boneIndex == localFrames.at(i).boneIndex){
+            static_cast<SkeletonFile *>(getParentFile())->localFrames.removeAll(localFrames.at(i).localFrame);
             localFrames.removeAt(i);
             return true;
         }

@@ -103,7 +103,7 @@ StateMachineUI::StateMachineUI()
     table->setHorizontalHeaderLabels(headerLabels1);
 
     table->setCellWidget(0, 0, name);
-    table->setItem(0, 1, new QTableWidgetItem("String"));
+    table->setItem(0, 1, new QTableWidgetItem("hkStringPtr"));
     table->setItem(0, 2, new QTableWidgetItem("N/A"));
     table->setItem(0, 3, new QTableWidgetItem("N/A"));
 
@@ -118,7 +118,7 @@ StateMachineUI::StateMachineUI()
     table->setCellWidget(2, 3, payload);
 
     table->setItem(3, 0, new QTableWidgetItem("startStateId"));
-    table->setItem(3, 1, new QTableWidgetItem("Int"));
+    table->setItem(3, 1, new QTableWidgetItem("hkInt32"));
     table->setCellWidget(3, 2, startStateIdBind);
     table->setCellWidget(3, 3, startStateId);
 
@@ -148,12 +148,12 @@ StateMachineUI::StateMachineUI()
     table->setCellWidget(8, 3, syncVariableIndex);
 
     table->setItem(9, 0, new QTableWidgetItem("wrapAroundStateId"));
-    table->setItem(9, 1, new QTableWidgetItem("Bool"));
+    table->setItem(9, 1, new QTableWidgetItem("hkBool"));
     table->setItem(9, 2, new QTableWidgetItem("N/A"));
     table->setCellWidget(9, 3, wrapAroundStateId);
 
     table->setItem(10, 0, new QTableWidgetItem("maxSimultaneousTransitions"));
-    table->setItem(10, 1, new QTableWidgetItem("Int"));
+    table->setItem(10, 1, new QTableWidgetItem("hkInt32"));
     table->setItem(10, 2, new QTableWidgetItem("N/A"));
     table->setCellWidget(10, 3, maxSimultaneousTransitions);
 
@@ -483,7 +483,7 @@ void StateMachineUI::addNewTransition(){
         wildcardTransitions->setRowCount(wildcardTransitions->rowCount() + 1);
         wildcardTransitions->setItem(i, 0, new QTableWidgetItem("New_Transition"));
         wildcardTransitions->setItem(i, 1, new QTableWidgetItem(transitions->getClassname()));
-        wildcardTransitions->setItem(i, 2, new QTableWidgetItem("Edit"));
+        wildcardTransitions->setItem(i, 2, new QTableWidgetItem("Click to Edit"));
         behaviorView->toggleChanged(true);
     }
 }
@@ -568,7 +568,7 @@ void StateMachineUI::loadData(HkxObject *data){
                     states->setRowCount(states->rowCount() + 1);
                     states->setItem(i, 0, new QTableWidgetItem(gen->getName()));
                     states->setItem(i, 1, new QTableWidgetItem(gen->getClassname()));
-                    states->setItem(i, 2, new QTableWidgetItem("Edit"));
+                    states->setItem(i, 2, new QTableWidgetItem("Click to Edit"));
                 }else{
                     states->setRowHidden(i, false);
                     states->item(i, 0)->setText(gen->getName());
@@ -585,7 +585,7 @@ void StateMachineUI::loadData(HkxObject *data){
                     wildcardTransitions->setRowCount(wildcardTransitions->rowCount() + 1);
                     wildcardTransitions->setItem(i, 0, new QTableWidgetItem(trans->getTransitionNameAt(i)));
                     wildcardTransitions->setItem(i, 1, new QTableWidgetItem(trans->getClassname()));
-                    wildcardTransitions->setItem(i, 2, new QTableWidgetItem("Edit"));
+                    wildcardTransitions->setItem(i, 2, new QTableWidgetItem("Click to Edit"));
                 }else{
                     wildcardTransitions->setRowHidden(i, false);
                     wildcardTransitions->item(i, 0)->setText(trans->getTransitionNameAt(i));

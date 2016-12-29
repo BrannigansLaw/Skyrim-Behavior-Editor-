@@ -31,6 +31,11 @@ protected:
     bool parse();
     bool link();
 private:
+    void addFootIK();
+    void addHandIK();
+    void disableFootIK();
+    void disableHandIK();
+private:
     SkeletonFile *skeleton;
     HkxObjectExpSharedPtr characterData;
     HkxObjectExpSharedPtr characterPropertyValues;

@@ -11,6 +11,7 @@ class hkbCharacterData: public HkxObject
     friend class BehaviorVariablesUI;
     friend class EventsUI;
     friend class CharacterPropertiesUI;
+    friend class CharacterFile;
 public:
     hkbCharacterData(HkxFile *parent, long ref = 0);
     virtual ~hkbCharacterData();

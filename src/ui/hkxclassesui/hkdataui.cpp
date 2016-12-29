@@ -148,7 +148,7 @@ void HkDataUI::viewTransition(hkbStateMachine *parent, HkTransition * transition
 }
 
 void HkDataUI::viewStateMachine(){
-    stack->setCurrentIndex(SM);
+    stack->setCurrentIndex(STATE_MACHINE);
 }
 
 void HkDataUI::setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *variables){
@@ -267,19 +267,19 @@ void HkDataUI::changeCurrentDataWidget(CustomTreeGraphicsViewIcon * icon){
             if (loadedData != oldData){
                 modGenUI->loadData(loadedData);
             }
-            stack->setCurrentIndex(MOD_GEN);
+            stack->setCurrentIndex(MODIFIER_GENERATOR);
             break;
         case HKB_MANUAL_SELECTOR_GENERATOR:
             if (loadedData != oldData){
                 manSelGenUI->loadData(loadedData);
             }
-            stack->setCurrentIndex(MSG);
+            stack->setCurrentIndex(MANUAL_SELECTOR_GENERATOR);
             break;
         case HKB_STATE_MACHINE:
             if (loadedData != oldData){
                 stateMachineUI->loadData(loadedData);
             }
-            stack->setCurrentIndex(SM);
+            stack->setCurrentIndex(STATE_MACHINE);
             break;
         default:
             stack->setCurrentIndex(NO_DATA_SELECTED);
