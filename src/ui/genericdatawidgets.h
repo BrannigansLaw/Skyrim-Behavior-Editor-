@@ -26,6 +26,7 @@ public:
     TableWidget(QWidget* parent = 0)
         : QTableWidget(parent)
     {
+        verticalHeader()->setVisible(false);
         setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
         horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -161,26 +162,27 @@ private:
     DoubleSpinBox *spinBoxW;
 };
 
-class HkxObjectTableWidget: public QWidget
+class GenericTableWidget: public QWidget
 {
     Q_OBJECT
 public:
-    HkxObjectTableWidget(const QString & title);
-    void loadTable(BehaviorFile *file, bool isGenerator = true);
+    GenericTableWidget(const QString & title);
+    void loadTable(const QStringList & list, const QString & empty);
+    void loadTable(const QStringList & names, const QStringList & types, const QString & empty);
+    void loadTable(const QStringList & names, const QString & type, const QString & empty);
     void addItem(const QString & name, const QString & type);
     void renameItem(int index, const QString & newname);
     void removeItem(int index);
-    void setSelectedRow(int row);
     int getNumRows() const;
     void setTypes(const QStringList & typeNames);
 signals:
-    void elementSelected(int index);
-    void hideWindow();
+    void elementSelected(int index, const QString & name);
     void elementAdded(int index);
 protected:
 private slots:
     void itemSelected();
     void itemAdded();
+    void showTable(int index);
 private:
     QGridLayout *lyt;
     TableWidget *table;
@@ -188,6 +190,7 @@ private:
     QPushButton *cancelPB;
     QPushButton *newPB;
     ComboBox *typeSelector;
+    int lastSelectedRow;
 };
 
 #endif // DATAWIDGETS_H

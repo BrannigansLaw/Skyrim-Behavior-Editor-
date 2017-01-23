@@ -201,49 +201,53 @@ void CustomTreeGraphicsView::deleteSelectedBranch(CustomTreeGraphicsViewIcon *ic
 }
 
 bool CustomTreeGraphicsView::reconnectBranch(DataIconManager *oldChild, DataIconManager *newChild, CustomTreeGraphicsViewIcon *icon){
-    if (!newChild || !icon){
-        return false;
-    }
-    if (icon->isGranfatherParadox(newChild)){
-        return false;
-    }
-    CustomTreeGraphicsViewIcon *oldChildIcon = NULL;
-    CustomTreeGraphicsViewIcon *newChildIcon = NULL;
-    for (int i = 0; i < icon->children.size(); i++){
-        if (icon->children.at(i)->data.data() == oldChild){
-            oldChildIcon = icon->children.at(i);
-        }
-    }
-    if (oldChildIcon){
-        for (int j =0; j < newChild->icons.size(); j++){
-            if (oldChildIcon->isDescendant(newChild->icons.at(j))){
-                newChildIcon = newChild->icons.at(j);
-                break;
+    if (newChild && icon && !icon->isGranfatherParadox(newChild)){
+        CustomTreeGraphicsViewIcon *oldChildIcon = NULL;
+        CustomTreeGraphicsViewIcon *newChildIcon = NULL;
+        int indexToInsert = -1;
+        for (int i = 0; i < icon->children.size(); i++){
+            if (icon->children.at(i)->data.data() == oldChild){
+                oldChildIcon = icon->children.at(i);
             }
         }
-    }
-    removeSelectedObjectBranch(oldChildIcon, newChildIcon, false);
-    if (!newChildIcon){
-        if (newChild->hasChildren() && !newChild->icons.isEmpty() && newChild->icons.first()->pos().y() > icon->pos().y()){
-            icon->children.append(newChild->icons.first());
-            if (newChild->icons.first()->parent){
-                newChild->icons.first()->parent->children.removeAll(newChild->icons.first());
-                initalizeAppendedIcon(newChild, newChild->icons.first()->parent);
-                newChild->icons.first()->parent = icon;
+        if (oldChildIcon){
+            for (int j =0; j < newChild->icons.size(); j++){
+                if (oldChildIcon->isDescendant(newChild->icons.at(j))){
+                    newChildIcon = newChild->icons.at(j);
+                    break;
+                }
             }
-        }else{
-            initalizeAppendedIcon(newChild, icon);
+            if (oldChildIcon->parent){
+                indexToInsert = oldChildIcon->parent->getIndexOfChild(oldChildIcon);
+            }
         }
-    }else if (!icon->hasChildIcon(newChildIcon)){
-        initalizeAppendedIcon(newChild, icon);
+        removeSelectedObjectBranch(oldChildIcon, newChildIcon, false);
+        if (icon->hasChildData(newChild)){
+            //
+        }else if (!newChildIcon){
+            if (newChild->hasChildren() && !newChild->icons.isEmpty() && newChild->icons.first()->pos().y() > icon->pos().y()){
+                icon->children.append(newChild->icons.first());
+                if (newChild->icons.first()->parent){
+                    newChild->icons.first()->parent->children.removeAll(newChild->icons.first());
+                    initalizeAppendedIcon(newChild, newChild->icons.first()->parent, indexToInsert);//->fixIconPosition();
+                    newChild->icons.first()->parent = icon;
+                }
+            }else{
+                initalizeAppendedIcon(newChild, icon, indexToInsert);//->fixIconPosition();
+            }
+        }else if (!icon->hasChildIcon(newChildIcon)){
+            initalizeAppendedIcon(newChild, icon, indexToInsert);//->fixIconPosition();
+        }
+        if (behaviorGS && !behaviorGS->items(Qt::AscendingOrder).isEmpty()){
+            CustomTreeGraphicsViewIcon *root = static_cast<CustomTreeGraphicsViewIcon *>(scene()->items(Qt::AscendingOrder).first());
+            expandBranch(root);
+            repositionIcons(root, true);
+            behaviorGS->update();
+        }
+        return true;
+    }else{
+        return false;
     }
-    if (behaviorGS && !behaviorGS->items(Qt::AscendingOrder).isEmpty()){
-        CustomTreeGraphicsViewIcon *root = static_cast<CustomTreeGraphicsViewIcon *>(scene()->items(Qt::AscendingOrder).first());
-        expandBranch(root);
-        repositionIcons(root, true);
-        behaviorGS->update();
-    }
-    return true;
 }
 
 void CustomTreeGraphicsView::removeSelectedObjectBranchSlot(){
@@ -451,11 +455,11 @@ CustomTreeGraphicsViewIcon * CustomTreeGraphicsView::initalizeInjectedIcon(DataI
     return icon;
 }
 
-CustomTreeGraphicsViewIcon * CustomTreeGraphicsView::initalizeAppendedIcon(DataIconManager *obj, CustomTreeGraphicsViewIcon * parentIcon){
+CustomTreeGraphicsViewIcon * CustomTreeGraphicsView::initalizeAppendedIcon(DataIconManager *obj, CustomTreeGraphicsViewIcon * parentIcon, int indexToInsert){
     if (!parentIcon){
         return NULL;
     }
-    CustomTreeGraphicsViewIcon *icon = new CustomTreeGraphicsViewIcon(obj, obj->getName(), parentIcon);
+    CustomTreeGraphicsViewIcon *icon = new CustomTreeGraphicsViewIcon(obj, obj->getName(), parentIcon, indexToInsert);
     //Order is important??
     behaviorGS->addItem(icon->linkToParent);
     behaviorGS->addItem(icon);

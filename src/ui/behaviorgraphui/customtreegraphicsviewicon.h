@@ -16,29 +16,33 @@ class CustomTreeGraphicsViewIcon: public QGraphicsItem
     friend class CustomTreeGraphicsView;
     friend class ModifierGeneratorUI;
     friend class MainWindow;
+    friend class DataIconManager;
 public:
-    CustomTreeGraphicsViewIcon(DataIconManager *d, const QString & s, CustomTreeGraphicsViewIcon *par = NULL);
+    CustomTreeGraphicsViewIcon(DataIconManager *d, const QString & s, CustomTreeGraphicsViewIcon *par = NULL, int indexToInsert = -1);
     virtual ~CustomTreeGraphicsViewIcon();
     QRectF boundingRect() const;
     QString getName() const;
     void unhighlight();
-    bool hasChildIcon(CustomTreeGraphicsViewIcon *child);
+    bool hasChildIcon(CustomTreeGraphicsViewIcon *child) const;
+    bool hasChildData(DataIconManager *data) const;
     CustomTreeGraphicsViewIcon* getChildIcon(HkxObject *child);
     void unselect();
     void setSelected(QGraphicsSceneMouseEvent *event = NULL);
     void setLinkCoordinates(const QLineF & line);
     bool isGranfatherParadox(CustomTreeGraphicsViewIcon *child) const;
     bool isGranfatherParadox(DataIconManager *child) const;
-    bool isDescendant(CustomTreeGraphicsViewIcon *icon);
+    bool isDescendant(CustomTreeGraphicsViewIcon *icon) const;
     void errorHighlight();
     CustomTreeGraphicsViewIcon* setParent(CustomTreeGraphicsViewIcon *newParent);
     CustomTreeGraphicsViewIcon* setParentReturnDuplicate(CustomTreeGraphicsViewIcon *newParent);
     void replaceChild(CustomTreeGraphicsViewIcon *childToReplace, CustomTreeGraphicsViewIcon *replacementChild);
+    int getIndexOfChild(CustomTreeGraphicsViewIcon *child) const;
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
 private:
     static void updateStaticMembers();
+    //void fixIconPosition();
     bool getLastIconY(CustomTreeGraphicsViewIcon *parent, qreal &lastIconY);
     void updatePosition(bool updateNonVisable = false);
 private:

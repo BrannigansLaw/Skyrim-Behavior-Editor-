@@ -8,7 +8,8 @@
 
 HkxFile::HkxFile(MainWindow *window, const QString & name)
     : QFile(name),
-      ui(window)
+      ui(window),
+      changed(false)
 {
     parse();
 }
@@ -17,6 +18,14 @@ void HkxFile::closeFile(){
     if (isOpen()){
         close();
     }
+}
+
+bool HkxFile::getIsChanged() const{
+    return changed;
+}
+
+void HkxFile::toggleChanged(bool wasEdited){
+    changed = wasEdited;
 }
 
 HkxObjectExpSharedPtr & HkxFile::getRootObject(){
@@ -48,10 +57,6 @@ bool HkxFile::appendAndReadData(int index, HkxObject *obj){
         return false;
     }
     return true;
-}
-
-MainWindow * HkxFile::getUI(){
-    return ui;
 }
 
 HkxXmlReader & HkxFile::getReader(){

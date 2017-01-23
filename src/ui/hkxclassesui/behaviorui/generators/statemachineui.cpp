@@ -280,21 +280,21 @@ void StateMachineUI::setEventToSendWhenStateOrTransitionChanges(int index){
 void StateMachineUI::setPayload(){
     if (bsData){
         bsData->payload = HkxObjectExpSharedPtr(new hkbStringEventPayload(bsData->getParentFile(), payload->text()));
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void StateMachineUI::setReturnToPreviousStateEventId(int index){
     if (bsData){
         bsData->returnToPreviousStateEventId = index - 1;
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void StateMachineUI::setStartStateId(int index){
     if (bsData && index < bsData->states.size()&& index > -1){
         bsData->startStateId = static_cast<hkbStateMachineStateInfo *>(bsData->states.at(index).data())->stateId;
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -308,7 +308,7 @@ void StateMachineUI::setStartStateIdBind(int index){
                 behaviorView->behavior->addObjectToFile(varBind);
             }
             varBind->addBinding("startStateId", index - 1);
-            behaviorView->toggleChanged(true);
+            bsData->getParentFile()->toggleChanged(true);
         }else{
             QMessageBox msg;
             msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
@@ -326,56 +326,56 @@ void StateMachineUI::setStartStateIdBind(int index){
 void StateMachineUI::setRandomTransitionEventId(int index){
     if (bsData){
         bsData->randomTransitionEventId = index - 1;
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void StateMachineUI::setTransitionToNextHigherStateEventId(int index){
     if (bsData){
         bsData->transitionToNextHigherStateEventId = index - 1;
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void StateMachineUI::setTransitionToNextLowerStateEventId(int index){
     if (bsData){
         bsData->transitionToNextLowerStateEventId = index - 1;
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void StateMachineUI::setSyncVariableIndex(int index){
     if (bsData){
         bsData->syncVariableIndex = index - 1;
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void StateMachineUI::setWrapAroundStateId(bool checked){
     if (bsData){
         bsData->wrapAroundStateId = checked;
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void StateMachineUI::setMaxSimultaneousTransitions(){
     if (bsData){
         bsData->maxSimultaneousTransitions = maxSimultaneousTransitions->value();
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void StateMachineUI::setStartStateMode(int index){
     if (bsData){
         bsData->startStateMode = bsData->StartStateMode.at(index);
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void StateMachineUI::setSelfTransitionMode(int index){
     if (bsData){
         bsData->selfTransitionMode = bsData->SelfTransitionMode.at(index);
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -395,9 +395,9 @@ void StateMachineUI::transitionSelected(int row, int column){
 void StateMachineUI::addNewStateWithGenerator(){
     if (behaviorView && bsData){
         ComboBox *genSelector = new ComboBox;
-        QStringList genList = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorNames();
-        genList.prepend("None");
-        genSelector->insertItems(0, genList);
+        //QStringList genList = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorNames();
+        //genList.prepend("None");
+        //genSelector->insertItems(0, genList);
         Type typeEnum = static_cast<Type>(typeSelectorCB->currentIndex());
         switch (typeEnum){
         case STATE_MACHINE:
@@ -446,7 +446,7 @@ void StateMachineUI::addNewStateWithGenerator(){
             states->setItem(index, 0, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->states.last().data())->getName()));
             states->setItem(index, 1, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->states.last().data())->getClassname()));
             states->setItem(index, 2, new QTableWidgetItem("Click To Edit"));
-            behaviorView->toggleChanged(true);
+            bsData->getParentFile()->toggleChanged(true);
         }
     }
 }
@@ -465,7 +465,7 @@ void StateMachineUI::removeStateWithGenerator(){
         }
         states->removeRow(index);
         behaviorView->removeGeneratorData();
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -484,7 +484,7 @@ void StateMachineUI::addNewTransition(){
         wildcardTransitions->setItem(i, 0, new QTableWidgetItem("New_Transition"));
         wildcardTransitions->setItem(i, 1, new QTableWidgetItem(transitions->getClassname()));
         wildcardTransitions->setItem(i, 2, new QTableWidgetItem("Click to Edit"));
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -496,7 +496,7 @@ void StateMachineUI::removeTransition(){
             transitions->removeTransition(i);
         }
         wildcardTransitions->removeRow(i);
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -505,7 +505,7 @@ void StateMachineUI::setName(){
     if (bsData){
         bsData->name = name->text();
         bsData->updateIconNames();
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
         emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
     }
 }

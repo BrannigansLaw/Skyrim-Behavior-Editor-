@@ -37,6 +37,7 @@ class BehaviorGraphView: public CustomTreeGraphicsView
     friend class StateUI;
     friend class TransitionsUI;
     friend class CustomTreeGraphicsViewIcon;
+    friend class BlenderGeneratorUI;
 
     friend class MainWindow;
 public:
@@ -47,7 +48,6 @@ public:
     void removeGeneratorData();
     void removeModifierData();
     void removeOtherData();
-    bool getIsChanged() const;
 signals:
     void addedGenerator(const QString & name, const QString & type);
     void addedModifier(const QString & name, const QString & type);
@@ -140,7 +140,7 @@ private:
     void enableAllMenuActions(QMenu *menu);
     void disableAllMenuActions(QMenu *menu);
     bool confirmationDialogue(const QString & message, QWidget *parent);
-    void toggleChanged(bool wasEdited);
+    CustomTreeGraphicsViewIcon * getSelectedIconsChildIcon(HkxObject *child);
 private:
     HkDataUI *ui;
     BehaviorFile *behavior;

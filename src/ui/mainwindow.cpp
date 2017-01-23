@@ -184,7 +184,7 @@ void MainWindow::save(){
     int index = tabs->currentIndex() - 1;
     if (index >= 0 && index < behaviorFiles.size() && index < behaviorGraphs.size()){
         behaviorFiles.at(index )->write();
-        behaviorGraphs.at(index)->toggleChanged(false);
+        behaviorFiles.at(index)->toggleChanged(false);
     }else{
         writeToLog("MainWindow: save() failed!\nThe tab index is out of sync with the behavior files!", true);
     }
@@ -194,7 +194,7 @@ void MainWindow::saveAll(){
     for (int i = 0; i < behaviorFiles.size(); i++){
         if (behaviorFiles.at(i) && i < behaviorGraphs.size() && behaviorGraphs.at(i)){
             behaviorFiles.at(i)->write();
-            behaviorGraphs.at(i)->toggleChanged(false);
+            behaviorFiles.at(i)->toggleChanged(false);
         }else{
             writeToLog("MainWindow: save() failed!\nThe tab index is out of sync with the behavior files or a NULL pointer in either the behavior or behavior graph list was encountered!", true);
         }
@@ -206,7 +206,7 @@ void MainWindow::closeTab(int index){
         closeAll();
     }else{
         index--;
-        if (index >= 0 && index < behaviorGraphs.size() && (!behaviorGraphs.at(index)->getIsChanged() || closeFileDialogue() != QMessageBox::Cancel)){
+        if (index >= 0 && index < behaviorGraphs.size() && (!behaviorFiles.at(index)->getIsChanged() || closeFileDialogue() != QMessageBox::Cancel)){
             if (index < behaviorFiles.size()){
                 if (behaviorGraphs.at(index)){
                     delete behaviorGraphs.at(index);
@@ -223,7 +223,7 @@ void MainWindow::closeTab(int index){
 
 bool MainWindow::closeAll(){
     for (int i = 0; i < behaviorGraphs.size(); i++){
-        if (behaviorGraphs.at(i)->getIsChanged()){
+        if (behaviorFiles.at(i)->getIsChanged()){
             if (closeAllDialogue() != QMessageBox::Cancel){
                 tabs->clear();
                 for (int j = 0; j < behaviorGraphs.size(); j++){

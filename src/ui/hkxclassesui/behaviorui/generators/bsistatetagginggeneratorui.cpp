@@ -107,7 +107,7 @@ void BSiStateTaggingGeneratorUI::setName(){
     if (bsData){
         bsData->name = name->text();
         bsData->updateIconNames();
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
         emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
     }
 }
@@ -115,14 +115,14 @@ void BSiStateTaggingGeneratorUI::setName(){
 void BSiStateTaggingGeneratorUI::setIStateToSetAs(){
     if (bsData){
         bsData->iStateToSetAs = iStateToSetAs->value();
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void BSiStateTaggingGeneratorUI::setIPriority(){
     if (bsData){
         bsData->iPriority = iPriority->value();
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -136,7 +136,7 @@ void BSiStateTaggingGeneratorUI::setIStateToSetAsBind(int index){
                 behaviorView->behavior->addObjectToFile(varBind);
             }
             varBind->addBinding("iStateToSetAs", index - 1);
-            behaviorView->toggleChanged(true);
+            bsData->getParentFile()->toggleChanged(true);
         }else{
             QMessageBox msg;
             msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
@@ -161,7 +161,7 @@ void BSiStateTaggingGeneratorUI::setIPriorityBind(int index){
                 behaviorView->behavior->addObjectToFile(varBind);
             }
             varBind->addBinding("iPriority", index - 1);
-            behaviorView->toggleChanged(true);
+            bsData->getParentFile()->toggleChanged(true);
         }else{
             QMessageBox msg;
             msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
@@ -191,15 +191,15 @@ void BSiStateTaggingGeneratorUI::setDefaultGenerator(int index){
         if (index > 0){
             bsData->pDefaultGenerator = HkxObjectExpSharedPtr(ptr);
             behaviorView->removeGeneratorData();
-            behaviorView->toggleChanged(true);
+            bsData->getParentFile()->toggleChanged(true);
         }
     }
 }
 
 void BSiStateTaggingGeneratorUI::loadComboBoxes(){
-    QStringList genList = behaviorView->behavior->getGeneratorNames();
-    genList.prepend("None");
-    pDefaultGenerator->insertItems(0, genList);
+    //QStringList genList = behaviorView->behavior->getGeneratorNames();
+    //genList.prepend("None");
+    //pDefaultGenerator->insertItems(0, genList);
 }
 
 void BSiStateTaggingGeneratorUI::loadData(HkxObject *data){

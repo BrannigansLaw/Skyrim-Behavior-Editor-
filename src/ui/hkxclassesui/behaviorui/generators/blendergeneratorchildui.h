@@ -3,7 +3,9 @@
 
 #include <QGroupBox>
 
-class QuadVariableWidget;
+#include "src/utility.h"
+
+class BoneWeightArrayUI;
 class TableWidget;
 class hkbBlenderGeneratorChild;
 class QVBoxLayout;
@@ -13,49 +15,46 @@ class QCheckBox;
 class QStackedLayout;
 class ComboBox;
 class QPushButton;
+class BehaviorGraphView;
 
 class BlenderGeneratorChildUI: public QGroupBox
 {
     Q_OBJECT
-    //friend class HkDataUI;
+    friend class BlenderGeneratorUI;
 public:
     BlenderGeneratorChildUI();
     virtual ~BlenderGeneratorChildUI(){}
-    void loadData(hkbFootIkDriverInfoLeg *data);
+    void loadData(HkxObject *data);
 signals:
+    void viewVariables(int index);
+    void viewGenerators(int index);
+    void viewProperties(int index);
     void returnToParent();
 private slots:
-    void setKneeAxisLS();
-    void setFootEndLS();
-    void setFootPlantedAnkleHeightMS();
-    void setFootRaisedAnkleHeightMS();
-    void setMaxAnkleHeightMS();
-    void setMinAnkleHeightMS();
-    void setMaxKneeAngleDegrees();
-    void setMinKneeAngleDegrees();
-    void setMaxAnkleAngleDegrees();
-    void setHipIndex(int index);
-    void setKneeIndex(int index);
-    void setAnkleIndex(int index);
+    void setBindingVariable(int index, const QString & name);
+    void setWeight();
+    void setWorldFromModelWeight();
+    void setGenerator(int index, const QString & name);
+    void viewSelected(int row, int column);
+    void returnToWidget();
 private:
-    static QStringList headerLabels1;
+    void variableRenamed(const QString & name, int index);
+    void setBehaviorView(BehaviorGraphView *view);
+    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type);
+private:
+    enum ACTIVE_WIDGET {
+        MAIN_WIDGET = 0,
+        CHILD_WIDGET = 1
+    };
+    static QStringList headerLabels;
+    BehaviorGraphView *behaviorView;
     hkbBlenderGeneratorChild *bsData;
-    QVBoxLayout *lyt;
     QStackedLayout *stackLyt;
     QPushButton *returnPB;
     TableWidget *table;
-    QuadVariableWidget *kneeAxisLS;
-    QuadVariableWidget *footEndLS;
-    DoubleSpinBox *footPlantedAnkleHeightMS;
-    DoubleSpinBox *footRaisedAnkleHeightMS;
-    DoubleSpinBox *maxAnkleHeightMS;
-    DoubleSpinBox *minAnkleHeightMS;
-    DoubleSpinBox *maxKneeAngleDegrees;
-    DoubleSpinBox *minKneeAngleDegrees;
-    DoubleSpinBox *maxAnkleAngleDegrees;
-    ComboBox *hipIndex;
-    ComboBox *kneeIndex;
-    ComboBox *ankleIndex;
+    BoneWeightArrayUI *boneWeights;
+    DoubleSpinBox *weight;
+    DoubleSpinBox *worldFromModelWeight;
 };
 
 #endif // BLENDERGENERATORCHILDUI_H

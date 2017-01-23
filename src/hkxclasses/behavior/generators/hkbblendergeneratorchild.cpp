@@ -1,4 +1,5 @@
 #include "hkbblendergeneratorchild.h"
+#include "hkbblendergenerator.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 /*
@@ -9,10 +10,11 @@ uint hkbBlenderGeneratorChild::refCount = 0;
 
 QString hkbBlenderGeneratorChild::classname = "hkbBlenderGeneratorChild";
 
-hkbBlenderGeneratorChild::hkbBlenderGeneratorChild(HkxFile *parent, long ref)
+hkbBlenderGeneratorChild::hkbBlenderGeneratorChild(HkxFile *parent, hkbGenerator *parentBG, long ref)
     : hkbGenerator(parent, ref),
       weight(0),
-      worldFromModelWeight(0)
+      worldFromModelWeight(0),
+      parentBG(parentBG)
 {
     setType(HKB_BLENDER_GENERATOR_CHILD, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
@@ -21,6 +23,13 @@ hkbBlenderGeneratorChild::hkbBlenderGeneratorChild(HkxFile *parent, long ref)
 
 QString hkbBlenderGeneratorChild::getClassname(){
     return classname;
+}
+
+hkbGenerator * hkbBlenderGeneratorChild::getParentGenerator() const{
+    if (parentBG.data() && (parentBG.data()->getSignature() == HKB_BLENDER_GENERATOR || parentBG.data()->getSignature() == HKB_POSE_MATCHING_GENERATOR)){
+        return reinterpret_cast<hkbGenerator *>(parentBG.data());
+    }
+    return NULL;
 }
 
 bool hkbBlenderGeneratorChild::readData(const HkxXmlReader &reader, long index){

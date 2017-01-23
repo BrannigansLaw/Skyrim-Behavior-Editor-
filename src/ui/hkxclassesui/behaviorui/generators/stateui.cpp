@@ -45,7 +45,7 @@ QStringList StateUI::headerLabels3 = {
 };
 
 StateUI::StateUI()
-    : generatorTable(new HkxObjectTableWidget("Select a hkbGenerator!")),
+    : generatorTable(new GenericTableWidget("Select a hkbGenerator!")),
       behaviorView(NULL),
       bsData(NULL),
       lyt(new QVBoxLayout),
@@ -141,7 +141,7 @@ StateUI::StateUI()
     connect(transitions, SIGNAL(cellClicked(int,int)), this, SLOT(transitionSelected(int,int)));
 }
 
-/*void StateUI::setGeneratorTable(HkxObjectTableWidget *genTable){
+/*void StateUI::setGeneratorTable(GenericTableWidget *genTable){
     if (genTable){
         generatorTable = genTable;
         connect(generatorTable, SIGNAL(elementSelected(int)), this, SLOT(setGenerator(int)));
@@ -219,7 +219,7 @@ void StateUI::renameEventInLists(const QString & newName, int index){
 void StateUI::setName(){
     if (bsData){
         bsData->name = name->text();
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
         emit stateNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
     }
 }
@@ -227,21 +227,21 @@ void StateUI::setName(){
 void StateUI::setStateId(){
     if (bsData){
         bsData->stateId = stateId->value();
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void StateUI::setProbability(){
     if (bsData){
         bsData->probability = probability->value();
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void StateUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -258,7 +258,7 @@ void StateUI::addEnterEvent(){
             bsData->enterNotifyEvents = HkxObjectExpSharedPtr(events);
         }
         appendEnterEventTableRow(events->getLastEventIndex(), events, eventList);
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -266,7 +266,7 @@ void StateUI::setEnterEventAt(int index){
     if (bsData){
         hkbStateMachineEventPropertyArray *events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
         events->setEventId(index, static_cast<ComboBox *>(enterNotifyEvents->cellWidget(index, 0))->currentIndex() - 1);
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -287,7 +287,7 @@ void StateUI::setEnterEventPayloadAt(int index){
                 events->events[index].payload = HkxObjectExpSharedPtr(new hkbStringEventPayload(bsData->getParentFile(), text));
             }
         }
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -304,7 +304,7 @@ void StateUI::removeEnterEvent(){
         enterNotifyEvents->removeRow(index);
     }
     enterNotifyEvents->blockSignals(false);
-    behaviorView->toggleChanged(true);
+    bsData->getParentFile()->toggleChanged(true);
 }
 
 void StateUI::addExitEvent(){
@@ -320,7 +320,7 @@ void StateUI::addExitEvent(){
             bsData->exitNotifyEvents = HkxObjectExpSharedPtr(events);
         }
         appendExitEventTableRow(events->getLastEventIndex(), events, eventList);
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -328,7 +328,7 @@ void StateUI::setExitEventAt(int index){
     if (bsData){
         hkbStateMachineEventPropertyArray *events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
         events->setEventId(index, static_cast<ComboBox *>(exitNotifyEvents->cellWidget(index, 0))->currentIndex() - 1);
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -349,7 +349,7 @@ void StateUI::setExitEventPayloadAt(int index){
                 events->events[index].payload = HkxObjectExpSharedPtr(new hkbStringEventPayload(bsData->getParentFile(), text));
             }
         }
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -366,7 +366,7 @@ void StateUI::removeExitEvent(){
         exitNotifyEvents->removeRow(index);
     }
     exitNotifyEvents->blockSignals(false);
-    behaviorView->toggleChanged(true);
+    bsData->getParentFile()->toggleChanged(true);
 }
 
 void StateUI::addTransition(){
@@ -384,7 +384,7 @@ void StateUI::addTransition(){
         transitions->setItem(i, 0, new QTableWidgetItem("New_Transition"));
         transitions->setItem(i, 1, new QTableWidgetItem(trans->getClassname()));
         transitions->setItem(i, 2, new QTableWidgetItem("Click to Edit"));
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -396,7 +396,7 @@ void StateUI::removeTransition(){
             trans->removeTransition(i);
         }
         transitions->removeRow(i);
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -424,7 +424,7 @@ void StateUI::setGenerator(int index){
         if (index > 0){
             bsData->generator = HkxObjectExpSharedPtr(ptr);
             behaviorView->removeGeneratorData();
-            behaviorView->toggleChanged(true);
+            bsData->getParentFile()->toggleChanged(true);
         }
     }
     generatorTable->hide();
@@ -509,7 +509,7 @@ void StateUI::loadData(HkxObject *data){
         QStringList eventList = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNames();
         eventList.prepend("None");
         if (generatorTable->getNumRows() < 1){
-            generatorTable->loadTable(static_cast<BehaviorFile *>(bsData->getParentFile()));
+            generatorTable->loadTable(static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorNamesAndTypeNames(), "NULL");
         }
         if (enterEvents){
             for (int i = 0; i < enterEvents->events.size(); i++){

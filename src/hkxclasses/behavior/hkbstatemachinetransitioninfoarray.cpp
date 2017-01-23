@@ -90,11 +90,12 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
+    int numtrans = 0;
     INTERVAL_TYPE intervalType = NONE;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "transitions"){
-            int numtrans = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            numtrans = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
                 return false;
             }

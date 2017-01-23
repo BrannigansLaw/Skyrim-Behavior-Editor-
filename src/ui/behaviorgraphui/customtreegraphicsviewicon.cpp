@@ -55,10 +55,17 @@ void CustomTreeGraphicsViewIcon::updateStaticMembers(){
                 << QPointF(boundingRectangle.topLeft().x() + boundingRectangle.width() * 0.2, boundingRectangle.topLeft().y() + \
                           boundingRectangle.height() * 0.5)
                 << QPointF(boundingRectangle.topLeft().x() + boundingRectangle.width() * 0.1, boundingRectangle.topLeft().y() + \
-                          boundingRectangle.height() * 0.1);
+                           boundingRectangle.height() * 0.1);
 }
 
-CustomTreeGraphicsViewIcon::CustomTreeGraphicsViewIcon(DataIconManager *d, const QString & s, CustomTreeGraphicsViewIcon * par)
+/*void CustomTreeGraphicsViewIcon::fixIconPosition(){
+    DataIconManager *d = static_cast<DataIconManager *>(data.data());
+    if (d){
+        d->swapIconPosition();
+    }
+}*/
+
+CustomTreeGraphicsViewIcon::CustomTreeGraphicsViewIcon(DataIconManager *d, const QString & s, CustomTreeGraphicsViewIcon * par, int indexToInsert)
     : data(HkxObjectExpSharedPtr(d)),
       name(s),
       isExpanded(true),
@@ -89,17 +96,17 @@ CustomTreeGraphicsViewIcon::CustomTreeGraphicsViewIcon(DataIconManager *d, const
         qreal lastY = 0;
         getLastIconY(parent, lastY);
         if (!parent->children.contains(this)){
-            int index = static_cast<DataIconManager *>(parent->data.data())->getIndexToInsertIcon(data.data());
-            if (index > -1 && index < parent->children.size()){
-                parent->children.insert(index, this);
+            if (indexToInsert >= 0 && indexToInsert < parent->children.size()){
+                parent->children.insert(indexToInsert, this);
             }else{
-                parent->children.append(this);
+                indexToInsert = static_cast<DataIconManager *>(parent->data.data())->getIndexToInsertIcon(data.data());
+                if (indexToInsert > -1 && indexToInsert < parent->children.size()){
+                    parent->children.insert(indexToInsert, this);
+                }else{
+                    parent->children.append(this);
+                }
             }
         }
-        /*int index = parent->children.indexOf(this);
-        if (index == -1){
-            parent->children.append(this);
-        }*/
         linkToParent = new QGraphicsLineItem(parent->pos().x() + parent->boundingRect().width(), parent->pos().y() + 1.0*parent->boundingRect().height(),
                                              parent->pos().x() + ICON_SPACING_X*parent->boundingRect().width(), lastY + ICON_SPACING*boundingRect().height());
         setPos(parent->pos().x() + ICON_SPACING_X*parent->boundingRect().width(), lastY + ICON_SPACING*boundingRect().height());
@@ -122,9 +129,18 @@ void CustomTreeGraphicsViewIcon::unhighlight(){
     }
 }
 
-bool CustomTreeGraphicsViewIcon::hasChildIcon(CustomTreeGraphicsViewIcon *child){
+bool CustomTreeGraphicsViewIcon::hasChildIcon(CustomTreeGraphicsViewIcon *child) const{
     if (children.contains(child)){
         return true;
+    }
+    return false;
+}
+
+bool CustomTreeGraphicsViewIcon::hasChildData(DataIconManager *data) const{
+    for (int i = 0; i < children.size(); i++){
+        if (children.at(i)->data.data() == data){
+            return true;
+        }
     }
     return false;
 }
@@ -333,7 +349,7 @@ bool CustomTreeGraphicsViewIcon::isGranfatherParadox(DataIconManager *child) con
     return false;
 }
 
-bool CustomTreeGraphicsViewIcon::isDescendant(CustomTreeGraphicsViewIcon *icon){
+bool CustomTreeGraphicsViewIcon::isDescendant(CustomTreeGraphicsViewIcon *icon) const{
     if (icon){
         for (int i = 0; i < children.size(); i++){
             if (children.at(i) == icon){
@@ -444,6 +460,15 @@ void CustomTreeGraphicsViewIcon::replaceChild(CustomTreeGraphicsViewIcon *childT
             childToReplace->setParent(replacementChild);
         }
     }
+}
+
+int CustomTreeGraphicsViewIcon::getIndexOfChild(CustomTreeGraphicsViewIcon *child) const{
+    for (int i = 0; i < children.size(); i++){
+        if (children.at(i) == child){
+            return i;
+        }
+    }
+    return -1;
 }
 
 CustomTreeGraphicsViewIcon::~CustomTreeGraphicsViewIcon(){

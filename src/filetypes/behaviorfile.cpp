@@ -133,7 +133,7 @@ QStringList BehaviorFile::getRagdollBoneNames() const{
     return QStringList();
 }
 
-CustomTreeGraphicsViewIcon * BehaviorFile::getRootIcon() const{
+/*CustomTreeGraphicsViewIcon * BehaviorFile::getRootIcon() const{
     hkRootLevelContainer *root = static_cast<hkRootLevelContainer *>(rootObject.data());
     hkbBehaviorGraph *graph = NULL;
     if (!root->namedVariants.isEmpty() && root->namedVariants.at(0).variant.data() && root->namedVariants.at(0).variant.data()->getSignature() == HKB_BEHAVIOR_GRAPH){
@@ -146,7 +146,7 @@ CustomTreeGraphicsViewIcon * BehaviorFile::getRootIcon() const{
         }
     }
     return NULL;
-}
+}*/
 
 bool BehaviorFile::addObjectToFile(HkxObject *obj, long ref){
     if (ref > largestRef){
@@ -242,7 +242,7 @@ bool BehaviorFile::parse(){
                         return false;
                     }
                 }else if (signature == HKB_BLENDER_GENERATOR_CHILD){
-                    if (!appendAndReadData(index, new hkbBlenderGeneratorChild(this, ref))){
+                    if (!appendAndReadData(index, new hkbBlenderGeneratorChild(this, NULL, ref))){
                         return false;
                     }
                 }else if (signature == HKB_BONE_WEIGHT_ARRAY){
@@ -693,6 +693,24 @@ HkxObjectExpSharedPtr * BehaviorFile::findHkxObject(long ref){
     return NULL;
 }
 
+void BehaviorFile::addCharacterProperty(int index){
+    static_cast<hkbBehaviorGraphData *>(graphData.data())->addVariable(character->getCharacterPropertyTypeAt(index), character->getCharacterPropertyNameAt(index), true);
+}
+
+QString BehaviorFile::getVariableNameAt(int index) const{
+    if (stringData.data()){
+        return static_cast<hkbBehaviorGraphStringData *>(stringData.data())->getVariableNameAt(index);
+    }
+    return "";
+}
+
+QString BehaviorFile::getCharacterPropertyNameAt(int index) const{
+    if (character){
+        return character->getCharacterPropertyNameAt(index);
+    }
+    return "";
+}
+
 void BehaviorFile::removeBindings(int varIndex){
     for (int i = 0; i < otherTypes.size(); i++){
         if (otherTypes.at(i).data()->getSignature() == HKB_VARIABLE_BINDING_SET){
@@ -786,6 +804,13 @@ QStringList BehaviorFile::getModifierNamesAndTypeNames() const{
     return list;
 }
 
+QStringList BehaviorFile::getCharacterPropertyNames() const{
+    if (character){
+        return character->getCharacterPropertyNames();
+    }
+    return QStringList();
+}
+
 QStringList BehaviorFile::getAllReferencedBehaviorFilePaths() const{
     QStringList list;
     hkbBehaviorReferenceGenerator *ptr = NULL;
@@ -840,6 +865,19 @@ hkbModifier* BehaviorFile::getModifierDataAt(int index){
         return static_cast<hkbModifier *>(modifiers[index].data());
     }
     return NULL;
+}
+
+QStringList BehaviorFile::getVariableTypenames() const{
+    if (graphData.data()){
+        return static_cast<hkbBehaviorGraphData *>(graphData.data())->getVariableTypeNames();
+    }
+}
+
+QStringList BehaviorFile::getCharacterPropertyTypenames() const{
+    if (character){
+        return static_cast<CharacterFile *>(character)->getCharacterPropertyTypenames();
+    }
+    return QStringList();
 }
 
 QStringList BehaviorFile::getVariableNames() const{

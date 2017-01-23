@@ -315,42 +315,49 @@ void BehaviorVariablesUI::loadData(HkxObject *data){
 void BehaviorVariablesUI::addVariable(){
     int type = typeSelector->currentIndex();
     hkVariableType varType;
+    QString typeString;
     hkbBehaviorGraphStringData *vars = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
     switch (type){
     case VARIABLE_TYPE_BOOL:
         varType = hkVariableType::VARIABLE_TYPE_BOOL;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_BOOL");
+        typeString = "VARIABLE_TYPE_BOOL";
+        addVariableToTable(vars->variableNames.last(), typeString);
         break;
     case VARIABLE_TYPE_INT32:
         varType = hkVariableType::VARIABLE_TYPE_INT32;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_INT32");
+        typeString = "VARIABLE_TYPE_INT32";
+        addVariableToTable(vars->variableNames.last(), typeString);
         break;
     case VARIABLE_TYPE_REAL:
         varType = hkVariableType::VARIABLE_TYPE_REAL;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_REAL");
+        typeString = "VARIABLE_TYPE_REAL";
+        addVariableToTable(vars->variableNames.last(), typeString);
         break;
     case VARIABLE_TYPE_POINTER:
         varType = hkVariableType::VARIABLE_TYPE_POINTER;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_POINTER");
+        typeString = "VARIABLE_TYPE_POINTER";
+        addVariableToTable(vars->variableNames.last(), typeString);
         break;
     case VARIABLE_TYPE_VECTOR4:
         varType = hkVariableType::VARIABLE_TYPE_VECTOR4;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_VECTOR4");
+        typeString = "VARIABLE_TYPE_VECTOR4";
+        addVariableToTable(vars->variableNames.last(), typeString);
         break;
     case VARIABLE_TYPE_QUATERNION:
         varType = hkVariableType::VARIABLE_TYPE_QUATERNION;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->variableNames.last(), "VARIABLE_TYPE_QUATERNION");
+        typeString = "VARIABLE_TYPE_QUATERNION";
+        addVariableToTable(vars->variableNames.last(), typeString);
         break;
     default:
         return;
     }
-    emit variableAdded(vars->variableNames.last());
+    emit variableAdded(vars->variableNames.last(), typeString);
 }
 
 void BehaviorVariablesUI::removeVariable(){

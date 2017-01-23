@@ -120,84 +120,84 @@ void FootIkDriverInfoLegUI::loadData(hkbFootIkDriverInfoLeg *data){
 void FootIkDriverInfoLegUI::setKneeAxisLS(){
     if (bsData){
         bsData->kneeAxisLS = kneeAxisLS->getValue();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setFootEndLS(){
     if (bsData){
         bsData->footEndLS = footEndLS->getValue();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setFootPlantedAnkleHeightMS(){
     if (bsData){
         bsData->footPlantedAnkleHeightMS = footPlantedAnkleHeightMS->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setFootRaisedAnkleHeightMS(){
     if (bsData){
         bsData->footRaisedAnkleHeightMS = footRaisedAnkleHeightMS->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setMaxAnkleHeightMS(){
     if (bsData){
         bsData->maxAnkleHeightMS = maxAnkleHeightMS->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setMinAnkleHeightMS(){
     if (bsData){
         bsData->minAnkleHeightMS = minAnkleHeightMS->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setMaxKneeAngleDegrees(){
     if (bsData){
         bsData->maxKneeAngleDegrees = maxKneeAngleDegrees->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setMinKneeAngleDegrees(){
     if (bsData){
         bsData->minKneeAngleDegrees = minKneeAngleDegrees->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setMaxAnkleAngleDegrees(){
     if (bsData){
         bsData->maxAnkleAngleDegrees = maxAnkleAngleDegrees->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setHipIndex(int index){
     if (bsData){
         bsData->hipIndex = index - 1;
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setKneeIndex(int index){
     if (bsData){
         bsData->kneeIndex = index - 1;
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setAnkleIndex(int index){
     if (bsData){
         bsData->ankleIndex = index - 1;
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 

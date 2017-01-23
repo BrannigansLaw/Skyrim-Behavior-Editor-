@@ -128,7 +128,8 @@ bool BSBoneSwitchGenerator::removeObject(DataIconManager *objToRemove, bool remo
         for (int i = 0; i < ChildrenA.size(); i++){
             child = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data());
             if (child->pGenerator.data() == objToRemove){
-                child->pGenerator = HkxObjectExpSharedPtr();
+                ChildrenA.removeAt(i);
+                i--;
             }
         }
     }else{
@@ -140,7 +141,7 @@ bool BSBoneSwitchGenerator::removeObject(DataIconManager *objToRemove, bool remo
         for (int i = 0; i < ChildrenA.size(); i++){
             child = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data());
             if (child->pGenerator.data() == objToRemove){
-                child->pGenerator = HkxObjectExpSharedPtr();
+                ChildrenA.removeAt(i);
                 return true;
             }
         }

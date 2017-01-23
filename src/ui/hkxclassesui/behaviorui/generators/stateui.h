@@ -25,7 +25,7 @@ class QStackedLayout;
 class HkTransition;
 class hkbStateMachineEventPropertyArray;
 class hkbStateMachine;
-class HkxObjectTableWidget;
+class GenericTableWidget;
 
 class StateUI: public QGroupBox
 {
@@ -36,7 +36,7 @@ public:
     StateUI();
     virtual ~StateUI(){}
     void loadData(HkxObject *data);
-    //void setGeneratorTable(HkxObjectTableWidget *genTable);
+    //void setGeneratorTable(GenericTableWidget *genTable);
 signals:
     void stateNameChanged(const QString & newName, int index);
     void toParentStateMachine();
@@ -70,7 +70,7 @@ private:
     static QStringList headerLabels1;
     static QStringList headerLabels2;
     static QStringList headerLabels3;
-    HkxObjectTableWidget *generatorTable;
+    GenericTableWidget *generatorTable;
     BehaviorGraphView *behaviorView;
     hkbStateMachineStateInfo *bsData;
     QVBoxLayout *lyt;

@@ -21,7 +21,7 @@ CharacterFile::CharacterFile(MainWindow *window, const QString & name)
 }
 
 HkxObjectExpSharedPtr * CharacterFile::findCharacterData(long ref){
-    if (characterData.getReference() == ref){
+    if (characterData->getReference() == ref){
         return &characterData;
     }
     return NULL;
@@ -86,6 +86,22 @@ QStringList CharacterFile::getAnimationNames() const{
         return static_cast<hkbCharacterStringData *>(stringData.data())->getAnimationNames();
     }
     return QStringList();
+}
+
+QString CharacterFile::getCharacterPropertyNameAt(int index) const{
+    return static_cast<hkbCharacterStringData *>(stringData.data())->getCharacterPropertyNameAt(index);
+}
+
+QStringList CharacterFile::getCharacterPropertyNames() const{
+    return static_cast<hkbCharacterData *>(characterData.data())->getCharacterPropertyNames();
+}
+
+QStringList CharacterFile::getCharacterPropertyTypenames() const{
+    return static_cast<hkbCharacterData *>(characterData.data())->getCharacterPropertyTypenames();
+}
+
+hkVariableType CharacterFile::getCharacterPropertyTypeAt(int index) const{
+    return static_cast<hkbCharacterData *>(characterData.data())->getCharacterPropertyTypeAt(index);
 }
 
 void CharacterFile::setSkeletonFile(SkeletonFile *skel){

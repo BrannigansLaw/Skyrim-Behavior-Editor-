@@ -361,14 +361,6 @@ void BehaviorGraphView::writeToLog(const QString &message, bool isError){
     behavior->writeToLog(message, isError);
 }
 
-bool BehaviorGraphView::getIsChanged() const{
-    return changed;
-}
-
-void BehaviorGraphView::toggleChanged(bool wasEdited){
-    changed = wasEdited;
-}
-
 bool BehaviorGraphView::confirmationDialogue(const QString & message, QWidget *parent){
     QMessageBox::StandardButton ret;
     ret = QMessageBox::warning(parent, "Skyrim Behavior Tool", message, QMessageBox::Yes | QMessageBox::Cancel);
@@ -378,6 +370,13 @@ bool BehaviorGraphView::confirmationDialogue(const QString & message, QWidget *p
         return false;
     }
     return false;
+}
+
+CustomTreeGraphicsViewIcon * BehaviorGraphView::getSelectedIconsChildIcon(HkxObject *child){
+    if (selectedIcon){
+        return selectedIcon->getChildIcon(child);
+    }
+    return NULL;
 }
 
 QStringList BehaviorGraphView::getEventNames() const{
@@ -718,7 +717,7 @@ void BehaviorGraphView::wrap(hkbStateMachine *obj){
 
 void BehaviorGraphView::wrap(hkbBlenderGenerator *obj){
     if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
-        hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior);
+        hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior, obj, -1);
         obj->children.append(HkxObjectExpSharedPtr(blendChild));
         wrapObject(obj, selectedIcon);
         changed = true;
@@ -728,7 +727,7 @@ void BehaviorGraphView::wrap(hkbBlenderGenerator *obj){
 
 void BehaviorGraphView::wrap(hkbPoseMatchingGenerator *obj){
     if (selectedIcon && selectedIcon->parent && selectedIcon->parent->data.constData()){
-        hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior);
+        hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior, obj, -1);
         obj->children.append(HkxObjectExpSharedPtr(blendChild));
         wrapObject(obj, selectedIcon);
         changed = true;

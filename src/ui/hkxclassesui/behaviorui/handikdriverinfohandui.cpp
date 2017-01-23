@@ -133,98 +133,98 @@ void HandIkDriverInfoHandUI::loadData(hkbHandIkDriverInfoHand *data){
 void HandIkDriverInfoHandUI::setElbowAxisLS(){
     if (bsData){
         bsData->elbowAxisLS = elbowAxisLS->getValue();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void HandIkDriverInfoHandUI::setBackHandNormalLS(){
     if (bsData){
         bsData->backHandNormalLS = backHandNormalLS->getValue();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void HandIkDriverInfoHandUI::setHandOffsetLS(){
     if (bsData){
         bsData->handOffsetLS = handOffsetLS->getValue();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void HandIkDriverInfoHandUI::setHandOrienationOffsetLS(){
     if (bsData){
         bsData->handOrienationOffsetLS = handOrienationOffsetLS->getValue();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void HandIkDriverInfoHandUI::setMaxElbowAngleDegrees(){
     if (bsData){
         bsData->maxElbowAngleDegrees = maxElbowAngleDegrees->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void HandIkDriverInfoHandUI::setMinElbowAngleDegrees(){
     if (bsData){
         bsData->minElbowAngleDegrees = minElbowAngleDegrees->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void HandIkDriverInfoHandUI::setShoulderIndex(int index){
     if (bsData){
         bsData->shoulderIndex = index - 1;
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void HandIkDriverInfoHandUI::setShoulderSiblingIndex(int index){
     if (bsData){
         bsData->shoulderSiblingIndex = index - 1;
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void HandIkDriverInfoHandUI::setElbowIndex(int index){
     if (bsData){
         bsData->elbowIndex = index - 1;
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void HandIkDriverInfoHandUI::setElbowSiblingIndex(int index){
     if (bsData){
         bsData->elbowSiblingIndex = index - 1;
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void HandIkDriverInfoHandUI::setWristIndex(int index){
     if (bsData){
         bsData->wristIndex = index - 1;
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void HandIkDriverInfoHandUI::setEnforceEndPosition(){
     if (bsData){
         bsData->enforceEndPosition = enforceEndPosition->isChecked();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void HandIkDriverInfoHandUI::setEnforceEndRotation(){
     if (bsData){
         bsData->enforceEndRotation = enforceEndRotation->isChecked();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void HandIkDriverInfoHandUI::setLocalFrameName(){
     if (bsData){
         bsData->localFrameName = localFrameName->text();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 

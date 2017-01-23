@@ -5,6 +5,7 @@
 
 class hkbBehaviorGraph;
 class CharacterFile;
+class hkbModifier;
 
 class BehaviorFile: public HkxFile
 {
@@ -12,6 +13,7 @@ class BehaviorFile: public HkxFile
     friend class BehaviorGraphView;
     friend class hkbBehaviorGraph;
     friend class MainWindow;
+    friend class HkDataUI;
 public:
     BehaviorFile(MainWindow *window, CharacterFile *characterData, const QString & name);
     virtual ~BehaviorFile();
@@ -29,28 +31,31 @@ public:
     int getIndexOfModifier(const HkxObjectExpSharedPtr & obj) const;
     bool setModifierData(HkxObjectExpSharedPtr & ptrToSet, int index);
     hkbModifier * getModifierDataAt(int index);
-    QStringList getVariableNames() const;
+    QStringList getVariableTypenames() const;
     QStringList getEventNames() const;
+    QStringList getVariableNames() const;
     QStringList getGeneratorNamesAndTypeNames() const;
     QStringList getModifierNamesAndTypeNames() const;
-    HkxObject * getBehaviorGraphData() const;
-    hkbBehaviorGraph * getBehaviorGraph() const;
-    HkxObject * getRootStateMachine() const;
-    void removeBindings(int varIndex);
+    QStringList getCharacterPropertyNames() const;
+    QStringList getCharacterPropertyTypenames() const;
     hkVariableType getVariableTypeAt(int index) const;
     bool addObjectToFile(HkxObject *obj, long ref = -1);
-    //For compatability for now... will be removed later...
-    QStringList getGeneratorNames(){return QStringList();}
-    QStringList getModifierNames(){return QStringList();}
-    //
-    void write();
-    CustomTreeGraphicsViewIcon * getRootIcon() const;
     QStringList getAllReferencedBehaviorFilePaths() const;
     QStringList getRagdollBoneNames() const;
     QStringList getRigBoneNames() const;
+    void addCharacterProperty(int index);
+    QString getVariableNameAt(int index) const;
+    QString getCharacterPropertyNameAt(int index) const;
 protected:
     bool parse();
     bool link();
+private:
+    HkxObject * getBehaviorGraphData() const;
+    hkbBehaviorGraph * getBehaviorGraph() const;
+    HkxObject * getRootStateMachine() const;
+    //CustomTreeGraphicsViewIcon * getRootIcon() const;
+    void write();
+    void removeBindings(int varIndex);
 private:
     CharacterFile *character;
     HkxObjectExpSharedPtr behaviorGraph;

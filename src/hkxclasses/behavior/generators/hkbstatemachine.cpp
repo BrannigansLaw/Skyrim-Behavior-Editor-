@@ -180,7 +180,8 @@ bool hkbStateMachine::removeObject(DataIconManager *objToRemove, bool removeAll)
         for (int i = 0; i < states.size(); i++){
             child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
             if (child->generator.data() == objToRemove){
-                child->generator = HkxObjectExpSharedPtr();
+                states.removeAt(i);
+                i--;
                 b = true;
             }
         }
@@ -190,7 +191,7 @@ bool hkbStateMachine::removeObject(DataIconManager *objToRemove, bool removeAll)
         for (int i = 0; i < states.size(); i++){
             child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
             if (child->generator.data() == objToRemove){
-                child->generator = HkxObjectExpSharedPtr();
+                states.removeAt(i);
                 return true;
             }
         }

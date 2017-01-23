@@ -13,6 +13,8 @@
 #include "src/hkxclasses/behavior/generators/hkbmodifiergenerator.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/bsistatetagginggeneratorui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/modifiergeneratorui.h"
+#include "src/ui/hkxclassesui/behaviorui/generators/blendergeneratorui.h"
+#include "src/ui/hkxclassesui/behaviorui/generators/blendergeneratorchildui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/manualselectorgeneratorui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/statemachineui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/stateui.h"
@@ -24,18 +26,18 @@
 #include <QCoreApplication>
 
 QStringList HkDataUI::generatorTypes = {
-        "hkbStateMachine",
-        "hkbManualSelectorGenerator",
-        "hkbBlenderGenerator",
-        "BSiStateTaggingGenerator",
-        "BSBoneSwitchGenerator",
-        "BSCyclicBlendTransitionGenerator",
-        "BSSynchronizedClipGenerator",
-        "hkbModifierGenerator",
-        "BSOffsetAnimationGenerator",
-        "hkbPoseMatchingGenerator",
-        "hkbClipGenerator",
-        "hkbBehaviorReferenceGenerator"
+    "hkbStateMachine",
+    "hkbManualSelectorGenerator",
+    "hkbBlenderGenerator",
+    "BSiStateTaggingGenerator",
+    "BSBoneSwitchGenerator",
+    "BSCyclicBlendTransitionGenerator",
+    "BSSynchronizedClipGenerator",
+    "hkbModifierGenerator",
+    "BSOffsetAnimationGenerator",
+    "hkbPoseMatchingGenerator",
+    "hkbClipGenerator",
+    "hkbBehaviorReferenceGenerator"
 };
 
 QStringList HkDataUI::modifierTypes = {
@@ -87,7 +89,17 @@ QStringList HkDataUI::modifierTypes = {
     "BSSpeedSamplerModifier",
     "hkbDetectCloseToGroundModifier",
     "BSLookAtModifier",
-    "BSTimerModifier", "BSPassByTargetTriggerModifier"
+    "BSTimerModifier",
+    "BSPassByTargetTriggerModifier"
+};
+
+QStringList HkDataUI::variableTypes = {
+    "hkBool",
+    "hkInt32",
+    "hkReal",
+    "hkPointer",
+    "hkVector4",
+    "hkQuaternion"
 };
 
 HkDataUI::HkDataUI(const QString &title)
@@ -95,60 +107,42 @@ HkDataUI::HkDataUI(const QString &title)
       verLyt(new QVBoxLayout),
       stack(new QStackedLayout),
       loadedData(NULL),
-      generatorsTable(new HkxObjectTableWidget("Select a hkbGenerator!")),
-      modifiersTable(new HkxObjectTableWidget("Select a hkbModifier!")),
+      generatorsTable(new GenericTableWidget("Select a hkbGenerator!")),
+      modifiersTable(new GenericTableWidget("Select a hkbModifier!")),
+      variablesTable(new GenericTableWidget("Select a Variable!")),
+      eventsTable(new GenericTableWidget("Select an Event!")),
+      characterPropertiesTable(new GenericTableWidget("Select a Character Property!")),
       noDataL(new QLabel("No Data Selected!")),
       iSTGUI(new BSiStateTaggingGeneratorUI),
       modGenUI(new ModifierGeneratorUI(NULL, NULL)),
       manSelGenUI(new ManualSelectorGeneratorUI),
       stateMachineUI(new StateMachineUI),
-      stateUI(new StateUI),
-      transitionUI(new TransitionsUI)
+      blenderGeneratorUI(new BlenderGeneratorUI)
 {
     setTitle(title);
     generatorsTable->setTypes(generatorTypes);
     modifiersTable->setTypes(modifierTypes);
-    modGenUI->setGeneratorTable(generatorsTable);
-    modGenUI->setModifierTable(modifiersTable);
+    variablesTable->setTypes(variableTypes);
+    eventsTable->setTypes(QStringList("hkEvents"));
+    characterPropertiesTable->setTypes(variableTypes);
     stack->addWidget(noDataL);
     stack->addWidget(iSTGUI);
     stack->addWidget(modGenUI);
     stack->addWidget(manSelGenUI);
     stack->addWidget(stateMachineUI);
-    stack->addWidget(stateUI);
-    stack->addWidget(transitionUI);
+    stack->addWidget(blenderGeneratorUI);
     verLyt->addLayout(stack, 5);
     setLayout(verLyt);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    connect(stateMachineUI, SIGNAL(viewState(hkbStateMachineStateInfo*)), this, SLOT(viewState(hkbStateMachineStateInfo*)));
-    connect(stateMachineUI, SIGNAL(viewTransition(hkbStateMachine*,HkTransition*)), this, SLOT(viewTransition(hkbStateMachine*,HkTransition*)));
-    connect(stateUI, SIGNAL(viewTransition(hkbStateMachine*,HkTransition*)), this, SLOT(viewTransition(hkbStateMachine*,HkTransition*)));
-    connect(transitionUI, SIGNAL(returnToParent()), this, SLOT(viewStateMachine()));
-    connect(stateUI, SIGNAL(toParentStateMachine()), this, SLOT(viewStateMachine()));
-
     connect(iSTGUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
     connect(modGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
     connect(manSelGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
-    connect(stateMachineUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
-    connect(stateUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
+    connect(iSTGUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
+    connect(blenderGeneratorUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
 
-    connect(generatorsTable, SIGNAL(elementAdded(int)), this, SLOT());
-}
-
-void HkDataUI::viewState(hkbStateMachineStateInfo *state){
-    if (state){
-        stateUI->loadData(state);
-        stack->setCurrentIndex(STATE);
-    }
-}
-
-void HkDataUI::viewTransition(hkbStateMachine *parent, HkTransition * transition){
-    transitionUI->loadData(parent, transition);
-    stack->setCurrentIndex(TRANSITION);
-}
-
-void HkDataUI::viewStateMachine(){
-    stack->setCurrentIndex(STATE_MACHINE);
+    connect(blenderGeneratorUI, SIGNAL(viewVariables(int)), variablesTable, SLOT(showTable(int)));
+    connect(blenderGeneratorUI, SIGNAL(viewProperties(int)), characterPropertiesTable, SLOT(showTable(int)));
+    connect(blenderGeneratorUI, SIGNAL(viewGenerators(int)), generatorsTable, SLOT(showTable(int)));
 }
 
 void HkDataUI::setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *variables){
@@ -160,7 +154,7 @@ void HkDataUI::setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *varia
     connect(eventsUI, SIGNAL(eventAdded(QString)), this, SLOT(eventAdded(QString)));
     connect(eventsUI, SIGNAL(eventRemoved(int)), this, SLOT(eventRemoved(int)));
     connect(eventsUI, SIGNAL(eventNameChanged(QString,int)), this, SLOT(eventNameChanged(QString,int)));
-    connect(variablesUI, SIGNAL(variableAdded(QString)), this, SLOT(variableAdded(QString)));
+    connect(variablesUI, SIGNAL(variableAdded(QString,QString)), this, SLOT(variableAdded(QString)));
     connect(variablesUI, SIGNAL(variableRemoved(int)), this, SLOT(variableRemoved(int)));
     connect(variablesUI, SIGNAL(variableNameChanged(QString,int)), this, SLOT(variableNameChanged(QString,int)));
 }
@@ -172,79 +166,123 @@ void HkDataUI::modifierAdded(const QString & name, const QString & type){
 }
 void HkDataUI::modifierNameChanged(const QString & newName, int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    //modifiersTable->renameItem(index, newName);
+    modifiersTable->renameItem(index, newName);
+    switch (stack->currentIndex()) {
+    case MODIFIER_GENERATOR:
+        //rename modifier in table...
+        break;
+    default:
+        break;
+    }
     QCoreApplication::processEvents();
 }
 
 void HkDataUI::generatorAdded(const QString & name, const QString & type){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    manSelGenUI->generatorTable->addItem(name, type);
-    stateUI->generatorTable->addItem(name, type);
-    //generatorsTable->addItem(name, type);
+    generatorsTable->addItem(name, type);
     QCoreApplication::processEvents();
 }
 
 void HkDataUI::generatorNameChanged(const QString & newName, int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    manSelGenUI->generatorTable->renameItem(index, newName);
-    stateUI->generatorTable->renameItem(index, newName);
-    //generatorsTable->renameItem(index, newName);
+    generatorsTable->renameItem(index, newName);
+    switch (stack->currentIndex()) {
+    case BLENDER_GENERATOR:
+        //rename generator in table...
+        break;
+    default:
+        break;
+    }
     QCoreApplication::processEvents();
 }
 
 void HkDataUI::eventNameChanged(const QString & newName, int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    stateMachineUI->renameEventInLists(newName, index);
+    eventsTable->renameItem(index, newName);
+    switch (stack->currentIndex()) {
+    case BLENDER_GENERATOR:
+        //rename event in table...
+        break;
+    default:
+        break;
+    }
     QCoreApplication::processEvents();
 }
 
 void HkDataUI::eventAdded(const QString & name){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    stateMachineUI->addEventToLists(name);
+    eventsTable->addItem(name, "hkEvent");
     QCoreApplication::processEvents();
 }
 
 void HkDataUI::eventRemoved(int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    stateMachineUI->removeEventFromLists(index);
+    eventsTable->removeItem(index);
+    switch (stack->currentIndex()) {
+    case BLENDER_GENERATOR:
+        //blenderGeneratorUI->variableRenamed(newName, index);
+        break;
+    default:
+        break;
+    }
     QCoreApplication::processEvents();
 }
 
 void HkDataUI::variableNameChanged(const QString & newName, int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    iSTGUI->renameVariableInLists(newName, index);
-    manSelGenUI->renameVariableInLists(newName, index);
-    stateMachineUI->renameVariableInLists(newName, index);
+    variablesTable->renameItem(index, newName);
+    switch (stack->currentIndex()) {
+    case BLENDER_GENERATOR:
+        blenderGeneratorUI->variableRenamed(newName, index);
+        break;
+    default:
+        break;
+    }
     QCoreApplication::processEvents();
 }
 
-void HkDataUI::variableAdded(const QString & name){
+void HkDataUI::variableAdded(const QString & name, const QString & type){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    iSTGUI->addVariableToLists(name);
-    manSelGenUI->addVariableToLists(name);
-    stateMachineUI->addVariableToLists(name);
+    variablesTable->addItem(name, type);
     QCoreApplication::processEvents();
 }
 
 void HkDataUI::generatorRemoved(int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    manSelGenUI->generatorTable->removeItem(index);
-    stateUI->generatorTable->removeItem(index);
-    //generatorsTable->removeItem(index);
+    generatorsTable->removeItem(index);
+    switch (stack->currentIndex()) {
+    case BLENDER_GENERATOR:
+        //remove generator in table???
+        break;
+    default:
+        break;
+    }
     QCoreApplication::processEvents();
 }
 
 void HkDataUI::modifierRemoved(int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    //modifiersTable->removeItem(index);
+    modifiersTable->removeItem(index);
+    switch (stack->currentIndex()) {
+    case BLENDER_GENERATOR:
+        //remove modifier in table???
+        break;
+    default:
+        break;
+    }
     QCoreApplication::processEvents();
 }
 
 void HkDataUI::variableRemoved(int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
-    iSTGUI->removeVariableFromLists(index);
-    manSelGenUI->removeVariableFromLists(index);
-    stateMachineUI->removeVariableFromLists(index);
+    variablesTable->removeItem(index);
+    switch (stack->currentIndex()) {
+    case BLENDER_GENERATOR:
+        //remove variable in table???
+        break;
+    default:
+        break;
+    }
     behaviorView->behavior->removeBindings(index);
     behaviorView->removeOtherData();
     QCoreApplication::processEvents();
@@ -256,7 +294,21 @@ void HkDataUI::changeCurrentDataWidget(CustomTreeGraphicsViewIcon * icon){
         HkxObject *oldData = loadedData;
         sig = icon->data.constData()->getSignature();
         loadedData = icon->data.data();
+        disconnect(variablesTable, SIGNAL(elementSelected(int,QString)), 0, 0);
+        disconnect(eventsTable, SIGNAL(elementSelected(int,QString)), 0, 0);
+        disconnect(characterPropertiesTable, SIGNAL(elementSelected(int,QString)), 0, 0);
+        disconnect(generatorsTable, SIGNAL(elementSelected(int,QString)), 0, 0);
+        disconnect(modifiersTable, SIGNAL(elementSelected(int,QString)), 0, 0);
+        //blenderGeneratorUI->disconnectChildUI(variablesTable, characterPropertiesTable, generatorsTable);
         switch (sig) {
+        case HKB_BLENDER_GENERATOR:
+            if (loadedData != oldData){
+                blenderGeneratorUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(BLENDER_GENERATOR);
+            blenderGeneratorUI->connectChildUI(variablesTable, characterPropertiesTable, generatorsTable);
+            connect(variablesTable, SIGNAL(elementSelected(int,QString)), blenderGeneratorUI, SLOT(setBindingVariable(int,QString)));
+            break;
         case BS_I_STATE_TAGGING_GENERATOR:
             if (loadedData != oldData){
                 iSTGUI->loadData(loadedData);
@@ -300,21 +352,19 @@ BehaviorGraphView *HkDataUI::setBehaviorView(BehaviorGraphView *view){
         setMinimumSize(parentWidget()->size()*0.99);
     }
     behaviorView = view;
-    iSTGUI->behaviorView = view;
+    /*iSTGUI->behaviorView = view;
     modGenUI->behaviorView = view;
     manSelGenUI->behaviorView = view;
-    stateMachineUI->behaviorView = view;
-    stateUI->behaviorView = view;
-    transitionUI->behaviorView = view;
+    stateMachineUI->behaviorView = view;*/
+    blenderGeneratorUI->setBehaviorView(view);
     if (behaviorView){
-        iSTGUI->loadComboBoxes();//Implement and change ->count() == 0){ code in all uis
-        manSelGenUI->loadComboBoxes();
-        stateMachineUI->loadComboBoxes();
-        transitionUI->loadComboBoxes();
-        generatorsTable->loadTable(behaviorView->behavior);
-        modifiersTable->loadTable(behaviorView->behavior);
-        connect(behaviorView, SIGNAL(addedGenerator(QString)), this, SLOT(generatorAdded(QString)));
-        connect(behaviorView, SIGNAL(addedModifier(QString)), this, SLOT(modifierAdded(QString)));
+        generatorsTable->loadTable(behaviorView->behavior->getGeneratorNamesAndTypeNames(), "NULL");
+        modifiersTable->loadTable(behaviorView->behavior->getModifierNamesAndTypeNames(), "NULL");
+        variablesTable->loadTable(behaviorView->behavior->getVariableNames(), behaviorView->behavior->getVariableTypenames(), "NULL");
+        eventsTable->loadTable(behaviorView->behavior->getEventNames(), "hkEvent", "NULL");
+        characterPropertiesTable->loadTable(behaviorView->behavior->getCharacterPropertyNames(), behaviorView->behavior->getCharacterPropertyTypenames(), "NULL");//inefficient...
+        connect(behaviorView, SIGNAL(addedGenerator(QString,QString)), this, SLOT(generatorAdded(QString,QString)));
+        connect(behaviorView, SIGNAL(addedModifier(QString,QString)), this, SLOT(modifierAdded(QString,QString)));
         connect(behaviorView, SIGNAL(removedGenerator(int)), this, SLOT(generatorRemoved(int)));
         connect(behaviorView, SIGNAL(removedModifier(int)), this, SLOT(modifierRemoved(int)));
     }

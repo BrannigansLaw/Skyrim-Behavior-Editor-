@@ -3,9 +3,13 @@
 
 #include "hkbgenerator.h"
 
+class hkbBlenderGeneratorChild;
+
 class hkbBlenderGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
+    friend class BlenderGeneratorUI;
+    friend class BlenderGeneratorChildUI;
 public:
     hkbBlenderGenerator(HkxFile *parent, long ref = 0);
     virtual ~hkbBlenderGenerator();
@@ -19,6 +23,7 @@ public:
     int getIndexToInsertIcon() const;
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
+    int getIndexOfChild(hkbBlenderGeneratorChild *child) const;
 private:
     bool wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace);
     bool setChildAt(HkxObject *newChild, ushort index = 0);
@@ -27,6 +32,9 @@ private:
     int addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder = true);
     hkbBlenderGenerator& operator=(const hkbBlenderGenerator&);
     hkbBlenderGenerator(const hkbBlenderGenerator &);
+    void addChildAt(HkxObjectExpSharedPtr &obj, int index = -1);
+    void removeChildAt(int index);
+    int generatorCount(hkbGenerator *gen);
 private:
     static QStringList Flags;   //{FLAG_SYNC=1, FLAG_SMOOTH_GENERATOR_WEIGHTS=4, FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS=8, FLAG_PARAMETRIC_BLEND=16, FLAG_IS_PARAMETRIC_BLEND_CYCLIC=32, FLAG_FORCE_DENSE_POSE=64};
     static uint refCount;

@@ -11,26 +11,32 @@ class CharacterFile: public HkxFile
     friend class hkbCharacterData;
     friend class MainWindow;
     friend class ProjectUI;
+    friend class hkbVariableValueSet;
+    friend class hkRootLevelContainer;
 public:
     CharacterFile(MainWindow *window, const QString & name);
     virtual ~CharacterFile();
     bool addObjectToFile(HkxObject *obj, long ref = -1);
-    void write();
     QString getRootObjectReferenceString();
-    HkxObjectExpSharedPtr * findCharacterData(long ref);
-    HkxObjectExpSharedPtr * findCharacterPropertyValues(long ref);
-    hkbCharacterData * getCharacterData() const;
     QString getRootBehaviorPath() const;
     QString getRigName() const;
     QStringList getRigBoneNames() const;
     QString getRagdollName() const;
     QStringList getRagdollBoneNames() const;
     QStringList getAnimationNames() const;
-    void setSkeletonFile(SkeletonFile *skel);
+    QString getCharacterPropertyNameAt(int index) const;
+    QStringList getCharacterPropertyNames() const;
+    QStringList getCharacterPropertyTypenames() const;
+    hkVariableType getCharacterPropertyTypeAt(int index) const;
 protected:
     bool parse();
     bool link();
 private:
+    void write();
+    void setSkeletonFile(SkeletonFile *skel);
+    HkxObjectExpSharedPtr * findCharacterData(long ref);
+    HkxObjectExpSharedPtr * findCharacterPropertyValues(long ref);
+    hkbCharacterData * getCharacterData() const;
     void addFootIK();
     void addHandIK();
     void disableFootIK();

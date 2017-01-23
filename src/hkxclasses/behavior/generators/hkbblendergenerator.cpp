@@ -44,7 +44,7 @@ int hkbBlenderGenerator::getNumberOfChildren() const{
 
 int hkbBlenderGenerator::getIndexToInsertIcon() const{
     for (int i = 0; i < children.size(); i++){
-        if (!children.at(i).constData()){
+        if (!children.at(i).data() || !static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->generator.data()){
             return i;
         }
     }
@@ -69,7 +69,7 @@ bool hkbBlenderGenerator::setChildAt(HkxObject *newChild, ushort index){
             return false;
         }
     }else{
-        child = new hkbBlenderGeneratorChild(getParentFile());
+        child = new hkbBlenderGeneratorChild(getParentFile(), this, -1);
         child->generator = HkxObjectExpSharedPtr(newChild);
         children.append(HkxObjectExpSharedPtr(child));
         return true;
@@ -99,7 +99,7 @@ bool hkbBlenderGenerator::appendObject(DataIconManager *objToAppend){
     if (!objToAppend || objToAppend->getType() != TYPE_GENERATOR){
         return false;
     }
-    hkbBlenderGeneratorChild *objChild = new hkbBlenderGeneratorChild(getParentFile(), -1);
+    hkbBlenderGeneratorChild *objChild = new hkbBlenderGeneratorChild(getParentFile(), this, -1);
     children.append(HkxObjectExpSharedPtr(objChild));
     objChild->generator = HkxObjectExpSharedPtr(objToAppend);
     return true;
@@ -111,7 +111,8 @@ bool hkbBlenderGenerator::removeObject(DataIconManager *objToRemove, bool remove
         for (int i = 0; i < children.size(); i++){
             child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
             if (child->generator.data() == objToRemove){
-                child->generator = HkxObjectExpSharedPtr();
+                children.removeAt(i);
+                i--;
             }
         }
         return true;
@@ -120,7 +121,7 @@ bool hkbBlenderGenerator::removeObject(DataIconManager *objToRemove, bool remove
         for (int i = 0; i < children.size(); i++){
             child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
             if (child->generator.data() == objToRemove){
-                child->generator = HkxObjectExpSharedPtr();
+                children.removeAt(i);
                 return true;
             }
         }
@@ -138,6 +139,15 @@ bool hkbBlenderGenerator::hasChildren() const{
         }
     }
     return false;
+}
+
+int hkbBlenderGenerator::getIndexOfChild(hkbBlenderGeneratorChild *child) const{
+    for (int i = 0; i < children.size(); i++){
+        if (children.at(i).data() == child){
+            return i;
+        }
+    }
+    return -1;
 }
 
 int hkbBlenderGenerator::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
@@ -158,6 +168,36 @@ int hkbBlenderGenerator::addChildrenToList(QList<DataIconManager *> & list, bool
         }
     }
     return objectChildCount;
+}
+
+void hkbBlenderGenerator::addChildAt(HkxObjectExpSharedPtr & obj, int index){
+    hkbBlenderGeneratorChild *ptr = new hkbBlenderGeneratorChild(getParentFile(), this, -1);
+    getParentFile()->addObjectToFile(ptr, -1);
+    if (index < 0 || index >= children.size()){
+        children.append(HkxObjectExpSharedPtr(ptr));
+        static_cast<hkbBlenderGeneratorChild *>(children.last().data())->generator = obj;
+    }else{
+        children.insert(index, HkxObjectExpSharedPtr(ptr));
+        static_cast<hkbBlenderGeneratorChild *>(children.at(index).data())->generator = obj;
+    }
+}
+
+void hkbBlenderGenerator::removeChildAt(int index){
+    if (index >= 0 && index < children.size()){
+        children.removeAt(index);
+    }
+}
+
+int hkbBlenderGenerator::generatorCount(hkbGenerator *gen){
+    hkbBlenderGeneratorChild *child;
+    int count = 0;
+    for (int i = 0; i < children.size(); i++){
+        child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
+        if (child->generator.data() == gen){
+            count++;
+        }
+    }
+    return count;
 }
 
 bool hkbBlenderGenerator::readData(const HkxXmlReader &reader, long index){
@@ -295,6 +335,7 @@ bool hkbBlenderGenerator::link(){
             children[i] = *ptr;
         }else{
             children[i] = *ptr;
+            static_cast<hkbBlenderGeneratorChild *>(children[i].data())->parentBG = this;
         }
     }
     return true;

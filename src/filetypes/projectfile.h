@@ -7,22 +7,24 @@ class CharacterFile;
 
 class ProjectFile: public HkxFile
 {
-    friend class hkbProjectData;
     friend class MainWindow;
     friend class ProjectUI;
+    friend class hkbProjectData;
+    friend class hkRootLevelContainer;
 public:
     ProjectFile(MainWindow *window, const QString & name);
     virtual ~ProjectFile();
     bool addObjectToFile(HkxObject *obj, long ref = -1);
     void write();
     QString getRootObjectReferenceString();
-    HkxObjectExpSharedPtr * findProjectData(long ref);
-    HkxObjectExpSharedPtr * findProjectStringData(long ref);
     QString getCharacterFilePathAt(int index) const;
     void setCharacterFile(CharacterFile *file);
 protected:
     bool parse();
     bool link();
+private:
+    HkxObjectExpSharedPtr * findProjectData(long ref);
+    HkxObjectExpSharedPtr * findProjectStringData(long ref);
 private:
     CharacterFile *character;
     HkxObjectExpSharedPtr stringData;

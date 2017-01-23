@@ -42,6 +42,7 @@ class CustomTreeGraphicsView: public QGraphicsView
     friend class StateMachineUI;
     friend class StateUI;
     friend class TransitionsUI;
+    friend class BlenderGeneratorUI;
     friend class MainWindow;
 public:
     virtual ~CustomTreeGraphicsView();
@@ -89,7 +90,7 @@ private:
     int initializeIcons(DataIconManager *ptr, QList <DataIconManager *> & objects, QList<CustomTreeGraphicsViewIcon *> & parentIcons, QVector <short> & objectChildCount);
     CustomTreeGraphicsViewIcon * addIconToGraph(DataIconManager *obj, CustomTreeGraphicsViewIcon * parentIcon);
     CustomTreeGraphicsViewIcon * initalizeInjectedIcon(DataIconManager *obj, CustomTreeGraphicsViewIcon * parentIcon, CustomTreeGraphicsViewIcon * selected);
-    CustomTreeGraphicsViewIcon * initalizeAppendedIcon(DataIconManager *obj, CustomTreeGraphicsViewIcon * parentIcon);
+    CustomTreeGraphicsViewIcon * initalizeAppendedIcon(DataIconManager *obj, CustomTreeGraphicsViewIcon * parentIcon, int indexToInsert = -1);
 };
 
 #endif // BEHAVIORGRAPHUI_H

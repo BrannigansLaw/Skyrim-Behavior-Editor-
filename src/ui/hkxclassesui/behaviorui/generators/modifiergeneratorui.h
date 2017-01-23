@@ -11,18 +11,18 @@ class TableWidget;
 class QLineEdit;
 class ComboBox;
 class QPushButton;
-class HkxObjectTableWidget;
+class GenericTableWidget;
 
 class ModifierGeneratorUI: public QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
 public:
-    ModifierGeneratorUI(HkxObjectTableWidget *genTable, HkxObjectTableWidget *modTable);
+    ModifierGeneratorUI(GenericTableWidget *genTable, GenericTableWidget *modTable);
     virtual ~ModifierGeneratorUI(){}
     void loadData(HkxObject *data);
-    void setGeneratorTable(HkxObjectTableWidget *genTable);
-    void setModifierTable(HkxObjectTableWidget *modTable);
+    void setGeneratorTable(GenericTableWidget *genTable);
+    void setModifierTable(GenericTableWidget *modTable);
 signals:
     void generatorNameChanged(const QString & newName, int index);
     void viewGeneratorTable(int index);
@@ -34,8 +34,8 @@ private slots:
     void viewModifiers();
 private:
     static QStringList headerLabels1;
-    HkxObjectTableWidget *generatorTable;
-    HkxObjectTableWidget *modifiersTable;
+    GenericTableWidget *generatorTable;
+    GenericTableWidget *modifiersTable;
     BehaviorGraphView *behaviorView;
     hkbModifierGenerator *bsData;
     QVBoxLayout *lyt;

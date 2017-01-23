@@ -24,7 +24,7 @@ QStringList ModifierGeneratorUI::headerLabels1 = {
     "Value"
 };
 
-ModifierGeneratorUI::ModifierGeneratorUI(HkxObjectTableWidget *genTable, HkxObjectTableWidget *modTable)
+ModifierGeneratorUI::ModifierGeneratorUI(GenericTableWidget *genTable, GenericTableWidget *modTable)
     : generatorTable(genTable),
       modifiersTable(modTable),
       behaviorView(NULL),
@@ -56,7 +56,7 @@ ModifierGeneratorUI::ModifierGeneratorUI(HkxObjectTableWidget *genTable, HkxObje
     connect(generator, SIGNAL(activated(int)), this, SLOT(setGenerator(int)));
 }
 
-void ModifierGeneratorUI::setGeneratorTable(HkxObjectTableWidget *genTable){
+void ModifierGeneratorUI::setGeneratorTable(GenericTableWidget *genTable){
     if (genTable){
         generatorTable = genTable;
         connect(generatorTable, SIGNAL(elementSelected(int)), this, SLOT(setGenerator(int)));
@@ -64,7 +64,7 @@ void ModifierGeneratorUI::setGeneratorTable(HkxObjectTableWidget *genTable){
     }
 }
 
-void ModifierGeneratorUI::setModifierTable(HkxObjectTableWidget *modTable){
+void ModifierGeneratorUI::setModifierTable(GenericTableWidget *modTable){
     if (modTable){
         modifiersTable = modTable;
         connect(modifiersTable, SIGNAL(elementSelected(int)), this, SLOT(setModifier(int)));
@@ -92,7 +92,7 @@ void ModifierGeneratorUI::setName(){
     if (bsData){
         bsData->name = name->text();
         bsData->updateIconNames();
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
         emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
     }
 }
@@ -112,7 +112,7 @@ void ModifierGeneratorUI::setModifier(int index){
         if (index > 0){
             bsData->modifier = HkxObjectExpSharedPtr(ptr);
             behaviorView->removeModifierData();
-            behaviorView->toggleChanged(true);
+            bsData->getParentFile()->toggleChanged(true);
         }
     }
     modifiersTable->hide();
@@ -133,7 +133,7 @@ void ModifierGeneratorUI::setGenerator(int index){
         if (index > 0){
             bsData->generator = HkxObjectExpSharedPtr(ptr);
             behaviorView->removeGeneratorData();
-            behaviorView->toggleChanged(true);
+            bsData->getParentFile()->toggleChanged(true);
         }
     }
     generatorTable->hide();

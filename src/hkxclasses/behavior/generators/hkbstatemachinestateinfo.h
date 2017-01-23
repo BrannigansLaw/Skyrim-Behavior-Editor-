@@ -9,10 +9,11 @@ class hkbStateMachineStateInfo: public hkbGenerator
 {
     friend class BehaviorGraphView;
     friend class hkbStateMachine;
+    friend class hkbStateMachineTransitionInfoArray;
     friend class StateMachineUI;
     friend class StateUI;
 public:
-    hkbStateMachineStateInfo(HkxFile *parent, hkbStateMachine *parentSM = NULL, long ref = 0);
+    hkbStateMachineStateInfo(HkxFile *parent, hkbStateMachine *parentSM, long ref = 0);
     virtual ~hkbStateMachineStateInfo();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
@@ -20,9 +21,9 @@ public:
     QString getName() const;
     bool evaulateDataValidity();
     static QString getClassname();
-    hkbStateMachine * getParentStateMachine() const;
     bool write(HkxXMLWriter *writer);
 private:
+    hkbStateMachine * getParentStateMachine() const;
     hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&);
     hkbStateMachineStateInfo(const hkbStateMachineStateInfo &);
 private:

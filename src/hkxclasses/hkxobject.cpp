@@ -518,6 +518,14 @@ bool DataIconManager::hasChildren() const{
     return false;
 }
 
+/*void DataIconManager::swapIconPosition(){
+    for (int i = 0; i < icons.size(); i++){
+        if (icons.first()->pos().y() > icons.at(i)->pos().y() && i > 0){
+            icons.at(i)->setParent(icons.first()->setParent(icons.at(i)->parent));
+        }
+    }
+}*/
+
 int DataIconManager::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
     return 0;
 }

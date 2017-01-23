@@ -18,7 +18,7 @@ class QLineEdit;
 class ComboBox;
 class QPushButton;
 class QHBoxLayout;
-class HkxObjectTableWidget;
+class GenericTableWidget;
 
 class ManualSelectorGeneratorUI: public QGroupBox
 {
@@ -28,7 +28,7 @@ public:
     ManualSelectorGeneratorUI();
     virtual ~ManualSelectorGeneratorUI(){}
     void loadData(HkxObject *data);
-    //void setGeneratorTable(HkxObjectTableWidget *genTable);
+    //void setGeneratorTable(GenericTableWidget *genTable);
 signals:
     void generatorNameChanged(const QString & newName, int index);
     void viewGeneratorTable(int index);
@@ -66,7 +66,7 @@ private:
     static QStringList types;
     static QStringList headerLabels1;
     static QStringList headerLabels2;
-    HkxObjectTableWidget *generatorTable;
+    GenericTableWidget *generatorTable;
     BehaviorGraphView *behaviorView;
     hkbManualSelectorGenerator *bsData;
     QVBoxLayout *lyt;

@@ -86,6 +86,7 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){
     int numElems = 0;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
+    int numtrans = 0;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "name"){
@@ -104,7 +105,7 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){
                 return false;
             }
         }else if (text == "bones"){
-            int numtrans = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            numtrans = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
                 return false;
             }
@@ -159,7 +160,7 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){
             }
             continue;
         }else if (text == "localFrames"){
-            int numtrans = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            numtrans = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
                 return false;
             }

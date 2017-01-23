@@ -36,9 +36,14 @@ QString hkbBehaviorGraphData::getClassname(){
     return classname;
 }
 
-void hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name){
+bool hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name, bool isProperty){
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    if (!isProperty && strData->variableNames.contains(name)){
+        return false;
+    }else if (strData->characterPropertyNames.contains(name)){
+        return false;
+    }
     hkVariableInfo varInfo;
     switch (type){
     case VARIABLE_TYPE_BOOL:
@@ -69,11 +74,17 @@ void hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name
         varData->quadVariableValues.append(hkQuadVariable());
         break;
     default:
-        return;
+        return false;
     }
-    strData->variableNames.append(name);
+    if (isProperty){
+        strData->characterPropertyNames.append(name);
+        characterPropertyInfos.append(varInfo);
+    }else{
+        strData->variableNames.append(name);
+        variableInfos.append(varInfo);
+    }
     varData->wordVariableValues.append(0);
-    variableInfos.append(varInfo);
+    return true;
 }
 
 void hkbBehaviorGraphData::addVariable(hkVariableType type){
@@ -556,6 +567,14 @@ bool hkbBehaviorGraphData::write(HkxXMLWriter *writer){
         }
     }
     return true;
+}
+
+QStringList hkbBehaviorGraphData::getVariableTypeNames() const{
+    QStringList list;
+    for (int i = 0; i < variableInfos.size(); i++){
+        list.append(variableInfos.at(i).type);
+    }
+    return list;
 }
 
 bool hkbBehaviorGraphData::link(){

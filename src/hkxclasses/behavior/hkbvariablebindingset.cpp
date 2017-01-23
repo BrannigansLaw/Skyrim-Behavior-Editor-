@@ -35,6 +35,9 @@ void hkbVariableBindingSet::addBinding(const QString & path, int varIndex, hkBin
         }
     }
     bindings.append(hkBinding(path, varIndex, -1, type));
+    if (type == hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
+        static_cast<BehaviorFile *>(getParentFile())->addCharacterProperty(varIndex);
+    }
     if (path == "enable"){
         indexOfBindingToEnable = bindings.size() - 1;
     }
@@ -69,10 +72,11 @@ bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
+    int numtrans = 0;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "bindings"){
-            int numtrans = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            numtrans = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
                 return false;
             }

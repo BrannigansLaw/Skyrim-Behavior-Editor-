@@ -150,6 +150,12 @@ bool hkbBehaviorGraphStringData::write(HkxXMLWriter *writer){
     return true;
 }
 
+QString hkbBehaviorGraphStringData::getVariableNameAt(int index) const{
+    if (index >= 0 && index < variableNames.size()){
+        return variableNames.at(index);
+    }
+    return "";
+}
 bool hkbBehaviorGraphStringData::link(){
     return true;
 }

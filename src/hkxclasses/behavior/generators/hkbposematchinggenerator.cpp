@@ -81,7 +81,7 @@ bool hkbPoseMatchingGenerator::setChildAt(HkxObject *newChild, ushort index){
             return false;
         }
     }else{
-        child = new hkbBlenderGeneratorChild(getParentFile());
+        child = new hkbBlenderGeneratorChild(getParentFile(), this, -1);
         child->generator = HkxObjectExpSharedPtr(newChild);
         children.append(HkxObjectExpSharedPtr(child));
         return true;
@@ -111,7 +111,7 @@ bool hkbPoseMatchingGenerator::appendObject(DataIconManager *objToAppend){
     if (!objToAppend || objToAppend->getType() != TYPE_GENERATOR){
         return false;
     }
-    hkbBlenderGeneratorChild *objChild = new hkbBlenderGeneratorChild(getParentFile(), -1);
+    hkbBlenderGeneratorChild *objChild = new hkbBlenderGeneratorChild(getParentFile(), this, -1);
     children.append(HkxObjectExpSharedPtr(objChild));
     objChild->generator = HkxObjectExpSharedPtr(objToAppend);
     return true;
@@ -123,7 +123,8 @@ bool hkbPoseMatchingGenerator::removeObject(DataIconManager *objToRemove, bool r
         for (int i = 0; i < children.size(); i++){
             child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
             if (child->generator.data() == objToRemove){
-                child->generator = HkxObjectExpSharedPtr();
+                children.removeAt(i);
+                i--;
             }
         }
         return true;
@@ -132,7 +133,7 @@ bool hkbPoseMatchingGenerator::removeObject(DataIconManager *objToRemove, bool r
         for (int i = 0; i < children.size(); i++){
             child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
             if (child->generator.data() == objToRemove){
-                child->generator = HkxObjectExpSharedPtr();
+                children.removeAt(i);
                 return true;
             }
         }
@@ -379,6 +380,7 @@ bool hkbPoseMatchingGenerator::link(){
             children[i] = *ptr;
         }else{
             children[i] = *ptr;
+            static_cast<hkbBlenderGeneratorChild *>(children[i].data())->parentBG = this;
         }
     }
     return true;

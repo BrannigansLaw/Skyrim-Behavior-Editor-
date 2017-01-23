@@ -25,6 +25,7 @@ public:
     hkVariableType getVariableTypeAt(int index) const;
     bool write(HkxXMLWriter *writer);
     QStringList getCharacterPropertyNames() const;
+    QStringList getCharacterPropertyTypenames() const;
 private:
     hkbCharacterData& operator=(const hkbCharacterData&);
     hkbCharacterData(const hkbCharacterData &);
@@ -50,6 +51,10 @@ private:
         QString type;
     };
 
+public:
+    hkVariableType getCharacterPropertyTypeAt(int index) const;
+
+private:
     struct hkCharacterControllerInfo{
         hkCharacterControllerInfo(): capsuleHeight(0), capsuleRadius(0), collisionFilterInfo(0){}
         qreal capsuleHeight;

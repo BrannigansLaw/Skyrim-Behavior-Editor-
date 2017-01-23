@@ -49,7 +49,7 @@ QStringList ManualSelectorGeneratorUI::headerLabels2 = {
 };
 
 ManualSelectorGeneratorUI::ManualSelectorGeneratorUI()
-    : generatorTable(new HkxObjectTableWidget("Select a hkbGenerator!")),
+    : generatorTable(new GenericTableWidget("Select a hkbGenerator!")),
       behaviorView(NULL),
       bsData(NULL),
       lyt(new QVBoxLayout),
@@ -96,7 +96,7 @@ ManualSelectorGeneratorUI::ManualSelectorGeneratorUI()
     connect(addObjectPB, SIGNAL(released()), this, SLOT(addNewGenerator()));
     connect(removeObjectPB, SIGNAL(released()), this, SLOT(removeGenerator()));
     connect(generators, SIGNAL(cellClicked(int,int)), this, SLOT(viewGenerators()));
-    connect(generatorTable, SIGNAL(elementSelected(int)), this, SLOT(setGenerator(int)));
+    connect(generatorTable, SIGNAL(elementSelected(int,QString)), this, SLOT(setGenerator(int)));
     connect(generatorTable, SIGNAL(hideWindow()), this, SLOT(viewGenerators()));
     connect(selectedGeneratorIndex, SIGNAL(editingFinished()), this, SLOT(setSelectedGeneratorIndex(int)));
     connect(selectedGeneratorIndexBind, SIGNAL(activated(int)), this, SLOT(setSelectedGeneratorIndexBind(int)));
@@ -104,7 +104,7 @@ ManualSelectorGeneratorUI::ManualSelectorGeneratorUI()
     connect(currentGeneratorIndexBind, SIGNAL(activated(int)), this, SLOT(setCurrentGeneratorIndexBind(int)));
 }
 
-/*void ManualSelectorGeneratorUI::setGeneratorTable(HkxObjectTableWidget *genTable){
+/*void ManualSelectorGeneratorUI::setGeneratorTable(GenericTableWidget *genTable){
     if (genTable){
         generatorTable = genTable;
         connect(generatorTable, SIGNAL(elementSelected(int)), this, SLOT(setGenerator(int)));
@@ -166,7 +166,7 @@ void ManualSelectorGeneratorUI::loadData(HkxObject *data){
         hkbGenerator *gen;
         hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
         if (generatorTable->getNumRows() < 1){
-            generatorTable->loadTable(static_cast<BehaviorFile *>(bsData->getParentFile()));
+            generatorTable->loadTable(static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorNamesAndTypeNames(), "NULL");
         }
         if (varBind){
             int ind = varBind->getVariableIndexOfBinding("selectedGeneratorIndex");
@@ -212,14 +212,14 @@ void ManualSelectorGeneratorUI::loadData(HkxObject *data){
 void ManualSelectorGeneratorUI::setSelectedGeneratorIndex(){
     if (bsData){
         bsData->selectedGeneratorIndex = selectedGeneratorIndex->value();
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void ManualSelectorGeneratorUI::setCurrentGeneratorIndex(){
     if (bsData){
         bsData->currentGeneratorIndex = currentGeneratorIndex->value();
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -233,7 +233,7 @@ void ManualSelectorGeneratorUI::setSelectedGeneratorIndexBind(int index){
                 behaviorView->behavior->addObjectToFile(varBind);
             }
             varBind->addBinding("selectedGeneratorIndex", index - 1);
-            behaviorView->toggleChanged(true);
+            bsData->getParentFile()->toggleChanged(true);
         }else{
             QMessageBox msg;
             msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
@@ -258,7 +258,7 @@ void ManualSelectorGeneratorUI::setCurrentGeneratorIndexBind(int index){
                 behaviorView->behavior->addObjectToFile(varBind);
             }
             varBind->addBinding("currentGeneratorIndex", index - 1);
-            behaviorView->toggleChanged(true);
+            bsData->getParentFile()->toggleChanged(true);
         }else{
             QMessageBox msg;
             msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
@@ -292,7 +292,7 @@ void ManualSelectorGeneratorUI::setGenerator(int index){
         if (row > 0/* && row < bsData->generators.size()*/){
             bsData->generators[row] = HkxObjectExpSharedPtr(ptr);
             behaviorView->removeGeneratorData();
-            behaviorView->toggleChanged(true);
+            bsData->getParentFile()->toggleChanged(true);
         }
     }
     generatorTable->hide();
@@ -348,7 +348,7 @@ void ManualSelectorGeneratorUI::addNewGenerator(){
         generators->setItem(generators->rowCount(), 0, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->generators.last().data())->getName()));
         generators->setItem(generators->rowCount(), 1, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->generators.last().data())->getClassname()));
         generators->setItem(generators->rowCount(), 2, new QTableWidgetItem("Click to Edit"));
-        behaviorView->toggleChanged(true);
+        bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -367,5 +367,5 @@ void ManualSelectorGeneratorUI::removeGenerator(){
     generators->removeCellWidget(index, 2);
     generators->removeRow(index);
     behaviorView->removeGeneratorData();
-    behaviorView->toggleChanged(true);
+    bsData->getParentFile()->toggleChanged(true);
 }

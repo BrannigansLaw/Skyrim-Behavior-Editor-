@@ -117,6 +117,7 @@ public:
     QString getName() const;
     virtual bool hasChildren() const;
 protected:
+    //void swapIconPosition();
     virtual bool wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace);
     virtual bool appendObject(DataIconManager *objToAppend);
     virtual bool removeObject(DataIconManager *objToRemove, bool removeAll = true);

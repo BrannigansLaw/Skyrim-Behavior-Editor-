@@ -10,6 +10,7 @@ class hkbBehaviorGraphData: public HkxObject
     friend class BehaviorGraphView;
     friend class BehaviorVariablesUI;
     friend class EventsUI;
+    friend class BehaviorFile;
 public:
     hkbBehaviorGraphData(HkxFile *parent, long ref = 0);
     virtual ~hkbBehaviorGraphData();
@@ -23,11 +24,12 @@ public:
     HkxObject * getVariantVariable(int index) const;
     hkVariableType getVariableTypeAt(int index) const;
     bool write(HkxXMLWriter *writer);
+    QStringList getVariableTypeNames() const;
 private:
     hkbBehaviorGraphData& operator=(const hkbBehaviorGraphData&);
     hkbBehaviorGraphData(const hkbBehaviorGraphData &);
 private:
-    void addVariable(hkVariableType type, const QString & name);
+    bool addVariable(hkVariableType type, const QString & name, bool isProperty = false);
     void addVariable(hkVariableType type);
     void removeVariable(int index);
     void setVariableNameAt(int index, const QString & name);

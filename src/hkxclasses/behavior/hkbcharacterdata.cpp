@@ -536,6 +536,38 @@ QStringList hkbCharacterData::getCharacterPropertyNames() const{
     return static_cast<hkbCharacterStringData *>(stringData.data())->characterPropertyNames;
 }
 
+QStringList hkbCharacterData::getCharacterPropertyTypenames() const{
+    QStringList list;
+    for (int i = 0; i < characterPropertyInfos.size(); i++){
+        list.append(characterPropertyInfos.at(i).type);
+    }
+    return list;
+}
+
+hkVariableType hkbCharacterData::getCharacterPropertyTypeAt(int index) const{
+    if (index < characterPropertyInfos.size() && index >= 0){
+        QString type = characterPropertyInfos.at(index).type;
+        if (type == "VARIABLE_TYPE_BOOL"){
+            return VARIABLE_TYPE_BOOL;
+        }else if (type == "VARIABLE_TYPE_INT8"){
+            return VARIABLE_TYPE_INT8;
+        }else if (type == "VARIABLE_TYPE_INT16"){
+            return VARIABLE_TYPE_INT16;
+        }else if (type == "VARIABLE_TYPE_INT32"){
+            return VARIABLE_TYPE_INT32;
+        }else if (type == "VARIABLE_TYPE_REAL"){
+            return VARIABLE_TYPE_REAL;
+        }else if (type == "VARIABLE_TYPE_POINTER"){
+            return VARIABLE_TYPE_POINTER;
+        }else if (type == "VARIABLE_TYPE_VECTOR4"){
+            return VARIABLE_TYPE_VECTOR4;
+        }else if (type == "VARIABLE_TYPE_QUATERNION"){
+            return VARIABLE_TYPE_QUATERNION;
+        }
+    }
+    return VARIABLE_TYPE_INT32;
+}
+
 bool hkbCharacterData::evaulateDataValidity(){
     if (!characterPropertyValues.data() || characterPropertyValues.data()->getSignature() != HKB_VARIABLE_VALUE_SET){
         setDataValidity(false);

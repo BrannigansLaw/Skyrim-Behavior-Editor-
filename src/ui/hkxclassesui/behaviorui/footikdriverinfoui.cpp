@@ -139,77 +139,77 @@ void FootIkDriverInfoUI::loadData(HkxObject *data){
 void FootIkDriverInfoUI::setRaycastDistanceUp(){
     if (bsData){
         bsData->raycastDistanceUp = raycastDistanceUp->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoUI::setRaycastDistanceDown(){
     if (bsData){
         bsData->raycastDistanceDown = raycastDistanceDown->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoUI::setOriginalGroundHeightMS(){
     if (bsData){
         bsData->originalGroundHeightMS = originalGroundHeightMS->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoUI::setVerticalOffset(){
     if (bsData){
         bsData->verticalOffset = verticalOffset->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoUI::setCollisionFilterInfo(){
     if (bsData){
         bsData->collisionFilterInfo = collisionFilterInfo->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoUI::setForwardAlignFraction(){
     if (bsData){
         bsData->forwardAlignFraction = forwardAlignFraction->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoUI::setSidewaysAlignFraction(){
     if (bsData){
         bsData->sidewaysAlignFraction = sidewaysAlignFraction->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoUI::setSidewaysSampleWidth(){
     if (bsData){
         bsData->sidewaysSampleWidth = sidewaysSampleWidth->value();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoUI::setLockFeetWhenPlanted(){
     if (bsData){
         bsData->lockFeetWhenPlanted = lockFeetWhenPlanted->isChecked();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoUI::setUseCharacterUpVector(){
     if (bsData){
         bsData->useCharacterUpVector = useCharacterUpVector->isChecked();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoUI::setIsQuadrupedNarrow(){
     if (bsData){
         bsData->isQuadrupedNarrow = isQuadrupedNarrow->isChecked();
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -229,7 +229,7 @@ void FootIkDriverInfoUI::addLeg(){
             table->item(result, 0)->setText("Leg "+QString::number(bsData->legs.size() - 1));
             table->item(result, 1)->setText("hkbFootIkDriverInfoLeg");
         }
-        //behaviorView->toggleChanged(true);
+        //bsData->getParentFile()->toggleChanged(true);
     }
 }
 

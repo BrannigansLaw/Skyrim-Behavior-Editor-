@@ -38,7 +38,7 @@ private slots:
     void returnToTable();
 signals:
     void variableNameChanged(const QString & newName, int index);
-    void variableAdded(const QString & name);
+    void variableAdded(const QString & name, const QString & type);
     void variableRemoved(int index);
 private:
     BehaviorVariablesUI& operator=(const BehaviorVariablesUI&);

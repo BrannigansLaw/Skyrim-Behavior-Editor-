@@ -26,6 +26,13 @@ QStringList hkbCharacterStringData::getAnimationNames() const{
     return QStringList(animationNames);
 }
 
+QString hkbCharacterStringData::getCharacterPropertyNameAt(int index) const{
+    if (characterPropertyNames.size() < index && index >= 0){
+        return characterPropertyNames.at(index);
+    }
+    return "";
+}
+
 bool hkbCharacterStringData::readData(const HkxXmlReader &reader, long index){
     bool ok;
     int numElems = 0;
