@@ -3,9 +3,9 @@
 #include "src/hkxclasses/behavior/generators/bsistatetagginggenerator.h"
 #include "src/ui/genericdatawidgets.h"
 #include "src/filetypes/behaviorfile.h"
-#include "src/ui/customtreegraphicsview.h"
-#include "src/ui/behaviorgraphui/behaviorgraphview.h"
-#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/ui/TreeGraphicsView.h"
+#include "src/ui/behaviorgraphview.h"
+#include "src/ui/treegraphicsitem.h"
 #include "src/hkxclasses/behavior/hkbvariablebindingset.h"
 
 #include <QVBoxLayout>

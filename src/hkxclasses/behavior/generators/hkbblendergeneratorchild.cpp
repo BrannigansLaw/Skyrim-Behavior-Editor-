@@ -113,7 +113,7 @@ bool hkbBlenderGeneratorChild::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
     HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(boneWeights.getReference());

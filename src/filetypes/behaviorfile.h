@@ -53,7 +53,7 @@ private:
     HkxObject * getBehaviorGraphData() const;
     hkbBehaviorGraph * getBehaviorGraph() const;
     HkxObject * getRootStateMachine() const;
-    //CustomTreeGraphicsViewIcon * getRootIcon() const;
+    //TreeGraphicsItem * getRootIcon() const;
     void write();
     void removeBindings(int varIndex);
 private:

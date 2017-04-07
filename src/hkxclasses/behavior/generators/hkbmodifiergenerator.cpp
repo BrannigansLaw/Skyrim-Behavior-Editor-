@@ -36,101 +36,53 @@ int hkbModifierGenerator::getIndexToInsertIcon(HkxObject *child) const{
     return -1;
 }
 
-bool hkbModifierGenerator::setChildAt(HkxObject *newChild, ushort index){
-    if (index == 0 && (!newChild || newChild->getType() == TYPE_GENERATOR)){
-        generator = HkxObjectExpSharedPtr(newChild);
-        return true;
-    }else if (index == 1 && (!newChild || newChild->getType() == TYPE_MODIFIER)){
-        modifier = HkxObjectExpSharedPtr(newChild);
-        return true;
+bool hkbModifierGenerator::insertObjectAt(int index, DataIconManager *obj){
+    if (((HkxObject *)obj)->getType() == TYPE_MODIFIER && index == 0){
+        modifier = HkxObjectExpSharedPtr((HkxObject *)obj);
+    }else if (((HkxObject *)obj)->getType() == TYPE_GENERATOR && index == 1){
+        generator = HkxObjectExpSharedPtr((HkxObject *)obj);
     }else{
         return false;
-    }
-}
-
-bool hkbModifierGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (generator.data() == childToReplace && childToReplace->getType() == TYPE_GENERATOR){
-        if (!objToInject->setChildAt(generator.data())){
-            return false;
-        }
-        generator = HkxObjectExpSharedPtr(objToInject);
-        return true;
-    }else if (modifier.data() == childToReplace && childToReplace->getType() == TYPE_MODIFIER){
-        if (!objToInject->setChildAt(modifier.data())){
-            return false;
-        }
-        modifier = HkxObjectExpSharedPtr(objToInject);
-        return true;
-    }
-    return false;
-}
-
-bool hkbModifierGenerator::appendObject(DataIconManager *objToAppend){
-    if (objToAppend->getType() == TYPE_GENERATOR){
-        generator = HkxObjectExpSharedPtr(objToAppend);
-    }else if (objToAppend->getType() == TYPE_MODIFIER){
-        modifier = HkxObjectExpSharedPtr(objToAppend);
     }
     return true;
 }
 
-bool hkbModifierGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
-    bool b = false;
-    if (removeAll){
-        if (generator.data() == objToRemove){
-            generator = HkxObjectExpSharedPtr();
-            b = true;
-        }
-        if (modifier.data() == objToRemove){
-            modifier = HkxObjectExpSharedPtr();
-            b = true;
-        }
-        return b;
+bool hkbModifierGenerator::removeObjectAt(int index){
+    if (index == 0){
+        modifier = HkxObjectExpSharedPtr();
+    }else if (index == 1){
+        generator = HkxObjectExpSharedPtr();
     }else{
-        if (generator.data() == objToRemove){
-            generator = HkxObjectExpSharedPtr();
-            return true;
-        }
-        if (modifier.data() == objToRemove){
-            modifier = HkxObjectExpSharedPtr();
-            return true;
-        }
+        return false;
     }
-    return false;
+    return true;
 }
 
 bool hkbModifierGenerator::hasChildren() const{
-    if (generator.data()){
-        return true;
-    }
-    if (modifier.data()){
+    if (generator.data() || modifier.data()){
         return true;
     }
     return false;
 }
 
-int hkbModifierGenerator::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
-    int objectChildCount = 0;
-    if (reverseOrder){
-        if (generator.data()){
-            list.append(static_cast<DataIconManager *>(generator.data()));
-            objectChildCount++;
-        }
-        if (modifier.data()){
-            list.append(static_cast<DataIconManager *>(modifier.data()));
-            objectChildCount++;
-        }
-    }else{
-        if (modifier.data()){
-            list.append(static_cast<DataIconManager *>(modifier.data()));
-            objectChildCount++;
-        }
-        if (generator.data()){
-            list.append(static_cast<DataIconManager *>(generator.data()));
-            objectChildCount++;
-        }
+QList<DataIconManager *> hkbModifierGenerator::getChildren() const{
+    QList<DataIconManager *> list;
+    if (modifier.data()){
+        list.append((DataIconManager *)modifier.data());
     }
-    return objectChildCount;
+    if (generator.data()){
+        list.append((DataIconManager *)generator.data());
+    }
+    return list;
+}
+
+int hkbModifierGenerator::getIndexOfObj(DataIconManager *obj) const{
+    if (modifier.data() == (HkxObject *)obj){
+        return 0;
+    }else if (generator.data() == (HkxObject *)obj){
+        return 1;
+    }
+    return -1;
 }
 
 bool hkbModifierGenerator::readData(const HkxXmlReader &reader, long index){
@@ -213,7 +165,7 @@ bool hkbModifierGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxObjectExpSharedPtr *ptr;

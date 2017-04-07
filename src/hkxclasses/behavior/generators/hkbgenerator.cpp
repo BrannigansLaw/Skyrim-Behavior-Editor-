@@ -1,9 +1,10 @@
 #include "hkbgenerator.h"
-#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/ui/treegraphicsitem.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/ui/dataiconmanager.h"
 
 hkbGenerator::hkbGenerator(HkxFile *parent, long ref)
-    : DataIconManager(parent, ref)
+    : HkDynamicObject(parent, ref)
 {
     //
 }

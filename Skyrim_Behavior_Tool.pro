@@ -128,9 +128,6 @@ SOURCES += \
     src/filetypes/skeletonfile.cpp \
     src/hkxclasses/behavior/hkbprojectdata.cpp \
     src/hkxclasses/behavior/hkbprojectstringdata.cpp \
-    src/ui/customtreegraphicsview.cpp \
-    src/ui/behaviorgraphui/behaviorgraphview.cpp \
-    src/ui/behaviorgraphui/customtreegraphicsviewicon.cpp \
     src/hkxclasses/behavior/hkbmirroredskeletoninfo.cpp \
     src/hkxclasses/behavior/hkbcharacterstringdata.cpp \
     src/hkxclasses/behavior/hkbcharacterdata.cpp \
@@ -149,7 +146,12 @@ SOURCES += \
     src/ui/hkxclassesui/behaviorui/handikdriverinfoui.cpp \
     src/ui/hkxclassesui/behaviorui/handikdriverinfohandui.cpp \
     src/ui/hkxclassesui/behaviorui/generators/blendergeneratorui.cpp \
-    src/ui/hkxclassesui/behaviorui/generators/blendergeneratorchildui.cpp
+    src/ui/hkxclassesui/behaviorui/generators/blendergeneratorchildui.cpp \
+    src/ui/treegraphicsview.cpp \
+    src/ui/treegraphicsscene.cpp \
+    src/ui/treegraphicsitem.cpp \
+    src/ui/dataiconmanager.cpp \
+    src/ui/behaviorgraphview.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -260,9 +262,6 @@ HEADERS  += \
     src/filetypes/skeletonfile.h \
     src/hkxclasses/behavior/hkbprojectdata.h \
     src/hkxclasses/behavior/hkbprojectstringdata.h \
-    src/ui/customtreegraphicsview.h \
-    src/ui/behaviorgraphui/behaviorgraphview.h \
-    src/ui/behaviorgraphui/customtreegraphicsviewicon.h \
     src/hkxclasses/behavior/hkbmirroredskeletoninfo.h \
     src/hkxclasses/behavior/hkbcharacterstringdata.h \
     src/hkxclasses/behavior/hkbcharacterdata.h \
@@ -281,4 +280,9 @@ HEADERS  += \
     src/ui/hkxclassesui/behaviorui/handikdriverinfoui.h \
     src/ui/hkxclassesui/behaviorui/handikdriverinfohandui.h \
     src/ui/hkxclassesui/behaviorui/generators/blendergeneratorui.h \
-    src/ui/hkxclassesui/behaviorui/generators/blendergeneratorchildui.h
+    src/ui/hkxclassesui/behaviorui/generators/blendergeneratorchildui.h \
+    src/ui/dataiconmanager.h \
+    src/ui/treegraphicsscene.h \
+    src/ui/treegraphicsview.h \
+    src/ui/treegraphicsitem.h \
+    src/ui/behaviorgraphview.h

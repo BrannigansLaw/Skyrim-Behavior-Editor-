@@ -90,7 +90,7 @@ bool BSBoneSwitchGeneratorBoneData::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog("BSBoneSwitchGeneratorBoneData: link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
     HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pGenerator.getReference());

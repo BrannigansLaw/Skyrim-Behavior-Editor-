@@ -42,67 +42,25 @@ int BSBoneSwitchGenerator::getIndexToInsertIcon() const{
     return -1;
 }
 
-bool BSBoneSwitchGenerator::setChildAt(HkxObject *newChild, ushort index){
-    if (newChild && newChild->getType() != TYPE_GENERATOR){
-        return false;
-    }
-    if (index == 0){
-        pDefaultGenerator = newChild;
-        return true;
-    }
-    index++;
-    BSBoneSwitchGeneratorBoneData *child = NULL;
-    if (!ChildrenA.isEmpty()){
-        if (index < ChildrenA.size()){
-            child = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index).data());
-            if (child){
-                child->pGenerator = HkxObjectExpSharedPtr(newChild);
-                return true;
-            }else{
-                return false;
-            }
+bool BSBoneSwitchGenerator::insertObjectAt(int index, DataIconManager *obj){
+    BSBoneSwitchGeneratorBoneData *objChild;
+    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
+        if (index == 0){
+            pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        }else if (index > ChildrenA.size()){
+            objChild = new BSBoneSwitchGeneratorBoneData(getParentFile(), -1);
+            ChildrenA.append(HkxObjectExpSharedPtr(objChild));
+            objChild->pGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        }else if (index > -1){
+            objChild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index - 1).data());
+            objChild->pGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
         }else{
             return false;
         }
-    }else{
-        child = new BSBoneSwitchGeneratorBoneData(getParentFile());
-        child->pGenerator = HkxObjectExpSharedPtr(newChild);
-        ChildrenA.append(HkxObjectExpSharedPtr(child));
         return true;
-    }
-}
-
-bool BSBoneSwitchGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (!objToInject || objToInject->getType() != TYPE_GENERATOR){
+    }else{
         return false;
     }
-    bool wasReplaced = false;
-    if (pDefaultGenerator.data() == childToReplace){
-        if (!objToInject->setChildAt(pDefaultGenerator.data())){
-            return false;
-        }
-        pDefaultGenerator = HkxObjectExpSharedPtr(objToInject);
-        wasReplaced = true;
-    }
-    BSBoneSwitchGeneratorBoneData *child;
-    for (int i = 0; i < ChildrenA.size(); i++){
-        child = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data());
-        if (child->pGenerator.data() == childToReplace){
-            if (!objToInject->setChildAt(child->pGenerator.data())){
-                return false;
-            }
-            child->pGenerator = HkxObjectExpSharedPtr(objToInject);
-            wasReplaced = true;
-        }
-    }
-    return wasReplaced;
-}
-
-bool BSBoneSwitchGenerator::appendObject(DataIconManager *objToAppend){
-    BSBoneSwitchGeneratorBoneData *objChild = new BSBoneSwitchGeneratorBoneData(getParentFile(), -1);
-    ChildrenA.append(HkxObjectExpSharedPtr(objChild));
-    objChild->pGenerator = HkxObjectExpSharedPtr(objToAppend);
-    return true;
 }
 
 bool BSBoneSwitchGenerator::hasChildren() const{
@@ -119,58 +77,47 @@ bool BSBoneSwitchGenerator::hasChildren() const{
     return false;
 }
 
-bool BSBoneSwitchGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
-    if (removeAll){
-        if (pDefaultGenerator.data() == objToRemove){
-            pDefaultGenerator = HkxObjectExpSharedPtr();
-        }
-        BSBoneSwitchGeneratorBoneData *child;
-        for (int i = 0; i < ChildrenA.size(); i++){
-            child = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data());
-            if (child->pGenerator.data() == objToRemove){
-                ChildrenA.removeAt(i);
-                i--;
-            }
-        }
-    }else{
-        if (pDefaultGenerator.data() == objToRemove){
-            pDefaultGenerator = HkxObjectExpSharedPtr();
-            return true;
-        }
-        BSBoneSwitchGeneratorBoneData *child;
-        for (int i = 0; i < ChildrenA.size(); i++){
-            child = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data());
-            if (child->pGenerator.data() == objToRemove){
-                ChildrenA.removeAt(i);
-                return true;
-            }
+QList<DataIconManager *> BSBoneSwitchGenerator::getChildren() const{
+    QList<DataIconManager *> list;
+    if (pDefaultGenerator.data()){
+        list.append((DataIconManager *)pDefaultGenerator.data());
+    }
+    BSBoneSwitchGeneratorBoneData *child;
+    for (int i = 0; i < ChildrenA.size(); i++){
+        child = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data());
+        if (child->pGenerator.data()){
+            list.append((DataIconManager *)child->pGenerator.data());
         }
     }
-    return true;
+    return list;
 }
 
-int BSBoneSwitchGenerator::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
-    int objectChildCount = 0;
-    if (pDefaultGenerator.data()){
-        list.append(static_cast<DataIconManager *>(pDefaultGenerator.data()));
-        objectChildCount++;
-    }
-    if (reverseOrder){
-        for (int i = ChildrenA.size() - 1; i >= 0; i--){
-            if (ChildrenA.at(i).data() && static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data())->pGenerator.data()){
-                list.append(static_cast<DataIconManager *>(static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data())->pGenerator.data()));
-                objectChildCount++;
-            }
-        }
+int BSBoneSwitchGenerator::getIndexOfObj(DataIconManager *obj) const{
+    BSBoneSwitchGeneratorBoneData *child;
+    if (pDefaultGenerator.data() == (HkxObject *)obj){
+        return 0;
     }else{
         for (int i = 0; i < ChildrenA.size(); i++){
-            if (ChildrenA.at(i).data() && static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data())->pGenerator.data()){
-                list.append(static_cast<DataIconManager *>(static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data())->pGenerator.data()));
-                objectChildCount++;
+            child = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data());
+            if (child->pGenerator.data() == (HkxObject *)obj){
+                return i + 1;
             }
         }
     }
-    return objectChildCount;
+    return -1;
+}
+
+bool BSBoneSwitchGenerator::removeObjectAt(int index){
+    BSBoneSwitchGeneratorBoneData *objChild;
+    if (index == 0){
+        pDefaultGenerator = HkxObjectExpSharedPtr();
+    }else if (index > -1 && index <= ChildrenA.size()){
+        objChild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index - 1).data());
+        ChildrenA.removeAt(index - 1);
+    }else{
+        return false;
+    }
+    return true;
 }
 
 bool BSBoneSwitchGenerator::readData(const HkxXmlReader &reader, long index){
@@ -264,7 +211,7 @@ bool BSBoneSwitchGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
     HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getReference());

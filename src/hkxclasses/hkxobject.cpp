@@ -2,8 +2,10 @@
 #include "src/filetypes/behaviorfile.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/hkxclasses/behavior/hkbvariablebindingset.h"
-#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/ui/treegraphicsitem.h"
 #include "src/hkxclasses/behavior/modifiers/hkbmodifier.h"
+
+#include <QGraphicsScene>
 
 /**
  * HkxObject
@@ -50,10 +52,6 @@ QString HkxObject::getBoolAsString(bool b) const{
     }else{
         return "false";
     }
-}
-
-bool HkxObject::setChildAt(HkxObject *newChild, ushort index){
-    return false;
 }
 
 HkxObject::HkxType HkxObject::getType() const{
@@ -473,71 +471,5 @@ bool HkDynamicObject::evaulateDataValidity(){
 }
 
 HkDynamicObject::~HkDynamicObject(){
-    //
-}
-
-/**
- * DataIconManager
-*/
-
-DataIconManager::DataIconManager(HkxFile *parent, long ref)
-    : HkDynamicObject(parent, ref)
-{
-    //
-}
-
-void DataIconManager::updateIconNames(){
-    icons.first()->scene()->update();
-    /*for (int i = 0; i < icons.size(); i++){
-        icons.at(i)->update(QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size())));
-    }*/
-}
-
-QString DataIconManager::getName() const{
-    if (getType() == TYPE_GENERATOR){
-        return static_cast<const hkbGenerator * const>(this)->getName();
-    }else if (getType() == TYPE_MODIFIER){
-        return static_cast<const hkbModifier * const>(this)->getName();
-    }
-    return "";
-}
-
-bool DataIconManager::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    return false;
-}
-
-bool DataIconManager::appendObject(DataIconManager *objToAppend){
-    return false;
-}
-
-bool DataIconManager::removeObject(DataIconManager *objToRemove, bool removeAll){
-    return false;
-}
-
-bool DataIconManager::hasChildren() const{
-    return false;
-}
-
-/*void DataIconManager::swapIconPosition(){
-    for (int i = 0; i < icons.size(); i++){
-        if (icons.first()->pos().y() > icons.at(i)->pos().y() && i > 0){
-            icons.at(i)->setParent(icons.first()->setParent(icons.at(i)->parent));
-        }
-    }
-}*/
-
-int DataIconManager::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
-    return 0;
-}
-
-int DataIconManager::getIndexToInsertIcon(HkxObject *child) const{
-    return -1;
-}
-
-void DataIconManager::appendIcon(CustomTreeGraphicsViewIcon *icon){
-    icons.append(icon);
-}
-
-DataIconManager::~DataIconManager(){
     //
 }

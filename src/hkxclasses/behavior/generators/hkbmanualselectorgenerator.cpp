@@ -38,83 +38,28 @@ int hkbManualSelectorGenerator::getIndexToInsertIcon(HkxObject *child) const{
     return -1;
 }
 
-bool hkbManualSelectorGenerator::setChildAt(HkxObject *newChild, ushort index){
-    if (newChild && newChild->getType() != TYPE_GENERATOR){
-        return false;
-    }
-    if (!generators.isEmpty()){
-        if (index < generators.size()){
-            if (generators.at(index)){
-                generators[index] = HkxObjectExpSharedPtr(newChild);
-                return true;
-            }else{
-                return false;
-            }
+bool hkbManualSelectorGenerator::insertObjectAt(int index, DataIconManager *obj){
+    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
+        if (index >= generators.size()){
+            generators.append(HkxObjectExpSharedPtr((HkxObject *)obj));
+        }else if (index > -1){
+            generators[index] = HkxObjectExpSharedPtr((HkxObject *)obj);
         }else{
             return false;
         }
-    }else{
-        generators.append(HkxObjectExpSharedPtr(newChild));
         return true;
+    }else{
+        return false;
     }
 }
 
-bool hkbManualSelectorGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (!objToInject || objToInject->getType() != TYPE_GENERATOR){
+bool hkbManualSelectorGenerator::removeObjectAt(int index){
+    if (index > -1 && index < generators.size()){
+        generators.removeAt(index);
+    }else{
         return false;
     }
-    bool wasReplaced = false;
-    for (int i = 0; i < generators.size(); i++){
-        if (generators.at(i).data() == childToReplace){
-            if (!objToInject->setChildAt(generators.at(i).data())){
-                return false;
-            }
-            generators[i] = HkxObjectExpSharedPtr(objToInject);
-            wasReplaced = true;
-        }
-    }
-    return wasReplaced;
-}
-
-bool hkbManualSelectorGenerator::appendObject(DataIconManager *objToAppend){
-    if (!objToAppend || objToAppend->getType() != TYPE_GENERATOR){
-        return false;
-    }
-    generators.append(HkxObjectExpSharedPtr(objToAppend));
     return true;
-}
-
-bool hkbManualSelectorGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
-    if (removeAll){
-        if (generators.removeAll(HkxObjectExpSharedPtr(objToRemove))){
-            return true;
-        }
-    }else{
-        if (generators.removeOne(HkxObjectExpSharedPtr(objToRemove))){
-            return true;
-        }
-    }
-    return false;
-}
-
-int hkbManualSelectorGenerator::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
-    int objectChildCount = 0;
-    if (reverseOrder){
-        for (int i = generators.size() - 1; i >= 0; i--){
-            if (generators.at(i).data()){
-                list.append(static_cast<DataIconManager *>(generators.at(i).data()));
-                objectChildCount++;
-            }
-        }
-    }else{
-        for (int i = 0; i < generators.size(); i++){
-            if (generators.at(i).data()){
-                list.append(static_cast<DataIconManager *>(generators.at(i).data()));
-                objectChildCount++;
-            }
-        }
-    }
-    return objectChildCount;
 }
 
 bool hkbManualSelectorGenerator::hasChildren() const{
@@ -124,6 +69,25 @@ bool hkbManualSelectorGenerator::hasChildren() const{
         }
     }
     return false;
+}
+
+QList<DataIconManager *> hkbManualSelectorGenerator::getChildren() const{
+    QList<DataIconManager *> list;
+    for (int i = 0; i < generators.size(); i++){
+        if (generators.at(i).data()){
+            list.append((DataIconManager *)generators.at(i).data());
+        }
+    }
+    return list;
+}
+
+int hkbManualSelectorGenerator::getIndexOfObj(DataIconManager *obj) const{
+    for (int i = 0; i < generators.size(); i++){
+        if (generators.at(i).data() == (HkxObject *)obj){
+            return i;
+        }
+    }
+    return -1;
 }
 
 bool hkbManualSelectorGenerator::readData(const HkxXmlReader &reader, long index){
@@ -216,7 +180,7 @@ bool hkbManualSelectorGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxObjectExpSharedPtr *ptr;

@@ -6,13 +6,13 @@
 #include "src/hkxclasses/behavior/generators/hkbgenerator.h"
 #include "src/hkxclasses/behavior/hkbcharacterdata.h"
 #include "src/hkxclasses/hkxobject.h"
-#include "src/ui/behaviorgraphui/behaviorgraphview.h"
+#include "src/ui/behaviorgraphview.h"
 #include "src/ui/hkxclassesui/hkdataui.h"
 #include "src/ui/hkxclassesui/behaviorui/behaviorvariablesui.h"
 #include "src/ui/hkxclassesui/behaviorui/characterpropertiesui.h"
 #include "src/ui/hkxclassesui/behaviorui/eventsui.h"
 #include "src/ui/hkxclassesui/projectui.h"
-#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/ui/treegraphicsitem.h"
 #include "src/hkxclasses/behavior/generators/hkbbehaviorgraph.h"
 
 #include <QtWidgets>
@@ -164,7 +164,7 @@ void MainWindow::changedTabs(int index){
 void MainWindow::expandBranches(){
     int index = tabs->currentIndex() - 1;
     if (index >= 0 && index < behaviorFiles.size() && index < behaviorGraphs.size()){
-        behaviorGraphs.at(index)->expandBranch(behaviorGraphs.at(index)->rootIcon, true);
+        behaviorGraphs.at(index)->expandAllBranches();
     }else{
         writeToLog("MainWindow: collapseBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!", true);
     }
@@ -173,8 +173,8 @@ void MainWindow::expandBranches(){
 void MainWindow::collapseBranches(){
     int index = tabs->currentIndex() - 1;
     if (index >= 0 && index < behaviorFiles.size() && index < behaviorGraphs.size()){
-        behaviorGraphs.at(index)->contractBranch(behaviorGraphs.at(index)->rootIcon, true);
-        behaviorGraphs.at(index)->rootIcon->setSelected();
+        behaviorGraphs.at(index)->contractAllBranches();
+        behaviorGraphs.at(index)->selectRoot();
     }else{
         writeToLog("MainWindow: collapseBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!", true);
     }
@@ -433,7 +433,7 @@ bool MainWindow::openBehavior(const QString & filename, QProgressDialog *dialog)
     behaviorGraphs.append(new BehaviorGraphView(objectDataWid, behaviorFiles.last()));
     tabs->addTab(behaviorGraphs.last(), filename.split("/").last());
     setProgressData("Drawing Behavior Graph...", 60);
-    if (!behaviorGraphs.last()->draw(static_cast<DataIconManager *>(behaviorFiles.last()->getBehaviorGraph()), static_cast<DataIconManager *>(behaviorFiles.last()->getRootStateMachine()))){
+    if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(behaviorFiles.last()->getBehaviorGraph()))){
         writeToLog("MainWindow: drawBehaviorGraph() failed!\nThe behavior graph was drawn incorrectly!", true);
     }
     //setProgressData("Loading Variables...", 95);

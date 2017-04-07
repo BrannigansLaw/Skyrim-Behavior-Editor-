@@ -32,30 +32,7 @@ QString hkbDelayedModifier::getName() const{
     return name;
 }
 
-bool hkbDelayedModifier::setChildAt(HkxObject *newChild, ushort index){
-    if (index == 0 && (!newChild || newChild->getType() == TYPE_MODIFIER)){
-        modifier = HkxObjectExpSharedPtr(newChild);
-        return true;
-    }else{
-        return false;
-    }
-}
-
-bool hkbDelayedModifier::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (objToInject->getType() != TYPE_MODIFIER){
-        return false;
-    }
-    if (modifier.data() == childToReplace){
-        if (!objToInject->setChildAt(modifier.data())){
-            return false;
-        }
-        modifier = HkxObjectExpSharedPtr(objToInject);
-        return true;
-    }
-    return false;
-}
-
-bool hkbDelayedModifier::appendObject(DataIconManager *objToAppend){
+bool hkbDelayedModifier::insertObjectAt(int index, DataIconManager *obj){
     if (objToAppend->getType() != TYPE_MODIFIER){
         return false;
     }
@@ -63,7 +40,7 @@ bool hkbDelayedModifier::appendObject(DataIconManager *objToAppend){
     return true;
 }
 
-bool hkbDelayedModifier::removeObject(DataIconManager *objToRemove, bool removeAll){
+bool hkbDelayedModifier::removeObjectAt(int index){
     if (modifier.data() == objToRemove){
         modifier = HkxObjectExpSharedPtr();
         return true;
@@ -76,15 +53,6 @@ bool hkbDelayedModifier::hasChildren() const{
         return true;
     }
     return false;
-}
-
-int hkbDelayedModifier::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
-    int objectChildCount = 0;
-    if (modifier.data()){
-        list.append(static_cast<DataIconManager *>(modifier.data()));
-        objectChildCount++;
-    }
-    return objectChildCount;
 }
 
 bool hkbDelayedModifier::readData(const HkxXmlReader &reader, long index){
@@ -179,7 +147,7 @@ bool hkbDelayedModifier::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifier.getReference());

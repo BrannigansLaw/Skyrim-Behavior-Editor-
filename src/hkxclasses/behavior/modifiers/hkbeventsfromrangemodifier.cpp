@@ -117,7 +117,7 @@ bool hkbEventsFromRangeModifier::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventRanges.getReference());

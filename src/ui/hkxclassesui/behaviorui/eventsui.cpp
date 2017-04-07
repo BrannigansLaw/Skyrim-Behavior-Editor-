@@ -1,10 +1,10 @@
 #include "eventsui.h"
 
-#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/ui/treegraphicsitem.h"
 #include "src/ui/genericdatawidgets.h"
 #include "src/hkxclasses/behavior/generators/hkbgenerator.h"
 #include "src/filetypes/behaviorfile.h"
-#include "src/ui/behaviorgraphui/behaviorgraphview.h"
+#include "src/ui/behaviorgraphview.h"
 #include "src/hkxclasses/behavior/generators/bsistatetagginggenerator.h"
 #include "src/hkxclasses/behavior/generators/hkbmodifiergenerator.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/bsistatetagginggeneratorui.h"

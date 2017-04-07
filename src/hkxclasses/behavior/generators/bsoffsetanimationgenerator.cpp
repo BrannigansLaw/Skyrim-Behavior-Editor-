@@ -39,97 +39,52 @@ int BSOffsetAnimationGenerator::getIndexToInsertIcon() const{
     return -1;
 }
 
-bool BSOffsetAnimationGenerator::setChildAt(HkxObject *newChild, ushort index){
-    if (index == 0 && (!newChild || newChild->getType() == TYPE_GENERATOR)){
-        pDefaultGenerator = HkxObjectExpSharedPtr(newChild);
-        return true;
-    }else if (index == 1 && (!newChild || newChild->getSignature() == HKB_CLIP_GENERATOR)){
-        pOffsetClipGenerator = HkxObjectExpSharedPtr(newChild);
-        return true;
+bool BSOffsetAnimationGenerator::insertObjectAt(int index, DataIconManager *obj){
+    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR && index == 0){
+        pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+    }else if (((HkxObject *)obj)->getSignature() == HKB_CLIP_GENERATOR && index == 1){
+        pOffsetClipGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
     }else{
         return false;
     }
 }
 
-bool BSOffsetAnimationGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (!objToInject || objToInject->getType() != TYPE_GENERATOR){
+bool BSOffsetAnimationGenerator::removeObjectAt(int index){
+    if (index == 0){
+        pDefaultGenerator = HkxObjectExpSharedPtr();
+    }else if (index == 1){
+        pOffsetClipGenerator = HkxObjectExpSharedPtr();
+    }else{
         return false;
     }
-    if (pDefaultGenerator.data() == childToReplace){
-        if (!objToInject->setChildAt(pDefaultGenerator.data())){
-            return false;
-        }
-        pDefaultGenerator = HkxObjectExpSharedPtr(objToInject);
-        return true;
-    }
-    return false;
-}
-
-bool BSOffsetAnimationGenerator::appendObject(DataIconManager *objToAppend){
-    if (!objToAppend || objToAppend->getType() != TYPE_GENERATOR){
-        return false;
-    }
-    pDefaultGenerator = HkxObjectExpSharedPtr(objToAppend);
     return true;
 }
 
-bool BSOffsetAnimationGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
-    bool b = false;
-    if (removeAll){
-        if (pDefaultGenerator.data() == objToRemove){
-            pDefaultGenerator = HkxObjectExpSharedPtr();
-            b = true;
-        }
-        if (pOffsetClipGenerator.data() == objToRemove){
-            pOffsetClipGenerator = HkxObjectExpSharedPtr();
-            b = true;
-        }
-        return b;
-    }else{
-        if (pDefaultGenerator.data() == objToRemove){
-            pDefaultGenerator = HkxObjectExpSharedPtr();
-            return true;
-        }
-        if (pOffsetClipGenerator.data() == objToRemove){
-            pOffsetClipGenerator = HkxObjectExpSharedPtr();
-            return true;
-        }
+bool BSOffsetAnimationGenerator::hasChildren() const{
+    if (pDefaultGenerator.data() || pOffsetClipGenerator.data()){
+        return true;
     }
     return false;
 }
 
-bool BSOffsetAnimationGenerator::hasChildren() const{
+QList<DataIconManager *> BSOffsetAnimationGenerator::getChildren() const{
+    QList<DataIconManager *> list;
     if (pDefaultGenerator.data()){
-        return true;
+        list.append((DataIconManager *)pDefaultGenerator.data());
     }
     if (pOffsetClipGenerator.data()){
-        return true;
+        list.append((DataIconManager *)pOffsetClipGenerator.data());
     }
-    return false;
+    return list;
 }
 
-int BSOffsetAnimationGenerator::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
-    int objectChildCount = 0;
-    if (reverseOrder){
-        if (pDefaultGenerator.data()){
-            list.append(static_cast<DataIconManager *>(pDefaultGenerator.data()));
-            objectChildCount++;
-        }
-        if (pOffsetClipGenerator.data()){
-            list.append(static_cast<DataIconManager *>(pOffsetClipGenerator.data()));
-            objectChildCount++;
-        }
-    }else{
-        if (pOffsetClipGenerator.data()){
-            list.append(static_cast<DataIconManager *>(pOffsetClipGenerator.data()));
-            objectChildCount++;
-        }
-        if (pDefaultGenerator.data()){
-            list.append(static_cast<DataIconManager *>(pDefaultGenerator.data()));
-            objectChildCount++;
-        }
+int BSOffsetAnimationGenerator::getIndexOfObj(DataIconManager *obj) const{
+    if (pDefaultGenerator.data() == (HkxObject *)obj){
+        return 0;
+    }else if (pOffsetClipGenerator.data() == (HkxObject *)obj){
+        return 1;
     }
-    return objectChildCount;
+    return -1;
 }
 
 bool BSOffsetAnimationGenerator::readData(const HkxXmlReader &reader, long index){
@@ -231,7 +186,7 @@ bool BSOffsetAnimationGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getReference());

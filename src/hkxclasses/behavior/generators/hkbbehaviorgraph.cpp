@@ -39,40 +39,26 @@ int hkbBehaviorGraph::getIndexToInsertIcon() const{
     return -1;
 }
 
-bool hkbBehaviorGraph::setChildAt(HkxObject *newChild, ushort index){
-    if (index == 0 && (!newChild || newChild->getSignature() == HKB_STATE_MACHINE)){
-        rootGenerator = HkxObjectExpSharedPtr(newChild);
+bool hkbBehaviorGraph::insertObjectAt(int index, DataIconManager *obj){
+    if (((HkxObject *)obj)->getSignature() == HKB_STATE_MACHINE){
+        if (index == 0){
+            rootGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        }else{
+            return false;
+        }
         return true;
     }else{
         return false;
     }
 }
 
-bool hkbBehaviorGraph::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (rootGenerator.data() == childToReplace && (!objToInject && objToInject->getSignature() == HKB_STATE_MACHINE)){
-        if (!objToInject->setChildAt(rootGenerator.data())){
-            return false;
-        }
-        rootGenerator = HkxObjectExpSharedPtr(objToInject);
-        return true;
-    }
-    return false;
-}
-
-bool hkbBehaviorGraph::appendObject(DataIconManager *objToAppend){
-    if (objToAppend->getSignature() == HKB_STATE_MACHINE){
-        rootGenerator = HkxObjectExpSharedPtr(objToAppend);
-        return true;
-    }
-    return false;
-}
-
-bool hkbBehaviorGraph::removeObject(DataIconManager *objToRemove, bool removeAll){
-    if (rootGenerator.data() == objToRemove){
+bool hkbBehaviorGraph::removeObjectAt(int index){
+    if (index == 0){
         rootGenerator = HkxObjectExpSharedPtr();
-        return true;
+    }else{
+        return false;
     }
-    return false;
+    return true;
 }
 
 bool hkbBehaviorGraph::hasChildren() const{
@@ -82,13 +68,19 @@ bool hkbBehaviorGraph::hasChildren() const{
     return false;
 }
 
-int hkbBehaviorGraph::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
-    int objectChildCount = 0;
+QList<DataIconManager *> hkbBehaviorGraph::getChildren() const{
+    QList<DataIconManager *> list;
     if (rootGenerator.data()){
-        list.append(static_cast<DataIconManager *>(rootGenerator.data()));
-        objectChildCount++;
+        list.append((DataIconManager *)rootGenerator.data());
     }
-    return objectChildCount;
+    return list;
+}
+
+int hkbBehaviorGraph::getIndexOfObj(DataIconManager *obj) const{
+    if (rootGenerator.data() == (HkxObject *)obj){
+        return 0;
+    }
+    return -1;
 }
 
 bool hkbBehaviorGraph::readData(const HkxXmlReader &reader, long index){
@@ -178,7 +170,7 @@ bool hkbBehaviorGraph::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(rootGenerator.getReference());

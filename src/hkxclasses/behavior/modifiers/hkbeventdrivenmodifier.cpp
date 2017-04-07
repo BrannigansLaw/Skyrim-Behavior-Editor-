@@ -29,30 +29,7 @@ QString hkbEventDrivenModifier::getName() const{
     return name;
 }
 
-bool hkbEventDrivenModifier::setChildAt(HkxObject *newChild, ushort index){
-    if (index == 0 && (!newChild || newChild->getType() == TYPE_MODIFIER)){
-        modifier = HkxObjectExpSharedPtr(newChild);
-        return true;
-    }else{
-        return false;
-    }
-}
-
-bool hkbEventDrivenModifier::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (objToInject->getType() != TYPE_MODIFIER){
-        return false;
-    }
-    if (modifier.data() == childToReplace){
-        if (!objToInject->setChildAt(modifier.data())){
-            return false;
-        }
-        modifier = HkxObjectExpSharedPtr(objToInject);
-        return true;
-    }
-    return false;
-}
-
-bool hkbEventDrivenModifier::appendObject(DataIconManager *objToAppend){
+bool hkbEventDrivenModifier::insertObjectAt(int index, DataIconManager *obj){
     if (objToAppend->getType() != TYPE_MODIFIER){
         return false;
     }
@@ -60,7 +37,7 @@ bool hkbEventDrivenModifier::appendObject(DataIconManager *objToAppend){
     return true;
 }
 
-bool hkbEventDrivenModifier::removeObject(DataIconManager *objToRemove, bool removeAll){
+bool hkbEventDrivenModifier::removeObjectAt(int index){
     if (modifier.data() == objToRemove){
         modifier = HkxObjectExpSharedPtr();
         return true;
@@ -73,15 +50,6 @@ bool hkbEventDrivenModifier::hasChildren() const{
         return true;
     }
     return false;
-}
-
-int hkbEventDrivenModifier::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
-    int objectChildCount = 0;
-    if (modifier.data()){
-        list.append(static_cast<DataIconManager *>(modifier.data()));
-        objectChildCount++;
-    }
-    return objectChildCount;
 }
 
 bool hkbEventDrivenModifier::readData(const HkxXmlReader &reader, long index){
@@ -176,7 +144,7 @@ bool hkbEventDrivenModifier::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifier.getReference());

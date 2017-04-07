@@ -7,8 +7,8 @@
 #include "src/hkxclasses/behavior/hkbstringeventpayload.h"
 #include "src/ui/genericdatawidgets.h"
 #include "src/filetypes/behaviorfile.h"
-#include "src/ui/behaviorgraphui/behaviorgraphview.h"
-#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/ui/behaviorgraphview.h"
+#include "src/ui/treegraphicsitem.h"
 #include "src/ui/hkxclassesui/behaviorui/blendingtransitioneffectui.h"
 
 #include <QVBoxLayout>

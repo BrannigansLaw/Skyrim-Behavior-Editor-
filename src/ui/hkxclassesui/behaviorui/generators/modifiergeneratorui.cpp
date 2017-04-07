@@ -4,8 +4,8 @@
 #include "src/hkxclasses/behavior/modifiers/hkbmodifier.h"
 #include "src/ui/genericdatawidgets.h"
 #include "src/filetypes/behaviorfile.h"
-#include "src/ui/behaviorgraphui/behaviorgraphview.h"
-#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/ui/behaviorgraphview.h"
+#include "src/ui/treegraphicsitem.h"
 
 #include <QVBoxLayout>
 #include <QPushButton>

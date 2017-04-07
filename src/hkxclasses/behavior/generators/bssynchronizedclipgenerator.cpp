@@ -34,52 +34,26 @@ QString BSSynchronizedClipGenerator::getName() const{
     return name;
 }
 
-bool BSSynchronizedClipGenerator::setChildAt(HkxObject *newChild, ushort index){
-    if (index == 0 && (!newChild || newChild->getSignature() == BS_SYNCHRONIZED_CLIP_GENERATOR)){
-        pClipGenerator = HkxObjectExpSharedPtr(newChild);
+bool BSSynchronizedClipGenerator::insertObjectAt(int index, DataIconManager *obj){
+    if (((HkxObject *)obj)->getSignature() == HKB_CLIP_GENERATOR){
+        if (index == 0){
+            pClipGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        }else{
+            return false;
+        }
         return true;
     }else{
         return false;
     }
 }
 
-bool BSSynchronizedClipGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (!objToInject || objToInject->getSignature() != HKB_CLIP_GENERATOR){
+bool BSSynchronizedClipGenerator::removeObjectAt(int index){
+    if (index == 0){
+        pClipGenerator = HkxObjectExpSharedPtr();
+    }else{
         return false;
     }
-    if (pClipGenerator.data() == childToReplace){
-        if (!objToInject->setChildAt(pClipGenerator.data())){
-            return false;
-        }
-        pClipGenerator = HkxObjectExpSharedPtr(objToInject);
-        return true;
-    }
-    return false;
-}
-
-bool BSSynchronizedClipGenerator::appendObject(DataIconManager *objToAppend){
-    if (objToAppend->getSignature() == HKB_CLIP_GENERATOR){
-        pClipGenerator = HkxObjectExpSharedPtr(objToAppend);
-        return true;
-    }
-    return false;
-}
-
-bool BSSynchronizedClipGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
-    if (pClipGenerator.data() == objToRemove){
-        pClipGenerator = HkxObjectExpSharedPtr();
-        return true;
-    }
-    return false;
-}
-
-int BSSynchronizedClipGenerator::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
-    int objectChildCount = 0;
-    if (pClipGenerator.data()){
-        list.append(static_cast<DataIconManager *>(pClipGenerator.data()));
-        objectChildCount++;
-    }
-    return objectChildCount;
+    return true;
 }
 
 bool BSSynchronizedClipGenerator::hasChildren() const{
@@ -87,6 +61,21 @@ bool BSSynchronizedClipGenerator::hasChildren() const{
         return true;
     }
     return false;
+}
+
+QList<DataIconManager *> BSSynchronizedClipGenerator::getChildren() const{
+    QList<DataIconManager *> list;
+    if (pClipGenerator.data()){
+        list.append((DataIconManager *)pClipGenerator.data());
+    }
+    return list;
+}
+
+int BSSynchronizedClipGenerator::getIndexOfObj(DataIconManager *obj) const{
+    if (pClipGenerator.data() == (HkxObject *)obj){
+        return 0;
+    }
+    return -1;
 }
 
 bool BSSynchronizedClipGenerator::readData(const HkxXmlReader &reader, long index){
@@ -205,7 +194,7 @@ bool BSSynchronizedClipGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pClipGenerator.getReference());

@@ -119,84 +119,34 @@ int hkbStateMachine::getNumberOfNestedStates(int stateId) const{
     return -1;
 }
 
-bool hkbStateMachine::setChildAt(HkxObject *newChild, ushort index){
-    if (newChild && newChild->getType() != TYPE_GENERATOR){
-        return false;
-    }
-    hkbStateMachineStateInfo *state = NULL;
-    if (!states.isEmpty()){
-        if (index < states.size()){
-            state = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
-            if (state){
-                state->generator = HkxObjectExpSharedPtr(newChild);
-                return true;
-            }else{
-                return false;
-            }
+bool hkbStateMachine::insertObjectAt(int index, DataIconManager *obj){
+    hkbStateMachineStateInfo *objChild;
+    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
+        if (index >= states.size()){
+            objChild = new hkbStateMachineStateInfo(getParentFile(), this, -1);
+            states.append(HkxObjectExpSharedPtr(objChild));
+            objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        }else if (index > -1){
+            objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index - 1).data());
+            objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
         }else{
             return false;
         }
-    }else{
-        state = new hkbStateMachineStateInfo(getParentFile(), this, 0);
-        state->generator = HkxObjectExpSharedPtr(newChild);
-        states.append(HkxObjectExpSharedPtr(state));
         return true;
-    }
-}
-
-bool hkbStateMachine::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (!objToInject || objToInject->getType() != TYPE_GENERATOR){
-        return false;
-    }
-    bool wasReplaced = false;
-    hkbStateMachineStateInfo *state;
-    for (int i = 0; i < states.size(); i++){
-        state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
-        if (state->generator.data() == childToReplace){
-            if (!objToInject->setChildAt(state->generator.data())){
-                return false;
-            }
-            state->generator = HkxObjectExpSharedPtr(objToInject);
-            wasReplaced = true;
-        }
-    }
-    return wasReplaced;
-}
-
-bool hkbStateMachine::appendObject(DataIconManager *objToAppend){
-    if (!objToAppend || objToAppend->getType() != TYPE_GENERATOR){
-        return false;
-    }
-    hkbStateMachineStateInfo *objChild = new hkbStateMachineStateInfo(getParentFile(), this, -1);
-    states.append(HkxObjectExpSharedPtr(objChild));
-    objChild->generator = HkxObjectExpSharedPtr(objToAppend);
-    return true;
-}
-
-bool hkbStateMachine::removeObject(DataIconManager *objToRemove, bool removeAll){
-    bool b = false;
-    if (removeAll){
-        hkbStateMachineStateInfo *child;
-        for (int i = 0; i < states.size(); i++){
-            child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
-            if (child->generator.data() == objToRemove){
-                states.removeAt(i);
-                i--;
-                b = true;
-            }
-        }
-        return b;
     }else{
-        hkbStateMachineStateInfo *child;
-        for (int i = 0; i < states.size(); i++){
-            child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
-            if (child->generator.data() == objToRemove){
-                states.removeAt(i);
-                return true;
-            }
-        }
+        return false;
     }
-    return false;
+}
+
+bool hkbStateMachine::removeObjectAt(int index){
+    hkbStateMachineStateInfo *objChild;
+    if (index > -1 && index < states.size()){
+        objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
+        states.removeAt(index);
+    }else{
+        return false;
+    }
+    return true;
 }
 
 bool hkbStateMachine::hasChildren() const{
@@ -210,24 +160,27 @@ bool hkbStateMachine::hasChildren() const{
     return false;
 }
 
-int hkbStateMachine::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
-    int objectChildCount = 0;
-    if (reverseOrder){
-        for (int i = states.size() - 1; i >= 0; i--){
-            if (states.at(i).data() && static_cast<hkbStateMachineStateInfo *>(states.at(i).data())->generator.data()){
-                list.append(static_cast<DataIconManager *>(static_cast<hkbStateMachineStateInfo *>(states.at(i).data())->generator.data()));
-                objectChildCount++;
-            }
-        }
-    }else{
-        for (int i = 0; i < states.size(); i++){
-            if (states.at(i).data() && static_cast<hkbStateMachineStateInfo *>(states.at(i).data())->generator.data()){
-                list.append(static_cast<DataIconManager *>(static_cast<hkbStateMachineStateInfo *>(states.at(i).data())->generator.data()));
-                objectChildCount++;
-            }
+int hkbStateMachine::getIndexOfObj(DataIconManager *obj) const{
+    hkbStateMachineStateInfo *child;
+    for (int i = 0; i < states.size(); i++){
+        child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+        if (child->generator.data() == (HkxObject *)obj){
+            return i;
         }
     }
-    return objectChildCount;
+    return -1;
+}
+
+QList<DataIconManager *> hkbStateMachine::getChildren() const{
+    QList<DataIconManager *> list;
+    hkbStateMachineStateInfo *child;
+    for (int i = 0; i < states.size(); i++){
+        child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+        if (child->generator.data()){
+            list.append((DataIconManager *)child->generator.data());
+        }
+    }
+    return list;
 }
 
 hkbStateMachine * hkbStateMachine::getNestedStateMachine(int stateId) const{
@@ -448,7 +401,7 @@ bool hkbStateMachine::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(payload.getReference());

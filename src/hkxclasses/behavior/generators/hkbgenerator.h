@@ -2,13 +2,14 @@
 #define HKBGENERATOR_H
 
 #include "src/hkxclasses/hkxobject.h"
+#include "src/ui/dataiconmanager.h"
 
-class CustomTreeGraphicsViewIcon;
+class TreeGraphicsItem;
 
-class hkbGenerator: public DataIconManager
+class hkbGenerator: public HkDynamicObject, public DataIconManager
 {
     friend class BehaviorGraphView;
-    friend class CustomTreeGraphicsViewIcon;
+    friend class TreeGraphicsItem;
 public:
     virtual ~hkbGenerator();
     bool link();

@@ -15,7 +15,7 @@ class ModifierGeneratorUI;
 class ManualSelectorGeneratorUI;
 class StateMachineUI;
 class StateUI;
-class CustomTreeGraphicsViewIcon;
+class TreeGraphicsItem;
 class BehaviorVariablesUI;
 class EventsUI;
 class MainWindow;
@@ -35,7 +35,7 @@ public:
     BehaviorGraphView * setBehaviorView(BehaviorGraphView *view);
     void setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *variables);
 public slots:
-    void changeCurrentDataWidget(CustomTreeGraphicsViewIcon *icon);
+    void changeCurrentDataWidget(TreeGraphicsItem *icon);
     void modifierAdded(const QString & name, const QString & type);
     void modifierNameChanged(const QString & newName, int index);
     void modifierRemoved(int index);

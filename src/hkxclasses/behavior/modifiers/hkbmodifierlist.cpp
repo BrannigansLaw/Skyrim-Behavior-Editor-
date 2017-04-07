@@ -38,45 +38,7 @@ int hkbModifierList::getIndexToInsertIcon() const{
     return -1;
 }
 
-bool hkbModifierList::setChildAt(HkxObject *newChild, ushort index){
-    if (newChild && newChild->getType() != TYPE_MODIFIER){
-        return false;
-    }
-    if (!modifiers.isEmpty()){
-        if (index < modifiers.size()){
-            if (modifiers.at(index)){
-                modifiers[index] = HkxObjectExpSharedPtr(newChild);
-                return true;
-            }else{
-                return false;
-            }
-        }else{
-            return false;
-        }
-    }else{
-        modifiers.append(HkxObjectExpSharedPtr(newChild));
-        return true;
-    }
-}
-
-bool hkbModifierList::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (!objToInject || objToInject->getType() != TYPE_MODIFIER){
-        return false;
-    }
-    bool wasReplaced = false;
-    for (int i = 0; i < modifiers.size(); i++){
-        if (modifiers.at(i).data() == childToReplace){
-            if (!objToInject->setChildAt(modifiers.at(i).data())){
-                return false;
-            }
-            modifiers[i] = HkxObjectExpSharedPtr(objToInject);
-            wasReplaced = true;
-        }
-    }
-    return wasReplaced;
-}
-
-bool hkbModifierList::appendObject(DataIconManager *objToAppend){
+bool hkbModifierList::insertObjectAt(int index, DataIconManager *obj){
     if (!objToAppend || objToAppend->getType() != TYPE_MODIFIER){
         return false;
     }
@@ -84,7 +46,7 @@ bool hkbModifierList::appendObject(DataIconManager *objToAppend){
     return true;
 }
 
-bool hkbModifierList::removeObject(DataIconManager *objToRemove, bool removeAll){
+bool hkbModifierList::removeObjectAt(int index){
     if (removeAll){
         if (modifiers.removeAll(HkxObjectExpSharedPtr(objToRemove))){
             return true;
@@ -104,26 +66,6 @@ bool hkbModifierList::hasChildren() const{
         }
     }
     return false;
-}
-
-int hkbModifierList::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
-    int objectChildCount = 0;
-    if (reverseOrder){
-        for (int i = modifiers.size() - 1; i >= 0; i--){
-            if (modifiers.at(i).data()){
-                list.append(static_cast<DataIconManager *>(modifiers.at(i).data()));
-                objectChildCount++;
-            }
-        }
-    }else{
-        for (int i = 0; i < modifiers.size(); i++){
-            if (modifiers.at(i).data()){
-                list.append(static_cast<DataIconManager *>(modifiers.at(i).data()));
-                objectChildCount++;
-            }
-        }
-    }
-    return objectChildCount;
 }
 
 bool hkbModifierList::readData(const HkxXmlReader &reader, long index){
@@ -210,7 +152,7 @@ bool hkbModifierList::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxObjectExpSharedPtr *ptr;

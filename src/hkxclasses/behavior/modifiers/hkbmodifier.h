@@ -2,13 +2,14 @@
 #define HKBMODIFIER_H
 
 #include "src/hkxclasses/hkxobject.h"
+#include "src/ui/dataiconmanager.h"
 
-class CustomTreeGraphicsViewIcon;
+class TreeGraphicsItem;
 
-class hkbModifier: public DataIconManager
+class hkbModifier: public HkDynamicObject, public DataIconManager
 {
     friend class BehaviorGraphView;
-    friend class CustomTreeGraphicsViewIcon;
+    friend class TreeGraphicsItem;
 public:
     virtual ~hkbModifier();
     bool link();

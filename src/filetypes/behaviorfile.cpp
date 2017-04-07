@@ -3,7 +3,7 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/xml/hkxxmlwriter.h"
 #include "src/ui/mainwindow.h"
-#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/ui/treegraphicsitem.h"
 
 #include "src/hkxclasses/behavior/generators/bsistatetagginggenerator.h"
 #include "src/hkxclasses/behavior/generators/bscyclicblendtransitiongenerator.h"
@@ -133,7 +133,7 @@ QStringList BehaviorFile::getRagdollBoneNames() const{
     return QStringList();
 }
 
-/*CustomTreeGraphicsViewIcon * BehaviorFile::getRootIcon() const{
+/*TreeGraphicsItem * BehaviorFile::getRootIcon() const{
     hkRootLevelContainer *root = static_cast<hkRootLevelContainer *>(rootObject.data());
     hkbBehaviorGraph *graph = NULL;
     if (!root->namedVariants.isEmpty() && root->namedVariants.at(0).variant.data() && root->namedVariants.at(0).variant.data()->getSignature() == HKB_BEHAVIOR_GRAPH){
@@ -141,7 +141,7 @@ QStringList BehaviorFile::getRagdollBoneNames() const{
         if (!graph->icons.isEmpty()){
             return graph->icons.first();
         }else{
-            graph->appendIcon(new CustomTreeGraphicsViewIcon(graph, graph->getName()));
+            graph->appendIcon(new TreeGraphicsItem(graph, graph->getName()));
             return graph->icons.first();
         }
     }

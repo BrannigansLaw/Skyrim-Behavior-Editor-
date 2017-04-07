@@ -8,8 +8,8 @@
 #include "src/ui/genericdatawidgets.h"
 #include "src/ui/hkxclassesui/behaviorui/transitionsui.h"
 #include "src/filetypes/behaviorfile.h"
-#include "src/ui/behaviorgraphui/behaviorgraphview.h"
-#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/ui/behaviorgraphview.h"
+#include "src/ui/treegraphicsitem.h"
 #include "src/hkxclasses/behavior/hkbvariablebindingset.h"
 
 #include <QVBoxLayout>

@@ -3,8 +3,8 @@
 #include "src/hkxclasses/behavior/generators/hkbmanualselectorgenerator.h"
 #include "src/ui/genericdatawidgets.h"
 #include "src/filetypes/behaviorfile.h"
-#include "src/ui/behaviorgraphui/behaviorgraphview.h"
-#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/ui/behaviorgraphview.h"
+#include "src/ui/treegraphicsitem.h"
 #include "src/hkxclasses/behavior/hkbvariablebindingset.h"
 
 #include <QVBoxLayout>
@@ -357,7 +357,7 @@ void ManualSelectorGeneratorUI::removeGenerator(){
     if (!behaviorView || bsData->generators.size() <= index || index < 0){
         return;
     }
-    CustomTreeGraphicsViewIcon *tempIcon = behaviorView->selectedIcon->getChildIcon(bsData->generators.at(index).data());
+    TreeGraphicsItem *tempIcon = behaviorView->selectedIcon->getChildIcon(bsData->generators.at(index).data());
     if (bsData->generators.count(bsData->generators.at(index)) == 1){
         behaviorView->removeSelectedObjectBranch(tempIcon, NULL, false);
     }else{

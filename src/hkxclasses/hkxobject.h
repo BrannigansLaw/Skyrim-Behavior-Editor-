@@ -9,7 +9,7 @@ class HkxFile;
 class HkxXmlReader;
 class HkxObjectExpSharedPtr;
 class HkxXMLWriter;
-class CustomTreeGraphicsViewIcon;
+class TreeGraphicsItem;
 class hkbGenerator;
 
 class HkxObject: public QSharedData
@@ -44,7 +44,6 @@ public:
     virtual bool readData(const HkxXmlReader & reader, long index);
     QString getReferenceString() const;
     QString getBoolAsString(bool b) const;
-    virtual bool setChildAt(HkxObject *newChild, ushort index = 0);
 protected:
     HkxObject(HkxFile *parent, long ref = -1);
     HkxFile * getParentFile() const;
@@ -103,29 +102,6 @@ private:
     HkDynamicObject& operator=(const HkDynamicObject&);
     HkDynamicObject(const HkDynamicObject &);
 
-};
-
-class DataIconManager: public HkDynamicObject
-{
-    friend class CustomTreeGraphicsView;
-    friend class CustomTreeGraphicsViewIcon;
-    friend class BehaviorFile;
-public:
-    virtual ~DataIconManager();
-    void updateIconNames();
-    virtual int getIndexToInsertIcon(HkxObject *child) const;
-    QString getName() const;
-    virtual bool hasChildren() const;
-protected:
-    //void swapIconPosition();
-    virtual bool wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace);
-    virtual bool appendObject(DataIconManager *objToAppend);
-    virtual bool removeObject(DataIconManager *objToRemove, bool removeAll = true);
-    virtual int addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder = true);
-    DataIconManager(HkxFile *parent, long ref = -1);
-    void appendIcon(CustomTreeGraphicsViewIcon * icon);
-private:
-    QList <CustomTreeGraphicsViewIcon *> icons;
 };
 
 #endif // HKXOBJECT_H

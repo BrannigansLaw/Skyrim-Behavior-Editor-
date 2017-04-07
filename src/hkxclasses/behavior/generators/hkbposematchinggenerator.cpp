@@ -63,81 +63,32 @@ int hkbPoseMatchingGenerator::getIndexToInsertIcon(HkxObject *child) const{
     return -1;
 }
 
-bool hkbPoseMatchingGenerator::setChildAt(HkxObject *newChild, ushort index){
-    if (newChild && newChild->getType() != TYPE_GENERATOR){
-        return false;
-    }
-    hkbBlenderGeneratorChild *child = NULL;
-    if (!children.isEmpty()){
-        if (index < children.size()){
-            child = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
-            if (child){
-                child->generator = HkxObjectExpSharedPtr(newChild);
-                return true;
-            }else{
-                return false;
-            }
+bool hkbPoseMatchingGenerator::insertObjectAt(int index, DataIconManager *obj){
+    hkbBlenderGeneratorChild *objChild;
+    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
+        if (index >= children.size()){
+            objChild = new hkbBlenderGeneratorChild(getParentFile(), this, -1);
+            children.append(HkxObjectExpSharedPtr(objChild));
+            objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        }else if (index > -1){
+            objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index - 1).data());
+            objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
         }else{
             return false;
         }
-    }else{
-        child = new hkbBlenderGeneratorChild(getParentFile(), this, -1);
-        child->generator = HkxObjectExpSharedPtr(newChild);
-        children.append(HkxObjectExpSharedPtr(child));
-        return true;
-    }
-}
-
-bool hkbPoseMatchingGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (!objToInject || objToInject->getType() != TYPE_GENERATOR){
-        return false;
-    }
-    bool wasReplaced = false;
-    hkbBlenderGeneratorChild *child;
-    for (int i = 0; i < children.size(); i++){
-        child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
-        if (child->generator.data() == childToReplace){
-            if (!objToInject->setChildAt(child->generator.data())){
-                return false;
-            }
-            child->generator = HkxObjectExpSharedPtr(objToInject);
-            wasReplaced = true;
-        }
-    }
-    return wasReplaced;
-}
-
-bool hkbPoseMatchingGenerator::appendObject(DataIconManager *objToAppend){
-    if (!objToAppend || objToAppend->getType() != TYPE_GENERATOR){
-        return false;
-    }
-    hkbBlenderGeneratorChild *objChild = new hkbBlenderGeneratorChild(getParentFile(), this, -1);
-    children.append(HkxObjectExpSharedPtr(objChild));
-    objChild->generator = HkxObjectExpSharedPtr(objToAppend);
-    return true;
-}
-
-bool hkbPoseMatchingGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
-    if (removeAll){
-        hkbBlenderGeneratorChild *child;
-        for (int i = 0; i < children.size(); i++){
-            child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
-            if (child->generator.data() == objToRemove){
-                children.removeAt(i);
-                i--;
-            }
-        }
         return true;
     }else{
-        hkbBlenderGeneratorChild *child;
-        for (int i = 0; i < children.size(); i++){
-            child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
-            if (child->generator.data() == objToRemove){
-                children.removeAt(i);
-                return true;
-            }
-        }
-        return true;
+        return false;
+    }
+}
+
+bool hkbPoseMatchingGenerator::removeObjectAt(int index){
+    hkbBlenderGeneratorChild *objChild;
+    if (index > -1 && index < children.size()){
+        objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
+        children.removeAt(index);
+    }else{
+        return false;
     }
     return true;
 }
@@ -153,24 +104,27 @@ bool hkbPoseMatchingGenerator::hasChildren() const{
     return false;
 }
 
-int hkbPoseMatchingGenerator::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
-    int objectChildCount = 0;
-    if (reverseOrder){
-        for (int i = children.size() - 1; i >= 0; i--){
-            if (children.at(i).data() && static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->generator.data()){
-                list.append(static_cast<DataIconManager *>(static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->generator.data()));
-                objectChildCount++;
-            }
-        }
-    }else{
-        for (int i = 0; i < children.size(); i++){
-            if (children.at(i).data() && static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->generator.data()){
-                list.append(static_cast<DataIconManager *>(static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->generator.data()));
-                objectChildCount++;
-            }
+int hkbPoseMatchingGenerator::getIndexOfObj(DataIconManager *obj) const{
+    hkbBlenderGeneratorChild *child;
+    for (int i = 0; i < children.size(); i++){
+        child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
+        if (child->generator.data() == (HkxObject *)obj){
+            return i;
         }
     }
-    return objectChildCount;
+    return -1;
+}
+
+QList<DataIconManager *> hkbPoseMatchingGenerator::getChildren() const{
+    QList<DataIconManager *> list;
+    hkbBlenderGeneratorChild *child;
+    for (int i = 0; i < children.size(); i++){
+        child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
+        if (child->generator.data()){
+            list.append((DataIconManager *)child->generator.data());
+        }
+    }
+    return list;
 }
 
 bool hkbPoseMatchingGenerator::readData(const HkxXmlReader &reader, long index){
@@ -365,7 +319,7 @@ bool hkbPoseMatchingGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxObjectExpSharedPtr *ptr;

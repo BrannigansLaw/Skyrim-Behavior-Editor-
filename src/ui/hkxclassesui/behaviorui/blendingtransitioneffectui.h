@@ -3,7 +3,7 @@
 
 #include <QGroupBox>
 
-class CustomTreeGraphicsView;
+class TreeGraphicsView;
 class TableWidget;
 class QLineEdit;
 class ComboBox;
@@ -32,7 +32,7 @@ private:
     void loadComboBoxes(){}
 private:
     static QStringList headerLabels1;
-    CustomTreeGraphicsView *behaviorView;
+    TreeGraphicsView *behaviorView;
     hkbBlendingTransitionEffect *bsData;
     QVBoxLayout *lyt;
     TableWidget *table;

@@ -2,7 +2,7 @@
 #define BEHAVIORGRAPHVIEW_H
 
 #include "src/hkxclasses/hkxobject.h"
-#include "src/ui/customtreegraphicsview.h"
+#include "src/ui/treegraphicsView.h"
 
 class FileSelectWindow;
 class QVBoxLayout;
@@ -25,7 +25,7 @@ class HkDataUI;
 class BehaviorGraphViewIcon;
 class hkbPoseMatchingGenerator;
 
-class BehaviorGraphView: public CustomTreeGraphicsView
+class BehaviorGraphView: public TreeGraphicsView
 {
     Q_OBJECT
     friend class BehaviorGraphViewIcon;
@@ -36,7 +36,7 @@ class BehaviorGraphView: public CustomTreeGraphicsView
     friend class StateMachineUI;
     friend class StateUI;
     friend class TransitionsUI;
-    friend class CustomTreeGraphicsViewIcon;
+    friend class TreeGraphicsItem;
     friend class BlenderGeneratorUI;
 
     friend class MainWindow;
@@ -140,7 +140,7 @@ private:
     void enableAllMenuActions(QMenu *menu);
     void disableAllMenuActions(QMenu *menu);
     bool confirmationDialogue(const QString & message, QWidget *parent);
-    CustomTreeGraphicsViewIcon * getSelectedIconsChildIcon(HkxObject *child);
+    TreeGraphicsItem * getSelectedIconsChildIcon(HkxObject *child);
 private:
     HkDataUI *ui;
     BehaviorFile *behavior;
@@ -226,5 +226,6 @@ private:
     QAction *appendBSPassByTargetTriggerModifierAct;
     QAction *removeObjBranchAct;
 };
+
 
 #endif // BEHAVIORGRAPHVIEW_H

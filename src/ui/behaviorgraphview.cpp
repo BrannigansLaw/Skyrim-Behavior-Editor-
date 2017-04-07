@@ -2,9 +2,9 @@
 #include "src/ui/mainwindow.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/generators/hkbgenerator.h"
-#include "src/ui/behaviorgraphui/behaviorgraphview.h"
+#include "src/ui/behaviorgraphview.h"
 #include "src/hkxclasses/hkxobject.h"
-#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/ui/treegraphicsitem.h"
 #include "src/ui/hkxclassesui/hkdataui.h"
 
 #include "src/hkxclasses/behavior/generators/bsistatetagginggenerator.h"
@@ -111,7 +111,7 @@
  */
 
 BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
-    : CustomTreeGraphicsView(),
+    : TreeGraphicsView(),
       ui(mainUI),
       behavior(file),
       changed(false),
@@ -372,7 +372,7 @@ bool BehaviorGraphView::confirmationDialogue(const QString & message, QWidget *p
     return false;
 }
 
-CustomTreeGraphicsViewIcon * BehaviorGraphView::getSelectedIconsChildIcon(HkxObject *child){
+TreeGraphicsViewIcon * BehaviorGraphView::getSelectedIconsChildIcon(HkxObject *child){
     if (selectedIcon){
         return selectedIcon->getChildIcon(child);
     }

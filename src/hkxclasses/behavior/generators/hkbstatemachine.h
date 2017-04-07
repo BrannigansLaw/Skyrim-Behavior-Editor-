@@ -28,11 +28,10 @@ public:
     bool hasChildren() const;
     int generateValidStateId();
 private:
-    bool wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace);
-    bool setChildAt(HkxObject *newChild, ushort index = 0);
-    bool appendObject(DataIconManager *objToAppend);
-    bool removeObject(DataIconManager *objToRemove, bool removeAll = true);
-    int addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder = true);
+    QList <DataIconManager *> getChildren() const;
+    int getIndexOfObj(DataIconManager *obj) const;
+    bool insertObjectAt(int index, DataIconManager *obj);
+    bool removeObjectAt(int index);
     hkbStateMachine * getNestedStateMachine(int stateId) const;
     hkbStateMachine& operator=(const hkbStateMachine&);
     hkbStateMachine(const hkbStateMachine &);

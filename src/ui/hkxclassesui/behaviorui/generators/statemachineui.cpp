@@ -8,8 +8,8 @@
 #include "src/ui/hkxclassesui/behaviorui/transitionsui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/stateui.h"
 #include "src/filetypes/behaviorfile.h"
-#include "src/ui/behaviorgraphui/behaviorgraphview.h"
-#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/ui/behaviorgraphview.h"
+#include "src/ui/treegraphicsitem.h"
 #include "src/hkxclasses/behavior/hkbvariablebindingset.h"
 #include "src/ui/hkxclassesui/behaviorui/transitionsui.h"
 
@@ -457,7 +457,7 @@ void StateMachineUI::removeStateWithGenerator(){
         if (!behaviorView || bsData->states.size() <= index || index < 0){
             return;
         }
-        CustomTreeGraphicsViewIcon *tempIcon = behaviorView->selectedIcon->getChildIcon(bsData->states.at(index).data());
+        TreeGraphicsItem *tempIcon = behaviorView->selectedIcon->getChildIcon(bsData->states.at(index).data());
         if (bsData->states.count(bsData->states.at(index)) == 1){
             behaviorView->removeSelectedObjectBranch(tempIcon, NULL, false);
         }else{

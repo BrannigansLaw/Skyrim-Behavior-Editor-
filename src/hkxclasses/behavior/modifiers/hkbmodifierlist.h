@@ -19,11 +19,8 @@ public:
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
 private:
-    bool wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace);
-    bool setChildAt(HkxObject *newChild, ushort index = 0);
-    bool appendObject(DataIconManager *objToAppend);
-    bool removeObject(DataIconManager *objToRemove, bool removeAll = true);
-    int addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder = true);
+    bool insertObjectAt(int index, DataIconManager *obj);
+    bool removeObjectAt(int index);
     hkbModifierList& operator=(const hkbModifierList&);
     hkbModifierList(const hkbModifierList &);
 private:

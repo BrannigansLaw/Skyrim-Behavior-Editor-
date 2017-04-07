@@ -1,12 +1,12 @@
 #include "hkdataui.h"
 
-#include "src/ui/behaviorgraphui/customtreegraphicsviewicon.h"
+#include "src/ui/treegraphicsitem.h"
 #include "src/ui/genericdatawidgets.h"
 #include "src/hkxclasses/behavior/generators/hkbgenerator.h"
 #include "src/hkxclasses/behavior/generators/hkbstatemachinestateinfo.h"
 #include "src/hkxclasses/behavior/hkbstatemachinetransitioninfoarray.h"
 #include "src/filetypes/behaviorfile.h"
-#include "src/ui/behaviorgraphui/behaviorgraphview.h"
+#include "src/ui/behaviorgraphview.h"
 #include "src/ui/hkxclassesui/behaviorui/behaviorvariablesui.h"
 #include "src/ui/hkxclassesui/behaviorui/eventsui.h"
 #include "src/hkxclasses/behavior/generators/bsistatetagginggenerator.h"
@@ -288,7 +288,7 @@ void HkDataUI::variableRemoved(int index){
     QCoreApplication::processEvents();
 }
 
-void HkDataUI::changeCurrentDataWidget(CustomTreeGraphicsViewIcon * icon){
+void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
     HkxSignature sig;
     if (icon && icon->data.constData()){
         HkxObject *oldData = loadedData;

@@ -20,11 +20,10 @@ public:
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
 private:
-    bool wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace);
-    bool setChildAt(HkxObject *newChild, ushort index = 0);
-    bool appendObject(DataIconManager *objToAppend);
-    bool removeObject(DataIconManager *objToRemove, bool removeAll = true);
-    int addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder);
+    QList <DataIconManager *> getChildren() const;
+    int getIndexOfObj(DataIconManager *obj) const;
+    bool insertObjectAt(int index, DataIconManager *obj);
+    bool removeObjectAt(int index);
     BSiStateTaggingGenerator& operator=(const BSiStateTaggingGenerator&);
     BSiStateTaggingGenerator(const BSiStateTaggingGenerator &);
 private:

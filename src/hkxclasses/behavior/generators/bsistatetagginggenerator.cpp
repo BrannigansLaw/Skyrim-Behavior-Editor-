@@ -30,40 +30,26 @@ QString BSiStateTaggingGenerator::getName() const{
     return name;
 }
 
-bool BSiStateTaggingGenerator::setChildAt(HkxObject *newChild, ushort index){
-    if (index == 0 && (!newChild || newChild->getType() == TYPE_GENERATOR)){
-        pDefaultGenerator = HkxObjectExpSharedPtr(newChild);
+bool BSiStateTaggingGenerator::insertObjectAt(int index, DataIconManager *obj){
+    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
+        if (index == 0){
+            pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        }else{
+            return false;
+        }
         return true;
     }else{
         return false;
     }
 }
 
-bool BSiStateTaggingGenerator::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (!objToInject || objToInject->getType() != TYPE_GENERATOR){
+bool BSiStateTaggingGenerator::removeObjectAt(int index){
+    if (index == 0){
+        pDefaultGenerator = HkxObjectExpSharedPtr();
+    }else{
         return false;
     }
-    if (pDefaultGenerator.data() == childToReplace){
-        if (!objToInject->setChildAt(pDefaultGenerator.data())){
-            return false;
-        }
-        pDefaultGenerator = HkxObjectExpSharedPtr(objToInject);
-        return true;
-    }
-    return false;
-}
-
-bool BSiStateTaggingGenerator::appendObject(DataIconManager *objToAppend){
-    pDefaultGenerator = HkxObjectExpSharedPtr(objToAppend);
     return true;
-}
-
-bool BSiStateTaggingGenerator::removeObject(DataIconManager *objToRemove, bool removeAll){
-    if (pDefaultGenerator.data() == objToRemove){
-        pDefaultGenerator = HkxObjectExpSharedPtr();
-        return true;
-    }
-    return false;
 }
 
 bool BSiStateTaggingGenerator::hasChildren() const{
@@ -73,13 +59,19 @@ bool BSiStateTaggingGenerator::hasChildren() const{
     return false;
 }
 
-int BSiStateTaggingGenerator::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
-    int objectChildCount = 0;
+QList<DataIconManager *> BSiStateTaggingGenerator::getChildren() const{
+    QList<DataIconManager *> list;
     if (pDefaultGenerator.data()){
-        list.append(static_cast<DataIconManager *>(pDefaultGenerator.data()));
-        objectChildCount++;
+        list.append((DataIconManager *)pDefaultGenerator.data());
     }
-    return objectChildCount;
+    return list;
+}
+
+int BSiStateTaggingGenerator::getIndexOfObj(DataIconManager *obj) const{
+    if (pDefaultGenerator.data() == (HkxObject *)obj){
+        return 0;
+    }
+    return -1;
 }
 
 bool BSiStateTaggingGenerator::readData(const HkxXmlReader &reader, long index){
@@ -162,7 +154,7 @@ bool BSiStateTaggingGenerator::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getReference());

@@ -29,18 +29,6 @@ QString BSModifyOnceModifier::getName() const{
     return name;
 }
 
-bool BSModifyOnceModifier::setChildAt(HkxObject *newChild, ushort index){
-    if (index == 0 && (!newChild || newChild->getType() == TYPE_MODIFIER)){
-        pOnActivateModifier = HkxObjectExpSharedPtr(newChild);
-        return true;
-    }else if (index == 1 && (!newChild || newChild->getType() == TYPE_MODIFIER)){
-        pOnDeactivateModifier = HkxObjectExpSharedPtr(newChild);
-        return true;
-    }else{
-        return false;
-    }
-}
-
 int BSModifyOnceModifier::getIndexToInsertIcon() const{
     if (!pOnActivateModifier.constData()){    //Not sure about this...
         return 0;
@@ -50,27 +38,7 @@ int BSModifyOnceModifier::getIndexToInsertIcon() const{
     return -1;
 }
 
-bool BSModifyOnceModifier::wrapObject(DataIconManager *objToInject, DataIconManager *childToReplace){
-    if (objToInject->getType() != TYPE_MODIFIER){
-        return false;
-    }
-    if (pOnActivateModifier.data() == childToReplace){
-        if (!objToInject->setChildAt(pOnActivateModifier.data())){
-            return false;
-        }
-        pOnActivateModifier = HkxObjectExpSharedPtr(objToInject);
-        return true;
-    }else if (pOnDeactivateModifier.data() == childToReplace){
-        if (!objToInject->setChildAt(pOnDeactivateModifier.data(), 1)){
-            return false;
-        }
-        pOnDeactivateModifier = HkxObjectExpSharedPtr(objToInject);
-        return true;
-    }
-    return false;
-}
-
-bool BSModifyOnceModifier::appendObject(DataIconManager *objToAppend){
+bool BSModifyOnceModifier::insertObjectAt(int index, DataIconManager *obj){
     if (objToAppend->getType() != TYPE_MODIFIER){
         return false;
     }
@@ -78,7 +46,7 @@ bool BSModifyOnceModifier::appendObject(DataIconManager *objToAppend){
     return true;
 }
 
-bool BSModifyOnceModifier::removeObject(DataIconManager *objToRemove, bool removeAll){
+bool BSModifyOnceModifier::removeObjectAt(int index){
     bool b = false;
     if (removeAll){
         if (pOnActivateModifier.data() == objToRemove){
@@ -112,31 +80,6 @@ bool BSModifyOnceModifier::hasChildren() const{
     }
     return false;
 }
-
-int BSModifyOnceModifier::addChildrenToList(QList<DataIconManager *> & list, bool reverseOrder){
-    int objectChildCount = 0;
-    if (reverseOrder){
-        if (pOnActivateModifier.data()){
-            list.append(static_cast<DataIconManager *>(pOnActivateModifier.data()));
-            objectChildCount++;
-        }
-        if (pOnDeactivateModifier.data()){
-            list.append(static_cast<DataIconManager *>(pOnDeactivateModifier.data()));
-            objectChildCount++;
-        }
-    }else{
-        if (pOnDeactivateModifier.data()){
-            list.append(static_cast<DataIconManager *>(pOnDeactivateModifier.data()));
-            objectChildCount++;
-        }
-        if (pOnActivateModifier.data()){
-            list.append(static_cast<DataIconManager *>(pOnActivateModifier.data()));
-            objectChildCount++;
-        }
-    }
-    return objectChildCount;
-}
-
 
 bool BSModifyOnceModifier::readData(const HkxXmlReader &reader, long index){
     bool ok;
@@ -225,7 +168,7 @@ bool BSModifyOnceModifier::link(){
     if (!getParentFile()){
         return false;
     }
-    if (!static_cast<DataIconManager *>(this)->linkVar()){
+    if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(pOnActivateModifier.getReference());
