@@ -39,24 +39,27 @@ int hkbModifierList::getIndexToInsertIcon() const{
 }
 
 bool hkbModifierList::insertObjectAt(int index, DataIconManager *obj){
-    if (!objToAppend || objToAppend->getType() != TYPE_MODIFIER){
+    if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
+        if (index >= modifiers.size()){
+            modifiers.append(HkxObjectExpSharedPtr((HkxObject *)obj));
+        }else if (index > -1){
+            modifiers[index] = HkxObjectExpSharedPtr((HkxObject *)obj);
+        }else{
+            return false;
+        }
+        return true;
+    }else{
         return false;
     }
-    modifiers.append(HkxObjectExpSharedPtr(objToAppend));
-    return true;
 }
 
 bool hkbModifierList::removeObjectAt(int index){
-    if (removeAll){
-        if (modifiers.removeAll(HkxObjectExpSharedPtr(objToRemove))){
-            return true;
-        }
+    if (index > -1 && index < modifiers.size()){
+        modifiers.removeAt(index);
     }else{
-        if (modifiers.removeOne(HkxObjectExpSharedPtr(objToRemove))){
-            return true;
-        }
+        return false;
     }
-    return false;
+    return true;
 }
 
 bool hkbModifierList::hasChildren() const{
@@ -66,6 +69,25 @@ bool hkbModifierList::hasChildren() const{
         }
     }
     return false;
+}
+
+QList<DataIconManager *> hkbModifierList::getChildren() const{
+    QList<DataIconManager *> list;
+    for (int i = 0; i < modifiers.size(); i++){
+        if (modifiers.at(i).data()){
+            list.append((DataIconManager *)modifiers.at(i).data());
+        }
+    }
+    return list;
+}
+
+int hkbModifierList::getIndexOfObj(DataIconManager *obj) const{
+    for (int i = 0; i < modifiers.size(); i++){
+        if (modifiers.at(i).data() == (HkxObject *)obj){
+            return i;
+        }
+    }
+    return -1;
 }
 
 bool hkbModifierList::readData(const HkxXmlReader &reader, long index){

@@ -361,7 +361,7 @@ int TreeGraphicsItem::getIndexOfChild(TreeGraphicsItem *child) const{
     return -1;
 }
 
-int TreeGraphicsItem::getIndexToInsert(DataIconManager *data) const{
+int TreeGraphicsItem::getIndexofIconWithData(DataIconManager *data) const{
     QList <QGraphicsItem *> children = childItems();
     for (int i = 0; i < children.size(); i++){
         if (((TreeGraphicsItem *)children.at(i))->hasSameData(data)){

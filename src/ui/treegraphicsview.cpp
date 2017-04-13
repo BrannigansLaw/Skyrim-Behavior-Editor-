@@ -62,3 +62,21 @@ void TreeGraphicsView::selectRoot(){
     treeScene->selectIcon(treeScene->rootIcon, false);
 }
 
+TreeGraphicsItem *TreeGraphicsView::getSelectedItem() const{
+    return treeScene->selectedIcon;
+}
+
+bool TreeGraphicsView::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData){
+    return treeScene->reconnectIcon(oldIconParent, dataToReplace, replacementData);
+}
+
+bool TreeGraphicsView::removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove){
+    if (item == treeScene->selectedIcon){
+        treeScene->selectedIcon = NULL;
+    }
+    return treeScene->removeItemFromGraph(item, indexToRemove);
+}
+
+TreeGraphicsItem *TreeGraphicsView::addItemToGraph(TreeGraphicsItem *selectedIcon, DataIconManager *data, int indexToInsert, bool inject, bool allowDuplicates){
+    return treeScene->addItemToGraph(selectedIcon, data, indexToInsert, inject, allowDuplicates);
+}

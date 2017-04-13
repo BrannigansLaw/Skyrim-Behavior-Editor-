@@ -290,10 +290,10 @@ void HkDataUI::variableRemoved(int index){
 
 void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
     HkxSignature sig;
-    if (icon && icon->data.constData()){
+    if (icon && (icon->itemData)){
         HkxObject *oldData = loadedData;
-        sig = icon->data.constData()->getSignature();
-        loadedData = icon->data.data();
+        sig = ((HkxObject *)((icon->itemData)))->getSignature();
+        loadedData = ((HkxObject *)((icon->itemData)));
         disconnect(variablesTable, SIGNAL(elementSelected(int,QString)), 0, 0);
         disconnect(eventsTable, SIGNAL(elementSelected(int,QString)), 0, 0);
         disconnect(characterPropertiesTable, SIGNAL(elementSelected(int,QString)), 0, 0);

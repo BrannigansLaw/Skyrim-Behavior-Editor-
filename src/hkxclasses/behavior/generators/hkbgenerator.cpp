@@ -4,7 +4,7 @@
 #include "src/ui/dataiconmanager.h"
 
 hkbGenerator::hkbGenerator(HkxFile *parent, long ref)
-    : HkDynamicObject(parent, ref)
+    : DataIconManager(parent, ref)
 {
     //
 }

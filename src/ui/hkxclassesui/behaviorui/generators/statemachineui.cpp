@@ -452,21 +452,21 @@ void StateMachineUI::addNewStateWithGenerator(){
 }
 
 void StateMachineUI::removeStateWithGenerator(){
-    if (bsData){
+    /*if (bsData){
         int index = states->currentRow();
         if (!behaviorView || bsData->states.size() <= index || index < 0){
             return;
         }
-        TreeGraphicsItem *tempIcon = behaviorView->selectedIcon->getChildIcon(bsData->states.at(index).data());
+        TreeGraphicsItem *tempIcon = behaviorView->selectedIcon->getChildWithData(bsData->states.at(index).data());
         if (bsData->states.count(bsData->states.at(index)) == 1){
-            behaviorView->removeSelectedObjectBranch(tempIcon, NULL, false);
+            //behaviorView->removeItemFromGraph(tempIcon, NULL, false);
         }else{
             bsData->removeState(index);
         }
         states->removeRow(index);
         behaviorView->removeGeneratorData();
         bsData->getParentFile()->toggleChanged(true);
-    }
+    }*/
 }
 
 void StateMachineUI::addNewTransition(){
@@ -504,7 +504,7 @@ void StateMachineUI::removeTransition(){
 void StateMachineUI::setName(){
     if (bsData){
         bsData->name = name->text();
-        bsData->updateIconNames();
+        ((DataIconManager *)(bsData))->updateIconNames();
         bsData->getParentFile()->toggleChanged(true);
         emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
     }

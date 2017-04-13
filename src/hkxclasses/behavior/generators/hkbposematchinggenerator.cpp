@@ -70,6 +70,9 @@ bool hkbPoseMatchingGenerator::insertObjectAt(int index, DataIconManager *obj){
             objChild = new hkbBlenderGeneratorChild(getParentFile(), this, -1);
             children.append(HkxObjectExpSharedPtr(objChild));
             objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        }else if (index == 0){
+            objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
+            objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
         }else if (index > -1){
             objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index - 1).data());
             objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);

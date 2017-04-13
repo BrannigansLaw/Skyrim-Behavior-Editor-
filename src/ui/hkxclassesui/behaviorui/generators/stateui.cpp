@@ -408,17 +408,17 @@ void StateUI::transitionSelected(int row, int column){
 }
 
 void StateUI::setGenerator(int index){
-    if (behaviorView && index > -1){
+    /*if (behaviorView && index > -1){
         DataIconManager *ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index);
-        if (!behaviorView->getSelectedItem()->getChildIcon(ptr)){
-            if (!ptr || ptr == bsData || !behaviorView->reconnectBranch(static_cast<DataIconManager *>(bsData->generator.data()), ptr, behaviorView->getSelectedItem())){
+        if (!behaviorView->getSelectedItem()->getChildWithData(ptr)){
+            if (!ptr || ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), ptr,  reinterpret_cast<DataIconManager *>(bsData->generator.data()))){
                 QMessageBox msg;
                 msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!");
                 msg.exec();
                 return;
             }
         }else{
-            behaviorView->removeSelectedObjectBranch(behaviorView->getSelectedItem()->getChildIcon(bsData->generator.data()), NULL, false);
+            //behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(bsData->generator.data()), NULL, false);
         }
         generator->setText(ptr->getName());
         if (index > 0){
@@ -427,7 +427,7 @@ void StateUI::setGenerator(int index){
             bsData->getParentFile()->toggleChanged(true);
         }
     }
-    generatorTable->hide();
+    generatorTable->hide();*/
 }
 
 void StateUI::appendEnterEventTableRow(int index, hkbStateMachineEventPropertyArray *enterEvents, const QStringList & eventList){

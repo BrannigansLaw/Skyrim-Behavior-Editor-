@@ -124,14 +124,14 @@ void BlenderGeneratorChildUI::loadData(HkxObject *data){
 }
 
 void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
-    if (bsData){
+    /*if (bsData){
         if (behaviorView){
             hkbBlenderGenerator *gen = static_cast<hkbBlenderGenerator *>(bsData->getParentGenerator());
             int indexOfChild = gen->getIndexOfChild(bsData);
             DataIconManager *ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
             if (!gen){
                 CRITICAL_ERROR_MESSAGE(QString("The currently loaded 'hkbBlenderGeneratorChild' has no parent 'hkbBlenderGenerator' or 'hkbPoseMatchingGenerator'!!!"))
-            }else if (!ptr || ptr == bsData || !behaviorView->reconnectBranch(static_cast<DataIconManager *>(bsData->generator.data()), ptr, behaviorView->getSelectedItem())){
+            }else if (!ptr || ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), ptr,  reinterpret_cast<DataIconManager *>(bsData->generator.data()))){
                 WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"))
             }else{
                 bsData->generator = HkxObjectExpSharedPtr(ptr);
@@ -145,7 +145,7 @@ void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI: The 'bsData' pointer is NULL!!"))
-    }
+    }*/
 }
 
 bool BlenderGeneratorChildUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type){

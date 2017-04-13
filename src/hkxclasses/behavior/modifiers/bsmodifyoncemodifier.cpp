@@ -39,46 +39,55 @@ int BSModifyOnceModifier::getIndexToInsertIcon() const{
 }
 
 bool BSModifyOnceModifier::insertObjectAt(int index, DataIconManager *obj){
-    if (objToAppend->getType() != TYPE_MODIFIER){
+    if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
+        if (index == 0){
+            pOnActivateModifier = HkxObjectExpSharedPtr((HkxObject *)obj);
+        }else if (index == 1){
+            pOnDeactivateModifier = HkxObjectExpSharedPtr((HkxObject *)obj);
+        }else{
+            return false;
+        }
+    }else{
         return false;
     }
-    pOnActivateModifier = HkxObjectExpSharedPtr(objToAppend);
-    return true;
 }
 
 bool BSModifyOnceModifier::removeObjectAt(int index){
-    bool b = false;
-    if (removeAll){
-        if (pOnActivateModifier.data() == objToRemove){
-            pOnActivateModifier = HkxObjectExpSharedPtr();
-            b = true;
-        }
-        if (pOnDeactivateModifier.data() == objToRemove){
-            pOnDeactivateModifier = HkxObjectExpSharedPtr();
-            b = true;
-        }
-        return b;
+    if (index == 0){
+        pOnActivateModifier = HkxObjectExpSharedPtr();
+    }else if (index == 1){
+        pOnDeactivateModifier = HkxObjectExpSharedPtr();
     }else{
-        if (pOnDeactivateModifier.data() == objToRemove){
-            pOnDeactivateModifier = HkxObjectExpSharedPtr();
-            return true;
-        }
-        if (pOnActivateModifier.data() == objToRemove){
-            pOnActivateModifier = HkxObjectExpSharedPtr();
-            return true;
-        }
+        return false;
+    }
+    return true;
+}
+
+bool BSModifyOnceModifier::hasChildren() const{
+    if (pOnActivateModifier.data() || pOnDeactivateModifier.data()){
+        return true;
     }
     return false;
 }
 
-bool BSModifyOnceModifier::hasChildren() const{
+QList<DataIconManager *> BSModifyOnceModifier::getChildren() const{
+    QList<DataIconManager *> list;
     if (pOnActivateModifier.data()){
-        return true;
+        list.append((DataIconManager *)pOnActivateModifier.data());
     }
     if (pOnDeactivateModifier.data()){
-        return true;
+        list.append((DataIconManager *)pOnDeactivateModifier.data());
     }
-    return false;
+    return list;
+}
+
+int BSModifyOnceModifier::getIndexOfObj(DataIconManager *obj) const{
+    if (pOnActivateModifier.data() == (HkxObject *)obj){
+        return 0;
+    }else if (pOnDeactivateModifier.data() == (HkxObject *)obj){
+        return 1;
+    }
+    return -1;
 }
 
 bool BSModifyOnceModifier::readData(const HkxXmlReader &reader, long index){

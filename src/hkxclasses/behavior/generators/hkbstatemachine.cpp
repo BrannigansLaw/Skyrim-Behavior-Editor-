@@ -126,6 +126,9 @@ bool hkbStateMachine::insertObjectAt(int index, DataIconManager *obj){
             objChild = new hkbStateMachineStateInfo(getParentFile(), this, -1);
             states.append(HkxObjectExpSharedPtr(objChild));
             objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        }else if (index == 0){
+            objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
+            objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
         }else if (index > -1){
             objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index - 1).data());
             objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);

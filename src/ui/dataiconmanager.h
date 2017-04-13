@@ -4,9 +4,11 @@
 #include <QString>
 #include <QList>
 
+#include "src/hkxclasses/hkxobject.h"
+
 class TreeGraphicsItem;
 
-class DataIconManager
+class DataIconManager: public HkDynamicObject
 {
     friend class GraphicsViewData;
     friend class TreeGraphicsScene;
@@ -15,11 +17,13 @@ public:
     virtual QString getName() const;
     virtual bool hasChildren() const;
     bool hasIcons() const;
+    void updateIconNames();
 protected:
     virtual QList <DataIconManager *> getChildren() const;
     virtual int getIndexOfObj(DataIconManager *) const;
     virtual bool insertObjectAt(int , DataIconManager *);
     virtual bool removeObjectAt(int );
+    DataIconManager(HkxFile *parent, long ref = -1);
 private:
     bool wrapObjectAt(int index, DataIconManager *obj, DataIconManager *parentObj);
     TreeGraphicsItem *reconnectToNext();

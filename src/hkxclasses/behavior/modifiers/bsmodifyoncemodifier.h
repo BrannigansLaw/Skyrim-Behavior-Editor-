@@ -19,6 +19,8 @@ public:
     int getIndexToInsertIcon() const;
     bool hasChildren() const;
 protected:
+    QList <DataIconManager *> getChildren() const;
+    int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int index, DataIconManager *obj);
     bool removeObjectAt(int index);
 private:

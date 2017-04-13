@@ -22,13 +22,13 @@ class BSBoneSwitchGenerator;
 class BSBoneSwitchGeneratorBoneData;
 class hkbGenerator;
 class HkDataUI;
-class BehaviorGraphViewIcon;
+class TreeGraphicsItem;
 class hkbPoseMatchingGenerator;
 
 class BehaviorGraphView: public TreeGraphicsView
 {
     Q_OBJECT
-    friend class BehaviorGraphViewIcon;
+    friend class TreeGraphicsItem;
     friend class HkDataUI;
     friend class ManualSelectorGeneratorUI;
     friend class ModifierGeneratorUI;

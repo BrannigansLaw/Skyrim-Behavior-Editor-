@@ -106,7 +106,7 @@ void BSiStateTaggingGeneratorUI::renameGeneratorInLists(const QString & name, in
 void BSiStateTaggingGeneratorUI::setName(){
     if (bsData){
         bsData->name = name->text();
-        bsData->updateIconNames();
+        ((DataIconManager *)(bsData))->updateIconNames();
         bsData->getParentFile()->toggleChanged(true);
         emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
     }
@@ -179,7 +179,7 @@ void BSiStateTaggingGeneratorUI::setIPriorityBind(int index){
 void BSiStateTaggingGeneratorUI::setDefaultGenerator(int index){
     if (behaviorView && index > -1 && index < pDefaultGenerator->count()){
         DataIconManager *ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
-        if (!ptr || ptr == bsData || !behaviorView->reconnectBranch(static_cast<DataIconManager *>(bsData->pDefaultGenerator.data()), ptr, behaviorView->getSelectedItem())){
+        if (!ptr || ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), ptr, reinterpret_cast<DataIconManager *>(bsData->pDefaultGenerator.data()))){
             QMessageBox msg;
             msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!");
             msg.exec();
@@ -189,7 +189,7 @@ void BSiStateTaggingGeneratorUI::setDefaultGenerator(int index){
             return;
         }
         if (index > 0){
-            bsData->pDefaultGenerator = HkxObjectExpSharedPtr(ptr);
+            bsData->pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)ptr);
             behaviorView->removeGeneratorData();
             bsData->getParentFile()->toggleChanged(true);
         }

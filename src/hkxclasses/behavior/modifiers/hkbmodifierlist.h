@@ -19,6 +19,8 @@ public:
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
 private:
+    QList <DataIconManager *> getChildren() const;
+    int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int index, DataIconManager *obj);
     bool removeObjectAt(int index);
     hkbModifierList& operator=(const hkbModifierList&);

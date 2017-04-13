@@ -17,6 +17,10 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
+    /*QList <DataIconManager *> getChildren() const;
+    int getIndexOfObj(DataIconManager *obj) const;
+    bool insertObjectAt(int index, DataIconManager *obj);
+    bool removeObjectAt(int index);*/
     hkbAttachmentModifier& operator=(const hkbAttachmentModifier&);
     hkbAttachmentModifier(const hkbAttachmentModifier &);
 private:

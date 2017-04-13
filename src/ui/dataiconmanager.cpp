@@ -1,6 +1,8 @@
 #include "dataiconmanager.h"
 #include "treegraphicsitem.h"
 
+#include <QGraphicsScene>
+
 QString DataIconManager::getName() const{
     return "";
 }
@@ -14,6 +16,13 @@ bool DataIconManager::hasIcons() const{
         return true;
     }
     return false;
+}
+
+void DataIconManager::updateIconNames(){
+    icons.first()->scene()->update();
+    /*for (int i = 0; i < icons.size(); i++){
+        icons.at(i)->update(QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size())));
+    }*/
 }
 
 QList<DataIconManager *> DataIconManager::getChildren() const{
@@ -41,6 +50,12 @@ bool DataIconManager::removeObjectAt(int ){
     return false;
 }
 
+DataIconManager::DataIconManager(HkxFile *parent, long ref)
+    : HkDynamicObject(parent, ref)
+{
+    //
+}
+
 TreeGraphicsItem * DataIconManager::reconnectToNext(){
     TreeGraphicsItem *iconRemoved = NULL;
     QList<QGraphicsItem *> children;
@@ -60,7 +75,7 @@ TreeGraphicsItem * DataIconManager::reconnectToNext(){
 
 void DataIconManager::appendIcon(TreeGraphicsItem *icon){
     int index = -1;
-    if (icon && !icons.contains(icon)){
+    if (icon && icons.isEmpty() || !icons.contains(icon)){
         if (icons.size() > 1){
             index = icon->determineInsertionIndex();
             if (index > -1 && index < icons.size()){

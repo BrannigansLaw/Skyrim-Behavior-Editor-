@@ -17,10 +17,11 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
-protected:
+private:
+    QList <DataIconManager *> getChildren() const;
+    int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int index, DataIconManager *obj);
     bool removeObjectAt(int index);
-private:
     hkbDelayedModifier& operator=(const hkbDelayedModifier&);
     hkbDelayedModifier(const hkbDelayedModifier &);
 private:

@@ -6,7 +6,7 @@
 
 class TreeGraphicsItem;
 
-class hkbGenerator: public HkDynamicObject, public DataIconManager
+class hkbGenerator: public DataIconManager//, public DataIconManager
 {
     friend class BehaviorGraphView;
     friend class TreeGraphicsItem;

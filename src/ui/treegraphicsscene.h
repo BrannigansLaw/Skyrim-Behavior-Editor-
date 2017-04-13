@@ -14,7 +14,7 @@ public:
     TreeGraphicsScene();
     void setCanDeleteRoot(bool value);
 protected:
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
+    //virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
 private:
     void selectIcon(TreeGraphicsItem *icon, bool expand);
     void contractBranch(TreeGraphicsItem *icon, bool contractAll = false);

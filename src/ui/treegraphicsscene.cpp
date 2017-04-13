@@ -1,7 +1,6 @@
 #include "treegraphicsscene.h"
 #include "treegraphicsitem.h"
 #include "dataiconmanager.h"
-#include "graphicsviewdata.h"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
@@ -21,7 +20,7 @@ void TreeGraphicsScene::setCanDeleteRoot(bool value){
     canDeleteRoot = value;
 }
 
-void TreeGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
+/*void TreeGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     QGraphicsScene::mouseReleaseEvent(event);
     QList <QGraphicsItem *> children;
     QPainterPath path(event->scenePos());
@@ -37,7 +36,7 @@ void TreeGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
         }
     }
     clearSelection();
-}
+}*/
 
 void TreeGraphicsScene::selectIcon(TreeGraphicsItem *icon, bool expand){
     TreeGraphicsItem *lastSelectedIcon = selectedIcon;
@@ -122,7 +121,11 @@ bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicate
             if (!newIcon || newIcon->isDescendant(newIcon)){
                 return false;
             }
-            children = objects.first()->getChildren();
+            if (objects.first()->hasIcons()){
+                children.clear();
+            }else{
+                children = objects.first()->getChildren();
+            }
             numChildren.first()--;
             if (numChildren.first() == 0){
                 numChildren.removeFirst();
@@ -155,7 +158,7 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
                             selectedIcon->itemData->insertObjectAt(indexToInsert, data);
                         }else if (parent){
                             selectedIcon->itemData->wrapObjectAt(indexToInsert, data, parent->itemData);
-                            selectedIcon->setParent(newIcon, newIcon->getIndexToInsert(selectedIcon->itemData));//Not sure...
+                            selectedIcon->setParent(newIcon, newIcon->getIndexofIconWithData(selectedIcon->itemData));//Not sure...
                         }
                         return NULL;
                     }
@@ -163,12 +166,12 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
             }
         }
         if (!inject){
-            newIcon = new TreeGraphicsItem(selectedIcon, data, selectedIcon->getIndexToInsert(data));
+            newIcon = new TreeGraphicsItem(selectedIcon, data, selectedIcon->getIndexofIconWithData(data));
             selectedIcon->itemData->insertObjectAt(indexToInsert, data);
         }else if (parent){
-            newIcon = new TreeGraphicsItem(parent, data, parent->getIndexToInsert(selectedIcon->itemData));
+            newIcon = new TreeGraphicsItem(parent, data, parent->getIndexofIconWithData(selectedIcon->itemData));
             selectedIcon->itemData->wrapObjectAt(indexToInsert, data, parent->itemData);
-            selectedIcon->setParent(newIcon, newIcon->getIndexToInsert(selectedIcon->itemData));
+            selectedIcon->setParent(newIcon, newIcon->getIndexofIconWithData(selectedIcon->itemData));
         }else{
             delete newIcon;
             return NULL;
@@ -178,7 +181,7 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
             return NULL;
         }
         //addItem(newIcon);  newIcon is added to scene already???
-        newIcon->reposition();
+        //newIcon->reposition();
         addItem(newIcon->path);
     }
     return newIcon;

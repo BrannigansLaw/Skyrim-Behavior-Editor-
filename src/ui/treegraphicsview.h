@@ -14,6 +14,8 @@ class TreeGraphicsView: public QGraphicsView
 public:
     TreeGraphicsView(QMenu *menu);
     bool drawGraph(DataIconManager *rootData, bool allowDuplicates = false);
+    TreeGraphicsItem * getSelectedItem() const;
+    bool reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData);
 protected:
     void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
@@ -21,6 +23,8 @@ protected:
     void contractAllBranches();
     void expandAllBranches();
     void selectRoot();
+    bool removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove);
+    TreeGraphicsItem * addItemToGraph(TreeGraphicsItem *selectedIcon, DataIconManager *data, int indexToInsert, bool inject = false, bool allowDuplicates = false);
 private:
     QMenu *popUpMenu;
     TreeGraphicsScene *treeScene;

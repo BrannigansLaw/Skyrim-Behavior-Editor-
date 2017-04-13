@@ -33,19 +33,25 @@ QString hkbDelayedModifier::getName() const{
 }
 
 bool hkbDelayedModifier::insertObjectAt(int index, DataIconManager *obj){
-    if (objToAppend->getType() != TYPE_MODIFIER){
+    if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
+        if (index == 0){
+            modifier = HkxObjectExpSharedPtr((HkxObject *)obj);
+        }else{
+            return false;
+        }
+        return true;
+    }else{
         return false;
     }
-    modifier = HkxObjectExpSharedPtr(objToAppend);
-    return true;
 }
 
 bool hkbDelayedModifier::removeObjectAt(int index){
-    if (modifier.data() == objToRemove){
+    if (index == 0){
         modifier = HkxObjectExpSharedPtr();
-        return true;
+    }else{
+        return false;
     }
-    return false;
+    return true;
 }
 
 bool hkbDelayedModifier::hasChildren() const{
@@ -53,6 +59,21 @@ bool hkbDelayedModifier::hasChildren() const{
         return true;
     }
     return false;
+}
+
+QList<DataIconManager *> hkbDelayedModifier::getChildren() const{
+    QList<DataIconManager *> list;
+    if (modifier.data()){
+        list.append((DataIconManager *)modifier.data());
+    }
+    return list;
+}
+
+int hkbDelayedModifier::getIndexOfObj(DataIconManager *obj) const{
+    if (modifier.data() == (HkxObject *)obj){
+        return 0;
+    }
+    return -1;
 }
 
 bool hkbDelayedModifier::readData(const HkxXmlReader &reader, long index){

@@ -30,6 +30,55 @@ QString hkbAttachmentModifier::getName() const{
     return name;
 }
 
+/*
+bool hkbAttachmentModifier::insertObjectAt(int index, DataIconManager *obj){
+    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR && index == 0){
+        pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+    }else if (((HkxObject *)obj)->getSignature() == HKB_CLIP_GENERATOR && index == 1){
+        pOffsetClipGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+    }else{
+        return false;
+    }
+}
+
+bool hkbAttachmentModifier::removeObjectAt(int index){
+    if (index == 0){
+        pDefaultGenerator = HkxObjectExpSharedPtr();
+    }else if (index == 1){
+        pOffsetClipGenerator = HkxObjectExpSharedPtr();
+    }else{
+        return false;
+    }
+    return true;
+}
+
+bool hkbAttachmentModifier::hasChildren() const{
+    if (pDefaultGenerator.data() || pOffsetClipGenerator.data()){
+        return true;
+    }
+    return false;
+}
+
+QList<DataIconManager *> hkbAttachmentModifier::getChildren() const{
+    QList<DataIconManager *> list;
+    if (pDefaultGenerator.data()){
+        list.append((DataIconManager *)pDefaultGenerator.data());
+    }
+    if (pOffsetClipGenerator.data()){
+        list.append((DataIconManager *)pOffsetClipGenerator.data());
+    }
+    return list;
+}
+
+int hkbAttachmentModifier::getIndexOfObj(DataIconManager *obj) const{
+    if (pDefaultGenerator.data() == (HkxObject *)obj){
+        return 0;
+    }else if (pOffsetClipGenerator.data() == (HkxObject *)obj){
+        return 1;
+    }
+    return -1;
+}*/
+
 bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);

@@ -148,7 +148,7 @@ void ManualSelectorGeneratorUI::renameVariableInLists(const QString & newName, i
 void ManualSelectorGeneratorUI::setName(){
     if (bsData){
         bsData->name = name->text();
-        bsData->updateIconNames();
+        ((DataIconManager *)(bsData))->updateIconNames();
         emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
     }
 }
@@ -274,28 +274,28 @@ void ManualSelectorGeneratorUI::setCurrentGeneratorIndexBind(int index){
 }
 
 void ManualSelectorGeneratorUI::setGenerator(int index){
-    int row = generators->currentRow();
+    /*int row = generators->currentRow();
     if (behaviorView && index > -1 && row > -1 && row < generators->rowCount() && row < bsData->generators.size()){
         DataIconManager *ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index);
-        if (!behaviorView->getSelectedItem()->getChildIcon(ptr)){
-            if (!ptr || ptr == bsData || !behaviorView->reconnectBranch(static_cast<DataIconManager *>(bsData->generators.at(row).data()), ptr, behaviorView->getSelectedItem())){
+        if (!behaviorView->getSelectedItem()->getChildWithData(ptr)){
+            if (!ptr || ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), ptr,  reinterpret_cast<DataIconManager *>(bsData->generators.at(row).data()))){
                 QMessageBox msg;
                 msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!");
                 msg.exec();
                 return;
             }
         }else{
-            behaviorView->removeSelectedObjectBranch(behaviorView->getSelectedItem()->getChildIcon(bsData->generators.at(row).data()), NULL, false);
+            //behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(bsData->generators.at(row).data()), NULL, false);
         }
         generators->item(row, 0)->setText(static_cast<hkbGenerator *>(ptr)->getName());
         generators->item(row, 1)->setText(static_cast<hkbGenerator *>(ptr)->getClassname());
-        if (row > 0/* && row < bsData->generators.size()*/){
+        if (row > 0){
             bsData->generators[row] = HkxObjectExpSharedPtr(ptr);
             behaviorView->removeGeneratorData();
             bsData->getParentFile()->toggleChanged(true);
         }
     }
-    generatorTable->hide();
+    generatorTable->hide();*/
 }
 
 void ManualSelectorGeneratorUI::addNewGenerator(){
@@ -353,13 +353,13 @@ void ManualSelectorGeneratorUI::addNewGenerator(){
 }
 
 void ManualSelectorGeneratorUI::removeGenerator(){
-    int index = generators->currentRow();
+    /*int index = generators->currentRow();
     if (!behaviorView || bsData->generators.size() <= index || index < 0){
         return;
     }
-    TreeGraphicsItem *tempIcon = behaviorView->selectedIcon->getChildIcon(bsData->generators.at(index).data());
+    TreeGraphicsItem *tempIcon = behaviorView->selectedIcon->getChildWithData(bsData->generators.at(index).data());
     if (bsData->generators.count(bsData->generators.at(index)) == 1){
-        behaviorView->removeSelectedObjectBranch(tempIcon, NULL, false);
+        //behaviorView->removeItemFromGraph(tempIcon, NULL, false);
     }else{
         bsData->generators.removeAt(index);
     }
@@ -367,5 +367,5 @@ void ManualSelectorGeneratorUI::removeGenerator(){
     generators->removeCellWidget(index, 2);
     generators->removeRow(index);
     behaviorView->removeGeneratorData();
-    bsData->getParentFile()->toggleChanged(true);
+    bsData->getParentFile()->toggleChanged(true);*/
 }

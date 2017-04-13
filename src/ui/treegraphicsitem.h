@@ -10,6 +10,8 @@ class TreeGraphicsItem: public QGraphicsItem
 {
     friend class TreeGraphicsScene;
     friend class DataIconManager;
+    friend class HkDataUI;
+    friend class BehaviorGraphView;
 public:
     TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *obj, int indexToInsert = -1, Qt::GlobalColor color = Qt::gray);
     virtual ~TreeGraphicsItem();
@@ -40,14 +42,14 @@ private:
     //TreeGraphicsItem *getChildWithData(DataIconManager *data, int index);
     TreeGraphicsItem *getReplacementIcon(DataIconManager *data);
     int getIndexOfChild(TreeGraphicsItem *child) const;
-    int getIndexToInsert(DataIconManager *data) const;
+    int getIndexofIconWithData(DataIconManager *data) const;
     bool getIsExpanded() const;
     void setIsExpanded(bool value);
     void setPathToParent();
     QList <TreeGraphicsItem *> getAllIconsInBranch(TreeGraphicsItem *iconToFind = NULL) const;
 private:
     Qt::GlobalColor brushColor;
-    DataIconManager *itemData;
+    DataIconManager * itemData;
     bool isExpanded;
     qreal yCoordinate;
     QGraphicsPathItem *path;

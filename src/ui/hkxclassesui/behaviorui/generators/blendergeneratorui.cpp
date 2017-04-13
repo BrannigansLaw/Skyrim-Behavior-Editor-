@@ -558,11 +558,11 @@ void BlenderGeneratorUI::addChild(){
 }
 
 void BlenderGeneratorUI::removeSelectedChild(){
-    int result = rowIndexOfChildToRemove - BASE_NUMBER_OF_ROWS;
+    /*int result = rowIndexOfChildToRemove - BASE_NUMBER_OF_ROWS;
     if (bsData && behaviorView && result < bsData->children.size() && result >= 0){
         hkbBlenderGeneratorChild *child = static_cast<hkbBlenderGeneratorChild *>(bsData->children.at(result).data());
         if (bsData->generatorCount(static_cast<hkbGenerator *>(child->generator.data())) == 1){
-            behaviorView->removeSelectedObjectBranch(behaviorView->getSelectedIconsChildIcon(child->generator.data()), NULL, false);
+            //behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->generator.data()), NULL, false);
         }else{
             bsData->removeChildAt(result);
         }
@@ -581,7 +581,7 @@ void BlenderGeneratorUI::removeSelectedChild(){
             }
         }
         rowIndexOfChildToRemove = -1;
-    }
+    }*/
 }
 
 void BlenderGeneratorUI::viewSelectedChild(int row, int column){

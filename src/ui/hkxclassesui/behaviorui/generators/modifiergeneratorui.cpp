@@ -91,17 +91,17 @@ void ModifierGeneratorUI::viewModifiers(){
 void ModifierGeneratorUI::setName(){
     if (bsData){
         bsData->name = name->text();
-        bsData->updateIconNames();
+        ((DataIconManager *)(bsData))->updateIconNames();
         bsData->getParentFile()->toggleChanged(true);
         emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
     }
 }
 
 void ModifierGeneratorUI::setModifier(int index){
-    if (behaviorView && index > -1){
+    /*if (behaviorView && index > -1){
         DataIconManager *ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getModifierDataAt(index);
-        if (!behaviorView->selectedIcon->getChildIcon(ptr)){
-            if (!ptr || ptr == bsData || !behaviorView->reconnectBranch(static_cast<DataIconManager *>(bsData->modifier.data()), ptr, behaviorView->getSelectedItem())){
+        if (!behaviorView->selectedIcon->getChildWithData(ptr)){
+            if (!ptr || ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), ptr,  reinterpret_cast<DataIconManager *>(bsData->modifier.data()))){
                 QMessageBox msg;
                 msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!");
                 msg.exec();
@@ -115,14 +115,14 @@ void ModifierGeneratorUI::setModifier(int index){
             bsData->getParentFile()->toggleChanged(true);
         }
     }
-    modifiersTable->hide();
+    modifiersTable->hide();*/
 }
 
 void ModifierGeneratorUI::setGenerator(int index){
-    if (behaviorView && index > -1){
+    /*if (behaviorView && index > -1){
         DataIconManager *ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index);
-        if (!behaviorView->selectedIcon->getChildIcon(ptr)){
-            if (!ptr || ptr == bsData || !behaviorView->reconnectBranch(static_cast<DataIconManager *>(bsData->generator.data()), ptr, behaviorView->getSelectedItem())){
+        if (!behaviorView->selectedIcon->getChildWithData(ptr)){
+            if (!ptr || ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), ptr,  reinterpret_cast<DataIconManager *>(bsData->generator.data()))){
                 QMessageBox msg;
                 msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!");
                 msg.exec();
@@ -136,7 +136,7 @@ void ModifierGeneratorUI::setGenerator(int index){
             bsData->getParentFile()->toggleChanged(true);
         }
     }
-    generatorTable->hide();
+    generatorTable->hide();*/
 }
 
 void ModifierGeneratorUI::loadData(HkxObject *data){
