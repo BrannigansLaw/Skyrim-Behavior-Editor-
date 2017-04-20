@@ -143,6 +143,8 @@ HkDataUI::HkDataUI(const QString &title)
     connect(blenderGeneratorUI, SIGNAL(viewVariables(int)), variablesTable, SLOT(showTable(int)));
     connect(blenderGeneratorUI, SIGNAL(viewProperties(int)), characterPropertiesTable, SLOT(showTable(int)));
     connect(blenderGeneratorUI, SIGNAL(viewGenerators(int)), generatorsTable, SLOT(showTable(int)));
+
+    connect(behaviorView, SIGNAL(iconSelected(TreeGraphicsItem*)), this, SLOT(changeCurrentDataWidget(TreeGraphicsItem*)));
 }
 
 void HkDataUI::setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *variables){
@@ -305,6 +307,7 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             if (loadedData != oldData){
                 blenderGeneratorUI->loadData(loadedData);
             }
+            blenderGeneratorUI->setCurrentIndex(BlenderGeneratorUI::MAIN_WIDGET);
             stack->setCurrentIndex(BLENDER_GENERATOR);
             blenderGeneratorUI->connectChildUI(variablesTable, characterPropertiesTable, generatorsTable);
             connect(variablesTable, SIGNAL(elementSelected(int,QString)), blenderGeneratorUI, SLOT(setBindingVariable(int,QString)));
@@ -331,6 +334,7 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             if (loadedData != oldData){
                 stateMachineUI->loadData(loadedData);
             }
+            //stateMachineUI->setCurrentIndex(BlenderGeneratorUI::MAIN_WIDGET);
             stack->setCurrentIndex(STATE_MACHINE);
             break;
         default:

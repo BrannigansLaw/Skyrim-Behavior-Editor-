@@ -40,7 +40,7 @@ int hkbModifierList::getIndexToInsertIcon() const{
 
 bool hkbModifierList::insertObjectAt(int index, DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
-        if (index >= modifiers.size()){
+        if (index >= modifiers.size() || index == -1){
             modifiers.append(HkxObjectExpSharedPtr((HkxObject *)obj));
         }else if (index > -1){
             modifiers[index] = HkxObjectExpSharedPtr((HkxObject *)obj);
@@ -56,6 +56,8 @@ bool hkbModifierList::insertObjectAt(int index, DataIconManager *obj){
 bool hkbModifierList::removeObjectAt(int index){
     if (index > -1 && index < modifiers.size()){
         modifiers.removeAt(index);
+    }else if (index == -1){
+        modifiers.clear();
     }else{
         return false;
     }

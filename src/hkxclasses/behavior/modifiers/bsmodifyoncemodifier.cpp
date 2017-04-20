@@ -40,22 +40,24 @@ int BSModifyOnceModifier::getIndexToInsertIcon() const{
 
 bool BSModifyOnceModifier::insertObjectAt(int index, DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
-        if (index == 0){
-            pOnActivateModifier = HkxObjectExpSharedPtr((HkxObject *)obj);
-        }else if (index == 1){
+        if (index == 1){
             pOnDeactivateModifier = HkxObjectExpSharedPtr((HkxObject *)obj);
         }else{
-            return false;
+            pOnDeactivateModifier = HkxObjectExpSharedPtr((HkxObject *)obj);
         }
     }else{
         return false;
     }
+    return true;
 }
 
 bool BSModifyOnceModifier::removeObjectAt(int index){
     if (index == 0){
         pOnActivateModifier = HkxObjectExpSharedPtr();
     }else if (index == 1){
+        pOnDeactivateModifier = HkxObjectExpSharedPtr();
+    }else if (index == -1){
+        pOnActivateModifier = HkxObjectExpSharedPtr();
         pOnDeactivateModifier = HkxObjectExpSharedPtr();
     }else{
         return false;

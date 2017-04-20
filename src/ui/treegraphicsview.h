@@ -10,12 +10,16 @@ class TreeGraphicsItem;
 
 class TreeGraphicsView: public QGraphicsView
 {
+    friend class BehaviorGraphView;
     Q_OBJECT
 public:
     TreeGraphicsView(QMenu *menu);
+    QSize sizeHint() const Q_DECL_OVERRIDE;
     bool drawGraph(DataIconManager *rootData, bool allowDuplicates = false);
     TreeGraphicsItem * getSelectedItem() const;
-    bool reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData);
+    bool reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData, bool removeData = true);
+signals:
+    void iconSelected(TreeGraphicsItem *selected);
 protected:
     void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;

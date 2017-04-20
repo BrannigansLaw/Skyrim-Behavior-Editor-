@@ -22,7 +22,7 @@ protected:
     virtual QList <DataIconManager *> getChildren() const;
     virtual int getIndexOfObj(DataIconManager *) const;
     virtual bool insertObjectAt(int , DataIconManager *);
-    virtual bool removeObjectAt(int );
+    virtual bool removeObjectAt(int );//If index is -1 remove all...
     DataIconManager(HkxFile *parent, long ref = -1);
 private:
     bool wrapObjectAt(int index, DataIconManager *obj, DataIconManager *parentObj);

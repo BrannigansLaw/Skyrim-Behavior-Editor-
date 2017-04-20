@@ -32,13 +32,9 @@ QString hkbDelayedModifier::getName() const{
     return name;
 }
 
-bool hkbDelayedModifier::insertObjectAt(int index, DataIconManager *obj){
+bool hkbDelayedModifier::insertObjectAt(int , DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
-        if (index == 0){
-            modifier = HkxObjectExpSharedPtr((HkxObject *)obj);
-        }else{
-            return false;
-        }
+        modifier = HkxObjectExpSharedPtr((HkxObject *)obj);
         return true;
     }else{
         return false;
@@ -46,7 +42,7 @@ bool hkbDelayedModifier::insertObjectAt(int index, DataIconManager *obj){
 }
 
 bool hkbDelayedModifier::removeObjectAt(int index){
-    if (index == 0){
+    if (index == 0 || index == -1){
         modifier = HkxObjectExpSharedPtr();
     }else{
         return false;

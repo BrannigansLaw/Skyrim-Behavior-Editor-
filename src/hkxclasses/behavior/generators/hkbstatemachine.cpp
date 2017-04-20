@@ -122,7 +122,7 @@ int hkbStateMachine::getNumberOfNestedStates(int stateId) const{
 bool hkbStateMachine::insertObjectAt(int index, DataIconManager *obj){
     hkbStateMachineStateInfo *objChild;
     if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
-        if (index >= states.size()){
+        if (index >= states.size() || index == -1){
             objChild = new hkbStateMachineStateInfo(getParentFile(), this, -1);
             states.append(HkxObjectExpSharedPtr(objChild));
             objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
@@ -130,7 +130,7 @@ bool hkbStateMachine::insertObjectAt(int index, DataIconManager *obj){
             objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
             objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
         }else if (index > -1){
-            objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index - 1).data());
+            objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
             objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
         }else{
             return false;
@@ -146,6 +146,8 @@ bool hkbStateMachine::removeObjectAt(int index){
     if (index > -1 && index < states.size()){
         objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
         states.removeAt(index);
+    }else if (index == -1){
+        states.clear();
     }else{
         return false;
     }

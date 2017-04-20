@@ -66,7 +66,7 @@ int hkbPoseMatchingGenerator::getIndexToInsertIcon(HkxObject *child) const{
 bool hkbPoseMatchingGenerator::insertObjectAt(int index, DataIconManager *obj){
     hkbBlenderGeneratorChild *objChild;
     if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
-        if (index >= children.size()){
+        if (index >= children.size() || index == -1){
             objChild = new hkbBlenderGeneratorChild(getParentFile(), this, -1);
             children.append(HkxObjectExpSharedPtr(objChild));
             objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
@@ -74,7 +74,7 @@ bool hkbPoseMatchingGenerator::insertObjectAt(int index, DataIconManager *obj){
             objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
             objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
         }else if (index > -1){
-            objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index - 1).data());
+            objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
             objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
         }else{
             return false;
@@ -90,6 +90,8 @@ bool hkbPoseMatchingGenerator::removeObjectAt(int index){
     if (index > -1 && index < children.size()){
         objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
         children.removeAt(index);
+    }else if (index == -1){
+        children.clear();
     }else{
         return false;
     }

@@ -36,10 +36,10 @@ int hkbModifierGenerator::getIndexToInsertIcon(HkxObject *child) const{
     return -1;
 }
 
-bool hkbModifierGenerator::insertObjectAt(int index, DataIconManager *obj){
-    if (((HkxObject *)obj)->getType() == TYPE_MODIFIER && index == 0){
+bool hkbModifierGenerator::insertObjectAt(int , DataIconManager *obj){
+    if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
         modifier = HkxObjectExpSharedPtr((HkxObject *)obj);
-    }else if (((HkxObject *)obj)->getType() == TYPE_GENERATOR && index == 1){
+    }else if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
         generator = HkxObjectExpSharedPtr((HkxObject *)obj);
     }else{
         return false;
@@ -51,6 +51,9 @@ bool hkbModifierGenerator::removeObjectAt(int index){
     if (index == 0){
         modifier = HkxObjectExpSharedPtr();
     }else if (index == 1){
+        generator = HkxObjectExpSharedPtr();
+    }else if (index == -1){
+        modifier = HkxObjectExpSharedPtr();
         generator = HkxObjectExpSharedPtr();
     }else{
         return false;

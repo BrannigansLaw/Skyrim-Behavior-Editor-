@@ -5,7 +5,10 @@
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 
-#define ITEM_WIDTH 200
+#include "src/utility.h"
+#include "src/hkxclasses/hkxobject.h"
+
+#define ITEM_WIDTH 300
 #define ITEM_HEIGHT 50
 
 #define MAX_NUM_GRAPH_ICONS 10000
@@ -18,35 +21,69 @@ TreeGraphicsItem::TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *ob
       yCoordinate(0),
       path(new QGraphicsPathItem)
 {
+    int index = -1;
     QList <QGraphicsItem *> children;
     setFlags(QGraphicsItem::ItemIsSelectable);
     itemData->appendIcon(this);
+    name = itemData->getName();
+    if (itemData->getType() == HkxObject::TYPE_MODIFIER){
+        brushColor = Qt::magenta;
+    }else{
+        HkxSignature sig = itemData->getSignature();
+        switch (sig){
+        case HKB_BLENDER_GENERATOR:
+            brushColor = Qt::darkRed;
+            break;
+        case HKB_POSE_MATCHING_GENERATOR:
+            brushColor = Qt::darkRed;
+            break;
+        case BS_BONE_SWITCH_GENERATOR:
+            brushColor = Qt::darkRed;
+            break;
+        case HKB_STATE_MACHINE:
+            brushColor = Qt::cyan;
+            break;
+        case HKB_CLIP_GENERATOR:
+            brushColor = Qt::yellow;
+            break;
+        case HKB_BEHAVIOR_REFERENCE_GENERATOR:
+            brushColor = Qt::darkYellow;
+            break;
+        case BS_SYNCHRONIZED_CLIP_GENERATOR:
+            brushColor = Qt::yellow;
+            break;
+        default:
+            brushColor = Qt::gray;
+        }
+    }
     if (parentItem()){
         if (indexToInsert > -1 && indexToInsert < parentItem()->childItems().size()){
             children = parentItem()->childItems();
             for (int i = 0; i < children.size(); i++){
                 children[i]->setParentItem(NULL);
             }
+            index = children.indexOf(this);
             children.insert(indexToInsert, this);
+            if (index > indexToInsert){
+                index++;
+            }
+            if (index < children.size()){
+                children.removeAt(index);
+            }
             for (int i = 0; i < children.size(); i++){
                 children[i]->setParentItem(parent);
             }
         }
         setPosition(QPointF(boundingRect().width()*2, getYCoordinate()));
+        this->parent = (TreeGraphicsItem *)parentItem();
     }
 }
 
 TreeGraphicsItem::~TreeGraphicsItem(){
-    QList <QGraphicsItem *> children;
     itemData->removeIcon(this);
+    setParentItem(NULL);
     if (scene()){
         scene()->removeItem(this);
-    }
-    if (parentItem()){
-        children = parentItem()->childItems();
-        for (int i = 0; i < children.size(); i++){
-            children[i]->setParentItem(NULL);
-        }
     }
     //scene()->removeItem(path); crashing here...
     delete path;
@@ -89,12 +126,46 @@ void TreeGraphicsItem::setIconSelected(){
 }
 
 void TreeGraphicsItem::unselect(){
-    brushColor = Qt::gray;
+    if (itemData->getType() == HkxObject::TYPE_MODIFIER){
+        brushColor = Qt::magenta;
+    }else{
+        HkxSignature sig = itemData->getSignature();
+        switch (sig){
+        case HKB_BLENDER_GENERATOR:
+            brushColor = Qt::darkRed;
+            break;
+        case HKB_POSE_MATCHING_GENERATOR:
+            brushColor = Qt::darkRed;
+            break;
+        case BS_BONE_SWITCH_GENERATOR:
+            brushColor = Qt::darkRed;
+            break;
+        case HKB_STATE_MACHINE:
+            brushColor = Qt::cyan;
+            break;
+        case HKB_CLIP_GENERATOR:
+            brushColor = Qt::yellow;
+            break;
+        case HKB_BEHAVIOR_REFERENCE_GENERATOR:
+            brushColor = Qt::darkYellow;
+            break;
+        case BS_SYNCHRONIZED_CLIP_GENERATOR:
+            brushColor = Qt::yellow;
+            break;
+        default:
+            brushColor = Qt::gray;
+        }
+    }
     scene()->update(QRectF(scenePos(), scenePos() + QPointF(ITEM_WIDTH, ITEM_HEIGHT)));
 }
 
 void TreeGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     if (boundingRect().contains(event->pos())){
+        QList <QGraphicsItem *> list = childItems();
+        QList <TreeGraphicsItem *> children;
+        for (int i = 0; i < list.size(); i++){
+            children.append((TreeGraphicsItem *)list.at(i));
+        }
         if (branchExpandCollapseBox().contains(event->pos())){
             ((TreeGraphicsScene *)scene())->selectIcon(this, true);
         }else{
@@ -198,6 +269,7 @@ TreeGraphicsItem *TreeGraphicsItem::getPrimaryIcon() const{
 }
 
 TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int indexToInsert){//Swap paths!!!
+    int index = -1;
     QList <QGraphicsItem *> children;
     QGraphicsItem *oldParent = parentItem();
     if (oldParent){
@@ -217,7 +289,14 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
                 for (int i = 0; i < children.size(); i++){
                     children[i]->setParentItem(NULL);
                 }
+                index = children.indexOf(this);
                 children.insert(indexToInsert, this);
+                if (index > indexToInsert){
+                    index++;
+                }
+                if (index < children.size()){
+                    children.removeAt(index);
+                }
                 for (int i = 0; i < children.size(); i++){
                     children[i]->setParentItem(newParent);
                 }
@@ -234,6 +313,7 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
     }else{
         //Error
     }
+    this->parent = newParent;
     return (TreeGraphicsItem *)oldParent;
 }
 

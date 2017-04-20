@@ -12,6 +12,7 @@ class TreeGraphicsItem: public QGraphicsItem
     friend class DataIconManager;
     friend class HkDataUI;
     friend class BehaviorGraphView;
+    friend class TreeGraphicsView;
 public:
     TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *obj, int indexToInsert = -1, Qt::GlobalColor color = Qt::gray);
     virtual ~TreeGraphicsItem();
@@ -53,6 +54,8 @@ private:
     bool isExpanded;
     qreal yCoordinate;
     QGraphicsPathItem *path;
+    QString name;
+    TreeGraphicsItem *parent;
 };
 
 #endif // TREEGRAPHICSITEM_H

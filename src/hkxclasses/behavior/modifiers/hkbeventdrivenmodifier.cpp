@@ -31,11 +31,7 @@ QString hkbEventDrivenModifier::getName() const{
 
 bool hkbEventDrivenModifier::insertObjectAt(int index, DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
-        if (index == 0){
-            modifier = HkxObjectExpSharedPtr((HkxObject *)obj);
-        }else{
-            return false;
-        }
+        modifier = HkxObjectExpSharedPtr((HkxObject *)obj);
         return true;
     }else{
         return false;
@@ -43,7 +39,7 @@ bool hkbEventDrivenModifier::insertObjectAt(int index, DataIconManager *obj){
 }
 
 bool hkbEventDrivenModifier::removeObjectAt(int index){
-    if (index == 0){
+    if (index == 0 || index == -1){
         modifier = HkxObjectExpSharedPtr();
     }else{
         return false;

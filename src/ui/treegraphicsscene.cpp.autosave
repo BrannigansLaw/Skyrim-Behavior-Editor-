@@ -222,12 +222,18 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
     QList <QGraphicsItem *> iconsToRemove;  //Storage for all icons to be removed from the graph...
     TreeGraphicsItem *itemToDeleteParent = NULL;
     TreeGraphicsItem *itemToDelete = NULL;  //Represents any icons to be removed that had children that were adopted by another icon representing the same data...
+    QList <DataIconManager *> childrenData;
+    int dataCount = 0;
     int count = 0;  //Used to prevent possible infinite looping due to icons referencing ancestors...
     int index = -1; //Used to store the index of the position of "itemToDelete" in "children"...
     if (item){
         NEED TO CHECK IF PARENT REFERENCES THE DATA ONLY ONCE OTHERWISE REMOVE THE DATA WITHOUT REMOVING THE ICON!!!
         itemToDeleteParent = (TreeGraphicsItem *)item->parentItem();
         if (itemToDeleteParent){
+            childrenData = itemToDeleteParent->itemData->getChildren();
+            if (!childrenData.isEmpty()){
+                dataCount = childrenData.count(item->itemData);
+            }
             children.append(item);
             for (; count < MAX_NUM_GRAPH_ICONS, !children.isEmpty(); count++){  //Start cycling through children...
                 itemToDelete = NULL;

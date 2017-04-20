@@ -732,7 +732,7 @@ QVector<int> BehaviorFile::removeGeneratorData(){
     for (int i = generators.size() - 1; i >= 0; i--){
         obj = generators.at(i).data();
         if (obj){
-            if (obj->ref < 2){
+            if (obj->ref < 1){
                 generators.removeAt(i);
                 removedIndices.append(i);
             }else if (obj->getSignature() == HKB_STATE_MACHINE){
@@ -759,7 +759,7 @@ QVector<int> BehaviorFile::removeGeneratorData(){
 QVector<int> BehaviorFile::removeModifierData(){
     QVector<int> removedIndices;
     for (int i = modifiers.size() - 1; i >= 0; i--){
-        if (modifiers.at(i).constData() && modifiers.at(i).constData()->ref < 2){
+        if (modifiers.at(i).constData() && modifiers.at(i).constData()->ref < 1){
             modifiers.removeAt(i);
             removedIndices.append(i);
         }
@@ -770,7 +770,7 @@ QVector<int> BehaviorFile::removeModifierData(){
 QVector<int> BehaviorFile::removeOtherData(){
     QVector<int> removedIndices;
     for (int i = otherTypes.size() - 1; i >= 0; i--){
-        if (otherTypes.at(i).constData() && otherTypes.at(i).constData()->ref < 2){
+        if (otherTypes.at(i).constData() && otherTypes.at(i).constData()->ref < 1){
             otherTypes.removeAt(i);
             removedIndices.append(i);
         }
@@ -871,6 +871,7 @@ QStringList BehaviorFile::getVariableTypenames() const{
     if (graphData.data()){
         return static_cast<hkbBehaviorGraphData *>(graphData.data())->getVariableTypeNames();
     }
+    return QStringList();
 }
 
 QStringList BehaviorFile::getCharacterPropertyTypenames() const{
@@ -889,5 +890,8 @@ QStringList BehaviorFile::getEventNames() const{
 }
 
 BehaviorFile::~BehaviorFile(){
-    //
+    generators.clear();
+    generatorChildren.clear();
+    modifiers.clear();
+    otherTypes.clear();
 }

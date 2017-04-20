@@ -34,13 +34,9 @@ QString BSSynchronizedClipGenerator::getName() const{
     return name;
 }
 
-bool BSSynchronizedClipGenerator::insertObjectAt(int index, DataIconManager *obj){
+bool BSSynchronizedClipGenerator::insertObjectAt(int , DataIconManager *obj){
     if (((HkxObject *)obj)->getSignature() == HKB_CLIP_GENERATOR){
-        if (index == 0){
-            pClipGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
-        }else{
-            return false;
-        }
+        pClipGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
         return true;
     }else{
         return false;
@@ -48,7 +44,7 @@ bool BSSynchronizedClipGenerator::insertObjectAt(int index, DataIconManager *obj
 }
 
 bool BSSynchronizedClipGenerator::removeObjectAt(int index){
-    if (index == 0){
+    if (index == 0 || index == -1){
         pClipGenerator = HkxObjectExpSharedPtr();
     }else{
         return false;

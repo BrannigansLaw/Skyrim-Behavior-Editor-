@@ -40,19 +40,23 @@ int BSOffsetAnimationGenerator::getIndexToInsertIcon() const{
 }
 
 bool BSOffsetAnimationGenerator::insertObjectAt(int index, DataIconManager *obj){
-    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR && index == 0){
-        pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
-    }else if (((HkxObject *)obj)->getSignature() == HKB_CLIP_GENERATOR && index == 1){
+    if (((HkxObject *)obj)->getSignature() == HKB_CLIP_GENERATOR && index == 1){
         pOffsetClipGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+    }else if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
+        pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
     }else{
         return false;
     }
+    return true;
 }
 
 bool BSOffsetAnimationGenerator::removeObjectAt(int index){
     if (index == 0){
         pDefaultGenerator = HkxObjectExpSharedPtr();
     }else if (index == 1){
+        pOffsetClipGenerator = HkxObjectExpSharedPtr();
+    }else if (index == -1){
+        pDefaultGenerator = HkxObjectExpSharedPtr();
         pOffsetClipGenerator = HkxObjectExpSharedPtr();
     }else{
         return false;

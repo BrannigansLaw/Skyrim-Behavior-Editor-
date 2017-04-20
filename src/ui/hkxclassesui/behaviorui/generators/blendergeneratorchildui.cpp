@@ -124,18 +124,18 @@ void BlenderGeneratorChildUI::loadData(HkxObject *data){
 }
 
 void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
-    /*if (bsData){
+    if (bsData){
         if (behaviorView){
             hkbBlenderGenerator *gen = static_cast<hkbBlenderGenerator *>(bsData->getParentGenerator());
-            int indexOfChild = gen->getIndexOfChild(bsData);
+            //int indexOfChild = gen->getIndexOfChild(bsData);
             DataIconManager *ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
             if (!gen){
                 CRITICAL_ERROR_MESSAGE(QString("The currently loaded 'hkbBlenderGeneratorChild' has no parent 'hkbBlenderGenerator' or 'hkbPoseMatchingGenerator'!!!"))
-            }else if (!ptr || ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), ptr,  reinterpret_cast<DataIconManager *>(bsData->generator.data()))){
+            }else if (!ptr || ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), (DataIconManager *)bsData->generator.data(), ptr, false)){
                 WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"))
             }else{
                 bsData->generator = HkxObjectExpSharedPtr(ptr);
-                gen->addChildAt(bsData->generator, indexOfChild);
+                //gen->addChildAt(bsData->generator, indexOfChild);
                 behaviorView->removeGeneratorData();
                 table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
                 bsData->getParentFile()->toggleChanged(true);
@@ -145,7 +145,7 @@ void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI: The 'bsData' pointer is NULL!!"))
-    }*/
+    }
 }
 
 bool BlenderGeneratorChildUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type){

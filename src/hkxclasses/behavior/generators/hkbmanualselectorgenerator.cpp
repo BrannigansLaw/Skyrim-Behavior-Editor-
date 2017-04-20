@@ -40,7 +40,7 @@ int hkbManualSelectorGenerator::getIndexToInsertIcon(HkxObject *child) const{
 
 bool hkbManualSelectorGenerator::insertObjectAt(int index, DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
-        if (index >= generators.size()){
+        if (index >= generators.size() || index == -1){
             generators.append(HkxObjectExpSharedPtr((HkxObject *)obj));
         }else if (index > -1){
             generators[index] = HkxObjectExpSharedPtr((HkxObject *)obj);
@@ -56,6 +56,8 @@ bool hkbManualSelectorGenerator::insertObjectAt(int index, DataIconManager *obj)
 bool hkbManualSelectorGenerator::removeObjectAt(int index){
     if (index > -1 && index < generators.size()){
         generators.removeAt(index);
+    }else if (index == -1){
+        generators.clear();
     }else{
         return false;
     }

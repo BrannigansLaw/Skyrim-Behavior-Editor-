@@ -39,13 +39,9 @@ int hkbBehaviorGraph::getIndexToInsertIcon() const{
     return -1;
 }
 
-bool hkbBehaviorGraph::insertObjectAt(int index, DataIconManager *obj){
+bool hkbBehaviorGraph::insertObjectAt(int , DataIconManager *obj){
     if (((HkxObject *)obj)->getSignature() == HKB_STATE_MACHINE){
-        if (index == 0){
-            rootGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
-        }else{
-            return false;
-        }
+        rootGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
         return true;
     }else{
         return false;
@@ -53,7 +49,7 @@ bool hkbBehaviorGraph::insertObjectAt(int index, DataIconManager *obj){
 }
 
 bool hkbBehaviorGraph::removeObjectAt(int index){
-    if (index == 0){
+    if (index == 0 || index == -1){
         rootGenerator = HkxObjectExpSharedPtr();
     }else{
         return false;

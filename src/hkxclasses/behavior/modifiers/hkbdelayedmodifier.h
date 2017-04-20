@@ -20,7 +20,7 @@ public:
 private:
     QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
-    bool insertObjectAt(int index, DataIconManager *obj);
+    bool insertObjectAt(int, DataIconManager *obj);
     bool removeObjectAt(int index);
     hkbDelayedModifier& operator=(const hkbDelayedModifier&);
     hkbDelayedModifier(const hkbDelayedModifier &);

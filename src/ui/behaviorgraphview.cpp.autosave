@@ -407,7 +407,7 @@ void BehaviorGraphView::deleteSelectedObjectBranchSlot(){
     changed = true;
     //removeSelectedObjectBranchSlot();
     getSelectedItem()->unselect();
-    removeItemFromGraph(getSelectedItem(), -1); !!!Fix index!!!
+    removeItemFromGraph(getSelectedItem(), -1);
     ui->changeCurrentDataWidget(NULL);
     removeGeneratorData();
     removeModifierData();

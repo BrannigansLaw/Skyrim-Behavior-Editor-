@@ -1,5 +1,6 @@
 #include "treegraphicsview.h"
 #include "treegraphicsscene.h"
+#include "treegraphicsitem.h"
 
 #include <QWheelEvent>
 #include <QMouseEvent>
@@ -16,6 +17,11 @@ TreeGraphicsView::TreeGraphicsView(QMenu *menu)
       scaleDownFactor(0.8)
 {
     setScene(treeScene);
+    connect(treeScene, SIGNAL(iconSelected(TreeGraphicsItem*)), this, SIGNAL(iconSelected(TreeGraphicsItem*)));
+}
+
+QSize TreeGraphicsView::sizeHint() const{
+    return QSize(500, 400);
 }
 
 bool TreeGraphicsView::drawGraph(DataIconManager *rootData, bool allowDuplicates){
@@ -66,8 +72,10 @@ TreeGraphicsItem *TreeGraphicsView::getSelectedItem() const{
     return treeScene->selectedIcon;
 }
 
-bool TreeGraphicsView::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData){
-    return treeScene->reconnectIcon(oldIconParent, dataToReplace, replacementData);
+bool TreeGraphicsView::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData, bool removeData){
+    bool result = treeScene->reconnectIcon(oldIconParent, dataToReplace, replacementData, removeData);
+    oldIconParent->reposition();
+    return result;
 }
 
 bool TreeGraphicsView::removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove){

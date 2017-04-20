@@ -30,13 +30,9 @@ QString BSiStateTaggingGenerator::getName() const{
     return name;
 }
 
-bool BSiStateTaggingGenerator::insertObjectAt(int index, DataIconManager *obj){
+bool BSiStateTaggingGenerator::insertObjectAt(int , DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
-        if (index == 0){
-            pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
-        }else{
-            return false;
-        }
+        pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
         return true;
     }else{
         return false;
@@ -44,7 +40,7 @@ bool BSiStateTaggingGenerator::insertObjectAt(int index, DataIconManager *obj){
 }
 
 bool BSiStateTaggingGenerator::removeObjectAt(int index){
-    if (index == 0){
+    if (index == 0 || index == -1){
         pDefaultGenerator = HkxObjectExpSharedPtr();
     }else{
         return false;

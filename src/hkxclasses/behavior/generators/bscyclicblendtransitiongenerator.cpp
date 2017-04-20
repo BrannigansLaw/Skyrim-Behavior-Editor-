@@ -33,13 +33,9 @@ QString BSCyclicBlendTransitionGenerator::getName() const{
     return name;
 }
 
-bool BSCyclicBlendTransitionGenerator::insertObjectAt(int index, DataIconManager *obj){
+bool BSCyclicBlendTransitionGenerator::insertObjectAt(int , DataIconManager *obj){
     if (((HkxObject *)obj)->getSignature() == HKB_BLENDER_GENERATOR){
-        if (index == 0){
-            pBlenderGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
-        }else{
-            return false;
-        }
+        pBlenderGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
         return true;
     }else{
         return false;
@@ -47,7 +43,7 @@ bool BSCyclicBlendTransitionGenerator::insertObjectAt(int index, DataIconManager
 }
 
 bool BSCyclicBlendTransitionGenerator::removeObjectAt(int index){
-    if (index == 0){
+    if (index == 0 || index == -1){
         pBlenderGenerator = HkxObjectExpSharedPtr();
     }else{
         return false;

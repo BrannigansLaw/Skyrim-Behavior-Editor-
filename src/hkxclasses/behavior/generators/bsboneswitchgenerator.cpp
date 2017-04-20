@@ -47,9 +47,12 @@ bool BSBoneSwitchGenerator::insertObjectAt(int index, DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
         if (index == 0){
             pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
-        }else if (index > ChildrenA.size()){
+        }else if (index >= ChildrenA.size() || index == -1){
             objChild = new BSBoneSwitchGeneratorBoneData(getParentFile(), -1);
             ChildrenA.append(HkxObjectExpSharedPtr(objChild));
+            objChild->pGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        }else if (index == 1){
+            objChild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index - 1).data());
             objChild->pGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
         }else if (index > -1){
             objChild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index - 1).data());
@@ -114,6 +117,9 @@ bool BSBoneSwitchGenerator::removeObjectAt(int index){
     }else if (index > -1 && index <= ChildrenA.size()){
         objChild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index - 1).data());
         ChildrenA.removeAt(index - 1);
+    }else if (index == -1){
+        pDefaultGenerator = HkxObjectExpSharedPtr();
+        ChildrenA.clear();
     }else{
         return false;
     }
