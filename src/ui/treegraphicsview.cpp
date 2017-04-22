@@ -78,11 +78,11 @@ bool TreeGraphicsView::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconMa
     return result;
 }
 
-bool TreeGraphicsView::removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove){
+bool TreeGraphicsView::removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove, bool removeData, bool removeAllSameData){
     if (item == treeScene->selectedIcon){
         treeScene->selectedIcon = NULL;
     }
-    return treeScene->removeItemFromGraph(item, indexToRemove);
+    return treeScene->removeItemFromGraph(item, indexToRemove, removeData, removeAllSameData);
 }
 
 TreeGraphicsItem *TreeGraphicsView::addItemToGraph(TreeGraphicsItem *selectedIcon, DataIconManager *data, int indexToInsert, bool inject, bool allowDuplicates){

@@ -27,7 +27,7 @@ protected:
     void contractAllBranches();
     void expandAllBranches();
     void selectRoot();
-    bool removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove);
+    bool removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove, bool removeData = true, bool removeAllSameData = false);
     TreeGraphicsItem * addItemToGraph(TreeGraphicsItem *selectedIcon, DataIconManager *data, int indexToInsert, bool inject = false, bool allowDuplicates = false);
 private:
     QMenu *popUpMenu;

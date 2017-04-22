@@ -201,6 +201,34 @@ qreal TreeGraphicsItem::getYCoordinate(){
     return 0;
 }
 
+bool TreeGraphicsItem::reorderChildren(){
+    QList <QGraphicsItem *> children = childItems();
+    QList <DataIconManager *> dataChildren = itemData->getChildren();
+    for (int j = 0; j < dataChildren.size(); j++){
+        for (int k = j + 1; k < dataChildren.size(); k++){
+            if (dataChildren.at(j) == dataChildren.at(k)){
+                dataChildren.removeAt(k);
+            }
+        }
+    }
+    for (int i = 0; i < children.size(); i++){
+        children[i]->setParentItem(NULL);
+    }
+    if (children.size() == dataChildren.size()){
+        for (int i = 0; i < dataChildren.size(); i++){
+            for (int k = 0; k < children.size(); k++){
+                if (((TreeGraphicsItem *)children.at(k))->itemData == dataChildren.at(i)){
+                    children[k]->setParentItem(this);
+                }
+            }
+        }
+        setPosition(QPointF(boundingRect().width()*2, getYCoordinate()));
+        return true;
+    }else{
+        return false;
+    }
+}
+
 void TreeGraphicsItem::reposition(){
     QList <QGraphicsItem *> children = childItems();
     QList <QGraphicsItem *> tempList;

@@ -27,6 +27,7 @@ protected:
     void setPosition(const QPointF &pos);
 private:
     qreal getYCoordinate();
+    bool reorderChildren();
     void reposition();
     bool isDescendant(TreeGraphicsItem *icon) const;
     bool isPrimaryIcon() const;

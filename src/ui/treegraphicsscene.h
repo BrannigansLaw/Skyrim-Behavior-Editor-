@@ -26,7 +26,7 @@ private:
     bool drawGraph(DataIconManager *rootData, bool allowDuplicates);
     TreeGraphicsItem * addItemToGraph(TreeGraphicsItem *selectedIcon, DataIconManager *data, int indexToInsert, bool inject = false, bool allowDuplicates = false, bool isFirstDraw = false);
     bool reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData, bool removeData = true);
-    bool removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove, bool removeData = true);
+    bool removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove, bool removeData = true, bool removeAllSameData = false);
 private:
     TreeGraphicsItem *rootIcon;
     TreeGraphicsItem *selectedIcon;
