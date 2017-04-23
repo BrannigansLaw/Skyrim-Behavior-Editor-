@@ -367,10 +367,10 @@ BehaviorGraphView *HkDataUI::setBehaviorView(BehaviorGraphView *view){
         variablesTable->loadTable(behaviorView->behavior->getVariableNames(), behaviorView->behavior->getVariableTypenames(), "NULL");
         eventsTable->loadTable(behaviorView->behavior->getEventNames(), "hkEvent", "NULL");
         characterPropertiesTable->loadTable(behaviorView->behavior->getCharacterPropertyNames(), behaviorView->behavior->getCharacterPropertyTypenames(), "NULL");//inefficient...
-        connect(behaviorView, SIGNAL(addedGenerator(QString,QString)), this, SLOT(generatorAdded(QString,QString)));
-        connect(behaviorView, SIGNAL(addedModifier(QString,QString)), this, SLOT(modifierAdded(QString,QString)));
-        connect(behaviorView, SIGNAL(removedGenerator(int)), this, SLOT(generatorRemoved(int)));
-        connect(behaviorView, SIGNAL(removedModifier(int)), this, SLOT(modifierRemoved(int)));
+        connect(behaviorView, SIGNAL(addedGenerator(QString,QString)), this, SLOT(generatorAdded(QString,QString)), Qt::UniqueConnection);
+        connect(behaviorView, SIGNAL(addedModifier(QString,QString)), this, SLOT(modifierAdded(QString,QString)), Qt::UniqueConnection);
+        connect(behaviorView, SIGNAL(removedGenerator(int)), this, SLOT(generatorRemoved(int)), Qt::UniqueConnection);
+        connect(behaviorView, SIGNAL(removedModifier(int)), this, SLOT(modifierRemoved(int)), Qt::UniqueConnection);
     }
     return oldView;
 }

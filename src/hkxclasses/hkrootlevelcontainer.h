@@ -17,6 +17,7 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
+    void disconnect();
     hkRootLevelContainer& operator=(const hkRootLevelContainer&);
     hkRootLevelContainer(const hkRootLevelContainer &);
 private:

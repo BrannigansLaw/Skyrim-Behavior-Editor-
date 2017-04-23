@@ -270,7 +270,7 @@ bool TreeGraphicsItem::isDescendant(TreeGraphicsItem *icon) const{
     if (icon){
         TreeGraphicsItem *parent = (TreeGraphicsItem *)parentItem();
         if (parent){
-            if (parent == icon || parent->hasSameData(icon)){
+            if (parent->hasSameData(icon)){
                 return true;
             }else{
                 if (parent->isDescendant(icon)){

@@ -127,15 +127,15 @@ void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
     if (bsData){
         if (behaviorView){
             hkbBlenderGenerator *gen = static_cast<hkbBlenderGenerator *>(bsData->getParentGenerator());
-            //int indexOfChild = gen->getIndexOfChild(bsData);
             DataIconManager *ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
-            if (!gen){
+            if (ptr && name != ptr->getName()){
+                CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"))
+            }else if (!gen){
                 CRITICAL_ERROR_MESSAGE(QString("The currently loaded 'hkbBlenderGeneratorChild' has no parent 'hkbBlenderGenerator' or 'hkbPoseMatchingGenerator'!!!"))
-            }else if (!ptr || ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), (DataIconManager *)bsData->generator.data(), ptr, false)){
+            }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), (DataIconManager *)bsData->generator.data(), ptr, false)){
                 WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"))
             }else{
                 bsData->generator = HkxObjectExpSharedPtr(ptr);
-                //gen->addChildAt(bsData->generator, indexOfChild);
                 behaviorView->removeGeneratorData();
                 table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
                 bsData->getParentFile()->toggleChanged(true);

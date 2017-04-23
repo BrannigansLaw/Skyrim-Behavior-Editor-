@@ -890,8 +890,5 @@ QStringList BehaviorFile::getEventNames() const{
 }
 
 BehaviorFile::~BehaviorFile(){
-    generators.clear();
-    generatorChildren.clear();
-    modifiers.clear();
-    otherTypes.clear();
+    ((hkRootLevelContainer *)(rootObject.data()))->disconnect();
 }

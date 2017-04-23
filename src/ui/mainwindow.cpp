@@ -154,11 +154,11 @@ void MainWindow::changedTabs(int index){
             progressD->setValue(100);
             progressD->done(0);
             progressD->close();
-            return;
         }
+    }else{
+        writeToLog("MainWindow: changedTabs() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!", true);
     }
     progressD->close();
-    writeToLog("MainWindow: changedTabs() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!", true);
 }
 
 void MainWindow::expandBranches(){
@@ -217,6 +217,8 @@ void MainWindow::closeTab(int index){
                 }
                 behaviorFiles.removeAt(index);
             }
+        }else{
+            writeToLog("MainWindow: closeTab()\nThe tab index is out of sync with the behavior files or behavior graphs!", true);
         }
     }
 }
@@ -443,6 +445,7 @@ bool MainWindow::openBehavior(const QString & filename, QProgressDialog *dialog)
     dialog->setValue(100);
     dialog->done(0);
     dialog->close();
+    tabs->setCurrentIndex(tabs->count() - 1);
     return true;
 }
 

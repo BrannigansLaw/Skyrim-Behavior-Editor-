@@ -97,11 +97,17 @@ bool hkRootLevelContainer::write(HkxXMLWriter *writer){
     return true;
 }
 
+void hkRootLevelContainer::disconnect(){
+    for (int i = 0; i < namedVariants.size(); i++){
+        namedVariants.at(i).variant.~HkxObjectExpSharedPtr();
+    }
+}
+
 bool hkRootLevelContainer::link(){
     if (!getParentFile()){
         return false;
     }
-    for (int i = 0; i < namedVariants.size(); i++){
+    for (int i = 0; i < namedVariants.size(); i++){//This is awful, I know. I'll sort it out later...
         HkxObjectExpSharedPtr *ptr = NULL;
         HkxFile *file = dynamic_cast<BehaviorFile *>(getParentFile());
         if (file){

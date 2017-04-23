@@ -169,6 +169,7 @@ BlenderGeneratorUI::BlenderGeneratorUI()
     connect(flagDontDeactivateChildrenWithZeroWeights, SIGNAL(released()), this, SLOT(setFlagDontDeactivateChildrenWithZeroWeights()));
     connect(flagParametricBlend, SIGNAL(released()), this, SLOT(setFlagParametricBlend()));
     connect(flagIsParametricBlendCyclic, SIGNAL(released()), this, SLOT(setFlagIsParametricBlendCyclic()));
+    connect(flagForceDensePose, SIGNAL(released()), this, SLOT(setFlagForceDensePose()));
     connect(subtractLastChild, SIGNAL(released()), this, SLOT(setSubtractLastChild()));
     connect(addChildPB, SIGNAL(released()), this, SLOT(addChild()));
     connect(removeChildPB, SIGNAL(released()), this, SLOT(removeSelectedChild()));
@@ -190,6 +191,12 @@ void BlenderGeneratorUI::loadData(HkxObject *data){
         maxCyclicBlendParameter->setValue(bsData->maxCyclicBlendParameter);
         indexOfSyncMasterChild->setValue(bsData->indexOfSyncMasterChild);
         QStringList flags = bsData->flags.split("|");
+        flagSync->setChecked(false);
+        flagSmoothGeneratorWeights->setChecked(false);
+        flagDontDeactivateChildrenWithZeroWeights->setChecked(false);
+        flagParametricBlend->setChecked(false);
+        flagIsParametricBlendCyclic->setChecked(false);
+        flagForceDensePose->setChecked(false);
         if (flags.isEmpty()){
             if (bsData->flags == "FLAG_SYNC"){
                 flagSync->setChecked(true);

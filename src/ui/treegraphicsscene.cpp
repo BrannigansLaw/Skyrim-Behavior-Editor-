@@ -202,25 +202,30 @@ bool TreeGraphicsScene::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconM
     int indexOfOldData = -1;
     int index = -1;
     if (oldIconParent && dataToReplace != replacementData){
-        dataChildren = oldIconParent->itemData->getChildren();
-        indexOfReplacementData = dataChildren.indexOf(replacementData);
-        indexOfOldData = dataChildren.indexOf(dataToReplace);
         iconToReplace = oldIconParent->getChildWithData(dataToReplace);
-        replacementIcon = oldIconParent->getReplacementIcon(replacementData);
-        index = oldIconParent->getIndexOfChild(iconToReplace);
-        if (iconToReplace){
+        if (replacementData == NULL){
             removeItemFromGraph(iconToReplace, oldIconParent->itemData->getIndexOfObj(dataToReplace), removeData);
+            return true;
+        }else if (replacementData->icons.isEmpty() || (!oldIconParent->isDescendant(replacementData->icons.first()) && !oldIconParent->hasSameData(replacementData->icons.first()))){
+            dataChildren = oldIconParent->itemData->getChildren();
+            indexOfReplacementData = dataChildren.indexOf(replacementData);
+            indexOfOldData = dataChildren.indexOf(dataToReplace);
+            replacementIcon = oldIconParent->getReplacementIcon(replacementData);
+            index = oldIconParent->getIndexOfChild(iconToReplace);
+            if (iconToReplace){
+                removeItemFromGraph(iconToReplace, oldIconParent->itemData->getIndexOfObj(dataToReplace), removeData);
+            }
+            if (replacementIcon){//Fix bugs 19, 20 here?
+                replacementIcon->setParent(oldIconParent, index);
+                oldIconParent->itemData->insertObjectAt(oldIconParent->itemData->getIndexOfObj(dataToReplace), replacementData);
+            }else{
+                addItemToGraph(oldIconParent, replacementData, oldIconParent->itemData->getIndexOfObj(dataToReplace));
+            }
+            if (indexOfReplacementData > indexOfOldData){
+                oldIconParent->reorderChildren();
+            }
+            return true;
         }
-        if (replacementIcon){
-            replacementIcon->setParent(oldIconParent, index);
-            oldIconParent->itemData->insertObjectAt(oldIconParent->itemData->getIndexOfObj(dataToReplace), replacementData);
-        }else{
-            addItemToGraph(oldIconParent, replacementData, oldIconParent->itemData->getIndexOfObj(dataToReplace));
-        }
-        if (indexOfReplacementData > indexOfOldData){
-            oldIconParent->reorderChildren();
-        }
-        return true;
     }
     return false;
 }
