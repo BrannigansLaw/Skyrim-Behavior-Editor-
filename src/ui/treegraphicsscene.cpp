@@ -259,8 +259,8 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
                     if (!tempList.isEmpty() && iconChild->isPrimaryIcon() && iconChild->hasIcons()){  //"item" has children and has data that is referenced by other icons...
                         itemToDelete = iconChild->reconnectToNextDuplicate();   //Reconnect "item" to the parent of the next icon that references it's data...
                         index = children.indexOf(itemToDelete);
-                        if (index != -1){
-                            children.replace(children.indexOf(itemToDelete), iconChild); //"itemToDelete" is the
+                        if (index != -1){//Problem here?
+                            children.replace(index, iconChild); //"itemToDelete" is the
                         }
                         iconsToRemove.append(itemToDelete);
                         tempList.clear();
@@ -279,7 +279,7 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
                 }else if (removeData){
                     itemToDeleteParent->itemData->removeObjectAt(indexToRemove);
                 }
-                for (int i = iconsToRemove.size() - 1; i >= 0; i--){
+                for (int i = iconsToRemove.size() - 1; i >= 0; i--){//Duplicates sometimes...
                     delete iconsToRemove.at(i);
                 }
                 itemToDeleteParent->reposition();

@@ -1,5 +1,6 @@
 #include "dataiconmanager.h"
 #include "treegraphicsitem.h"
+#include "src/filetypes/behaviorfile.h"
 
 #include <QGraphicsScene>
 
@@ -12,8 +13,13 @@ bool DataIconManager::hasChildren() const{
 }
 
 bool DataIconManager::hasIcons() const{
-    if (icons.size() > 1){
-        return true;
+    if (!icons.isEmpty()){
+        if (icons.size() > 1){
+            return true;
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("DataIconManager::hasIcons(): 'icons' is empty!!!"))
+        getParentFile()->writeToLog("DataIconManager::hasIcons(): 'icons' is empty!!!");
     }
     return false;
 }
@@ -57,18 +63,23 @@ DataIconManager::DataIconManager(HkxFile *parent, long ref)
 }
 
 TreeGraphicsItem * DataIconManager::reconnectToNext(){
-    TreeGraphicsItem *iconRemoved = NULL;
+    TreeGraphicsItem *iconToBeRemoved = NULL;
     QList<QGraphicsItem *> children;
-    if (icons.size() > 1){
-        iconRemoved = icons.at(1);
-        icons.removeAt(1);
-        if (iconRemoved){
-            if (iconRemoved->parentItem() && icons.first()){
-                children = iconRemoved->parentItem()->childItems();
-                icons.first()->setParent((TreeGraphicsItem *)iconRemoved->parentItem(), children.indexOf(iconRemoved));
-                return iconRemoved;
+    if (!icons.isEmpty()){
+        if (icons.size() > 1){
+            iconToBeRemoved = icons.at(1);
+            //icons.removeAt(1);
+            if (iconToBeRemoved){
+                if (iconToBeRemoved->parentItem() && icons.first()){
+                    children = iconToBeRemoved->parentItem()->childItems();
+                    icons.first()->setParent((TreeGraphicsItem *)iconToBeRemoved->parentItem(), children.indexOf(iconToBeRemoved));
+                    return iconToBeRemoved;
+                }
             }
         }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("DataIconManager::reconnectToNext(): 'icons' is empty!!!"))
+        getParentFile()->writeToLog("DataIconManager::reconnectToNext(): 'icons' is empty!!!");
     }
     return NULL;
 }
@@ -88,5 +99,10 @@ void DataIconManager::appendIcon(TreeGraphicsItem *icon){
 }
 
 void DataIconManager::removeIcon(TreeGraphicsItem *icon){
-    icons.removeAll(icon);
+    if (!icons.isEmpty()){
+        icons.removeAll(icon);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("DataIconManager::removeIcon(): 'icons' is empty!!!"))
+        getParentFile()->writeToLog("DataIconManager::removeIcon(): 'icons' is empty!!!");
+    }
 }

@@ -24,7 +24,7 @@ GenericTableWidget::GenericTableWidget(const QString & title)
     lyt->addWidget(typeSelector, 9, 5, 1, 4);
     setLayout(lyt);
     connect(selectPB, SIGNAL(released()), this, SLOT(itemSelected()));
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(itemSelected()));
+    connect(table, SIGNAL(cellChanged(int,int)), this, SLOT(itemSelected()));
     connect(cancelPB, SIGNAL(released()), this, SLOT(hide()));
     connect(newPB, SIGNAL(released()), this, SLOT(itemAdded()));
 }

@@ -407,13 +407,17 @@ void BehaviorGraphView::deleteSelectedObjectBranchSlot(){
         getSelectedItem()->unselect();
         removeItemFromGraph(getSelectedItem(), 0, true, true);
         ui->changeCurrentDataWidget(NULL);
-        removeGeneratorData();
-        behavior->removeGeneratorChildrenData();
-        removeGeneratorData();//Inefficient...
-        removeModifierData();
-        behavior->removeOtherData();
-        behavior->changed = true;
+        removeObjects();
     }
+}
+
+void BehaviorGraphView::removeObjects(){
+    removeGeneratorData();
+    behavior->removeGeneratorChildrenData();
+    removeGeneratorData();//Inefficient...
+    removeModifierData();
+    behavior->removeOtherData();
+    behavior->changed = true;
 }
 
 template <typename T>

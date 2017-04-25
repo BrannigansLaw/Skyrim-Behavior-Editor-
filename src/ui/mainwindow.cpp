@@ -484,11 +484,13 @@ void MainWindow::writeSettings()
 bool MainWindow::exitProgram()
 {
     QMessageBox::StandardButton ret;
-    ret = QMessageBox::warning(this, tr("Application"), "Quit?", QMessageBox::Ok | QMessageBox::Cancel);
-    if (ret == QMessageBox::Ok){
-        return true;
-    }else if (ret == QMessageBox::Cancel){
-        return false;
+    if (closeAll()){
+        ret = QMessageBox::warning(this, tr("Application"), "Close the application?", QMessageBox::Ok | QMessageBox::Cancel);
+        if (ret == QMessageBox::Ok){
+            return true;
+        }else if (ret == QMessageBox::Cancel){
+            return false;
+        }
     }
     return false;
 }

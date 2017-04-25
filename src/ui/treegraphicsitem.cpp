@@ -80,8 +80,10 @@ TreeGraphicsItem::TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *ob
 }
 
 TreeGraphicsItem::~TreeGraphicsItem(){
+    if (!itemData->hasIcons()){
+        itemData->removeObjectAt(-1);
+    }
     itemData->removeIcon(this);
-    setParentItem(NULL);
     if (scene()){
         scene()->removeItem(this);
     }
@@ -107,7 +109,7 @@ void TreeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->setPen(Qt::black);
     painter->setBrush(brushColor);
     painter->drawRect(boundingRect());
-    painter->drawText(boundingRect(), itemData->getName());
+    painter->drawText(boundingRect(), name);
     if (!childItems().isEmpty()){
         if (!isExpanded){
             painter->setBrush(Qt::red);
@@ -161,11 +163,13 @@ void TreeGraphicsItem::unselect(){
 
 void TreeGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     if (boundingRect().contains(event->pos())){
+        //DEBUG CODE START
         QList <QGraphicsItem *> list = childItems();
         QList <TreeGraphicsItem *> children;
         for (int i = 0; i < list.size(); i++){
             children.append((TreeGraphicsItem *)list.at(i));
         }
+        //DEBUG CODE END
         if (branchExpandCollapseBox().contains(event->pos())){
             ((TreeGraphicsScene *)scene())->selectIcon(this, true);
         }else{
@@ -306,25 +310,24 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
             children[i]->setParentItem(NULL);
         }
         if (children.removeAll(this) != 1){
-            //Error
+            CRITICAL_ERROR_MESSAGE(QString("TreeGraphicsItem::setParent(): Error!!!"))
         }
         for (int i = 0; i < children.size(); i++){
             children[i]->setParentItem(oldParent);
         }
+        children.clear();
         if (newParent){
             children = newParent->childItems();
+            index = newParent->getIndexofIconWithData(itemData);
             if (indexToInsert > -1 && indexToInsert < children.size()){
                 for (int i = 0; i < children.size(); i++){
                     children[i]->setParentItem(NULL);
                 }
-                index = children.indexOf(this);
-                children.insert(indexToInsert, this);
-                if (index > indexToInsert){
-                    index++;
-                }
                 if (index < children.size()){
                     children.removeAt(index);
                 }
+                indexToInsert--;
+                children.insert(indexToInsert, this);
                 for (int i = 0; i < children.size(); i++){
                     children[i]->setParentItem(newParent);
                 }
@@ -339,7 +342,7 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
         }
         reposition();
     }else{
-        //Error
+        CRITICAL_ERROR_MESSAGE(QString("TreeGraphicsItem::setParent(): Error!!!"))
     }
     this->parent = newParent;
     return (TreeGraphicsItem *)oldParent;

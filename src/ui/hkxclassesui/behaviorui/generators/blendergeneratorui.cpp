@@ -583,7 +583,7 @@ void BlenderGeneratorUI::addChild(){
         default:
             return;
         }
-        int result = BASE_NUMBER_OF_ROWS + bsData->children.size() - 2;
+        int result = BASE_NUMBER_OF_ROWS + bsData->children.size() - 1;
         if (result >= table->rowCount()){
             table->setRowCount(table->rowCount() + 1);
             table->setItem(result, NAME_COLUMN, new QTableWidgetItem("Child "+QString::number(bsData->children.size() - 1)));
@@ -591,6 +591,7 @@ void BlenderGeneratorUI::addChild(){
             table->setItem(result, BINDING_COLUMN, new QTableWidgetItem("N/A"));
             table->setItem(result, VALUE_COLUMN, new QTableWidgetItem("Click to Edit"));
         }else{
+            //'result' can be ADD_CHILD_ROW!!!
             table->setRowHidden(result, false);
             table->item(result, NAME_COLUMN)->setText("Child "+QString::number(bsData->children.size() - 1));
         }
@@ -607,10 +608,12 @@ void BlenderGeneratorUI::removeSelectedChild(){
             hkbBlenderGeneratorChild *child = static_cast<hkbBlenderGeneratorChild *>(bsData->children.at(result).data());
             //if (bsData->generatorCount(static_cast<hkbGenerator *>(child->generator.data())) == 1){
                 behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->generator.data()), result);//Reorderchildren?
+                behaviorView->removeObjects();
             //}else{
                 //bsData->removeObjectAt(result);
                 //behaviorView->getSelectedItem()->reorderChildren();
             //}
+                behaviorView->removeObjects();
             delete table->takeItem(rowIndexOfChildToRemove, NAME_COLUMN);
             delete table->takeItem(rowIndexOfChildToRemove, TYPE_COLUMN);
             delete table->takeItem(rowIndexOfChildToRemove, BINDING_COLUMN);

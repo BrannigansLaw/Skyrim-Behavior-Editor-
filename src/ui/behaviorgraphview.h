@@ -141,6 +141,7 @@ private:
     void disableAllMenuActions(QMenu *menu);
     bool confirmationDialogue(const QString & message, QWidget *parent);
     TreeGraphicsItem * getSelectedIconsChildIcon(HkxObject *child);
+    void removeObjects();
 private:
     HkDataUI *ui;
     BehaviorFile *behavior;

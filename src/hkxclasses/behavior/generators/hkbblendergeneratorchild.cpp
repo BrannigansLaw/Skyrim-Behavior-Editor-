@@ -140,6 +140,7 @@ bool hkbBlenderGeneratorChild::link(){
 
 void hkbBlenderGeneratorChild::unlink(){
     HkDynamicObject::unlink();
+    parentBG = HkxObjectExpSharedPtr();
     generator = HkxObjectExpSharedPtr();
     boneWeights = HkxObjectExpSharedPtr();
 }

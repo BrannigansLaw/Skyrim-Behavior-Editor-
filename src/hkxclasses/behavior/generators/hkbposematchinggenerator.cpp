@@ -89,8 +89,13 @@ bool hkbPoseMatchingGenerator::removeObjectAt(int index){
     hkbBlenderGeneratorChild *objChild;
     if (index > -1 && index < children.size()){
         objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
+        objChild->unlink();
         children.removeAt(index);
     }else if (index == -1){
+        for (int i = 0; i < children.size(); i++){
+            objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
+            objChild->unlink();
+        }
         children.clear();
     }else{
         return false;

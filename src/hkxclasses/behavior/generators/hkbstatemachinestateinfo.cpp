@@ -209,6 +209,7 @@ bool hkbStateMachineStateInfo::link(){
 
 void hkbStateMachineStateInfo::unlink(){
     HkDynamicObject::unlink();
+    parentSM = HkxObjectExpSharedPtr();
     enterNotifyEvents = HkxObjectExpSharedPtr();
     exitNotifyEvents = HkxObjectExpSharedPtr();
     transitions = HkxObjectExpSharedPtr();
