@@ -29,62 +29,29 @@ GenericTableWidget::GenericTableWidget(const QString & title)
     connect(newPB, SIGNAL(released()), this, SLOT(itemAdded()));
 }
 
-void GenericTableWidget::loadTable(const QStringList & list, const QString & empty){
-    if (table->rowCount() > 0){
-        if (table->itemAt(0, 0)){
-            table->itemAt(0, 0)->setText(empty);
-        }else{
-            table->setItem(0, 0, new QTableWidgetItem(empty));
-        }
-        if (table->itemAt(0, 1)){
-            table->itemAt(0, 1)->setText(empty);
-        }else{
-            table->setItem(0, 1, new QTableWidgetItem(empty));
-        }
-    }else{
-        table->setRowCount(table->rowCount() + 1);
-        table->setItem(0, 0, new QTableWidgetItem(empty));
-        table->setItem(0, 1, new QTableWidgetItem(empty));
-    }
-    for (int i = 1, j = 0, k = 1; i < list.size(), j < list.size(), k < list.size(); i++, j+=2, k+=2){
-        if (i < table->rowCount()){
-            if (table->itemAt(i, 0)){
-                table->itemAt(i, 0)->setText(list.at(j));
-            }else{
-                table->setItem(i, 0, new QTableWidgetItem(list.at(j)));
-            }
-            if (table->itemAt(i, 1)){
-                table->itemAt(i, 1)->setText(list.at(k));
-            }else{
-                table->setItem(i, 1, new QTableWidgetItem(list.at(k)));
-            }
-        }else{
-            table->setRowCount(table->rowCount() + 1);
-            table->setItem(i, 0, new QTableWidgetItem(list.at(j)));
-            table->setItem(i, 1, new QTableWidgetItem(list.at(k)));
-        }
-    }
-}
-
-void GenericTableWidget::loadTable(const QStringList & names, const QStringList & types, const QString & empty){
+void GenericTableWidget::loadTable(const QStringList & names, const QStringList & types, const QString & firstElement){
+    int start = 0;
     if (names.size() == types.size()){
-        if (table->rowCount() > 0){
-            if (table->itemAt(0, 0)){
-                table->itemAt(0, 0)->setText(empty);
+        if (firstElement != ""){
+            start = 1;
+            if (table->rowCount() > 0){
+                if (table->itemAt(0, 0)){
+                    table->itemAt(0, 0)->setText(firstElement);
+                }else{
+                    table->setItem(0, 0, new QTableWidgetItem(firstElement));
+                }
+                if (table->itemAt(0, 1)){
+                    table->itemAt(0, 1)->setText(firstElement);
+                }else{
+                    table->setItem(0, 1, new QTableWidgetItem(firstElement));
+                }
             }else{
-                table->setItem(0, 0, new QTableWidgetItem(empty));
+                table->setRowCount(table->rowCount() + 1);
+                table->setItem(0, 0, new QTableWidgetItem(firstElement));
+                table->setItem(0, 1, new QTableWidgetItem(firstElement));
             }
-            if (table->itemAt(0, 1)){
-                table->itemAt(0, 1)->setText(empty);
-            }else{
-                table->setItem(0, 1, new QTableWidgetItem(empty));
-            }
-        }else{
-            table->setRowCount(table->rowCount() + 1);
-            table->setItem(0, 0, new QTableWidgetItem(empty));
-            table->setItem(0, 1, new QTableWidgetItem(empty));
         }
-        for (int i = 1, j = 0; i < table->rowCount(), j < names.size(); i++, j++){
+        for (int i = start, j = 0; i < table->rowCount(), j < names.size(); i++, j++){
             if (i < table->rowCount()){
                 if (table->itemAt(i, 0)){
                     table->itemAt(i, 0)->setText(names.at(j));
@@ -102,32 +69,38 @@ void GenericTableWidget::loadTable(const QStringList & names, const QStringList 
                 table->setItem(i, 1, new QTableWidgetItem(types.at(j)));
             }
         }
+    }else{
+        WARNING_MESSAGE(QString("GenericTableWidget: loadTable()\nThe stringlist arguments have different sizes!!!"))
     }
 }
 
-void GenericTableWidget::loadTable(const QStringList & names, const QString & type, const QString & empty){
-    if (table->rowCount() > 0){
-        if (table->itemAt(0, 0)){
-            table->itemAt(0, 0)->setText(empty);
+void GenericTableWidget::loadTable(const QStringList & names, const QString & type, const QString & firstElement){
+    int start = 0;
+    if (firstElement != ""){
+        start = 1;
+        if (table->rowCount() > 0){
+            if (table->itemAt(0, 0)){
+                table->itemAt(0, 0)->setText(firstElement);
+            }else{
+                table->setItem(0, 0, new QTableWidgetItem(firstElement));
+            }
+            if (table->itemAt(0, 1)){
+                table->itemAt(0, 1)->setText(firstElement);
+            }else{
+                table->setItem(0, 1, new QTableWidgetItem(firstElement));
+            }
         }else{
-            table->setItem(0, 0, new QTableWidgetItem(empty));
+            table->setRowCount(table->rowCount() + 1);
+            table->setItem(0, 0, new QTableWidgetItem(firstElement));
+            table->setItem(0, 1, new QTableWidgetItem(firstElement));
         }
-        if (table->itemAt(0, 1)){
-            table->itemAt(0, 1)->setText(empty);
-        }else{
-            table->setItem(0, 1, new QTableWidgetItem(empty));
-        }
-    }else{
-        table->setRowCount(table->rowCount() + 1);
-        table->setItem(0, 0, new QTableWidgetItem(empty));
-        table->setItem(0, 1, new QTableWidgetItem(empty));
     }
-    for (int i = 1, j = 0; i < table->rowCount(), j < names.size(); i++, j++){
+    for (int i = start; i < names.size(); i++){
         if (i < table->rowCount()){
             if (table->itemAt(i, 0)){
-                table->itemAt(i, 0)->setText(names.at(j));
+                table->itemAt(i, 0)->setText(names.at(i));
             }else{
-                table->setItem(i, 0, new QTableWidgetItem(names.at(j)));
+                table->setItem(i, 0, new QTableWidgetItem(names.at(i)));
             }
             if (table->itemAt(i, 1)){
                 table->itemAt(i, 1)->setText(type);
@@ -136,7 +109,7 @@ void GenericTableWidget::loadTable(const QStringList & names, const QString & ty
             }
         }else{
             table->setRowCount(table->rowCount() + 1);
-            table->setItem(i, 0, new QTableWidgetItem(names.at(j)));
+            table->setItem(i, 0, new QTableWidgetItem(names.at(i)));
             table->setItem(i, 1, new QTableWidgetItem(type));
         }
     }

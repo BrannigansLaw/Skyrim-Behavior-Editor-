@@ -23,6 +23,7 @@ public:
     HkxObjectExpSharedPtr * findModifier(long ref);
     HkxObjectExpSharedPtr * findBehaviorGraph(long ref);
     QVector<int> removeGeneratorData();
+    QVector<int> removeGeneratorChildrenData();
     QVector<int> removeModifierData();
     QVector<int> removeOtherData();
     int getIndexOfGenerator(const HkxObjectExpSharedPtr & obj) const;
@@ -34,8 +35,10 @@ public:
     QStringList getVariableTypenames() const;
     QStringList getEventNames() const;
     QStringList getVariableNames() const;
-    QStringList getGeneratorNamesAndTypeNames() const;
-    QStringList getModifierNamesAndTypeNames() const;
+    QStringList getGeneratorNames() const;
+    QStringList getGeneratorTypeNames() const;
+    QStringList getModifierNames() const;
+    QStringList getModifierTypeNames() const;
     QStringList getCharacterPropertyNames() const;
     QStringList getCharacterPropertyTypenames() const;
     hkVariableType getVariableTypeAt(int index) const;

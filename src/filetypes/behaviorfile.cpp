@@ -732,25 +732,25 @@ QVector<int> BehaviorFile::removeGeneratorData(){
     for (int i = generators.size() - 1; i >= 0; i--){
         obj = generators.at(i).data();
         if (obj){
-            if (obj->ref < 1){
+            if (obj->ref < 2){
                 generators.removeAt(i);
                 removedIndices.append(i);
-            }else if (obj->getSignature() == HKB_STATE_MACHINE){
-                if (obj->ref <= static_cast<hkbStateMachine *>(obj)->getNumberOfStates() + 1){
-                    generators.removeAt(i);
-                    removedIndices.append(i);
-                }
-            }/*else if (obj->getSignature() == HKB_BLENDER_GENERATOR){
-                if (obj->ref <= static_cast<hkbBlenderGenerator *>(obj)->getNumberOfChildren() + 1){
-                    generators.removeAt(i);
-                    removedIndices.append(i);
-                }
-            }else if (obj->getSignature() == HKB_POSE_MATCHING_GENERATOR){
-                if (obj->ref <= static_cast<hkbPoseMatchingGenerator *>(obj)->getNumberOfChildren() + 1){
-                    generators.removeAt(i);
-                    removedIndices.append(i);
-                }
-            }*/
+            }
+        }
+    }
+    return removedIndices;
+}
+
+QVector<int> BehaviorFile::removeGeneratorChildrenData(){
+    QVector<int> removedIndices;
+    HkxObject *obj = NULL;
+    for (int i = generatorChildren.size() - 1; i >= 0; i--){
+        obj = generatorChildren.at(i).data();
+        if (obj){
+            if (obj->ref < 2){
+                generatorChildren.removeAt(i);
+                removedIndices.append(i);
+            }
         }
     }
     return removedIndices;
@@ -759,7 +759,7 @@ QVector<int> BehaviorFile::removeGeneratorData(){
 QVector<int> BehaviorFile::removeModifierData(){
     QVector<int> removedIndices;
     for (int i = modifiers.size() - 1; i >= 0; i--){
-        if (modifiers.at(i).constData() && modifiers.at(i).constData()->ref < 1){
+        if (modifiers.at(i).constData() && modifiers.at(i).constData()->ref < 2){
             modifiers.removeAt(i);
             removedIndices.append(i);
         }
@@ -770,7 +770,7 @@ QVector<int> BehaviorFile::removeModifierData(){
 QVector<int> BehaviorFile::removeOtherData(){
     QVector<int> removedIndices;
     for (int i = otherTypes.size() - 1; i >= 0; i--){
-        if (otherTypes.at(i).constData() && otherTypes.at(i).constData()->ref < 1){
+        if (otherTypes.at(i).constData() && otherTypes.at(i).constData()->ref < 2){
             otherTypes.removeAt(i);
             removedIndices.append(i);
         }
@@ -782,24 +782,34 @@ hkVariableType BehaviorFile::getVariableTypeAt(int index) const{
     return static_cast<hkbBehaviorGraphData *>(graphData.data())->getVariableTypeAt(index);
 }
 
-QStringList BehaviorFile::getGeneratorNamesAndTypeNames() const{
+QStringList BehaviorFile::getGeneratorNames() const{
     QStringList list;
     for (int i = 0; i < generators.size(); i++){
-        if (generators.at(i).constData()->getType() == HkxObject::TYPE_GENERATOR){
-            list.append(static_cast<hkbGenerator *>(generators.at(i).data())->getName());
-            list.append(static_cast<hkbGenerator *>(generators.at(i).data())->getClassname());
-        }
+        list.append(static_cast<hkbGenerator *>(generators.at(i).data())->getName());
     }
     return list;
 }
 
-QStringList BehaviorFile::getModifierNamesAndTypeNames() const{
+QStringList BehaviorFile::getGeneratorTypeNames() const{
+    QStringList list;
+    for (int i = 0; i < generators.size(); i++){
+        list.append(static_cast<hkbGenerator *>(generators.at(i).data())->getClassname());
+    }
+    return list;
+}
+
+QStringList BehaviorFile::getModifierNames() const{
     QStringList list;
     for (int i = 0; i < modifiers.size(); i++){
-        if (modifiers.at(i).constData()->getType() == HkxObject::TYPE_MODIFIER){
-            list.append(static_cast<hkbGenerator *>(modifiers.at(i).data())->getName());
-            list.append(static_cast<hkbGenerator *>(modifiers.at(i).data())->getClassname());
-        }
+        list.append(static_cast<hkbGenerator *>(modifiers.at(i).data())->getName());
+    }
+    return list;
+}
+
+QStringList BehaviorFile::getModifierTypeNames() const{
+    QStringList list;
+    for (int i = 0; i < modifiers.size(); i++){
+        list.append(static_cast<hkbGenerator *>(modifiers.at(i).data())->getClassname());
     }
     return list;
 }
@@ -890,5 +900,5 @@ QStringList BehaviorFile::getEventNames() const{
 }
 
 BehaviorFile::~BehaviorFile(){
-    ((hkRootLevelContainer *)(rootObject.data()))->disconnect();
+    //((hkRootLevelContainer *)(rootObject.data()))->disconnect();
 }

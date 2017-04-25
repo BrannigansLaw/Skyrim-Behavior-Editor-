@@ -19,6 +19,7 @@ public:
     virtual QRectF boundingRect() const;
     virtual QRectF branchExpandCollapseBox() const;
     void setBrushColor(Qt::GlobalColor color);
+    bool reorderChildren();
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
     virtual void setIconSelected();
@@ -27,7 +28,6 @@ protected:
     void setPosition(const QPointF &pos);
 private:
     qreal getYCoordinate();
-    bool reorderChildren();
     void reposition();
     bool isDescendant(TreeGraphicsItem *icon) const;
     bool isPrimaryIcon() const;

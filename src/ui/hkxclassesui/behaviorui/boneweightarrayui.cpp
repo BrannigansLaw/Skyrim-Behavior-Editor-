@@ -52,7 +52,7 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
                 //error
             }
         }
-        for (int i = 0; i < bsData->boneWeights.size() - 1, i < boneNames.size(); i++){
+        for (int i = 0; i < bsData->boneWeights.size(), i < boneNames.size(); i++){
             rowCount = bones->rowCount();
             if (rowCount > i){
                 bones->setRowHidden(i, false);

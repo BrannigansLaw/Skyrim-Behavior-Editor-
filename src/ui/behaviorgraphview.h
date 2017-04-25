@@ -144,7 +144,6 @@ private:
 private:
     HkDataUI *ui;
     BehaviorFile *behavior;
-    bool changed;
     QMenu *contextMenu;
     QMenu *appendGeneratorMenu;
     QAction *appendStateMachineAct;

@@ -362,11 +362,11 @@ BehaviorGraphView *HkDataUI::setBehaviorView(BehaviorGraphView *view){
     stateMachineUI->behaviorView = view;*/
     blenderGeneratorUI->setBehaviorView(view);
     if (behaviorView){
-        generatorsTable->loadTable(behaviorView->behavior->getGeneratorNamesAndTypeNames(), "NULL");
-        modifiersTable->loadTable(behaviorView->behavior->getModifierNamesAndTypeNames(), "NULL");
-        variablesTable->loadTable(behaviorView->behavior->getVariableNames(), behaviorView->behavior->getVariableTypenames(), "NULL");
-        eventsTable->loadTable(behaviorView->behavior->getEventNames(), "hkEvent", "NULL");
-        characterPropertiesTable->loadTable(behaviorView->behavior->getCharacterPropertyNames(), behaviorView->behavior->getCharacterPropertyTypenames(), "NULL");//inefficient...
+        generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "NULL");
+        modifiersTable->loadTable(behaviorView->behavior->getModifierNames(), behaviorView->behavior->getModifierTypeNames(), "NULL");
+        variablesTable->loadTable(behaviorView->behavior->getVariableNames(), behaviorView->behavior->getVariableTypenames(), "NONE");
+        eventsTable->loadTable(behaviorView->behavior->getEventNames(), "hkEvent", "NONE");
+        characterPropertiesTable->loadTable(behaviorView->behavior->getCharacterPropertyNames(), behaviorView->behavior->getCharacterPropertyTypenames(), "NONE");//inefficient...
         connect(behaviorView, SIGNAL(addedGenerator(QString,QString)), this, SLOT(generatorAdded(QString,QString)), Qt::UniqueConnection);
         connect(behaviorView, SIGNAL(addedModifier(QString,QString)), this, SLOT(modifierAdded(QString,QString)), Qt::UniqueConnection);
         connect(behaviorView, SIGNAL(removedGenerator(int)), this, SLOT(generatorRemoved(int)), Qt::UniqueConnection);

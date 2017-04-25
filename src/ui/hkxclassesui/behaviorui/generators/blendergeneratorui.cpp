@@ -605,11 +605,12 @@ void BlenderGeneratorUI::removeSelectedChild(){
     if (bsData && behaviorView && result < bsData->children.size() && result >= 0){
         if (result < bsData->children.size() && result >= 0){
             hkbBlenderGeneratorChild *child = static_cast<hkbBlenderGeneratorChild *>(bsData->children.at(result).data());
-            if (bsData->generatorCount(static_cast<hkbGenerator *>(child->generator.data())) == 1){
-                behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->generator.data()), result);
-            }else{
-                bsData->removeObjectAt(result);
-            }
+            //if (bsData->generatorCount(static_cast<hkbGenerator *>(child->generator.data())) == 1){
+                behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->generator.data()), result);//Reorderchildren?
+            //}else{
+                //bsData->removeObjectAt(result);
+                //behaviorView->getSelectedItem()->reorderChildren();
+            //}
             delete table->takeItem(rowIndexOfChildToRemove, NAME_COLUMN);
             delete table->takeItem(rowIndexOfChildToRemove, TYPE_COLUMN);
             delete table->takeItem(rowIndexOfChildToRemove, BINDING_COLUMN);

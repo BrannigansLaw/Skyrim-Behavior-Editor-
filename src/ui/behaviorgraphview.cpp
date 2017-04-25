@@ -115,7 +115,6 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     : TreeGraphicsView(0),
       ui(mainUI),
       behavior(file),
-      changed(false),
       contextMenu(new QMenu(this)),
       appendGeneratorMenu(new QMenu("Append Generator:", contextMenu)),
       appendStateMachineAct(new QAction("State Machine", appendGeneratorMenu)),
@@ -409,9 +408,11 @@ void BehaviorGraphView::deleteSelectedObjectBranchSlot(){
         removeItemFromGraph(getSelectedItem(), 0, true, true);
         ui->changeCurrentDataWidget(NULL);
         removeGeneratorData();
+        behavior->removeGeneratorChildrenData();
+        removeGeneratorData();//Inefficient...
         removeModifierData();
         behavior->removeOtherData();
-        changed = true;
+        behavior->changed = true;
     }
 }
 
@@ -453,7 +454,7 @@ void BehaviorGraphView::append(T *obj){
             ((HkxObject *)((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData)->evaulateDataValidity();
         }
         selectedItemData->evaulateDataValidity();
-        changed = true;
+        behavior->changed = true;
         getSelectedItem()->reposition();
         treeScene->selectIcon(newIcon, false);
         emit addedGenerator(obj->getName(), obj->getClassname());
@@ -718,7 +719,7 @@ template <typename T>
 void BehaviorGraphView::wrap(T *obj){
     if (getSelectedItem() && ((TreeGraphicsItem *)getSelectedItem()->parentItem()) && ((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData){
         TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), (DataIconManager *)(obj), -1, true);
-        changed = true;
+        behavior->changed = true;
         getSelectedItem()->reposition();
         treeScene->selectIcon(newIcon, false);
         emit addedGenerator(obj->getName(), obj->getClassname());
@@ -730,7 +731,7 @@ void BehaviorGraphView::wrap(hkbStateMachine *obj){
         hkbStateMachineStateInfo *state = new hkbStateMachineStateInfo(behavior, obj);
         obj->states.append(HkxObjectExpSharedPtr(state));
         TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), (DataIconManager *)(obj), -1, true);
-        changed = true;
+        behavior->changed = true;
         getSelectedItem()->reposition();
         treeScene->selectIcon(newIcon, false);
         emit addedGenerator(obj->getName(), obj->getClassname());
@@ -742,7 +743,7 @@ void BehaviorGraphView::wrap(hkbBlenderGenerator *obj){
         hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior, obj, -1);
         obj->children.append(HkxObjectExpSharedPtr(blendChild));
         TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), (DataIconManager *)(obj), -1, true);
-        changed = true;
+        behavior->changed = true;
         getSelectedItem()->reposition();
         treeScene->selectIcon(newIcon, false);
         emit addedGenerator(obj->getName(), obj->getClassname());
@@ -754,7 +755,7 @@ void BehaviorGraphView::wrap(hkbPoseMatchingGenerator *obj){
         hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior, obj, -1);
         obj->children.append(HkxObjectExpSharedPtr(blendChild));
         TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), (DataIconManager *)(obj), -1, true);
-        changed = true;
+        behavior->changed = true;
         getSelectedItem()->reposition();
         treeScene->selectIcon(newIcon, false);
         emit addedGenerator(obj->getName(), obj->getClassname());

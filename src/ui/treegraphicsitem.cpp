@@ -214,7 +214,7 @@ bool TreeGraphicsItem::reorderChildren(){
     for (int i = 0; i < children.size(); i++){
         children[i]->setParentItem(NULL);
     }
-    if (children.size() == dataChildren.size()){
+    if (children.size() == dataChildren.size()){//Fix this...
         for (int i = 0; i < dataChildren.size(); i++){
             for (int k = 0; k < children.size(); k++){
                 if (((TreeGraphicsItem *)children.at(k))->itemData == dataChildren.at(i)){
@@ -222,7 +222,7 @@ bool TreeGraphicsItem::reorderChildren(){
                 }
             }
         }
-        setPosition(QPointF(boundingRect().width()*2, getYCoordinate()));
+        reposition();
         return true;
     }else{
         return false;
@@ -435,8 +435,7 @@ TreeGraphicsItem *TreeGraphicsItem::getReplacementIcon(DataIconManager *data){
     QList <QGraphicsItem *> tempList;
     TreeGraphicsItem *parent = NULL;
     TreeGraphicsItem *child = NULL;
-    parent = (TreeGraphicsItem *)parentItem();
-    child = this;
+    parent = this;
     while (parent){
         children = parent->childItems();
         for (int i = 0; i < children.size(); i++){

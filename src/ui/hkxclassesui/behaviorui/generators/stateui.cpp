@@ -509,7 +509,7 @@ void StateUI::loadData(HkxObject *data){
         QStringList eventList = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNames();
         eventList.prepend("None");
         if (generatorTable->getNumRows() < 1){
-            generatorTable->loadTable(static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorNamesAndTypeNames(), "NULL");
+            //generatorTable->loadTable(static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorNamesAndTypeNames(), "NULL");
         }
         if (enterEvents){
             for (int i = 0; i < enterEvents->events.size(); i++){

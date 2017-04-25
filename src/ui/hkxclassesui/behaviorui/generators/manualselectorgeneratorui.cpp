@@ -166,7 +166,7 @@ void ManualSelectorGeneratorUI::loadData(HkxObject *data){
         hkbGenerator *gen;
         hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
         if (generatorTable->getNumRows() < 1){
-            generatorTable->loadTable(static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorNamesAndTypeNames(), "NULL");
+            //generatorTable->loadTable(static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorNamesAndTypeNames(), "NULL");
         }
         if (varBind){
             int ind = varBind->getVariableIndexOfBinding("selectedGeneratorIndex");

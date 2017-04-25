@@ -167,9 +167,8 @@ class GenericTableWidget: public QWidget
     Q_OBJECT
 public:
     GenericTableWidget(const QString & title);
-    void loadTable(const QStringList & list, const QString & empty);
-    void loadTable(const QStringList & names, const QStringList & types, const QString & empty);
-    void loadTable(const QStringList & names, const QString & type, const QString & empty);
+    void loadTable(const QStringList & names, const QStringList & types, const QString & firstElement = "");
+    void loadTable(const QStringList & names, const QString & type, const QString & firstElement = "");
     void addItem(const QString & name, const QString & type);
     void renameItem(int index, const QString & newname);
     void removeItem(int index);
