@@ -19,6 +19,28 @@
 #include <QHeaderView>
 #include <QSizePolicy>
 
+class Validator: public QValidator
+{
+public:
+    QValidator::State validate(QString & input, int &) const Q_DECL_OVERRIDE{
+        if (input == ""){
+            return QValidator::Invalid;
+        }else{
+            return QValidator::Acceptable;
+        }
+    }
+};
+
+class LineEdit: public QLineEdit{
+    Q_OBJECT
+public:
+    LineEdit(const QString & text = "", QWidget * par = 0)
+        : QLineEdit(text, par)
+    {
+        setValidator(new Validator());
+    }
+};
+
 class TableWidget: public QTableWidget
 {
     Q_OBJECT
@@ -176,7 +198,7 @@ public:
     void setTypes(const QStringList & typeNames);
 signals:
     void elementSelected(int index, const QString & name);
-    void elementAdded(int index);
+    void elementAdded(int index, const QString & type);
 protected:
 private slots:
     void itemSelected();

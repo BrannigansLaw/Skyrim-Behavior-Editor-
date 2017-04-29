@@ -17,7 +17,7 @@ class SpinBox;
 class QPushButton;
 class QGroupBox;
 class BlenderGeneratorChildUI;
-class QLineEdit;
+class LineEdit;
 class BehaviorGraphView;
 class ComboBox;
 class GenericTableWidget;
@@ -55,8 +55,9 @@ private slots:
     void viewSelectedChild(int row, int column);
     void returnToWidget();
 private:
-    void connectChildUI(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *generators);
-    void variableRenamed(const QString & name, int index);
+    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *generators);
+    void renameVariable(const QString & name, int index);
+    void generatorRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
     bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type);
 private:
@@ -90,7 +91,7 @@ private:
     ComboBox *typeSelectorCB;
     QPushButton *removeChildPB;
     TableWidget *table;
-    QLineEdit *name;
+    LineEdit *name;
     DoubleSpinBox *referencePoseWeightThreshold;
     DoubleSpinBox *blendParameter;
     DoubleSpinBox *minCyclicBlendParameter;

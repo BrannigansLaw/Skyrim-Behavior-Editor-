@@ -42,7 +42,7 @@ TransitionsUI::TransitionsUI()
       exitEventIdII(new ComboBox),
       enterTimeII(new DoubleSpinBox),
       exitTimeII(new DoubleSpinBox),
-      condition(new QLineEdit),
+      condition(new LineEdit),
       eventId(new ComboBox),
       toStateId(new ComboBox),
       fromNestedStateId(new ComboBox),

@@ -13,7 +13,7 @@ GenericTableWidget::GenericTableWidget(const QString & title)
 {
     setWindowTitle(title);
     resize(500, 800);
-    setWindowModality(Qt::WindowModal);
+    setWindowModality(Qt::ApplicationModal);
     QStringList list = {"Name", "Type"};
     table->setColumnCount(2);
     table->setHorizontalHeaderLabels(list);
@@ -144,7 +144,7 @@ void GenericTableWidget::removeItem(int index){
 
 void GenericTableWidget::itemAdded(){
     addItem("New"+typeSelector->currentText(), typeSelector->currentText());
-    emit elementAdded(table->rowCount() - 1);
+    emit elementAdded(table->rowCount() - 1, typeSelector->currentText());
 }
 
 void GenericTableWidget::showTable(int index){

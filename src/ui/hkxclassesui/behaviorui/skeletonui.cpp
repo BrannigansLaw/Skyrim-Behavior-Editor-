@@ -54,18 +54,18 @@ void SkeletonUI::loadData(HkxObject *data, bool isRagdoll){
                     bones->setItem(i, 0, new QTableWidgetItem(boneNames.at(i)));
                 }
                 if (bones->cellWidget(i, 1)){
-                    static_cast<QLineEdit *>(bones->cellWidget(i, 1))->setText(bsData->bones.at(i).name);
+                    static_cast<LineEdit *>(bones->cellWidget(i, 1))->setText(bsData->bones.at(i).name);
                 }else{
-                    bones->setCellWidget(rowCount, 1, new QLineEdit(bsData->getLocalFrameName(i)));
+                    bones->setCellWidget(rowCount, 1, new LineEdit(bsData->getLocalFrameName(i)));
                     mapper->setMapping(bones->cellWidget(rowCount, 1), i);
-                    connect(static_cast<QLineEdit *>(bones->cellWidget(i, 1)), SIGNAL(editingFinished()), mapper, SLOT(map()));
+                    connect(static_cast<LineEdit *>(bones->cellWidget(i, 1)), SIGNAL(editingFinished()), mapper, SLOT(map()));
                 }
             }else{
                 bones->setRowCount(rowCount + 1);
                 bones->setItem(rowCount, 0, new QTableWidgetItem(boneNames.at(i)));
-                bones->setCellWidget(rowCount, 1, new QLineEdit(bsData->getLocalFrameName(i)));
+                bones->setCellWidget(rowCount, 1, new LineEdit(bsData->getLocalFrameName(i)));
                 mapper->setMapping(bones->cellWidget(rowCount, 1), i);
-                connect(static_cast<QLineEdit *>(bones->cellWidget(i, 1)), SIGNAL(editingFinished()), mapper, SLOT(map()));
+                connect(static_cast<LineEdit *>(bones->cellWidget(i, 1)), SIGNAL(editingFinished()), mapper, SLOT(map()));
             }
         }
         for (int j = bsData->bones.size(); j < bones->rowCount(); j++){
@@ -78,7 +78,7 @@ void SkeletonUI::setLocalFrame(int row){
     if (bsData){
         if (bsData->bones.size() > row && row >= 0){
             if (bones->cellWidget(row, 1)){
-                bsData->setLocalFrameName(row, static_cast<QLineEdit *>(bones->cellWidget(row, 1))->text());
+                bsData->setLocalFrameName(row, static_cast<LineEdit *>(bones->cellWidget(row, 1))->text());
             }
         }
     }

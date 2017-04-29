@@ -693,13 +693,20 @@ HkxObjectExpSharedPtr * BehaviorFile::findHkxObject(long ref){
     return NULL;
 }
 
-void BehaviorFile::addCharacterProperty(int index){
-    static_cast<hkbBehaviorGraphData *>(graphData.data())->addVariable(character->getCharacterPropertyTypeAt(index), character->getCharacterPropertyNameAt(index), true);
+bool BehaviorFile::addCharacterProperty(int index){
+    return static_cast<hkbBehaviorGraphData *>(graphData.data())->addVariable(character->getCharacterPropertyTypeAt(index), character->getCharacterPropertyNameAt(index), true);
 }
 
 QString BehaviorFile::getVariableNameAt(int index) const{
     if (stringData.data()){
         return static_cast<hkbBehaviorGraphStringData *>(stringData.data())->getVariableNameAt(index);
+    }
+    return "";
+}
+
+QString BehaviorFile::getEventNameAt(int index) const{
+    if (stringData.data()){
+        return static_cast<hkbBehaviorGraphStringData *>(stringData.data())->getEventNameAt(index);
     }
     return "";
 }

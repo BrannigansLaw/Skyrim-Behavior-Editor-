@@ -23,7 +23,7 @@ QString hkbVariableBindingSet::getClassname(){
     return classname;
 }
 
-void hkbVariableBindingSet::addBinding(const QString & path, int varIndex, hkBinding::BindingType type){
+bool hkbVariableBindingSet::addBinding(const QString & path, int varIndex, hkBinding::BindingType type){
     for (int i = 0; i < bindings.size(); i++){
         if (bindings.at(i).memberPath == path){
             bindings[i].variableIndex = varIndex;
@@ -31,16 +31,21 @@ void hkbVariableBindingSet::addBinding(const QString & path, int varIndex, hkBin
             if (path == "enable"){
                 indexOfBindingToEnable = i;
             }
-            return;
+            return true;
         }
     }
     bindings.append(hkBinding(path, varIndex, -1, type));
     if (type == hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-        static_cast<BehaviorFile *>(getParentFile())->addCharacterProperty(varIndex);
+        if (!static_cast<BehaviorFile *>(getParentFile())->addCharacterProperty(varIndex)){
+            removeBinding(bindings.size() - 1);
+            WARNING_MESSAGE(QString("hkbVariableBindingSet::addBinding(): Failed! probably because the character property does not exist in the character file..."))
+            return false;
+        }
     }
     if (path == "enable"){
         indexOfBindingToEnable = bindings.size() - 1;
     }
+    return true;
 }
 
 void hkbVariableBindingSet::removeBinding(const QString & path){

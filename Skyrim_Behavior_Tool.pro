@@ -151,7 +151,8 @@ SOURCES += \
     src/ui/treegraphicsscene.cpp \
     src/ui/treegraphicsitem.cpp \
     src/ui/dataiconmanager.cpp \
-    src/ui/behaviorgraphview.cpp
+    src/ui/behaviorgraphview.cpp \
+    src/ui/hkxclassesui/behaviorui/variablestable.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -285,4 +286,5 @@ HEADERS  += \
     src/ui/treegraphicsscene.h \
     src/ui/treegraphicsview.h \
     src/ui/treegraphicsitem.h \
-    src/ui/behaviorgraphview.h
+    src/ui/behaviorgraphview.h \
+    src/ui/hkxclassesui/behaviorui/variablestable.h

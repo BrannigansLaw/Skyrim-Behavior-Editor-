@@ -31,7 +31,7 @@ ModifierGeneratorUI::ModifierGeneratorUI(GenericTableWidget *genTable, GenericTa
       bsData(NULL),
       lyt(new QVBoxLayout),
       table(new TableWidget),
-      name(new QLineEdit),
+      name(new LineEdit),
       modifier(new QPushButton("NULL")),
       generator(new QPushButton("NULL"))
 {

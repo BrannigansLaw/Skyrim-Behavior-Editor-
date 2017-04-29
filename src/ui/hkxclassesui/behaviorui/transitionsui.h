@@ -7,7 +7,7 @@
 
 class BehaviorGraphView;
 class TableWidget;
-class QLineEdit;
+class LineEdit;
 class ComboBox;
 class hkbStateMachineTransitionInfoArray;
 class QVBoxLayout;
@@ -84,7 +84,7 @@ private:
     ComboBox *exitEventIdII;
     DoubleSpinBox *enterTimeII;
     DoubleSpinBox *exitTimeII;
-    QLineEdit *condition;
+    LineEdit *condition;
     ComboBox *eventId;
     ComboBox *toStateId;
     ComboBox *fromNestedStateId;

@@ -39,6 +39,7 @@ private slots:
     void returnToWidget();
 private:
     void variableRenamed(const QString & name, int index);
+    void generatorRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
     bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type);
 private:

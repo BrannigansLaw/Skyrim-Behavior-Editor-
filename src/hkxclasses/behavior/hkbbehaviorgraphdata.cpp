@@ -39,9 +39,7 @@ QString hkbBehaviorGraphData::getClassname(){
 bool hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name, bool isProperty){
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
-    if (!isProperty && strData->variableNames.contains(name)){
-        return false;
-    }else if (strData->characterPropertyNames.contains(name)){
+    if (name == "" || (!isProperty && strData->variableNames.contains(name))/* || strData->characterPropertyNames.contains(name)*/){
         return false;
     }
     hkVariableInfo varInfo;

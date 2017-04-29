@@ -8,7 +8,7 @@ class BehaviorGraphView;
 class hkbModifierGenerator;
 class QVBoxLayout;
 class TableWidget;
-class QLineEdit;
+class LineEdit;
 class ComboBox;
 class QPushButton;
 class GenericTableWidget;
@@ -40,7 +40,7 @@ private:
     hkbModifierGenerator *bsData;
     QVBoxLayout *lyt;
     TableWidget *table;
-    QLineEdit *name;
+    LineEdit *name;
     QPushButton *modifier;
     QPushButton *generator;
 };

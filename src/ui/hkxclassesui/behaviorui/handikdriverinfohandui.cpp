@@ -42,7 +42,7 @@ HandIkDriverInfoHandUI::HandIkDriverInfoHandUI()
       wristIndex(new ComboBox),
       enforceEndPosition(new QCheckBox),
       enforceEndRotation(new QCheckBox),
-      localFrameName(new QLineEdit)
+      localFrameName(new LineEdit)
 {
     setTitle("hkbHandIkDriverInfoHand");
     table->setRowCount(15);

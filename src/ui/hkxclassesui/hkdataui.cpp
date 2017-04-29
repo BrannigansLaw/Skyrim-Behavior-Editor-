@@ -190,7 +190,10 @@ void HkDataUI::generatorNameChanged(const QString & newName, int index){
     generatorsTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
     case BLENDER_GENERATOR:
-        //rename generator in table...
+        blenderGeneratorUI->generatorRenamed(newName, index);
+        break;
+    case STATE_MACHINE:
+        stateMachineUI->generatorRenamed(newName, index);
         break;
     default:
         break;
@@ -202,8 +205,8 @@ void HkDataUI::eventNameChanged(const QString & newName, int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     eventsTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
-    case BLENDER_GENERATOR:
-        //rename event in table...
+    case STATE_MACHINE:
+        stateMachineUI->eventRenamed(newName, index);
         break;
     default:
         break;
@@ -221,8 +224,8 @@ void HkDataUI::eventRemoved(int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     eventsTable->removeItem(index);
     switch (stack->currentIndex()) {
-    case BLENDER_GENERATOR:
-        //blenderGeneratorUI->variableRenamed(newName, index);
+    case STATE_MACHINE:
+        stateMachineUI->eventRenamed("NONE", index);
         break;
     default:
         break;
@@ -235,7 +238,10 @@ void HkDataUI::variableNameChanged(const QString & newName, int index){
     variablesTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
     case BLENDER_GENERATOR:
-        blenderGeneratorUI->variableRenamed(newName, index);
+        blenderGeneratorUI->renameVariable(newName, index);
+        break;
+    case STATE_MACHINE:
+        stateMachineUI->renameVariable(newName, index);
         break;
     default:
         break;
@@ -266,7 +272,7 @@ void HkDataUI::modifierRemoved(int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     modifiersTable->removeItem(index);
     switch (stack->currentIndex()) {
-    case BLENDER_GENERATOR:
+    case MODIFIER_GENERATOR:
         //remove modifier in table???
         break;
     default:
@@ -280,7 +286,7 @@ void HkDataUI::variableRemoved(int index){
     variablesTable->removeItem(index);
     switch (stack->currentIndex()) {
     case BLENDER_GENERATOR:
-        //remove variable in table???
+        blenderGeneratorUI->renameVariable("NONE", index);
         break;
     default:
         break;
@@ -296,12 +302,6 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
         HkxObject *oldData = loadedData;
         sig = ((HkxObject *)((icon->itemData)))->getSignature();
         loadedData = ((HkxObject *)((icon->itemData)));
-        disconnect(variablesTable, SIGNAL(elementSelected(int,QString)), 0, 0);
-        disconnect(eventsTable, SIGNAL(elementSelected(int,QString)), 0, 0);
-        disconnect(characterPropertiesTable, SIGNAL(elementSelected(int,QString)), 0, 0);
-        disconnect(generatorsTable, SIGNAL(elementSelected(int,QString)), 0, 0);
-        disconnect(modifiersTable, SIGNAL(elementSelected(int,QString)), 0, 0);
-        //blenderGeneratorUI->disconnectChildUI(variablesTable, characterPropertiesTable, generatorsTable);
         switch (sig) {
         case HKB_BLENDER_GENERATOR:
             if (loadedData != oldData){
@@ -309,7 +309,7 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             }
             blenderGeneratorUI->setCurrentIndex(BlenderGeneratorUI::MAIN_WIDGET);
             stack->setCurrentIndex(BLENDER_GENERATOR);
-            blenderGeneratorUI->connectChildUI(variablesTable, characterPropertiesTable, generatorsTable);
+            blenderGeneratorUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
             connect(variablesTable, SIGNAL(elementSelected(int,QString)), blenderGeneratorUI, SLOT(setBindingVariable(int,QString)));
             break;
         case BS_I_STATE_TAGGING_GENERATOR:
@@ -334,8 +334,10 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             if (loadedData != oldData){
                 stateMachineUI->loadData(loadedData);
             }
-            //stateMachineUI->setCurrentIndex(BlenderGeneratorUI::MAIN_WIDGET);
+            stateMachineUI->setCurrentIndex(StateMachineUI::MAIN_WIDGET);
             stack->setCurrentIndex(STATE_MACHINE);
+            stateMachineUI->connectChildUI(variablesTable, characterPropertiesTable, generatorsTable);
+            connect(eventsTable, SIGNAL(elementSelected(int,QString)), stateMachineUI, SLOT(setBindingVariable(int,QString)));
             break;
         default:
             stack->setCurrentIndex(NO_DATA_SELECTED);

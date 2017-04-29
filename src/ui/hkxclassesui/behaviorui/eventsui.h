@@ -12,7 +12,7 @@ class QSignalMapper;
 class hkbBehaviorGraphData;
 class HkxObject;
 class QStackedLayout;
-class QLineEdit;
+class LineEdit;
 class QCheckBox;
 
 class EventsUI: public QGroupBox
@@ -50,7 +50,7 @@ private:
     QPushButton *addObjectPB;
     QPushButton *removeObjectPB;
     QHBoxLayout *buttonLyt;
-    QLineEdit *eventName;
+    LineEdit *eventName;
     QCheckBox *flag;
     TableWidget *eventWidget;
     QStackedLayout *stackLyt;

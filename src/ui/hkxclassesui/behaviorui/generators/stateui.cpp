@@ -51,7 +51,7 @@ StateUI::StateUI()
       lyt(new QVBoxLayout),
       table(new TableWidget),
       returnPB(new QPushButton("Return")),
-      name(new QLineEdit),
+      name(new LineEdit),
       generator(new QPushButton("NULL")),
       stateId(new SpinBox),
       probability(new DoubleSpinBox),
@@ -120,7 +120,7 @@ StateUI::StateUI()
     lyt->addLayout(transitionButtonLyt);
     lyt->addWidget(transitions);
     setLayout(lyt);
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(toParentStateMachine()));
+    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
     connect(generator, SIGNAL(released()), this, SLOT(viewGenerators()));
     connect(generatorTable, SIGNAL(elementSelected(int)), this, SLOT(setGenerator(int)));
@@ -275,7 +275,7 @@ void StateUI::setEnterEventPayloadAt(int index){
         hkbStateMachineEventPropertyArray *events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
         hkbStringEventPayload *payload = static_cast<hkbStringEventPayload *>(events->events.at(index).payload.data());
         QString text;
-        text = static_cast<QLineEdit *>(enterNotifyEvents->cellWidget(index, 1))->text();
+        text = static_cast<LineEdit *>(enterNotifyEvents->cellWidget(index, 1))->text();
         if (payload){
             if (text == ""){
                 events->events[index].payload = HkxObjectExpSharedPtr();
@@ -337,7 +337,7 @@ void StateUI::setExitEventPayloadAt(int index){
         hkbStateMachineEventPropertyArray *events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
         hkbStringEventPayload *payload = static_cast<hkbStringEventPayload *>(events->events.at(index).payload.data());
         QString text;
-        text = static_cast<QLineEdit *>(exitNotifyEvents->cellWidget(index, 1))->text();
+        text = static_cast<LineEdit *>(exitNotifyEvents->cellWidget(index, 1))->text();
         if (payload){
             if (text == ""){
                 events->events[index].payload = HkxObjectExpSharedPtr();
@@ -432,7 +432,7 @@ void StateUI::setGenerator(int index){
 
 void StateUI::appendEnterEventTableRow(int index, hkbStateMachineEventPropertyArray *enterEvents, const QStringList & eventList){
     ComboBox *comboBox;
-    QLineEdit *lineEdit;
+    LineEdit *lineEdit;
     hkbStringEventPayload *payload = NULL;
     if (index >= enterNotifyEvents->rowCount()){
         enterNotifyEvents->setRowCount(enterNotifyEvents->rowCount() + 1);
@@ -442,7 +442,7 @@ void StateUI::appendEnterEventTableRow(int index, hkbStateMachineEventPropertyAr
         comboBox->setCurrentIndex(enterEvents->events.at(index).id + 1);
         connect(comboBox, SIGNAL(activated(int)), enterEventSignalMapper, SLOT(map()));
         enterEventSignalMapper->setMapping(comboBox, index);
-        lineEdit = new QLineEdit;
+        lineEdit = new LineEdit;
         payload = static_cast<hkbStringEventPayload *>(enterEvents->events.at(index).payload.data());
         if (payload){
             lineEdit->setText(payload->data);
@@ -457,7 +457,7 @@ void StateUI::appendEnterEventTableRow(int index, hkbStateMachineEventPropertyAr
         comboBox->setCurrentIndex(enterEvents->events.at(index).id + 1);
         connect(enterEventSignalMapper, SIGNAL(mapped(int)), this, SLOT(setEnterEventAt(int)));
         enterEventSignalMapper->setMapping(comboBox, index);
-        lineEdit = qobject_cast<QLineEdit *>(enterNotifyEvents->cellWidget(index, 1));
+        lineEdit = qobject_cast<LineEdit *>(enterNotifyEvents->cellWidget(index, 1));
         enterEventSignalMapper->blockSignals(false);
         comboBox->setCurrentIndex(enterEvents->events.at(index).id + 1);
         connect(enterEventPayloadSignalMapper, SIGNAL(mapped(int)), this, SLOT(setEnterEventPayloadAt(int)));
@@ -467,7 +467,7 @@ void StateUI::appendEnterEventTableRow(int index, hkbStateMachineEventPropertyAr
 
 void StateUI::appendExitEventTableRow(int index, hkbStateMachineEventPropertyArray *exitEvents, const QStringList &eventList){
     ComboBox *comboBox;
-    QLineEdit *lineEdit;
+    LineEdit *lineEdit;
     hkbStringEventPayload *payload = NULL;
     if (index >= exitNotifyEvents->rowCount()){
         exitNotifyEvents->setRowCount(exitNotifyEvents->rowCount() + 1);
@@ -477,7 +477,7 @@ void StateUI::appendExitEventTableRow(int index, hkbStateMachineEventPropertyArr
         comboBox->setCurrentIndex(exitEvents->events.at(index).id + 1);
         connect(comboBox, SIGNAL(activated(int)), enterEventSignalMapper, SLOT(map()));
         enterEventSignalMapper->setMapping(comboBox, index);
-        lineEdit = new QLineEdit;
+        lineEdit = new LineEdit;
         payload = static_cast<hkbStringEventPayload *>(exitEvents->events.at(index).payload.data());
         if (payload){
             lineEdit->setText(payload->data);
@@ -492,7 +492,7 @@ void StateUI::appendExitEventTableRow(int index, hkbStateMachineEventPropertyArr
         comboBox->setCurrentIndex(exitEvents->events.at(index).id + 1);
         exitEventSignalMapper->blockSignals(false);
         exitEventSignalMapper->setMapping(comboBox, index);
-        lineEdit = qobject_cast<QLineEdit *>(enterNotifyEvents->cellWidget(index, 1));
+        lineEdit = qobject_cast<LineEdit *>(enterNotifyEvents->cellWidget(index, 1));
         exitEventPayloadSignalMapper->blockSignals(true);
         comboBox->setCurrentIndex(exitEvents->events.at(index).id + 1);
         exitEventPayloadSignalMapper->blockSignals(false);
@@ -564,4 +564,8 @@ void StateUI::loadData(HkxObject *data){
             generator->setText(static_cast<hkbGenerator *>(bsData->generator.data())->getName());
         }
     }
+}
+
+void StateUI::setBehaviorView(BehaviorGraphView *view){
+    behaviorView = view;
 }

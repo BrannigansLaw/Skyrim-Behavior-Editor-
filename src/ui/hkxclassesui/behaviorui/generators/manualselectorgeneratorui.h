@@ -14,7 +14,7 @@ class QVBoxLayout;
 class TableWidget;
 class QTableWidgetItem;
 class SpinBox;
-class QLineEdit;
+class LineEdit;
 class ComboBox;
 class QPushButton;
 class QHBoxLayout;
@@ -71,7 +71,7 @@ private:
     hkbManualSelectorGenerator *bsData;
     QVBoxLayout *lyt;
     TableWidget *table;
-    QLineEdit *name;
+    LineEdit *name;
     TableWidget *generators;
     QPushButton *addObjectPB;
     QPushButton *removeObjectPB;

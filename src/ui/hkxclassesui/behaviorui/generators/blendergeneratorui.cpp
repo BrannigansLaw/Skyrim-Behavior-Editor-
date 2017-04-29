@@ -77,7 +77,7 @@ BlenderGeneratorUI::BlenderGeneratorUI()
       typeSelectorCB(new ComboBox),
       removeChildPB(new QPushButton("Remove Selected Child")),
       table(new TableWidget),
-      name(new QLineEdit),
+      name(new LineEdit),
       referencePoseWeightThreshold(new DoubleSpinBox),
       blendParameter(new DoubleSpinBox),
       minCyclicBlendParameter(new DoubleSpinBox),
@@ -151,9 +151,6 @@ BlenderGeneratorUI::BlenderGeneratorUI()
     table->setCellWidget(ADD_CHILD_ROW, TYPE_COLUMN, typeSelectorCB);
     table->setCellWidget(ADD_CHILD_ROW, BINDING_COLUMN, removeChildPB);
     table->setItem(ADD_CHILD_ROW, VALUE_COLUMN, new QTableWidgetItem("N/A"));
-    //topLyt->addWidget(addChildPB, 0, 0, 1, 1);
-    //topLyt->addWidget(typeSelectorCB, 0, 1, 1, 1);
-    //topLyt->addWidget(removeChildPB, 0, 2, 1, 1);
     topLyt->addWidget(table, 1, 0, 8, 3);
     groupBox->setLayout(topLyt);
     addWidget(groupBox);
@@ -181,117 +178,123 @@ BlenderGeneratorUI::BlenderGeneratorUI()
 }
 
 void BlenderGeneratorUI::loadData(HkxObject *data){
-    if (data && data->getSignature() == HKB_BLENDER_GENERATOR){
-        bsData = static_cast<hkbBlenderGenerator *>(data);
-        rowIndexOfChildToRemove = -1;
-        name->setText(bsData->name);
-        referencePoseWeightThreshold->setValue(bsData->referencePoseWeightThreshold);
-        blendParameter->setValue(bsData->blendParameter);
-        minCyclicBlendParameter->setValue(bsData->minCyclicBlendParameter);
-        maxCyclicBlendParameter->setValue(bsData->maxCyclicBlendParameter);
-        indexOfSyncMasterChild->setValue(bsData->indexOfSyncMasterChild);
-        QStringList flags = bsData->flags.split("|");
-        flagSync->setChecked(false);
-        flagSmoothGeneratorWeights->setChecked(false);
-        flagDontDeactivateChildrenWithZeroWeights->setChecked(false);
-        flagParametricBlend->setChecked(false);
-        flagIsParametricBlendCyclic->setChecked(false);
-        flagForceDensePose->setChecked(false);
-        if (flags.isEmpty()){
-            if (bsData->flags == "FLAG_SYNC"){
-                flagSync->setChecked(true);
-            }else if (bsData->flags == "FLAG_SMOOTH_GENERATOR_WEIGHTS"){
-                flagSmoothGeneratorWeights->setChecked(true);
-            }else if (bsData->flags == "FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS"){
-                flagDontDeactivateChildrenWithZeroWeights->setChecked(true);
-            }else if (bsData->flags == "FLAG_PARAMETRIC_BLEND"){
-                flagParametricBlend->setChecked(true);
-            }else if (bsData->flags == "FLAG_IS_PARAMETRIC_BLEND_CYCLIC"){
-                flagIsParametricBlendCyclic->setChecked(true);
-            }else if (bsData->flags == "FLAG_FORCE_DENSE_POSE"){
-                flagForceDensePose->setChecked(true);
-            }
-        }else{
-            for (int i = 0; i < flags.size(); i++){
-                if (flags.at(i) == "FLAG_SYNC"){
+    hkbVariableBindingSet *bind = NULL;
+    if (data){
+        if (data->getSignature() == HKB_BLENDER_GENERATOR){
+            bsData = static_cast<hkbBlenderGenerator *>(data);
+            rowIndexOfChildToRemove = -1;
+            name->setText(bsData->name);
+            referencePoseWeightThreshold->setValue(bsData->referencePoseWeightThreshold);
+            blendParameter->setValue(bsData->blendParameter);
+            minCyclicBlendParameter->setValue(bsData->minCyclicBlendParameter);
+            maxCyclicBlendParameter->setValue(bsData->maxCyclicBlendParameter);
+            indexOfSyncMasterChild->setValue(bsData->indexOfSyncMasterChild);
+            QStringList flags = bsData->flags.split("|");
+            flagSync->setChecked(false);
+            flagSmoothGeneratorWeights->setChecked(false);
+            flagDontDeactivateChildrenWithZeroWeights->setChecked(false);
+            flagParametricBlend->setChecked(false);
+            flagIsParametricBlendCyclic->setChecked(false);
+            flagForceDensePose->setChecked(false);
+            if (flags.isEmpty()){
+                if (bsData->flags == "FLAG_SYNC"){
                     flagSync->setChecked(true);
-                }else if (flags.at(i) == "FLAG_SMOOTH_GENERATOR_WEIGHTS"){
+                }else if (bsData->flags == "FLAG_SMOOTH_GENERATOR_WEIGHTS"){
                     flagSmoothGeneratorWeights->setChecked(true);
-                }else if (flags.at(i) == "FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS"){
+                }else if (bsData->flags == "FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS"){
                     flagDontDeactivateChildrenWithZeroWeights->setChecked(true);
-                }else if (flags.at(i) == "FLAG_PARAMETRIC_BLEND"){
+                }else if (bsData->flags == "FLAG_PARAMETRIC_BLEND"){
                     flagParametricBlend->setChecked(true);
-                }else if (flags.at(i) == "FLAG_IS_PARAMETRIC_BLEND_CYCLIC"){
+                }else if (bsData->flags == "FLAG_IS_PARAMETRIC_BLEND_CYCLIC"){
                     flagIsParametricBlendCyclic->setChecked(true);
-                }else if (flags.at(i) == "FLAG_FORCE_DENSE_POSE"){
+                }else if (bsData->flags == "FLAG_FORCE_DENSE_POSE"){
                     flagForceDensePose->setChecked(true);
                 }
-            }
-        }
-        subtractLastChild->setChecked(bsData->subtractLastChild);
-        for (int i = 0, k; i < bsData->children.size(); i++){
-            k = i + BASE_NUMBER_OF_ROWS;
-            if (k >= table->rowCount()){
-                table->setRowCount(table->rowCount() + 1);
-                table->setItem(k, NAME_COLUMN, new QTableWidgetItem("Child "+QString::number(i)));
-                table->setItem(k, TYPE_COLUMN, new QTableWidgetItem("hkbBlenderGeneratorChild"));
-                table->setItem(k, BINDING_COLUMN, new QTableWidgetItem("N/A"));
-                table->setItem(k, VALUE_COLUMN, new QTableWidgetItem("Click to Edit"));
             }else{
-                table->setRowHidden(k, false);
-                table->item(k, NAME_COLUMN)->setText("Child "+QString::number(i));
+                for (int i = 0; i < flags.size(); i++){
+                    if (flags.at(i) == "FLAG_SYNC"){
+                        flagSync->setChecked(true);
+                    }else if (flags.at(i) == "FLAG_SMOOTH_GENERATOR_WEIGHTS"){
+                        flagSmoothGeneratorWeights->setChecked(true);
+                    }else if (flags.at(i) == "FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS"){
+                        flagDontDeactivateChildrenWithZeroWeights->setChecked(true);
+                    }else if (flags.at(i) == "FLAG_PARAMETRIC_BLEND"){
+                        flagParametricBlend->setChecked(true);
+                    }else if (flags.at(i) == "FLAG_IS_PARAMETRIC_BLEND_CYCLIC"){
+                        flagIsParametricBlendCyclic->setChecked(true);
+                    }else if (flags.at(i) == "FLAG_FORCE_DENSE_POSE"){
+                        flagForceDensePose->setChecked(true);
+                    }
+                }
             }
-        }
-        for (int j = bsData->children.size() + BASE_NUMBER_OF_ROWS; j < table->rowCount(); j++){
-            table->setRowHidden(j, true);
-        }
-        hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
-        if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("referencePoseWeightThreshold");
-            if (bindIndex >= 0){
-                table->item(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN)->setText(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(bindIndex));
-            }else{
-                table->item(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN)->setText("NONE");
+            subtractLastChild->setChecked(bsData->subtractLastChild);
+            for (int i = 0, k; i < bsData->children.size(); i++){
+                k = i + BASE_NUMBER_OF_ROWS;
+                if (k >= table->rowCount()){
+                    table->setRowCount(table->rowCount() + 1);
+                    table->setItem(k, NAME_COLUMN, new QTableWidgetItem("Child "+QString::number(i)));
+                    table->setItem(k, TYPE_COLUMN, new QTableWidgetItem("hkbBlenderGeneratorChild"));
+                    table->setItem(k, BINDING_COLUMN, new QTableWidgetItem("N/A"));
+                    table->setItem(k, VALUE_COLUMN, new QTableWidgetItem("Click to Edit"));
+                }else{
+                    table->setRowHidden(k, false);
+                    table->item(k, NAME_COLUMN)->setText("Child "+QString::number(i));
+                }
             }
-            bindIndex = bind->getVariableIndexOfBinding("blendParameter");
-            if (bindIndex >= 0){
-                table->item(BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(bindIndex));
-            }else{
-                table->item(BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText("NONE");
+            for (int j = bsData->children.size() + BASE_NUMBER_OF_ROWS; j < table->rowCount(); j++){
+                table->setRowHidden(j, true);
             }
-            bindIndex = bind->getVariableIndexOfBinding("minCyclicBlendParameter");
-            if (bindIndex >= 0){
-                table->item(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(bindIndex));
-            }else{
-                table->item(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText("NONE");
+            bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            if (bind){
+                int bindIndex = bind->getVariableIndexOfBinding("referencePoseWeightThreshold");
+                if (bindIndex >= 0){
+                    table->item(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN)->setText(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(bindIndex));
+                }else{
+                    table->item(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN)->setText("NONE");
+                }
+                bindIndex = bind->getVariableIndexOfBinding("blendParameter");
+                if (bindIndex >= 0){
+                    table->item(BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(bindIndex));
+                }else{
+                    table->item(BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText("NONE");
+                }
+                bindIndex = bind->getVariableIndexOfBinding("minCyclicBlendParameter");
+                if (bindIndex >= 0){
+                    table->item(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(bindIndex));
+                }else{
+                    table->item(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText("NONE");
+                }
+                bindIndex = bind->getVariableIndexOfBinding("maxCyclicBlendParameter");
+                if (bindIndex >= 0){
+                    table->item(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(bindIndex));
+                }else{
+                    table->item(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText("NONE");
+                }
+                bindIndex = bind->getVariableIndexOfBinding("indexOfSyncMasterChild");
+                if (bindIndex >= 0){
+                    table->item(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN)->setText(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(bindIndex));
+                }else{
+                    table->item(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN)->setText("NONE");
+                }
+                bindIndex = bind->getVariableIndexOfBinding("subtractLastChild");
+                if (bindIndex >= 0){
+                    table->item(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN)->setText(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(bindIndex));
+                }else{
+                    table->item(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN)->setText("NONE");
+                }
             }
-            bindIndex = bind->getVariableIndexOfBinding("maxCyclicBlendParameter");
-            if (bindIndex >= 0){
-                table->item(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(bindIndex));
-            }else{
-                table->item(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText("NONE");
-            }
-            bindIndex = bind->getVariableIndexOfBinding("indexOfSyncMasterChild");
-            if (bindIndex >= 0){
-                table->item(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN)->setText(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(bindIndex));
-            }else{
-                table->item(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN)->setText("NONE");
-            }
-            bindIndex = bind->getVariableIndexOfBinding("subtractLastChild");
-            if (bindIndex >= 0){
-                table->item(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN)->setText(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(bindIndex));
-            }else{
-                table->item(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN)->setText("NONE");
-            }
+        }else{
+            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)))
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: Attempting to load a null pointer!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::loadData(): Attempting to load a null pointer!!"))
     }
 }
 
 bool BlenderGeneratorUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = NULL;
     if (bsData){
+        varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
         if (index == 0){
             varBind->removeBinding(path);
             table->item(row, BINDING_COLUMN)->setText("None");
@@ -309,12 +312,11 @@ bool BlenderGeneratorUI::setBinding(int index, int row, const QString & variable
             table->item(row, BINDING_COLUMN)->setText(variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            QMessageBox msg;
-            msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-            msg.exec();
+            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setBinding(): The data is NULL!!"))
+        return false;
     }
     return true;
 }
@@ -346,7 +348,7 @@ void BlenderGeneratorUI::setBindingVariable(int index, const QString & name){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setBindingVariable(): The data is NULL!!"))
     }
 }
 
@@ -356,7 +358,7 @@ void BlenderGeneratorUI::setName(){
         emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setName(): The data is NULL!!"))
     }
 }
 
@@ -365,7 +367,7 @@ void BlenderGeneratorUI::setReferencePoseWeightThreshold(){
         bsData->referencePoseWeightThreshold = referencePoseWeightThreshold->value();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setReferencePoseWeightThreshold(): The data is NULL!!"))
     }
 }
 
@@ -374,7 +376,7 @@ void BlenderGeneratorUI::setBlendParameter(){
         bsData->blendParameter = blendParameter->value();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setBlendParameter(): The data is NULL!!"))
     }
 }
 
@@ -383,7 +385,7 @@ void BlenderGeneratorUI::setMinCyclicBlendParameter(){
         bsData->minCyclicBlendParameter = minCyclicBlendParameter->value();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setMinCyclicBlendParameter(): The data is NULL!!"))
     }
 }
 
@@ -392,7 +394,7 @@ void BlenderGeneratorUI::setMaxCyclicBlendParameter(){
         bsData->maxCyclicBlendParameter = maxCyclicBlendParameter->value();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setMaxCyclicBlendParameter(): The data is NULL!!"))
     }
 }
 
@@ -401,7 +403,7 @@ void BlenderGeneratorUI::setIndexOfSyncMasterChild(){
         bsData->indexOfSyncMasterChild = indexOfSyncMasterChild->value();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setIndexOfSyncMasterChild(): The data is NULL!!"))
     }
 }
 
@@ -422,7 +424,7 @@ void BlenderGeneratorUI::setFlagSync(){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setFlagSync(): The data is NULL!!"))
     }
 }
 
@@ -443,7 +445,7 @@ void BlenderGeneratorUI::setFlagSmoothGeneratorWeights(){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setFlagSmoothGeneratorWeights(): The data is NULL!!"))
     }
 }
 
@@ -464,7 +466,7 @@ void BlenderGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The data is NULL!!"))
     }
 }
 
@@ -485,7 +487,7 @@ void BlenderGeneratorUI::setFlagParametricBlend(){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setFlagParametricBlend(): The data is NULL!!"))
     }
 }
 
@@ -506,7 +508,7 @@ void BlenderGeneratorUI::setFlagIsParametricBlendCyclic(){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setFlagIsParametricBlendCyclic(): The data is NULL!!"))
     }
 }
 
@@ -527,7 +529,7 @@ void BlenderGeneratorUI::setFlagForceDensePose(){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setFlagForceDensePose(): The data is NULL!!"))
     }
 }
 
@@ -536,13 +538,15 @@ void BlenderGeneratorUI::setSubtractLastChild(){
         bsData->subtractLastChild = subtractLastChild->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setSubtractLastChild(): The data is NULL!!"))
     }
 }
 
 void BlenderGeneratorUI::addChild(){
+    Generator_Type typeEnum;
+    int result;
     if (bsData && behaviorView){
-        Generator_Type typeEnum = static_cast<Generator_Type>(typeSelectorCB->currentIndex());
+        typeEnum = static_cast<Generator_Type>(typeSelectorCB->currentIndex());
         switch (typeEnum){
         case STATE_MACHINE:
             behaviorView->appendStateMachine();
@@ -581,9 +585,10 @@ void BlenderGeneratorUI::addChild(){
             behaviorView->appendBehaviorReferenceGenerator();
             break;
         default:
+            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::addChild(): Invalid typeEnum!!"))
             return;
         }
-        int result = BASE_NUMBER_OF_ROWS + bsData->children.size() - 1;
+        result = BASE_NUMBER_OF_ROWS + bsData->children.size() - 1;
         if (result >= table->rowCount()){
             table->setRowCount(table->rowCount() + 1);
             table->setItem(result, NAME_COLUMN, new QTableWidgetItem("Child "+QString::number(bsData->children.size() - 1)));
@@ -591,29 +596,22 @@ void BlenderGeneratorUI::addChild(){
             table->setItem(result, BINDING_COLUMN, new QTableWidgetItem("N/A"));
             table->setItem(result, VALUE_COLUMN, new QTableWidgetItem("Click to Edit"));
         }else{
-            //'result' can be ADD_CHILD_ROW!!!
             table->setRowHidden(result, false);
             table->item(result, NAME_COLUMN)->setText("Child "+QString::number(bsData->children.size() - 1));
         }
-        bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data or behavior graph pointer is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::addChild(): The data or behavior graph pointer is NULL!!"))
     }
 }
 
 void BlenderGeneratorUI::removeSelectedChild(){
     int result = rowIndexOfChildToRemove - BASE_NUMBER_OF_ROWS;
-    if (bsData && behaviorView && result < bsData->children.size() && result >= 0){
+    hkbBlenderGeneratorChild *child = NULL;
+    if (bsData && behaviorView){
         if (result < bsData->children.size() && result >= 0){
-            hkbBlenderGeneratorChild *child = static_cast<hkbBlenderGeneratorChild *>(bsData->children.at(result).data());
-            //if (bsData->generatorCount(static_cast<hkbGenerator *>(child->generator.data())) == 1){
-                behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->generator.data()), result);//Reorderchildren?
-                behaviorView->removeObjects();
-            //}else{
-                //bsData->removeObjectAt(result);
-                //behaviorView->getSelectedItem()->reorderChildren();
-            //}
-                behaviorView->removeObjects();
+            child = static_cast<hkbBlenderGeneratorChild *>(bsData->children.at(result).data());
+            behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->generator.data()), result);//Reorderchildren?
+            behaviorView->removeObjects();
             delete table->takeItem(rowIndexOfChildToRemove, NAME_COLUMN);
             delete table->takeItem(rowIndexOfChildToRemove, TYPE_COLUMN);
             delete table->takeItem(rowIndexOfChildToRemove, BINDING_COLUMN);
@@ -630,14 +628,15 @@ void BlenderGeneratorUI::removeSelectedChild(){
             }
             rowIndexOfChildToRemove = -1;
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: Invalid index of child to remove!!"))
+            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::removeSelectedChild(): Invalid index of child to remove!!"))
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: The data or behavior graph pointer is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::removeSelectedChild(): The data or behavior graph pointer is NULL!!"))
     }
 }
 
 void BlenderGeneratorUI::viewSelectedChild(int row, int column){
+    int result;
     if (bsData){
         if (row < BASE_NUMBER_OF_ROWS && row >= 0){
             if (column == BINDING_COLUMN){
@@ -671,7 +670,7 @@ void BlenderGeneratorUI::viewSelectedChild(int row, int column){
                 }
             }
         }else{
-            int result = row - BASE_NUMBER_OF_ROWS;
+            result = row - BASE_NUMBER_OF_ROWS;
             rowIndexOfChildToRemove = row;
             if (bsData->children.size() > result && result >= 0){
                 if (column == VALUE_COLUMN){
@@ -679,9 +678,11 @@ void BlenderGeneratorUI::viewSelectedChild(int row, int column){
                     setCurrentIndex(CHILD_WIDGET);
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI: Invalid index of child to view!!"))
+                CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::viewSelectedChild(): Invalid index of child to view!!"))
             }
         }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::viewSelectedChild(): The data is NULL!!"))
     }
 }
 
@@ -689,20 +690,30 @@ void BlenderGeneratorUI::returnToWidget(){
     setCurrentIndex(MAIN_WIDGET);
 }
 
-void BlenderGeneratorUI::connectChildUI(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *generators){
+void BlenderGeneratorUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *generators){
     if (variables && properties && generators){
-        connect(variables, SIGNAL(elementSelected(int,QString)), childUI, SLOT(setBindingVariable(int,QString)));
-        connect(properties, SIGNAL(elementSelected(int,QString)), childUI, SLOT(setBindingVariable(int,QString)));
+        disconnect(variables, SIGNAL(elementSelected(int,QString)), 0, 0);
+        disconnect(properties, SIGNAL(elementSelected(int,QString)), 0, 0);
+        disconnect(generators, SIGNAL(elementSelected(int,QString)), 0, 0);
+        connect(variables, SIGNAL(elementSelected(int,QString)), this, SLOT(setBindingVariable(int,QString)));
+        //connect(properties, SIGNAL(elementSelected(int,QString)), childUI, SLOT(setBindingVariable(int,QString))); Right click to choose character property???
         connect(generators, SIGNAL(elementSelected(int,QString)), childUI, SLOT(setGenerator(int,QString)));
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::connectToTables(): One or more arguments are NULL!!"))
     }
 }
 
-void BlenderGeneratorUI::variableRenamed(const QString & name, int index){
+void BlenderGeneratorUI::renameVariable(const QString & name, int index){
+    int bindIndex = -1;
+    hkbVariableBindingSet *bind = NULL;
+    if (name == ""){
+        WARNING_MESSAGE(QString("BlenderGeneratorUI::variableRenamed(): The new variable name is the empty string!!"))
+    }
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
         if (bind){
-            int bindIndex = bind->getVariableIndexOfBinding("referencePoseWeightThreshold");
+            bindIndex = bind->getVariableIndexOfBinding("referencePoseWeightThreshold");
             if (bindIndex == index){
                 table->item(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN)->setText(name);
             }else{
@@ -732,7 +743,17 @@ void BlenderGeneratorUI::variableRenamed(const QString & name, int index){
                 }
             }
         }
+        childUI->variableRenamed(name, index);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::variableRenamed(): The data is NULL!!"))
     }
+}
+
+void BlenderGeneratorUI::generatorRenamed(const QString &name, int index){
+    if (name == ""){
+        WARNING_MESSAGE(QString("BlenderGeneratorUI::generatorRenamed(): The new variable name is the empty string!!"))
+    }
+    childUI->generatorRenamed(name, index);
 }
 
 void BlenderGeneratorUI::setBehaviorView(BehaviorGraphView *view){

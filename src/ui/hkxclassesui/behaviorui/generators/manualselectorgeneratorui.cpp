@@ -54,7 +54,7 @@ ManualSelectorGeneratorUI::ManualSelectorGeneratorUI()
       bsData(NULL),
       lyt(new QVBoxLayout),
       table(new TableWidget),
-      name(new QLineEdit),
+      name(new LineEdit),
       generators(new TableWidget),
       addObjectPB(new QPushButton("Add Generator")),
       removeObjectPB(new QPushButton("Remove Selected Generator")),

@@ -31,7 +31,7 @@ BSiStateTaggingGeneratorUI::BSiStateTaggingGeneratorUI()
       bsData(NULL),
       lyt(new QVBoxLayout),
       table(new TableWidget),
-      name(new QLineEdit),
+      name(new LineEdit),
       pDefaultGenerator(new ComboBox),
       iStateToSetAs(new SpinBox),
       iStateToSetAsBind(new ComboBox),
@@ -180,9 +180,7 @@ void BSiStateTaggingGeneratorUI::setDefaultGenerator(int index){
     if (behaviorView && index > -1 && index < pDefaultGenerator->count()){
         DataIconManager *ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
         if (!ptr || ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), ptr, reinterpret_cast<DataIconManager *>(bsData->pDefaultGenerator.data()))){
-            QMessageBox msg;
-            msg.setText("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!");
-            msg.exec();
+            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to create a circular branch or dead end!!!"))
             int i = static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pDefaultGenerator);
             i++;
             pDefaultGenerator->setCurrentIndex(i);

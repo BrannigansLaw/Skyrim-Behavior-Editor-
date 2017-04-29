@@ -5,7 +5,7 @@
 
 class TreeGraphicsView;
 class TableWidget;
-class QLineEdit;
+class LineEdit;
 class ComboBox;
 class hkbBlendingTransitionEffect;
 class QVBoxLayout;
@@ -36,7 +36,7 @@ private:
     hkbBlendingTransitionEffect *bsData;
     QVBoxLayout *lyt;
     TableWidget *table;
-    QLineEdit *name;
+    LineEdit *name;
     ComboBox *selfTransitionMode;
     ComboBox *eventMode;
     DoubleSpinBox *duration;

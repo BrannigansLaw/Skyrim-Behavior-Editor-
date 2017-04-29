@@ -156,6 +156,14 @@ QString hkbBehaviorGraphStringData::getVariableNameAt(int index) const{
     }
     return "";
 }
+
+QString hkbBehaviorGraphStringData::getEventNameAt(int index) const{
+    if (index >= 0 && index < eventNames.size()){
+        return eventNames.at(index);
+    }
+    return "";
+}
+
 bool hkbBehaviorGraphStringData::link(){
     return true;
 }

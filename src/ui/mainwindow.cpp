@@ -495,12 +495,12 @@ bool MainWindow::exitProgram()
     return false;
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-    if (exitProgram()) {
+void MainWindow::closeEvent(QCloseEvent *event){
+    writeSettings();
+    /*if (exitProgram()) {
         writeSettings();
         event->accept();
     }else {
         event->ignore();
-    }
+    }*/
 }

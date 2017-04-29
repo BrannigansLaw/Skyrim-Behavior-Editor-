@@ -15,7 +15,7 @@ class QCheckBox;
 class QStackedLayout;
 class ComboBox;
 class QPushButton;
-class QLineEdit;
+class LineEdit;
 
 class HandIkDriverInfoHandUI: public QGroupBox
 {
@@ -63,7 +63,7 @@ private:
     ComboBox *wristIndex;
     QCheckBox *enforceEndPosition;
     QCheckBox *enforceEndRotation;
-    QLineEdit *localFrameName;
+    LineEdit *localFrameName;
 };
 
 #endif // HANDIKDRIVERINFOHANDUI_H

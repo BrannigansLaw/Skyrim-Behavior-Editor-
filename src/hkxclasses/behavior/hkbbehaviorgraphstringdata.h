@@ -22,6 +22,7 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     QString getVariableNameAt(int index) const;
+    QString getEventNameAt(int index) const;
 private:
     hkbBehaviorGraphStringData& operator=(const hkbBehaviorGraphStringData&);
     hkbBehaviorGraphStringData(const hkbBehaviorGraphStringData &);

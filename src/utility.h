@@ -8,9 +8,9 @@
 
 #define MAX_HKXXML_LINE_LENGTH 512
 
-#define CRITICAL_ERROR_MESSAGE(message) {QMessageBox msg;msg.setText("CRITICAL ERROR: "+message+"\n\nWe advise that you close the application and contact the author!!!");msg.exec();}
+#define CRITICAL_ERROR_MESSAGE(message) {QMessageBox msg;msg.setModal(true);msg.setText("CRITICAL ERROR: "+message+"\n\nWe advise that you close the application and contact the author!!!");msg.exec();}
 
-#define WARNING_MESSAGE(message) {QMessageBox msg;msg.setText("WARNING: "+message);msg.exec();}
+#define WARNING_MESSAGE(message) {QMessageBox msg;msg.setModal(true);msg.setText("WARNING: "+message);msg.exec();}
 
 enum hkVariableType {
     VARIABLE_TYPE_BOOL,

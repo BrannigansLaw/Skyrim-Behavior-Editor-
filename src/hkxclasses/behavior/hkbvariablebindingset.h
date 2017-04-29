@@ -27,7 +27,7 @@ public:
     bool link();
     bool evaulateDataValidity();
     static QString getClassname();
-    void addBinding(const QString & path, int varIndex, hkBinding::BindingType type = hkBinding::BINDING_TYPE_VARIABLE);
+    bool addBinding(const QString & path, int varIndex, hkBinding::BindingType type = hkBinding::BINDING_TYPE_VARIABLE);
     void removeBinding(const QString & path);
     void removeBinding(int varIndex);
     int getVariableIndexOfBinding(const QString & path) const;

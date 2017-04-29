@@ -14,7 +14,7 @@ class QVBoxLayout;
 class TableWidget;
 class QTableWidgetItem;
 class SpinBox;
-class QLineEdit;
+class LineEdit;
 class ComboBox;
 class QPushButton;
 class QHBoxLayout;
@@ -39,7 +39,7 @@ public:
     //void setGeneratorTable(GenericTableWidget *genTable);
 signals:
     void stateNameChanged(const QString & newName, int index);
-    void toParentStateMachine();
+    void returnToParent();
     void viewTransition(hkbStateMachine *parent, HkTransition *transition);
     void viewGeneratorTable(int index);
 private slots:
@@ -66,6 +66,7 @@ private:
     void addEventToLists(const QString & name);
     void removeEventFromLists(int index);
     void renameEventInLists(const QString & newName, int index);
+    void setBehaviorView(BehaviorGraphView *view);
 private:
     static QStringList headerLabels1;
     static QStringList headerLabels2;
@@ -76,7 +77,7 @@ private:
     QVBoxLayout *lyt;
     TableWidget *table;
     QPushButton *returnPB;
-    QLineEdit *name;
+    LineEdit *name;
     QPushButton *generator;
     SpinBox *stateId;
     DoubleSpinBox *probability;

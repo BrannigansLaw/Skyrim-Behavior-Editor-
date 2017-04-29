@@ -5,7 +5,7 @@
 
 class BehaviorGraphView;
 class TableWidget;
-class QLineEdit;
+class LineEdit;
 class ComboBox;
 class BSiStateTaggingGenerator;
 class QVBoxLayout;
@@ -43,7 +43,7 @@ private:
     BSiStateTaggingGenerator *bsData;
     QVBoxLayout *lyt;
     TableWidget *table;
-    QLineEdit *name;
+    LineEdit *name;
     ComboBox *pDefaultGenerator;
     SpinBox *iStateToSetAs;
     ComboBox *iStateToSetAsBind;
