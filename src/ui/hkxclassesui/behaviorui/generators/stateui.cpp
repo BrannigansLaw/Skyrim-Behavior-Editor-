@@ -226,7 +226,7 @@ void StateUI::setName(){
 
 void StateUI::setStateId(){
     if (bsData){
-        bsData->stateId = stateId->value();
+        bsData->setStateId(stateId->value());//Update parent state machine???
         bsData->getParentFile()->toggleChanged(true);
     }
 }

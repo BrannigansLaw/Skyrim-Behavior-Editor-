@@ -48,7 +48,7 @@ public:
     TableWidget(QWidget* parent = 0)
         : QTableWidget(parent)
     {
-        verticalHeader()->setVisible(false);
+        //verticalHeader()->setVisible(false);
         setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
         horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

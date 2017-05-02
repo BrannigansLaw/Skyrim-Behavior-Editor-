@@ -81,8 +81,8 @@ StateMachineUI::StateMachineUI()
       addStatePB(new QPushButton("Add State With Generator")),
       removeStatePB(new QPushButton("Remove Selected State")),
       typeSelectorCB(new ComboBox),
-      addTransitionPB(new QPushButton("Add Transition")),
-      removeTransitionPB(new QPushButton("Remove Selected Transition")),
+      //addTransitionPB(new QPushButton("Add Transition")),
+      //removeTransitionPB(new QPushButton("Remove Selected Transition")),
       name(new LineEdit),
       payload(new LineEdit),
       startStateId(new ComboBox),
@@ -151,30 +151,34 @@ StateMachineUI::StateMachineUI()
     table->setCellWidget(ADD_CHILD_ROW, TYPE_COLUMN, typeSelectorCB);
     table->setCellWidget(ADD_CHILD_ROW, BINDING_COLUMN, removeStatePB);
     table->setItem(ADD_CHILD_ROW, VALUE_COLUMN, new QTableWidgetItem("N/A"));
-    table->setCellWidget(ADD_CHILD_ROW + 1, NAME_COLUMN, addTransitionPB);
+    //table->setCellWidget(ADD_CHILD_ROW + 1, NAME_COLUMN, addTransitionPB);
+    table->setCellWidget(ADD_CHILD_ROW + 1, NAME_COLUMN, new QPushButton("Add Transition"));
     table->setItem(ADD_CHILD_ROW + 1, TYPE_COLUMN, new QTableWidgetItem("hkbStateMachineTransitionInfoArray"));
-    table->setCellWidget(ADD_CHILD_ROW + 1, BINDING_COLUMN, removeTransitionPB);
+    //table->setCellWidget(ADD_CHILD_ROW + 1, BINDING_COLUMN, removeTransitionPB);
+    table->setCellWidget(ADD_CHILD_ROW + 1, BINDING_COLUMN, new QPushButton("Remove Selected Transition"));
     table->setItem(ADD_CHILD_ROW + 1, VALUE_COLUMN, new QTableWidgetItem("N/A"));
     topLyt->addWidget(table, 1, 0, 8, 3);
     groupBox->setLayout(topLyt);
     addWidget(groupBox);
     addWidget(stateUI);
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    connect(payload, SIGNAL(editingFinished()), this, SLOT(setPayload()));
-    connect(wrapAroundStateId, SIGNAL(clicked(bool)), this, SLOT(setWrapAroundStateId(bool)));
-    connect(maxSimultaneousTransitions, SIGNAL(editingFinished()), this, SLOT(setMaxSimultaneousTransitions()));
-    connect(startStateId, SIGNAL(activated(int)), this, SLOT(setStartStateId(int)));
-    connect(startStateMode, SIGNAL(activated(int)), this, SLOT(setStartStateMode(int)));
-    connect(selfTransitionMode, SIGNAL(activated(int)), this, SLOT(setSelfTransitionMode(int)));
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
-    connect(addStatePB, SIGNAL(released()), this, SLOT(addNewStateWithGenerator()));
-    connect(removeStatePB, SIGNAL(released()), this, SLOT(removeObjectChild()));
-    connect(addTransitionPB, SIGNAL(released()), this, SLOT(addNewTransition()));
-    connect(removeTransitionPB, SIGNAL(released()), this, SLOT(removeObjectChild()));
-    connect(stateUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    connect(stateUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
-    connect(stateUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)));
-    connect(stateUI, SIGNAL(viewGenerators(int)), this, SIGNAL(viewGenerators(int)));
+    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
+    connect(payload, SIGNAL(editingFinished()), this, SLOT(setPayload()), Qt::UniqueConnection);
+    connect(wrapAroundStateId, SIGNAL(clicked(bool)), this, SLOT(setWrapAroundStateId(bool)), Qt::UniqueConnection);
+    connect(maxSimultaneousTransitions, SIGNAL(editingFinished()), this, SLOT(setMaxSimultaneousTransitions()), Qt::UniqueConnection);
+    connect(startStateId, SIGNAL(activated(int)), this, SLOT(setStartStateId(int)), Qt::UniqueConnection);
+    connect(startStateMode, SIGNAL(activated(int)), this, SLOT(setStartStateMode(int)), Qt::UniqueConnection);
+    connect(selfTransitionMode, SIGNAL(activated(int)), this, SLOT(setSelfTransitionMode(int)), Qt::UniqueConnection);
+    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    connect(addStatePB, SIGNAL(released()), this, SLOT(addNewStateWithGenerator()), Qt::UniqueConnection);
+    connect(removeStatePB, SIGNAL(released()), this, SLOT(removeObjectChild()), Qt::UniqueConnection);
+    /*connect(addTransitionPB, SIGNAL(released()), this, SLOT(addNewTransition()), Qt::UniqueConnection);
+    connect(removeTransitionPB, SIGNAL(released()), this, SLOT(removeObjectChild()), Qt::UniqueConnection);*/
+    connect(qobject_cast<QPushButton *>(table->cellWidget(ADD_CHILD_ROW + 1, NAME_COLUMN)), SIGNAL(released()), this, SLOT(addNewTransition()), Qt::UniqueConnection);
+    connect(qobject_cast<QPushButton *>(table->cellWidget(ADD_CHILD_ROW + 1, BINDING_COLUMN)), SIGNAL(released()), this, SLOT(removeObjectChild()), Qt::UniqueConnection);
+    connect(stateUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+    connect(stateUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
+    connect(stateUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
+    connect(stateUI, SIGNAL(viewGenerators(int)), this, SIGNAL(viewGenerators(int)), Qt::UniqueConnection);
 }
 
 void StateMachineUI::loadData(HkxObject *data){
@@ -273,6 +277,11 @@ void StateMachineUI::loadData(HkxObject *data){
             selfTransitionMode->insertItems(0, bsData->SelfTransitionMode);
         }
         selfTransitionMode->setCurrentIndex(bsData->SelfTransitionMode.indexOf(bsData->selfTransitionMode));
+        if (rowIndexOfTransitionButtonPanel != bsData->states.size() + BASE_NUMBER_OF_ROWS - 1){
+            //moveRowItems(rowIndexOfTransitionButtonPanel, bsData->states.size() + BASE_NUMBER_OF_ROWS - 1);
+            //rowIndexOfTransitionButtonPanel = bsData->states.size() + BASE_NUMBER_OF_ROWS - 1;
+            moveRowWidgets(bsData->states.size() + BASE_NUMBER_OF_ROWS - 1);
+        }
         for (int i = 0, k; i < bsData->states.size(); i++){
             k = i + BASE_NUMBER_OF_ROWS - 1;
             state = static_cast<hkbStateMachineStateInfo *>(bsData->states.at(i).data());
@@ -311,15 +320,11 @@ void StateMachineUI::loadData(HkxObject *data){
         }
         trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->wildcardTransitions.data());
         if (trans){
-            for (int i = 0, k = bsData->states.size() + BASE_NUMBER_OF_ROWS; i < trans->getNumTransitions(); i++){
+            for (int i = 0, k = bsData->states.size() + BASE_NUMBER_OF_ROWS; i < trans->getNumTransitions(); i++, k++){
                 if (k >= table->rowCount()){
                     table->setRowCount(table->rowCount() + 1);
                     if (k == rowIndexOfTransitionButtonPanel){
-                        rowIndexOfTransitionButtonPanel = k + 1;
-                        moveRowItems(k, rowIndexOfTransitionButtonPanel);
-                        /*if (moveRowItems(k, rowIndexOfTransitionButtonPanel) != 0){
-                            CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadData(): moveRowItems() returned unexpected value!!!"))
-                        }*/
+                        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadData(): moveRowItems() returned unexpected value!!!"))
                     }
                     table->setItem(k, NAME_COLUMN, new QTableWidgetItem(trans->getTransitionNameAt(i)));
                     table->setItem(k, TYPE_COLUMN, new QTableWidgetItem(trans->getClassname()));
@@ -328,11 +333,7 @@ void StateMachineUI::loadData(HkxObject *data){
                 }else{
                     //table->setRowHidden(k, false);
                     if (k == rowIndexOfTransitionButtonPanel){
-                        rowIndexOfTransitionButtonPanel = k + 1;
-                        moveRowItems(k, rowIndexOfTransitionButtonPanel);
-                        /*if (moveRowItems(k, rowIndexOfTransitionButtonPanel) != 0){
-                            CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadData(): moveRowItems() returned unexpected value!!!"))
-                        }*/
+                        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadData(): moveRowItems() returned unexpected value!!!"))
                     }
                     if (table->item(k, NAME_COLUMN)){
                         table->item(k, NAME_COLUMN)->setText(trans->getTransitionNameAt(i));
@@ -573,30 +574,55 @@ void StateMachineUI::viewSelectedChild(int row, int column){
     }
 }
 
+void StateMachineUI::moveRowWidgets(int targetRow){//Have to do this because I cannot swap cell widgets around for some fucking reason...
+    table->setRowCount(targetRow + 1);
+    table->removeCellWidget(rowIndexOfTransitionButtonPanel, NAME_COLUMN);
+    table->removeCellWidget(rowIndexOfTransitionButtonPanel, BINDING_COLUMN);
+    for (int i = 0; i < VALUE_COLUMN; i++){
+        if (table->itemAt(rowIndexOfTransitionButtonPanel, i)){
+            delete table->takeItem(rowIndexOfTransitionButtonPanel, 0);
+        }
+    }
+    rowIndexOfTransitionButtonPanel = targetRow;
+    table->setCellWidget(rowIndexOfTransitionButtonPanel, NAME_COLUMN, new QPushButton("Add Transition"));
+    table->setCellWidget(rowIndexOfTransitionButtonPanel, BINDING_COLUMN, new QPushButton("Remove Selected Transition"));
+    connect(qobject_cast<QPushButton *>(table->cellWidget(rowIndexOfTransitionButtonPanel, NAME_COLUMN)), SIGNAL(released()), this, SLOT(addNewTransition()), Qt::UniqueConnection);
+    connect(qobject_cast<QPushButton *>(table->cellWidget(rowIndexOfTransitionButtonPanel, BINDING_COLUMN)), SIGNAL(released()), this, SLOT(removeObjectChild()), Qt::UniqueConnection);
+}
+
 int StateMachineUI::moveRowItems(int oldRow, int targetRow){
     int count = 0;
-    QTableWidgetItem *oldItem;
-    QWidget *oldWidget;
-    QTableWidgetItem *targetItem;
-    QWidget *targetWidget;
-    if (targetRow >= table->rowCount()){
-        table->setRowCount(targetRow + 1);
-    }
-    for (int j = oldRow; j < table->rowCount(); j++){
-        table->setRowHidden(j, false);
-    }
-    for (int i = 0; i < table->columnCount(); i++){
-        oldItem = table->takeItem(oldRow, i);
-        oldWidget = table->cellWidget(oldRow, i);
-        targetItem = table->takeItem(targetRow, i);
-        targetWidget = table->cellWidget(targetRow, i);
-        if (targetItem || targetWidget){
-            count++;
-            table->setItem(oldRow, i, targetItem);
-            table->setCellWidget(oldRow, i, targetWidget);
+    QTableWidgetItem *oldItem = NULL;
+    QWidget *oldWidget = NULL;
+    QTableWidgetItem *targetItem = NULL;
+    QWidget *targetWidget = NULL;
+    if (oldRow != targetRow){
+        if (targetRow >= table->rowCount()){
+            table->setRowCount(targetRow + 1);
         }
-        table->setItem(targetRow, i, oldItem);
-        table->setCellWidget(targetRow, i, oldWidget);
+        for (int j = oldRow; j < table->rowCount(); j++){
+            table->setRowHidden(j, false);
+        }
+        for (int i = 0; i < table->columnCount(); i++){
+            oldItem = table->takeItem(oldRow, i);
+            oldWidget = table->cellWidget(oldRow, i);
+            targetItem = table->takeItem(targetRow, i);
+            targetWidget = table->cellWidget(targetRow, i);
+            if (targetItem){
+                count++;
+                table->setItem(oldRow, i, targetItem);
+            }else if (targetWidget){
+                count++;
+                table->setCellWidget(oldRow, i, targetWidget);
+            }
+            if (oldItem){
+                count++;
+                table->setItem(targetRow, i, oldItem);
+            }else if (oldWidget){
+                count++;
+                table->setCellWidget(targetRow, i, oldWidget);
+            }
+        }
     }
     return count;
 }

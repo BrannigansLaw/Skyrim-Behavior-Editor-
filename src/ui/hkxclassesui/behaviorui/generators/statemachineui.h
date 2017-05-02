@@ -65,6 +65,7 @@ private:
     void eventRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
     bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type);
+    void moveRowWidgets(int targetRow);
     int moveRowItems(int oldRow, int targetRow);
     void generatorRenamed(const QString & name, int index);
 private:
@@ -101,8 +102,8 @@ private:
     QPushButton *addStatePB;
     QPushButton *removeStatePB;
     ComboBox *typeSelectorCB;
-    QPushButton *addTransitionPB;
-    QPushButton *removeTransitionPB;
+    //QPushButton *addTransitionPB;
+    //QPushButton *removeTransitionPB;
     LineEdit *name;
     LineEdit *payload;
     ComboBox *startStateId;

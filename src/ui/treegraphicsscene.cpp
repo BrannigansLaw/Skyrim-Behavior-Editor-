@@ -159,9 +159,9 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
                     if (((TreeGraphicsItem *)children.at(i))->itemData == data){
                         if (!inject && !isFirstDraw){
                             selectedIcon->itemData->insertObjectAt(indexToInsert, data);
-                        }else if (parent){
+                        }else if (parent && inject){
                             selectedIcon->itemData->wrapObjectAt(indexToInsert, data, parent->itemData);
-                            selectedIcon->setParent(newIcon, newIcon->getIndexofIconWithData(selectedIcon->itemData));//Not sure...
+                            //selectedIcon->setParent(newIcon, newIcon->getIndexofIconWithData(selectedIcon->itemData));//Not sure...
                         }
                         return NULL;
                     }

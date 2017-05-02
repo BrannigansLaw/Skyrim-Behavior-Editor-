@@ -358,10 +358,10 @@ BehaviorGraphView *HkDataUI::setBehaviorView(BehaviorGraphView *view){
         setMinimumSize(parentWidget()->size()*0.99);
     }
     behaviorView = view;
-    /*iSTGUI->behaviorView = view;
+    iSTGUI->behaviorView = view;
     modGenUI->behaviorView = view;
     manSelGenUI->behaviorView = view;
-    stateMachineUI->behaviorView = view;*/
+    stateMachineUI->behaviorView = view;
     blenderGeneratorUI->setBehaviorView(view);
     if (behaviorView){
         generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "NULL");
