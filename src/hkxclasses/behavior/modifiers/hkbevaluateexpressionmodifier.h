@@ -25,7 +25,7 @@ private:
     long userData;
     QString name;
     bool enable;
-    HkxObjectExpSharedPtr expressions;
+    HkxSharedPtr expressions;
 };
 
 #endif // HKBEVALUATEEXPRESSIONMODIFIER_H

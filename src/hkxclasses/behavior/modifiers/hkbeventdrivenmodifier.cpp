@@ -31,7 +31,7 @@ QString hkbEventDrivenModifier::getName() const{
 
 bool hkbEventDrivenModifier::insertObjectAt(int index, DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
-        modifier = HkxObjectExpSharedPtr((HkxObject *)obj);
+        modifier = HkxSharedPtr((HkxObject *)obj);
         return true;
     }else{
         return false;
@@ -40,7 +40,7 @@ bool hkbEventDrivenModifier::insertObjectAt(int index, DataIconManager *obj){
 
 bool hkbEventDrivenModifier::removeObjectAt(int index){
     if (index == 0 || index == -1){
-        modifier = HkxObjectExpSharedPtr();
+        modifier = HkxSharedPtr();
     }else{
         return false;
     }
@@ -164,7 +164,7 @@ bool hkbEventDrivenModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifier.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifier.getReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_MODIFIER){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'modifier' is not a modifier!");
@@ -177,7 +177,7 @@ bool hkbEventDrivenModifier::link(){
 
 void hkbEventDrivenModifier::unlink(){
     HkDynamicObject::unlink();
-    modifier = HkxObjectExpSharedPtr();
+    modifier = HkxSharedPtr();
 }
 
 bool hkbEventDrivenModifier::evaulateDataValidity(){    //Check if event id is valid???

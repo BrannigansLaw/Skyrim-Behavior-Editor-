@@ -34,8 +34,8 @@ private:
     qint64 userData;
     QString name;
     QString variableMode;
-    HkxObjectExpSharedPtr rootGenerator;
-    HkxObjectExpSharedPtr data;
+    HkxSharedPtr rootGenerator;
+    HkxSharedPtr data;
 };
 
 #endif // HKBBEHAVIORGRAPH_H

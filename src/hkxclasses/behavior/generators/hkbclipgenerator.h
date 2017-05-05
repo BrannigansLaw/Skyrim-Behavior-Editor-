@@ -28,7 +28,7 @@ private:
     ulong userData;
     QString name;
     QString animationName;
-    HkxObjectExpSharedPtr triggers;
+    HkxSharedPtr triggers;
     qreal cropStartAmountLocalTime;
     qreal cropEndAmountLocalTime;
     qreal startTime;

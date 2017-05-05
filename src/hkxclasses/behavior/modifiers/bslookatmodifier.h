@@ -47,7 +47,7 @@ private:
     hkQuadVariable targetLocation;
     bool targetOutsideLimits;
     int id;
-    HkxObjectExpSharedPtr payload;
+    HkxSharedPtr payload;
     bool lookAtCamera;
     qreal lookAtCameraX;
     qreal lookAtCameraY;

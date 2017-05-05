@@ -38,7 +38,7 @@ private:
     qreal snapMaxLinearDistance;
     qreal snapMaxAngularDistance;
     qreal durationToBlend;
-    HkxObjectExpSharedPtr bones;
+    HkxSharedPtr bones;
 };
 
 #endif // HKBRIGIDBODYRAGDOLLCONTROLSMODIFIER_H

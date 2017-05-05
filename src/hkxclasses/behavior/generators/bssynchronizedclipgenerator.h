@@ -29,7 +29,7 @@ private:
     static QString classname;
     ulong userData;
     QString name;
-    HkxObjectExpSharedPtr pClipGenerator;
+    HkxSharedPtr pClipGenerator;
     QString SyncAnimPrefix;
     bool bSyncClipIgnoreMarkPlacement;
     qreal fGetToMarkTime;

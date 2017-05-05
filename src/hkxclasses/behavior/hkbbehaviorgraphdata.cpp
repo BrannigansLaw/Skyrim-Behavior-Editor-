@@ -61,7 +61,7 @@ bool hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name
         break;
     case VARIABLE_TYPE_POINTER:
         varInfo.type = "VARIABLE_TYPE_POINTER";
-        varData->variantVariableValues.append(HkxObjectExpSharedPtr());
+        varData->variantVariableValues.append(HkxSharedPtr());
         break;
     case VARIABLE_TYPE_VECTOR4:
         varInfo.type = "VARIABLE_TYPE_VECTOR4";
@@ -107,7 +107,7 @@ void hkbBehaviorGraphData::addVariable(hkVariableType type){
         break;
     case VARIABLE_TYPE_POINTER:
         varInfo.type = "VARIABLE_TYPE_POINTER";
-        varData->variantVariableValues.append(HkxObjectExpSharedPtr());
+        varData->variantVariableValues.append(HkxSharedPtr());
         break;
     case VARIABLE_TYPE_VECTOR4:
         varInfo.type = "VARIABLE_TYPE_VECTOR4";
@@ -579,7 +579,7 @@ bool hkbBehaviorGraphData::link(){
     if (!getParentFile()){
         return false;
     }
-    HkxObjectExpSharedPtr *ptr = &static_cast<BehaviorFile *>(getParentFile())->variableValues;
+    HkxSharedPtr *ptr = &static_cast<BehaviorFile *>(getParentFile())->variableValues;
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableInitialValues' data field!\n");
         setDataValidity(false);

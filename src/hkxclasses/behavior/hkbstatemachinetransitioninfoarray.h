@@ -39,8 +39,8 @@ public:
 
         HkInterval triggerInterval;
         HkInterval initiateInterval;
-        HkxObjectExpSharedPtr transition;
-        HkxObjectExpSharedPtr condition;
+        HkxSharedPtr transition;
+        HkxSharedPtr condition;
         int eventId;
         int toStateId;
         int fromNestedStateId;
@@ -59,7 +59,7 @@ private:
     static uint refCount;
     static QString classname;
     QList <HkTransition> transitions;
-    HkxObjectExpSharedPtr parent;
+    HkxSharedPtr parent;
 };
 
 #endif // HKBSTATEMACHINETRANSITIONINFOARRAY_H

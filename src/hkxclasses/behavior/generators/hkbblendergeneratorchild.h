@@ -26,11 +26,11 @@ private:
     hkbBlenderGeneratorChild& operator=(const hkbBlenderGeneratorChild&);
     hkbBlenderGeneratorChild(const hkbBlenderGeneratorChild &);
 private:
-    HkxObjectExpSharedPtr parentBG;
+    HkxSharedPtr parentBG;
     static uint refCount;
     static QString classname;
-    HkxObjectExpSharedPtr generator;
-    HkxObjectExpSharedPtr boneWeights;
+    HkxSharedPtr generator;
+    HkxSharedPtr boneWeights;
     qreal weight;
     qreal worldFromModelWeight;
 };

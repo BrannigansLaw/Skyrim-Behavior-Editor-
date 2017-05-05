@@ -32,8 +32,8 @@ private:
     long userData;
     QString name;
     bool enable;
-    HkxObjectExpSharedPtr pOnActivateModifier;
-    HkxObjectExpSharedPtr pOnDeactivateModifier;
+    HkxSharedPtr pOnActivateModifier;
+    HkxSharedPtr pOnDeactivateModifier;
 };
 
 #endif // BSMODIFYONCEMODIFIER_H

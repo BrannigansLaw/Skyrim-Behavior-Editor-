@@ -41,9 +41,9 @@ int hkbManualSelectorGenerator::getIndexToInsertIcon(HkxObject *child) const{
 bool hkbManualSelectorGenerator::insertObjectAt(int index, DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
         if (index >= generators.size() || index == -1){
-            generators.append(HkxObjectExpSharedPtr((HkxObject *)obj));
+            generators.append(HkxSharedPtr((HkxObject *)obj));
         }else if (index > -1){
-            generators[index] = HkxObjectExpSharedPtr((HkxObject *)obj);
+            generators[index] = HkxSharedPtr((HkxObject *)obj);
         }else{
             return false;
         }
@@ -185,7 +185,7 @@ bool hkbManualSelectorGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr;
+    HkxSharedPtr *ptr;
     for (int i = 0; i < generators.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(generators.at(i).getReference());
         if (!ptr){
@@ -205,7 +205,7 @@ bool hkbManualSelectorGenerator::link(){
 void hkbManualSelectorGenerator::unlink(){
     HkDynamicObject::unlink();
     for (int i = 0; i < generators.size(); i++){
-        generators[i] = HkxObjectExpSharedPtr();
+        generators[i] = HkxSharedPtr();
     }
 }
 

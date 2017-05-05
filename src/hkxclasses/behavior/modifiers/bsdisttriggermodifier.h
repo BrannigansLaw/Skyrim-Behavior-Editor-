@@ -28,8 +28,7 @@ private:
     hkQuadVariable targetPosition;
     qreal distance;
     qreal distanceTrigger;
-    int id;
-    HkxObjectExpSharedPtr payload;
+    hkEventPayload triggerEvent;
 };
 
 #endif // BSDISTTRIGGERMODIFIER_H

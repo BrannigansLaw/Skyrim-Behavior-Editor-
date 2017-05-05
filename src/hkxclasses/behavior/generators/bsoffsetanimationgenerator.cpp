@@ -41,9 +41,9 @@ int BSOffsetAnimationGenerator::getIndexToInsertIcon() const{
 
 bool BSOffsetAnimationGenerator::insertObjectAt(int index, DataIconManager *obj){
     if (((HkxObject *)obj)->getSignature() == HKB_CLIP_GENERATOR && index == 1){
-        pOffsetClipGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        pOffsetClipGenerator = HkxSharedPtr((HkxObject *)obj);
     }else if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
-        pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        pDefaultGenerator = HkxSharedPtr((HkxObject *)obj);
     }else{
         return false;
     }
@@ -52,12 +52,12 @@ bool BSOffsetAnimationGenerator::insertObjectAt(int index, DataIconManager *obj)
 
 bool BSOffsetAnimationGenerator::removeObjectAt(int index){
     if (index == 0){
-        pDefaultGenerator = HkxObjectExpSharedPtr();
+        pDefaultGenerator = HkxSharedPtr();
     }else if (index == 1){
-        pOffsetClipGenerator = HkxObjectExpSharedPtr();
+        pOffsetClipGenerator = HkxSharedPtr();
     }else if (index == -1){
-        pDefaultGenerator = HkxObjectExpSharedPtr();
-        pOffsetClipGenerator = HkxObjectExpSharedPtr();
+        pDefaultGenerator = HkxSharedPtr();
+        pOffsetClipGenerator = HkxSharedPtr();
     }else{
         return false;
     }
@@ -193,7 +193,7 @@ bool BSOffsetAnimationGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pDefaultGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
@@ -220,8 +220,8 @@ bool BSOffsetAnimationGenerator::link(){
 
 void BSOffsetAnimationGenerator::unlink(){
     HkDynamicObject::unlink();
-    pDefaultGenerator = HkxObjectExpSharedPtr();
-    pOffsetClipGenerator = HkxObjectExpSharedPtr();
+    pDefaultGenerator = HkxSharedPtr();
+    pOffsetClipGenerator = HkxSharedPtr();
 }
 
 bool BSOffsetAnimationGenerator::evaulateDataValidity(){

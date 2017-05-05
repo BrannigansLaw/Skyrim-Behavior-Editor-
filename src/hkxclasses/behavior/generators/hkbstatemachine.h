@@ -7,6 +7,7 @@ class hkbStateMachine: public hkbGenerator
 {
     friend class BehaviorGraphView;
     friend class StateMachineUI;
+    friend class hkbStateMachineStateInfo;
 public:
     hkbStateMachine(HkxFile *parent, long ref = 0);
     virtual ~hkbStateMachine();
@@ -43,9 +44,7 @@ private:
     ulong userData;
     QString name;
     //startStateChooser
-    //HkxObjectExpSharedPtr eventToSendWhenStateOrTransitionChanges;
-    int id;
-    HkxObjectExpSharedPtr payload;
+    hkEventPayload eventToSendWhenStateOrTransitionChanges;
     int startStateId;
     int returnToPreviousStateEventId;
     int randomTransitionEventId;
@@ -56,8 +55,8 @@ private:
     ushort maxSimultaneousTransitions;  //Max 32, min 0.
     QString startStateMode;
     QString selfTransitionMode;
-    QList <HkxObjectExpSharedPtr> states;
-    HkxObjectExpSharedPtr wildcardTransitions;
+    QList <HkxSharedPtr> states;
+    HkxSharedPtr wildcardTransitions;
 };
 
 #endif // HKBSTATEMACHINE_H

@@ -93,7 +93,7 @@ bool BSBoneSwitchGeneratorBoneData::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog("BSBoneSwitchGeneratorBoneData: link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pGenerator.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pGenerator.getReference());
     if (!ptr){
         writeToLog("BSBoneSwitchGeneratorBoneData: link()!\nFailed to properly link 'pGenerator' data field!");
         setDataValidity(false);
@@ -117,8 +117,8 @@ bool BSBoneSwitchGeneratorBoneData::link(){
 
 void BSBoneSwitchGeneratorBoneData::unlink(){
     HkDynamicObject::unlink();
-    pGenerator = HkxObjectExpSharedPtr();
-    spBoneWeight = HkxObjectExpSharedPtr();
+    pGenerator = HkxSharedPtr();
+    spBoneWeight = HkxSharedPtr();
 }
 
 bool BSBoneSwitchGeneratorBoneData::evaulateDataValidity(){

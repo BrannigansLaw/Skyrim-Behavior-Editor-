@@ -25,8 +25,7 @@ private:
     long userData;
     QString name;
     bool enable;
-    int id;
-    HkxObjectExpSharedPtr payload;
+    hkEventPayload event;
 };
 
 #endif // BSEVENTONDEACTIVATEMODIFIER_H

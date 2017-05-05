@@ -26,7 +26,7 @@ private:
     long userData;
     QString name;
     bool enable;
-    HkxObjectExpSharedPtr handle;   //Always NULL???
+    HkxSharedPtr handle;   //Always NULL???
     hkQuadVariable handlePositionOut;
     hkQuadVariable handleRotationOut;
     bool isValidOut;

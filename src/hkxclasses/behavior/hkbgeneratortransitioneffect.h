@@ -28,7 +28,7 @@ private:
     QString name;
     QString selfTransitionMode;
     QString eventMode;
-    HkxObjectExpSharedPtr transitionGenerator;  //This may preserve generators unexpectedly...
+    HkxSharedPtr transitionGenerator;  //This may preserve generators unexpectedly...
     qreal blendInDuration;
     qreal blendOutDuration;
     bool syncToGeneratorStartTime;

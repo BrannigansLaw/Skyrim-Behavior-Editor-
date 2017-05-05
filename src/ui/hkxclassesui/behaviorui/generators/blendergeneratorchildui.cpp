@@ -75,11 +75,11 @@ BlenderGeneratorChildUI::BlenderGeneratorChildUI()
     stackLyt->addWidget(table);
     stackLyt->addWidget(boneWeights);
     setLayout(stackLyt);
-    connect(boneWeights, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    connect(weight, SIGNAL(editingFinished()), this, SLOT(setWeight()));
-    connect(worldFromModelWeight, SIGNAL(editingFinished()), this, SLOT(setWorldFromModelWeight()));
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelected(int,int)));
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+    connect(boneWeights, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+    connect(weight, SIGNAL(editingFinished()), this, SLOT(setWeight()), Qt::UniqueConnection);
+    connect(worldFromModelWeight, SIGNAL(editingFinished()), this, SLOT(setWorldFromModelWeight()), Qt::UniqueConnection);
+    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
+    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
 }
 
 void BlenderGeneratorChildUI::loadData(HkxObject *data){
@@ -138,7 +138,7 @@ void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
             }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), (DataIconManager *)bsData->generator.data(), ptr, false)){
                 WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"))
             }else{
-                bsData->generator = HkxObjectExpSharedPtr(ptr);
+                bsData->generator = HkxSharedPtr(ptr);
                 behaviorView->removeGeneratorData();
                 table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
                 bsData->getParentFile()->toggleChanged(true);
@@ -161,7 +161,7 @@ bool BlenderGeneratorChildUI::setBinding(int index, int row, const QString & var
         }else if (static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxObjectExpSharedPtr(varBind);
+                bsData->variableBindingSet = HkxSharedPtr(varBind);
                 bsData->getParentFile()->addObjectToFile(varBind, -1);
             }
             if (type == VARIABLE_TYPE_POINTER){

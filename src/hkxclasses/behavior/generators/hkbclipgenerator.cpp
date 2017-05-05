@@ -170,7 +170,7 @@ bool hkbClipGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggers.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggers.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_CLIP_TRIGGER_ARRAY){
             writeToLog(getClassname()+": link()!\n'triggers' data field is linked to invalid child!\nObject Name: "+name);
@@ -183,7 +183,7 @@ bool hkbClipGenerator::link(){
 
 void hkbClipGenerator::unlink(){
     HkDynamicObject::unlink();
-    triggers = HkxObjectExpSharedPtr();
+    triggers = HkxSharedPtr();
 }
 
 bool hkbClipGenerator::evaulateDataValidity(){

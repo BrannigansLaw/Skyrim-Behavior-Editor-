@@ -24,24 +24,18 @@ private:
     hkbAttachmentModifier& operator=(const hkbAttachmentModifier&);
     hkbAttachmentModifier(const hkbAttachmentModifier &);
 private:
-    struct hkEvent{
-        hkEvent(): id(-1){}
-        int id;
-        HkxObjectExpSharedPtr payload;
-    };
-
     static uint refCount;
     static QString classname;
     long userData;
     QString name;
     bool enable;
-    hkEvent sendToAttacherOnAttach;
-    hkEvent sendToAttacheeOnAttach;
-    hkEvent sendToAttacherOnDetach;
-    hkEvent sendToAttacheeOnDetach;
-    HkxObjectExpSharedPtr attachmentSetup;
-    HkxObjectExpSharedPtr attacherHandle;
-    HkxObjectExpSharedPtr attacheeHandle;
+    hkEventPayload sendToAttacherOnAttach;
+    hkEventPayload sendToAttacheeOnAttach;
+    hkEventPayload sendToAttacherOnDetach;
+    hkEventPayload sendToAttacheeOnDetach;
+    HkxSharedPtr attachmentSetup;
+    HkxSharedPtr attacherHandle;
+    HkxSharedPtr attacheeHandle;
     int attacheeLayer;
 };
 

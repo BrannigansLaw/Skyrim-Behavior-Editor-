@@ -36,7 +36,7 @@ QString BSSynchronizedClipGenerator::getName() const{
 
 bool BSSynchronizedClipGenerator::insertObjectAt(int , DataIconManager *obj){
     if (((HkxObject *)obj)->getSignature() == HKB_CLIP_GENERATOR){
-        pClipGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        pClipGenerator = HkxSharedPtr((HkxObject *)obj);
         return true;
     }else{
         return false;
@@ -45,7 +45,7 @@ bool BSSynchronizedClipGenerator::insertObjectAt(int , DataIconManager *obj){
 
 bool BSSynchronizedClipGenerator::removeObjectAt(int index){
     if (index == 0 || index == -1){
-        pClipGenerator = HkxObjectExpSharedPtr();
+        pClipGenerator = HkxSharedPtr();
     }else{
         return false;
     }
@@ -193,7 +193,7 @@ bool BSSynchronizedClipGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pClipGenerator.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pClipGenerator.getReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pClipGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
@@ -209,7 +209,7 @@ bool BSSynchronizedClipGenerator::link(){
 
 void BSSynchronizedClipGenerator::unlink(){
     HkDynamicObject::unlink();
-    pClipGenerator = HkxObjectExpSharedPtr();
+    pClipGenerator = HkxSharedPtr();
 }
 
 bool BSSynchronizedClipGenerator::evaulateDataValidity(){

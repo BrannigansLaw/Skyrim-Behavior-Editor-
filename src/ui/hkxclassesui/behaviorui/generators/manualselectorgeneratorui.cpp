@@ -229,7 +229,7 @@ void ManualSelectorGeneratorUI::setSelectedGeneratorIndexBind(int index){
         if (behaviorView->behavior->getVariableTypeAt(index - 1) == VARIABLE_TYPE_INT32){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(behaviorView->behavior);
-                bsData->variableBindingSet = HkxObjectExpSharedPtr(varBind);
+                bsData->variableBindingSet = HkxSharedPtr(varBind);
                 behaviorView->behavior->addObjectToFile(varBind);
             }
             varBind->addBinding("selectedGeneratorIndex", index - 1);
@@ -254,7 +254,7 @@ void ManualSelectorGeneratorUI::setCurrentGeneratorIndexBind(int index){
         if (behaviorView->behavior->getVariableTypeAt(index - 1) == VARIABLE_TYPE_INT32){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(behaviorView->behavior);
-                bsData->variableBindingSet = HkxObjectExpSharedPtr(varBind);
+                bsData->variableBindingSet = HkxSharedPtr(varBind);
                 behaviorView->behavior->addObjectToFile(varBind);
             }
             varBind->addBinding("currentGeneratorIndex", index - 1);

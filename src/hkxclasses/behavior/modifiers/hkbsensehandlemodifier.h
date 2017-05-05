@@ -22,16 +22,14 @@ private:
 private:
     struct hkRanges{
         hkRanges()
-            : id(-1),
-              minDistance(0),
+            : minDistance(0),
               maxDistance(0),
               ignoreHandle(false)
         {
             //
         }
 
-        int id;
-        HkxObjectExpSharedPtr payload;
+        hkEventPayload event;
         qreal minDistance;
         qreal maxDistance;
         bool ignoreHandle;
@@ -45,8 +43,8 @@ private:
     bool enable;
     hkQuadVariable sensorLocalOffset;
     QList <hkRanges> ranges;
-    HkxObjectExpSharedPtr handleOut;
-    HkxObjectExpSharedPtr handleIn;
+    HkxSharedPtr handleOut;
+    HkxSharedPtr handleIn;
     QString localFrameName;
     QString sensorLocalFrameName;
     qreal minDistance;

@@ -118,7 +118,7 @@ bool hkbStateMachineEventPropertyArray::link(){
     if (!getParentFile()){
         return false;
     }
-    HkxObjectExpSharedPtr *ptr;
+    HkxSharedPtr *ptr;
     for (int i = 0; i < events.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(events.at(i).payload.getReference());
         if (ptr){
@@ -133,7 +133,7 @@ bool hkbStateMachineEventPropertyArray::link(){
 
 void hkbStateMachineEventPropertyArray::unlink(){
     for (int i = 0; i < events.size(); i++){
-        events[i].payload = HkxObjectExpSharedPtr();
+        events[i].payload = HkxSharedPtr();
     }
 }
 

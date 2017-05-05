@@ -40,7 +40,7 @@ private:
     QString name;
     bool enable;
     QList <hkKeyframeInfo> keyframeInfo;
-    HkxObjectExpSharedPtr keyframedBonesList;
+    HkxSharedPtr keyframedBonesList;
 };
 
 #endif // HKBKEYFRAMEBONESMODIFIER_H

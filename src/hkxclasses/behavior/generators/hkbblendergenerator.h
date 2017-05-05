@@ -45,7 +45,7 @@ private:
     int indexOfSyncMasterChild;
     QString flags;
     bool subtractLastChild;
-    QList <HkxObjectExpSharedPtr> children;
+    QList <HkxSharedPtr> children;
 };
 
 #endif // HKBBLENDERGENERATOR_H

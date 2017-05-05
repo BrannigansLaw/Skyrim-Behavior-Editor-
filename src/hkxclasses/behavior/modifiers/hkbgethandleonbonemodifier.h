@@ -25,7 +25,7 @@ private:
     long userData;
     QString name;
     bool enable;
-    HkxObjectExpSharedPtr handleOut;
+    HkxSharedPtr handleOut;
     QString localFrameName;
     int ragdollBoneIndex;
     int animationBoneIndex;

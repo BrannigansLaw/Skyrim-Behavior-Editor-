@@ -41,9 +41,9 @@ int BSModifyOnceModifier::getIndexToInsertIcon() const{
 bool BSModifyOnceModifier::insertObjectAt(int index, DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
         if (index == 1){
-            pOnDeactivateModifier = HkxObjectExpSharedPtr((HkxObject *)obj);
+            pOnDeactivateModifier = HkxSharedPtr((HkxObject *)obj);
         }else{
-            pOnDeactivateModifier = HkxObjectExpSharedPtr((HkxObject *)obj);
+            pOnDeactivateModifier = HkxSharedPtr((HkxObject *)obj);
         }
     }else{
         return false;
@@ -53,12 +53,12 @@ bool BSModifyOnceModifier::insertObjectAt(int index, DataIconManager *obj){
 
 bool BSModifyOnceModifier::removeObjectAt(int index){
     if (index == 0){
-        pOnActivateModifier = HkxObjectExpSharedPtr();
+        pOnActivateModifier = HkxSharedPtr();
     }else if (index == 1){
-        pOnDeactivateModifier = HkxObjectExpSharedPtr();
+        pOnDeactivateModifier = HkxSharedPtr();
     }else if (index == -1){
-        pOnActivateModifier = HkxObjectExpSharedPtr();
-        pOnDeactivateModifier = HkxObjectExpSharedPtr();
+        pOnActivateModifier = HkxSharedPtr();
+        pOnDeactivateModifier = HkxSharedPtr();
     }else{
         return false;
     }
@@ -182,7 +182,7 @@ bool BSModifyOnceModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(pOnActivateModifier.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(pOnActivateModifier.getReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_MODIFIER){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'pOnActivateModifier' is not a modifier!");
@@ -203,8 +203,8 @@ bool BSModifyOnceModifier::link(){
 
 void BSModifyOnceModifier::unlink(){
     HkDynamicObject::unlink();
-    pOnActivateModifier = HkxObjectExpSharedPtr();
-    pOnDeactivateModifier = HkxObjectExpSharedPtr();
+    pOnActivateModifier = HkxSharedPtr();
+    pOnDeactivateModifier = HkxSharedPtr();
 }
 
 bool BSModifyOnceModifier::evaulateDataValidity(){    //Check if event id is valid???

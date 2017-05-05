@@ -20,19 +20,13 @@ private:
     BSEventEveryNEventsModifier& operator=(const BSEventEveryNEventsModifier&);
     BSEventEveryNEventsModifier(const BSEventEveryNEventsModifier &);
 private:
-    struct hkEvent{
-        hkEvent(): id(-1){}
-        int id;
-        HkxObjectExpSharedPtr payload;
-    };
-
     static uint refCount;
     static QString classname;
     long userData;
     QString name;
     bool enable;
-    hkEvent eventToCheckFor;
-    hkEvent eventToSend;
+    hkEventPayload eventToCheckFor;
+    hkEventPayload eventToSend;
     int numberOfEventsBeforeSend;
     int minimumNumberOfEventsBeforeSend;
     bool randomizeNumberOfEvents;

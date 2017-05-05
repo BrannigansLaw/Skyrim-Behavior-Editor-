@@ -26,8 +26,7 @@ private:
     QString name;
     bool enable;
     qreal alarmTimeSeconds;
-    int id;
-    HkxObjectExpSharedPtr payload;
+    hkEventPayload alarmEvent;
 };
 
 #endif // HKBTIMERMODIFIER_H

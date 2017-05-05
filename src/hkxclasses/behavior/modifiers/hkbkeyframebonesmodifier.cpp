@@ -155,7 +155,7 @@ bool hkbKeyframeBonesModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(keyframedBonesList.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(keyframedBonesList.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_INDEX_ARRAY){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'keyframedBonesList' is not a HKB_BONE_INDEX_ARRAY!");
@@ -168,7 +168,7 @@ bool hkbKeyframeBonesModifier::link(){
 
 void hkbKeyframeBonesModifier::unlink(){
     HkDynamicObject::unlink();
-    keyframedBonesList = HkxObjectExpSharedPtr();
+    keyframedBonesList = HkxSharedPtr();
 }
 
 bool hkbKeyframeBonesModifier::evaulateDataValidity(){    //Check if bone id is valid???

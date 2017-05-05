@@ -254,7 +254,7 @@ bool hkbFootIkControlsModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr;
+    HkxSharedPtr *ptr;
     for (int i = 0; i < legs.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(legs.at(i).payload.getReference());
         if (ptr){
@@ -270,7 +270,7 @@ bool hkbFootIkControlsModifier::link(){
 void hkbFootIkControlsModifier::unlink(){
     HkDynamicObject::unlink();
     for (int i = 0; i < legs.size(); i++){
-        legs[i].payload = HkxObjectExpSharedPtr();
+        legs[i].payload = HkxSharedPtr();
     }
 }
 

@@ -41,7 +41,7 @@ int hkbBehaviorGraph::getIndexToInsertIcon() const{
 
 bool hkbBehaviorGraph::insertObjectAt(int , DataIconManager *obj){
     if (((HkxObject *)obj)->getSignature() == HKB_STATE_MACHINE){
-        rootGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        rootGenerator = HkxSharedPtr((HkxObject *)obj);
         return true;
     }else{
         return false;
@@ -50,7 +50,7 @@ bool hkbBehaviorGraph::insertObjectAt(int , DataIconManager *obj){
 
 bool hkbBehaviorGraph::removeObjectAt(int index){
     if (index == 0 || index == -1){
-        rootGenerator = HkxObjectExpSharedPtr();
+        rootGenerator = HkxSharedPtr();
     }else{
         return false;
     }
@@ -169,7 +169,7 @@ bool hkbBehaviorGraph::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(rootGenerator.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(rootGenerator.getReference());
     if (!ptr){
         writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'rootGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
@@ -196,8 +196,8 @@ bool hkbBehaviorGraph::link(){
 
 void hkbBehaviorGraph::unlink(){
     HkDynamicObject::unlink();
-    rootGenerator = HkxObjectExpSharedPtr();
-    data = HkxObjectExpSharedPtr();
+    rootGenerator = HkxSharedPtr();
+    data = HkxSharedPtr();
 }
 
 bool hkbBehaviorGraph::evaulateDataValidity(){

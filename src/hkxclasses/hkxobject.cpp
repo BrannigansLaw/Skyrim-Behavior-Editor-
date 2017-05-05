@@ -111,7 +111,7 @@ void HkxObject::setProgressData(const QString & message, int value){
     }
 }
 
-bool HkxObject::readReferences(const QByteArray &line, QList <HkxObjectExpSharedPtr> & children){
+bool HkxObject::readReferences(const QByteArray &line, QList <HkxSharedPtr> & children){
     int size = 0;
     int start;
     bool ok = false;
@@ -129,7 +129,7 @@ bool HkxObject::readReferences(const QByteArray &line, QList <HkxObjectExpShared
                 value[j] = line[start];
                 start++;
             }
-            children.append(HkxObjectExpSharedPtr(NULL, value.toLong(&ok)));
+            children.append(HkxSharedPtr(NULL, value.toLong(&ok)));
             if (!ok){
                 return false;
             }
@@ -381,27 +381,27 @@ HkxObject::~HkxObject(){
  * HkxObjectExpSharedPtr
  */
 
-HkxObjectExpSharedPtr::HkxObjectExpSharedPtr(HkxObject *obj, long ref)
+HkxSharedPtr::HkxSharedPtr(HkxObject *obj, long ref)
     :QExplicitlySharedDataPointer(obj), reference(ref)
 {
     //
 }
 
-bool HkxObjectExpSharedPtr::operator==(const HkxObjectExpSharedPtr & other) const{
+bool HkxSharedPtr::operator==(const HkxSharedPtr & other) const{
     if (data() == other.data()){
         return true;
     }
     return false;
 }
-void HkxObjectExpSharedPtr::setReference(long ref){
+void HkxSharedPtr::setReference(long ref){
     reference = ref;
 }
 
-long HkxObjectExpSharedPtr::getReference() const{
+long HkxSharedPtr::getReference() const{
     return reference;
 }
 
-bool HkxObjectExpSharedPtr::readReference(long index, const HkxXmlReader & reader){
+bool HkxSharedPtr::readReference(long index, const HkxXmlReader & reader){
     bool ok = true;
     //need to remove the '#' from the reference string
     QByteArray temp = reader.getElementValueAt(index);
@@ -445,7 +445,7 @@ bool HkDynamicObject::linkVar(){
     if (!getParentFile()){
         return false;
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variableBindingSet.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variableBindingSet.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_VARIABLE_BINDING_SET){
             getParentFile()->writeToLog("HkDynamicObject: linkVar()!\nThe linked object is not a HKB_VARIABLE_BINDING_SET!\nRemoving the link to the invalid object!");
@@ -458,7 +458,7 @@ bool HkDynamicObject::linkVar(){
 }
 
 void HkDynamicObject::unlink(){
-    variableBindingSet = HkxObjectExpSharedPtr();
+    variableBindingSet = HkxSharedPtr();
 }
 
 bool HkDynamicObject::evaulateDataValidity(){

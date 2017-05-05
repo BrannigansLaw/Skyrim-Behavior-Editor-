@@ -23,17 +23,18 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
+	void setStateId(ushort id);
     hkbStateMachine * getParentStateMachine() const;
     hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&);
     hkbStateMachineStateInfo(const hkbStateMachineStateInfo &);
 private:
-    HkxObjectExpSharedPtr parentSM;
+    HkxSharedPtr parentSM;
     static uint refCount;
     static QString classname;
-    HkxObjectExpSharedPtr enterNotifyEvents;
-    HkxObjectExpSharedPtr exitNotifyEvents;
-    HkxObjectExpSharedPtr transitions;
-    HkxObjectExpSharedPtr generator;
+    HkxSharedPtr enterNotifyEvents;
+    HkxSharedPtr exitNotifyEvents;
+    HkxSharedPtr transitions;
+    HkxSharedPtr generator;
     QString name;
     ushort stateId;
     qreal probability;

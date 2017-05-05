@@ -23,10 +23,10 @@ GenericTableWidget::GenericTableWidget(const QString & title)
     lyt->addWidget(newPB, 9, 2, 1, 2);
     lyt->addWidget(typeSelector, 9, 5, 1, 4);
     setLayout(lyt);
-    connect(selectPB, SIGNAL(released()), this, SLOT(itemSelected()));
-    connect(table, SIGNAL(cellChanged(int,int)), this, SLOT(itemSelected()));
-    connect(cancelPB, SIGNAL(released()), this, SLOT(hide()));
-    connect(newPB, SIGNAL(released()), this, SLOT(itemAdded()));
+    connect(selectPB, SIGNAL(released()), this, SLOT(itemSelected()), Qt::UniqueConnection);
+    connect(table, SIGNAL(cellChanged(int,int)), this, SLOT(itemSelected()), Qt::UniqueConnection);
+    connect(cancelPB, SIGNAL(released()), this, SLOT(hide()), Qt::UniqueConnection);
+    connect(newPB, SIGNAL(released()), this, SLOT(itemAdded()), Qt::UniqueConnection);
 }
 
 void GenericTableWidget::loadTable(const QStringList & names, const QStringList & types, const QString & firstElement){
@@ -120,11 +120,13 @@ int GenericTableWidget::getNumRows() const{
 }
 
 void GenericTableWidget::addItem(const QString & name, const QString & type){
+    table->blockSignals(true);
     int i = table->rowCount();
     table->setRowCount(table->rowCount() + 1);
     table->setItem(i, 0, new QTableWidgetItem(name));
     table->setItem(i, 1, new QTableWidgetItem(type));
     table->setCurrentCell(table->rowCount() - 1, 0);
+    table->blockSignals(false);
 }
 
 void GenericTableWidget::renameItem(int index, const QString & newname){

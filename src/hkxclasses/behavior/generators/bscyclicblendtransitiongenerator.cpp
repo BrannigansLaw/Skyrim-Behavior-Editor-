@@ -35,7 +35,7 @@ QString BSCyclicBlendTransitionGenerator::getName() const{
 
 bool BSCyclicBlendTransitionGenerator::insertObjectAt(int , DataIconManager *obj){
     if (((HkxObject *)obj)->getSignature() == HKB_BLENDER_GENERATOR){
-        pBlenderGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        pBlenderGenerator = HkxSharedPtr((HkxObject *)obj);
         return true;
     }else{
         return false;
@@ -44,7 +44,7 @@ bool BSCyclicBlendTransitionGenerator::insertObjectAt(int , DataIconManager *obj
 
 bool BSCyclicBlendTransitionGenerator::removeObjectAt(int index){
     if (index == 0 || index == -1){
-        pBlenderGenerator = HkxObjectExpSharedPtr();
+        pBlenderGenerator = HkxSharedPtr();
     }else{
         return false;
     }
@@ -102,12 +102,12 @@ bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long
             while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                 text = reader.getNthAttributeValueAt(index, 0);
                 if (text == "id"){
-                    eventToFreezeBlendValueId = reader.getElementValueAt(index).toInt(&ok);
+                    eventToFreezeBlendValue.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
                         writeToLog(getClassname()+": readData()!\nFailed to properly read 'eventToFreezeBlendValueId' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
-                    if (!eventToFreezeBlendValuePayload.readReference(index, reader)){
+                    if (!eventToFreezeBlendValue.payload.readReference(index, reader)){
                         writeToLog(getClassname()+": readData()!\nFailed to properly read 'eventToFreezeBlendValuePayload' reference!\nObject Reference: "+ref);
                     }
                     break;
@@ -119,12 +119,12 @@ bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long
             while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                 text = reader.getNthAttributeValueAt(index, 0);
                 if (text == "id"){
-                    eventToCrossBlendId = reader.getElementValueAt(index).toInt(&ok);
+                    eventToCrossBlend.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
                         writeToLog(getClassname()+": readData()!\nFailed to properly read 'eventToCrossBlendId' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
-                    if (!eventToCrossBlendPayload.readReference(index, reader)){
+                    if (!eventToCrossBlend.payload.readReference(index, reader)){
                         writeToLog(getClassname()+": readData()!\nFailed to properly read 'eventToCrossBlendPayload' reference!\nObject Reference: "+ref);
                     }
                     break;
@@ -175,9 +175,9 @@ bool BSCyclicBlendTransitionGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pBlenderGenerator"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("eventToFreezeBlendValue"), "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventToFreezeBlendValueId));
-        if (eventToFreezeBlendValuePayload.data()){
-            refString = eventToFreezeBlendValuePayload.data()->getReferenceString();
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventToFreezeBlendValue.id));
+        if (eventToFreezeBlendValue.payload.data()){
+            refString = eventToFreezeBlendValue.payload.data()->getReferenceString();
         }else{
             refString = "null";
         }
@@ -186,9 +186,9 @@ bool BSCyclicBlendTransitionGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, false);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("eventToCrossBlend"), "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventToCrossBlendId));
-        if (eventToCrossBlendPayload.data()){
-            refString = eventToCrossBlendPayload.data()->getReferenceString();
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventToCrossBlend.id));
+        if (eventToCrossBlend.payload.data()){
+            refString = eventToCrossBlend.payload.data()->getReferenceString();
         }else{
             refString = "null";
         }
@@ -207,10 +207,10 @@ bool BSCyclicBlendTransitionGenerator::write(HkxXMLWriter *writer){
         if (pBlenderGenerator.data() && !pBlenderGenerator.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'pBlenderGenerator'!!!", true);
         }
-        if (eventToFreezeBlendValuePayload.data() && !eventToFreezeBlendValuePayload.data()->write(writer)){
+        if (eventToFreezeBlendValue.payload.data() && !eventToFreezeBlendValue.payload.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'eventToFreezeBlendValuePayload'!!!", true);
         }
-        if (eventToCrossBlendPayload.data() && !eventToCrossBlendPayload.data()->write(writer)){
+        if (eventToCrossBlend.payload.data() && !eventToCrossBlend.payload.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'eventToCrossBlendPayload'!!!", true);
         }
     }
@@ -224,7 +224,7 @@ bool BSCyclicBlendTransitionGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pBlenderGenerator.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pBlenderGenerator.getReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pBlenderGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
@@ -235,22 +235,38 @@ bool BSCyclicBlendTransitionGenerator::link(){
     }else{
         pBlenderGenerator = *ptr;
     }
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToFreezeBlendValue.payload.getReference());
+    if (ptr){
+        if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+            writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            setDataValidity(false);
+        }
+        eventToFreezeBlendValue.payload = *ptr;
+    }
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToCrossBlend.payload.getReference());
+    if (ptr){
+        if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+            writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            setDataValidity(false);
+        }
+        eventToCrossBlend.payload = *ptr;
+    }
     return true;
 }
 
 void BSCyclicBlendTransitionGenerator::unlink(){
     HkDynamicObject::unlink();
-    pBlenderGenerator = HkxObjectExpSharedPtr();
-    eventToFreezeBlendValuePayload = HkxObjectExpSharedPtr();
-    eventToCrossBlendPayload = HkxObjectExpSharedPtr();
+    pBlenderGenerator = HkxSharedPtr();
+    eventToFreezeBlendValue.payload = HkxSharedPtr();
+    eventToCrossBlend.payload = HkxSharedPtr();
 }
 
 bool BSCyclicBlendTransitionGenerator::evaulateDataValidity(){
     if (!HkDynamicObject::evaulateDataValidity()){
         return false;
     }else if (!pBlenderGenerator.data() || pBlenderGenerator.data()->getSignature() != HKB_BLENDER_GENERATOR){
-    }else if (eventToFreezeBlendValuePayload.data() && eventToFreezeBlendValuePayload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-    }else if (eventToCrossBlendPayload.data() && eventToCrossBlendPayload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+    }else if (eventToFreezeBlendValue.payload.data() && eventToFreezeBlendValue.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+    }else if (eventToCrossBlend.payload.data() && eventToCrossBlend.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
     }else if (!BlendCurve.contains(eBlendCurve)){
     }else if (name == ""){
     }else{

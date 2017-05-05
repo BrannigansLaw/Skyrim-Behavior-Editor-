@@ -31,12 +31,12 @@ private:
     qreal damping;
     qreal proportionalRecoveryVelocity;
     qreal constantRecoveryVelocity;
-    HkxObjectExpSharedPtr bones;
+    HkxSharedPtr bones;
     int poseMatchingBone0;
     int poseMatchingBone1;
     int poseMatchingBone2;
     QString mode;
-    HkxObjectExpSharedPtr boneWeights;
+    HkxSharedPtr boneWeights;
 };
 
 #endif // HKBPOWEREDRAGDOLLCONTROLSMODIFIER_H

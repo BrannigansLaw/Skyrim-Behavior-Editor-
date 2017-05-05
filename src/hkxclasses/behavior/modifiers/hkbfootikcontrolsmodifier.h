@@ -64,7 +64,7 @@ private:
 
         hkQuadVariable groundPosition;
         int id;
-        HkxObjectExpSharedPtr payload;
+        HkxSharedPtr payload;
         qreal verticalError;
         bool hitSomething;
         bool isPlantedMS;

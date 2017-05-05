@@ -22,8 +22,8 @@ private:
 private:
     static uint refCount;
     static QString classname;
-    HkxObjectExpSharedPtr pGenerator;
-    HkxObjectExpSharedPtr spBoneWeight;
+    HkxSharedPtr pGenerator;
+    HkxSharedPtr spBoneWeight;
 };
 
 #endif // BSBONESWITCHGENERATORBONEDATA_H

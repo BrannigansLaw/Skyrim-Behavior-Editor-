@@ -146,7 +146,7 @@ bool BSIStateManagerModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr;
+    HkxSharedPtr *ptr;
     for (int i = 0; i < stateData.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(stateData.at(i).pStateMachine.data()->getReference());
         if (!ptr){
@@ -166,7 +166,7 @@ bool BSIStateManagerModifier::link(){
 void BSIStateManagerModifier::unlink(){
     HkDynamicObject::unlink();
     for (int i = 0; i < stateData.size(); i++){
-        stateData[i].pStateMachine = HkxObjectExpSharedPtr();
+        stateData[i].pStateMachine = HkxSharedPtr();
     }
 }
 

@@ -20,7 +20,6 @@ private:
     {
         HkTrigger()
             : localTime(0),
-              id(-1),
               relativeToEndOfClip(false),
               acyclic(false),
               isAnnotation(false)
@@ -28,8 +27,7 @@ private:
             //
         }
         qreal localTime;
-        int id;
-        HkxObjectExpSharedPtr payload;
+        hkEventPayload event;
         bool relativeToEndOfClip;
         bool acyclic;
         bool isAnnotation;

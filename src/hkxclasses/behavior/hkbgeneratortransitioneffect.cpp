@@ -136,7 +136,7 @@ bool hkbGeneratorTransitionEffect::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+":  link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(transitionGenerator.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(transitionGenerator.getReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_GENERATOR){
             writeToLog(getClassname()+": linkVar()!\nThe linked object is not a TYPE_GENERATOR!");
@@ -149,7 +149,7 @@ bool hkbGeneratorTransitionEffect::link(){
 
 void hkbGeneratorTransitionEffect::unlink(){
     HkDynamicObject::unlink();
-    transitionGenerator = HkxObjectExpSharedPtr();
+    transitionGenerator = HkxSharedPtr();
 }
 
 bool hkbGeneratorTransitionEffect::evaulateDataValidity(){

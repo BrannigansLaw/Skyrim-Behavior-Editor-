@@ -38,9 +38,9 @@ int hkbModifierGenerator::getIndexToInsertIcon(HkxObject *child) const{
 
 bool hkbModifierGenerator::insertObjectAt(int , DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
-        modifier = HkxObjectExpSharedPtr((HkxObject *)obj);
+        modifier = HkxSharedPtr((HkxObject *)obj);
     }else if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
-        generator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        generator = HkxSharedPtr((HkxObject *)obj);
     }else{
         return false;
     }
@@ -49,12 +49,12 @@ bool hkbModifierGenerator::insertObjectAt(int , DataIconManager *obj){
 
 bool hkbModifierGenerator::removeObjectAt(int index){
     if (index == 0){
-        modifier = HkxObjectExpSharedPtr();
+        modifier = HkxSharedPtr();
     }else if (index == 1){
-        generator = HkxObjectExpSharedPtr();
+        generator = HkxSharedPtr();
     }else if (index == -1){
-        modifier = HkxObjectExpSharedPtr();
-        generator = HkxObjectExpSharedPtr();
+        modifier = HkxSharedPtr();
+        generator = HkxSharedPtr();
     }else{
         return false;
     }
@@ -171,7 +171,7 @@ bool hkbModifierGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr;
+    HkxSharedPtr *ptr;
     ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifier.getReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_MODIFIER){
@@ -196,8 +196,8 @@ bool hkbModifierGenerator::link(){
 
 void hkbModifierGenerator::unlink(){
     HkDynamicObject::unlink();
-    modifier = HkxObjectExpSharedPtr();
-    generator = HkxObjectExpSharedPtr();
+    modifier = HkxSharedPtr();
+    generator = HkxSharedPtr();
 }
 
 bool hkbModifierGenerator::evaulateDataValidity(){

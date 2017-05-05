@@ -327,7 +327,7 @@ bool BSLookAtModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(payload.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(payload.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
@@ -339,7 +339,7 @@ bool BSLookAtModifier::link(){
 
 void BSLookAtModifier::unlink(){
     HkDynamicObject::unlink();
-    payload = HkxObjectExpSharedPtr();
+    payload = HkxSharedPtr();
 }
 
 bool BSLookAtModifier::evaulateDataValidity(){  //Check for valid bone indices???

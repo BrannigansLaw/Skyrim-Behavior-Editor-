@@ -310,7 +310,7 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             blenderGeneratorUI->setCurrentIndex(BlenderGeneratorUI::MAIN_WIDGET);
             stack->setCurrentIndex(BLENDER_GENERATOR);
             blenderGeneratorUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
-            connect(variablesTable, SIGNAL(elementSelected(int,QString)), blenderGeneratorUI, SLOT(setBindingVariable(int,QString)));
+            connect(variablesTable, SIGNAL(elementSelected(int,QString)), blenderGeneratorUI, SLOT(setBindingVariable(int,QString)), Qt::UniqueConnection);
             break;
         case BS_I_STATE_TAGGING_GENERATOR:
             if (loadedData != oldData){
@@ -337,7 +337,7 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             stateMachineUI->setCurrentIndex(StateMachineUI::MAIN_WIDGET);
             stack->setCurrentIndex(STATE_MACHINE);
             stateMachineUI->connectChildUI(variablesTable, characterPropertiesTable, generatorsTable);
-            connect(eventsTable, SIGNAL(elementSelected(int,QString)), stateMachineUI, SLOT(setBindingVariable(int,QString)));
+            connect(eventsTable, SIGNAL(elementSelected(int,QString)), stateMachineUI, SLOT(setBindingVariable(int,QString)), Qt::UniqueConnection);
             break;
         default:
             stack->setCurrentIndex(NO_DATA_SELECTED);

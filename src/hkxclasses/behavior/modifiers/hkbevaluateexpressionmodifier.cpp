@@ -106,7 +106,7 @@ bool hkbEvaluateExpressionModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(expressions.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(expressions.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_EXPRESSION_DATA_ARRAY){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'expressions' is not a HKB_EXPRESSION_DATA_ARRAY!");
@@ -119,7 +119,7 @@ bool hkbEvaluateExpressionModifier::link(){
 
 void hkbEvaluateExpressionModifier::unlink(){
     HkDynamicObject::unlink();
-    expressions = HkxObjectExpSharedPtr();
+    expressions = HkxSharedPtr();
 }
 
 bool hkbEvaluateExpressionModifier::evaulateDataValidity(){

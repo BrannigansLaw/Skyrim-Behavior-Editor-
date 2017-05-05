@@ -29,7 +29,7 @@ void hkbEventRangeDataArray::addEventData(const hkbEventRangeData & data){
 
 void hkbEventRangeDataArray::setEventDataId(int index, int id){
     if (eventData.size() > index){
-        eventData[index].id = id;
+        eventData[index].event.id = id;
     }
 }
 
@@ -63,12 +63,12 @@ bool hkbEventRangeDataArray::readData(const HkxXmlReader &reader, long index){
                             return false;
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "id"){
-                        eventData.last().id = reader.getElementValueAt(index).toInt(&ok);
+                        eventData.last().event.id = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
                             return false;
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "payload"){
-                        if (!eventData.last().payload.readReference(index, reader)){
+                        if (!eventData.last().event.payload.readReference(index, reader)){
                             return false;
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "eventMode"){
@@ -106,8 +106,8 @@ bool hkbEventRangeDataArray::write(HkxXMLWriter *writer){
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("upperBound"), QString::number(eventData.at(i).upperBound));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("event"), "");
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventData.at(i).id));
-            if (eventData.at(i).payload.data()){
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventData.at(i).event.id));
+            if (eventData.at(i).event.payload.data()){
                 refString = eventData.at(i).payload.data()->getReferenceString();
             }else{
                 refString = "null";
@@ -125,7 +125,7 @@ bool hkbEventRangeDataArray::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         for (int i = 0; i < eventData.size(); i++){
-            if (eventData.at(i).payload.data() && !eventData.at(i).payload.data()->write(writer)){
+            if (eventData.at(i).event.payload.data() && !eventData.at(i).event.payload.data()->write(writer)){
                 getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!", true);
             }
         }
@@ -137,14 +137,14 @@ bool hkbEventRangeDataArray::link(){
     if (!getParentFile()){
         return false;
     }
-    HkxObjectExpSharedPtr *ptr;
+    HkxSharedPtr *ptr;
     for (int i = 0; i < eventData.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventData.at(i).payload.getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventData.at(i).event.payload.getReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 return false;
             }
-            eventData[i].payload = *ptr;
+            eventData[i].event.payload = *ptr;
         }
     }
     return true;
@@ -152,7 +152,7 @@ bool hkbEventRangeDataArray::link(){
 
 bool hkbEventRangeDataArray::evaulateDataValidity(){
     for (int i = 0; i < eventData.size(); i++){
-        if (eventData.at(i).payload.data() && eventData.at(i).payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+        if (eventData.at(i).event.payload.data() && eventData.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             setDataValidity(false);
             return false;
         }

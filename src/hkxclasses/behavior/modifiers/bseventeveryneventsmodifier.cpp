@@ -169,7 +169,7 @@ bool BSEventEveryNEventsModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToCheckFor.payload.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToCheckFor.payload.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
@@ -190,8 +190,8 @@ bool BSEventEveryNEventsModifier::link(){
 
 void BSEventEveryNEventsModifier::unlink(){
     HkDynamicObject::unlink();
-    eventToCheckFor.payload = HkxObjectExpSharedPtr();
-    eventToSend.payload = HkxObjectExpSharedPtr();
+    eventToCheckFor.payload = HkxSharedPtr();
+    eventToSend.payload = HkxSharedPtr();
 }
 
 bool BSEventEveryNEventsModifier::evaulateDataValidity(){    //Check if event id is valid???

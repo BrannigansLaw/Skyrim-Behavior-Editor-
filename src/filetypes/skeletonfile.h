@@ -21,11 +21,11 @@ protected:
     bool parse();
     bool link();
 private:
-    HkxObjectExpSharedPtr * findSkeleton(long ref);
-    HkxObjectExpSharedPtr * findLocalFrame(long ref);
+    HkxSharedPtr * findSkeleton(long ref);
+    HkxSharedPtr * findLocalFrame(long ref);
 private:
-    QList <HkxObjectExpSharedPtr> skeletons;
-    QList <HkxObjectExpSharedPtr> localFrames;
+    QList <HkxSharedPtr> skeletons;
+    QList <HkxSharedPtr> localFrames;
     long largestRef;
 };
 

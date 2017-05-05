@@ -79,12 +79,12 @@ bool hkbSenseHandleModifier::readData(const HkxXmlReader &reader, long index){
                 ranges.append(hkRanges());
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                     if (text == "id"){
-                        ranges.last().id = reader.getElementValueAt(index).toDouble(&ok);
+                        ranges.last().event.id = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "payload"){
-                        if (!ranges.last().payload.readReference(index, reader)){
+                        if (!ranges.last().event.payload.readReference(index, reader)){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                         }
                     }else if (text == "minDistance"){
@@ -198,14 +198,15 @@ bool hkbSenseHandleModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensorLocalOffset"), sensorLocalOffset.getValueAsString());list1 = {writer->name, writer->numelements};
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensorLocalOffset"), sensorLocalOffset.getValueAsString());
+        list1 = {writer->name, writer->numelements};
         list2 = {"ranges", QString::number(ranges.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < ranges.size(); i++){
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(ranges.at(i).id));
-            if (ranges.at(i).payload.data()){
-                refString = ranges.at(i).payload.data()->getReferenceString();
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(ranges.at(i).event.id));
+            if (ranges.at(i).event.payload.data()){
+                refString = ranges.at(i).event.payload.data()->getReferenceString();
             }else{
                 refString = "null";
             }
@@ -249,7 +250,7 @@ bool hkbSenseHandleModifier::write(HkxXMLWriter *writer){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
         }
         for (int i = 0; i < ranges.size(); i++){
-            if (ranges.at(i).payload.data() && !ranges.at(i).payload.data()->write(writer)){
+            if (ranges.at(i).event.payload.data() && !ranges.at(i).event.payload.data()->write(writer)){
                 getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!", true);
             }
         }
@@ -264,14 +265,14 @@ bool hkbSenseHandleModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr;
+    HkxSharedPtr *ptr;
     for (int i = 0; i < ranges.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(ranges.at(i).payload.getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(ranges.at(i).event.payload.getReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 return false;
             }
-            ranges[i].payload = *ptr;
+            ranges[i].event.payload = *ptr;
         }
     }
     return true;
@@ -280,11 +281,17 @@ bool hkbSenseHandleModifier::link(){
 void hkbSenseHandleModifier::unlink(){
     HkDynamicObject::unlink();
     for (int i = 0; i < ranges.size(); i++){
-        ranges[i].payload = HkxObjectExpSharedPtr();
+        ranges[i].event.payload = HkxSharedPtr();
     }
 }
 
 bool hkbSenseHandleModifier::evaulateDataValidity(){  //Check for valid event id???
+    for (int i = 0; i < ranges.size(); i++){
+        if (ranges.at(i).event.payload.data() && ranges.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+            setDataValidity(false);
+            return false;
+        }
+    }
     if (!HkDynamicObject::evaulateDataValidity()){
         return false;
     }else if (name == ""){

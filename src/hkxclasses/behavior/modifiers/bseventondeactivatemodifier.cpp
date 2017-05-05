@@ -13,8 +13,7 @@ QString BSEventOnDeactivateModifier::classname = "BSEventOnDeactivateModifier";
 BSEventOnDeactivateModifier::BSEventOnDeactivateModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
       userData(0),
-      enable(true),
-      id(-1)
+      enable(true)
 {
     setType(HKB_EVENT_DRIVEN_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
@@ -56,12 +55,12 @@ bool BSEventOnDeactivateModifier::readData(const HkxXmlReader &reader, long inde
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "id"){
-            id = reader.getElementValueAt(index).toInt(&ok);
+            event.id = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
             }
         }else if (text == "payload"){
-            if (!payload.readReference(index, reader)){
+            if (!event.payload.readReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
             }
         }
@@ -88,9 +87,9 @@ bool BSEventOnDeactivateModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("event"), "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(id));
-        if (payload.data()){
-            refString = payload.data()->getReferenceString();
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(event.id));
+        if (event.payload.data()){
+            refString = event.payload.data()->getReferenceString();
         }else{
             refString = "null";
         }
@@ -103,7 +102,7 @@ bool BSEventOnDeactivateModifier::write(HkxXMLWriter *writer){
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
         }
-        if (payload.data() && !payload.data()->write(writer)){
+        if (event.payload.data() && !event.payload.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload'!!!", true);
         }
     }
@@ -117,27 +116,27 @@ bool BSEventOnDeactivateModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(payload.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(event.payload.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
-        payload = *ptr;
+        event.payload = *ptr;
     }
     return true;
 }
 
 void BSEventOnDeactivateModifier::unlink(){
     HkDynamicObject::unlink();
-    payload = HkxObjectExpSharedPtr();
+    event.payload = HkxSharedPtr();
 }
 
 bool BSEventOnDeactivateModifier::evaulateDataValidity(){    //Check if event id is valid???
     if (!HkDynamicObject::evaulateDataValidity()){
         return false;
     }else if (name == ""){
-    }else if (payload.data() && payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+    }else if (event.payload.data() && event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
     }else{
         setDataValidity(true);
         return true;

@@ -28,8 +28,7 @@ private:
     hkQuadVariable targetPosition;
     qreal radius;
     hkQuadVariable movementDirection;
-    int id;
-    HkxObjectExpSharedPtr payload;
+    hkEventPayload triggerEvent;
 };
 
 #endif // BSPASSBYTARGETTRIGGERMODIFIER_H

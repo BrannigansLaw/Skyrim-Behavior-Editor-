@@ -60,7 +60,7 @@ private:
         qreal capsuleHeight;
         qreal capsuleRadius;
         int collisionFilterInfo;
-        HkxObjectExpSharedPtr characterControllerCinfo;
+        HkxSharedPtr characterControllerCinfo;
     };
 
     static uint refCount;
@@ -71,11 +71,11 @@ private:
     hkQuadVariable modelRightMS;
     QVector <hkVariableInfo> characterPropertyInfos;
     QVector <int> numBonesPerLod;
-    HkxObjectExpSharedPtr characterPropertyValues;
-    HkxObjectExpSharedPtr footIkDriverInfo;
-    HkxObjectExpSharedPtr handIkDriverInfo;
-    HkxObjectExpSharedPtr stringData;
-    HkxObjectExpSharedPtr mirroredSkeletonInfo;
+    HkxSharedPtr characterPropertyValues;
+    HkxSharedPtr footIkDriverInfo;
+    HkxSharedPtr handIkDriverInfo;
+    HkxSharedPtr stringData;
+    HkxSharedPtr mirroredSkeletonInfo;
     qreal scale;
 };
 

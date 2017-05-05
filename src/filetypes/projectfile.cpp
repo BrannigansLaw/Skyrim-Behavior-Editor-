@@ -25,14 +25,14 @@ QString ProjectFile::getCharacterFilePathAt(int index) const{
     return static_cast<hkbProjectStringData *>(stringData.data())->getCharacterFilePathAt(index);
 }
 
-HkxObjectExpSharedPtr * ProjectFile::findProjectData(long ref){
+HkxSharedPtr * ProjectFile::findProjectData(long ref){
     if (projectData.getReference() == ref){
         return &projectData;
     }
     return NULL;
 }
 
-HkxObjectExpSharedPtr * ProjectFile::findProjectStringData(long ref){
+HkxSharedPtr * ProjectFile::findProjectStringData(long ref){
     if (stringData.getReference() == ref){
         return &stringData;
     }
@@ -47,11 +47,11 @@ bool ProjectFile::addObjectToFile(HkxObject *obj, long ref){
     }
     obj->setReference(largestRef);
     if (obj->getSignature() == HKB_PROJECT_DATA){
-        projectData = HkxObjectExpSharedPtr(obj, ref);
+        projectData = HkxSharedPtr(obj, ref);
     }else if (obj->getSignature() == HKB_PROJECT_STRING_DATA){
-        stringData = HkxObjectExpSharedPtr(obj, ref);
+        stringData = HkxSharedPtr(obj, ref);
     }else if (obj->getSignature() == HK_ROOT_LEVEL_CONTAINER){
-        setRootObject(HkxObjectExpSharedPtr(obj, ref));
+        setRootObject(HkxSharedPtr(obj, ref));
     }else{
         writeToLog("ProjectFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16), true);
         return false;

@@ -79,7 +79,7 @@ bool hkbProjectData::link(){
     if (!getParentFile()){
         return false;
     }
-    HkxObjectExpSharedPtr *ptr;
+    HkxSharedPtr *ptr;
     ProjectFile *file = dynamic_cast<ProjectFile *>(getParentFile());
     if (file){
         ptr = file->findProjectStringData(stringData.getReference());
@@ -101,7 +101,7 @@ bool hkbProjectData::link(){
 }
 
 void hkbProjectData::unlink(){
-    stringData = HkxObjectExpSharedPtr();
+    stringData = HkxSharedPtr();
 }
 
 bool hkbProjectData::evaulateDataValidity(){

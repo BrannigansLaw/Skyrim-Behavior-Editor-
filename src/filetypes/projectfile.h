@@ -23,12 +23,12 @@ protected:
     bool parse();
     bool link();
 private:
-    HkxObjectExpSharedPtr * findProjectData(long ref);
-    HkxObjectExpSharedPtr * findProjectStringData(long ref);
+    HkxSharedPtr * findProjectData(long ref);
+    HkxSharedPtr * findProjectStringData(long ref);
 private:
     CharacterFile *character;
-    HkxObjectExpSharedPtr stringData;
-    HkxObjectExpSharedPtr projectData;
+    HkxSharedPtr stringData;
+    HkxSharedPtr projectData;
     long largestRef;
 };
 

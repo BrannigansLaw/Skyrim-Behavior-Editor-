@@ -28,7 +28,7 @@ private:
     static QString classname;
     QVector <int> wordVariableValues;
     QVector <hkQuadVariable> quadVariableValues;
-    QList <HkxObjectExpSharedPtr> variantVariableValues;
+    QList <HkxSharedPtr> variantVariableValues;
 };
 
 #endif // HKBVARIABLEVALUESET_H

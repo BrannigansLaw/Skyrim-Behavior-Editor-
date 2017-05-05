@@ -7,7 +7,7 @@
 
 class HkxFile;
 class HkxXmlReader;
-class HkxObjectExpSharedPtr;
+class HkxSharedPtr;
 class HkxXMLWriter;
 class TreeGraphicsItem;
 class hkbGenerator;
@@ -50,7 +50,7 @@ protected:
     void setDataValidity(bool isValid);
     void setType(HkxSignature sig, HkxType type);
     bool readMultipleVector4(const QByteArray &lineIn,  QVector <hkQuadVariable> & vectors);
-    bool readReferences(const QByteArray &line, QList <HkxObjectExpSharedPtr> & children);
+    bool readReferences(const QByteArray &line, QList <HkxSharedPtr> & children);
     bool readIntegers(const QByteArray &line, QVector<int> & ints);
     bool toBool(const QByteArray &line, bool *ok);
     bool readDoubles(const QByteArray &line, QVector<qreal> & doubles);
@@ -72,16 +72,22 @@ private:
     bool isWritten;
 };
 
-class HkxObjectExpSharedPtr: public QExplicitlySharedDataPointer <HkxObject>
+class HkxSharedPtr: public QExplicitlySharedDataPointer <HkxObject>
 {
 public:
-    HkxObjectExpSharedPtr(HkxObject *obj = NULL, long ref = -1);
-    bool operator==(const HkxObjectExpSharedPtr & other) const;
+    HkxSharedPtr(HkxObject *obj = NULL, long ref = -1);
+    bool operator==(const HkxSharedPtr & other) const;
     void setReference(long ref);
     long getReference() const;
     bool readReference(long index, const HkxXmlReader & reader);
 private:
     long reference;
+};
+
+struct hkEventPayload{
+    hkEventPayload(): id(-1){}
+    int id;
+    HkxSharedPtr payload;
 };
 
 class HkDynamicObject: public HkxObject
@@ -97,7 +103,7 @@ public:
 protected:
     HkDynamicObject(HkxFile *parent, long ref = -1);
 protected:
-    HkxObjectExpSharedPtr variableBindingSet;
+    HkxSharedPtr variableBindingSet;
 private:
     HkDynamicObject& operator=(const HkDynamicObject&);
     HkDynamicObject(const HkDynamicObject &);

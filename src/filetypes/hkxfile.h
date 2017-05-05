@@ -26,14 +26,14 @@ public:
     bool getIsChanged() const;
     void toggleChanged(bool wasEdited);
 protected:
-    HkxObjectExpSharedPtr & getRootObject();
+    HkxSharedPtr & getRootObject();
     virtual bool parse();
     virtual bool link();
-    void setRootObject(HkxObjectExpSharedPtr & obj);
+    void setRootObject(HkxSharedPtr & obj);
     bool appendAndReadData(int index, HkxObject * obj);
     HkxXmlReader & getReader();
     HkxXMLWriter & getWriter();
-    HkxObjectExpSharedPtr rootObject;
+    HkxSharedPtr rootObject;
 private:
     MainWindow *ui;
     HkxXmlReader reader;

@@ -28,7 +28,7 @@ private:
             //
         }
 
-        HkxObjectExpSharedPtr pStateMachine;    //This may preserve state machines unexpectedly...
+        HkxSharedPtr pStateMachine;    //This may preserve state machines unexpectedly...
         int stateID;
         int iStateToSetAs;
     };

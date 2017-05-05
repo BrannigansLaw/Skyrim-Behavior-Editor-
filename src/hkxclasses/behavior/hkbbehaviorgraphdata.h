@@ -63,8 +63,8 @@ private:
     QStringList eventInfos;
     QVector <int> wordMinVariableValues;
     QVector <int> wordMaxVariableValues;
-    HkxObjectExpSharedPtr variableInitialValues;
-    HkxObjectExpSharedPtr stringData;
+    HkxSharedPtr variableInitialValues;
+    HkxSharedPtr stringData;
 };
 
 #endif // HKBBEHAVIORGRAPHDATA_H

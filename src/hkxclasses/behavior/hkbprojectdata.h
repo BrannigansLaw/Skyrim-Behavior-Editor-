@@ -24,7 +24,7 @@ private:
     static uint refCount;
     static QString classname;
     hkQuadVariable worldUpWS;
-    HkxObjectExpSharedPtr stringData;
+    HkxSharedPtr stringData;
     QString defaultEventMode;
 };
 

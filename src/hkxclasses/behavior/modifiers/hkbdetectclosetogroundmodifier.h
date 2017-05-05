@@ -25,8 +25,7 @@ private:
     long userData;
     QString name;
     bool enable;
-    int id;
-    HkxObjectExpSharedPtr payload;
+    hkEventPayload closeToGroundEvent;
     qreal closeToGroundHeight;
     qreal raycastDistanceDown;
     int collisionFilterInfo;

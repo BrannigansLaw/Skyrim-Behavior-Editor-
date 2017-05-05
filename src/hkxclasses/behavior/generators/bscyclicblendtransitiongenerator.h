@@ -30,11 +30,9 @@ private:
     static QString classname;
     ulong userData;
     QString name;
-    HkxObjectExpSharedPtr pBlenderGenerator;
-    int eventToFreezeBlendValueId;
-    HkxObjectExpSharedPtr eventToFreezeBlendValuePayload;
-    int eventToCrossBlendId;
-    HkxObjectExpSharedPtr eventToCrossBlendPayload;
+    HkxSharedPtr pBlenderGenerator;
+    hkEventPayload eventToFreezeBlendValue;
+    hkEventPayload eventToCrossBlend;
     qreal fBlendParameter;
     qreal fTransitionDuration;
     QString eBlendCurve;

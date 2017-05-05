@@ -269,7 +269,7 @@ bool hkbStateMachineTransitionInfoArray::link(){
     if (!getParentFile()){
         return false;
     }
-    HkxObjectExpSharedPtr *ptr;
+    HkxSharedPtr *ptr;
     for (int i = 0; i < transitions.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(transitions.at(i).transition.getReference());
         if (ptr){

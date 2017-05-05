@@ -41,9 +41,9 @@ int hkbModifierList::getIndexToInsertIcon() const{
 bool hkbModifierList::insertObjectAt(int index, DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
         if (index >= modifiers.size() || index == -1){
-            modifiers.append(HkxObjectExpSharedPtr((HkxObject *)obj));
+            modifiers.append(HkxSharedPtr((HkxObject *)obj));
         }else if (index > -1){
-            modifiers[index] = HkxObjectExpSharedPtr((HkxObject *)obj);
+            modifiers[index] = HkxSharedPtr((HkxObject *)obj);
         }else{
             return false;
         }
@@ -179,7 +179,7 @@ bool hkbModifierList::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr;
+    HkxSharedPtr *ptr;
     for (int i = 0; i < modifiers.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifiers.at(i).getReference());
         if (!ptr){
@@ -199,7 +199,7 @@ bool hkbModifierList::link(){
 void hkbModifierList::unlink(){
     HkDynamicObject::unlink();
     for (int i = 0; i < modifiers.size(); i++){
-        modifiers[i] = HkxObjectExpSharedPtr();
+        modifiers[i] = HkxSharedPtr();
     }
 }
 

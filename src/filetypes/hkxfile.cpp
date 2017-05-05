@@ -28,7 +28,7 @@ void HkxFile::toggleChanged(bool wasEdited){
     changed = wasEdited;
 }
 
-HkxObjectExpSharedPtr & HkxFile::getRootObject(){
+HkxSharedPtr & HkxFile::getRootObject(){
     return rootObject;
 }
 
@@ -40,7 +40,7 @@ bool HkxFile::link(){
     return true;
 }
 
-void HkxFile::setRootObject(HkxObjectExpSharedPtr & obj){
+void HkxFile::setRootObject(HkxSharedPtr & obj){
     rootObject = obj;
 }
 

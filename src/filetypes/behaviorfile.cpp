@@ -161,14 +161,14 @@ bool BehaviorFile::addObjectToFile(HkxObject *obj, long ref){
             obj->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA
            )
         {
-            generatorChildren.append(HkxObjectExpSharedPtr(obj, ref));
+            generatorChildren.append(HkxSharedPtr(obj, ref));
         }else{
-            generators.append(HkxObjectExpSharedPtr(obj, ref));
+            generators.append(HkxSharedPtr(obj, ref));
         }
     }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
-        modifiers.append(HkxObjectExpSharedPtr(obj, ref));
+        modifiers.append(HkxSharedPtr(obj, ref));
     }else if (obj->getType() == HkxObject::TYPE_OTHER){
-        otherTypes.append(HkxObjectExpSharedPtr(obj, ref));
+        otherTypes.append(HkxSharedPtr(obj, ref));
     }else{
         writeToLog("BehaviorFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16), true);
         return false;
@@ -645,7 +645,7 @@ void BehaviorFile::write(){
     getWriter().writeToXMLFile();
 }
 
-HkxObjectExpSharedPtr * BehaviorFile::findGenerator(long ref){
+HkxSharedPtr * BehaviorFile::findGenerator(long ref){
     if (ref < 0){
         return NULL;
     }
@@ -657,7 +657,7 @@ HkxObjectExpSharedPtr * BehaviorFile::findGenerator(long ref){
     return NULL;
 }
 
-HkxObjectExpSharedPtr * BehaviorFile::findGeneratorChild(long ref){
+HkxSharedPtr * BehaviorFile::findGeneratorChild(long ref){
     if (ref < 0){
         return NULL;
     }
@@ -669,7 +669,7 @@ HkxObjectExpSharedPtr * BehaviorFile::findGeneratorChild(long ref){
     return NULL;
 }
 
-HkxObjectExpSharedPtr * BehaviorFile::findModifier(long ref){
+HkxSharedPtr * BehaviorFile::findModifier(long ref){
     if (ref < 0){
         return NULL;
     }
@@ -681,7 +681,7 @@ HkxObjectExpSharedPtr * BehaviorFile::findModifier(long ref){
     return NULL;
 }
 
-HkxObjectExpSharedPtr * BehaviorFile::findHkxObject(long ref){
+HkxSharedPtr * BehaviorFile::findHkxObject(long ref){
     if (ref < 0){
         return NULL;
     }
@@ -726,7 +726,7 @@ void BehaviorFile::removeBindings(int varIndex){
     }
 }
 
-HkxObjectExpSharedPtr * BehaviorFile::findBehaviorGraph(long ref){
+HkxSharedPtr * BehaviorFile::findBehaviorGraph(long ref){
     if (behaviorGraph.getReference() == ref){
         return &behaviorGraph;
     }
@@ -846,11 +846,11 @@ HkxObject * BehaviorFile::getBehaviorGraphData() const{
     return graphData.data();
 }
 
-int BehaviorFile::getIndexOfGenerator(const HkxObjectExpSharedPtr & obj) const{
+int BehaviorFile::getIndexOfGenerator(const HkxSharedPtr & obj) const{
     return generators.indexOf(obj);
 }
 
-bool BehaviorFile::setGeneratorData(HkxObjectExpSharedPtr & ptrToSet, int index){
+bool BehaviorFile::setGeneratorData(HkxSharedPtr & ptrToSet, int index){
     if (index >= 0 && index < generators.size()){
         ptrToSet = generators.at(index);
         return true;
@@ -865,11 +865,11 @@ hkbGenerator *BehaviorFile::getGeneratorDataAt(int index){
     return NULL;
 }
 
-int BehaviorFile::getIndexOfModifier(const HkxObjectExpSharedPtr & obj) const{
+int BehaviorFile::getIndexOfModifier(const HkxSharedPtr & obj) const{
     return modifiers.indexOf(obj);
 }
 
-bool BehaviorFile::setModifierData(HkxObjectExpSharedPtr & ptrToSet, int index){
+bool BehaviorFile::setModifierData(HkxSharedPtr & ptrToSet, int index){
     if (index >= 0 && index < modifiers.size()){
         ptrToSet = modifiers.at(index);
         return true;
@@ -907,5 +907,5 @@ QStringList BehaviorFile::getEventNames() const{
 }
 
 BehaviorFile::~BehaviorFile(){
-    //((hkRootLevelContainer *)(rootObject.data()))->disconnect();
+    //
 }

@@ -97,18 +97,12 @@ bool hkRootLevelContainer::write(HkxXMLWriter *writer){
     return true;
 }
 
-void hkRootLevelContainer::disconnect(){
-    for (int i = 0; i < namedVariants.size(); i++){
-        namedVariants.at(i).variant.~HkxObjectExpSharedPtr();
-    }
-}
-
 bool hkRootLevelContainer::link(){
     if (!getParentFile()){
         return false;
     }
     for (int i = 0; i < namedVariants.size(); i++){//This is awful, I know. I'll sort it out later...
-        HkxObjectExpSharedPtr *ptr = NULL;
+        HkxSharedPtr *ptr = NULL;
         HkxFile *file = dynamic_cast<BehaviorFile *>(getParentFile());
         if (file){
             ptr = static_cast<BehaviorFile *>(getParentFile())->findBehaviorGraph(namedVariants.at(i).variant.getReference());
@@ -142,7 +136,7 @@ bool hkRootLevelContainer::link(){
 
 void hkRootLevelContainer::unlink(){
     for (int i = 0; i < namedVariants.size(); i++){
-        namedVariants[i].variant = HkxObjectExpSharedPtr();
+        namedVariants[i].variant = HkxSharedPtr();
     }
 }
 

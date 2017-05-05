@@ -25,6 +25,8 @@ class QGroupBox;
 class HkTransition;
 class hkbStateMachineStateInfo;
 class GenericTableWidget;
+class hkbStateMachineTransitionInfoArray;
+class EventUI;
 
 class StateMachineUI: public QStackedWidget
 {
@@ -58,21 +60,21 @@ private slots:
     void removeObjectChild();
     void addNewTransition();
     void viewSelectedChild(int row, int column);
-    void returnToWidget();
 private:
+    void loadDynamicTableRows();
+    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value);
     void connectChildUI(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *generators);
     void renameVariable(const QString & name, int index);
     void eventRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
     bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type);
-    void moveRowWidgets(int targetRow);
-    int moveRowItems(int oldRow, int targetRow);
     void generatorRenamed(const QString & name, int index);
 private:
     enum ACTIVE_WIDGET {
         MAIN_WIDGET = 0,
         STATE_WIDGET = 1,
-        TRANSITION_WIDGET = 2
+        TRANSITION_WIDGET = 2,
+        EVENT_PAYLOAD_WIDGET = 3
     };
     enum Generator_Type {
         STATE_MACHINE = 0,
@@ -90,11 +92,12 @@ private:
     };
     static QStringList types;
     static QStringList headerLabels;
-    int rowIndexOfTransitionButtonPanel;
-    int rowIndexOfChildToRemove;
+    int transitionButtonRow;
+    int rowToRemove;
     BehaviorGraphView *behaviorView;
     hkbStateMachine *bsData;
     QGroupBox *groupBox;
+    EventUI *eventUI;
     StateUI *stateUI;
     TransitionsUI *transitionUI;
     QGridLayout *topLyt;
@@ -102,8 +105,8 @@ private:
     QPushButton *addStatePB;
     QPushButton *removeStatePB;
     ComboBox *typeSelectorCB;
-    //QPushButton *addTransitionPB;
-    //QPushButton *removeTransitionPB;
+    QPushButton *addTransitionPB;
+    QPushButton *removeTransitionPB;
     LineEdit *name;
     LineEdit *payload;
     ComboBox *startStateId;

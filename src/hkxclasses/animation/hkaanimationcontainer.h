@@ -19,7 +19,7 @@ private:
 private:
     static uint refCount;
     static QString classname;
-    QList <HkxObjectExpSharedPtr> skeletons;
+    QList <HkxSharedPtr> skeletons;
     //animations, bindings, attachments, skins, etc...
 };
 

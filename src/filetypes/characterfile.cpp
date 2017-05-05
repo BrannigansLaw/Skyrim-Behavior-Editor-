@@ -20,14 +20,14 @@ CharacterFile::CharacterFile(MainWindow *window, const QString & name)
     getReader().setFile(this);
 }
 
-HkxObjectExpSharedPtr * CharacterFile::findCharacterData(long ref){
+HkxSharedPtr * CharacterFile::findCharacterData(long ref){
     if (characterData->getReference() == ref){
         return &characterData;
     }
     return NULL;
 }
 
-HkxObjectExpSharedPtr * CharacterFile::findCharacterPropertyValues(long ref){
+HkxSharedPtr * CharacterFile::findCharacterPropertyValues(long ref){
     for (int i = 0; i < boneWeightArrays.size(); i++){
         if (boneWeightArrays.at(i).data() && boneWeightArrays.at(i).getReference() == ref){
             return &boneWeightArrays[i];
@@ -116,23 +116,23 @@ bool CharacterFile::addObjectToFile(HkxObject *obj, long ref){
     }
     obj->setReference(largestRef);
     if (obj->getSignature() == HKB_BONE_WEIGHT_ARRAY){
-        boneWeightArrays.append(HkxObjectExpSharedPtr(obj, ref));
+        boneWeightArrays.append(HkxSharedPtr(obj, ref));
     }else if (obj->getSignature() == HKB_CHARACTER_DATA){
-        characterData = HkxObjectExpSharedPtr(obj, ref);
+        characterData = HkxSharedPtr(obj, ref);
     }else if (obj->getSignature() == HKB_CHARACTER_STRING_DATA){
-        stringData = HkxObjectExpSharedPtr(obj, ref);
+        stringData = HkxSharedPtr(obj, ref);
     }else if (obj->getSignature() == HKB_MIRRORED_SKELETON_INFO){
-        mirroredSkeletonInfo = HkxObjectExpSharedPtr(obj, ref);
+        mirroredSkeletonInfo = HkxSharedPtr(obj, ref);
     }else if (obj->getSignature() == HKB_VARIABLE_VALUE_SET){
-        characterPropertyValues = HkxObjectExpSharedPtr(obj, ref);
+        characterPropertyValues = HkxSharedPtr(obj, ref);
     }else if (obj->getSignature() == HKB_HAND_IK_DRIVER_INFO){
-        handIkDriverInfo = HkxObjectExpSharedPtr(obj, ref);
+        handIkDriverInfo = HkxSharedPtr(obj, ref);
     }else if (obj->getSignature() == HKB_FOOT_IK_DRIVER_INFO){
-        footIkDriverInfo = HkxObjectExpSharedPtr(obj, ref);
+        footIkDriverInfo = HkxSharedPtr(obj, ref);
     }else if (obj->getSignature() == HKB_CHARACTER_DATA){
-        characterData = HkxObjectExpSharedPtr(obj, ref);
+        characterData = HkxSharedPtr(obj, ref);
     }else if (obj->getSignature() == HK_ROOT_LEVEL_CONTAINER){
-        setRootObject(HkxObjectExpSharedPtr(obj, ref));
+        setRootObject(HkxSharedPtr(obj, ref));
     }else{
         writeToLog("CharacterFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16), true);
         return false;
@@ -253,8 +253,8 @@ void CharacterFile::addFootIK(){
         if (!footIkDriverInfo.data() && !static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo.data()){
             hkbFootIkDriverInfo *ptr = new hkbFootIkDriverInfo(this);
             addObjectToFile(ptr);
-            footIkDriverInfo = HkxObjectExpSharedPtr(ptr);
-            static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo = HkxObjectExpSharedPtr(ptr);
+            footIkDriverInfo = HkxSharedPtr(ptr);
+            static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo = HkxSharedPtr(ptr);
         }else{
             static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo = footIkDriverInfo;
         }
@@ -266,8 +266,8 @@ void CharacterFile::addHandIK(){
         if (!handIkDriverInfo.data() && !static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo.data()){
             hkbHandIkDriverInfo *ptr = new hkbHandIkDriverInfo(this);
             addObjectToFile(ptr);
-            handIkDriverInfo = HkxObjectExpSharedPtr(ptr);
-            static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo = HkxObjectExpSharedPtr(ptr);
+            handIkDriverInfo = HkxSharedPtr(ptr);
+            static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo = HkxSharedPtr(ptr);
         }else{
             static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo = handIkDriverInfo;
         }
@@ -276,13 +276,13 @@ void CharacterFile::addHandIK(){
 
 void CharacterFile::disableFootIK(){
     if (characterData.data() && !static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo.data()){
-        static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo = HkxObjectExpSharedPtr();
+        static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo = HkxSharedPtr();
     }
 }
 
 void CharacterFile::disableHandIK(){
     if (characterData.data() && !static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo.data()){
-        static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo = HkxObjectExpSharedPtr();
+        static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo = HkxSharedPtr();
     }
 }
 

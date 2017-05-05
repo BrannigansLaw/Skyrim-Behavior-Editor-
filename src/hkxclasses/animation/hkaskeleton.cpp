@@ -49,7 +49,7 @@ bool hkaSkeleton::addLocalFrame(const QString & name){
         }
     }
     localFrames.append(hkLocalFrame());
-    localFrames.last().localFrame = HkxObjectExpSharedPtr(new hkSimpleLocalFrame(getParentFile(), name));
+    localFrames.last().localFrame = HkxSharedPtr(new hkSimpleLocalFrame(getParentFile(), name));
     if (!getParentFile()->addObjectToFile(localFrames.last().localFrame.data(), ref)){
         return false;
     }
@@ -280,7 +280,7 @@ bool hkaSkeleton::link(){
     if (!getParentFile()){
         return false;
     }
-    HkxObjectExpSharedPtr *ptr;
+    HkxSharedPtr *ptr;
     for (int i = 0; i < localFrames.size(); i++){
         ptr = static_cast<SkeletonFile *>(getParentFile())->findLocalFrame(localFrames.at(i).localFrame.getReference());
         if (!ptr){
@@ -299,7 +299,7 @@ bool hkaSkeleton::link(){
 
 void hkaSkeleton::unlink(){
     for (int i = 0; i < localFrames.size(); i++){
-        localFrames[i].localFrame = HkxObjectExpSharedPtr();
+        localFrames[i].localFrame = HkxSharedPtr();
     }
 }
 

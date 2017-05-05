@@ -219,7 +219,7 @@ bool BSEventOnFalseToTrueModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToSend1.payload.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToSend1.payload.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
@@ -248,9 +248,9 @@ bool BSEventOnFalseToTrueModifier::link(){
 
 void BSEventOnFalseToTrueModifier::unlink(){
     HkDynamicObject::unlink();
-    eventToSend1.payload = HkxObjectExpSharedPtr();
-    eventToSend2.payload = HkxObjectExpSharedPtr();
-    eventToSend3.payload = HkxObjectExpSharedPtr();
+    eventToSend1.payload = HkxSharedPtr();
+    eventToSend2.payload = HkxSharedPtr();
+    eventToSend3.payload = HkxSharedPtr();
 }
 
 bool BSEventOnFalseToTrueModifier::evaulateDataValidity(){    //Check if event id is valid???

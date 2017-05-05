@@ -32,7 +32,7 @@ QString BSiStateTaggingGenerator::getName() const{
 
 bool BSiStateTaggingGenerator::insertObjectAt(int , DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
-        pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+        pDefaultGenerator = HkxSharedPtr((HkxObject *)obj);
         return true;
     }else{
         return false;
@@ -41,7 +41,7 @@ bool BSiStateTaggingGenerator::insertObjectAt(int , DataIconManager *obj){
 
 bool BSiStateTaggingGenerator::removeObjectAt(int index){
     if (index == 0 || index == -1){
-        pDefaultGenerator = HkxObjectExpSharedPtr();
+        pDefaultGenerator = HkxSharedPtr();
     }else{
         return false;
     }
@@ -153,7 +153,7 @@ bool BSiStateTaggingGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pDefaultGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
@@ -169,7 +169,7 @@ bool BSiStateTaggingGenerator::link(){
 
 void BSiStateTaggingGenerator::unlink(){
     HkDynamicObject::unlink();
-    pDefaultGenerator = HkxObjectExpSharedPtr();
+    pDefaultGenerator = HkxSharedPtr();
 }
 
 bool BSiStateTaggingGenerator::evaulateDataValidity(){

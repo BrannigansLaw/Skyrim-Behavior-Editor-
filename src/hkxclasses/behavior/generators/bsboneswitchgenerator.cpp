@@ -46,17 +46,17 @@ bool BSBoneSwitchGenerator::insertObjectAt(int index, DataIconManager *obj){
     BSBoneSwitchGeneratorBoneData *objChild;
     if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
         if (index == 0){
-            pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+            pDefaultGenerator = HkxSharedPtr((HkxObject *)obj);
         }else if (index >= ChildrenA.size() || index == -1){
             objChild = new BSBoneSwitchGeneratorBoneData(getParentFile(), -1);
-            ChildrenA.append(HkxObjectExpSharedPtr(objChild));
-            objChild->pGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+            ChildrenA.append(HkxSharedPtr(objChild));
+            objChild->pGenerator = HkxSharedPtr((HkxObject *)obj);
         }else if (index == 1){
             objChild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index - 1).data());
-            objChild->pGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+            objChild->pGenerator = HkxSharedPtr((HkxObject *)obj);
         }else if (index > -1){
             objChild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index - 1).data());
-            objChild->pGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
+            objChild->pGenerator = HkxSharedPtr((HkxObject *)obj);
         }else{
             return false;
         }
@@ -113,12 +113,12 @@ int BSBoneSwitchGenerator::getIndexOfObj(DataIconManager *obj) const{
 bool BSBoneSwitchGenerator::removeObjectAt(int index){
     BSBoneSwitchGeneratorBoneData *objChild;
     if (index == 0){
-        pDefaultGenerator = HkxObjectExpSharedPtr();
+        pDefaultGenerator = HkxSharedPtr();
     }else if (index > -1 && index <= ChildrenA.size()){
         objChild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index - 1).data());
         ChildrenA.removeAt(index - 1);
     }else if (index == -1){
-        pDefaultGenerator = HkxObjectExpSharedPtr();
+        pDefaultGenerator = HkxSharedPtr();
         ChildrenA.clear();
     }else{
         return false;
@@ -220,7 +220,7 @@ bool BSBoneSwitchGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pDefaultGenerator' data field!");
         setDataValidity(false);
@@ -249,12 +249,12 @@ bool BSBoneSwitchGenerator::link(){
 
 void BSBoneSwitchGenerator::unlink(){
     HkDynamicObject::unlink();
-    pDefaultGenerator = HkxObjectExpSharedPtr();
+    pDefaultGenerator = HkxSharedPtr();
     for (int i = 0; i < ChildrenA.size(); i++){
         if (ChildrenA.at(i).data()){
             ChildrenA[i].data()->unlink(); //Do here since this is not stored in the hkx file for long...
         }
-        ChildrenA[i] = HkxObjectExpSharedPtr();
+        ChildrenA[i] = HkxSharedPtr();
     }
 }
 

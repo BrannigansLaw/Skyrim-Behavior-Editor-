@@ -14,7 +14,6 @@ hkbDetectCloseToGroundModifier::hkbDetectCloseToGroundModifier(HkxFile *parent, 
     : hkbModifier(parent, ref),
       userData(0),
       enable(true),
-      id(-1),
       closeToGroundHeight(0),
       raycastDistanceDown(0),
       collisionFilterInfo(0),
@@ -61,12 +60,12 @@ bool hkbDetectCloseToGroundModifier::readData(const HkxXmlReader &reader, long i
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "id"){
-            id = reader.getElementValueAt(index).toInt(&ok);
+            closeToGroundEvent.id = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
             }
         }else if (text == "payload"){
-            if (!payload.readReference(index, reader)){
+            if (!closeToGroundEvent.payload.readReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
             }
         }else if (text == "closeToGroundHeight"){
@@ -118,9 +117,9 @@ bool hkbDetectCloseToGroundModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("closeToGroundEvent"), "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(id));
-        if (payload.data()){
-            refString = payload.data()->getReferenceString();
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(closeToGroundEvent.id));
+        if (closeToGroundEvent.payload.data()){
+            refString = closeToGroundEvent.payload.data()->getReferenceString();
         }else{
             refString = "null";
         }
@@ -138,7 +137,7 @@ bool hkbDetectCloseToGroundModifier::write(HkxXMLWriter *writer){
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
         }
-        if (payload.data() && !payload.data()->write(writer)){
+        if (closeToGroundEvent.payload.data() && !closeToGroundEvent.payload.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload'!!!", true);
         }
     }
@@ -152,27 +151,27 @@ bool hkbDetectCloseToGroundModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(payload.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(closeToGroundEvent.payload.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
-        payload = *ptr;
+        closeToGroundEvent.payload = *ptr;
     }
     return true;
 }
 
 void hkbDetectCloseToGroundModifier::unlink(){
     HkDynamicObject::unlink();
-    payload = HkxObjectExpSharedPtr();
+    payload = HkxSharedPtr();
 }
 
 bool hkbDetectCloseToGroundModifier::evaulateDataValidity(){    //Check if event id is valid???
     if (!HkDynamicObject::evaulateDataValidity()){
         return false;
     }else if (name == ""){
-    }else if (payload.data() && payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+    }else if (closeToGroundEvent.payload.data() && closeToGroundEvent.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
     }else{
         setDataValidity(true);
         return true;

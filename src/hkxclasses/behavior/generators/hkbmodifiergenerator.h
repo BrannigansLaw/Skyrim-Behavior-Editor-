@@ -33,8 +33,8 @@ private:
     static QString classname;
     long userData;
     QString name;
-    HkxObjectExpSharedPtr modifier;
-    HkxObjectExpSharedPtr generator;
+    HkxSharedPtr modifier;
+    HkxSharedPtr generator;
 };
 
 

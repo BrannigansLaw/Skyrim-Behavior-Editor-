@@ -27,7 +27,7 @@ void hkbClipTriggerArray::addTrigger(const HkTrigger & trigger){
 
 void hkbClipTriggerArray::setTriggerId(int index, int id){
     if (triggers.size() > index){
-        triggers[index].id = id;
+        triggers[index].event.id = id;
     }
 }
 
@@ -61,12 +61,12 @@ bool hkbClipTriggerArray::readData(const HkxXmlReader &reader, long index){
                             return false;
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "id"){
-                        triggers.last().id = reader.getElementValueAt(index).toInt(&ok);
+                        triggers.last().event.id = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
                             return false;
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "payload"){
-                        if (!triggers.last().payload.readReference(index, reader)){
+                        if (!triggers.last().event.payload.readReference(index, reader)){
                             return false;
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "relativeToEndOfClip"){
@@ -114,9 +114,9 @@ bool hkbClipTriggerArray::write(HkxXMLWriter *writer){
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("localTime"), QString::number(triggers.at(i).localTime));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("event"), "");
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(triggers.at(i).id));
-            if (triggers.at(i).payload.data()){
-                refString = triggers.at(i).payload.data()->getReferenceString();
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(triggers.at(i).event.id));
+            if (triggers.at(i).event.payload.data()){
+                refString = triggers.at(i).event.payload.data()->getReferenceString();
             }else{
                 refString = "null";
             }
@@ -135,7 +135,7 @@ bool hkbClipTriggerArray::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         for (int i = 0; i < triggers.size(); i++){
-            if (triggers.at(i).payload.data() && !triggers.at(i).payload.data()->write(writer)){
+            if (triggers.at(i).event.payload.data() && !triggers.at(i).event.payload.data()->write(writer)){
                 getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!", true);
             }
         }
@@ -147,14 +147,14 @@ bool hkbClipTriggerArray::link(){
     if (!getParentFile()){
         return false;
     }
-    HkxObjectExpSharedPtr *ptr;
+    HkxSharedPtr *ptr;
     for (int i = 0; i < triggers.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggers.at(i).payload.getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggers.at(i).event.payload.getReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 return false;
             }
-            triggers[i].payload = *ptr;
+            triggers[i].event.payload = *ptr;
         }
     }
     return true;
@@ -162,7 +162,7 @@ bool hkbClipTriggerArray::link(){
 
 bool hkbClipTriggerArray::evaulateDataValidity(){
     for (int i = 0; i < triggers.size(); i++){
-        if (triggers.at(i).payload.data() && triggers.at(i).payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+        if (triggers.at(i).event.payload.data() && triggers.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             setDataValidity(false);
             return false;
         }

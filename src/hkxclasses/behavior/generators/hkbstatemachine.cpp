@@ -19,7 +19,6 @@ QStringList hkbStateMachine::SelfTransitionMode = {"SELF_TRANSITION_MODE_NO_TRAN
 hkbStateMachine::hkbStateMachine(HkxFile *parent, long ref)
     : hkbGenerator(parent, ref),
       userData(0),
-      id(-1),
       startStateId(-1),
       returnToPreviousStateEventId(-1),
       randomTransitionEventId(-1),
@@ -124,14 +123,14 @@ bool hkbStateMachine::insertObjectAt(int index, DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
         if (index >= states.size() || index == -1){
             objChild = new hkbStateMachineStateInfo(getParentFile(), this, -1);
-            states.append(HkxObjectExpSharedPtr(objChild));
-            objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
+            states.append(HkxSharedPtr(objChild));
+            objChild->generator = HkxSharedPtr((HkxObject *)obj);
         }else if (index == 0){
             objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
-            objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
+            objChild->generator = HkxSharedPtr((HkxObject *)obj);
         }else if (index > -1){
             objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
-            objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
+            objChild->generator = HkxSharedPtr((HkxObject *)obj);
         }else{
             return false;
         }
@@ -258,12 +257,12 @@ bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "id"){
-            id = reader.getElementValueAt(index).toInt(&ok);
+            eventToSendWhenStateOrTransitionChanges.id = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
             }
         }else if (text == "payload"){
-            if (!payload.readReference(index, reader)){
+            if (!eventToSendWhenStateOrTransitionChanges.payload.readReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
             }
         /*}*else if (text == "startStateChooser"){
@@ -346,9 +345,9 @@ bool hkbStateMachine::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("eventToSendWhenStateOrTransitionChanges"), "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(id));
-        if (payload.data()){
-            refString = payload.data()->getReferenceString();
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventToSendWhenStateOrTransitionChanges.id));
+        if (eventToSendWhenStateOrTransitionChanges.payload.data()){
+            refString = eventToSendWhenStateOrTransitionChanges.payload.data()->getReferenceString();
         }else{
             refString = "null";
         }
@@ -392,7 +391,7 @@ bool hkbStateMachine::write(HkxXMLWriter *writer){
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
         }
-        if (payload.data() && !payload.data()->write(writer)){
+        if (eventToSendWhenStateOrTransitionChanges.payload.data() && !eventToSendWhenStateOrTransitionChanges.payload.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload'!!!", true);
         }
         if (wildcardTransitions.data() && !wildcardTransitions.data()->write(writer)){
@@ -414,12 +413,12 @@ bool hkbStateMachine::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(payload.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToSendWhenStateOrTransitionChanges.payload.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
         }
-        payload = *ptr;
+        eventToSendWhenStateOrTransitionChanges.payload = *ptr;
     }
     for (int i = 0; i < states.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(states.at(i).getReference());
@@ -448,14 +447,14 @@ bool hkbStateMachine::link(){
 
 void hkbStateMachine::unlink(){
     HkDynamicObject::unlink();
-    payload = HkxObjectExpSharedPtr();
+    eventToSendWhenStateOrTransitionChanges.payload = HkxSharedPtr();
     for (int i = 0; i < states.size(); i++){
         if (states.at(i).data()){
             states[i].data()->unlink(); //Do here since this is not stored in the hkx file for long...
         }
-        states[i] = HkxObjectExpSharedPtr();
+        states[i] = HkxSharedPtr();
     }
-    wildcardTransitions = HkxObjectExpSharedPtr();
+    wildcardTransitions = HkxSharedPtr();
 }
 
 bool hkbStateMachine::evaulateDataValidity(){
@@ -467,7 +466,7 @@ bool hkbStateMachine::evaulateDataValidity(){
     }
     if (!HkDynamicObject::evaulateDataValidity()){
         return false;
-    }else if (payload.data() && payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+    }else if (eventToSendWhenStateOrTransitionChanges.payload.data() && eventToSendWhenStateOrTransitionChanges.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
     }else if (maxSimultaneousTransitions > 32){
     }else if (!StartStateMode.contains(startStateMode)){
     }else if (!SelfTransitionMode.contains(selfTransitionMode)){

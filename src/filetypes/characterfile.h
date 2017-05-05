@@ -34,8 +34,8 @@ protected:
 private:
     void write();
     void setSkeletonFile(SkeletonFile *skel);
-    HkxObjectExpSharedPtr * findCharacterData(long ref);
-    HkxObjectExpSharedPtr * findCharacterPropertyValues(long ref);
+    HkxSharedPtr * findCharacterData(long ref);
+    HkxSharedPtr * findCharacterPropertyValues(long ref);
     hkbCharacterData * getCharacterData() const;
     void addFootIK();
     void addHandIK();
@@ -43,13 +43,13 @@ private:
     void disableHandIK();
 private:
     SkeletonFile *skeleton;
-    HkxObjectExpSharedPtr characterData;
-    HkxObjectExpSharedPtr characterPropertyValues;
-    HkxObjectExpSharedPtr footIkDriverInfo;
-    HkxObjectExpSharedPtr handIkDriverInfo;
-    HkxObjectExpSharedPtr stringData;
-    HkxObjectExpSharedPtr mirroredSkeletonInfo;
-    QList <HkxObjectExpSharedPtr> boneWeightArrays;
+    HkxSharedPtr characterData;
+    HkxSharedPtr characterPropertyValues;
+    HkxSharedPtr footIkDriverInfo;
+    HkxSharedPtr handIkDriverInfo;
+    HkxSharedPtr stringData;
+    HkxSharedPtr mirroredSkeletonInfo;
+    QList <HkxSharedPtr> boneWeightArrays;
     long largestRef;
 };
 

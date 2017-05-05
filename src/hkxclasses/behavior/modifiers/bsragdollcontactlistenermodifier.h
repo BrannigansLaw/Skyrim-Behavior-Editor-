@@ -25,9 +25,8 @@ private:
     long userData;
     QString name;
     bool enable;
-    int id;
-    HkxObjectExpSharedPtr payload;
-    HkxObjectExpSharedPtr bones;
+    hkEventPayload contactEvent;
+    HkxSharedPtr bones;
 };
 
 #endif // BSRAGDOLLCONTACTLISTENERMODIFIER_H

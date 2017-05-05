@@ -31,7 +31,7 @@ private:
     static QString classname;
     long userData;
     QString name;
-    QList <HkxObjectExpSharedPtr> generators;
+    QList <HkxSharedPtr> generators;
     qint8 selectedGeneratorIndex;
     qint8 currentGeneratorIndex;
 };

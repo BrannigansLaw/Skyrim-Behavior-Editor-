@@ -36,7 +36,7 @@ private:
 
     struct hkLocalFrame{
         hkLocalFrame():boneIndex(-1){}
-        HkxObjectExpSharedPtr localFrame;
+        HkxSharedPtr localFrame;
         int boneIndex;
     };
 

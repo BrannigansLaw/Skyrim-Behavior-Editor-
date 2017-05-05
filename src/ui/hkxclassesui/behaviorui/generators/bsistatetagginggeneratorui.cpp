@@ -132,7 +132,7 @@ void BSiStateTaggingGeneratorUI::setIStateToSetAsBind(int index){
         if (behaviorView->behavior->getVariableTypeAt(index - 1) == VARIABLE_TYPE_INT32){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(behaviorView->behavior);
-                bsData->variableBindingSet = HkxObjectExpSharedPtr(varBind);
+                bsData->variableBindingSet = HkxSharedPtr(varBind);
                 behaviorView->behavior->addObjectToFile(varBind);
             }
             varBind->addBinding("iStateToSetAs", index - 1);
@@ -157,7 +157,7 @@ void BSiStateTaggingGeneratorUI::setIPriorityBind(int index){
         if (behaviorView->behavior->getVariableTypeAt(index - 1) == VARIABLE_TYPE_INT32){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(behaviorView->behavior);
-                bsData->variableBindingSet = HkxObjectExpSharedPtr(varBind);
+                bsData->variableBindingSet = HkxSharedPtr(varBind);
                 behaviorView->behavior->addObjectToFile(varBind);
             }
             varBind->addBinding("iPriority", index - 1);
@@ -187,7 +187,7 @@ void BSiStateTaggingGeneratorUI::setDefaultGenerator(int index){
             return;
         }
         if (index > 0){
-            bsData->pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)ptr);
+            bsData->pDefaultGenerator = HkxSharedPtr((HkxObject *)ptr);
             behaviorView->removeGeneratorData();
             bsData->getParentFile()->toggleChanged(true);
         }

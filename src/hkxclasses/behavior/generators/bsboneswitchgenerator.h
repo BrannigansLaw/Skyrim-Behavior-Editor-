@@ -30,8 +30,8 @@ private:
     static QString classname;
     long userData;
     QString name;
-    HkxObjectExpSharedPtr pDefaultGenerator;
-    QList <HkxObjectExpSharedPtr> ChildrenA;
+    HkxSharedPtr pDefaultGenerator;
+    QList <HkxSharedPtr> ChildrenA;
 };
 
 #endif // BSBONESWITCHGENERATOR_H

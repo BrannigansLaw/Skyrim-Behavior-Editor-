@@ -155,29 +155,30 @@ BlenderGeneratorUI::BlenderGeneratorUI()
     groupBox->setLayout(topLyt);
     addWidget(groupBox);
     addWidget(childUI);
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    connect(referencePoseWeightThreshold, SIGNAL(editingFinished()), this, SLOT(setReferencePoseWeightThreshold()));
-    connect(blendParameter, SIGNAL(editingFinished()), this, SLOT(setBlendParameter()));
-    connect(minCyclicBlendParameter, SIGNAL(editingFinished()), this, SLOT(setMinCyclicBlendParameter()));
-    connect(maxCyclicBlendParameter, SIGNAL(editingFinished()), this, SLOT(setMaxCyclicBlendParameter()));
-    connect(indexOfSyncMasterChild, SIGNAL(editingFinished()), this, SLOT(setIndexOfSyncMasterChild()));
-    connect(flagSync, SIGNAL(released()), this, SLOT(setFlagSync()));
-    connect(flagSmoothGeneratorWeights, SIGNAL(released()), this, SLOT(setFlagSmoothGeneratorWeights()));
-    connect(flagDontDeactivateChildrenWithZeroWeights, SIGNAL(released()), this, SLOT(setFlagDontDeactivateChildrenWithZeroWeights()));
-    connect(flagParametricBlend, SIGNAL(released()), this, SLOT(setFlagParametricBlend()));
-    connect(flagIsParametricBlendCyclic, SIGNAL(released()), this, SLOT(setFlagIsParametricBlendCyclic()));
-    connect(flagForceDensePose, SIGNAL(released()), this, SLOT(setFlagForceDensePose()));
-    connect(subtractLastChild, SIGNAL(released()), this, SLOT(setSubtractLastChild()));
-    connect(addChildPB, SIGNAL(released()), this, SLOT(addChild()));
-    connect(removeChildPB, SIGNAL(released()), this, SLOT(removeSelectedChild()));
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
-    connect(childUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    connect(childUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
-    connect(childUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)));
-    connect(childUI, SIGNAL(viewGenerators(int)), this, SIGNAL(viewGenerators(int)));
+    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
+    connect(referencePoseWeightThreshold, SIGNAL(editingFinished()), this, SLOT(setReferencePoseWeightThreshold()), Qt::UniqueConnection);
+    connect(blendParameter, SIGNAL(editingFinished()), this, SLOT(setBlendParameter()), Qt::UniqueConnection);
+    connect(minCyclicBlendParameter, SIGNAL(editingFinished()), this, SLOT(setMinCyclicBlendParameter()), Qt::UniqueConnection);
+    connect(maxCyclicBlendParameter, SIGNAL(editingFinished()), this, SLOT(setMaxCyclicBlendParameter()), Qt::UniqueConnection);
+    connect(indexOfSyncMasterChild, SIGNAL(editingFinished()), this, SLOT(setIndexOfSyncMasterChild()), Qt::UniqueConnection);
+    connect(flagSync, SIGNAL(released()), this, SLOT(setFlagSync()), Qt::UniqueConnection);
+    connect(flagSmoothGeneratorWeights, SIGNAL(released()), this, SLOT(setFlagSmoothGeneratorWeights()), Qt::UniqueConnection);
+    connect(flagDontDeactivateChildrenWithZeroWeights, SIGNAL(released()), this, SLOT(setFlagDontDeactivateChildrenWithZeroWeights()), Qt::UniqueConnection);
+    connect(flagParametricBlend, SIGNAL(released()), this, SLOT(setFlagParametricBlend()), Qt::UniqueConnection);
+    connect(flagIsParametricBlendCyclic, SIGNAL(released()), this, SLOT(setFlagIsParametricBlendCyclic()), Qt::UniqueConnection);
+    connect(flagForceDensePose, SIGNAL(released()), this, SLOT(setFlagForceDensePose()), Qt::UniqueConnection);
+    connect(subtractLastChild, SIGNAL(released()), this, SLOT(setSubtractLastChild()), Qt::UniqueConnection);
+    connect(addChildPB, SIGNAL(released()), this, SLOT(addChild()), Qt::UniqueConnection);
+    connect(removeChildPB, SIGNAL(released()), this, SLOT(removeSelectedChild()), Qt::UniqueConnection);
+    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    connect(childUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+    connect(childUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
+    connect(childUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
+    connect(childUI, SIGNAL(viewGenerators(int)), this, SIGNAL(viewGenerators(int)), Qt::UniqueConnection);
 }
 
 void BlenderGeneratorUI::loadData(HkxObject *data){
+    setCurrentIndex(MAIN_WIDGET);
     hkbVariableBindingSet *bind = NULL;
     if (data){
         if (data->getSignature() == HKB_BLENDER_GENERATOR){
@@ -301,7 +302,7 @@ bool BlenderGeneratorUI::setBinding(int index, int row, const QString & variable
         }else if (static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxObjectExpSharedPtr(varBind);
+                bsData->variableBindingSet = HkxSharedPtr(varBind);
                 bsData->getParentFile()->addObjectToFile(varBind, -1);
             }
             if (type == VARIABLE_TYPE_POINTER){
@@ -695,9 +696,9 @@ void BlenderGeneratorUI::connectToTables(GenericTableWidget *variables, GenericT
         disconnect(variables, SIGNAL(elementSelected(int,QString)), 0, 0);
         disconnect(properties, SIGNAL(elementSelected(int,QString)), 0, 0);
         disconnect(generators, SIGNAL(elementSelected(int,QString)), 0, 0);
-        connect(variables, SIGNAL(elementSelected(int,QString)), this, SLOT(setBindingVariable(int,QString)));
+        connect(variables, SIGNAL(elementSelected(int,QString)), this, SLOT(setBindingVariable(int,QString)), Qt::UniqueConnection);
         //connect(properties, SIGNAL(elementSelected(int,QString)), childUI, SLOT(setBindingVariable(int,QString))); Right click to choose character property???
-        connect(generators, SIGNAL(elementSelected(int,QString)), childUI, SLOT(setGenerator(int,QString)));
+        connect(generators, SIGNAL(elementSelected(int,QString)), childUI, SLOT(setGenerator(int,QString)), Qt::UniqueConnection);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::connectToTables(): One or more arguments are NULL!!"))
     }
@@ -758,6 +759,7 @@ void BlenderGeneratorUI::generatorRenamed(const QString &name, int index){
 
 void BlenderGeneratorUI::setBehaviorView(BehaviorGraphView *view){
     behaviorView = view;
+    setCurrentIndex(MAIN_WIDGET);
     childUI->setBehaviorView(view);
 }
 

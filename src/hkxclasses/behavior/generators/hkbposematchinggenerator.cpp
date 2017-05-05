@@ -68,14 +68,14 @@ bool hkbPoseMatchingGenerator::insertObjectAt(int index, DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
         if (index >= children.size() || index == -1){
             objChild = new hkbBlenderGeneratorChild(getParentFile(), this, -1);
-            children.append(HkxObjectExpSharedPtr(objChild));
-            objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
+            children.append(HkxSharedPtr(objChild));
+            objChild->generator = HkxSharedPtr((HkxObject *)obj);
         }else if (index == 0){
             objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
-            objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
+            objChild->generator = HkxSharedPtr((HkxObject *)obj);
         }else if (index > -1){
             objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
-            objChild->generator = HkxObjectExpSharedPtr((HkxObject *)obj);
+            objChild->generator = HkxSharedPtr((HkxObject *)obj);
         }else{
             return false;
         }
@@ -332,7 +332,7 @@ bool hkbPoseMatchingGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr;
+    HkxSharedPtr *ptr;
     for (int i = 0; i < children.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(children.at(i).getReference());
         if (!ptr){
@@ -356,7 +356,7 @@ void hkbPoseMatchingGenerator::unlink(){
         if (children.at(i).data()){
             children[i].data()->unlink(); //Do here since this is not stored in the hkx file for long...
         }
-        children[i] = HkxObjectExpSharedPtr();
+        children[i] = HkxSharedPtr();
     }
 }
 

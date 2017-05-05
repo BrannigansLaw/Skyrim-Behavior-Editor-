@@ -73,7 +73,7 @@ void hkbCharacterData::addVariable(hkVariableType type, const QString & name){
         break;
     case VARIABLE_TYPE_POINTER:
         varInfo.type = "VARIABLE_TYPE_POINTER";
-        varData->variantVariableValues.append(HkxObjectExpSharedPtr());
+        varData->variantVariableValues.append(HkxSharedPtr());
         break;
     case VARIABLE_TYPE_VECTOR4:
         varInfo.type = "VARIABLE_TYPE_VECTOR4";
@@ -113,7 +113,7 @@ void hkbCharacterData::addVariable(hkVariableType type){
         break;
     case VARIABLE_TYPE_POINTER:
         varInfo.type = "VARIABLE_TYPE_POINTER";
-        varData->variantVariableValues.append(HkxObjectExpSharedPtr());
+        varData->variantVariableValues.append(HkxSharedPtr());
         break;
     case VARIABLE_TYPE_VECTOR4:
         varInfo.type = "VARIABLE_TYPE_VECTOR4";
@@ -489,7 +489,7 @@ bool hkbCharacterData::link(){
     if (!getParentFile()){
         return false;
     }
-    HkxObjectExpSharedPtr *ptr = &static_cast<CharacterFile *>(getParentFile())->characterPropertyValues;
+    HkxSharedPtr *ptr = &static_cast<CharacterFile *>(getParentFile())->characterPropertyValues;
     if ((*ptr).data() && (*ptr)->getSignature() != HKB_VARIABLE_VALUE_SET){
         writeToLog(getClassname()+": link()!\n'characterPropertyValues' data field is linked to invalid child!\n");
         setDataValidity(false);

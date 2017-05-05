@@ -14,7 +14,7 @@ SkeletonFile::SkeletonFile(MainWindow *window, const QString & name)
     getReader().setFile(this);
 }
 
-HkxObjectExpSharedPtr * SkeletonFile::findSkeleton(long ref){
+HkxSharedPtr * SkeletonFile::findSkeleton(long ref){
     for (int i = 0; i < skeletons.size(); i++){
         if (skeletons.at(i).data() && skeletons.at(i).getReference() == ref){
             return &skeletons[i];
@@ -23,7 +23,7 @@ HkxObjectExpSharedPtr * SkeletonFile::findSkeleton(long ref){
     return NULL;
 }
 
-HkxObjectExpSharedPtr * SkeletonFile::findLocalFrame(long ref){
+HkxSharedPtr * SkeletonFile::findLocalFrame(long ref){
     for (int i = 0; i < localFrames.size(); i++){
         if (localFrames.at(i).data() && localFrames.at(i).getReference() == ref){
             return &localFrames[i];
@@ -49,11 +49,11 @@ bool SkeletonFile::addObjectToFile(HkxObject *obj, long ref){
     }
     obj->setReference(largestRef);
     if (obj->getSignature() == HKA_SKELETON){
-        skeletons.append(HkxObjectExpSharedPtr(obj, ref));
+        skeletons.append(HkxSharedPtr(obj, ref));
     }else if (obj->getSignature() == HK_SIMPLE_LOCAL_FRAME){
-        localFrames.append(HkxObjectExpSharedPtr(obj, ref));
+        localFrames.append(HkxSharedPtr(obj, ref));
     }else if (obj->getSignature() == HK_ROOT_LEVEL_CONTAINER){
-        setRootObject(HkxObjectExpSharedPtr(obj, ref));
+        setRootObject(HkxSharedPtr(obj, ref));
     }else{
         writeToLog("SkeletonFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16), true);
         return false;

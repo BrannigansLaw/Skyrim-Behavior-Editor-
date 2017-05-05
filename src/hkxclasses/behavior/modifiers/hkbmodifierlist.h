@@ -31,7 +31,7 @@ private:
     long userData;
     QString name;
     bool enable;
-    QList <HkxObjectExpSharedPtr> modifiers;
+    QList <HkxSharedPtr> modifiers;
 };
 
 #endif // HKBMODIFIERLIST_H

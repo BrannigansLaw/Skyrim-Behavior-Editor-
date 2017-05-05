@@ -31,7 +31,7 @@ private:
     static QString classname;
     ulong userData;
     QString name;
-    HkxObjectExpSharedPtr pDefaultGenerator;
+    HkxSharedPtr pDefaultGenerator;
     int iStateToSetAs;
     int iPriority;
 };

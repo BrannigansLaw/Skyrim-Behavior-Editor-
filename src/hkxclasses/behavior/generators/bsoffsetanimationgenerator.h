@@ -30,8 +30,8 @@ private:
     static QString classname;
     ulong userData;
     QString name;
-    HkxObjectExpSharedPtr pDefaultGenerator;
-    HkxObjectExpSharedPtr pOffsetClipGenerator;
+    HkxSharedPtr pDefaultGenerator;
+    HkxSharedPtr pOffsetClipGenerator;
     qreal fOffsetVariable;
     qreal fOffsetRangeStart;
     qreal fOffsetRangeEnd;

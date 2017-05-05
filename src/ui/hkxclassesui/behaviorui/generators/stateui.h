@@ -1,7 +1,9 @@
 #ifndef STATEUI_H
 #define STATEUI_H
 
-#include <QGroupBox>
+#include <QStackedWidget>
+
+#include "src/utility.h"
 
 class HkxObject;
 class BehaviorGraphView;
@@ -10,7 +12,7 @@ class StringWidget;
 class IntWidget;
 class TransitionsUI;
 class hkbStateMachineStateInfo;
-class QVBoxLayout;
+class QGridLayout;
 class TableWidget;
 class QTableWidgetItem;
 class SpinBox;
@@ -21,13 +23,13 @@ class QHBoxLayout;
 class QSignalMapper;
 class DoubleSpinBox;
 class QCheckBox;
-class QStackedLayout;
+class EventUI;
 class HkTransition;
 class hkbStateMachineEventPropertyArray;
 class hkbStateMachine;
-class GenericTableWidget;
+class QGroupBox;
 
-class StateUI: public QGroupBox
+class StateUI: public QStackedWidget
 {
     Q_OBJECT
     friend class HkDataUI;
@@ -36,12 +38,10 @@ public:
     StateUI();
     virtual ~StateUI(){}
     void loadData(HkxObject *data);
-    //void setGeneratorTable(GenericTableWidget *genTable);
 signals:
     void stateNameChanged(const QString & newName, int index);
+    void viewGenerators(int index);
     void returnToParent();
-    void viewTransition(hkbStateMachine *parent, HkTransition *transition);
-    void viewGeneratorTable(int index);
 private slots:
     void setName();
     void setGenerator(int index);
@@ -49,32 +49,35 @@ private slots:
     void setProbability();
     void setEnable();
     void addEnterEvent();
-    void setEnterEventAt(int index);
-    void setEnterEventPayloadAt(int index);
     void removeEnterEvent();
     void addExitEvent();
-    void setExitEventAt(int index);
-    void setExitEventPayloadAt(int index);
     void removeExitEvent();
     void addTransition();
     void removeTransition();
-    void transitionSelected(int row, int column);
-    void viewGenerators();
+    void viewSelectedChild(int row, int column);
+    void returnToWidget();
 private:
-    void appendEnterEventTableRow(int index, hkbStateMachineEventPropertyArray *enterEvents, const QStringList &eventList);
-    void appendExitEventTableRow(int index, hkbStateMachineEventPropertyArray *exitEvents, const QStringList &eventList);
-    void addEventToLists(const QString & name);
-    void removeEventFromLists(int index);
-    void renameEventInLists(const QString & newName, int index);
+    void loadDynamicTableRows();
+    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value);
+    void connectChildUI(GenericTableWidget *generators);
+    void eventRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
+    void generatorRenamed(const QString & name, int index);
 private:
-    static QStringList headerLabels1;
-    static QStringList headerLabels2;
-    static QStringList headerLabels3;
-    GenericTableWidget *generatorTable;
+    enum ACTIVE_WIDGET {
+        MAIN_WIDGET = 0,
+        EVENT_WIDGET = 1,
+        TRANSITION_WIDGET = 2
+    };
+    static QStringList headerLabels;
+    int exitEventsButtonRow;
+    int rowToRemove;
     BehaviorGraphView *behaviorView;
     hkbStateMachineStateInfo *bsData;
-    QVBoxLayout *lyt;
+    QGroupBox *groupBox;
+    EventUI *eventUI;
+    TransitionsUI *transitionUI;
+    QGridLayout *topLyt;
     TableWidget *table;
     QPushButton *returnPB;
     LineEdit *name;
@@ -82,25 +85,13 @@ private:
     SpinBox *stateId;
     DoubleSpinBox *probability;
     QCheckBox *enable;
-    TableWidget *enterNotifyEvents;
-    TableWidget *exitNotifyEvents;
-    TableWidget *transitions;
+    QCheckBox *enableTransitions;
     QPushButton *addEnterEventPB;
     QPushButton *removeEnterEventPB;
-    ComboBox *typeEnterEventCB;
-    QSignalMapper *enterEventSignalMapper;
-    QSignalMapper *enterEventPayloadSignalMapper;
-    QHBoxLayout *enterEventButtonLyt;
     QPushButton *addExitEventPB;
     QPushButton *removeExitEventPB;
-    ComboBox *typeExitEventCB;
-    QSignalMapper *exitEventSignalMapper;
-    QSignalMapper *exitEventPayloadSignalMapper;
-    QHBoxLayout *exitEventButtonLyt;
     QPushButton *addTransitionPB;
     QPushButton *removeTransitionPB;
-    ComboBox *typeTransitionCB;
-    QHBoxLayout *transitionButtonLyt;
 };
 
 #endif // STATEUI_H

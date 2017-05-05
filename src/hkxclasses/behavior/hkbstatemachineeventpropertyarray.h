@@ -18,19 +18,13 @@ public:
     bool write(HkxXMLWriter *writer);
 protected:
 private:
-    struct HkEvent
-    {
-        HkEvent(): id(-1){}
-        int id;
-        HkxObjectExpSharedPtr payload;
-    };
     void addEvent(const HkEvent & event = HkEvent());
     void setEventId(int index, int id);
     void removeEvent(int index);
 private:
     static uint refCount;
     static QString classname;
-    QList <HkEvent> events;
+    QList <hkEventPayload> events;
 };
 
 #endif // HKBSTATEMACHINEEVENTPROPERTYARRAY_H

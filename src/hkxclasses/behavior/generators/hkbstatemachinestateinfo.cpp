@@ -43,6 +43,34 @@ hkbStateMachine * hkbStateMachineStateInfo::getParentStateMachine() const{
     return NULL;
 }
 
+void hkbStateMachineStateInfo::setStateId(ushort id){
+    hkbStateMachine *parent = static_cast<hkbStateMachine *>(parentSM.data());
+    hkbStateMachineStateInfo *state = NULL;
+    hkbStateMachineTransitionInfoArray *trans = NULL;
+    if (parent){
+        for (int i = 0; i < parent->states.size(); i++){
+            state = static_cast<hkbStateMachineStateInfo *>(parent->states.at(i).data());
+            trans = static_cast<hkbStateMachineTransitionInfoArray *>(state->transitions.data());
+            if (trans){
+                for (int j = 0; j < trans->transitions.size(); j++){
+                    if (trans->transitions.at(j).toStateId == stateId){
+                        trans->transitions[j].toStateId = id;
+                    }
+                }
+            }
+        }
+        trans = static_cast<hkbStateMachineTransitionInfoArray *>(parent->wildcardTransitions.data());
+        if (trans){
+            for (int i = 0; i < trans->transitions.size(); i++){
+                if (trans->transitions.at(i).toStateId == stateId){
+                    trans->transitions[i].toStateId = id;
+                }
+            }
+        }
+    }
+    stateId = id;
+}
+
 bool hkbStateMachineStateInfo::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
@@ -168,7 +196,7 @@ bool hkbStateMachineStateInfo::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(enterNotifyEvents.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(enterNotifyEvents.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'enterNotifyEvents' is not a HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY!");
@@ -209,11 +237,11 @@ bool hkbStateMachineStateInfo::link(){
 
 void hkbStateMachineStateInfo::unlink(){
     HkDynamicObject::unlink();
-    parentSM = HkxObjectExpSharedPtr();
-    enterNotifyEvents = HkxObjectExpSharedPtr();
-    exitNotifyEvents = HkxObjectExpSharedPtr();
-    transitions = HkxObjectExpSharedPtr();
-    generator = HkxObjectExpSharedPtr();
+    parentSM = HkxSharedPtr();
+    enterNotifyEvents = HkxSharedPtr();
+    exitNotifyEvents = HkxSharedPtr();
+    transitions = HkxSharedPtr();
+    generator = HkxSharedPtr();
 }
 
 bool hkbStateMachineStateInfo::evaulateDataValidity(){

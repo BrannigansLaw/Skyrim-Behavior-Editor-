@@ -30,7 +30,7 @@ private:
     long userData;
     QString name;
     bool enable;
-    HkxObjectExpSharedPtr modifier;
+    HkxSharedPtr modifier;
     qreal delaySeconds;
     qreal durationSeconds;
     qreal secondsElapsed;

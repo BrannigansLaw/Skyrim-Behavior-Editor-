@@ -13,8 +13,7 @@ QString BSRagdollContactListenerModifier::classname = "BSRagdollContactListenerM
 BSRagdollContactListenerModifier::BSRagdollContactListenerModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
       userData(0),
-      enable(true),
-      id(-1)
+      enable(true)
 {
     setType(BS_RAGDOLL_CONTACT_LISTENER_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
@@ -56,12 +55,12 @@ bool BSRagdollContactListenerModifier::readData(const HkxXmlReader &reader, long
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "id"){
-            id = reader.getElementValueAt(index).toInt(&ok);
+            contactEvent.id = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
             }
         }else if (text == "payload"){
-            if (!payload.readReference(index, reader)){
+            if (!contactEvent.payload.readReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
             }
         }else if (text == "bones"){
@@ -92,9 +91,9 @@ bool BSRagdollContactListenerModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("event"), "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(id));
-        if (payload.data()){
-            refString = payload.data()->getReferenceString();
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(contactEvent.id));
+        if (contactEvent.payload.data()){
+            refString = contactEvent.payload.data()->getReferenceString();
         }else{
             refString = "null";
         }
@@ -113,7 +112,7 @@ bool BSRagdollContactListenerModifier::write(HkxXMLWriter *writer){
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
         }
-        if (payload.data() && !payload.data()->write(writer)){
+        if (contactEvent.payload.data() && !contactEvent.payload.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload'!!!", true);
         }
         if (bones.data() && !bones.data()->write(writer)){
@@ -130,13 +129,13 @@ bool BSRagdollContactListenerModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(payload.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(contactEvent.payload.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
-        payload = *ptr;
+        contactEvent.payload = *ptr;
     }
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(bones.getReference());
     if (ptr){
@@ -151,8 +150,8 @@ bool BSRagdollContactListenerModifier::link(){
 
 void BSRagdollContactListenerModifier::unlink(){
     HkDynamicObject::unlink();
-    payload = HkxObjectExpSharedPtr();
-    bones = HkxObjectExpSharedPtr();
+    contactEvent.payload = HkxSharedPtr();
+    bones = HkxSharedPtr();
 }
 
 bool BSRagdollContactListenerModifier::evaulateDataValidity(){    //Check if event id is valid???

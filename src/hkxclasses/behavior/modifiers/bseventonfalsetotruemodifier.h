@@ -20,12 +20,6 @@ private:
     BSEventOnFalseToTrueModifier& operator=(const BSEventOnFalseToTrueModifier&);
     BSEventOnFalseToTrueModifier(const BSEventOnFalseToTrueModifier &);
 private:
-    struct hkEvent{
-        hkEvent(): id(-1){}
-        int id;
-        HkxObjectExpSharedPtr payload;
-    };
-
     static uint refCount;
     static QString classname;
     long userData;
@@ -33,13 +27,13 @@ private:
     bool enable;
     bool bEnableEvent1;
     bool bVariableToTest1;
-    hkEvent eventToSend1;
+    hkEventPayload eventToSend1;
     bool bEnableEvent2;
     bool bVariableToTest2;
-    hkEvent eventToSend2;
+    hkEventPayload eventToSend2;
     bool bEnableEvent3;
     bool bVariableToTest3;
-    hkEvent eventToSend3;
+    hkEventPayload eventToSend3;
 };
 
 #endif // BSEVENTONFALSETOTRUEMODIFIER_H

@@ -116,7 +116,7 @@ bool hkbBlenderGeneratorChild::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(boneWeights.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(boneWeights.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
             writeToLog(getClassname()+": link()!\n'boneWeights' data field is linked to invalid child!");
@@ -140,9 +140,9 @@ bool hkbBlenderGeneratorChild::link(){
 
 void hkbBlenderGeneratorChild::unlink(){
     HkDynamicObject::unlink();
-    parentBG = HkxObjectExpSharedPtr();
-    generator = HkxObjectExpSharedPtr();
-    boneWeights = HkxObjectExpSharedPtr();
+    parentBG = HkxSharedPtr();
+    generator = HkxSharedPtr();
+    boneWeights = HkxSharedPtr();
 }
 
 bool hkbBlenderGeneratorChild::evaulateDataValidity(){

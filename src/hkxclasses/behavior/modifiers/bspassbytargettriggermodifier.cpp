@@ -14,8 +14,7 @@ BSPassByTargetTriggerModifier::BSPassByTargetTriggerModifier(HkxFile *parent, lo
     : hkbModifier(parent, ref),
       userData(0),
       enable(true),
-      radius(0),
-      id(-1)
+      radius(0)
 {
     setType(BS_PASS_BY_TARGET_TRIGGER_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
@@ -72,12 +71,12 @@ bool BSPassByTargetTriggerModifier::readData(const HkxXmlReader &reader, long in
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'movementDirection' data field!\nObject Reference: "+ref);
             }
         }else if (text == "id"){
-            id = reader.getElementValueAt(index).toInt(&ok);
+            triggerEvent.id = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
             }
         }else if (text == "payload"){
-            if (!payload.readReference(index, reader)){
+            if (!triggerEvent.payload.readReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
             }
         }
@@ -107,9 +106,9 @@ bool BSPassByTargetTriggerModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("movementDirection"), movementDirection.getValueAsString());
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("triggerEvent"), "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(id));
-        if (payload.data()){
-            refString = payload.data()->getReferenceString();
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(triggerEvent.id));
+        if (triggerEvent.payload.data()){
+            refString = triggerEvent.payload.data()->getReferenceString();
         }else{
             refString = "null";
         }
@@ -122,7 +121,7 @@ bool BSPassByTargetTriggerModifier::write(HkxXMLWriter *writer){
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
         }
-        if (payload.data() && !payload.data()->write(writer)){
+        if (triggerEvent.payload.data() && !triggerEvent.payload.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload'!!!", true);
         }
     }
@@ -136,27 +135,27 @@ bool BSPassByTargetTriggerModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxObjectExpSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(payload.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggerEvent.payload.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
-        payload = *ptr;
+        triggerEvent.payload = *ptr;
     }
     return true;
 }
 
 void BSPassByTargetTriggerModifier::unlink(){
     HkDynamicObject::unlink();
-    payload = HkxObjectExpSharedPtr();
+    payload = HkxSharedPtr();
 }
 
 bool BSPassByTargetTriggerModifier::evaulateDataValidity(){    //Check if event id is valid???
     if (!HkDynamicObject::evaulateDataValidity()){
         return false;
     }else if (name == ""){
-    }else if (payload.data() && payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+    }else if (triggerEvent.payload.data() && triggerEvent.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
     }else{
         setDataValidity(true);
         return true;

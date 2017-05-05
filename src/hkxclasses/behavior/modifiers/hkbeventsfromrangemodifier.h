@@ -27,7 +27,7 @@ private:
     bool enable;
     qreal inputValue;
     qreal lowerBound;
-    HkxObjectExpSharedPtr eventRanges;
+    HkxSharedPtr eventRanges;
 };
 
 #endif // HKBEVENTSFROMRANGEMODIFIER_H
