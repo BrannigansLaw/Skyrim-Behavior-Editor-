@@ -356,6 +356,7 @@ void BlenderGeneratorUI::setBindingVariable(int index, const QString & name){
 void BlenderGeneratorUI::setName(){
     if (bsData){
         bsData->name = name->text();
+        ((DataIconManager *)(bsData))->updateIconNames();
         emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
         bsData->getParentFile()->toggleChanged(true);
     }else{

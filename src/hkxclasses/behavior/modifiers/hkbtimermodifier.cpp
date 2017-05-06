@@ -136,7 +136,7 @@ bool hkbTimerModifier::link(){
 
 void hkbTimerModifier::unlink(){
     HkDynamicObject::unlink();
-    payload = HkxSharedPtr();
+    alarmEvent.payload = HkxSharedPtr();
 }
 
 bool hkbTimerModifier::evaulateDataValidity(){    //Check if event id is valid???

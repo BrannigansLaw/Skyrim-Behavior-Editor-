@@ -44,13 +44,11 @@ signals:
 private slots:
     void setBindingVariable(int index, const QString & name);
     void setName();
-    void setEventToSendWhenStateOrTransitionChanges(int index);
-    void setPayload();
     void setStartStateId(int index);
-    void setReturnToPreviousStateEventId(int index);
-    void setRandomTransitionEventId(int index);
-    void setTransitionToNextHigherStateEventId(int index);
-    void setTransitionToNextLowerStateEventId(int index);
+    void setReturnToPreviousStateEventId(int index, const QString &name);
+    void setRandomTransitionEventId(int index, const QString &name);
+    void setTransitionToNextHigherStateEventId(int index, const QString &name);
+    void setTransitionToNextLowerStateEventId(int index, const QString &name);
     void setSyncVariableIndex(int index);
     void setWrapAroundStateId(bool checked);
     void setMaxSimultaneousTransitions();
@@ -58,12 +56,16 @@ private slots:
     void setSelfTransitionMode(int index);
     void addNewStateWithGenerator();
     void removeObjectChild();
-    void addNewTransition();
+    void addTransition();
     void viewSelectedChild(int row, int column);
+    void eventTableElementSelected(int index, const QString &name);
+    void variableTableElementSelected(int index, const QString &name);
+    void generatorTableElementSelected(int index, const QString &name);
 private:
+    void returnToWidget();
     void loadDynamicTableRows();
     void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value);
-    void connectChildUI(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *generators);
+    void connectToTableWidgets(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *events);
     void renameVariable(const QString & name, int index);
     void eventRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
@@ -92,7 +94,7 @@ private:
     };
     static QStringList types;
     static QStringList headerLabels;
-    int transitionButtonRow;
+    int transitionsButtonRow;
     int rowToRemove;
     BehaviorGraphView *behaviorView;
     hkbStateMachine *bsData;
@@ -108,7 +110,6 @@ private:
     QPushButton *addTransitionPB;
     QPushButton *removeTransitionPB;
     LineEdit *name;
-    LineEdit *payload;
     ComboBox *startStateId;
     QCheckBox *wrapAroundStateId;
     SpinBox *maxSimultaneousTransitions;

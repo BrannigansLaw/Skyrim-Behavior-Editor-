@@ -108,7 +108,7 @@ bool hkbEventRangeDataArray::write(HkxXMLWriter *writer){
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventData.at(i).event.id));
             if (eventData.at(i).event.payload.data()){
-                refString = eventData.at(i).payload.data()->getReferenceString();
+                refString = eventData.at(i).event.payload.data()->getReferenceString();
             }else{
                 refString = "null";
             }

@@ -142,7 +142,7 @@ bool BSTimerModifier::link(){
 
 void BSTimerModifier::unlink(){
     HkDynamicObject::unlink();
-    payload = HkxSharedPtr();
+    alarmEvent.payload = HkxSharedPtr();
 }
 
 bool BSTimerModifier::evaulateDataValidity(){    //Check if event id is valid???

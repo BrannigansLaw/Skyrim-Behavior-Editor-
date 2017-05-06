@@ -42,35 +42,35 @@ signals:
     void stateNameChanged(const QString & newName, int index);
     void viewGenerators(int index);
     void returnToParent();
+    void viewEvents(int index);
 private slots:
     void setName();
-    void setGenerator(int index);
+    void setGenerator(int index, const QString &name);
     void setStateId();
     void setProbability();
     void setEnable();
+    void setEvent(int index, const QString & name);
     void addEnterEvent();
-    void removeEnterEvent();
     void addExitEvent();
-    void removeExitEvent();
     void addTransition();
-    void removeTransition();
+    void removeObjectChild();
     void viewSelectedChild(int row, int column);
     void returnToWidget();
 private:
     void loadDynamicTableRows();
     void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value);
-    void connectChildUI(GenericTableWidget *generators);
     void eventRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
     void generatorRenamed(const QString & name, int index);
 private:
     enum ACTIVE_WIDGET {
         MAIN_WIDGET = 0,
-        EVENT_WIDGET = 1,
+        EVENT_PAYLOAD_WIDGET = 1,
         TRANSITION_WIDGET = 2
     };
     static QStringList headerLabels;
     int exitEventsButtonRow;
+    int transitionsButtonRow;
     int rowToRemove;
     BehaviorGraphView *behaviorView;
     hkbStateMachineStateInfo *bsData;

@@ -140,9 +140,9 @@ HkDataUI::HkDataUI(const QString &title)
     connect(iSTGUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
     connect(blenderGeneratorUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
 
-    connect(blenderGeneratorUI, SIGNAL(viewVariables(int)), variablesTable, SLOT(showTable(int)));
+    /*connect(blenderGeneratorUI, SIGNAL(viewVariables(int)), variablesTable, SLOT(showTable(int)));
     connect(blenderGeneratorUI, SIGNAL(viewProperties(int)), characterPropertiesTable, SLOT(showTable(int)));
-    connect(blenderGeneratorUI, SIGNAL(viewGenerators(int)), generatorsTable, SLOT(showTable(int)));
+    connect(blenderGeneratorUI, SIGNAL(viewGenerators(int)), generatorsTable, SLOT(showTable(int)));*/
 
     connect(behaviorView, SIGNAL(iconSelected(TreeGraphicsItem*)), this, SLOT(changeCurrentDataWidget(TreeGraphicsItem*)));
 }
@@ -334,10 +334,8 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             if (loadedData != oldData){
                 stateMachineUI->loadData(loadedData);
             }
-            stateMachineUI->setCurrentIndex(StateMachineUI::MAIN_WIDGET);
             stack->setCurrentIndex(STATE_MACHINE);
-            stateMachineUI->connectChildUI(variablesTable, characterPropertiesTable, generatorsTable);
-            connect(eventsTable, SIGNAL(elementSelected(int,QString)), stateMachineUI, SLOT(setBindingVariable(int,QString)), Qt::UniqueConnection);
+            stateMachineUI->connectToTableWidgets(generatorsTable, variablesTable, eventsTable);
             break;
         default:
             stack->setCurrentIndex(NO_DATA_SELECTED);

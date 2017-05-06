@@ -7,6 +7,7 @@ class hkbStringEventPayload: public HkxObject
 {
     friend class StateMachineUI;
     friend class StateUI;
+    friend class EventUI;
 public:
     hkbStringEventPayload(HkxFile *parent, const QString & string = "", long ref = -1);
     virtual ~hkbStringEventPayload();

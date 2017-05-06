@@ -18,7 +18,7 @@ public:
     bool write(HkxXMLWriter *writer);
 protected:
 private:
-    void addEvent(const HkEvent & event = HkEvent());
+    void addEvent(const hkEventPayload & event = hkEventPayload());
     void setEventId(int index, int id);
     void removeEvent(int index);
 private:

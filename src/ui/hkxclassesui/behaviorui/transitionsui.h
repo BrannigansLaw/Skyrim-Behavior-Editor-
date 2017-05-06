@@ -30,7 +30,7 @@ class TransitionsUI: public QGroupBox
 public:
     TransitionsUI();
     virtual ~TransitionsUI(){}
-    void loadData(hkbStateMachine *parent, HkTransition *data);
+    void loadData(hkbStateMachine *parent, hkbStateMachineTransitionInfoArray::HkTransition *data);
 signals:
     void returnToParent();
 private slots:

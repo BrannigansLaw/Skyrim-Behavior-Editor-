@@ -249,7 +249,7 @@ void TransitionsUI::loadComboBoxes(){
     eventId->insertItems(0, eventList);
 }
 
-void TransitionsUI::loadData(hkbStateMachine *parent, HkTransition *data){
+void TransitionsUI::loadData(hkbStateMachine *parent, hkbStateMachineTransitionInfoArray::HkTransition *data){
     if (data && parent){
         bsData = (hkbStateMachineTransitionInfoArray::HkTransition *)data;
         parentObj = parent;

@@ -148,7 +148,7 @@ bool BSPassByTargetTriggerModifier::link(){
 
 void BSPassByTargetTriggerModifier::unlink(){
     HkDynamicObject::unlink();
-    payload = HkxSharedPtr();
+    triggerEvent.payload = HkxSharedPtr();
 }
 
 bool BSPassByTargetTriggerModifier::evaulateDataValidity(){    //Check if event id is valid???

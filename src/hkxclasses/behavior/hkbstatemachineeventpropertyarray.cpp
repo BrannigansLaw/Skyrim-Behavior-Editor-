@@ -21,7 +21,7 @@ QString hkbStateMachineEventPropertyArray::getClassname(){
     return classname;
 }
 
-void hkbStateMachineEventPropertyArray::addEvent(const HkEvent & event){
+void hkbStateMachineEventPropertyArray::addEvent(const hkEventPayload &event){
     events.append(event);
 }
 
@@ -52,7 +52,7 @@ bool hkbStateMachineEventPropertyArray::readData(const HkxXmlReader &reader, lon
                 return false;
             }
             for (int j = 0; j < numEvents; j++){
-                events.append(HkEvent());
+                events.append(hkEventPayload());
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                     if (reader.getNthAttributeValueAt(index, 0) == "id"){
                         events.last().id = reader.getElementValueAt(index).toInt(&ok);

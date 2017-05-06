@@ -164,7 +164,7 @@ bool hkbDetectCloseToGroundModifier::link(){
 
 void hkbDetectCloseToGroundModifier::unlink(){
     HkDynamicObject::unlink();
-    payload = HkxSharedPtr();
+    closeToGroundEvent.payload = HkxSharedPtr();
 }
 
 bool hkbDetectCloseToGroundModifier::evaulateDataValidity(){    //Check if event id is valid???

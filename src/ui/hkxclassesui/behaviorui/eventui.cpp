@@ -2,6 +2,7 @@
 #include "src/utility.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbstringeventpayload.h"
+#include "src/hkxclasses/hkxobject.h"
 
 #include <QFormLayout>
 #include <QLabel>
@@ -27,7 +28,7 @@ EventUI::EventUI()
     connect(eventPayload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()), Qt::UniqueConnection);
 }
 
-void EventUI::loadData(BehaviorFile *parentFile, hkEventPayload *event){
+void EventUI::loadData(BehaviorFile *parentFile, hkEventPayload * event){
     QString text;
     if (parentFile && event){
         file = parentFile;
@@ -47,9 +48,10 @@ void EventUI::loadData(BehaviorFile *parentFile, hkEventPayload *event){
     }
 }
 
-void EventUI::setEvent(int index){
+void EventUI::setEvent(int index, const QString & name){
     if (eventData && file){
         eventData->id = index - 1;
+        selectEvent->setText(name);
         file->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("EventUI::setEvent(): Behavior file or event data is null!!!"));
@@ -82,5 +84,15 @@ void EventUI::emitViewEvent(){
         emit viewEvents(eventData->id + 1);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("EventUI::emitViewEvent(): Event data is null!!!"));
+    }
+}
+
+void EventUI::eventRenamed(const QString & name, int index){
+    if (eventData){
+        if (index == eventData->id){
+            selectEvent->setText(name);
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("EventUI::eventRenamed(): The data is NULL!!"))
     }
 }
