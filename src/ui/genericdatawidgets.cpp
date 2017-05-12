@@ -35,38 +35,38 @@ void GenericTableWidget::loadTable(const QStringList & names, const QStringList 
         if (firstElement != ""){
             start = 1;
             if (table->rowCount() > 0){
-                if (table->itemAt(0, 0)){
-                    table->itemAt(0, 0)->setText(firstElement);
+                if (table->item(0, 0)){
+                    table->item(0, 0)->setText(firstElement);
                 }else{
-                    table->setItem(0, 0, new QTableWidgetItem(firstElement));
+                    table->setItem(0, 0, new TableWidgetItem(firstElement));
                 }
-                if (table->itemAt(0, 1)){
-                    table->itemAt(0, 1)->setText(firstElement);
+                if (table->item(0, 1)){
+                    table->item(0, 1)->setText(firstElement);
                 }else{
-                    table->setItem(0, 1, new QTableWidgetItem(firstElement));
+                    table->setItem(0, 1, new TableWidgetItem(firstElement));
                 }
             }else{
                 table->setRowCount(table->rowCount() + 1);
-                table->setItem(0, 0, new QTableWidgetItem(firstElement));
-                table->setItem(0, 1, new QTableWidgetItem(firstElement));
+                table->setItem(0, 0, new TableWidgetItem(firstElement));
+                table->setItem(0, 1, new TableWidgetItem(firstElement));
             }
         }
-        for (int i = start, j = 0; i < table->rowCount(), j < names.size(); i++, j++){
+        for (int i = start, j = 0; j < names.size(); i++, j++){
             if (i < table->rowCount()){
-                if (table->itemAt(i, 0)){
-                    table->itemAt(i, 0)->setText(names.at(j));
+                if (table->item(i, 0)){
+                    table->item(i, 0)->setText(names.at(j));
                 }else{
-                    table->setItem(i, 0, new QTableWidgetItem(names.at(j)));
+                    table->setItem(i, 0, new TableWidgetItem(names.at(j)));
                 }
-                if (table->itemAt(i, 1)){
-                    table->itemAt(i, 1)->setText(types.at(j));
+                if (table->item(i, 1)){
+                    table->item(i, 1)->setText(types.at(j));
                 }else{
-                    table->setItem(i, 1, new QTableWidgetItem(types.at(j)));
+                    table->setItem(i, 1, new TableWidgetItem(types.at(j)));
                 }
             }else{
                 table->setRowCount(table->rowCount() + 1);
-                table->setItem(i, 0, new QTableWidgetItem(names.at(j)));
-                table->setItem(i, 1, new QTableWidgetItem(types.at(j)));
+                table->setItem(i, 0, new TableWidgetItem(names.at(j)));
+                table->setItem(i, 1, new TableWidgetItem(types.at(j)));
             }
         }
     }else{
@@ -79,38 +79,38 @@ void GenericTableWidget::loadTable(const QStringList & names, const QString & ty
     if (firstElement != ""){
         start = 1;
         if (table->rowCount() > 0){
-            if (table->itemAt(0, 0)){
-                table->itemAt(0, 0)->setText(firstElement);
+            if (table->item(0, 0)){
+                table->item(0, 0)->setText(firstElement);
             }else{
-                table->setItem(0, 0, new QTableWidgetItem(firstElement));
+                table->setItem(0, 0, new TableWidgetItem(firstElement));
             }
-            if (table->itemAt(0, 1)){
-                table->itemAt(0, 1)->setText(firstElement);
+            if (table->item(0, 1)){
+                table->item(0, 1)->setText(firstElement);
             }else{
-                table->setItem(0, 1, new QTableWidgetItem(firstElement));
+                table->setItem(0, 1, new TableWidgetItem(firstElement));
             }
         }else{
             table->setRowCount(table->rowCount() + 1);
-            table->setItem(0, 0, new QTableWidgetItem(firstElement));
-            table->setItem(0, 1, new QTableWidgetItem(firstElement));
+            table->setItem(0, 0, new TableWidgetItem(firstElement));
+            table->setItem(0, 1, new TableWidgetItem(firstElement));
         }
     }
-    for (int i = start; i < names.size(); i++){
+    for (int i = start, j = 0; j < names.size(); i++, j++){
         if (i < table->rowCount()){
-            if (table->itemAt(i, 0)){
-                table->itemAt(i, 0)->setText(names.at(i));
+            if (table->item(i, 0)){
+                table->item(i, 0)->setText(names.at(j));
             }else{
-                table->setItem(i, 0, new QTableWidgetItem(names.at(i)));
+                table->setItem(i, 0, new TableWidgetItem(names.at(j)));
             }
-            if (table->itemAt(i, 1)){
-                table->itemAt(i, 1)->setText(type);
+            if (table->item(i, 1)){
+                table->item(i, 1)->setText(type);
             }else{
-                table->setItem(i, 1, new QTableWidgetItem(type));
+                table->setItem(i, 1, new TableWidgetItem(type));
             }
         }else{
             table->setRowCount(table->rowCount() + 1);
-            table->setItem(i, 0, new QTableWidgetItem(names.at(i)));
-            table->setItem(i, 1, new QTableWidgetItem(type));
+            table->setItem(i, 0, new TableWidgetItem(names.at(j)));
+            table->setItem(i, 1, new TableWidgetItem(type));
         }
     }
 }
@@ -123,15 +123,15 @@ void GenericTableWidget::addItem(const QString & name, const QString & type){
     table->blockSignals(true);
     int i = table->rowCount();
     table->setRowCount(table->rowCount() + 1);
-    table->setItem(i, 0, new QTableWidgetItem(name));
-    table->setItem(i, 1, new QTableWidgetItem(type));
+    table->setItem(i, 0, new TableWidgetItem(name));
+    table->setItem(i, 1, new TableWidgetItem(type));
     table->setCurrentCell(table->rowCount() - 1, 0);
     table->blockSignals(false);
 }
 
 void GenericTableWidget::renameItem(int index, const QString & newname){
     if (index < table->rowCount() && index >= 0){
-        table->itemAt(index, 0)->setText(newname);
+        table->item(index, 0)->setText(newname);
     }
 }
 

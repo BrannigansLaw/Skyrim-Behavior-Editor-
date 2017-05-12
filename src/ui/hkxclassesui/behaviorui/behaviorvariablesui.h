@@ -28,7 +28,7 @@ public:
     virtual ~BehaviorVariablesUI(){}
     void setHkDataUI(HkDataUI *ui);
     void loadData(HkxObject *data);
-    //QSize sizeHint() const Q_DECL_OVERRIDE;
+    void clear();
 private slots:
     void addVariable();
     void removeVariable();

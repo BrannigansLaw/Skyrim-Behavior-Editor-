@@ -38,8 +38,8 @@ HandIkDriverInfoUI::HandIkDriverInfoUI()
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(3);
     table->setHorizontalHeaderLabels(headerLabels1);
-    table->setItem(0, 0, new QTableWidgetItem("fadeInOutCurve"));
-    table->setItem(0, 1, new QTableWidgetItem("BlendCurve"));
+    table->setItem(0, 0, new TableWidgetItem("fadeInOutCurve"));
+    table->setItem(0, 1, new TableWidgetItem("BlendCurve"));
     table->setCellWidget(0, 2, fadeInOutCurve);
     footDriverLyt->addWidget(addHandPB, 0, 0, 1, 1);
     footDriverLyt->addWidget(removeHandPB, 0, 2, 1, 1);
@@ -65,9 +65,9 @@ void HandIkDriverInfoUI::loadData(HkxObject *data){
             k = i + BASE_NUMBER_OF_ROWS;
             if (k >= table->rowCount()){
                 table->setRowCount(table->rowCount() + 1);
-                table->setItem(k, 0, new QTableWidgetItem("Hand "+QString::number(i)));
-                table->setItem(k, 1, new QTableWidgetItem("hkbHandIkDriverInfoHand"));
-                table->setItem(k, 2, new QTableWidgetItem("Click to Edit"));
+                table->setItem(k, 0, new TableWidgetItem("Hand "+QString::number(i)));
+                table->setItem(k, 1, new TableWidgetItem("hkbHandIkDriverInfoHand"));
+                table->setItem(k, 2, new TableWidgetItem("Click to Edit"));
             }else{
                 table->setRowHidden(k, false);
                 table->item(k, 0)->setText("Hand "+QString::number(i));
@@ -94,9 +94,9 @@ void HandIkDriverInfoUI::addHand(){
         if (result >= table->rowCount()){
             result--;
             table->setRowCount(table->rowCount() + 1);
-            table->setItem(result, 0, new QTableWidgetItem("Hand "+QString::number(bsData->hands.size() - 1)));
-            table->setItem(result, 1, new QTableWidgetItem("hkbHandIkDriverInfoHand"));
-            table->setItem(result, 2, new QTableWidgetItem("Click to Edit"));
+            table->setItem(result, 0, new TableWidgetItem("Hand "+QString::number(bsData->hands.size() - 1)));
+            table->setItem(result, 1, new TableWidgetItem("hkbHandIkDriverInfoHand"));
+            table->setItem(result, 2, new TableWidgetItem("Click to Edit"));
         }else{
             result--;
             table->setRowHidden(result, false);

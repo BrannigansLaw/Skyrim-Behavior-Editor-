@@ -29,6 +29,7 @@ EventUI::EventUI()
 }
 
 void EventUI::loadData(BehaviorFile *parentFile, hkEventPayload * event){
+    blockSignals(true);
     QString text;
     if (parentFile && event){
         file = parentFile;
@@ -46,6 +47,7 @@ void EventUI::loadData(BehaviorFile *parentFile, hkEventPayload * event){
     }else{
         CRITICAL_ERROR_MESSAGE(QString("EventUI::loadData(): Behavior file or event data is null!!!"));
     }
+    blockSignals(false);
 }
 
 void EventUI::setEvent(int index, const QString & name){

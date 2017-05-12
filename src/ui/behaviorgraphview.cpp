@@ -730,42 +730,6 @@ void BehaviorGraphView::wrap(T *obj){
     }
 }
 
-void BehaviorGraphView::wrap(hkbStateMachine *obj){
-    if (getSelectedItem() && ((TreeGraphicsItem *)getSelectedItem()->parentItem()) && ((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData){
-        hkbStateMachineStateInfo *state = new hkbStateMachineStateInfo(behavior, obj);
-        obj->states.append(HkxSharedPtr(state));
-        TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), (DataIconManager *)(obj), -1, true);
-        behavior->changed = true;
-        getSelectedItem()->reposition();
-        treeScene->selectIcon(newIcon, false);
-        emit addedGenerator(obj->getName(), obj->getClassname());
-    }
-}
-
-void BehaviorGraphView::wrap(hkbBlenderGenerator *obj){
-    if (getSelectedItem() && ((TreeGraphicsItem *)getSelectedItem()->parentItem()) && ((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData){
-        hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior, obj, -1);
-        obj->children.append(HkxSharedPtr(blendChild));
-        TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), (DataIconManager *)(obj), -1, true);
-        behavior->changed = true;
-        getSelectedItem()->reposition();
-        treeScene->selectIcon(newIcon, false);
-        emit addedGenerator(obj->getName(), obj->getClassname());
-    }
-}
-
-void BehaviorGraphView::wrap(hkbPoseMatchingGenerator *obj){
-    if (getSelectedItem() && ((TreeGraphicsItem *)getSelectedItem()->parentItem()) && ((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData){
-        hkbBlenderGeneratorChild *blendChild = new hkbBlenderGeneratorChild(behavior, obj, -1);
-        obj->children.append(HkxSharedPtr(blendChild));
-        TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), (DataIconManager *)(obj), -1, true);
-        behavior->changed = true;
-        getSelectedItem()->reposition();
-        treeScene->selectIcon(newIcon, false);
-        emit addedGenerator(obj->getName(), obj->getClassname());
-    }
-}
-
 void BehaviorGraphView::wrapManualSelectorGenerator(){
     wrap(new hkbManualSelectorGenerator(behavior));
 }

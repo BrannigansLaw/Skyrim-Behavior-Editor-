@@ -95,62 +95,62 @@ BlenderGeneratorUI::BlenderGeneratorUI()
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
     table->setHorizontalHeaderLabels(headerLabels);
-    table->setItem(NAME_ROW, NAME_COLUMN, new QTableWidgetItem("name"));
-    table->setItem(NAME_ROW, TYPE_COLUMN, new QTableWidgetItem("hkStringPtr"));
-    table->setItem(NAME_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(NAME_ROW, NAME_COLUMN, new TableWidgetItem("name"));
+    table->setItem(NAME_ROW, TYPE_COLUMN, new TableWidgetItem("hkStringPtr"));
+    table->setItem(NAME_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
     table->setCellWidget(NAME_ROW, VALUE_COLUMN, name);
-    table->setItem(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, NAME_COLUMN, new QTableWidgetItem("referencePoseWeightThreshold"));
-    table->setItem(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, TYPE_COLUMN, new QTableWidgetItem("hkReal"));
-    table->setItem(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN, new QTableWidgetItem("NONE"));
+    table->setItem(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, NAME_COLUMN, new TableWidgetItem("referencePoseWeightThreshold"));
+    table->setItem(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal"));
+    table->setItem(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN, new TableWidgetItem("NONE"));
     table->setCellWidget(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, VALUE_COLUMN, referencePoseWeightThreshold);
-    table->setItem(BLEND_PARAMETER_ROW, NAME_COLUMN, new QTableWidgetItem("blendParameter"));
-    table->setItem(BLEND_PARAMETER_ROW, TYPE_COLUMN, new QTableWidgetItem("hkReal"));
-    table->setItem(BLEND_PARAMETER_ROW, BINDING_COLUMN, new QTableWidgetItem("NONE"));
+    table->setItem(BLEND_PARAMETER_ROW, NAME_COLUMN, new TableWidgetItem("blendParameter"));
+    table->setItem(BLEND_PARAMETER_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal"));
+    table->setItem(BLEND_PARAMETER_ROW, BINDING_COLUMN, new TableWidgetItem("NONE"));
     table->setCellWidget(BLEND_PARAMETER_ROW, VALUE_COLUMN, blendParameter);
-    table->setItem(MIN_CYCLIC_BLEND_PARAMETER_ROW, NAME_COLUMN, new QTableWidgetItem("minCyclicBlendParameter"));
-    table->setItem(MIN_CYCLIC_BLEND_PARAMETER_ROW, TYPE_COLUMN, new QTableWidgetItem("hkReal"));
-    table->setItem(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN, new QTableWidgetItem("NONE"));
+    table->setItem(MIN_CYCLIC_BLEND_PARAMETER_ROW, NAME_COLUMN, new TableWidgetItem("minCyclicBlendParameter"));
+    table->setItem(MIN_CYCLIC_BLEND_PARAMETER_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal"));
+    table->setItem(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN, new TableWidgetItem("NONE"));
     table->setCellWidget(MIN_CYCLIC_BLEND_PARAMETER_ROW, VALUE_COLUMN, minCyclicBlendParameter);
-    table->setItem(MAX_CYCLIC_BLEND_PARAMETER_ROW, NAME_COLUMN, new QTableWidgetItem("maxCyclicBlendParameter"));
-    table->setItem(MAX_CYCLIC_BLEND_PARAMETER_ROW, TYPE_COLUMN, new QTableWidgetItem("hkReal"));
-    table->setItem(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN, new QTableWidgetItem("NONE"));
+    table->setItem(MAX_CYCLIC_BLEND_PARAMETER_ROW, NAME_COLUMN, new TableWidgetItem("maxCyclicBlendParameter"));
+    table->setItem(MAX_CYCLIC_BLEND_PARAMETER_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal"));
+    table->setItem(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN, new TableWidgetItem("NONE"));
     table->setCellWidget(MAX_CYCLIC_BLEND_PARAMETER_ROW, VALUE_COLUMN, maxCyclicBlendParameter);
-    table->setItem(INDEX_OF_SYNC_MASTER_CHILD_ROW, NAME_COLUMN, new QTableWidgetItem("indexOfSyncMasterChild"));
-    table->setItem(INDEX_OF_SYNC_MASTER_CHILD_ROW, TYPE_COLUMN, new QTableWidgetItem("hkInt32"));
-    table->setItem(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN, new QTableWidgetItem("NONE"));
+    table->setItem(INDEX_OF_SYNC_MASTER_CHILD_ROW, NAME_COLUMN, new TableWidgetItem("indexOfSyncMasterChild"));
+    table->setItem(INDEX_OF_SYNC_MASTER_CHILD_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
+    table->setItem(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN, new TableWidgetItem("NONE"));
     table->setCellWidget(INDEX_OF_SYNC_MASTER_CHILD_ROW, VALUE_COLUMN, indexOfSyncMasterChild);
-    table->setItem(FLAG_SYNC_ROW, NAME_COLUMN, new QTableWidgetItem("flagSync"));
-    table->setItem(FLAG_SYNC_ROW, TYPE_COLUMN, new QTableWidgetItem("hkInt16"));
-    table->setItem(FLAG_SYNC_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(FLAG_SYNC_ROW, NAME_COLUMN, new TableWidgetItem("flagSync"));
+    table->setItem(FLAG_SYNC_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt16"));
+    table->setItem(FLAG_SYNC_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
     table->setCellWidget(FLAG_SYNC_ROW, VALUE_COLUMN, flagSync);
-    table->setItem(FLAG_SMOOTH_GENERATOR_WEIGHTS_ROW, NAME_COLUMN, new QTableWidgetItem("flagSmoothGeneratorWeights"));
-    table->setItem(FLAG_SMOOTH_GENERATOR_WEIGHTS_ROW, TYPE_COLUMN, new QTableWidgetItem("hkInt16"));
-    table->setItem(FLAG_SMOOTH_GENERATOR_WEIGHTS_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(FLAG_SMOOTH_GENERATOR_WEIGHTS_ROW, NAME_COLUMN, new TableWidgetItem("flagSmoothGeneratorWeights"));
+    table->setItem(FLAG_SMOOTH_GENERATOR_WEIGHTS_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt16"));
+    table->setItem(FLAG_SMOOTH_GENERATOR_WEIGHTS_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
     table->setCellWidget(FLAG_SMOOTH_GENERATOR_WEIGHTS_ROW, VALUE_COLUMN, flagSmoothGeneratorWeights);
-    table->setItem(FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS_ROW, NAME_COLUMN, new QTableWidgetItem("flagDontDeactivateChildrenWithZeroWeights"));
-    table->setItem(FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS_ROW, TYPE_COLUMN, new QTableWidgetItem("hkInt16"));
-    table->setItem(FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS_ROW, NAME_COLUMN, new TableWidgetItem("flagDontDeactivateChildrenWithZeroWeights"));
+    table->setItem(FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt16"));
+    table->setItem(FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
     table->setCellWidget(FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS_ROW, VALUE_COLUMN, flagDontDeactivateChildrenWithZeroWeights);
-    table->setItem(FLAG_PARAMETRIC_BLEND_ROW, NAME_COLUMN, new QTableWidgetItem("flagParametricBlend"));
-    table->setItem(FLAG_PARAMETRIC_BLEND_ROW, TYPE_COLUMN, new QTableWidgetItem("hkInt16"));
-    table->setItem(FLAG_PARAMETRIC_BLEND_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(FLAG_PARAMETRIC_BLEND_ROW, NAME_COLUMN, new TableWidgetItem("flagParametricBlend"));
+    table->setItem(FLAG_PARAMETRIC_BLEND_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt16"));
+    table->setItem(FLAG_PARAMETRIC_BLEND_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
     table->setCellWidget(FLAG_PARAMETRIC_BLEND_ROW, VALUE_COLUMN, flagParametricBlend);
-    table->setItem(FLAG_IS_PARAMETRIC_BLEND_CYCLIC_ROW, NAME_COLUMN, new QTableWidgetItem("flagIsParametricBlendCyclic"));
-    table->setItem(FLAG_IS_PARAMETRIC_BLEND_CYCLIC_ROW, TYPE_COLUMN, new QTableWidgetItem("hkInt16"));
-    table->setItem(FLAG_IS_PARAMETRIC_BLEND_CYCLIC_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(FLAG_IS_PARAMETRIC_BLEND_CYCLIC_ROW, NAME_COLUMN, new TableWidgetItem("flagIsParametricBlendCyclic"));
+    table->setItem(FLAG_IS_PARAMETRIC_BLEND_CYCLIC_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt16"));
+    table->setItem(FLAG_IS_PARAMETRIC_BLEND_CYCLIC_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
     table->setCellWidget(FLAG_IS_PARAMETRIC_BLEND_CYCLIC_ROW, VALUE_COLUMN, flagIsParametricBlendCyclic);
-    table->setItem(FLAG_FORCE_DENSE_POSE_ROW, NAME_COLUMN, new QTableWidgetItem("flagForceDensePose"));
-    table->setItem(FLAG_FORCE_DENSE_POSE_ROW, TYPE_COLUMN, new QTableWidgetItem("hkInt16"));
-    table->setItem(FLAG_FORCE_DENSE_POSE_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(FLAG_FORCE_DENSE_POSE_ROW, NAME_COLUMN, new TableWidgetItem("flagForceDensePose"));
+    table->setItem(FLAG_FORCE_DENSE_POSE_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt16"));
+    table->setItem(FLAG_FORCE_DENSE_POSE_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
     table->setCellWidget(FLAG_FORCE_DENSE_POSE_ROW, VALUE_COLUMN, flagForceDensePose);
-    table->setItem(SUBTRACT_LAST_CHILD_ROW, NAME_COLUMN, new QTableWidgetItem("subtractLastChild"));
-    table->setItem(SUBTRACT_LAST_CHILD_ROW, TYPE_COLUMN, new QTableWidgetItem("hkBool"));
-    table->setItem(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN, new QTableWidgetItem("NONE"));
+    table->setItem(SUBTRACT_LAST_CHILD_ROW, NAME_COLUMN, new TableWidgetItem("subtractLastChild"));
+    table->setItem(SUBTRACT_LAST_CHILD_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool"));
+    table->setItem(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN, new TableWidgetItem("NONE"));
     table->setCellWidget(SUBTRACT_LAST_CHILD_ROW, VALUE_COLUMN, subtractLastChild);
     table->setCellWidget(ADD_CHILD_ROW, NAME_COLUMN, addChildPB);
     table->setCellWidget(ADD_CHILD_ROW, TYPE_COLUMN, typeSelectorCB);
     table->setCellWidget(ADD_CHILD_ROW, BINDING_COLUMN, removeChildPB);
-    table->setItem(ADD_CHILD_ROW, VALUE_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(ADD_CHILD_ROW, VALUE_COLUMN, new TableWidgetItem("N/A"));
     topLyt->addWidget(table, 1, 0, 8, 3);
     groupBox->setLayout(topLyt);
     addWidget(groupBox);
@@ -178,6 +178,7 @@ BlenderGeneratorUI::BlenderGeneratorUI()
 }
 
 void BlenderGeneratorUI::loadData(HkxObject *data){
+    blockSignals(true);
     setCurrentIndex(MAIN_WIDGET);
     hkbVariableBindingSet *bind = NULL;
     if (data){
@@ -233,10 +234,10 @@ void BlenderGeneratorUI::loadData(HkxObject *data){
                 k = i + BASE_NUMBER_OF_ROWS;
                 if (k >= table->rowCount()){
                     table->setRowCount(table->rowCount() + 1);
-                    table->setItem(k, NAME_COLUMN, new QTableWidgetItem("Child "+QString::number(i)));
-                    table->setItem(k, TYPE_COLUMN, new QTableWidgetItem("hkbBlenderGeneratorChild"));
-                    table->setItem(k, BINDING_COLUMN, new QTableWidgetItem("N/A"));
-                    table->setItem(k, VALUE_COLUMN, new QTableWidgetItem("Click to Edit"));
+                    table->setItem(k, NAME_COLUMN, new TableWidgetItem("Child "+QString::number(i)));
+                    table->setItem(k, TYPE_COLUMN, new TableWidgetItem("hkbBlenderGeneratorChild"));
+                    table->setItem(k, BINDING_COLUMN, new TableWidgetItem("N/A"));
+                    table->setItem(k, VALUE_COLUMN, new TableWidgetItem("Click to Edit"));
                 }else{
                     table->setRowHidden(k, false);
                     table->item(k, NAME_COLUMN)->setText("Child "+QString::number(i));
@@ -290,6 +291,7 @@ void BlenderGeneratorUI::loadData(HkxObject *data){
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::loadData(): Attempting to load a null pointer!!"))
     }
+    blockSignals(false);
 }
 
 bool BlenderGeneratorUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type){
@@ -593,10 +595,10 @@ void BlenderGeneratorUI::addChild(){
         result = BASE_NUMBER_OF_ROWS + bsData->children.size() - 1;
         if (result >= table->rowCount()){
             table->setRowCount(table->rowCount() + 1);
-            table->setItem(result, NAME_COLUMN, new QTableWidgetItem("Child "+QString::number(bsData->children.size() - 1)));
-            table->setItem(result, TYPE_COLUMN, new QTableWidgetItem("hkbBlenderGeneratorChild"));
-            table->setItem(result, BINDING_COLUMN, new QTableWidgetItem("N/A"));
-            table->setItem(result, VALUE_COLUMN, new QTableWidgetItem("Click to Edit"));
+            table->setItem(result, NAME_COLUMN, new TableWidgetItem("Child "+QString::number(bsData->children.size() - 1)));
+            table->setItem(result, TYPE_COLUMN, new TableWidgetItem("hkbBlenderGeneratorChild"));
+            table->setItem(result, BINDING_COLUMN, new TableWidgetItem("N/A"));
+            table->setItem(result, VALUE_COLUMN, new TableWidgetItem("Click to Edit"));
         }else{
             table->setRowHidden(result, false);
             table->item(result, NAME_COLUMN)->setText("Child "+QString::number(bsData->children.size() - 1));
@@ -622,7 +624,7 @@ void BlenderGeneratorUI::removeSelectedChild(){
             for (int i = BASE_NUMBER_OF_ROWS, k = 0; i < table->rowCount(); i++, k++){
                 if (!table->isRowHidden(i)){
                     if (!table->item(i, NAME_COLUMN)){
-                        table->setItem(i, NAME_COLUMN, new QTableWidgetItem("Child "+QString::number(k)));
+                        table->setItem(i, NAME_COLUMN, new TableWidgetItem("Child "+QString::number(k)));
                     }else{
                         table->item(i, NAME_COLUMN)->setText("Child "+QString::number(k));
                     }
@@ -700,6 +702,7 @@ void BlenderGeneratorUI::connectToTables(GenericTableWidget *variables, GenericT
         connect(variables, SIGNAL(elementSelected(int,QString)), this, SLOT(setBindingVariable(int,QString)), Qt::UniqueConnection);
         //connect(properties, SIGNAL(elementSelected(int,QString)), childUI, SLOT(setBindingVariable(int,QString))); Right click to choose character property???
         connect(generators, SIGNAL(elementSelected(int,QString)), childUI, SLOT(setGenerator(int,QString)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewGenerators(int)), generators, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::connectToTables(): One or more arguments are NULL!!"))
     }

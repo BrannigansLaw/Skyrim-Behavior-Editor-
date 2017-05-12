@@ -5,7 +5,7 @@
 
 class hkbStringCondition: public HkxObject
 {
-    friend class TransitionUI;
+    friend class TransitionsUI;
 public:
     hkbStringCondition(BehaviorFile *parent, const QString & string = "", long ref = -1);
     virtual ~hkbStringCondition();

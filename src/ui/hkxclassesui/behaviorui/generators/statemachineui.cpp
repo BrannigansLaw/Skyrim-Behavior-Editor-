@@ -95,62 +95,62 @@ StateMachineUI::StateMachineUI()
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
     table->setHorizontalHeaderLabels(headerLabels);
-    table->setItem(NAME_ROW, NAME_COLUMN, new QTableWidgetItem("name"));
-    table->setItem(NAME_ROW, TYPE_COLUMN, new QTableWidgetItem("hkStringPtr"));
-    table->setItem(NAME_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(NAME_ROW, NAME_COLUMN, new TableWidgetItem("name"));
+    table->setItem(NAME_ROW, TYPE_COLUMN, new TableWidgetItem("hkStringPtr"));
+    table->setItem(NAME_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
     table->setCellWidget(NAME_ROW, VALUE_COLUMN, name);
-    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, NAME_COLUMN, new QTableWidgetItem("eventToSendWhenStateOrTransitionChanges"));
-    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, TYPE_COLUMN, new QTableWidgetItem("hkEventPayload"));
-    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
-    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, VALUE_COLUMN, new QTableWidgetItem("Click To Edit"));
-    table->setItem(START_STATE_ID_ROW, NAME_COLUMN, new QTableWidgetItem("startStateId"));
-    table->setItem(START_STATE_ID_ROW, TYPE_COLUMN, new QTableWidgetItem("hkInt32"));
-    table->setItem(START_STATE_ID_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, NAME_COLUMN, new TableWidgetItem("eventToSendWhenStateOrTransitionChanges"));
+    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, TYPE_COLUMN, new TableWidgetItem("hkEventPayload"));
+    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
+    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, VALUE_COLUMN, new TableWidgetItem("Click To Edit"));
+    table->setItem(START_STATE_ID_ROW, NAME_COLUMN, new TableWidgetItem("startStateId"));
+    table->setItem(START_STATE_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
+    table->setItem(START_STATE_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
     table->setCellWidget(START_STATE_ID_ROW, VALUE_COLUMN, startStateId);
-    table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, NAME_COLUMN, new QTableWidgetItem("returnToPreviousStateEventId"));
-    table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, TYPE_COLUMN, new QTableWidgetItem("hkEvent"));
-    table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
-    table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, VALUE_COLUMN, new QTableWidgetItem("NONE"));
-    table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, NAME_COLUMN, new QTableWidgetItem("randomTransitionEventId"));
-    table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, TYPE_COLUMN, new QTableWidgetItem("hkEvent"));
-    table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
-    table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, VALUE_COLUMN, new QTableWidgetItem("NONE"));
-    table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, NAME_COLUMN, new QTableWidgetItem("transitionToNextHigherStateEventId"));
-    table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, TYPE_COLUMN, new QTableWidgetItem("hkEvent"));
-    table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
-    table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, VALUE_COLUMN, new QTableWidgetItem("NONE"));
-    table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, NAME_COLUMN, new QTableWidgetItem("transitionToNextLowerStateEventId"));
-    table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, TYPE_COLUMN, new QTableWidgetItem("hkEvent"));
-    table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
-    table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN, new QTableWidgetItem("NONE"));
-    table->setItem(SYNC_VARIABLE_INDEX_ROW, NAME_COLUMN, new QTableWidgetItem("syncVariableIndex"));
-    table->setItem(SYNC_VARIABLE_INDEX_ROW, TYPE_COLUMN, new QTableWidgetItem("hkInt32"));
-    table->setItem(SYNC_VARIABLE_INDEX_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
-    table->setItem(SYNC_VARIABLE_INDEX_ROW, VALUE_COLUMN, new QTableWidgetItem("NONE"));
-    table->setItem(WRAP_AROUND_STATE_ID_ROW, NAME_COLUMN, new QTableWidgetItem("wrapAroundStateId"));
-    table->setItem(WRAP_AROUND_STATE_ID_ROW, TYPE_COLUMN, new QTableWidgetItem("hkBool"));
-    table->setItem(WRAP_AROUND_STATE_ID_ROW, BINDING_COLUMN, new QTableWidgetItem("NONE"));
+    table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("returnToPreviousStateEventId"));
+    table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent"));
+    table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
+    table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
+    table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("randomTransitionEventId"));
+    table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent"));
+    table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
+    table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
+    table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("transitionToNextHigherStateEventId"));
+    table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent"));
+    table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
+    table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
+    table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("transitionToNextLowerStateEventId"));
+    table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent"));
+    table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
+    table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
+    table->setItem(SYNC_VARIABLE_INDEX_ROW, NAME_COLUMN, new TableWidgetItem("syncVariableIndex"));
+    table->setItem(SYNC_VARIABLE_INDEX_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
+    table->setItem(SYNC_VARIABLE_INDEX_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
+    table->setItem(SYNC_VARIABLE_INDEX_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
+    table->setItem(WRAP_AROUND_STATE_ID_ROW, NAME_COLUMN, new TableWidgetItem("wrapAroundStateId"));
+    table->setItem(WRAP_AROUND_STATE_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool"));
+    table->setItem(WRAP_AROUND_STATE_ID_ROW, BINDING_COLUMN, new TableWidgetItem("NONE"));
     table->setCellWidget(WRAP_AROUND_STATE_ID_ROW, VALUE_COLUMN, wrapAroundStateId);
-    table->setItem(MAX_SIMULTANEOUS_TRANSITIONS_ROW, NAME_COLUMN, new QTableWidgetItem("maxSimultaneousTransitions"));
-    table->setItem(MAX_SIMULTANEOUS_TRANSITIONS_ROW, TYPE_COLUMN, new QTableWidgetItem("hkInt32"));
-    table->setItem(MAX_SIMULTANEOUS_TRANSITIONS_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(MAX_SIMULTANEOUS_TRANSITIONS_ROW, NAME_COLUMN, new TableWidgetItem("maxSimultaneousTransitions"));
+    table->setItem(MAX_SIMULTANEOUS_TRANSITIONS_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
+    table->setItem(MAX_SIMULTANEOUS_TRANSITIONS_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
     table->setCellWidget(MAX_SIMULTANEOUS_TRANSITIONS_ROW, VALUE_COLUMN, maxSimultaneousTransitions);
-    table->setItem(START_STATE_MODE_ROW, NAME_COLUMN, new QTableWidgetItem("startStateMode"));
-    table->setItem(START_STATE_MODE_ROW, TYPE_COLUMN, new QTableWidgetItem("hkEnum"));
-    table->setItem(START_STATE_MODE_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(START_STATE_MODE_ROW, NAME_COLUMN, new TableWidgetItem("startStateMode"));
+    table->setItem(START_STATE_MODE_ROW, TYPE_COLUMN, new TableWidgetItem("hkEnum"));
+    table->setItem(START_STATE_MODE_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
     table->setCellWidget(START_STATE_MODE_ROW, VALUE_COLUMN, startStateMode);
-    table->setItem(SELF_TRANSITION_MODE_ROW, NAME_COLUMN, new QTableWidgetItem("selfTransitionMode"));
-    table->setItem(SELF_TRANSITION_MODE_ROW, TYPE_COLUMN, new QTableWidgetItem("hkEnum"));
-    table->setItem(SELF_TRANSITION_MODE_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(SELF_TRANSITION_MODE_ROW, NAME_COLUMN, new TableWidgetItem("selfTransitionMode"));
+    table->setItem(SELF_TRANSITION_MODE_ROW, TYPE_COLUMN, new TableWidgetItem("hkEnum"));
+    table->setItem(SELF_TRANSITION_MODE_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
     table->setCellWidget(SELF_TRANSITION_MODE_ROW, VALUE_COLUMN, selfTransitionMode);
     table->setCellWidget(ADD_CHILD_ROW, NAME_COLUMN, addStatePB);
     table->setCellWidget(ADD_CHILD_ROW, TYPE_COLUMN, typeSelectorCB);
     table->setCellWidget(ADD_CHILD_ROW, BINDING_COLUMN, removeStatePB);
-    table->setItem(ADD_CHILD_ROW, VALUE_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(ADD_CHILD_ROW, VALUE_COLUMN, new TableWidgetItem("N/A"));
     table->setCellWidget(ADD_CHILD_ROW + 1, NAME_COLUMN, addTransitionPB);
-    table->setItem(ADD_CHILD_ROW + 1, TYPE_COLUMN, new QTableWidgetItem("hkbStateMachineTransitionInfoArray"));
+    table->setItem(ADD_CHILD_ROW + 1, TYPE_COLUMN, new TableWidgetItem("hkbStateMachineTransitionInfoArray"));
     table->setCellWidget(ADD_CHILD_ROW + 1, BINDING_COLUMN, removeTransitionPB);
-    table->setItem(ADD_CHILD_ROW + 1, VALUE_COLUMN, new QTableWidgetItem("N/A"));
+    table->setItem(ADD_CHILD_ROW + 1, VALUE_COLUMN, new TableWidgetItem("N/A"));
     topLyt->addWidget(table, 1, 0, 8, 3);
     groupBox->setLayout(topLyt);
     //Order here must correspond with the ACTIVE_WIDGET Enumerated type!!!
@@ -176,9 +176,12 @@ StateMachineUI::StateMachineUI()
     connect(stateUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
     //connect(stateUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
     connect(stateUI, SIGNAL(viewGenerators(int)), this, SIGNAL(viewGenerators(int)), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
 }
 
 void StateMachineUI::loadData(HkxObject *data){
+    blockSignals(true);
+    //table->setSortingEnabled(false);
     setCurrentIndex(MAIN_WIDGET);
     hkbVariableBindingSet *varBind = NULL;
     QString varName;
@@ -189,9 +192,9 @@ void StateMachineUI::loadData(HkxObject *data){
         name->setText(bsData->name);
         varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->eventToSendWhenStateOrTransitionChanges.id);
         if (varName != ""){
-            table->itemAt(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, VALUE_COLUMN)->setText(varName);
+            table->item(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, VALUE_COLUMN)->setText(varName);
         }else{
-            table->itemAt(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, VALUE_COLUMN)->setText("NONE");
+            table->item(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, VALUE_COLUMN)->setText("NONE");
         }
         startStateId->clear();
         startStateId->insertItems(0, bsData->getStateNames());
@@ -204,7 +207,7 @@ void StateMachineUI::loadData(HkxObject *data){
                 if (varName == ""){
                     varName = "NONE";
                 }
-                table->itemAt(START_STATE_ID_ROW, BINDING_COLUMN)->setText(varName);
+                table->item(START_STATE_ID_ROW, BINDING_COLUMN)->setText(varName);
             }else{
                 ind = varBind->getVariableIndexOfBinding("syncVariableIndex");
                 if (ind != -1){
@@ -212,7 +215,7 @@ void StateMachineUI::loadData(HkxObject *data){
                     if (varName == ""){
                         varName = "NONE";
                     }
-                    table->itemAt(SYNC_VARIABLE_INDEX_ROW, BINDING_COLUMN)->setText(varName);
+                    table->item(SYNC_VARIABLE_INDEX_ROW, BINDING_COLUMN)->setText(varName);
                 }else{
                     ind = varBind->getVariableIndexOfBinding("wrapAroundStateId");
                     if (ind != -1){
@@ -220,50 +223,50 @@ void StateMachineUI::loadData(HkxObject *data){
                         if (varName == ""){
                             varName = "NONE";
                         }
-                        table->itemAt(WRAP_AROUND_STATE_ID_ROW, BINDING_COLUMN)->setText(varName);
+                        table->item(WRAP_AROUND_STATE_ID_ROW, BINDING_COLUMN)->setText(varName);
                     }
                 }
             }
         }else{
-            table->itemAt(START_STATE_ID_ROW, BINDING_COLUMN)->setText("NONE");
-            table->itemAt(SYNC_VARIABLE_INDEX_ROW, BINDING_COLUMN)->setText("NONE");
-            table->itemAt(WRAP_AROUND_STATE_ID_ROW, BINDING_COLUMN)->setText("NONE");
+            table->item(START_STATE_ID_ROW, BINDING_COLUMN)->setText("NONE");
+            table->item(SYNC_VARIABLE_INDEX_ROW, BINDING_COLUMN)->setText("NONE");
+            table->item(WRAP_AROUND_STATE_ID_ROW, BINDING_COLUMN)->setText("NONE");
         }
         varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->returnToPreviousStateEventId);
         if (varName != ""){
-            table->itemAt(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(varName);
+            table->item(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(varName);
         }else{
-            table->itemAt(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
+            table->item(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
         }
         varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->randomTransitionEventId);
         if (varName != ""){
-            table->itemAt(RANDOM_TRANSITION_EVENT_ID_ROW, VALUE_COLUMN)->setText(varName);
+            table->item(RANDOM_TRANSITION_EVENT_ID_ROW, VALUE_COLUMN)->setText(varName);
         }else{
-            table->itemAt(RANDOM_TRANSITION_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
+            table->item(RANDOM_TRANSITION_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
         }
         varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->transitionToNextHigherStateEventId);
         if (varName != ""){
-            table->itemAt(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(varName);
+            table->item(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(varName);
         }else{
-            table->itemAt(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
+            table->item(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
         }
         varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->transitionToNextLowerStateEventId);
         if (varName != ""){
-            table->itemAt(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(varName);
+            table->item(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(varName);
         }else{
-            table->itemAt(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
+            table->item(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
         }
         varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(bsData->transitionToNextLowerStateEventId);
         if (varName != ""){
-            table->itemAt(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(varName);
+            table->item(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(varName);
         }else{
-            table->itemAt(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
+            table->item(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
         }
         varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(bsData->syncVariableIndex);
         if (varName != ""){
-            table->itemAt(SYNC_VARIABLE_INDEX_ROW, VALUE_COLUMN)->setText(varName);
+            table->item(SYNC_VARIABLE_INDEX_ROW, VALUE_COLUMN)->setText(varName);
         }else{
-            table->itemAt(SYNC_VARIABLE_INDEX_ROW, VALUE_COLUMN)->setText("NONE");
+            table->item(SYNC_VARIABLE_INDEX_ROW, VALUE_COLUMN)->setText("NONE");
         }
         wrapAroundStateId->setChecked(bsData->wrapAroundStateId);
         maxSimultaneousTransitions->setValue(bsData->maxSimultaneousTransitions);
@@ -279,9 +282,12 @@ void StateMachineUI::loadData(HkxObject *data){
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadData(): The data is NULL or an incorrect type!!"));
     }
+    blockSignals(false);
+    //table->setSortingEnabled(true);
 }
 
 void StateMachineUI::loadDynamicTableRows(){
+    table->setSortingEnabled(false);
     if (bsData){
         int temp = ADD_CHILD_ROW + bsData->getNumberOfStates() + 1 - transitionsButtonRow;
         if (temp > 0){
@@ -321,28 +327,29 @@ void StateMachineUI::loadDynamicTableRows(){
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadDynamicTableRows(): The data is NULL!!"));
     }
+    table->setSortingEnabled(true);
 }
 
 void StateMachineUI::setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value){
     if (table->item(row, NAME_COLUMN)){
         table->item(row, NAME_COLUMN)->setText(name);
     }else{
-        table->setItem(row, NAME_COLUMN, new QTableWidgetItem(name));
+        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name));
     }
     if (table->item(row, TYPE_COLUMN)){
         table->item(row, TYPE_COLUMN)->setText(classname);
     }else{
-        table->setItem(row, TYPE_COLUMN, new QTableWidgetItem(classname));
+        table->setItem(row, TYPE_COLUMN, new TableWidgetItem(classname));
     }
     if (table->item(row, BINDING_COLUMN)){
         table->item(row, BINDING_COLUMN)->setText(bind);
     }else{
-        table->setItem(row, BINDING_COLUMN, new QTableWidgetItem(bind));
+        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind));
     }
     if (table->item(row, VALUE_COLUMN)){
         table->item(row, VALUE_COLUMN)->setText(value);
     }else{
-        table->setItem(row, VALUE_COLUMN, new QTableWidgetItem(value));
+        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value));
     }
 }
 
@@ -534,23 +541,18 @@ void StateMachineUI::viewSelectedChild(int row, int column){
                 }else{
                     switch (row){
                     case EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW:
-                        path = "id";
                         index = bsData->eventToSendWhenStateOrTransitionChanges.id;
                         break;
                     case RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW:
-                        path = "returnToPreviousStateEventId";
                         index = bsData->returnToPreviousStateEventId;
                         break;
                     case RANDOM_TRANSITION_EVENT_ID_ROW:
-                        path = "randomTransitionEventId";
                         index = bsData->randomTransitionEventId;
                         break;
                     case TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW:
-                        path = "transitionToNextHigherStateEventId";
                         index = bsData->transitionToNextHigherStateEventId;
                         break;
                     case TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW:
-                        path = "transitionToNextLowerStateEventId";
                         index = bsData->transitionToNextLowerStateEventId;
                         break;
                     default:
@@ -564,7 +566,7 @@ void StateMachineUI::viewSelectedChild(int row, int column){
             rowToRemove = row;
             if (bsData->getNumberOfStates() > result && result >= 0){
                 if (column == VALUE_COLUMN){
-                    stateUI->loadData(static_cast<hkbStateMachineStateInfo *>(bsData->states.at(result).data()));
+                    stateUI->loadData(static_cast<hkbStateMachineStateInfo *>(bsData->states.at(result).data()), result);
                     setCurrentIndex(STATE_WIDGET);
                 }
             }else{
@@ -576,7 +578,7 @@ void StateMachineUI::viewSelectedChild(int row, int column){
             trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->wildcardTransitions.data());
             if (trans && result < trans->getNumTransitions() && result >= 0){
                 if (column == VALUE_COLUMN){
-                    transitionUI->loadData(bsData, &trans->transitions[result]);
+                    transitionUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), bsData, &trans->transitions[result]);
                     setCurrentIndex(TRANSITION_WIDGET);
                 }
             }else{
@@ -772,9 +774,15 @@ void StateMachineUI::connectToTableWidgets(GenericTableWidget *generators, Gener
         disconnect(events, SIGNAL(elementSelected(int,QString)), 0, 0);
         disconnect(variables, SIGNAL(elementSelected(int,QString)), 0, 0);
         disconnect(generators, SIGNAL(elementSelected(int,QString)), 0, 0);
+        disconnect(events, SIGNAL(elementSelected(int,QString)), 0, 0);
+        disconnect(variables, SIGNAL(elementSelected(int,QString)), 0, 0);
+        disconnect(generators, SIGNAL(elementSelected(int,QString)), 0, 0);
         connect(events, SIGNAL(elementSelected(int,QString)), this, SLOT(eventTableElementSelected(int,QString)), Qt::UniqueConnection);
         connect(variables, SIGNAL(elementSelected(int,QString)), this, SLOT(variableTableElementSelected(int,QString)), Qt::UniqueConnection);
         connect(generators, SIGNAL(elementSelected(int,QString)), this, SLOT(generatorTableElementSelected(int,QString)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewGenerators(int)), generators, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::connectToTableWidgets(): One or more arguments are NULL!!"));
     }

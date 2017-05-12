@@ -3,16 +3,19 @@
 
 #include <QGroupBox>
 
-class TreeGraphicsView;
+#include "src/utility.h"
+
+class QGroupBox;
 class TableWidget;
 class LineEdit;
 class ComboBox;
 class hkbBlendingTransitionEffect;
-class QVBoxLayout;
+class QGridLayout;
 class HkxObject;
 class SpinBox;
 class DoubleSpinBox;
 class QCheckBox;
+class QPushButton;
 
 class BlendingTransitionEffectUI: public QGroupBox
 {
@@ -22,19 +25,31 @@ class BlendingTransitionEffectUI: public QGroupBox
 public:
     BlendingTransitionEffectUI();
     virtual ~BlendingTransitionEffectUI(){}
-    void loadData(HkxObject *data){}
+    void loadData(HkxObject *data);
+signals:
+    void viewVariables(int index);
+    void viewProperties(int index);
+    void returnToParent();
 private slots:
-    void setName(){}
+    void setName();
+    void setBindingVariable(int index, const QString & name);
+    void setSelfTransitionMode();
+    void setEventMode();
+    void setDuration();
+    void setToGeneratorStartTimeFraction();
+    void setEndMode();
+    void setBlendCurve();
+    void setFlagSync();
+    void setFlagIgnoreFromWorldFromModel();
+    void setFlagIgnoreToWorldFromModel();
 private:
-    void addVariableToLists(const QString & name){}
-    void removeVariableFromLists(int index){}
-    void renameVariableInLists(const QString & newName, int index){}
-    void loadComboBoxes(){}
+    void variableRenamed(const QString & name, int index);
+    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type);
 private:
-    static QStringList headerLabels1;
-    TreeGraphicsView *behaviorView;
+    static QStringList headerLabels;
     hkbBlendingTransitionEffect *bsData;
-    QVBoxLayout *lyt;
+    QGridLayout *topLyt;
+    QPushButton *returnPB;
     TableWidget *table;
     LineEdit *name;
     ComboBox *selfTransitionMode;
@@ -43,6 +58,7 @@ private:
     DoubleSpinBox *toGeneratorStartTimeFraction;
     QCheckBox *flagSync;
     QCheckBox *flagIgnoreFromWorldFromModel;
+    QCheckBox *flagIgnoreToWorldFromModel;
     ComboBox *endMode;
     ComboBox *blendCurve;
 };

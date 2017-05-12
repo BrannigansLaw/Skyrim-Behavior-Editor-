@@ -9,7 +9,8 @@ class DoubleSpinBox;
 class TableWidget;
 class HkxObject;
 class QPushButton;
-class QSignalMapper;
+class QGridLayout;
+class QLabel;
 
 class BoneWeightArrayUI: public QGroupBox
 {
@@ -18,17 +19,19 @@ public:
     BoneWeightArrayUI();
     virtual ~BoneWeightArrayUI();
     void loadData(HkxObject *data, bool isRagdoll = false);
-protected:
 signals:
     void returnToParent();
 private slots:
-    void setBoneWeight(int row);
+    void setBoneWeight();
+    void loadBoneWeight(int row, int);
 private:
+    static QStringList headerLabels;
     hkbBoneWeightArray *bsData;
-    QVBoxLayout *lyt;
-    QPushButton *backPB;
+    QGridLayout *topLyt;
+    QPushButton *returnPB;
     TableWidget *bones;
-    QSignalMapper *mapper;
+    QLabel *label;
+    DoubleSpinBox *selectedBone;
 };
 
 #endif // BONEWEIGHTARRAYUI_H

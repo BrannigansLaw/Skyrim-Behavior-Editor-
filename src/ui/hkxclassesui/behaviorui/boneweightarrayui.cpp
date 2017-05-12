@@ -4,24 +4,33 @@
 #include "src/hkxclasses/behavior/hkbboneweightarray.h"
 #include "src/ui/genericdatawidgets.h"
 
-#include <QSignalMapper>
+#define NAME_COLUMN 0
+#define VALUE_COLUMN 1
+
+QStringList BoneWeightArrayUI::headerLabels = {
+    "Bone Name",
+    "Weight"
+};
 
 BoneWeightArrayUI::BoneWeightArrayUI()
     : bsData(NULL),
-      lyt(new QVBoxLayout(this)),
-      backPB(new QPushButton("Return")),
+      topLyt(new QGridLayout(this)),
+      returnPB(new QPushButton("Return")),
       bones(new TableWidget),
-      mapper(new QSignalMapper)
+      selectedBone(new DoubleSpinBox),
+      label(new QLabel("Selected Bone Weight:"))
 {
     setTitle("hkbBoneWeightArray");
-    QStringList list = {"Name", "Value"};
     bones->setColumnCount(2);
-    bones->setHorizontalHeaderLabels(list);
-    lyt->addWidget(backPB, 2);
-    lyt->addWidget(bones, 8);
-    setLayout(lyt);
-    connect(mapper, SIGNAL(mapped(int)), this, SLOT(setBoneWeight(int)));
-    connect(backPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+    bones->setHorizontalHeaderLabels(headerLabels);
+    topLyt->addWidget(returnPB, 0, 1, 1, 1);
+    topLyt->addWidget(bones, 1, 0, 8, 3);
+    topLyt->addWidget(label, 10, 1, 1, 1);
+    topLyt->addWidget(selectedBone, 10, 2, 1, 1);
+    setLayout(topLyt);
+    connect(selectedBone, SIGNAL(editingFinished()), this, SLOT(setBoneWeight()));
+    connect(bones, SIGNAL(cellClicked(int,int)), this, SLOT(loadBoneWeight(int,int)));
+    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
 }
 
 BoneWeightArrayUI::~BoneWeightArrayUI(){
@@ -29,9 +38,10 @@ BoneWeightArrayUI::~BoneWeightArrayUI(){
 }
 
 void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
+    blockSignals(true);
     if (data && data->getSignature() == HKB_BONE_WEIGHT_ARRAY){
         bsData = static_cast<hkbBoneWeightArray *>(data);
-        /*HkxFile *file = dynamic_cast<BehaviorFile *>(bsData->getParentFile());
+        HkxFile *file = dynamic_cast<BehaviorFile *>(bsData->getParentFile());
         int rowCount = 0;
         QStringList boneNames;
         if (file){
@@ -49,45 +59,60 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
                     boneNames = static_cast<CharacterFile *>(file)->getRigBoneNames();
                 }
             }else{
-                //error
+                CRITICAL_ERROR_MESSAGE(QString("BoneWeightArrayUI::loadData(): Parent file type is unrecognized!!!"))
             }
         }
         for (int i = 0; i < bsData->boneWeights.size(), i < boneNames.size(); i++){
             rowCount = bones->rowCount();
             if (rowCount > i){
                 bones->setRowHidden(i, false);
-                if (bones->item(i, 0)){
-                    bones->item(i, 0)->setText(boneNames.at(i));
+                if (bones->item(i, NAME_COLUMN)){
+                    bones->item(i, NAME_COLUMN)->setText(boneNames.at(i));
                 }else{
-                    bones->setItem(i, 0, new QTableWidgetItem(boneNames.at(i)));
+                    bones->setItem(i, NAME_COLUMN, new TableWidgetItem(boneNames.at(i)));
                 }
-                if (bones->cellWidget(i, 1)){
-                    static_cast<DoubleSpinBox *>(bones->cellWidget(i, 1))->setValue(bsData->boneWeights.at(i));
+                if (bones->item(i, VALUE_COLUMN)){
+                    bones->item(i, VALUE_COLUMN)->setText(QString::number(bsData->boneWeights.at(i)));
                 }else{
-                    bones->setCellWidget(i, 1, new DoubleSpinBox(NULL, bsData->boneWeights.at(i), 6, 0.1, 1, 0));
-                    mapper->setMapping(bones->cellWidget(i, 1), i);
-                    connect(static_cast<DoubleSpinBox *>(bones->cellWidget(i, 1)), SIGNAL(editingFinished()), mapper, SLOT(map()));
+                    bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6)));
                 }
             }else{
                 bones->setRowCount(rowCount + 1);
-                bones->setItem(rowCount, 0, new QTableWidgetItem(boneNames.at(i)));
-                bones->setCellWidget(rowCount, 1, new DoubleSpinBox(NULL, bsData->boneWeights.at(i), 6, 0.1, 1, 0));
-                mapper->setMapping(bones->cellWidget(rowCount, 1), i);
-                connect(static_cast<DoubleSpinBox *>(bones->cellWidget(i, 1)), SIGNAL(editingFinished()), mapper, SLOT(map()));
+                bones->setItem(rowCount, NAME_COLUMN, new TableWidgetItem(boneNames.at(i)));
+                bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6)));
             }
         }
         for (int j = bsData->boneWeights.size(); j < bones->rowCount(); j++){
             bones->setRowHidden(j, true);
-        }*/
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("BoneWeightArrayUI::loadData(): The data passed to the UI is NULL!!!"))
+    }
+    blockSignals(false);
+}
+
+void BoneWeightArrayUI::setBoneWeight(){
+    int row = bones->currentRow();
+    if (bsData){
+        if (bsData->boneWeights.size() > row && row >= 0){
+            bsData->boneWeights[row] = selectedBone->value();
+            if (bones->item(row, VALUE_COLUMN)){
+                bones->item(row, VALUE_COLUMN)->setText(QString::number(selectedBone->value(), char('f'), 6));
+            }else{
+                bones->setItem(row, VALUE_COLUMN, new TableWidgetItem(QString::number(selectedBone->value(), char('f'), 6)));
+            }
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("BoneWeightArrayUI::setBoneWeight(): The 'bsData' pointer is NULL!!"))
     }
 }
 
-void BoneWeightArrayUI::setBoneWeight(int row){
+void BoneWeightArrayUI::loadBoneWeight(int row, int){
     if (bsData){
         if (bsData->boneWeights.size() > row && row >= 0){
-            if (bones->cellWidget(row, 1)){
-                bsData->boneWeights[row] = static_cast<DoubleSpinBox *>(bones->cellWidget(row, 1))->value();
-            }
+            selectedBone->setValue(bsData->boneWeights.at(row));
         }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("loadBoneWeight::setBoneWeight(): The 'bsData' pointer is NULL!!"))
     }
 }

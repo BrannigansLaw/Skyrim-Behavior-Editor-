@@ -20,6 +20,7 @@ public:
     virtual QRectF branchExpandCollapseBox() const;
     void setBrushColor(Qt::GlobalColor color);
     bool reorderChildren();
+    TreeGraphicsItem *getChildWithData(DataIconManager *data);
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
     virtual void setIconSelected();
@@ -40,7 +41,6 @@ private:
     bool hasSameData(DataIconManager *data) const;
     int getIconIndex();
     int determineInsertionIndex() const;
-    TreeGraphicsItem *getChildWithData(DataIconManager *data);
     //TreeGraphicsItem *getChildWithData(DataIconManager *data, int index);
     TreeGraphicsItem *getReplacementIcon(DataIconManager *data);
     int getIndexOfChild(TreeGraphicsItem *child) const;
@@ -49,14 +49,14 @@ private:
     void setIsExpanded(bool value);
     void setPathToParent();
     QList <TreeGraphicsItem *> getAllIconsInBranch(TreeGraphicsItem *iconToFind = NULL) const;
-private:
+protected:
     Qt::GlobalColor brushColor;
     DataIconManager * itemData;
     bool isExpanded;
     qreal yCoordinate;
     QGraphicsPathItem *path;
-    QString name;
-    TreeGraphicsItem *parent;
+    //QString name;
+    //TreeGraphicsItem *parent;
 };
 
 #endif // TREEGRAPHICSITEM_H

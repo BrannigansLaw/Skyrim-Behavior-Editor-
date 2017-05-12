@@ -275,9 +275,9 @@ void BehaviorVariablesUI::returnToTable(){
 void BehaviorVariablesUI::addVariableToTable(const QString & name, const QString & type){
     int row = table->rowCount();
     table->setRowCount(row + 1);
-    table->setItem(row, 0, new QTableWidgetItem(name));
-    table->setItem(row, 1, new QTableWidgetItem(type));
-    table->setItem(row, 2, new QTableWidgetItem("Click To Edit"));
+    table->setItem(row, 0, new TableWidgetItem(name));
+    table->setItem(row, 1, new TableWidgetItem(type));
+    table->setItem(row, 2, new TableWidgetItem("Click To Edit"));
     if (stackLyt->currentIndex() == VARIABLE_WIDGET){
         stackLyt->setCurrentIndex(TABLE_WIDGET);
     }
@@ -297,18 +297,24 @@ void BehaviorVariablesUI::loadData(HkxObject *data){
                 if (table->item(row, 0)){
                     table->item(row, 0)->setText(varNames->variableNames.at(i));
                 }else{
-                    table->setItem(row, 0, new QTableWidgetItem(varNames->variableNames.at(i)));
+                    table->setItem(row, 0, new TableWidgetItem(varNames->variableNames.at(i)));
                 }
             }else{
                 table->setRowCount(row + 1);
-                table->setItem(row, 0, new QTableWidgetItem(varNames->variableNames.at(i)));
-                table->setItem(row, 1, new QTableWidgetItem(loadedData->variableInfos.at(i).type));
-                table->setItem(row, 2, new QTableWidgetItem("Click To Edit"));
+                table->setItem(row, 0, new TableWidgetItem(varNames->variableNames.at(i)));
+                table->setItem(row, 1, new TableWidgetItem(loadedData->variableInfos.at(i).type));
+                table->setItem(row, 2, new TableWidgetItem("Click To Edit"));
             }
         }
         for (int j = varNames->variableNames.size(); j < table->rowCount(); j++){
             table->setRowHidden(j, true);
         }
+    }
+}
+
+void BehaviorVariablesUI::clear(){
+    for (int i = table->rowCount() - 1; i >= 0; i--){
+        table->removeRow(i);
     }
 }
 

@@ -9,11 +9,38 @@ uint hkbBlendingTransitionEffect::refCount = 0;
 
 QString hkbBlendingTransitionEffect::classname = "hkbBlendingTransitionEffect";
 
-QStringList hkbBlendingTransitionEffect::SelfTransitionMode = {"SELF_TRANSITION_MODE_CONTINUE_IF_CYCLIC_BLEND_IF_ACYCLIC", "SELF_TRANSITION_MODE_CONTINUE", "SELF_TRANSITION_MODE_RESET", "SELF_TRANSITION_MODE_BLEND"};
-QStringList hkbBlendingTransitionEffect::EventMode = {"EVENT_MODE_DEFAULT", "EVENT_MODE_PROCESS_ALL", "EVENT_MODE_IGNORE_FROM_GENERATOR", "EVENT_MODE_IGNORE_TO_GENERATOR"};
-QStringList hkbBlendingTransitionEffect::Flags = {"FLAG_NONE", "FLAG_IGNORE_FROM_WORLD_FROM_MODEL", "FLAG_SYNC", "FLAG_IGNORE_TO_WORLD_FROM_MODEL"};
-QStringList hkbBlendingTransitionEffect::EndMode = {"END_MODE_NONE", "END_MODE_TRANSITION_UNTIL_END_OF_FROM_GENERATOR", "END_MODE_CAP_DURATION_AT_END_OF_FROM_GENERATOR"};
-QStringList hkbBlendingTransitionEffect::BlendCurve = {"BLEND_CURVE_SMOOTH", "BLEND_CURVE_LINEAR", "BLEND_CURVE_LINEAR_TO_SMOOTH", "BLEND_CURVE_SMOOTH_TO_LINEAR"};
+QStringList hkbBlendingTransitionEffect::SelfTransitionMode = {
+    "SELF_TRANSITION_MODE_CONTINUE_IF_CYCLIC_BLEND_IF_ACYCLIC",
+    "SELF_TRANSITION_MODE_CONTINUE", "SELF_TRANSITION_MODE_RESET",
+    "SELF_TRANSITION_MODE_BLEND"
+};
+
+QStringList hkbBlendingTransitionEffect::EventMode = {
+    "EVENT_MODE_DEFAULT",
+    "EVENT_MODE_PROCESS_ALL",
+    "EVENT_MODE_IGNORE_FROM_GENERATOR",
+    "EVENT_MODE_IGNORE_TO_GENERATOR"
+};
+
+QStringList hkbBlendingTransitionEffect::Flags = {
+    "FLAG_NONE",
+    "FLAG_IGNORE_FROM_WORLD_FROM_MODEL",
+    "FLAG_SYNC",
+    "FLAG_IGNORE_TO_WORLD_FROM_MODEL"
+};
+
+QStringList hkbBlendingTransitionEffect::EndMode = {
+    "END_MODE_NONE",
+    "END_MODE_TRANSITION_UNTIL_END_OF_FROM_GENERATOR",
+    "END_MODE_CAP_DURATION_AT_END_OF_FROM_GENERATOR"
+};
+
+QStringList hkbBlendingTransitionEffect::BlendCurve = {
+    "BLEND_CURVE_SMOOTH",
+    "BLEND_CURVE_LINEAR",
+    "BLEND_CURVE_LINEAR_TO_SMOOTH",
+    "BLEND_CURVE_SMOOTH_TO_LINEAR"
+};
 
 hkbBlendingTransitionEffect::hkbBlendingTransitionEffect(HkxFile *parent, long ref)
     : HkDynamicObject(parent, ref),

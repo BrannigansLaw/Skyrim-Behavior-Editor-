@@ -12,7 +12,7 @@ class GenericTableWidget;
 class hkbManualSelectorGenerator;
 class QVBoxLayout;
 class TableWidget;
-class QTableWidgetItem;
+class TableWidgetItem;
 class SpinBox;
 class LineEdit;
 class ComboBox;

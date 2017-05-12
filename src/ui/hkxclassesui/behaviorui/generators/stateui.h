@@ -14,7 +14,7 @@ class TransitionsUI;
 class hkbStateMachineStateInfo;
 class QGridLayout;
 class TableWidget;
-class QTableWidgetItem;
+class TableWidgetItem;
 class SpinBox;
 class LineEdit;
 class ComboBox;
@@ -37,11 +37,12 @@ class StateUI: public QStackedWidget
 public:
     StateUI();
     virtual ~StateUI(){}
-    void loadData(HkxObject *data);
+    void loadData(HkxObject *data, int stateindex);
 signals:
     void stateNameChanged(const QString & newName, int index);
     void viewGenerators(int index);
     void returnToParent();
+    void viewVariables(int index);
     void viewEvents(int index);
 private slots:
     void setName();
@@ -55,6 +56,7 @@ private slots:
     void addTransition();
     void removeObjectChild();
     void viewSelectedChild(int row, int column);
+    void emitViewGenerators();
     void returnToWidget();
 private:
     void loadDynamicTableRows();
@@ -74,6 +76,7 @@ private:
     int rowToRemove;
     BehaviorGraphView *behaviorView;
     hkbStateMachineStateInfo *bsData;
+    int stateIndex;
     QGroupBox *groupBox;
     EventUI *eventUI;
     TransitionsUI *transitionUI;

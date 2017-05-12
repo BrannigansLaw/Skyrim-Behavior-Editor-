@@ -17,6 +17,7 @@ public:
     QSize sizeHint() const Q_DECL_OVERRIDE;
     bool drawGraph(DataIconManager *rootData, bool allowDuplicates = false);
     TreeGraphicsItem * getSelectedItem() const;
+    DataIconManager * getSelectedData() const;
     bool reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData, bool removeData = true);
 signals:
     void iconSelected(TreeGraphicsItem *selected);

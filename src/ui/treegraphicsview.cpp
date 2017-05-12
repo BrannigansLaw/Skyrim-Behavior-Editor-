@@ -72,6 +72,13 @@ TreeGraphicsItem *TreeGraphicsView::getSelectedItem() const{
     return treeScene->selectedIcon;
 }
 
+DataIconManager *TreeGraphicsView::getSelectedData() const{
+    if (treeScene->selectedIcon){
+        return treeScene->selectedIcon->itemData;
+    }
+    return NULL;
+}
+
 bool TreeGraphicsView::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData, bool removeData){
     bool result = treeScene->reconnectIcon(oldIconParent, dataToReplace, replacementData, removeData);
     oldIconParent->reposition();

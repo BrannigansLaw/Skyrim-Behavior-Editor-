@@ -8,7 +8,7 @@
 #include "src/utility.h"
 #include "src/hkxclasses/hkxobject.h"
 
-#define ITEM_WIDTH 300
+#define ITEM_WIDTH 400
 #define ITEM_HEIGHT 50
 
 #define MAX_NUM_GRAPH_ICONS 10000
@@ -25,37 +25,7 @@ TreeGraphicsItem::TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *ob
     QList <QGraphicsItem *> children;
     setFlags(QGraphicsItem::ItemIsSelectable);
     itemData->appendIcon(this);
-    name = itemData->getName();
-    if (itemData->getType() == HkxObject::TYPE_MODIFIER){
-        brushColor = Qt::magenta;
-    }else{
-        HkxSignature sig = itemData->getSignature();
-        switch (sig){
-        case HKB_BLENDER_GENERATOR:
-            brushColor = Qt::darkRed;
-            break;
-        case HKB_POSE_MATCHING_GENERATOR:
-            brushColor = Qt::darkRed;
-            break;
-        case BS_BONE_SWITCH_GENERATOR:
-            brushColor = Qt::darkRed;
-            break;
-        case HKB_STATE_MACHINE:
-            brushColor = Qt::cyan;
-            break;
-        case HKB_CLIP_GENERATOR:
-            brushColor = Qt::yellow;
-            break;
-        case HKB_BEHAVIOR_REFERENCE_GENERATOR:
-            brushColor = Qt::darkYellow;
-            break;
-        case BS_SYNCHRONIZED_CLIP_GENERATOR:
-            brushColor = Qt::yellow;
-            break;
-        default:
-            brushColor = Qt::gray;
-        }
-    }
+    //name = itemData->getName();
     if (parentItem()){
         if (indexToInsert > -1 && indexToInsert < parentItem()->childItems().size()){
             children = parentItem()->childItems();
@@ -75,7 +45,6 @@ TreeGraphicsItem::TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *ob
             }
         }
         setPosition(QPointF(boundingRect().width()*2, getYCoordinate()));
-        this->parent = (TreeGraphicsItem *)parentItem();
     }
 }
 
@@ -106,10 +75,11 @@ void TreeGraphicsItem::setBrushColor(Qt::GlobalColor color){
 }
 
 void TreeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
+    painter->setRenderHint(QPainter::Antialiasing);
     painter->setPen(Qt::black);
     painter->setBrush(brushColor);
     painter->drawRect(boundingRect());
-    painter->drawText(boundingRect(), name);
+    painter->drawText(boundingRect(), itemData->getName());
     if (!childItems().isEmpty()){
         if (!isExpanded){
             painter->setBrush(Qt::red);
@@ -128,36 +98,7 @@ void TreeGraphicsItem::setIconSelected(){
 }
 
 void TreeGraphicsItem::unselect(){
-    if (itemData->getType() == HkxObject::TYPE_MODIFIER){
-        brushColor = Qt::magenta;
-    }else{
-        HkxSignature sig = itemData->getSignature();
-        switch (sig){
-        case HKB_BLENDER_GENERATOR:
-            brushColor = Qt::darkRed;
-            break;
-        case HKB_POSE_MATCHING_GENERATOR:
-            brushColor = Qt::darkRed;
-            break;
-        case BS_BONE_SWITCH_GENERATOR:
-            brushColor = Qt::darkRed;
-            break;
-        case HKB_STATE_MACHINE:
-            brushColor = Qt::cyan;
-            break;
-        case HKB_CLIP_GENERATOR:
-            brushColor = Qt::yellow;
-            break;
-        case HKB_BEHAVIOR_REFERENCE_GENERATOR:
-            brushColor = Qt::darkYellow;
-            break;
-        case BS_SYNCHRONIZED_CLIP_GENERATOR:
-            brushColor = Qt::yellow;
-            break;
-        default:
-            brushColor = Qt::gray;
-        }
-    }
+    brushColor = Qt::gray;
     scene()->update(QRectF(scenePos(), scenePos() + QPointF(ITEM_WIDTH, ITEM_HEIGHT)));
 }
 
@@ -344,7 +285,6 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
     }else{
         CRITICAL_ERROR_MESSAGE(QString("TreeGraphicsItem::setParent(): Error!!!"))
     }
-    this->parent = newParent;
     return (TreeGraphicsItem *)oldParent;
 }
 

@@ -1,6 +1,7 @@
 #include "treegraphicsscene.h"
 #include "treegraphicsitem.h"
 #include "dataiconmanager.h"
+#include "src/ui/hkxclassesui/behaviorui/behaviorgraphicon.h"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
@@ -112,7 +113,7 @@ bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicate
     QVector <short> numChildren;
     TreeGraphicsItem *newIcon = NULL;
     if (rootData){
-        rootIcon = new TreeGraphicsItem(NULL, rootData);
+        rootIcon = new BehaviorGraphIcon(NULL, rootData);
         addItem(rootIcon);
         objects.append(children);
         numChildren.append(children.size());
@@ -170,13 +171,13 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
         }
         if (!inject){
             if (isFirstDraw){
-                newIcon = new TreeGraphicsItem(selectedIcon, data, selectedIcon->getIndexofIconWithData(data));
+                newIcon = new BehaviorGraphIcon(selectedIcon, data, selectedIcon->getIndexofIconWithData(data));
             }else{
-                newIcon = new TreeGraphicsItem(selectedIcon, data, indexToInsert);
+                newIcon = new BehaviorGraphIcon(selectedIcon, data, indexToInsert);
                 selectedIcon->itemData->insertObjectAt(indexToInsert, data);
             }
         }else if (parent){
-            newIcon = new TreeGraphicsItem(parent, data, parent->getIndexofIconWithData(selectedIcon->itemData));
+            newIcon = new BehaviorGraphIcon(parent, data, parent->getIndexofIconWithData(selectedIcon->itemData));
             selectedIcon->itemData->wrapObjectAt(indexToInsert, data, parent->itemData);
             selectedIcon->setParent(newIcon, newIcon->getIndexofIconWithData(selectedIcon->itemData));
         }else{

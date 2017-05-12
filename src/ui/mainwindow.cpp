@@ -140,8 +140,10 @@ void MainWindow::changedTabs(int index){
         }else if (index >= 0){
             objectDataWid->setBehaviorView(behaviorGraphs.at(index));
             setProgressData("Loading Variables...", 0);
+            variablesWid->clear();
             variablesWid->loadData(behaviorFiles.at(index)->getBehaviorGraphData());
             setProgressData("Loading Events...", 99);
+            eventsWid->clear();
             eventsWid->loadData(behaviorFiles.at(index)->getBehaviorGraphData());
             topLyt->removeWidget(behaviorGraphViewGB);
             topLyt->addWidget(behaviorGraphViewGB, 1, 0, 9, 6);

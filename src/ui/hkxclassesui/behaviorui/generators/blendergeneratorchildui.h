@@ -1,7 +1,7 @@
 #ifndef BLENDERGENERATORCHILDUI_H
 #define BLENDERGENERATORCHILDUI_H
 
-#include <QGroupBox>
+#include <QStackedWidget>
 
 #include "src/utility.h"
 
@@ -16,8 +16,10 @@ class QStackedLayout;
 class ComboBox;
 class QPushButton;
 class BehaviorGraphView;
+class QGroupBox;
+class QGridLayout;
 
-class BlenderGeneratorChildUI: public QGroupBox
+class BlenderGeneratorChildUI: public QStackedWidget
 {
     Q_OBJECT
     friend class BlenderGeneratorUI;
@@ -45,12 +47,13 @@ private:
 private:
     enum ACTIVE_WIDGET {
         MAIN_WIDGET = 0,
-        CHILD_WIDGET = 1
+        BONE_WEIGHTS_ARRAY_WIDGET = 1
     };
     static QStringList headerLabels;
     BehaviorGraphView *behaviorView;
     hkbBlenderGeneratorChild *bsData;
-    QStackedLayout *stackLyt;
+    QGridLayout *topLyt;
+    QGroupBox *groupBox;
     QPushButton *returnPB;
     TableWidget *table;
     BoneWeightArrayUI *boneWeights;

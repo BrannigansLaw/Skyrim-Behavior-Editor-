@@ -41,18 +41,60 @@ public:
     }
 };
 
+class ConditionValidator: public QValidator
+{
+public:
+    QValidator::State validate(QString & input, int &) const Q_DECL_OVERRIDE{
+        if (input.contains(">") || input.contains("<")){
+            return QValidator::Invalid;
+        }else{
+            return QValidator::Acceptable;
+        }
+    }
+
+    void fixup(QString & input) const{
+        input.replace(">", "gt;");
+        input.replace("<", "lt;");
+    }
+};
+
+class ConditionLineEdit: public QLineEdit{
+    Q_OBJECT
+public:
+    ConditionLineEdit(const QString & text = "", QWidget * par = 0)
+        : QLineEdit(text, par)
+    {
+        setValidator(new ConditionValidator());
+    }
+};
+
+class TableWidgetItem: public QTableWidgetItem
+{
+public:
+    TableWidgetItem(const QString & text, int align = Qt::AlignLeft | Qt::AlignVCenter, const QColor & backgroundColor = QColor(Qt::white), const QBrush & textColor = QBrush(Qt::black), const QString & tip = "")
+        : QTableWidgetItem(text)
+    {
+        setTextAlignment(align);
+        setBackgroundColor(backgroundColor);
+        setForeground(textColor);
+        setToolTip(tip);
+    }
+};
+
 class TableWidget: public QTableWidget
 {
     Q_OBJECT
 public:
-    TableWidget(QWidget* parent = 0)
+    TableWidget(QWidget *parent = 0)
         : QTableWidget(parent)
     {
-        //verticalHeader()->setVisible(false);
+        setStyleSheet("QHeaderView::section { background-color:grey }");
+        setMouseTracking(true);
+        verticalHeader()->setVisible(false);
         setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
         horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        setSelectionBehavior(QAbstractItemView::SelectRows);
+        //setSelectionBehavior(QAbstractItemView::SelectRows);
         setSelectionMode(QAbstractItemView::SingleSelection);
         setEditTriggers(QAbstractItemView::NoEditTriggers);
     }

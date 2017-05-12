@@ -134,9 +134,6 @@ private slots:
 private:
     template <typename T> void append(T *obj);
     template <typename T> void wrap(T *obj);
-    void wrap(hkbStateMachine *obj);
-    void wrap(hkbBlenderGenerator *obj);
-    void wrap(hkbPoseMatchingGenerator *obj);
     void enableAllMenuActions(QMenu *menu);
     void disableAllMenuActions(QMenu *menu);
     bool confirmationDialogue(const QString & message, QWidget *parent);

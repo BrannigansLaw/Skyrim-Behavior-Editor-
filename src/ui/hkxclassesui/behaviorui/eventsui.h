@@ -23,6 +23,7 @@ public:
     virtual ~EventsUI(){}
     void setHkDataUI(HkDataUI *ui);
     void loadData(HkxObject *data);
+    void clear();
 private slots:
     void addEvent();
     void removeEvent();

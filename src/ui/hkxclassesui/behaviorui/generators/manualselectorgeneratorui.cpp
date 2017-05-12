@@ -74,15 +74,15 @@ ManualSelectorGeneratorUI::ManualSelectorGeneratorUI()
     table->setColumnCount(4);
     table->setHorizontalHeaderLabels(headerLabels1);
     table->setCellWidget(0, 0, name);
-    table->setItem(0, 1, new QTableWidgetItem("hkStringPtr"));
-    table->setItem(0, 2, new QTableWidgetItem("N/A"));
-    table->setItem(0, 3, new QTableWidgetItem("N/A"));
-    table->setItem(1, 0, new QTableWidgetItem("selectedGeneratorIndex"));
-    table->setItem(1, 1, new QTableWidgetItem("hkInt32"));
+    table->setItem(0, 1, new TableWidgetItem("hkStringPtr"));
+    table->setItem(0, 2, new TableWidgetItem("N/A"));
+    table->setItem(0, 3, new TableWidgetItem("N/A"));
+    table->setItem(1, 0, new TableWidgetItem("selectedGeneratorIndex"));
+    table->setItem(1, 1, new TableWidgetItem("hkInt32"));
     table->setCellWidget(1, 2, selectedGeneratorIndexBind);
     table->setCellWidget(1, 3, selectedGeneratorIndex);
-    table->setItem(2, 0, new QTableWidgetItem("currentGeneratorIndex"));
-    table->setItem(2, 1, new QTableWidgetItem("hkInt32"));
+    table->setItem(2, 0, new TableWidgetItem("currentGeneratorIndex"));
+    table->setItem(2, 1, new TableWidgetItem("hkInt32"));
     table->setCellWidget(2, 2, currentGeneratorIndexBind);
     table->setCellWidget(2, 3, currentGeneratorIndex);
     generators->setColumnCount(3);
@@ -97,7 +97,6 @@ ManualSelectorGeneratorUI::ManualSelectorGeneratorUI()
     connect(removeObjectPB, SIGNAL(released()), this, SLOT(removeGenerator()));
     connect(generators, SIGNAL(cellClicked(int,int)), this, SLOT(viewGenerators()));
     connect(generatorTable, SIGNAL(elementSelected(int,QString)), this, SLOT(setGenerator(int)));
-    connect(generatorTable, SIGNAL(hideWindow()), this, SLOT(viewGenerators()));
     connect(selectedGeneratorIndex, SIGNAL(editingFinished()), this, SLOT(setSelectedGeneratorIndex(int)));
     connect(selectedGeneratorIndexBind, SIGNAL(activated(int)), this, SLOT(setSelectedGeneratorIndexBind(int)));
     connect(currentGeneratorIndex, SIGNAL(editingFinished()), this, SLOT(setCurrentGeneratorIndex(int)));
@@ -191,9 +190,9 @@ void ManualSelectorGeneratorUI::loadData(HkxObject *data){
             if (bsData->generators.at(i).data()){
                 if (i >= generators->rowCount()){
                     generators->setRowCount(generators->rowCount() + 1);
-                    generators->setItem(i, 0, new QTableWidgetItem(gen->getName()));
-                    generators->setItem(i, 1, new QTableWidgetItem(gen->getClassname()));
-                    generators->setItem(i, 2, new QTableWidgetItem("Click to Edit"));
+                    generators->setItem(i, 0, new TableWidgetItem(gen->getName()));
+                    generators->setItem(i, 1, new TableWidgetItem(gen->getClassname()));
+                    generators->setItem(i, 2, new TableWidgetItem("Click to Edit"));
                 }else{
                     generators->setRowHidden(i, false);
                     generators->item(i, 0)->setText(gen->getName());
@@ -345,9 +344,9 @@ void ManualSelectorGeneratorUI::addNewGenerator(){
     }
     if (!bsData->generators.isEmpty() && bsData->generators.last().data()){
         generators->setRowCount(generators->rowCount() + 1);
-        generators->setItem(generators->rowCount(), 0, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->generators.last().data())->getName()));
-        generators->setItem(generators->rowCount(), 1, new QTableWidgetItem(static_cast<hkbGenerator *>(bsData->generators.last().data())->getClassname()));
-        generators->setItem(generators->rowCount(), 2, new QTableWidgetItem("Click to Edit"));
+        generators->setItem(generators->rowCount(), 0, new TableWidgetItem(static_cast<hkbGenerator *>(bsData->generators.last().data())->getName()));
+        generators->setItem(generators->rowCount(), 1, new TableWidgetItem(static_cast<hkbGenerator *>(bsData->generators.last().data())->getClassname()));
+        generators->setItem(generators->rowCount(), 2, new TableWidgetItem("Click to Edit"));
         bsData->getParentFile()->toggleChanged(true);
     }
 }

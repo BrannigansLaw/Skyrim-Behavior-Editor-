@@ -156,7 +156,7 @@ void HkDataUI::setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *varia
     connect(eventsUI, SIGNAL(eventAdded(QString)), this, SLOT(eventAdded(QString)));
     connect(eventsUI, SIGNAL(eventRemoved(int)), this, SLOT(eventRemoved(int)));
     connect(eventsUI, SIGNAL(eventNameChanged(QString,int)), this, SLOT(eventNameChanged(QString,int)));
-    connect(variablesUI, SIGNAL(variableAdded(QString,QString)), this, SLOT(variableAdded(QString)));
+    connect(variablesUI, SIGNAL(variableAdded(QString,QString)), this, SLOT(variableAdded(QString,QString)));
     connect(variablesUI, SIGNAL(variableRemoved(int)), this, SLOT(variableRemoved(int)));
     connect(variablesUI, SIGNAL(variableNameChanged(QString,int)), this, SLOT(variableNameChanged(QString,int)));
 }
@@ -260,7 +260,7 @@ void HkDataUI::generatorRemoved(int index){
     generatorsTable->removeItem(index);
     switch (stack->currentIndex()) {
     case BLENDER_GENERATOR:
-        //remove generator in table???
+        //reload active widget...
         break;
     default:
         break;
@@ -273,7 +273,7 @@ void HkDataUI::modifierRemoved(int index){
     modifiersTable->removeItem(index);
     switch (stack->currentIndex()) {
     case MODIFIER_GENERATOR:
-        //remove modifier in table???
+        //reload active widget table for multi-modifier child class...
         break;
     default:
         break;
@@ -285,7 +285,7 @@ void HkDataUI::variableRemoved(int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     variablesTable->removeItem(index);
     switch (stack->currentIndex()) {
-    case BLENDER_GENERATOR:
+    case BLENDER_GENERATOR://reload active widget???
         blenderGeneratorUI->renameVariable("NONE", index);
         break;
     default:
@@ -307,10 +307,9 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             if (loadedData != oldData){
                 blenderGeneratorUI->loadData(loadedData);
             }
-            blenderGeneratorUI->setCurrentIndex(BlenderGeneratorUI::MAIN_WIDGET);
             stack->setCurrentIndex(BLENDER_GENERATOR);
             blenderGeneratorUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
-            connect(variablesTable, SIGNAL(elementSelected(int,QString)), blenderGeneratorUI, SLOT(setBindingVariable(int,QString)), Qt::UniqueConnection);
+            //connect(variablesTable, SIGNAL(elementSelected(int,QString)), blenderGeneratorUI, SLOT(setBindingVariable(int,QString)), Qt::UniqueConnection);
             break;
         case BS_I_STATE_TAGGING_GENERATOR:
             if (loadedData != oldData){
@@ -359,7 +358,7 @@ BehaviorGraphView *HkDataUI::setBehaviorView(BehaviorGraphView *view){
     iSTGUI->behaviorView = view;
     modGenUI->behaviorView = view;
     manSelGenUI->behaviorView = view;
-    stateMachineUI->behaviorView = view;
+    stateMachineUI->setBehaviorView(view);
     blenderGeneratorUI->setBehaviorView(view);
     if (behaviorView){
         generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "NULL");

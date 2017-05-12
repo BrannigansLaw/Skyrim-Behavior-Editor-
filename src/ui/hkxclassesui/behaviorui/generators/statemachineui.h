@@ -61,8 +61,8 @@ private slots:
     void eventTableElementSelected(int index, const QString &name);
     void variableTableElementSelected(int index, const QString &name);
     void generatorTableElementSelected(int index, const QString &name);
-private:
     void returnToWidget();
+private:
     void loadDynamicTableRows();
     void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value);
     void connectToTableWidgets(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *events);

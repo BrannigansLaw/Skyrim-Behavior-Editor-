@@ -6,6 +6,7 @@
 class hkbBlendingTransitionEffect: public HkDynamicObject
 {
     friend class BehaviorGraphView;
+    friend class BlendingTransitionEffectUI;
 public:
     hkbBlendingTransitionEffect(HkxFile *parent, long ref = -1);
     virtual ~hkbBlendingTransitionEffect();

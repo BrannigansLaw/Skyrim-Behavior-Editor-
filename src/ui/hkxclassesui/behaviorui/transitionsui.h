@@ -1,7 +1,7 @@
 #ifndef TRANSITIONSUI_H
 #define TRANSITIONSUI_H
 
-#include <QGroupBox>
+#include <QStackedWidget>
 
 #include "src/hkxclasses/behavior/hkbstatemachinetransitioninfoarray.h"
 
@@ -10,7 +10,7 @@ class TableWidget;
 class LineEdit;
 class ComboBox;
 class hkbStateMachineTransitionInfoArray;
-class QVBoxLayout;
+class QGridLayout;
 class HkxObject;
 class SpinBox;
 class DoubleSpinBox;
@@ -20,8 +20,11 @@ class QStackedLayout;
 class QPushButton;
 class HkTransition;
 class hkbGenerator;
+class ConditionLineEdit;
+class QGroupBox;
+class BehaviorFile;
 
-class TransitionsUI: public QGroupBox
+class TransitionsUI: public QStackedWidget
 {
     Q_OBJECT
     friend class HkDataUI;
@@ -30,73 +33,66 @@ class TransitionsUI: public QGroupBox
 public:
     TransitionsUI();
     virtual ~TransitionsUI(){}
-    void loadData(hkbStateMachine *parent, hkbStateMachineTransitionInfoArray::HkTransition *data);
+    void loadData(BehaviorFile *parentfile, hkbStateMachine *parent, hkbStateMachineTransitionInfoArray::HkTransition *data);
 signals:
+    void viewEvents(int index);
+    void viewVariables(int index);
     void returnToParent();
 private slots:
-    void setTriggerIntervalEnterEventId();
-    void setTriggerIntervalExitEventId();
+    void setTriggerIntervalEnterEventId(int index, const QString &name);
+    void setTriggerIntervalExitEventId(int index, const QString &name);
     void setTriggerIntervalEnterTime();
     void setTriggerIntervalExitTime();
-    void setInitiateIntervalEnterEventId();
-    void setInitiateIntervalExitEventId();
+    void setInitiateIntervalEnterEventId(int index, const QString &name);
+    void setInitiateIntervalExitEventId(int index, const QString &name);
     void setInitiateIntervalEnterTime();
     void setInitiateIntervalExitTime();
-    void viewTransition();
+    void viewTransitionEffect();
     void setCondition();
-    void setEventId();
-    void setToStateId();
-    void setFromNestedStateId();
-    void setToNestedStateId();
+    void setEventId(int index, const QString &name);
+    void setToStateId(const QString &name);
+    void setFromNestedStateId(const QString &name);
+    void setToNestedStateId(const QString &name);
     void setPriority();
-    void toggleWildcardFlag();
-    void toggleLocalFlag();
+    void toggleGlobalWildcardFlag();
     void toggleUseNestedStateFlag();
     void toggleDisallowRandomTransitionFlag();
     void toggleDisallowReturnToStateFlag();
     void toggleAbutEndStateFlag();
+    void eventTableElementSelected(int index, const QString &name);
+    void returnToWidget();
+    void viewSelectedChild(int row, int column);
 private:
-    void addEventToLists(const QString & name);
-    void removeEventFromLists(int index);
-    void renameEventInLists(const QString & newName, int index);
-    void addVariableToLists(const QString & name);
-    void removeVariableFromLists(int index);
-    void renameVariableInLists(const QString & newName, int index);
-    void loadComboBoxes();
+    void eventRenamed(const QString & name, int index);
+    void stateRenamed(const QString & name, int index);
 private:
     enum TransitionEffectView {
         TRANSITION_WIDGET = 0,
         TRANSITION_EFFECT_WIDGET = 1
     };
-    static QStringList headerLabels1;
-    BehaviorGraphView *behaviorView;
+    static QStringList headerLabels;
+    BehaviorFile *file;
     hkbStateMachine *parentObj;
     hkbStateMachineTransitionInfoArray::HkTransition *bsData;
-    QPushButton *returnToParentPB;
-    QVBoxLayout *lyt;
-    TableWidget *table;
     QPushButton *returnPB;
-    ComboBox *enterEventIdTI;
-    ComboBox *exitEventIdTI;
+    QGridLayout *topLyt;
+    QGroupBox *groupBox;
+    TableWidget *table;
     DoubleSpinBox *enterTimeTI;
     DoubleSpinBox *exitTimeTI;
-    ComboBox *enterEventIdII;
-    ComboBox *exitEventIdII;
     DoubleSpinBox *enterTimeII;
     DoubleSpinBox *exitTimeII;
-    LineEdit *condition;
-    ComboBox *eventId;
+    BlendingTransitionEffectUI *transition; //Need Generator transition effect too???
+    ConditionLineEdit *condition;
     ComboBox *toStateId;
     ComboBox *fromNestedStateId;
     ComboBox *toNestedStateId;
     SpinBox *priority;
-    QCheckBox *flagWildcard;
-    QCheckBox *flagLocal;
+    QCheckBox *flagGlobalWildcard;
     QCheckBox *flagUseNestedState;
     QCheckBox *flagDisallowRandomTransition;
     QCheckBox *flagDisallowReturnToState;
     QCheckBox *flagAbutEndState;
-    QStackedLayout *stackLyt;
 };
 
 #endif // TRANSITIONSUI_H

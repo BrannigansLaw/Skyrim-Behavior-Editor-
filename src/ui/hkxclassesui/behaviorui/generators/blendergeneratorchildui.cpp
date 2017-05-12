@@ -16,23 +16,19 @@
 #include <QStackedLayout>
 #include <QHeaderView>
 #include <QSpinBox>
+#include <QGroupBox>
 
-#define BASE_NUMBER_OF_ROWS 5
+#define BASE_NUMBER_OF_ROWS 4
 
-#define RETURN_BUTTON_ROW 0
-#define BONE_WEIGHTS_ROW 1
-#define WEIGHT_ROW 2
-#define WORLD_FROM_MODEL_WEIGHT_ROW 3
-#define GENERATOR_ROW 4
+#define BONE_WEIGHTS_ROW 0
+#define WEIGHT_ROW 1
+#define WORLD_FROM_MODEL_WEIGHT_ROW 2
+#define GENERATOR_ROW 3
 
 #define NAME_COLUMN 0
 #define TYPE_COLUMN 1
 #define BINDING_COLUMN 2
 #define VALUE_COLUMN 3
-
-/*
- * BlenderGeneratorChildUI
- */
 
 QStringList BlenderGeneratorChildUI::headerLabels = {
     "Name",
@@ -44,37 +40,39 @@ QStringList BlenderGeneratorChildUI::headerLabels = {
 BlenderGeneratorChildUI::BlenderGeneratorChildUI()
     : behaviorView(NULL),
       bsData(NULL),
-      stackLyt(new QStackedLayout),
+      topLyt(new QGridLayout),
+      groupBox(new QGroupBox("hkbBlenderGeneratorChild")),
       returnPB(new QPushButton("Return")),
       table(new TableWidget),
       boneWeights(new BoneWeightArrayUI),
       weight(new DoubleSpinBox),
       worldFromModelWeight(new DoubleSpinBox)
 {
-    setTitle("hkbBlenderGeneratorChild");
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
     table->setHorizontalHeaderLabels(headerLabels);
-    table->setCellWidget(RETURN_BUTTON_ROW, NAME_COLUMN, returnPB);
-    table->setItem(BONE_WEIGHTS_ROW, NAME_COLUMN, new QTableWidgetItem("boneWeights"));
-    table->setItem(BONE_WEIGHTS_ROW, TYPE_COLUMN, new QTableWidgetItem("hkbBoneWeightArray"));
-    table->setItem(BONE_WEIGHTS_ROW, BINDING_COLUMN, new QTableWidgetItem("NONE"));
-    table->setItem(BONE_WEIGHTS_ROW, VALUE_COLUMN, new QTableWidgetItem("NONE"));
-    table->setItem(WEIGHT_ROW, NAME_COLUMN, new QTableWidgetItem("weight"));
-    table->setItem(WEIGHT_ROW, TYPE_COLUMN, new QTableWidgetItem("hkReal"));
-    table->setItem(WEIGHT_ROW, BINDING_COLUMN, new QTableWidgetItem("NONE"));
+    table->setItem(BONE_WEIGHTS_ROW, NAME_COLUMN, new TableWidgetItem("boneWeights"));
+    table->setItem(BONE_WEIGHTS_ROW, TYPE_COLUMN, new TableWidgetItem("hkbBoneWeightArray", Qt::AlignCenter));
+    table->setItem(BONE_WEIGHTS_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::white), "Click to view the list of variables to bind to this value"));
+    table->setItem(BONE_WEIGHTS_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::white), "Click to view the list of bone weights"));
+    table->setItem(WEIGHT_ROW, NAME_COLUMN, new TableWidgetItem("weight"));
+    table->setItem(WEIGHT_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
+    table->setItem(WEIGHT_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::white), "Click to view the list of variables to bind to this value"));
     table->setCellWidget(WEIGHT_ROW, VALUE_COLUMN, weight);
-    table->setItem(WORLD_FROM_MODEL_WEIGHT_ROW, NAME_COLUMN, new QTableWidgetItem("worldFromModelWeight"));
-    table->setItem(WORLD_FROM_MODEL_WEIGHT_ROW, TYPE_COLUMN, new QTableWidgetItem("hkReal"));
-    table->setItem(WORLD_FROM_MODEL_WEIGHT_ROW, BINDING_COLUMN, new QTableWidgetItem("NONE"));
+    table->setItem(WORLD_FROM_MODEL_WEIGHT_ROW, NAME_COLUMN, new TableWidgetItem("worldFromModelWeight"));
+    table->setItem(WORLD_FROM_MODEL_WEIGHT_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
+    table->setItem(WORLD_FROM_MODEL_WEIGHT_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::white), "Click to view the list of variables to bind to this value"));
     table->setCellWidget(WORLD_FROM_MODEL_WEIGHT_ROW, VALUE_COLUMN, worldFromModelWeight);
-    table->setItem(GENERATOR_ROW, NAME_COLUMN, new QTableWidgetItem("generator"));
-    table->setItem(GENERATOR_ROW, TYPE_COLUMN, new QTableWidgetItem("hkbGenerator"));
-    table->setItem(GENERATOR_ROW, BINDING_COLUMN, new QTableWidgetItem("N/A"));
-    table->setItem(GENERATOR_ROW, VALUE_COLUMN, new QTableWidgetItem("NONE"));
-    stackLyt->addWidget(table);
-    stackLyt->addWidget(boneWeights);
-    setLayout(stackLyt);
+    table->setItem(GENERATOR_ROW, NAME_COLUMN, new TableWidgetItem("generator"));
+    table->setItem(GENERATOR_ROW, TYPE_COLUMN, new TableWidgetItem("hkbGenerator", Qt::AlignCenter));
+    table->setItem(GENERATOR_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
+    table->setItem(GENERATOR_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::white), "Click to view the list of generators"));
+    topLyt->addWidget(returnPB, 0, 1, 1, 1);
+    topLyt->addWidget(table, 1, 0, 8, 3);
+    groupBox->setLayout(topLyt);
+    //Order here must correspond with the ACTIVE_WIDGET Enumerated type!!!
+    addWidget(groupBox);
+    addWidget(boneWeights);
     connect(boneWeights, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
     connect(weight, SIGNAL(editingFinished()), this, SLOT(setWeight()), Qt::UniqueConnection);
     connect(worldFromModelWeight, SIGNAL(editingFinished()), this, SLOT(setWorldFromModelWeight()), Qt::UniqueConnection);
@@ -83,11 +81,16 @@ BlenderGeneratorChildUI::BlenderGeneratorChildUI()
 }
 
 void BlenderGeneratorChildUI::loadData(HkxObject *data){
+    blockSignals(true);
     hkbVariableBindingSet *bind = NULL;
     if (data){
         if (data->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
             bsData = static_cast<hkbBlenderGeneratorChild *>(data);
-            boneWeights->loadData(bsData->boneWeights.data());
+            if (bsData->boneWeights.data()){
+                table->item(GENERATOR_ROW, VALUE_COLUMN)->setText("Click to edit");
+            }else{
+                table->item(GENERATOR_ROW, VALUE_COLUMN)->setText("NULL");
+            }
             weight->setValue(bsData->weight);
             worldFromModelWeight->setValue(bsData->worldFromModelWeight);
             if (bsData->generator.data()){
@@ -122,6 +125,7 @@ void BlenderGeneratorChildUI::loadData(HkxObject *data){
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::loadData(): The data passed to the UI is NULL!!!"))
     }
+    blockSignals(false);
 }
 
 void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
@@ -238,7 +242,7 @@ void BlenderGeneratorChildUI::viewSelected(int row, int column){
         if (row == BONE_WEIGHTS_ROW){
             if (column == VALUE_COLUMN){
                 boneWeights->loadData(bsData->boneWeights.data());
-                stackLyt->setCurrentIndex(CHILD_WIDGET);
+                setCurrentIndex(BONE_WEIGHTS_ARRAY_WIDGET);
             }else if (column == BINDING_COLUMN){
                 if (bsData->variableBindingSet.data()){
                     emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
@@ -248,7 +252,7 @@ void BlenderGeneratorChildUI::viewSelected(int row, int column){
             }
         }else if (row == GENERATOR_ROW && column == VALUE_COLUMN){
             emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1);
-        }else if (row > RETURN_BUTTON_ROW && row != GENERATOR_ROW && column == BINDING_COLUMN){
+        }else if (row >= 0 && row != GENERATOR_ROW && column == BINDING_COLUMN){
             if (bsData->variableBindingSet.data()){
                 emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
             }else{
@@ -261,7 +265,7 @@ void BlenderGeneratorChildUI::viewSelected(int row, int column){
 }
 
 void BlenderGeneratorChildUI::returnToWidget(){
-    stackLyt->setCurrentIndex(MAIN_WIDGET);
+    setCurrentIndex(MAIN_WIDGET);
 }
 
 void BlenderGeneratorChildUI::variableRenamed(const QString & name, int index){

@@ -275,9 +275,9 @@ void CharacterPropertiesUI::returnToTable(){
 void CharacterPropertiesUI::addVariableToTable(const QString & name, const QString & type){
     int row = table->rowCount();
     table->setRowCount(row + 1);
-    table->setItem(row, 0, new QTableWidgetItem(name));
-    table->setItem(row, 1, new QTableWidgetItem(type));
-    table->setItem(row, 2, new QTableWidgetItem("Click To Edit"));
+    table->setItem(row, 0, new TableWidgetItem(name));
+    table->setItem(row, 1, new TableWidgetItem(type));
+    table->setItem(row, 2, new TableWidgetItem("Click To Edit"));
     if (stackLyt->currentIndex() == VARIABLE_WIDGET){
         stackLyt->setCurrentIndex(TABLE_WIDGET);
     }
@@ -297,13 +297,13 @@ void CharacterPropertiesUI::loadData(HkxObject *data){
                 if (table->item(row, 0)){
                     table->item(row, 0)->setText(varNames->characterPropertyNames.at(i));
                 }else{
-                    table->setItem(row, 0, new QTableWidgetItem(varNames->characterPropertyNames.at(i)));
+                    table->setItem(row, 0, new TableWidgetItem(varNames->characterPropertyNames.at(i)));
                 }
             }else{
                 table->setRowCount(row + 1);
-                table->setItem(row, 0, new QTableWidgetItem(varNames->characterPropertyNames.at(i)));
-                table->setItem(row, 1, new QTableWidgetItem(loadedData->characterPropertyInfos.at(i).type));
-                table->setItem(row, 2, new QTableWidgetItem("Click To Edit"));
+                table->setItem(row, 0, new TableWidgetItem(varNames->characterPropertyNames.at(i)));
+                table->setItem(row, 1, new TableWidgetItem(loadedData->characterPropertyInfos.at(i).type));
+                table->setItem(row, 2, new TableWidgetItem("Click To Edit"));
             }
         }
         for (int j = varNames->characterPropertyNames.size(); j < table->rowCount(); j++){

@@ -152,7 +152,8 @@ SOURCES += \
     src/ui/treegraphicsitem.cpp \
     src/ui/dataiconmanager.cpp \
     src/ui/behaviorgraphview.cpp \
-    src/ui/hkxclassesui/behaviorui/eventui.cpp
+    src/ui/hkxclassesui/behaviorui/eventui.cpp \
+    src/ui/hkxclassesui/behaviorui/behaviorgraphicon.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -287,4 +288,5 @@ HEADERS  += \
     src/ui/treegraphicsview.h \
     src/ui/treegraphicsitem.h \
     src/ui/behaviorgraphview.h \
-    src/ui/hkxclassesui/behaviorui/eventui.h
+    src/ui/hkxclassesui/behaviorui/eventui.h \
+    src/ui/hkxclassesui/behaviorui/behaviorgraphicon.h
