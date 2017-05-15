@@ -26,12 +26,12 @@ class BlenderGeneratorChildUI: public QStackedWidget
 public:
     BlenderGeneratorChildUI();
     virtual ~BlenderGeneratorChildUI(){}
-    void loadData(HkxObject *data);
+    void loadData(HkxObject *data, int childindex);
 signals:
     void viewVariables(int index);
     void viewGenerators(int index);
     void viewProperties(int index);
-    void returnToParent();
+    void returnToParent(bool reloadData);
 private slots:
     void setBindingVariable(int index, const QString & name);
     void setWeight();
@@ -52,6 +52,7 @@ private:
     static QStringList headerLabels;
     BehaviorGraphView *behaviorView;
     hkbBlenderGeneratorChild *bsData;
+    int childIndex;
     QGridLayout *topLyt;
     QGroupBox *groupBox;
     QPushButton *returnPB;

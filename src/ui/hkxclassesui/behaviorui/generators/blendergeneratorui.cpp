@@ -171,7 +171,7 @@ BlenderGeneratorUI::BlenderGeneratorUI()
     connect(addChildPB, SIGNAL(released()), this, SLOT(addChild()), Qt::UniqueConnection);
     connect(removeChildPB, SIGNAL(released()), this, SLOT(removeSelectedChild()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-    connect(childUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+    connect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)), Qt::UniqueConnection);
     connect(childUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
     connect(childUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
     connect(childUI, SIGNAL(viewGenerators(int)), this, SIGNAL(viewGenerators(int)), Qt::UniqueConnection);
@@ -678,7 +678,7 @@ void BlenderGeneratorUI::viewSelectedChild(int row, int column){
             rowIndexOfChildToRemove = row;
             if (bsData->children.size() > result && result >= 0){
                 if (column == VALUE_COLUMN){
-                    childUI->loadData(static_cast<hkbBlenderGeneratorChild *>(bsData->children.at(result).data()));
+                    childUI->loadData(static_cast<hkbBlenderGeneratorChild *>(bsData->children.at(result).data()), result);
                     setCurrentIndex(CHILD_WIDGET);
                 }
             }else{
@@ -690,7 +690,10 @@ void BlenderGeneratorUI::viewSelectedChild(int row, int column){
     }
 }
 
-void BlenderGeneratorUI::returnToWidget(){
+void BlenderGeneratorUI::returnToWidget(bool reloadData){
+    if (reloadData){
+        loadData(bsData);
+    }
     setCurrentIndex(MAIN_WIDGET);
 }
 

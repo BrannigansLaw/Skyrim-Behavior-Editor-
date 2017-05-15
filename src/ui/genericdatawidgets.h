@@ -88,8 +88,9 @@ public:
     TableWidget(QWidget *parent = 0)
         : QTableWidget(parent)
     {
-        setStyleSheet("QHeaderView::section { background-color:grey }");
         setMouseTracking(true);
+        //setStyleSheet("QTableView::item:pressed {background-color:cyan}");
+        setStyleSheet("QHeaderView::section { background-color:grey }");
         verticalHeader()->setVisible(false);
         setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
         horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -154,6 +155,7 @@ public:
     ComboBox(QWidget* parent = 0)
         : QComboBox(parent)
     {
+        //setStyleSheet("QComboBox:hover { background-color:red }");
         setFocusPolicy(Qt::StrongFocus);
     }
 

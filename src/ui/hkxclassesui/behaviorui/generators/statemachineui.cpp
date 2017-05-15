@@ -96,61 +96,61 @@ StateMachineUI::StateMachineUI()
     table->setColumnCount(headerLabels.size());
     table->setHorizontalHeaderLabels(headerLabels);
     table->setItem(NAME_ROW, NAME_COLUMN, new TableWidgetItem("name"));
-    table->setItem(NAME_ROW, TYPE_COLUMN, new TableWidgetItem("hkStringPtr"));
-    table->setItem(NAME_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
+    table->setItem(NAME_ROW, TYPE_COLUMN, new TableWidgetItem("hkStringPtr", Qt::AlignCenter));
+    table->setItem(NAME_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setCellWidget(NAME_ROW, VALUE_COLUMN, name);
     table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, NAME_COLUMN, new TableWidgetItem("eventToSendWhenStateOrTransitionChanges"));
-    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, TYPE_COLUMN, new TableWidgetItem("hkEventPayload"));
-    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
-    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, VALUE_COLUMN, new TableWidgetItem("Click To Edit"));
+    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, TYPE_COLUMN, new TableWidgetItem("hkEventPayload", Qt::AlignCenter));
+    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
+    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white), "Click to edit"));
     table->setItem(START_STATE_ID_ROW, NAME_COLUMN, new TableWidgetItem("startStateId"));
-    table->setItem(START_STATE_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
-    table->setItem(START_STATE_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
+    table->setItem(START_STATE_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
+    table->setItem(START_STATE_ID_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white), "Click to view the list of variables to bind to this value"));
     table->setCellWidget(START_STATE_ID_ROW, VALUE_COLUMN, startStateId);
     table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("returnToPreviousStateEventId"));
-    table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent"));
-    table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
-    table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
+    table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
+    table->setItem(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white), "Click to view the list of events"));
     table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("randomTransitionEventId"));
-    table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent"));
-    table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
-    table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
+    table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
+    table->setItem(RANDOM_TRANSITION_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white), "Click to view the list of events"));
     table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("transitionToNextHigherStateEventId"));
-    table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent"));
-    table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
-    table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
+    table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
+    table->setItem(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white), "Click to view the list of events"));
     table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("transitionToNextLowerStateEventId"));
-    table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent"));
-    table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
-    table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
+    table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
+    table->setItem(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white), "Click to view the list of events"));
     table->setItem(SYNC_VARIABLE_INDEX_ROW, NAME_COLUMN, new TableWidgetItem("syncVariableIndex"));
-    table->setItem(SYNC_VARIABLE_INDEX_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
-    table->setItem(SYNC_VARIABLE_INDEX_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
-    table->setItem(SYNC_VARIABLE_INDEX_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
+    table->setItem(SYNC_VARIABLE_INDEX_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
+    table->setItem(SYNC_VARIABLE_INDEX_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white), "Click to view the list of variables to bind to this value"));
+    table->setItem(SYNC_VARIABLE_INDEX_ROW, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setItem(WRAP_AROUND_STATE_ID_ROW, NAME_COLUMN, new TableWidgetItem("wrapAroundStateId"));
-    table->setItem(WRAP_AROUND_STATE_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool"));
-    table->setItem(WRAP_AROUND_STATE_ID_ROW, BINDING_COLUMN, new TableWidgetItem("NONE"));
+    table->setItem(WRAP_AROUND_STATE_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool", Qt::AlignCenter));
+    table->setItem(WRAP_AROUND_STATE_ID_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white), "Click to view the list of variables to bind to this value"));
     table->setCellWidget(WRAP_AROUND_STATE_ID_ROW, VALUE_COLUMN, wrapAroundStateId);
     table->setItem(MAX_SIMULTANEOUS_TRANSITIONS_ROW, NAME_COLUMN, new TableWidgetItem("maxSimultaneousTransitions"));
-    table->setItem(MAX_SIMULTANEOUS_TRANSITIONS_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
-    table->setItem(MAX_SIMULTANEOUS_TRANSITIONS_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
+    table->setItem(MAX_SIMULTANEOUS_TRANSITIONS_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
+    table->setItem(MAX_SIMULTANEOUS_TRANSITIONS_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setCellWidget(MAX_SIMULTANEOUS_TRANSITIONS_ROW, VALUE_COLUMN, maxSimultaneousTransitions);
     table->setItem(START_STATE_MODE_ROW, NAME_COLUMN, new TableWidgetItem("startStateMode"));
-    table->setItem(START_STATE_MODE_ROW, TYPE_COLUMN, new TableWidgetItem("hkEnum"));
-    table->setItem(START_STATE_MODE_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
+    table->setItem(START_STATE_MODE_ROW, TYPE_COLUMN, new TableWidgetItem("StartStateMode", Qt::AlignCenter));
+    table->setItem(START_STATE_MODE_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setCellWidget(START_STATE_MODE_ROW, VALUE_COLUMN, startStateMode);
     table->setItem(SELF_TRANSITION_MODE_ROW, NAME_COLUMN, new TableWidgetItem("selfTransitionMode"));
-    table->setItem(SELF_TRANSITION_MODE_ROW, TYPE_COLUMN, new TableWidgetItem("hkEnum"));
-    table->setItem(SELF_TRANSITION_MODE_ROW, BINDING_COLUMN, new TableWidgetItem("N/A"));
+    table->setItem(SELF_TRANSITION_MODE_ROW, TYPE_COLUMN, new TableWidgetItem("SelfTransitionMode", Qt::AlignCenter));
+    table->setItem(SELF_TRANSITION_MODE_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setCellWidget(SELF_TRANSITION_MODE_ROW, VALUE_COLUMN, selfTransitionMode);
     table->setCellWidget(ADD_CHILD_ROW, NAME_COLUMN, addStatePB);
     table->setCellWidget(ADD_CHILD_ROW, TYPE_COLUMN, typeSelectorCB);
     table->setCellWidget(ADD_CHILD_ROW, BINDING_COLUMN, removeStatePB);
-    table->setItem(ADD_CHILD_ROW, VALUE_COLUMN, new TableWidgetItem("N/A"));
+    table->setItem(ADD_CHILD_ROW, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white)));
     table->setCellWidget(ADD_CHILD_ROW + 1, NAME_COLUMN, addTransitionPB);
-    table->setItem(ADD_CHILD_ROW + 1, TYPE_COLUMN, new TableWidgetItem("hkbStateMachineTransitionInfoArray"));
+    table->setItem(ADD_CHILD_ROW + 1, TYPE_COLUMN, new TableWidgetItem("hkbStateMachineTransitionInfoArray", Qt::AlignCenter));
     table->setCellWidget(ADD_CHILD_ROW + 1, BINDING_COLUMN, removeTransitionPB);
-    table->setItem(ADD_CHILD_ROW + 1, VALUE_COLUMN, new TableWidgetItem("N/A"));
+    table->setItem(ADD_CHILD_ROW + 1, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white)));
     topLyt->addWidget(table, 1, 0, 8, 3);
     groupBox->setLayout(topLyt);
     //Order here must correspond with the ACTIVE_WIDGET Enumerated type!!!
@@ -169,10 +169,10 @@ StateMachineUI::StateMachineUI()
     connect(removeStatePB, SIGNAL(released()), this, SLOT(removeObjectChild()), Qt::UniqueConnection);
     connect(addTransitionPB, SIGNAL(released()), this, SLOT(addTransition()), Qt::UniqueConnection);
     connect(removeTransitionPB, SIGNAL(released()), this, SLOT(removeObjectChild()), Qt::UniqueConnection);
-    connect(eventUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+    connect(eventUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)), Qt::UniqueConnection);
     connect(eventUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)), Qt::UniqueConnection);
     connect(stateUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)), Qt::UniqueConnection);
-    connect(stateUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+    connect(stateUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)), Qt::UniqueConnection);
     connect(stateUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
     //connect(stateUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
     connect(stateUI, SIGNAL(viewGenerators(int)), this, SIGNAL(viewGenerators(int)), Qt::UniqueConnection);
@@ -181,7 +181,6 @@ StateMachineUI::StateMachineUI()
 
 void StateMachineUI::loadData(HkxObject *data){
     blockSignals(true);
-    //table->setSortingEnabled(false);
     setCurrentIndex(MAIN_WIDGET);
     hkbVariableBindingSet *varBind = NULL;
     QString varName;
@@ -283,7 +282,6 @@ void StateMachineUI::loadData(HkxObject *data){
         CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadData(): The data is NULL or an incorrect type!!"));
     }
     blockSignals(false);
-    //table->setSortingEnabled(true);
 }
 
 void StateMachineUI::loadDynamicTableRows(){
@@ -339,17 +337,17 @@ void StateMachineUI::setRowItems(int row, const QString & name, const QString & 
     if (table->item(row, TYPE_COLUMN)){
         table->item(row, TYPE_COLUMN)->setText(classname);
     }else{
-        table->setItem(row, TYPE_COLUMN, new TableWidgetItem(classname));
+        table->setItem(row, TYPE_COLUMN, new TableWidgetItem(classname, Qt::AlignCenter));
     }
     if (table->item(row, BINDING_COLUMN)){
         table->item(row, BINDING_COLUMN)->setText(bind);
     }else{
-        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind));
+        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind, Qt::AlignCenter));
     }
     if (table->item(row, VALUE_COLUMN)){
         table->item(row, VALUE_COLUMN)->setText(value);
     }else{
-        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value));
+        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value, Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white)));
     }
 }
 
@@ -732,7 +730,6 @@ void StateMachineUI::removeObjectChild(){
                     child = static_cast<hkbStateMachineStateInfo *>(bsData->states.at(result).data());
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->generator.data()), result);//Reorderchildren?
                     behaviorView->removeObjects();
-                    //transitionsButtonRow--;
                     rowToRemove = -1;
                 }else{
                     WARNING_MESSAGE(QString("StateMachineUI::removeObjectChild(): Invalid index of child to remove!!"));
@@ -765,15 +762,15 @@ void StateMachineUI::addTransition(){
     }
 }
 
-void StateMachineUI::returnToWidget(){
+void StateMachineUI::returnToWidget(bool reloadData){
+    if (reloadData){
+        loadData(bsData);
+    }
     setCurrentIndex(MAIN_WIDGET);
 }
 
 void StateMachineUI::connectToTableWidgets(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *events){
     if (generators && variables && events){
-        disconnect(events, SIGNAL(elementSelected(int,QString)), 0, 0);
-        disconnect(variables, SIGNAL(elementSelected(int,QString)), 0, 0);
-        disconnect(generators, SIGNAL(elementSelected(int,QString)), 0, 0);
         disconnect(events, SIGNAL(elementSelected(int,QString)), 0, 0);
         disconnect(variables, SIGNAL(elementSelected(int,QString)), 0, 0);
         disconnect(generators, SIGNAL(elementSelected(int,QString)), 0, 0);
@@ -788,7 +785,7 @@ void StateMachineUI::connectToTableWidgets(GenericTableWidget *generators, Gener
     }
 }
 
-void StateMachineUI::renameVariable(const QString & name, int index){
+void StateMachineUI::variableRenamed(const QString & name, int index){
     int bindIndex = -1;
     hkbVariableBindingSet *bind = NULL;
     if (bsData){

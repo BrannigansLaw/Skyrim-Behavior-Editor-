@@ -8,36 +8,39 @@
 #include "src/utility.h"
 #include "src/hkxclasses/hkxobject.h"
 
-#define ITEM_WIDTH 400
+#define ITEM_WIDTH 500
 #define ITEM_HEIGHT 50
 
-QRectF BehaviorGraphIcon::button = QRectF(360, 0, 40, 50);
-QLineF BehaviorGraphIcon::vert = QLineF(380, 5, 380, 45);
-QLineF BehaviorGraphIcon::horiz = QLineF(365, 25, 395, 25);
-QRectF BehaviorGraphIcon::textRec = QRectF(120, 10, 240, 40);
-//QRadialGradient BehaviorGraphIcon::rGrad = QRadialGradient();
+#define OUTLINE_PEN_WIDTH 5
+#define TEXT_PEN_WIDTH 2
+
+QRectF BehaviorGraphIcon::button = QRectF(ITEM_WIDTH*0.9, 0, ITEM_WIDTH*0.1, ITEM_HEIGHT);
+QLineF BehaviorGraphIcon::vert = QLineF(ITEM_WIDTH*0.95, ITEM_HEIGHT*0.1, ITEM_WIDTH*0.95, ITEM_HEIGHT*0.8);
+QLineF BehaviorGraphIcon::horiz = QLineF(ITEM_WIDTH*0.91, ITEM_HEIGHT*0.5, ITEM_WIDTH*0.99, ITEM_HEIGHT*0.5);
+QRectF BehaviorGraphIcon::textRec = QRectF(ITEM_WIDTH*0.25, ITEM_HEIGHT*0.2, ITEM_WIDTH*0.75, ITEM_HEIGHT*0.8);
 QFont BehaviorGraphIcon::font = QFont("Helvetica [Cronyx]", 9);
-//QPen BehaviorGraphIcon::textPen = QPen(Qt::white);
-//QPen BehaviorGraphIcon::pen = QPen(QBrush(Qt::black), 2);
 QBrush BehaviorGraphIcon::brush = QBrush(Qt::green);
 QBrush BehaviorGraphIcon::buttonBrush = QBrush(Qt::gray);
-//QPolygonF BehaviorGraphIcon::polygon = QPolygonF();
-QRectF BehaviorGraphIcon::ellipse = QRectF(40, 5, 40, 40);
-QRectF BehaviorGraphIcon::square = QRectF(40, 5, 40, 40);
-//QPolygonF BehaviorGraphIcon::arrowHead = QPolygonF();
+QRectF BehaviorGraphIcon::ellipse = QRectF(ITEM_WIDTH*0.1, ITEM_HEIGHT*0.1, ITEM_WIDTH*0.1, ITEM_HEIGHT*0.8);
+QRectF BehaviorGraphIcon::square = QRectF(ITEM_WIDTH*0.1, ITEM_HEIGHT*0.1, ITEM_WIDTH*0.1, ITEM_HEIGHT*0.8);
 
 BehaviorGraphIcon::BehaviorGraphIcon(TreeGraphicsItem *parent, DataIconManager *obj, int indexToInsert, Qt::GlobalColor color)
     : TreeGraphicsItem(parent, obj, indexToInsert, color)
 {
-    arrowHead << QPointF(365, 25) << QPointF(380, 5) << QPointF(395, 25);
-    polygon << QPointF(boundingRect().topLeft().x() + boundingRect().width() * 0.1, boundingRect().topLeft().y() + boundingRect().height() * 0.1)
-            << QPointF(boundingRect().topLeft().x() + boundingRect().width() * 0.1, boundingRect().topLeft().y() + boundingRect().height() * 0.9)
-            << QPointF(boundingRect().topLeft().x() + boundingRect().width() * 0.2, boundingRect().topLeft().y() + boundingRect().height() * 0.5)
-            << QPointF(boundingRect().topLeft().x() + boundingRect().width() * 0.1, boundingRect().topLeft().y() + boundingRect().height() * 0.1);
+    arrowHead << QPointF(boundingRect().width()*0.9125, boundingRect().height()*0.5)
+              << QPointF(boundingRect().width()*0.95, boundingRect().height()*0.1)
+              << QPointF(boundingRect().width()*0.9875, boundingRect().height()*0.5);
+    polygon << QPointF(boundingRect().width() * 0.1, boundingRect().height() * 0.1)
+            << QPointF(boundingRect().width() * 0.1, boundingRect().height() * 0.9)
+            << QPointF(boundingRect().width() * 0.2, boundingRect().height() * 0.5)
+            << QPointF(boundingRect().width() * 0.1, boundingRect().height() * 0.1);
     rGrad.setCenter(boundingRect().topLeft());
     rGrad.setCenterRadius(boundingRect().width());
     rGrad.setColorAt(0.0, Qt::white);
+    pen.setWidth(OUTLINE_PEN_WIDTH);
+    textPen.setWidth(TEXT_PEN_WIDTH);
     if (itemData->getType() == HkxObject::TYPE_MODIFIER){
+        path.addEllipse(ellipse);
         rGrad.setColorAt(1.0, Qt::magenta);
     }else{
         HkxSignature sig = itemData->getSignature();
@@ -81,6 +84,11 @@ QRectF BehaviorGraphIcon::boundingRect() const{
     return QRectF(0,0,ITEM_WIDTH,ITEM_HEIGHT);
 }
 
+void BehaviorGraphIcon::setIconSelected(){
+    rGrad.setColorAt(1.0, Qt::green);
+    scene()->update(QRectF(scenePos(), scenePos() + QPointF(boundingRect().width(), boundingRect().height())));
+}
+
 void BehaviorGraphIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setFont(font);
@@ -91,15 +99,11 @@ void BehaviorGraphIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     painter->drawPath(path);
     painter->setPen(textPen);
     painter->drawText(textRec, itemData->getName());
-    painter->setPen(pen);
     painter->setBrush(buttonBrush);
     if (itemData->hasChildren()){
         painter->drawRect(button);
         if (itemData->icons.isEmpty()){
-            painter->drawLine(horiz);
-            if (!isExpanded){
-                painter->drawLine(vert);
-            }
+            CRITICAL_ERROR_MESSAGE(QString("BehaviorGraphIcon::paint(): Icon data has no icons!!!"));
         }else if (itemData->icons.first() == this){
             if (!childItems().isEmpty()){
                 painter->drawLine(horiz);
@@ -145,5 +149,5 @@ void BehaviorGraphIcon::unselect(){
             rGrad.setColorAt(1.0, Qt::gray);
         }
     }
-    scene()->update(QRectF(scenePos(), scenePos() + QPointF(ITEM_WIDTH, ITEM_HEIGHT)));
+    scene()->update(QRectF(scenePos(), scenePos() + QPointF(boundingRect().width(), boundingRect().height())));
 }

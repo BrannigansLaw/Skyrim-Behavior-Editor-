@@ -8,7 +8,7 @@
 #include "src/utility.h"
 #include "src/hkxclasses/hkxobject.h"
 
-#define ITEM_WIDTH 400
+#define ITEM_WIDTH 500
 #define ITEM_HEIGHT 50
 
 #define MAX_NUM_GRAPH_ICONS 10000
@@ -66,7 +66,7 @@ QRectF TreeGraphicsItem::boundingRect() const{
 }
 
 QRectF TreeGraphicsItem::branchExpandCollapseBox() const{
-    return QRectF(ITEM_WIDTH*0.8, 0, ITEM_WIDTH*0.2, ITEM_HEIGHT);
+    return QRectF(boundingRect().width()*0.8, 0, boundingRect().width()*0.2, boundingRect().height());
 }
 
 void TreeGraphicsItem::setBrushColor(Qt::GlobalColor color){
@@ -94,22 +94,22 @@ void TreeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 void TreeGraphicsItem::setIconSelected(){
     brushColor = Qt::green;
-    scene()->update(QRectF(scenePos(), scenePos() + QPointF(ITEM_WIDTH, ITEM_HEIGHT)));
+    scene()->update(QRectF(scenePos(), scenePos() + QPointF(boundingRect().width(), boundingRect().height())));
 }
 
 void TreeGraphicsItem::unselect(){
     brushColor = Qt::gray;
-    scene()->update(QRectF(scenePos(), scenePos() + QPointF(ITEM_WIDTH, ITEM_HEIGHT)));
+    scene()->update(QRectF(scenePos(), scenePos() + QPointF(boundingRect().width(), boundingRect().height())));
 }
 
 void TreeGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     if (boundingRect().contains(event->pos())){
         //DEBUG CODE START
-        QList <QGraphicsItem *> list = childItems();
+        /*QList <QGraphicsItem *> list = childItems();
         QList <TreeGraphicsItem *> children;
         for (int i = 0; i < list.size(); i++){
             children.append((TreeGraphicsItem *)list.at(i));
-        }
+        }*/
         //DEBUG CODE END
         if (branchExpandCollapseBox().contains(event->pos())){
             ((TreeGraphicsScene *)scene())->selectIcon(this, true);
@@ -432,7 +432,7 @@ void TreeGraphicsItem::setIsExpanded(bool value){
 void TreeGraphicsItem::setPathToParent(){
     if (parentItem()){
         QPainterPath newpath(scenePos());
-        newpath.lineTo(QPointF(scenePos().x() - ITEM_WIDTH, scenePos().y() - yCoordinate + ITEM_HEIGHT));
+        newpath.lineTo(QPointF(scenePos().x() - boundingRect().width(), scenePos().y() - yCoordinate + boundingRect().height()));
         path->setPath(newpath);
     }
 }

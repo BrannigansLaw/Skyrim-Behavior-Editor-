@@ -40,6 +40,7 @@ QStringList BlenderGeneratorChildUI::headerLabels = {
 BlenderGeneratorChildUI::BlenderGeneratorChildUI()
     : behaviorView(NULL),
       bsData(NULL),
+      childIndex(0),
       topLyt(new QGridLayout),
       groupBox(new QGroupBox("hkbBlenderGeneratorChild")),
       returnPB(new QPushButton("Return")),
@@ -53,20 +54,20 @@ BlenderGeneratorChildUI::BlenderGeneratorChildUI()
     table->setHorizontalHeaderLabels(headerLabels);
     table->setItem(BONE_WEIGHTS_ROW, NAME_COLUMN, new TableWidgetItem("boneWeights"));
     table->setItem(BONE_WEIGHTS_ROW, TYPE_COLUMN, new TableWidgetItem("hkbBoneWeightArray", Qt::AlignCenter));
-    table->setItem(BONE_WEIGHTS_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::white), "Click to view the list of variables to bind to this value"));
-    table->setItem(BONE_WEIGHTS_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::white), "Click to view the list of bone weights"));
+    table->setItem(BONE_WEIGHTS_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white), "Click to view the list of variables to bind to this value"));
+    table->setItem(BONE_WEIGHTS_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white), "Click to view the list of bone weights"));
     table->setItem(WEIGHT_ROW, NAME_COLUMN, new TableWidgetItem("weight"));
     table->setItem(WEIGHT_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
-    table->setItem(WEIGHT_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::white), "Click to view the list of variables to bind to this value"));
+    table->setItem(WEIGHT_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white), "Click to view the list of variables to bind to this value"));
     table->setCellWidget(WEIGHT_ROW, VALUE_COLUMN, weight);
     table->setItem(WORLD_FROM_MODEL_WEIGHT_ROW, NAME_COLUMN, new TableWidgetItem("worldFromModelWeight"));
     table->setItem(WORLD_FROM_MODEL_WEIGHT_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
-    table->setItem(WORLD_FROM_MODEL_WEIGHT_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::white), "Click to view the list of variables to bind to this value"));
+    table->setItem(WORLD_FROM_MODEL_WEIGHT_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white), "Click to view the list of variables to bind to this value"));
     table->setCellWidget(WORLD_FROM_MODEL_WEIGHT_ROW, VALUE_COLUMN, worldFromModelWeight);
     table->setItem(GENERATOR_ROW, NAME_COLUMN, new TableWidgetItem("generator"));
     table->setItem(GENERATOR_ROW, TYPE_COLUMN, new TableWidgetItem("hkbGenerator", Qt::AlignCenter));
     table->setItem(GENERATOR_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
-    table->setItem(GENERATOR_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::white), "Click to view the list of generators"));
+    table->setItem(GENERATOR_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::white), "Click to view the list of generators"));
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 8, 3);
     groupBox->setLayout(topLyt);
@@ -77,14 +78,15 @@ BlenderGeneratorChildUI::BlenderGeneratorChildUI()
     connect(weight, SIGNAL(editingFinished()), this, SLOT(setWeight()), Qt::UniqueConnection);
     connect(worldFromModelWeight, SIGNAL(editingFinished()), this, SLOT(setWorldFromModelWeight()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
+    connect(returnPB, SIGNAL(clicked(bool)), this, SIGNAL(returnToParent(bool)), Qt::UniqueConnection);
 }
 
-void BlenderGeneratorChildUI::loadData(HkxObject *data){
+void BlenderGeneratorChildUI::loadData(HkxObject *data, int childindex){
     blockSignals(true);
     hkbVariableBindingSet *bind = NULL;
     if (data){
         if (data->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+            childIndex = childindex;
             bsData = static_cast<hkbBlenderGeneratorChild *>(data);
             if (bsData->boneWeights.data()){
                 table->item(GENERATOR_ROW, VALUE_COLUMN)->setText("Click to edit");
@@ -142,10 +144,20 @@ void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
             }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), (DataIconManager *)bsData->generator.data(), ptr, false)){
                 WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"))
             }else{
-                bsData->generator = HkxSharedPtr(ptr);
+                if (behaviorView->getSelectedItem()){
+                    behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData((DataIconManager *)bsData->generator.data()), childIndex);
+                }else{
+                    CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setGenerator(): The selected icon is NULL!!"));
+                }
+                if (bsData->parentBG.data()){
+                    static_cast<hkbBlenderGenerator *>(bsData->parentBG.data())->removeObjectAt(childIndex);
+                }else{
+                    CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setGenerator(): The state is orphaned!!"));
+                }
                 behaviorView->removeGeneratorData();
-                table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
+                table->item(GENERATOR_ROW, BINDING_COLUMN)->setText(name);
                 bsData->getParentFile()->toggleChanged(true);
+                emit returnToParent(true);
             }
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setGenerator(): The 'behaviorView' pointer is NULL!!"))

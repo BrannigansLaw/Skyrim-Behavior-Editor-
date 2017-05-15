@@ -53,7 +53,7 @@ private slots:
     void addChild();
     void removeSelectedChild();
     void viewSelectedChild(int row, int column);
-    void returnToWidget();
+    void returnToWidget(bool reloadData);
 private:
     void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *generators);
     void renameVariable(const QString & name, int index);

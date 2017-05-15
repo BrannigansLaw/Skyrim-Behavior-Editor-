@@ -18,6 +18,7 @@
 #include "src/ui/hkxclassesui/behaviorui/generators/manualselectorgeneratorui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/statemachineui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/stateui.h"
+#include "src/ui/hkxclassesui/behaviorui/generators/behaviorgraphui.h"
 #include "src/ui/hkxclassesui/behaviorui/transitionsui.h"
 
 #include <QPushButton>
@@ -117,7 +118,8 @@ HkDataUI::HkDataUI(const QString &title)
       modGenUI(new ModifierGeneratorUI(NULL, NULL)),
       manSelGenUI(new ManualSelectorGeneratorUI),
       stateMachineUI(new StateMachineUI),
-      blenderGeneratorUI(new BlenderGeneratorUI)
+      blenderGeneratorUI(new BlenderGeneratorUI),
+      behaviorGraphUI(new BehaviorGraphUI)
 {
     setTitle(title);
     generatorsTable->setTypes(generatorTypes);
@@ -131,6 +133,7 @@ HkDataUI::HkDataUI(const QString &title)
     stack->addWidget(manSelGenUI);
     stack->addWidget(stateMachineUI);
     stack->addWidget(blenderGeneratorUI);
+    stack->addWidget(behaviorGraphUI);
     verLyt->addLayout(stack, 5);
     setLayout(verLyt);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -241,7 +244,7 @@ void HkDataUI::variableNameChanged(const QString & newName, int index){
         blenderGeneratorUI->renameVariable(newName, index);
         break;
     case STATE_MACHINE:
-        stateMachineUI->renameVariable(newName, index);
+        stateMachineUI->variableRenamed(newName, index);
         break;
     default:
         break;
@@ -336,6 +339,13 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             stack->setCurrentIndex(STATE_MACHINE);
             stateMachineUI->connectToTableWidgets(generatorsTable, variablesTable, eventsTable);
             break;
+        case HKB_BEHAVIOR_GRAPH:
+            if (loadedData != oldData){
+                behaviorGraphUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(BEHAVIOR_GRAPH);
+            behaviorGraphUI->connectToTableWidgets(generatorsTable);
+            break;
         default:
             stack->setCurrentIndex(NO_DATA_SELECTED);
             break;
@@ -360,6 +370,7 @@ BehaviorGraphView *HkDataUI::setBehaviorView(BehaviorGraphView *view){
     manSelGenUI->behaviorView = view;
     stateMachineUI->setBehaviorView(view);
     blenderGeneratorUI->setBehaviorView(view);
+    behaviorGraphUI->setBehaviorView(view);
     if (behaviorView){
         generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "NULL");
         modifiersTable->loadTable(behaviorView->behavior->getModifierNames(), behaviorView->behavior->getModifierTypeNames(), "NULL");

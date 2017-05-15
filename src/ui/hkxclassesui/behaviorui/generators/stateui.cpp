@@ -13,16 +13,9 @@
 #include "src/ui/treegraphicsitem.h"
 #include "src/hkxclasses/behavior/hkbvariablebindingset.h"
 
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QComboBox>
+#include <QGridLayout>
 #include <QHeaderView>
-#include <QSpinBox>
 #include <QStackedLayout>
-#include <QSignalMapper>
-#include <QComboBox>
 
 #define BASE_NUMBER_OF_ROWS 8
 
@@ -58,7 +51,6 @@ StateUI::StateUI()
       table(new TableWidget),
       returnPB(new QPushButton("Return")),
       name(new LineEdit),
-      generator(new QPushButton("NULL")),
       stateId(new SpinBox),
       probability(new DoubleSpinBox),
       enable(new QCheckBox),
@@ -81,7 +73,7 @@ StateUI::StateUI()
     table->setItem(STATE_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
     table->setItem(STATE_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setCellWidget(STATE_ID_ROW, VALUE_COLUMN, stateId);
-    table->setItem(PROBABILITY_ROW, NAME_COLUMN, new TableWidgetItem("probability", Qt::AlignCenter));
+    table->setItem(PROBABILITY_ROW, NAME_COLUMN, new TableWidgetItem("probability"));
     table->setItem(PROBABILITY_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
     table->setItem(PROBABILITY_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setCellWidget(PROBABILITY_ROW, VALUE_COLUMN, probability);
@@ -92,17 +84,17 @@ StateUI::StateUI()
     table->setItem(GENERATOR_ROW, NAME_COLUMN, new TableWidgetItem("generator"));
     table->setItem(GENERATOR_ROW, TYPE_COLUMN, new TableWidgetItem("hkbGenerator", Qt::AlignCenter));
     table->setItem(GENERATOR_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
-    table->setCellWidget(GENERATOR_ROW, VALUE_COLUMN, generator);
+    table->setItem(GENERATOR_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(219, 219, 219), QBrush(Qt::black), "Click to view the list of generators"));
     table->setCellWidget(ADD_ENTER_EVENT_ROW, NAME_COLUMN, addEnterEventPB);
-    table->setItem(ADD_ENTER_EVENT_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(ADD_ENTER_EVENT_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter, QColor(219, 219, 219), QBrush(Qt::black)));
     table->setCellWidget(ADD_ENTER_EVENT_ROW, BINDING_COLUMN, removeEnterEventPB);
     table->setItem(ADD_ENTER_EVENT_ROW, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setCellWidget(ADD_ENTER_EVENT_ROW + 1, NAME_COLUMN, addExitEventPB);
-    table->setItem(ADD_ENTER_EVENT_ROW + 1, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(ADD_ENTER_EVENT_ROW + 1, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter, QColor(219, 219, 219), QBrush(Qt::black)));
     table->setCellWidget(ADD_ENTER_EVENT_ROW + 1, BINDING_COLUMN, removeExitEventPB);
     table->setItem(ADD_ENTER_EVENT_ROW + 1, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setCellWidget(ADD_ENTER_EVENT_ROW + 2, NAME_COLUMN, addTransitionPB);
-    table->setItem(ADD_ENTER_EVENT_ROW + 2, TYPE_COLUMN, new TableWidgetItem("hkbStateMachineTransitionInfoArray", Qt::AlignCenter));
+    table->setItem(ADD_ENTER_EVENT_ROW + 2, TYPE_COLUMN, new TableWidgetItem("hkbStateMachineTransitionInfoArray", Qt::AlignCenter, QColor(219, 219, 219), QBrush(Qt::black)));
     table->setCellWidget(ADD_ENTER_EVENT_ROW + 2, BINDING_COLUMN, removeTransitionPB);
     table->setItem(ADD_ENTER_EVENT_ROW + 2, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
@@ -114,7 +106,6 @@ StateUI::StateUI()
     addWidget(transitionUI);
     connect(returnPB, SIGNAL(pressed()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(generator, SIGNAL(released()), this, SLOT(emitViewGenerators()), Qt::UniqueConnection);
     connect(stateId, SIGNAL(editingFinished()), this, SLOT(setStateId()), Qt::UniqueConnection);
     connect(probability, SIGNAL(editingFinished()), this, SLOT(setProbability()), Qt::UniqueConnection);
     connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
@@ -144,9 +135,9 @@ void StateUI::loadData(HkxObject *data, int stateindex){
         probability->setValue(bsData->probability);
         enable->setChecked(bsData->enable);
         if (bsData->generator.data()){
-            generator->setText(static_cast<hkbGenerator *>(bsData->generator.data())->getName());
+            table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(static_cast<hkbGenerator *>(bsData->generator.data())->getName());
         }else{
-            generator->setText("NONE");
+            table->item(GENERATOR_ROW, VALUE_COLUMN)->setText("NONE");
         }
         loadDynamicTableRows();
     }else{
@@ -241,17 +232,17 @@ void StateUI::setRowItems(int row, const QString & name, const QString & classna
     if (table->item(row, TYPE_COLUMN)){
         table->item(row, TYPE_COLUMN)->setText(classname);
     }else{
-        table->setItem(row, TYPE_COLUMN, new TableWidgetItem(classname));
+        table->setItem(row, TYPE_COLUMN, new TableWidgetItem(classname, Qt::AlignCenter));
     }
     if (table->item(row, BINDING_COLUMN)){
         table->item(row, BINDING_COLUMN)->setText(bind);
     }else{
-        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind));
+        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind, Qt::AlignCenter));
     }
     if (table->item(row, VALUE_COLUMN)){
         table->item(row, VALUE_COLUMN)->setText(value);
     }else{
-        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value));
+        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value, Qt::AlignCenter, QColor(219, 219, 219), QBrush(Qt::black)));
     }
 }
 
@@ -358,7 +349,6 @@ void StateUI::removeObjectChild(){
                 result = rowToRemove - exitEventsButtonRow - 1;
                 if (result < exitEvents->events.size() && result >= 0){
                     exitEvents->removeEvent(result);
-                    //transitionsButtonRow--;
                     rowToRemove = -1;
                 }else{
                     WARNING_MESSAGE(QString("StateUI::removeObjectChild(): Invalid index of child to remove!!"));
@@ -367,8 +357,6 @@ void StateUI::removeObjectChild(){
                 result = rowToRemove - ADD_ENTER_EVENT_ROW - 1;
                 if (result < enterEvents->events.size() && result >= 0){
                     enterEvents->removeEvent(result);
-                    //exitEventsButtonRow--;
-                    //transitionsButtonRow--;
                     rowToRemove = -1;
                 }else{
                     WARNING_MESSAGE(QString("StateUI::removeObjectChild(): Invalid index of child to remove!!"));
@@ -408,11 +396,9 @@ void StateUI::viewSelectedChild(int row, int column){
     hkbStateMachineEventPropertyArray *enterEvents = NULL;
     hkbStateMachineEventPropertyArray *exitEvents = NULL;
     if (bsData){
-        /*if (row < ADD_ENTER_EVENT_ROW && row >= 0){
-            if (row == GENERATOR_ROW && column == VALUE_COLUMN){
-                emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1);
-            }
-        }else */if (row > ADD_ENTER_EVENT_ROW && row < exitEventsButtonRow){
+        if (row == GENERATOR_ROW && column == VALUE_COLUMN){
+            emitViewGenerators();
+        }else if (row > ADD_ENTER_EVENT_ROW && row < exitEventsButtonRow){
             enterEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
             result = row - ADD_ENTER_EVENT_ROW - 1;
             rowToRemove = row;
@@ -489,15 +475,15 @@ void StateUI::setGenerator(int index, const QString & name){
                 }else{
                     CRITICAL_ERROR_MESSAGE(QString("StateUI::setGenerator(): The selected icon is NULL!!"));
                 }
-                emit returnToParent();
                 if (bsData->parentSM.data()){
                     static_cast<hkbStateMachine *>(bsData->parentSM.data())->removeState(stateIndex);
                 }else{
                     CRITICAL_ERROR_MESSAGE(QString("StateUI::setGenerator(): The state is orphaned!!"));
                 }
                 behaviorView->removeGeneratorData();
-                generator->setText(name);
+                table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
                 bsData->getParentFile()->toggleChanged(true);
+                emit returnToParent(true);
             }
         }else{
             CRITICAL_ERROR_MESSAGE(QString("StateUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));
@@ -524,7 +510,7 @@ void StateUI::generatorRenamed(const QString & name, int index){
     if (bsData){
         index--;
         if (index == static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator)){
-            generator->setText(name);
+            table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateUI::generatorRenamed(): The 'bsData' pointer is NULL!!"));

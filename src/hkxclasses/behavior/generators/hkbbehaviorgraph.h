@@ -6,7 +6,7 @@
 class hkbBehaviorGraph: public hkbGenerator
 {
     friend class BehaviorGraphView;
-    //friend class MainWindow;
+    friend class BehaviorGraphUI;
     friend class BehaviorFile;
 public:
     hkbBehaviorGraph(HkxFile *parent, long ref = 0);

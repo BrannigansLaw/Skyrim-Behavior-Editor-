@@ -42,7 +42,6 @@ signals:
     void viewEvents(int index);
     void viewGenerators(int index);
 private slots:
-    void setBindingVariable(int index, const QString & name);
     void setName();
     void setStartStateId(int index);
     void setReturnToPreviousStateEventId(int index, const QString &name);
@@ -61,12 +60,13 @@ private slots:
     void eventTableElementSelected(int index, const QString &name);
     void variableTableElementSelected(int index, const QString &name);
     void generatorTableElementSelected(int index, const QString &name);
-    void returnToWidget();
+    void returnToWidget(bool reloadData);
 private:
     void loadDynamicTableRows();
+    void setBindingVariable(int index, const QString & name);
     void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value);
     void connectToTableWidgets(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *events);
-    void renameVariable(const QString & name, int index);
+    void variableRenamed(const QString & name, int index);
     void eventRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
     bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type);

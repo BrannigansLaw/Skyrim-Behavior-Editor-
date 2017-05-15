@@ -7,9 +7,6 @@
 
 class HkxObject;
 class BehaviorGraphView;
-class PointerWidget;
-class StringWidget;
-class IntWidget;
 class TransitionsUI;
 class hkbStateMachineStateInfo;
 class QGridLayout;
@@ -19,8 +16,6 @@ class SpinBox;
 class LineEdit;
 class ComboBox;
 class QPushButton;
-class QHBoxLayout;
-class QSignalMapper;
 class DoubleSpinBox;
 class QCheckBox;
 class EventUI;
@@ -41,7 +36,7 @@ public:
 signals:
     void stateNameChanged(const QString & newName, int index);
     void viewGenerators(int index);
-    void returnToParent();
+    void returnToParent(bool reloadData);
     void viewVariables(int index);
     void viewEvents(int index);
 private slots:
@@ -56,9 +51,9 @@ private slots:
     void addTransition();
     void removeObjectChild();
     void viewSelectedChild(int row, int column);
-    void emitViewGenerators();
     void returnToWidget();
 private:
+    void emitViewGenerators();
     void loadDynamicTableRows();
     void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value);
     void eventRenamed(const QString & name, int index);
@@ -84,7 +79,6 @@ private:
     TableWidget *table;
     QPushButton *returnPB;
     LineEdit *name;
-    QPushButton *generator;
     SpinBox *stateId;
     DoubleSpinBox *probability;
     QCheckBox *enable;

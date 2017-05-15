@@ -14,18 +14,19 @@ protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
     void unselect();
+    void setIconSelected();
 private:
     static QRectF button;
     static QRectF textRec;
     static QFont font;
-    QPen pen;
     static QBrush brush;
     static QBrush buttonBrush;
     static QLineF vert;
     static QLineF horiz;
     static QRectF ellipse;
-    QPolygonF polygon;
     static QRectF square;
+    QPen pen;
+    QPolygonF polygon;
     QPolygonF arrowHead;
     QRadialGradient rGrad;
     QPen textPen;

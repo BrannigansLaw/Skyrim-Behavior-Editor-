@@ -153,7 +153,9 @@ SOURCES += \
     src/ui/dataiconmanager.cpp \
     src/ui/behaviorgraphview.cpp \
     src/ui/hkxclassesui/behaviorui/eventui.cpp \
-    src/ui/hkxclassesui/behaviorui/behaviorgraphicon.cpp
+    src/ui/hkxclassesui/behaviorui/behaviorgraphicon.cpp \
+    src/ui/hkxclassesui/behaviorui/generators/behaviorgraphui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bslimbikmodifierui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -289,4 +291,6 @@ HEADERS  += \
     src/ui/treegraphicsitem.h \
     src/ui/behaviorgraphview.h \
     src/ui/hkxclassesui/behaviorui/eventui.h \
-    src/ui/hkxclassesui/behaviorui/behaviorgraphicon.h
+    src/ui/hkxclassesui/behaviorui/behaviorgraphicon.h \
+    src/ui/hkxclassesui/behaviorui/generators/behaviorgraphui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bslimbikmodifierui.h

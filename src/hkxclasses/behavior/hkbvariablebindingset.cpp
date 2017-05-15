@@ -23,6 +23,10 @@ QString hkbVariableBindingSet::getClassname(){
     return classname;
 }
 
+int hkbVariableBindingSet::getNumberOfBindings() const{
+    return bindings.size();
+}
+
 bool hkbVariableBindingSet::addBinding(const QString & path, int varIndex, hkBinding::BindingType type){
     for (int i = 0; i < bindings.size(); i++){
         if (bindings.at(i).memberPath == path){
@@ -62,6 +66,14 @@ void hkbVariableBindingSet::removeBinding(int varIndex){
             bindings.removeAt(i);
         }
     }
+}
+
+QString hkbVariableBindingSet::getPathOfBindingAt(int index){
+    QString path;
+    if (index < bindings.size() && index >= 0){
+        path = bindings.at(index);
+    }
+    return path;
 }
 
 int hkbVariableBindingSet::getVariableIndexOfBinding(const QString & path) const{

@@ -14,6 +14,7 @@ TreeGraphicsScene::TreeGraphicsScene()
       selectedIcon(NULL),
       canDeleteRoot(false)
 {
+    setBackgroundBrush(QBrush(Qt::gray));
     setItemIndexMethod(QGraphicsScene::NoIndex);
 }
 

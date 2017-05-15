@@ -6,6 +6,7 @@
 class BSLimbIKModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSLimbIKModifierUI;
 public:
     BSLimbIKModifier(HkxFile *parent, long ref = 0);
     virtual ~BSLimbIKModifier();

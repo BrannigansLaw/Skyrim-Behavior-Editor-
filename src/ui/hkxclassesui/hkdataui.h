@@ -25,6 +25,7 @@ class hkbStateMachineStateInfo;
 class hkbStateMachine;
 class GenericTableWidget;
 class BlenderGeneratorUI;
+class BehaviorGraphUI;
 
 class HkDataUI: public QGroupBox
 {
@@ -58,7 +59,8 @@ private:
         MODIFIER_GENERATOR = 2,
         MANUAL_SELECTOR_GENERATOR = 3,
         STATE_MACHINE = 4,
-        BLENDER_GENERATOR = 5
+        BLENDER_GENERATOR = 5,
+        BEHAVIOR_GRAPH,
     };
     static QStringList generatorTypes;
     static QStringList modifierTypes;
@@ -80,6 +82,7 @@ private:
     ManualSelectorGeneratorUI *manSelGenUI;
     StateMachineUI *stateMachineUI;
     BlenderGeneratorUI *blenderGeneratorUI;
+    BehaviorGraphUI *behaviorGraphUI;
 };
 
 #endif // HKDATAUI_H
