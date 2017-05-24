@@ -12,7 +12,8 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QMessageBox>
-#include <QCheckBox>
+
+#include "src/ui/genericdatawidgets.h"
 #include <QStackedLayout>
 #include <QHeaderView>
 #include <QSpinBox>
@@ -44,7 +45,7 @@ BlenderGeneratorChildUI::BlenderGeneratorChildUI()
       topLyt(new QGridLayout),
       groupBox(new QGroupBox("hkbBlenderGeneratorChild")),
       returnPB(new QPushButton("Return")),
-      table(new TableWidget),
+      table(new TableWidget(QColor(Qt::cyan))),
       boneWeights(new BoneWeightArrayUI),
       weight(new DoubleSpinBox),
       worldFromModelWeight(new DoubleSpinBox)
@@ -181,9 +182,9 @@ bool BlenderGeneratorChildUI::setBinding(int index, int row, const QString & var
                 bsData->getParentFile()->addObjectToFile(varBind, -1);
             }
             if (type == VARIABLE_TYPE_POINTER){
-                varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY);
+                varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY);
             }else{
-                varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
+                varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
             }
             table->item(row, BINDING_COLUMN)->setText(variableName);
             bsData->getParentFile()->toggleChanged(true);

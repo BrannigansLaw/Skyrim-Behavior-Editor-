@@ -22,7 +22,8 @@
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QComboBox>
-#include <QCheckBox>
+
+#include "src/ui/genericdatawidgets.h"
 #include <QDoubleSpinBox>
 #include <QSpinBox>
 #include <QStackedLayout>
@@ -132,36 +133,40 @@ BehaviorVariablesUI::BehaviorVariablesUI(const QString &title)
 }*/
 
 void BehaviorVariablesUI::setVariableValue(int type){
-    int index = table->currentRow();
-    if (type == 0){
-        loadedData->setWordVariableValueAt(index, boolCB->isChecked());
-    }else if (type == 1){
-        loadedData->setWordVariableValueAt(index, intSB->value());
-    }else if (type == 2){
-        loadedData->setWordVariableValueAt(index, doubleSB->value());
-    }/*else if (type == "VARIABLE_TYPE_POINTER"){
-        loadedData->setWordVariableValueAt(index, intSB->value());
-    }*/else if (type == 3){
-        loadedData->setQuadVariableValueAt(index, quadWidget->getValue());
+    if (loadedData){
+        int index = table->currentRow();
+        if (type == 0){
+            loadedData->setWordVariableValueAt(index, boolCB->isChecked());
+        }else if (type == 1){
+            loadedData->setWordVariableValueAt(index, intSB->value());
+        }else if (type == 2){
+            loadedData->setWordVariableValueAt(index, doubleSB->value());
+        }/*else if (type == "VARIABLE_TYPE_POINTER"){
+            loadedData->setWordVariableValueAt(index, intSB->value());
+        }*/else if (type == 3){
+            loadedData->setQuadVariableValueAt(index, quadWidget->getValue());
+        }
     }
 }
 
 void BehaviorVariablesUI::renameSelectedVariable(int type){
-    QString newName;
-    if (type == 0){
-        newName = boolName->text();
-    }else if (type == 1){
-        newName = intName->text();
-    }else if (type == 2){
-        newName = doubleName->text();
-    }/*else if (type == "VARIABLE_TYPE_POINTER"){
-        loadedData->setWordVariableValueAt(index, intSB->value());
-    }*/else if (type == 3){
-        newName = quadName->text();
+    if (loadedData){
+        QString newName;
+        if (type == 0){
+            newName = boolName->text();
+        }else if (type == 1){
+            newName = intName->text();
+        }else if (type == 2){
+            newName = doubleName->text();
+        }/*else if (type == "VARIABLE_TYPE_POINTER"){
+            loadedData->setWordVariableValueAt(index, intSB->value());
+        }*/else if (type == 3){
+            newName = quadName->text();
+        }
+        table->item(table->currentRow(), 0)->setText(newName);
+        loadedData->setVariableNameAt(table->currentRow(), newName);
+        emit variableNameChanged(newName, table->currentRow());
     }
-    table->item(table->currentRow(), 0)->setText(newName);
-    loadedData->setVariableNameAt(table->currentRow(), newName);
-    emit variableNameChanged(newName, table->currentRow());
 }
 
 void BehaviorVariablesUI::removeVariableFromTable(int row){
@@ -275,9 +280,9 @@ void BehaviorVariablesUI::returnToTable(){
 void BehaviorVariablesUI::addVariableToTable(const QString & name, const QString & type){
     int row = table->rowCount();
     table->setRowCount(row + 1);
-    table->setItem(row, 0, new TableWidgetItem(name));
-    table->setItem(row, 1, new TableWidgetItem(type));
-    table->setItem(row, 2, new TableWidgetItem("Click To Edit"));
+    table->setItem(row, 0, new QTableWidgetItem(name));
+    table->setItem(row, 1, new QTableWidgetItem(type));
+    table->setItem(row, 2, new QTableWidgetItem("Click To Edit"));
     if (stackLyt->currentIndex() == VARIABLE_WIDGET){
         stackLyt->setCurrentIndex(TABLE_WIDGET);
     }
@@ -297,13 +302,13 @@ void BehaviorVariablesUI::loadData(HkxObject *data){
                 if (table->item(row, 0)){
                     table->item(row, 0)->setText(varNames->variableNames.at(i));
                 }else{
-                    table->setItem(row, 0, new TableWidgetItem(varNames->variableNames.at(i)));
+                    table->setItem(row, 0, new QTableWidgetItem(varNames->variableNames.at(i)));
                 }
             }else{
                 table->setRowCount(row + 1);
-                table->setItem(row, 0, new TableWidgetItem(varNames->variableNames.at(i)));
-                table->setItem(row, 1, new TableWidgetItem(loadedData->variableInfos.at(i).type));
-                table->setItem(row, 2, new TableWidgetItem("Click To Edit"));
+                table->setItem(row, 0, new QTableWidgetItem(varNames->variableNames.at(i)));
+                table->setItem(row, 1, new QTableWidgetItem(loadedData->variableInfos.at(i).type));
+                table->setItem(row, 2, new QTableWidgetItem("Click To Edit"));
             }
         }
         for (int j = varNames->variableNames.size(); j < table->rowCount(); j++){
@@ -319,63 +324,67 @@ void BehaviorVariablesUI::clear(){
 }
 
 void BehaviorVariablesUI::addVariable(){
-    int type = typeSelector->currentIndex();
-    hkVariableType varType;
-    QString typeString;
-    hkbBehaviorGraphStringData *vars = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-    switch (type){
-    case VARIABLE_TYPE_BOOL:
-        varType = hkVariableType::VARIABLE_TYPE_BOOL;
-        loadedData->addVariable(varType);
-        typeString = "VARIABLE_TYPE_BOOL";
-        addVariableToTable(vars->variableNames.last(), typeString);
-        break;
-    case VARIABLE_TYPE_INT32:
-        varType = hkVariableType::VARIABLE_TYPE_INT32;
-        loadedData->addVariable(varType);
-        typeString = "VARIABLE_TYPE_INT32";
-        addVariableToTable(vars->variableNames.last(), typeString);
-        break;
-    case VARIABLE_TYPE_REAL:
-        varType = hkVariableType::VARIABLE_TYPE_REAL;
-        loadedData->addVariable(varType);
-        typeString = "VARIABLE_TYPE_REAL";
-        addVariableToTable(vars->variableNames.last(), typeString);
-        break;
-    case VARIABLE_TYPE_POINTER:
-        varType = hkVariableType::VARIABLE_TYPE_POINTER;
-        loadedData->addVariable(varType);
-        typeString = "VARIABLE_TYPE_POINTER";
-        addVariableToTable(vars->variableNames.last(), typeString);
-        break;
-    case VARIABLE_TYPE_VECTOR4:
-        varType = hkVariableType::VARIABLE_TYPE_VECTOR4;
-        loadedData->addVariable(varType);
-        typeString = "VARIABLE_TYPE_VECTOR4";
-        addVariableToTable(vars->variableNames.last(), typeString);
-        break;
-    case VARIABLE_TYPE_QUATERNION:
-        varType = hkVariableType::VARIABLE_TYPE_QUATERNION;
-        loadedData->addVariable(varType);
-        typeString = "VARIABLE_TYPE_QUATERNION";
-        addVariableToTable(vars->variableNames.last(), typeString);
-        break;
-    default:
-        return;
+    if (loadedData){
+        int type = typeSelector->currentIndex();
+        hkVariableType varType;
+        QString typeString;
+        hkbBehaviorGraphStringData *vars = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
+        switch (type){
+        case VARIABLE_TYPE_BOOL:
+            varType = hkVariableType::VARIABLE_TYPE_BOOL;
+            loadedData->addVariable(varType);
+            typeString = "VARIABLE_TYPE_BOOL";
+            addVariableToTable(vars->variableNames.last(), typeString);
+            break;
+        case VARIABLE_TYPE_INT32:
+            varType = hkVariableType::VARIABLE_TYPE_INT32;
+            loadedData->addVariable(varType);
+            typeString = "VARIABLE_TYPE_INT32";
+            addVariableToTable(vars->variableNames.last(), typeString);
+            break;
+        case VARIABLE_TYPE_REAL:
+            varType = hkVariableType::VARIABLE_TYPE_REAL;
+            loadedData->addVariable(varType);
+            typeString = "VARIABLE_TYPE_REAL";
+            addVariableToTable(vars->variableNames.last(), typeString);
+            break;
+        case VARIABLE_TYPE_POINTER:
+            varType = hkVariableType::VARIABLE_TYPE_POINTER;
+            loadedData->addVariable(varType);
+            typeString = "VARIABLE_TYPE_POINTER";
+            addVariableToTable(vars->variableNames.last(), typeString);
+            break;
+        case VARIABLE_TYPE_VECTOR4:
+            varType = hkVariableType::VARIABLE_TYPE_VECTOR4;
+            loadedData->addVariable(varType);
+            typeString = "VARIABLE_TYPE_VECTOR4";
+            addVariableToTable(vars->variableNames.last(), typeString);
+            break;
+        case VARIABLE_TYPE_QUATERNION:
+            varType = hkVariableType::VARIABLE_TYPE_QUATERNION;
+            loadedData->addVariable(varType);
+            typeString = "VARIABLE_TYPE_QUATERNION";
+            addVariableToTable(vars->variableNames.last(), typeString);
+            break;
+        default:
+            return;
+        }
+        emit variableAdded(vars->variableNames.last(), typeString);
     }
-    emit variableAdded(vars->variableNames.last(), typeString);
 }
 
 void BehaviorVariablesUI::removeVariable(){
-    int index = table->currentRow();
-    loadedData->removeVariable(index);
-    if (index < table->rowCount()){
-        table->removeRow(index);
+    if (loadedData){
+        int index = table->currentRow();
+        loadedData->removeVariable(index);
+        if (index < table->rowCount()){
+            table->removeRow(index);
+        }
+        if (stackLyt->currentIndex() == VARIABLE_WIDGET){
+            stackLyt->setCurrentIndex(TABLE_WIDGET);
+        }
+        emit variableRemoved(index);
     }
-    if (stackLyt->currentIndex() == VARIABLE_WIDGET){
-        stackLyt->setCurrentIndex(TABLE_WIDGET);
-    }
-    emit variableRemoved(index);
 }
 
 void BehaviorVariablesUI::setHkDataUI(HkDataUI *ui){

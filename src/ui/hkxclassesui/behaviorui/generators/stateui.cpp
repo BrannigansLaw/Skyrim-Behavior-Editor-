@@ -11,11 +11,10 @@
 #include "src/filetypes/behaviorfile.h"
 #include "src/ui/behaviorgraphview.h"
 #include "src/ui/treegraphicsitem.h"
+#include "src/ui/mainwindow.h"
 #include "src/hkxclasses/behavior/hkbvariablebindingset.h"
 
-#include <QGridLayout>
 #include <QHeaderView>
-#include <QStackedLayout>
 
 #define BASE_NUMBER_OF_ROWS 8
 
@@ -25,11 +24,15 @@
 #define ENABLE_ROW 3
 #define GENERATOR_ROW 4
 #define ADD_ENTER_EVENT_ROW 5
+#define INITIAL_EXIT_EVENT_ROW 6
+#define INITIAL_ADD_TRANSITION_ROW 7
 
 #define NAME_COLUMN 0
 #define TYPE_COLUMN 1
 #define BINDING_COLUMN 2
 #define VALUE_COLUMN 3
+
+#define BINDING_ITEM_LABEL QString("Use Property     ")
 
 QStringList StateUI::headerLabels = {
     "Name",
@@ -42,26 +45,22 @@ StateUI::StateUI()
     : behaviorView(NULL),
       bsData(NULL),
       stateIndex(-1),
-      exitEventsButtonRow(ADD_ENTER_EVENT_ROW + 1),
-      transitionsButtonRow(ADD_ENTER_EVENT_ROW + 2),
+      exitEventsButtonRow(INITIAL_EXIT_EVENT_ROW),
+      transitionsButtonRow(INITIAL_ADD_TRANSITION_ROW),
       groupBox(new QGroupBox("hkbStateMachineStateInfo")),
       topLyt(new QGridLayout),
       transitionUI(new TransitionsUI()),
       eventUI(new EventUI()),
-      table(new TableWidget),
+      table(new TableWidget(QColor(Qt::cyan))),
       returnPB(new QPushButton("Return")),
       name(new LineEdit),
       stateId(new SpinBox),
       probability(new DoubleSpinBox),
       enable(new QCheckBox),
-      enableTransitions(new QCheckBox("Enable Transitions")),
-      addEnterEventPB(new QPushButton("Add Enter Event")),
-      removeEnterEventPB(new QPushButton("Remove Selected Enter Event")),
-      addExitEventPB(new QPushButton("Add Exit Event")),
-      removeExitEventPB(new QPushButton("Remove Selected Exit Event")),
-      addTransitionPB(new QPushButton("Add Transition")),
-      removeTransitionPB(new QPushButton("Remove Selected Transition"))
+      enableTransitions(new QCheckBox("Enable Transitions"))
 {
+    stateId->setReadOnly(true);
+    transitionUI->flagGlobalWildcard->setDisabled(true);
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
     table->setHorizontalHeaderLabels(headerLabels);
@@ -80,23 +79,24 @@ StateUI::StateUI()
     table->setItem(ENABLE_ROW, NAME_COLUMN, new TableWidgetItem("enable"));
     table->setItem(ENABLE_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool", Qt::AlignCenter));
     table->setItem(ENABLE_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
+    table->setItem(ENABLE_ROW, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter, QColor(Qt::lightGray)));
     table->setCellWidget(ENABLE_ROW, VALUE_COLUMN, enable);
     table->setItem(GENERATOR_ROW, NAME_COLUMN, new TableWidgetItem("generator"));
     table->setItem(GENERATOR_ROW, TYPE_COLUMN, new TableWidgetItem("hkbGenerator", Qt::AlignCenter));
     table->setItem(GENERATOR_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
-    table->setItem(GENERATOR_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(219, 219, 219), QBrush(Qt::black), "Click to view the list of generators"));
-    table->setCellWidget(ADD_ENTER_EVENT_ROW, NAME_COLUMN, addEnterEventPB);
-    table->setItem(ADD_ENTER_EVENT_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter, QColor(219, 219, 219), QBrush(Qt::black)));
-    table->setCellWidget(ADD_ENTER_EVENT_ROW, BINDING_COLUMN, removeEnterEventPB);
-    table->setItem(ADD_ENTER_EVENT_ROW, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
-    table->setCellWidget(ADD_ENTER_EVENT_ROW + 1, NAME_COLUMN, addExitEventPB);
-    table->setItem(ADD_ENTER_EVENT_ROW + 1, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter, QColor(219, 219, 219), QBrush(Qt::black)));
-    table->setCellWidget(ADD_ENTER_EVENT_ROW + 1, BINDING_COLUMN, removeExitEventPB);
-    table->setItem(ADD_ENTER_EVENT_ROW + 1, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
-    table->setCellWidget(ADD_ENTER_EVENT_ROW + 2, NAME_COLUMN, addTransitionPB);
-    table->setItem(ADD_ENTER_EVENT_ROW + 2, TYPE_COLUMN, new TableWidgetItem("hkbStateMachineTransitionInfoArray", Qt::AlignCenter, QColor(219, 219, 219), QBrush(Qt::black)));
-    table->setCellWidget(ADD_ENTER_EVENT_ROW + 2, BINDING_COLUMN, removeTransitionPB);
-    table->setItem(ADD_ENTER_EVENT_ROW + 2, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
+    table->setItem(GENERATOR_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_GENERATORS_TABLE_TIP));
+    table->setItem(ADD_ENTER_EVENT_ROW, NAME_COLUMN, new TableWidgetItem("Add Enter Event", Qt::AlignCenter, QColor(Qt::green), QBrush(Qt::black), "Double click to add a event to be emitted when this state is entered"));
+    table->setItem(ADD_ENTER_EVENT_ROW, TYPE_COLUMN, new TableWidgetItem("hkbStateMachineEventPropertyArray", Qt::AlignCenter, QColor(Qt::gray)));
+    table->setItem(ADD_ENTER_EVENT_ROW, BINDING_COLUMN, new TableWidgetItem("Remove Selected Enter Event", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black)));
+    table->setItem(ADD_ENTER_EVENT_ROW, VALUE_COLUMN, new TableWidgetItem("Edit Selected Enter Event", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black)));
+    table->setItem(INITIAL_EXIT_EVENT_ROW, NAME_COLUMN, new TableWidgetItem("Add Exit Event", Qt::AlignCenter, QColor(Qt::green), QBrush(Qt::black), "Double click to add a event to be emitted when this state is exited"));
+    table->setItem(INITIAL_EXIT_EVENT_ROW, TYPE_COLUMN, new TableWidgetItem("hkbStateMachineEventPropertyArray", Qt::AlignCenter, QColor(Qt::gray)));
+    table->setItem(INITIAL_EXIT_EVENT_ROW, BINDING_COLUMN, new TableWidgetItem("Remove Selected Exit Event", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black)));
+    table->setItem(INITIAL_EXIT_EVENT_ROW, VALUE_COLUMN, new TableWidgetItem("Edit Selected Exit Event", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black)));
+    table->setItem(INITIAL_ADD_TRANSITION_ROW, NAME_COLUMN, new TableWidgetItem("Add Transition", Qt::AlignCenter, QColor(Qt::green), QBrush(Qt::black), "Double click to add a new transition"));
+    table->setItem(INITIAL_ADD_TRANSITION_ROW, TYPE_COLUMN, new TableWidgetItem("hkbStateMachineTransitionInfoArray", Qt::AlignCenter, QColor(Qt::gray)));
+    table->setItem(INITIAL_ADD_TRANSITION_ROW, BINDING_COLUMN, new TableWidgetItem("Remove Selected Transition", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black)));
+    table->setItem(INITIAL_ADD_TRANSITION_ROW, VALUE_COLUMN, new TableWidgetItem("Edit Selected Transition", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black)));
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 8, 3);
     groupBox->setLayout(topLyt);
@@ -104,32 +104,62 @@ StateUI::StateUI()
     addWidget(groupBox);
     addWidget(eventUI);
     addWidget(transitionUI);
-    connect(returnPB, SIGNAL(pressed()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
+    connectSignals();
+}
+
+void StateUI::connectSignals(){
+    connect(returnPB, SIGNAL(clicked(bool)), this, SIGNAL(returnToParent(bool)), Qt::UniqueConnection);
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
     connect(stateId, SIGNAL(editingFinished()), this, SLOT(setStateId()), Qt::UniqueConnection);
     connect(probability, SIGNAL(editingFinished()), this, SLOT(setProbability()), Qt::UniqueConnection);
     connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-    connect(addEnterEventPB, SIGNAL(released()), this, SLOT(addEnterEvent()), Qt::UniqueConnection);
-    connect(removeEnterEventPB, SIGNAL(released()), this, SLOT(removeObjectChild()), Qt::UniqueConnection);
-    connect(addExitEventPB, SIGNAL(released()), this, SLOT(addExitEvent()), Qt::UniqueConnection);
-    connect(removeExitEventPB, SIGNAL(released()), this, SLOT(removeObjectChild()), Qt::UniqueConnection);
-    connect(addTransitionPB, SIGNAL(released()), this, SLOT(addTransition()), Qt::UniqueConnection);
-    connect(removeTransitionPB, SIGNAL(released()), this, SLOT(removeObjectChild()), Qt::UniqueConnection);
+    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
     connect(eventUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
     connect(eventUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)), Qt::UniqueConnection);
     connect(transitionUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
     connect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(transitionNamChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)), Qt::UniqueConnection);
+}
+
+void StateUI::disconnectSignals(){
+    disconnect(returnPB, SIGNAL(clicked(bool)), this, SIGNAL(returnToParent(bool)));
+    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
+    disconnect(stateId, SIGNAL(editingFinished()), this, SLOT(setStateId()));
+    disconnect(probability, SIGNAL(editingFinished()), this, SLOT(setProbability()));
+    disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
+    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    disconnect(eventUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+    disconnect(eventUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)));
+    disconnect(transitionUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)));
+    disconnect(transitionUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
+    disconnect(transitionUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)));
+    disconnect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+    disconnect(transitionUI, SIGNAL(transitionNamChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)));
+}
+
+void StateUI::variableTableElementSelected(int index, const QString &name){
+    if (bsData){
+        switch (currentIndex()){
+        case TRANSITION_WIDGET:
+            transitionUI->variableTableElementSelected(index, name);
+            break;
+        default:
+            CRITICAL_ERROR_MESSAGE(QString("StateUI::variableTableElementSelected(): Event relayed to wrong widget!!"));
+            return;
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("StateUI::variableTableElementSelected(): The data is NULL!!"));
+    }
 }
 
 void StateUI::loadData(HkxObject *data, int stateindex){
-    blockSignals(true);
-    stateIndex = -1;
+    disconnectSignals();
     setCurrentIndex(MAIN_WIDGET);
     if (data && data->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
         bsData = static_cast<hkbStateMachineStateInfo *>(data);
         stateIndex = stateindex;
-        rowToRemove = -1;
         name->setText(bsData->name);
         stateId->setValue(bsData->stateId);
         probability->setValue(bsData->probability);
@@ -143,7 +173,7 @@ void StateUI::loadData(HkxObject *data, int stateindex){
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateUI::loadData(): The data is NULL or an incorrect type!!"));
     }
-    blockSignals(false);
+    connectSignals();
 }
 
 void StateUI::loadDynamicTableRows(){
@@ -153,7 +183,7 @@ void StateUI::loadDynamicTableRows(){
         if (events){
             temp = ADD_ENTER_EVENT_ROW + events->events.size() + 1 - exitEventsButtonRow;
         }else{
-            temp = ADD_ENTER_EVENT_ROW + 1 - exitEventsButtonRow;
+            temp = INITIAL_EXIT_EVENT_ROW - exitEventsButtonRow;
         }
         if (temp > 0){
             for (int i = 0; i < temp; i++){
@@ -188,10 +218,10 @@ void StateUI::loadDynamicTableRows(){
         QString eventName;
         events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
         if (events){
-            for (int i = ADD_ENTER_EVENT_ROW + 1, j = 0; i < exitEventsButtonRow, j < events->events.size(); i++, j++){
+            for (int i = INITIAL_EXIT_EVENT_ROW, j = 0; i < exitEventsButtonRow, j < events->events.size(); i++, j++){
                 eventName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(events->events.at(j).id);
                 if (eventName != ""){
-                    setRowItems(i, eventName, events->getClassname(), "N/A", "Click to Edit");
+                    setRowItems(i, eventName, events->getClassname(), "Remove", "Edit", "Double click to remove this enter event", "Double click to edit this enter event");
                 }else{
                     CRITICAL_ERROR_MESSAGE(QString("StateUI::loadDynamicTableRows(): Invalid event name!!!"));
                 }
@@ -202,7 +232,7 @@ void StateUI::loadDynamicTableRows(){
             for (int i = exitEventsButtonRow + 1, j = 0; i < transitionsButtonRow, j < events->events.size(); i++, j++){
                 eventName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(events->events.at(j).id);
                 if (eventName != ""){
-                    setRowItems(i, eventName, events->getClassname(), "N/A", "Click to Edit");
+                    setRowItems(i, eventName, events->getClassname(), "Remove", "Edit", "Double click to remove this exit event", "Double click to edit this exit event");
                 }else{
                     CRITICAL_ERROR_MESSAGE(QString("StateUI::loadDynamicTableRows(): Invalid event name!!!"));
                 }
@@ -212,7 +242,7 @@ void StateUI::loadDynamicTableRows(){
         if (trans){
             table->setRowCount(transitionsButtonRow + trans->getNumTransitions() + 1);
             for (int i = transitionsButtonRow + 1, j = 0; i < table->rowCount(), j < trans->getNumTransitions(); i++, j++){
-                setRowItems(i, trans->getTransitionNameAt(j), trans->getClassname(), "N/A", "Click to Edit");
+                setRowItems(i, trans->getTransitionNameAt(j), trans->getClassname(), "Remove", "Edit", "Double click to remove this transition", "Double click to edit this transition");
             }
         }else{
             table->setRowCount(transitionsButtonRow + 1);
@@ -223,7 +253,7 @@ void StateUI::loadDynamicTableRows(){
 }
 
 
-void StateUI::setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value){
+void StateUI::setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2){
     if (table->item(row, NAME_COLUMN)){
         table->item(row, NAME_COLUMN)->setText(name);
     }else{
@@ -237,12 +267,12 @@ void StateUI::setRowItems(int row, const QString & name, const QString & classna
     if (table->item(row, BINDING_COLUMN)){
         table->item(row, BINDING_COLUMN)->setText(bind);
     }else{
-        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind, Qt::AlignCenter));
+        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind, Qt::AlignCenter, QColor(Qt::red), QBrush(Qt::black), tip1));
     }
     if (table->item(row, VALUE_COLUMN)){
         table->item(row, VALUE_COLUMN)->setText(value);
     }else{
-        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value, Qt::AlignCenter, QColor(219, 219, 219), QBrush(Qt::black)));
+        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value, Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), tip2));
     }
 }
 
@@ -250,7 +280,7 @@ void StateUI::setName(){
     if (bsData){
         bsData->name = name->text();
         bsData->getParentFile()->toggleChanged(true);
-        emit stateNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
+        emit stateNameChanged(name->text(), stateIndex);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateUI::setName(): The data is NULL!!"));
     }
@@ -283,8 +313,17 @@ void StateUI::setEnable(){
     }
 }
 
-void StateUI::setEvent(int index, const QString & name){
-    eventUI->setEvent(index, name);
+void StateUI::eventTableElementSelected(int index, const QString & name){
+    switch (currentIndex()){
+    case EVENT_PAYLOAD_WIDGET:
+        eventUI->setEvent(index, name);
+        break;
+    case TRANSITION_WIDGET:
+        transitionUI->eventTableElementSelected(index, name);
+        break;
+    default:
+        WARNING_MESSAGE(QString("StateMachineUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));;
+    }
     loadDynamicTableRows(); //Inefficient...
 }
 
@@ -305,6 +344,27 @@ void StateUI::addEnterEvent(){
     }
 }
 
+void StateUI::removeEnterEvent(int index){
+    hkbStateMachineEventPropertyArray *events = NULL;
+    if (bsData){
+        events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
+        if (events){
+            if (index < events->events.size() && index >= 0){
+                events->removeEvent(index);
+            }else{
+                WARNING_MESSAGE(QString("StateUI::removeEnterEvent(): Invalid row index selected!!"));
+                return;
+            }
+        }else{
+            WARNING_MESSAGE(QString("StateUI::removeEnterEvent(): Event data is NULL!!"));
+            return;
+        }
+        loadDynamicTableRows();
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("StateUI::removeEnterEvent(): The data is NULL!!"));
+    }
+}
+
 void StateUI::addExitEvent(){
     hkbStateMachineEventPropertyArray *exitEvents = NULL;
     if (bsData){
@@ -322,54 +382,24 @@ void StateUI::addExitEvent(){
     }
 }
 
-void StateUI::removeObjectChild(){
-    int result = -1;
-    hkbStateMachineEventPropertyArray *enterEvents = NULL;
-    hkbStateMachineEventPropertyArray *exitEvents = NULL;
-    hkbStateMachineTransitionInfoArray *trans = NULL;
+void StateUI::removeExitEvent(int index){
+    hkbStateMachineEventPropertyArray *events = NULL;
     if (bsData){
-        enterEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
-        exitEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
-        if (rowToRemove != transitionsButtonRow && rowToRemove != exitEventsButtonRow && rowToRemove != ADD_ENTER_EVENT_ROW){
-            trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
-            if (rowToRemove >= BASE_NUMBER_OF_ROWS + enterEvents->events.size() + exitEvents->events.size()){
-                if (trans){
-                    result = rowToRemove - BASE_NUMBER_OF_ROWS - enterEvents->events.size() - exitEvents->events.size();
-                    if (result != transitionsButtonRow && result < trans->getNumTransitions() && result >= 0){
-                        trans->removeTransition(result);
-                    }else{
-                        WARNING_MESSAGE(QString("StateUI::removeObjectChild(): Invalid row index selected!!"));
-                        return;
-                    }
-                }else{
-                    WARNING_MESSAGE(QString("StateUI::removeObjectChild(): Transition data is NULL!!"));
-                    return;
-                }
-            }else if (rowToRemove > exitEventsButtonRow){
-                result = rowToRemove - exitEventsButtonRow - 1;
-                if (result < exitEvents->events.size() && result >= 0){
-                    exitEvents->removeEvent(result);
-                    rowToRemove = -1;
-                }else{
-                    WARNING_MESSAGE(QString("StateUI::removeObjectChild(): Invalid index of child to remove!!"));
-                }
-            }else if (rowToRemove > ADD_ENTER_EVENT_ROW){
-                result = rowToRemove - ADD_ENTER_EVENT_ROW - 1;
-                if (result < enterEvents->events.size() && result >= 0){
-                    enterEvents->removeEvent(result);
-                    rowToRemove = -1;
-                }else{
-                    WARNING_MESSAGE(QString("StateUI::removeObjectChild(): Invalid index of child to remove!!"));
-                }
+        events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
+        if (events){
+            if (index < events->events.size() && index >= 0){
+                events->removeEvent(index);
             }else{
-                WARNING_MESSAGE(QString("StateUI::removeObjectChild(): Invalid index of child to remove!!"));
+                WARNING_MESSAGE(QString("StateUI::removeExitEvent(): Invalid row index selected!!"));
+                return;
             }
-            loadDynamicTableRows();
         }else{
-            WARNING_MESSAGE(QString("StateUI::removeObjectChild(): Attempting to remove button row!!"));
+            WARNING_MESSAGE(QString("StateUI::removeExitEvent(): Event data is NULL!!"));
+            return;
         }
+        loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateUI::removeObjectChild(): The data or behavior graph pointer is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("StateUI::removeExitEvent(): The data is NULL!!"));
     }
 }
 
@@ -389,6 +419,27 @@ void StateUI::addTransition(){
     }
 }
 
+void StateUI::removeTransition(int index){
+    hkbStateMachineTransitionInfoArray *trans = NULL;
+    if (bsData){
+        trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
+        if (trans){
+            if (index < trans->getNumTransitions() && index >= 0){
+                trans->removeTransition(index);
+            }else{
+                WARNING_MESSAGE(QString("StateUI::removeTransition(): Invalid row index selected!!"));
+                return;
+            }
+        }else{
+            WARNING_MESSAGE(QString("StateUI::removeTransition(): Transition data is NULL!!"));
+            return;
+        }
+        loadDynamicTableRows();
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("StateUI::removeTransition(): The data is NULL!!"));
+    }
+}
+
 void StateUI::viewSelectedChild(int row, int column){
     int result;
     int count = 0;
@@ -397,15 +448,24 @@ void StateUI::viewSelectedChild(int row, int column){
     hkbStateMachineEventPropertyArray *exitEvents = NULL;
     if (bsData){
         if (row == GENERATOR_ROW && column == VALUE_COLUMN){
-            emitViewGenerators();
+            emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1);
+        }else if (row == ADD_ENTER_EVENT_ROW && column == NAME_COLUMN){
+            addEnterEvent();
+        }else if (row == exitEventsButtonRow && column == NAME_COLUMN){
+            addExitEvent();
+        }else if (row == transitionsButtonRow && column == NAME_COLUMN){
+            addTransition();
         }else if (row > ADD_ENTER_EVENT_ROW && row < exitEventsButtonRow){
             enterEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
             result = row - ADD_ENTER_EVENT_ROW - 1;
-            rowToRemove = row;
             if (enterEvents->events.size() > result && result >= 0){
                 if (column == VALUE_COLUMN){
                     eventUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), &enterEvents->events[result]);
                     setCurrentIndex(EVENT_PAYLOAD_WIDGET);
+                }else if (column == BINDING_COLUMN){
+                    if (MainWindow::yesNoDialogue("Are you sure you want to remove the enter event \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
+                        removeEnterEvent(result);
+                    }
                 }
             }else{
                 CRITICAL_ERROR_MESSAGE(QString("StateUI::viewSelectedChild(): Invalid index of child to view!!"));
@@ -413,11 +473,14 @@ void StateUI::viewSelectedChild(int row, int column){
         }else if (row > exitEventsButtonRow && row < transitionsButtonRow){
             exitEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
             result = row - exitEventsButtonRow - 1;
-            rowToRemove = row;
             if (exitEvents->events.size() > result && result >= 0){
                 if (column == VALUE_COLUMN){
                     eventUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), &exitEvents->events[result]);
                     setCurrentIndex(EVENT_PAYLOAD_WIDGET);
+                }else if (column == BINDING_COLUMN){
+                    if (MainWindow::yesNoDialogue("Are you sure you want to remove the exit event \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
+                        removeExitEvent(result);
+                    }
                 }
             }else{
                 CRITICAL_ERROR_MESSAGE(QString("StateUI::viewSelectedChild(): Invalid index of child to view!!"));
@@ -432,12 +495,15 @@ void StateUI::viewSelectedChild(int row, int column){
                 count = count + exitEvents->events.size();
             }
             result = row - BASE_NUMBER_OF_ROWS - count;
-            rowToRemove = row;
             trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
             if (trans && result < trans->getNumTransitions() && result >= 0){
                 if (column == VALUE_COLUMN){
-                    transitionUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), bsData->getParentStateMachine(), &trans->transitions[result]);
+                    transitionUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), bsData->getParentStateMachine(), &trans->transitions[result], result);
                     setCurrentIndex(TRANSITION_WIDGET);
+                }else if (column == BINDING_COLUMN){
+                    if (MainWindow::yesNoDialogue("Are you sure you want to remove the transition \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
+                        removeTransition(result);
+                    }
                 }
             }else{
                 CRITICAL_ERROR_MESSAGE(QString("StateUI::viewSelectedChild(): Invalid index of child to view!!"));
@@ -445,14 +511,6 @@ void StateUI::viewSelectedChild(int row, int column){
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateUI::viewSelectedChild(): The data is NULL!!"));
-    }
-}
-
-void StateUI::emitViewGenerators(){
-    if (bsData && bsData->getParentFile()){
-        emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1);
-    }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateUI::emitViewGenerators(): The data or parent file is NULL!!"));
     }
 }
 
@@ -476,7 +534,7 @@ void StateUI::setGenerator(int index, const QString & name){
                     CRITICAL_ERROR_MESSAGE(QString("StateUI::setGenerator(): The selected icon is NULL!!"));
                 }
                 if (bsData->parentSM.data()){
-                    static_cast<hkbStateMachine *>(bsData->parentSM.data())->removeState(stateIndex);
+                    static_cast<hkbStateMachine *>(bsData->parentSM.data())->removeObjectAt(stateIndex);
                 }else{
                     CRITICAL_ERROR_MESSAGE(QString("StateUI::setGenerator(): The state is orphaned!!"));
                 }
@@ -495,6 +553,18 @@ void StateUI::setGenerator(int index, const QString & name){
 
 void StateUI::setBehaviorView(BehaviorGraphView *view){
     behaviorView = view;
+}
+
+void StateUI::transitionRenamed(const QString &name, int index){
+    if (bsData){
+        if (table->item(transitionsButtonRow + index + 1, NAME_COLUMN)){
+            table->item(transitionsButtonRow + index + 1, NAME_COLUMN)->setText(name);
+        }else{
+            CRITICAL_ERROR_MESSAGE(QString("StateUI::transitionRenamed(): Invalid row selected!!"));
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("StateUI::transitionRenamed(): The data is NULL!!"));
+    }
 }
 
 void StateUI::eventRenamed(const QString & name, int index){

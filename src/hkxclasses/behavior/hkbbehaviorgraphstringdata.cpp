@@ -164,6 +164,17 @@ QString hkbBehaviorGraphStringData::getEventNameAt(int index) const{
     return "";
 }
 
+int hkbBehaviorGraphStringData::getCharacterPropertyIndex(const QString &name) const{
+    int index = -1;
+    for (int i = 0; i < characterPropertyNames.size(); i++){
+        if (name == characterPropertyNames.at(i)){
+            index = i;
+            break;
+        }
+    }
+    return index;
+}
+
 bool hkbBehaviorGraphStringData::link(){
     return true;
 }

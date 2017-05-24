@@ -13,7 +13,7 @@ class hkbStateMachineStateInfo: public hkbGenerator
     friend class StateMachineUI;
     friend class StateUI;
 public:
-    hkbStateMachineStateInfo(HkxFile *parent, hkbStateMachine *parentSM, long ref = 0);
+    hkbStateMachineStateInfo(HkxFile *parent, hkbStateMachine *parentsm, long ref = 0);
     virtual ~hkbStateMachineStateInfo();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

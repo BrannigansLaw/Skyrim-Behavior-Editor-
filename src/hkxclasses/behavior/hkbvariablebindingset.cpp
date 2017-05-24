@@ -27,29 +27,49 @@ int hkbVariableBindingSet::getNumberOfBindings() const{
     return bindings.size();
 }
 
-bool hkbVariableBindingSet::addBinding(const QString & path, int varIndex, hkBinding::BindingType type){
-    for (int i = 0; i < bindings.size(); i++){
+bool hkbVariableBindingSet::addBinding(const QString & path, const QString & name, int varIndex, hkBinding::BindingType type){
+    int index = -1;
+    bool exists = false;
+    for (int i = 0; i < bindings.size(); i++){//Do this for below but remove the binding if the paths are the same...
         if (bindings.at(i).memberPath == path){
-            bindings[i].variableIndex = varIndex;
+            if (type == hkBinding::BINDING_TYPE_VARIABLE){
+                bindings[i].variableIndex = varIndex;
+            }else if (type == hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
+                index = static_cast<BehaviorFile *>(getParentFile())->addCharacterProperty(varIndex);
+                if (index > -1){
+                    bindings[i].variableIndex = index;
+                }else{
+                    index = static_cast<BehaviorFile *>(getParentFile())->getCharacterPropertyIndex(name);
+                    if (index > -1){
+                        bindings[i].variableIndex = index;
+                    }else{
+                        return false;
+                    }
+                }
+            }
             bindings[i].bindingType = type;
             if (path == "enable"){
                 indexOfBindingToEnable = i;
             }
-            return true;
+            exists = true;
         }
     }
-    bindings.append(hkBinding(path, varIndex, -1, type));
-    if (type == hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-        if (!static_cast<BehaviorFile *>(getParentFile())->addCharacterProperty(varIndex)){
-            removeBinding(bindings.size() - 1);
-            WARNING_MESSAGE(QString("hkbVariableBindingSet::addBinding(): Failed! probably because the character property does not exist in the character file..."))
-            return false;
+    if (!exists){
+        if (type == hkBinding::BINDING_TYPE_VARIABLE){
+            bindings.append(hkBinding(path, varIndex, -1, type));
+        }else if (type == hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
+            index = static_cast<BehaviorFile *>(getParentFile())->addCharacterProperty(varIndex);
+            if (index > -1){
+                bindings.append(hkBinding(path, index, -1, type));
+            }else{
+                return false;
+            }
         }
+        if (path == "enable"){
+            indexOfBindingToEnable = bindings.size() - 1;
+        }
+        return true;
     }
-    if (path == "enable"){
-        indexOfBindingToEnable = bindings.size() - 1;
-    }
-    return true;
 }
 
 void hkbVariableBindingSet::removeBinding(const QString & path){
@@ -71,7 +91,7 @@ void hkbVariableBindingSet::removeBinding(int varIndex){
 QString hkbVariableBindingSet::getPathOfBindingAt(int index){
     QString path;
     if (index < bindings.size() && index >= 0){
-        path = bindings.at(index);
+        path = bindings.at(index).memberPath;
     }
     return path;
 }

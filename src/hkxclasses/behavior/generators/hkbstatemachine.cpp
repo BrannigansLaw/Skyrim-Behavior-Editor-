@@ -84,6 +84,25 @@ QString hkbStateMachine::getStateName(int stateId) const{
     return "";
 }
 
+int hkbStateMachine::getStateId(const QString &statename) const{
+    hkbStateMachineStateInfo *state;
+    for (int i = 0; i < states.size(); i++){
+        state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+        if (state->name == statename){
+            return i;
+        }
+    }
+    return -1;
+}
+
+int hkbStateMachine::getNestedStateId(const QString &statename, int stateId) const{
+    hkbStateMachine *ptr = getNestedStateMachine(stateId);
+    if (ptr){
+        return ptr->getStateId(statename);
+    }
+    return -1;
+}
+
 QStringList hkbStateMachine::getStateNames() const{
     QStringList list;
     hkbStateMachineStateInfo *state;
@@ -141,21 +160,53 @@ bool hkbStateMachine::insertObjectAt(int index, DataIconManager *obj){
 }
 
 bool hkbStateMachine::removeObjectAt(int index){
-    hkbStateMachineStateInfo *objChild;
-    if (index > -1 && index < states.size()){
-        objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
-        objChild->unlink();
-        states.removeAt(index);
-    }else if (index == -1){
-        for (int i = 0; i < states.size(); i++){
-            objChild = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
-            objChild->unlink();
+    if (index < states.size()){
+        hkbStateMachineStateInfo *state = NULL;
+        hkbStateMachineTransitionInfoArray *trans = NULL;
+        int stateId = 0;
+        if (index > -1 && index < states.size()){
+            trans = static_cast<hkbStateMachineTransitionInfoArray *>(wildcardTransitions.data());
+            state = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
+            stateId = state->stateId;
+            if (stateId == startStateId){
+                startStateId = -1;
+            }
+            if (trans){
+                trans->removeTransitionToState(stateId);
+            }
+            state->unlink();
+            for (int i = 0; i < states.size(); i++){
+                state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+                trans = static_cast<hkbStateMachineTransitionInfoArray *>(state->transitions.data());
+                if (trans){
+                    trans->removeTransitionToState(stateId);
+                }
+            }
+            states.removeAt(index);
+        }else if (index == -1){
+            for (int i = 0; i < states.size(); i++){
+                state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+                trans = static_cast<hkbStateMachineTransitionInfoArray *>(state->transitions.data());
+                stateId = state->stateId;
+                if (stateId == startStateId){
+                    startStateId = -1;
+                }
+                if (trans){
+                    trans->removeTransitionToState(stateId);
+                }
+                trans = static_cast<hkbStateMachineTransitionInfoArray *>(wildcardTransitions.data());
+                if (trans){
+                    trans->removeTransitionToState(stateId);
+                }
+                state->unlink();
+            }
+            states.clear();
+        }else{
+            return false;
         }
-        states.clear();
-    }else{
-        return false;
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool hkbStateMachine::hasChildren() const{
@@ -218,22 +269,6 @@ hkbStateMachine * hkbStateMachine::getNestedStateMachine(int stateId) const{
         }
     }
     return NULL;
-}
-
-void hkbStateMachine::removeState(int index){
-    if (index < states.size()){
-        hkbStateMachineTransitionInfoArray *trans = static_cast<hkbStateMachineTransitionInfoArray *>(wildcardTransitions.data());
-        hkbStateMachineStateInfo *state = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
-        int stateId = state->stateId;
-        trans->removeTransitionToState(stateId);
-        for (int i = 0; i < states.size(); i++){
-            state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
-            trans = static_cast<hkbStateMachineTransitionInfoArray *>(state->transitions.data());
-            if (trans){
-                trans->removeTransitionToState(stateId);
-            }
-        }
-    }
 }
 
 bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){

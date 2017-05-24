@@ -8,14 +8,13 @@
 
 #define MAX_HKXXML_LINE_LENGTH 512
 
-#define CRITICAL_ERROR_MESSAGE(message) {QMessageBox msg;msg.setModal(true);msg.setText("CRITICAL ERROR: "+message+"\n\nWe advise that you close the application and contact the author!!!");msg.exec();}
+#define CRITICAL_ERROR_MESSAGE(message){QMessageBox msg;msg.setModal(true);msg.setText("CRITICAL ERROR: "+message+"\n\nWe advise that you close the application and contact the author!!!");msg.exec();}
+#define WARNING_MESSAGE(message){QMessageBox msg;msg.setModal(true);msg.setText("WARNING: "+message);msg.exec();}
 
-#define WARNING_MESSAGE(message) {QMessageBox msg;msg.setModal(true);msg.setText("WARNING: "+message);msg.exec();}
-
-#define VIEW_GENERATORS_TABLE_TIP "Click to view the list of generators"
-#define VIEW_MODIFIERS_TABLE_TIP "Click to view the list of modifiers"
-#define VIEW_EVENTS_TABLE_TIP "Click to view the list of events"
-#define VIEW_VARIABLES_TABLE_TIP "Click to view the list of variables to bind to this value"
+#define VIEW_GENERATORS_TABLE_TIP "Double click to view the list of generators"
+#define VIEW_MODIFIERS_TABLE_TIP "Double click to view the list of modifiers"
+#define VIEW_EVENTS_TABLE_TIP "Double click to view the list of events"
+#define VIEW_VARIABLES_TABLE_TIP "Double click to view the list of variables, check the box to view the list of character properties instead"
 
 enum hkVariableType {
     VARIABLE_TYPE_BOOL,

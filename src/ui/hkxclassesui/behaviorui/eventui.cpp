@@ -4,41 +4,62 @@
 #include "src/hkxclasses/behavior/hkbstringeventpayload.h"
 #include "src/hkxclasses/hkxobject.h"
 
-#include <QFormLayout>
+#include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QLineEdit>
 
 EventUI::EventUI()
     : file(NULL),
-      topLyt(new QFormLayout),
+      topLyt(new QGridLayout),
       returnPB(new QPushButton("Return")),
       nameL(new QLabel("Event Name:")),
       selectEvent(new QPushButton("NONE")),
       payloadL(new QLabel("Payload String:")),
       eventPayload(new QLineEdit)
 {
+    setMinimumHeight(400);
+    setMaximumHeight(400);
+    setMinimumWidth(600);
+    setMaximumWidth(600);
+    //topLyt->setSizeConstraint(QLayout::SetMaximumSize);
+    setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     setTitle("Event Payload Editor");
-    topLyt->addWidget(returnPB);
-    topLyt->addRow(nameL, selectEvent);
-    topLyt->addRow(payloadL, eventPayload);
+    topLyt->addWidget(returnPB, 0, 2, 1, 1);
+    topLyt->addWidget(nameL, 2, 0, 1, 1);
+    topLyt->addWidget(selectEvent, 2, 2, 1, 2);
+    topLyt->addWidget(payloadL, 4, 0, 1, 1);
+    topLyt->addWidget(eventPayload, 4, 2, 1, 2);
     setLayout(topLyt);
+    connectSignals();
+}
+
+void EventUI::connectSignals(){
     connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
     connect(selectEvent, SIGNAL(released()), this, SLOT(emitViewEvent()), Qt::UniqueConnection);
     connect(eventPayload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()), Qt::UniqueConnection);
 }
 
+void EventUI::disconnectSignals(){
+    disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+    disconnect(selectEvent, SIGNAL(released()), this, SLOT(emitViewEvent()));
+    disconnect(eventPayload, SIGNAL(editingFinished()), this, SLOT(setEventPayload()));
+}
+
 void EventUI::loadData(BehaviorFile *parentFile, hkEventPayload * event){
-    blockSignals(true);
+    disconnectSignals();
     QString text;
     if (parentFile && event){
         file = parentFile;
         eventData = event;
         text = file->getEventNameAt(event->id);
-        selectEvent->setText(text);
-        if (text == "" && event->id != -1){
-            WARNING_MESSAGE(QString("EventUI::loadData(): Invalid event id!!!"));
+        if (text == ""){
+            if (event->id != -1){
+                WARNING_MESSAGE(QString("EventUI::loadData(): Invalid event id!!!"));
+            }
+            text = "NONE";
         }
+        selectEvent->setText(text);
         if (event->payload.data()){
             eventPayload->setText(static_cast<hkbStringEventPayload *>(event->payload.data())->data);
         }else{
@@ -47,7 +68,15 @@ void EventUI::loadData(BehaviorFile *parentFile, hkEventPayload * event){
     }else{
         CRITICAL_ERROR_MESSAGE(QString("EventUI::loadData(): Behavior file or event data is null!!!"));
     }
-    blockSignals(false);
+    connectSignals();
+}
+
+QSize EventUI::sizeHint() const{
+    return QSize(1600, 800);
+}
+
+QSize EventUI::minimumSizeHint() const{
+    return QSize(1200, 600);
 }
 
 void EventUI::setEvent(int index, const QString & name){

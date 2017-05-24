@@ -34,7 +34,7 @@ QStringList BSLimbIKModifierUI::headerLabels = {
 BSLimbIKModifierUI::BSLimbIKModifierUI()
     : bsData(NULL),
       topLyt(new QGridLayout),
-      table(new TableWidget),
+      table(new TableWidget(QColor(Qt::cyan))),
       name(new LineEdit),
       enable(new QCheckBox),
       limitAngleDegrees(new DoubleSpinBox),
@@ -92,7 +92,6 @@ void BSLimbIKModifierUI::loadData(HkxObject *data){
         if (data->getSignature() == BS_LIMB_IK_MODIFIER){
             QStringList stringlist;
             hkbVariableBindingSet *varBind = NULL;
-            int index = -1;
             bsData = static_cast<BSLimbIKModifier *>(data);
             name->setText(bsData->name);
             enable->setChecked(bsData->enable);
@@ -110,68 +109,23 @@ void BSLimbIKModifierUI::loadData(HkxObject *data){
             gain->setValue(bsData->gain);
             boneRadius->setValue(bsData->boneRadius);
             castOffset->setValue(bsData->castOffset);
-            stringlist.clear();
-            stringlist << "enable" << "limitAngleDegrees" << "startBoneIndex" << "endBoneIndex" << "gain" << "boneRadius" << "castOffset" <<;
             varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
-            for (int i = 0; i < stringlist.size(); i++){
-                index = varBind->getVariableIndexOfBinding(stringlist.at(i));
-                if (index != -1){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                    if (varName == ""){
-                        varName = "NONE";
-                    }
-                    table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->setText(varName);
-                }
-            }
             if (varBind){
-                ind = varBind->getVariableIndexOfBinding("enable");
-                if (ind != -1){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(ind);
-                    if (varName == ""){
-                        varName = "NONE";
-                    }
-                    table->item(ENABLE_ROW, BINDING_COLUMN)->setText(varName);
-                }else{
-                    ind = varBind->getVariableIndexOfBinding("limitAngleDegrees");
-                    if (ind != -1){
-                        varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(ind);
-                        if (varName == ""){
-                            varName = "NONE";
-                        }
-                        table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->setText(varName);
-                    }else{
-                        ind = varBind->getVariableIndexOfBinding("startBoneIndex");
-                        if (ind != -1){
-                            varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(ind);
-                            if (varName == ""){
-                                varName = "NONE";
-                            }
-                            table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->setText(varName);
-                        }else{
-                            ind = varBind->getVariableIndexOfBinding("endBoneIndex");
-                            if (ind != -1){
-                                varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(ind);
-                                if (varName == ""){
-                                    varName = "NONE";
-                                }
-                                table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->setText(varName);
-                            }else{
-                                ind = varBind->getVariableIndexOfBinding("gain");
-                                if (ind != -1){
-                                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(ind);
-                                    if (varName == ""){
-                                        varName = "NONE";
-                                    }
-                                    table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->setText(varName);
-                                }
-                            }
-                        }
-                    }
-                }
+                loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
+                loadBinding(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN, varBind, "limitAngleDegrees");
+                loadBinding(START_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "startBoneIndex");
+                loadBinding(END_BONE_INDEX_ROW, BINDING_COLUMN, varBind, "endBoneIndex");
+                loadBinding(GAIN_ROW, BINDING_COLUMN, varBind, "gain");
+                loadBinding(BONE_RADIUS_ROW, BINDING_COLUMN, varBind, "boneRadius");
+                loadBinding(CAST_OFFSET_ROW, BINDING_COLUMN, varBind, "castOffset");
             }else{
-                table->item(START_STATE_ID_ROW, BINDING_COLUMN)->setText("NONE");
-                table->item(SYNC_VARIABLE_INDEX_ROW, BINDING_COLUMN)->setText("NONE");
-                table->item(WRAP_AROUND_STATE_ID_ROW, BINDING_COLUMN)->setText("NONE");
+                table->item(ENABLE_ROW, BINDING_COLUMN)->setText("NONE");
+                table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->setText("NONE");
+                table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->setText("NONE");
+                table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->setText("NONE");
+                table->item(GAIN_ROW, BINDING_COLUMN)->setText("NONE");
+                table->item(BONE_RADIUS_ROW, BINDING_COLUMN)->setText("NONE");
+                table->item(CAST_OFFSET_ROW, BINDING_COLUMN)->setText("NONE");
             }
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BehaviorGraphUI::loadData(): The data is an incorrect type!!"));
@@ -239,7 +193,7 @@ void BSLimbIKModifierUI::variableRenamed(const QString &name, int index)
 
 bool BSLimbIKModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type)
 {
-
+return true;
 }
 
 void BSLimbIKModifierUI::setBindingVariable(int index, const QString &name)
@@ -247,17 +201,22 @@ void BSLimbIKModifierUI::setBindingVariable(int index, const QString &name)
 
 }
 
-void BSLimbIKModifierUI::loadBinding(int row, int colunm, const QString &path){
+void BSLimbIKModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
-        hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
-        int index = varBind->getVariableIndexOfBinding(path);
-        QString varName;
-        if (index != -1){
-            varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-            if (varName == ""){
-                varName = "NONE";
+        if (varBind){
+            int index = varBind->getVariableIndexOfBinding(path);
+            QString varName;
+            if (index != -1){
+                varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
+                if (varName == ""){
+                    varName = "NONE";
+                }
+                table->item(row, colunm)->setText(varName);
             }
-            table->item(row, colunm)->setText(varName);
+        }else{
+            CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

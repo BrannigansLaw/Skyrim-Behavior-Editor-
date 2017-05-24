@@ -48,12 +48,14 @@ class MainWindow : public QWidget
 {
     Q_OBJECT
 public:
+    static QMessageBox::StandardButton yesNoDialogue(const QString & message);
     MainWindow();
     virtual ~MainWindow();
     void writeToLog(const QString & message, bool isError = false);
     void setProgressData(const QString & message, int value);
 protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
+    void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
 private:
     PlainTextEdit *debugLog;
     QGridLayout *topLyt;

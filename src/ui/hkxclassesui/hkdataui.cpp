@@ -122,11 +122,11 @@ HkDataUI::HkDataUI(const QString &title)
       behaviorGraphUI(new BehaviorGraphUI)
 {
     setTitle(title);
-    generatorsTable->setTypes(generatorTypes);
-    modifiersTable->setTypes(modifierTypes);
-    variablesTable->setTypes(variableTypes);
-    eventsTable->setTypes(QStringList("hkEvents"));
-    characterPropertiesTable->setTypes(variableTypes);
+    //generatorsTable->setTypes(generatorTypes);
+    //modifiersTable->setTypes(modifierTypes);
+    //variablesTable->setTypes(variableTypes);
+    //eventsTable->setTypes(QStringList("hkEvents"));
+    //characterPropertiesTable->setTypes(variableTypes);
     stack->addWidget(noDataL);
     stack->addWidget(iSTGUI);
     stack->addWidget(modGenUI);
@@ -337,7 +337,7 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
                 stateMachineUI->loadData(loadedData);
             }
             stack->setCurrentIndex(STATE_MACHINE);
-            stateMachineUI->connectToTableWidgets(generatorsTable, variablesTable, eventsTable);
+            stateMachineUI->connectToTableWidgets(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
             break;
         case HKB_BEHAVIOR_GRAPH:
             if (loadedData != oldData){

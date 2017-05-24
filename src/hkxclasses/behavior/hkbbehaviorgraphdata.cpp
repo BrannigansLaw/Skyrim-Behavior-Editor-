@@ -36,53 +36,59 @@ QString hkbBehaviorGraphData::getClassname(){
     return classname;
 }
 
-bool hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name, bool isProperty){
+int hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name, bool isProperty){
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
-    if (name == "" || (!isProperty && strData->variableNames.contains(name))/* || strData->characterPropertyNames.contains(name)*/){
-        return false;
-    }
-    hkVariableInfo varInfo;
-    switch (type){
-    case VARIABLE_TYPE_BOOL:
-        varInfo.type = "VARIABLE_TYPE_BOOL";
-        break;
-    case VARIABLE_TYPE_INT8:
-        varInfo.type = "VARIABLE_TYPE_INT8";
-        break;
-    case VARIABLE_TYPE_INT16:
-        varInfo.type = "VARIABLE_TYPE_INT16";
-        break;
-    case VARIABLE_TYPE_INT32:
-        varInfo.type = "VARIABLE_TYPE_INT32";
-        break;
-    case VARIABLE_TYPE_REAL:
-        varInfo.type = "VARIABLE_TYPE_REAL";
-        break;
-    case VARIABLE_TYPE_POINTER:
-        varInfo.type = "VARIABLE_TYPE_POINTER";
-        varData->variantVariableValues.append(HkxSharedPtr());
-        break;
-    case VARIABLE_TYPE_VECTOR4:
-        varInfo.type = "VARIABLE_TYPE_VECTOR4";
-        varData->quadVariableValues.append(hkQuadVariable());
-        break;
-    case VARIABLE_TYPE_QUATERNION:
-        varInfo.type = "VARIABLE_TYPE_QUATERNION";
-        varData->quadVariableValues.append(hkQuadVariable());
-        break;
-    default:
-        return false;
-    }
-    if (isProperty){
-        strData->characterPropertyNames.append(name);
-        characterPropertyInfos.append(varInfo);
+    if (name != "" && (isProperty || !strData->variableNames.contains(name))){
+        hkVariableInfo varInfo;
+        switch (type){
+        case VARIABLE_TYPE_BOOL:
+            varInfo.type = "VARIABLE_TYPE_BOOL";
+            break;
+        case VARIABLE_TYPE_INT8:
+            varInfo.type = "VARIABLE_TYPE_INT8";
+            break;
+        case VARIABLE_TYPE_INT16:
+            varInfo.type = "VARIABLE_TYPE_INT16";
+            break;
+        case VARIABLE_TYPE_INT32:
+            varInfo.type = "VARIABLE_TYPE_INT32";
+            break;
+        case VARIABLE_TYPE_REAL:
+            varInfo.type = "VARIABLE_TYPE_REAL";
+            break;
+        case VARIABLE_TYPE_POINTER:
+            varInfo.type = "VARIABLE_TYPE_POINTER";
+            varData->variantVariableValues.append(HkxSharedPtr());
+            break;
+        case VARIABLE_TYPE_VECTOR4:
+            varInfo.type = "VARIABLE_TYPE_VECTOR4";
+            varData->quadVariableValues.append(hkQuadVariable());
+            break;
+        case VARIABLE_TYPE_QUATERNION:
+            varInfo.type = "VARIABLE_TYPE_QUATERNION";
+            varData->quadVariableValues.append(hkQuadVariable());
+            break;
+        default:
+            return -2;
+        }
+        if (isProperty){
+            if (!strData->characterPropertyNames.contains(name)){
+                strData->characterPropertyNames.append(name);
+                characterPropertyInfos.append(varInfo);
+                return strData->characterPropertyNames.size() - 1;
+            }else{
+                return -1;
+            }
+        }else{
+            strData->variableNames.append(name);
+            variableInfos.append(varInfo);
+            varData->wordVariableValues.append(0);
+            return strData->variableNames.size() - 1;
+        }
     }else{
-        strData->variableNames.append(name);
-        variableInfos.append(varInfo);
+        return -1;
     }
-    varData->wordVariableValues.append(0);
-    return true;
 }
 
 void hkbBehaviorGraphData::addVariable(hkVariableType type){
@@ -322,6 +328,30 @@ HkxObject * hkbBehaviorGraphData::getVariantVariable(int index) const{
         }
     }
     return NULL;
+}
+
+hkVariableType hkbBehaviorGraphData::getCharacterPropertyTypeAt(int index) const{
+    if (characterPropertyInfos.size() > index && index > -1){
+        QString type = characterPropertyInfos.at(index).type;
+        if (type == "VARIABLE_TYPE_BOOL"){
+            return VARIABLE_TYPE_BOOL;
+        }else if (type == "VARIABLE_TYPE_INT8"){
+            return VARIABLE_TYPE_INT8;
+        }else if (type == "VARIABLE_TYPE_INT16"){
+            return VARIABLE_TYPE_INT16;
+        }else if (type == "VARIABLE_TYPE_INT32"){
+            return VARIABLE_TYPE_INT32;
+        }else if (type == "VARIABLE_TYPE_REAL"){
+            return VARIABLE_TYPE_REAL;
+        }else if (type == "VARIABLE_TYPE_POINTER"){
+            return VARIABLE_TYPE_POINTER;
+        }else if (type == "VARIABLE_TYPE_VECTOR4"){
+            return VARIABLE_TYPE_VECTOR4;
+        }else if (type == "VARIABLE_TYPE_QUATERNION"){
+            return VARIABLE_TYPE_QUATERNION;
+        }
+    }
+    return VARIABLE_TYPE_INT8;
 }
 
 bool hkbBehaviorGraphData::readData(const HkxXmlReader &reader, long index){

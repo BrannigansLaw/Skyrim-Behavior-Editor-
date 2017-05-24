@@ -13,7 +13,8 @@
 #include <QFileSystemModel>
 #include <QListView>
 #include <QSizePolicy>
-#include <QCheckBox>
+
+#include "src/ui/genericdatawidgets.h"
 
 ProjectUI::ProjectUI(ProjectFile *file)
     : project(file),

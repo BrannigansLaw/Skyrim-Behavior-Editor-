@@ -29,22 +29,27 @@ public:
 signals:
     void viewVariables(int index);
     void viewProperties(int index);
+    void transitionEffectRenamed(const QString & name);
     void returnToParent();
 private slots:
     void setName();
     void setBindingVariable(int index, const QString & name);
-    void setSelfTransitionMode();
-    void setEventMode();
+    void setSelfTransitionMode(int index);
+    void setEventMode(int index);
     void setDuration();
     void setToGeneratorStartTimeFraction();
-    void setEndMode();
-    void setBlendCurve();
-    void setFlagSync();
-    void setFlagIgnoreFromWorldFromModel();
-    void setFlagIgnoreToWorldFromModel();
+    void setEndMode(int index);
+    void setBlendCurve(int index);
+    void toggleSyncFlag();
+    void toggleIgnoreFromWorldFromModelFlag();
+    void toggleIgnoreToWorldFromModelFlag();
+    void viewSelectedChild(int row, int column);
 private:
+    void connectSignals();
+    void disconnectSignals();
+    void selectTableToView(bool viewproperties, const QString & path);
     void variableRenamed(const QString & name, int index);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type);
+    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
 private:
     static QStringList headerLabels;
     hkbBlendingTransitionEffect *bsData;

@@ -113,13 +113,13 @@ void EventsUI::loadData(HkxObject *data){
                 if (table->item(row, 0)){
                     table->item(row, 0)->setText(events->eventNames.at(i));
                 }else{
-                    table->setItem(row, 0, new TableWidgetItem(events->eventNames.at(i)));
+                    table->setItem(row, 0, new QTableWidgetItem(events->eventNames.at(i)));
                 }
             }else{
                 table->setRowCount(row + 1);
-                table->setItem(row, 0, new TableWidgetItem(events->eventNames.at(i)));
-                table->setItem(row, 1, new TableWidgetItem("hkEvent"));
-                table->setItem(row, 2, new TableWidgetItem("Click To Edit"));
+                table->setItem(row, 0, new QTableWidgetItem(events->eventNames.at(i)));
+                table->setItem(row, 1, new QTableWidgetItem("hkEvent"));
+                table->setItem(row, 2, new QTableWidgetItem("Click To Edit"));
             }
         }
         for (int j = events->eventNames.size(); j < table->rowCount(); j++){
@@ -135,30 +135,34 @@ void EventsUI::clear(){
 }
 
 void EventsUI::addEvent(){
-    loadedData->addEvent();
-    hkbBehaviorGraphStringData *events = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-    int row = table->rowCount();
-    table->setRowCount(row + 1);
-    table->setItem(row, 0, new TableWidgetItem(events->eventNames.last()));
-    table->setItem(row, 1, new TableWidgetItem("hkEvent"));
-    table->setItem(row, 2, new TableWidgetItem("Click To Edit"));
-    if (stackLyt->currentIndex() == EVENT_WIDGET){
-        stackLyt->setCurrentIndex(TABLE_WIDGET);
+    if (loadedData){
+        loadedData->addEvent();
+        hkbBehaviorGraphStringData *events = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
+        int row = table->rowCount();
+        table->setRowCount(row + 1);
+        table->setItem(row, 0, new QTableWidgetItem(events->eventNames.last()));
+        table->setItem(row, 1, new QTableWidgetItem("hkEvent"));
+        table->setItem(row, 2, new QTableWidgetItem("Click To Edit"));
+        if (stackLyt->currentIndex() == EVENT_WIDGET){
+            stackLyt->setCurrentIndex(TABLE_WIDGET);
+        }
+        table->setCurrentCell(row, 0);
+        emit eventAdded(events->eventNames.last());
     }
-    table->setCurrentCell(row, 0);
-    emit eventAdded(events->eventNames.last());
 }
 
 void EventsUI::removeEvent(){
-    int index = table->currentRow();
-    loadedData->removeEvent(index);
-    if (index < table->rowCount()){
-        table->removeRow(index);
+    if (loadedData){
+        int index = table->currentRow();
+        loadedData->removeEvent(index);
+        if (index < table->rowCount()){
+            table->removeRow(index);
+        }
+        if (stackLyt->currentIndex() == EVENT_WIDGET){
+            stackLyt->setCurrentIndex(TABLE_WIDGET);
+        }
+        emit eventRemoved(index);
     }
-    if (stackLyt->currentIndex() == EVENT_WIDGET){
-        stackLyt->setCurrentIndex(TABLE_WIDGET);
-    }
-    emit eventRemoved(index);
 }
 
 void EventsUI::setHkDataUI(HkDataUI *ui){

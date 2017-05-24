@@ -53,7 +53,7 @@ ManualSelectorGeneratorUI::ManualSelectorGeneratorUI()
       behaviorView(NULL),
       bsData(NULL),
       lyt(new QVBoxLayout),
-      table(new TableWidget),
+      table(new TableWidget(QColor(Qt::cyan))),
       name(new LineEdit),
       generators(new TableWidget),
       addObjectPB(new QPushButton("Add Generator")),
@@ -231,7 +231,7 @@ void ManualSelectorGeneratorUI::setSelectedGeneratorIndexBind(int index){
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
                 behaviorView->behavior->addObjectToFile(varBind);
             }
-            varBind->addBinding("selectedGeneratorIndex", index - 1);
+            //varBind->addBinding("selectedGeneratorIndex", index - 1);
             bsData->getParentFile()->toggleChanged(true);
         }else{
             QMessageBox msg;
@@ -256,7 +256,7 @@ void ManualSelectorGeneratorUI::setCurrentGeneratorIndexBind(int index){
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
                 behaviorView->behavior->addObjectToFile(varBind);
             }
-            varBind->addBinding("currentGeneratorIndex", index - 1);
+            //varBind->addBinding("currentGeneratorIndex", index - 1);
             bsData->getParentFile()->toggleChanged(true);
         }else{
             QMessageBox msg;

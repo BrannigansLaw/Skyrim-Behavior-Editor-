@@ -49,6 +49,7 @@ MainWindow::MainWindow()
       progressD(new QProgressDialog(this)),
       lastFileSelected("C:/")
 {
+    //setStyleSheet("QComboBox {background: yellow};QWidget {background: darkGray}");
     progressD->setMinimumSize(QSize(800, 200));
     progressD->setWindowModality(Qt::WindowModal);
     progressD->cancel();
@@ -88,6 +89,7 @@ MainWindow::MainWindow()
     readSettings();
     setLayout(topLyt);
     objectDataSA->setWidget(objectDataWid);
+    //objectDataSA->setStyleSheet("QScrollArea {background-color:cyan}");
     //variablesWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
     //eventsWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
     logGB->setMaximumSize(size().width()*0.6, size().height()*0.1);
@@ -103,6 +105,10 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow(){
     //
+}
+
+QMessageBox::StandardButton MainWindow::yesNoDialogue(const QString & message){
+    return QMessageBox::warning(0, "Skyrim Behavior Tool", message, QMessageBox::Yes | QMessageBox::No);
 }
 
 QMessageBox::StandardButton MainWindow::closeAllDialogue(){
@@ -505,4 +511,11 @@ void MainWindow::closeEvent(QCloseEvent *event){
     }else {
         event->ignore();
     }*/
+}
+
+void MainWindow::paintEvent(QPaintEvent *){
+    QStyleOption opt;
+    opt.init(this);
+    QPainter p(this);
+    style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }

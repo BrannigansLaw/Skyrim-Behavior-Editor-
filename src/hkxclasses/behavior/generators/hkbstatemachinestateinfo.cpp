@@ -11,20 +11,20 @@ uint hkbStateMachineStateInfo::refCount = 0;
 
 QString hkbStateMachineStateInfo::classname = "hkbStateMachineStateInfo";
 
-hkbStateMachineStateInfo::hkbStateMachineStateInfo(HkxFile *parent, hkbStateMachine *parentSM, long ref)
+hkbStateMachineStateInfo::hkbStateMachineStateInfo(HkxFile *parent, hkbStateMachine *parentsm, long ref)
     : hkbGenerator(parent, ref),
       probability(1),
-      stateId(0),
       enable(true),
-      parentSM(parentSM)
+      parentSM(parentsm)
 {
     setType(HKB_STATE_MACHINE_STATE_INFO, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     if (parentSM){
-        name = "State"+QString::number(parentSM->generateValidStateId());
+        stateId = parentsm->generateValidStateId();
     }else{
-        name = "State"+QString::number(refCount);
+        stateId = refCount;
     }
+    name = "State"+QString::number(stateId);
     refCount++;
 }
 

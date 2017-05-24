@@ -13,7 +13,8 @@
 #include <QGridLayout>
 #include <QPushButton>
 #include <QMessageBox>
-#include <QCheckBox>
+
+#include "src/ui/genericdatawidgets.h"
 #include <QStackedLayout>
 #include <QHeaderView>
 #include <QSpinBox>
@@ -76,7 +77,7 @@ BlenderGeneratorUI::BlenderGeneratorUI()
       addChildPB(new QPushButton("Add Child With")),
       typeSelectorCB(new ComboBox),
       removeChildPB(new QPushButton("Remove Selected Child")),
-      table(new TableWidget),
+      table(new TableWidget(QColor(Qt::cyan))),
       name(new LineEdit),
       referencePoseWeightThreshold(new DoubleSpinBox),
       blendParameter(new DoubleSpinBox),
@@ -308,9 +309,9 @@ bool BlenderGeneratorUI::setBinding(int index, int row, const QString & variable
                 bsData->getParentFile()->addObjectToFile(varBind, -1);
             }
             if (type == VARIABLE_TYPE_POINTER){
-                varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY);
+                varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY);
             }else{
-                varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
+                varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
             }
             table->item(row, BINDING_COLUMN)->setText(variableName);
             bsData->getParentFile()->toggleChanged(true);

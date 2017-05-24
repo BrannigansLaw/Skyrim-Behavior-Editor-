@@ -430,7 +430,7 @@ HkDynamicObject::HkDynamicObject(HkxFile *parent, long ref)
 }
 
 void HkDynamicObject::addBinding(const QString & path, int varIndex, bool isProperty){
-    static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->addBinding(path, varIndex, (hkbVariableBindingSet::hkBinding::BindingType)(isProperty));
+    static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->addBinding(path, "", varIndex,(hkbVariableBindingSet::hkBinding::BindingType)(isProperty));
 }
 
 void HkDynamicObject::removeBinding(const QString & path){

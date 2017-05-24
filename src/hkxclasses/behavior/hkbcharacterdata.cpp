@@ -565,7 +565,7 @@ hkVariableType hkbCharacterData::getCharacterPropertyTypeAt(int index) const{
             return VARIABLE_TYPE_QUATERNION;
         }
     }
-    return VARIABLE_TYPE_INT32;
+    return VARIABLE_TYPE_INT8;
 }
 
 bool hkbCharacterData::evaulateDataValidity(){

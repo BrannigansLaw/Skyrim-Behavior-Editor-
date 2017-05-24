@@ -1,11 +1,11 @@
-#ifndef DATAWIDGETS_H
-#define DATAWIDGETS_H
+#ifndef GENERICDATAWIDGETS_H
+#define GENERICDATAWIDGETS_H
 
 #include <QGridLayout>
 #include <QLabel>
 #include <QComboBox>
 #include <limits.h>
-#include <QCheckBox>
+
 #include <QSpinBox>
 #include <QLineEdit>
 #include <QGroupBox>
@@ -16,6 +16,7 @@
 #include <QTableWidget>
 #include <QPushButton>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QHeaderView>
 #include <QSizePolicy>
 
@@ -39,6 +40,56 @@ public:
     {
         setValidator(new Validator());
     }
+};
+
+class CheckButtonCombo: public QWidget{
+    Q_OBJECT
+public:
+    CheckButtonCombo(const QString & buttontip = "", const QString & boxtext = "Enable:", bool disablebutton = true, const QString & buttontext = "Edit", QWidget * par = 0)
+        : QWidget(par),
+          label(new QLabel(boxtext)),
+          checkBox(new QCheckBox),
+          pushButton(new QPushButton(buttontext)),
+          disableButton(disablebutton)
+    {
+        QPalette p = palette();
+        p.setColor(QPalette::Base, Qt::lightGray);
+        setPalette(p);
+        QHBoxLayout *lyt = new QHBoxLayout;
+        pushButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        pushButton->setDisabled(disablebutton);
+        pushButton->setToolTip(buttontip);
+        lyt->addWidget(label, 1);
+        lyt->addWidget(checkBox, 1);
+        lyt->addWidget(pushButton, 6);
+        lyt->setContentsMargins(0,0,0,0);
+        setLayout(lyt);
+        connect(checkBox, SIGNAL(clicked(bool)), this, SLOT(setChecked(bool)));
+        connect(pushButton, SIGNAL(clicked(bool)), this, SIGNAL(pressed()));
+    }
+
+    void setText(const QString & buttontext){
+        pushButton->setText(buttontext);
+    }
+
+    bool isChecked() const{
+        return checkBox->isChecked();
+    }
+signals:
+    void pressed();
+    void enabled(bool enabled);
+public slots:
+    void setChecked(bool checked){
+        if (disableButton){
+            pushButton->setEnabled(checked);
+        }
+        emit enabled(checked);
+    }
+private:
+    QLabel *label;
+    QCheckBox *checkBox;
+    QPushButton *pushButton;
+    bool disableButton;
 };
 
 class ConditionValidator: public QValidator
@@ -71,9 +122,12 @@ public:
 class TableWidgetItem: public QTableWidgetItem
 {
 public:
-    TableWidgetItem(const QString & text, int align = Qt::AlignLeft | Qt::AlignVCenter, const QColor & backgroundColor = QColor(Qt::white), const QBrush & textColor = QBrush(Qt::black), const QString & tip = "")
+    TableWidgetItem(const QString & text, int align = Qt::AlignLeft | Qt::AlignVCenter, const QColor & backgroundColor = QColor(Qt::cyan), const QBrush & textColor = QBrush(Qt::black), const QString & tip = "", bool checkable = false)
         : QTableWidgetItem(text)
     {
+        if (checkable){
+            setCheckState(Qt::Unchecked);
+        }
         setTextAlignment(align);
         setBackgroundColor(backgroundColor);
         setForeground(textColor);
@@ -85,15 +139,19 @@ class TableWidget: public QTableWidget
 {
     Q_OBJECT
 public:
-    TableWidget(QWidget *parent = 0)
+    TableWidget(const QColor & background = QColor(Qt::white), QWidget *parent = 0)
         : QTableWidget(parent)
     {
+        QPalette p = palette();
+        p.setColor(QPalette::Base, background);
+        setPalette(p);
         setMouseTracking(true);
-        //setStyleSheet("QTableView::item:pressed {background-color:cyan}");
+        //setStyleSheet("QTableWidget { background:cyan }");
         setStyleSheet("QHeaderView::section { background-color:grey }");
         verticalHeader()->setVisible(false);
         setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
         horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+        horizontalHeader()->setSectionsClickable(false);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         //setSelectionBehavior(QAbstractItemView::SelectRows);
         setSelectionMode(QAbstractItemView::SingleSelection);
@@ -239,23 +297,23 @@ public:
     void renameItem(int index, const QString & newname);
     void removeItem(int index);
     int getNumRows() const;
-    void setTypes(const QStringList & typeNames);
+    //void setTypes(const QStringList & typeNames);
 signals:
     void elementSelected(int index, const QString & name);
     void elementAdded(int index, const QString & type);
 protected:
 private slots:
     void itemSelected();
-    void itemAdded();
+    //void itemAdded();
     void showTable(int index);
 private:
     QGridLayout *lyt;
-    TableWidget *table;
+    QTableWidget *table;
     QPushButton *selectPB;
     QPushButton *cancelPB;
-    QPushButton *newPB;
-    ComboBox *typeSelector;
+    //QPushButton *newPB;
+    //ComboBox *typeSelector;
     int lastSelectedRow;
 };
 
-#endif // DATAWIDGETS_H
+#endif // GENERICDATAWIDGETS_H

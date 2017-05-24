@@ -30,7 +30,7 @@ BSiStateTaggingGeneratorUI::BSiStateTaggingGeneratorUI()
     : behaviorView(NULL),
       bsData(NULL),
       lyt(new QVBoxLayout),
-      table(new TableWidget),
+      table(new TableWidget(QColor(Qt::cyan))),
       name(new LineEdit),
       pDefaultGenerator(new ComboBox),
       iStateToSetAs(new SpinBox),
@@ -135,7 +135,7 @@ void BSiStateTaggingGeneratorUI::setIStateToSetAsBind(int index){
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
                 behaviorView->behavior->addObjectToFile(varBind);
             }
-            varBind->addBinding("iStateToSetAs", index - 1);
+            //varBind->addBinding("iStateToSetAs", index - 1);
             bsData->getParentFile()->toggleChanged(true);
         }else{
             QMessageBox msg;
@@ -160,7 +160,7 @@ void BSiStateTaggingGeneratorUI::setIPriorityBind(int index){
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
                 behaviorView->behavior->addObjectToFile(varBind);
             }
-            varBind->addBinding("iPriority", index - 1);
+            //varBind->addBinding("iPriority", index - 1);
             bsData->getParentFile()->toggleChanged(true);
         }else{
             QMessageBox msg;

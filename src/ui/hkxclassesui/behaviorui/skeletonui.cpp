@@ -51,7 +51,7 @@ void SkeletonUI::loadData(HkxObject *data, bool isRagdoll){
                 if (bones->item(i, 0)){
                     bones->item(i, 0)->setText(boneNames.at(i));
                 }else{
-                    bones->setItem(i, 0, new TableWidgetItem(boneNames.at(i)));
+                    bones->setItem(i, 0, new QTableWidgetItem(boneNames.at(i)));
                 }
                 if (bones->cellWidget(i, 1)){
                     static_cast<LineEdit *>(bones->cellWidget(i, 1))->setText(bsData->bones.at(i).name);
@@ -62,7 +62,7 @@ void SkeletonUI::loadData(HkxObject *data, bool isRagdoll){
                 }
             }else{
                 bones->setRowCount(rowCount + 1);
-                bones->setItem(rowCount, 0, new TableWidgetItem(boneNames.at(i)));
+                bones->setItem(rowCount, 0, new QTableWidgetItem(boneNames.at(i)));
                 bones->setCellWidget(rowCount, 1, new LineEdit(bsData->getLocalFrameName(i)));
                 mapper->setMapping(bones->cellWidget(rowCount, 1), i);
                 connect(static_cast<LineEdit *>(bones->cellWidget(i, 1)), SIGNAL(editingFinished()), mapper, SLOT(map()));

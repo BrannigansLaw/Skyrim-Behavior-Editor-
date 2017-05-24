@@ -7,7 +7,8 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QMessageBox>
-#include <QCheckBox>
+
+#include "src/ui/genericdatawidgets.h"
 #include <QStackedLayout>
 #include <QHeaderView>
 #include <QSpinBox>

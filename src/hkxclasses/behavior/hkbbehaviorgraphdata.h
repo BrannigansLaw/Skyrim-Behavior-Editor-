@@ -22,6 +22,7 @@ public:
     static QString getClassname();
     hkQuadVariable getQuadVariable(int index, bool *ok) const;
     HkxObject * getVariantVariable(int index) const;
+    hkVariableType getCharacterPropertyTypeAt(int index) const;
     hkVariableType getVariableTypeAt(int index) const;
     bool write(HkxXMLWriter *writer);
     QStringList getVariableTypeNames() const;
@@ -29,7 +30,7 @@ private:
     hkbBehaviorGraphData& operator=(const hkbBehaviorGraphData&);
     hkbBehaviorGraphData(const hkbBehaviorGraphData &);
 private:
-    bool addVariable(hkVariableType type, const QString & name, bool isProperty = false);
+    int addVariable(hkVariableType type, const QString & name, bool isProperty = false);
     void addVariable(hkVariableType type);
     void removeVariable(int index);
     void setVariableNameAt(int index, const QString & name);

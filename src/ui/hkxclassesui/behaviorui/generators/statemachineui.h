@@ -12,21 +12,17 @@ class QGridLayout;
 class SpinBox;
 class LineEdit;
 class ComboBox;
-class QPushButton;
-class QHBoxLayout;
-class QSignalMapper;
 class hkbStateMachine;
-class QVBoxLayout;
-class QStackedLayout;
 class QCheckBox;
 class StateUI;
 class TransitionsUI;
 class QGroupBox;
-class HkTransition;
 class hkbStateMachineStateInfo;
 class GenericTableWidget;
 class hkbStateMachineTransitionInfoArray;
 class EventUI;
+class hkbVariableBindingSet;
+class CheckButtonCombo;
 
 class StateMachineUI: public QStackedWidget
 {
@@ -39,6 +35,7 @@ public:
 signals:
     void generatorNameChanged(const QString & newName, int index);
     void viewVariables(int index);
+    void viewProperties(int index);
     void viewEvents(int index);
     void viewGenerators(int index);
 private slots:
@@ -53,24 +50,35 @@ private slots:
     void setMaxSimultaneousTransitions();
     void setStartStateMode(int index);
     void setSelfTransitionMode(int index);
-    void addNewStateWithGenerator();
-    void removeObjectChild();
-    void addTransition();
     void viewSelectedChild(int row, int column);
     void eventTableElementSelected(int index, const QString &name);
     void variableTableElementSelected(int index, const QString &name);
     void generatorTableElementSelected(int index, const QString &name);
     void returnToWidget(bool reloadData);
+    void returnToWidget();
+    void viewEventToSendWhenStateOrTransitionChanges();
+    void toggleEventToSendWhenStateOrTransitionChanges(bool enable);
+    void stateRenamed(const QString & name, int stateIndex);
+    void transitionRenamed(const QString &name, int index);
 private:
+    void connectSignals();
+    void disconnectSignals();
+    void addStateWithGenerator();
+    void addTransition();
     void loadDynamicTableRows();
     void setBindingVariable(int index, const QString & name);
-    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value);
-    void connectToTableWidgets(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *events);
+    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString &tip1, const QString &tip2);
+    void connectToTableWidgets(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events);
     void variableRenamed(const QString & name, int index);
     void eventRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type);
+    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
     void generatorRenamed(const QString & name, int index);
+    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
+    void loadTableValue(int row, const QString & value);
+    void removeState(int index);
+    void removeTransition(int index);
+    void selectTableToView(bool properties, const QString & path);
 private:
     enum ACTIVE_WIDGET {
         MAIN_WIDGET = 0,
@@ -95,7 +103,6 @@ private:
     static QStringList types;
     static QStringList headerLabels;
     int transitionsButtonRow;
-    int rowToRemove;
     BehaviorGraphView *behaviorView;
     hkbStateMachine *bsData;
     QGroupBox *groupBox;
@@ -104,12 +111,9 @@ private:
     TransitionsUI *transitionUI;
     QGridLayout *topLyt;
     TableWidget *table;
-    QPushButton *addStatePB;
-    QPushButton *removeStatePB;
     ComboBox *typeSelectorCB;
-    QPushButton *addTransitionPB;
-    QPushButton *removeTransitionPB;
     LineEdit *name;
+    CheckButtonCombo *eventToSendWhenStateOrTransitionChanges;
     ComboBox *startStateId;
     QCheckBox *wrapAroundStateId;
     SpinBox *maxSimultaneousTransitions;

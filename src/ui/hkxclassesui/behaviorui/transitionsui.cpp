@@ -12,16 +12,9 @@
 #include "src/ui/behaviorgraphview.h"
 #include "src/ui/treegraphicsitem.h"
 #include "src/ui/hkxclassesui/behaviorui/blendingtransitioneffectui.h"
+#include "src/filetypes/behaviorfile.h"
 
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QComboBox>
 #include <QHeaderView>
-#include <QSpinBox>
-#include <QTableWidget>
-#include <QStackedLayout>
 
 #define BASE_NUMBER_OF_ROWS 20
 
@@ -59,15 +52,17 @@ QStringList TransitionsUI::headerLabels = {
 TransitionsUI::TransitionsUI()
     : file(NULL),
       bsData(NULL),
-      transition(new BlendingTransitionEffectUI()),
+      transitionIndex(-1),
+      transitionUI(new BlendingTransitionEffectUI()),
       returnPB(new QPushButton("Return")),
       topLyt(new QGridLayout),
       groupBox(new QGroupBox("hkbStateMachineTransitionInfoArray")),
-      table(new TableWidget),
+      table(new TableWidget(QColor(Qt::cyan))),
       enterTimeTI(new DoubleSpinBox),
       exitTimeTI(new DoubleSpinBox),
       enterTimeII(new DoubleSpinBox),
       exitTimeII(new DoubleSpinBox),
+      transition(new CheckButtonCombo("Click to edit")),
       condition(new ConditionLineEdit),
       toStateId(new ComboBox),
       fromNestedStateId(new ComboBox),
@@ -83,191 +78,581 @@ TransitionsUI::TransitionsUI()
     table->setColumnCount(headerLabels.size());
     table->setHorizontalHeaderLabels(headerLabels);
     table->setItem(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("Trigger Interval: Enter Event"));
-    table->setItem(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent"));
-    table->setItem(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
-    table->item(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
-    table->item(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setTextAlignment(Qt::AlignCenter);
-    table->item(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setBackgroundColor(QColor(Qt::lightGray));
+    table->setItem(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_EVENTS_TABLE_TIP));
     table->setItem(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("Trigger Interval: Exit Event"));
-    table->setItem(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent"));
-    table->setItem(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
-    table->item(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
-    table->item(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setTextAlignment(Qt::AlignCenter);
-    table->item(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setBackgroundColor(QColor(Qt::lightGray));
+    table->setItem(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_EVENTS_TABLE_TIP));
     table->setItem(TRIGGER_INTERVAL_ENTER_TIME_ROW, NAME_COLUMN, new TableWidgetItem("Trigger Interval: Enter Time"));
-    table->setItem(TRIGGER_INTERVAL_ENTER_TIME_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal"));
+    table->setItem(TRIGGER_INTERVAL_ENTER_TIME_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
     table->setCellWidget(TRIGGER_INTERVAL_ENTER_TIME_ROW, VALUE_COLUMN, enterTimeTI);
-    table->item(TRIGGER_INTERVAL_ENTER_TIME_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
     table->setItem(TRIGGER_INTERVAL_EXIT_TIME_ROW, NAME_COLUMN, new TableWidgetItem("Trigger Interval: Exit Time"));
-    table->setItem(TRIGGER_INTERVAL_EXIT_TIME_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal"));
+    table->setItem(TRIGGER_INTERVAL_EXIT_TIME_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
     table->setCellWidget(TRIGGER_INTERVAL_EXIT_TIME_ROW, VALUE_COLUMN, exitTimeTI);
-    table->item(TRIGGER_INTERVAL_EXIT_TIME_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
     table->setItem(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("Initiate Interval: Enter Event"));
-    table->setItem(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent"));
-    table->setItem(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
-    table->item(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
-    table->item(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setTextAlignment(Qt::AlignCenter);
-    table->item(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setBackgroundColor(QColor(Qt::lightGray));
+    table->setItem(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_EVENTS_TABLE_TIP));
     table->setItem(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("Initiate Interval: Exit Event"));
-    table->setItem(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent"));
-    table->setItem(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
-    table->item(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
-    table->item(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setTextAlignment(Qt::AlignCenter);
-    table->item(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setBackgroundColor(QColor(Qt::lightGray));
+    table->setItem(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_EVENTS_TABLE_TIP));
     table->setItem(INITIATE_INTERVAL_ENTER_TIME_ROW, NAME_COLUMN, new TableWidgetItem("Initiate Interval: Enter Time"));
-    table->setItem(INITIATE_INTERVAL_ENTER_TIME_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal"));
+    table->setItem(INITIATE_INTERVAL_ENTER_TIME_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
     table->setCellWidget(INITIATE_INTERVAL_ENTER_TIME_ROW, VALUE_COLUMN, enterTimeII);
-    table->item(INITIATE_INTERVAL_ENTER_TIME_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
     table->setItem(INITIATE_INTERVAL_EXIT_TIME_ROW, NAME_COLUMN, new TableWidgetItem("Initiate Interval: Exit Time"));
-    table->setItem(INITIATE_INTERVAL_EXIT_TIME_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal"));
+    table->setItem(INITIATE_INTERVAL_EXIT_TIME_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
     table->setCellWidget(INITIATE_INTERVAL_EXIT_TIME_ROW, VALUE_COLUMN, exitTimeII);
-    table->item(INITIATE_INTERVAL_EXIT_TIME_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
     table->setItem(TRANSITION_ROW, NAME_COLUMN, new TableWidgetItem("transition"));
-    table->setItem(TRANSITION_ROW, TYPE_COLUMN, new TableWidgetItem("hkbTransitionEffect"));
-    table->setItem(TRANSITION_ROW, VALUE_COLUMN, new TableWidgetItem("NULL"));
-    table->item(TRANSITION_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
-    table->item(TRANSITION_ROW, VALUE_COLUMN)->setTextAlignment(Qt::AlignCenter);
-    table->item(TRANSITION_ROW, VALUE_COLUMN)->setBackgroundColor(QColor(Qt::lightGray));
+    table->setItem(TRANSITION_ROW, TYPE_COLUMN, new TableWidgetItem("hkbTransitionEffect", Qt::AlignCenter));
+    table->setCellWidget(TRANSITION_ROW, VALUE_COLUMN, transition);
     table->setItem(CONDITION_ROW, NAME_COLUMN, new TableWidgetItem("condition"));
-    table->setItem(CONDITION_ROW, TYPE_COLUMN, new TableWidgetItem("hkbStringCondition"));
+    table->setItem(CONDITION_ROW, TYPE_COLUMN, new TableWidgetItem("hkbStringCondition", Qt::AlignCenter));
     table->setCellWidget(CONDITION_ROW, VALUE_COLUMN, condition);
-    table->item(CONDITION_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
     table->setItem(EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("eventId"));
-    table->setItem(EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent"));
-    table->setItem(EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE"));
-    table->item(EVENT_ID_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
-    table->item(EVENT_ID_ROW, VALUE_COLUMN)->setTextAlignment(Qt::AlignCenter);
-    table->item(EVENT_ID_ROW, VALUE_COLUMN)->setBackgroundColor(QColor(Qt::lightGray));
+    table->setItem(EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_EVENTS_TABLE_TIP));
     table->setItem(TO_STATE_ID_ROW, NAME_COLUMN, new TableWidgetItem("toStateId"));
-    table->setItem(TO_STATE_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
+    table->setItem(TO_STATE_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
     table->setCellWidget(TO_STATE_ID_ROW, VALUE_COLUMN, toStateId);
-    table->item(TO_STATE_ID_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
     table->setItem(FROM_NESTED_STATE_ID_ROW, NAME_COLUMN, new TableWidgetItem("fromNestedStateId"));
-    table->setItem(FROM_NESTED_STATE_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
+    table->setItem(FROM_NESTED_STATE_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
     table->setCellWidget(FROM_NESTED_STATE_ID_ROW, VALUE_COLUMN, fromNestedStateId);
-    table->item(FROM_NESTED_STATE_ID_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
     table->setItem(TO_NESTED_STATE_ID_ROW, NAME_COLUMN, new TableWidgetItem("toNestedStateId"));
-    table->setItem(TO_NESTED_STATE_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
+    table->setItem(TO_NESTED_STATE_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
     table->setCellWidget(TO_NESTED_STATE_ID_ROW, VALUE_COLUMN, toNestedStateId);
-    table->item(TO_NESTED_STATE_ID_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
     table->setItem(PRIORITY_ROW, NAME_COLUMN, new TableWidgetItem("priority"));
-    table->setItem(PRIORITY_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal"));
+    table->setItem(PRIORITY_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
     table->setCellWidget(PRIORITY_ROW, VALUE_COLUMN, priority);
-    table->item(PRIORITY_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
     table->setItem(FLAG_GLOBAL_WILDCARD_ROW, NAME_COLUMN, new TableWidgetItem("flagGlobalWildcard"));
-    table->setItem(FLAG_GLOBAL_WILDCARD_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
+    table->setItem(FLAG_GLOBAL_WILDCARD_ROW, TYPE_COLUMN, new TableWidgetItem("TransitionFlag", Qt::AlignCenter));
     table->setCellWidget(FLAG_GLOBAL_WILDCARD_ROW, VALUE_COLUMN, flagGlobalWildcard);
-    table->item(FLAG_GLOBAL_WILDCARD_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
     table->setItem(FLAG_USE_NESTED_STATE_ROW, NAME_COLUMN, new TableWidgetItem("flagUseNestedState"));
-    table->setItem(FLAG_USE_NESTED_STATE_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
+    table->setItem(FLAG_USE_NESTED_STATE_ROW, TYPE_COLUMN, new TableWidgetItem("TransitionFlag", Qt::AlignCenter));
     table->setCellWidget(FLAG_USE_NESTED_STATE_ROW, VALUE_COLUMN, flagUseNestedState);
-    table->item(FLAG_USE_NESTED_STATE_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
     table->setItem(FLAG_DISALLOW_RANDOM_TRANSITION_ROW, NAME_COLUMN, new TableWidgetItem("flagDisallowRandomTransition"));
-    table->setItem(FLAG_DISALLOW_RANDOM_TRANSITION_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
+    table->setItem(FLAG_DISALLOW_RANDOM_TRANSITION_ROW, TYPE_COLUMN, new TableWidgetItem("TransitionFlag", Qt::AlignCenter));
     table->setCellWidget(FLAG_DISALLOW_RANDOM_TRANSITION_ROW, VALUE_COLUMN, flagDisallowRandomTransition);
-    table->item(FLAG_DISALLOW_RANDOM_TRANSITION_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
     table->setItem(FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE_ROW, NAME_COLUMN, new TableWidgetItem("flagDisallowReturnToState"));
-    table->setItem(FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
+    table->setItem(FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE_ROW, TYPE_COLUMN, new TableWidgetItem("TransitionFlag", Qt::AlignCenter));
     table->setCellWidget(FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE_ROW, VALUE_COLUMN, flagDisallowReturnToState);
-    table->item(FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
     table->setItem(FLAG_ABUT_END_STATE_ROW, NAME_COLUMN, new TableWidgetItem("flagAbutEndState"));
-    table->setItem(FLAG_ABUT_END_STATE_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32"));
+    table->setItem(FLAG_ABUT_END_STATE_ROW, TYPE_COLUMN, new TableWidgetItem("TransitionFlag", Qt::AlignCenter));
     table->setCellWidget(FLAG_ABUT_END_STATE_ROW, VALUE_COLUMN, flagAbutEndState);
-    table->item(FLAG_ABUT_END_STATE_ROW, TYPE_COLUMN)->setTextAlignment(Qt::AlignCenter);
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 8, 3);
     groupBox->setLayout(topLyt);
     //Order here must correspond with the ACTIVE_WIDGET Enumerated type!!!
     addWidget(groupBox);
-    addWidget(transition);
+    addWidget(transitionUI);
+    connectSignals();
+    fromNestedStateId->setDisabled(true);
+    toNestedStateId->setDisabled(true);
+}
+
+void TransitionsUI::connectSignals(){
     connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
-    connect(transition, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
-    connect(transition, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    connect(enterTimeTI, SIGNAL(editingFinished()), this, SLOT(setTriggerIntervalEnterTime()), Qt::UniqueConnection);
+    connect(exitTimeTI, SIGNAL(editingFinished()), this, SLOT(setTriggerIntervalExitTime()), Qt::UniqueConnection);
+    connect(enterTimeII, SIGNAL(editingFinished()), this, SLOT(setInitiateIntervalEnterTime()), Qt::UniqueConnection);
+    connect(exitTimeII, SIGNAL(editingFinished()), this, SLOT(setInitiateIntervalExitTime()), Qt::UniqueConnection);
+    connect(transition, SIGNAL(pressed()), this, SLOT(viewTransitionEffect()), Qt::UniqueConnection);
+    connect(transition, SIGNAL(enabled(bool)), this, SLOT(toggleTransitionEffect(bool)), Qt::UniqueConnection);
+    connect(condition, SIGNAL(editingFinished()), this, SLOT(setCondition()), Qt::UniqueConnection);
+    connect(toStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToStateId(QString)), Qt::UniqueConnection);
+    connect(fromNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setFromNestedStateId(QString)), Qt::UniqueConnection);
+    connect(toNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToNestedStateId(QString)), Qt::UniqueConnection);
+    connect(priority, SIGNAL(editingFinished()), this, SLOT(setPriority()), Qt::UniqueConnection);
+    connect(flagGlobalWildcard, SIGNAL(released()), this, SLOT(toggleGlobalWildcardFlag()), Qt::UniqueConnection);
+    connect(flagUseNestedState, SIGNAL(released()), this, SLOT(toggleUseNestedStateFlag()), Qt::UniqueConnection);
+    connect(flagDisallowRandomTransition, SIGNAL(released()), this, SLOT(toggleDisallowRandomTransitionFlag()), Qt::UniqueConnection);
+    connect(flagDisallowReturnToState, SIGNAL(released()), this, SLOT(toggleDisallowReturnToStateFlag()), Qt::UniqueConnection);
+    connect(flagAbutEndState, SIGNAL(released()), this, SLOT(toggleAbutEndStateFlag()), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(transitionEffectRenamed(QString)), this, SLOT(transitionEffectRenamed(QString)), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+}
+
+void TransitionsUI::disconnectSignals(){
+    disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+    disconnect(enterTimeTI, SIGNAL(editingFinished()), this, SLOT(setTriggerIntervalEnterTime()));
+    disconnect(exitTimeTI, SIGNAL(editingFinished()), this, SLOT(setTriggerIntervalExitTime()));
+    disconnect(enterTimeII, SIGNAL(editingFinished()), this, SLOT(setInitiateIntervalEnterTime()));
+    disconnect(exitTimeII, SIGNAL(editingFinished()), this, SLOT(setInitiateIntervalExitTime()));
+    disconnect(transition, SIGNAL(pressed()), this, SLOT(viewTransitionEffect()));
+    disconnect(transition, SIGNAL(enabled(bool)), this, SLOT(toggleTransitionEffect(bool)));
+    disconnect(condition, SIGNAL(editingFinished()), this, SLOT(setCondition()));
+    disconnect(toStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToStateId(QString)));
+    disconnect(fromNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setFromNestedStateId(QString)));
+    disconnect(toNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToNestedStateId(QString)));
+    disconnect(priority, SIGNAL(editingFinished()), this, SLOT(setPriority()));
+    disconnect(flagGlobalWildcard, SIGNAL(released()), this, SLOT(toggleGlobalWildcardFlag()));
+    disconnect(flagUseNestedState, SIGNAL(released()), this, SLOT(toggleUseNestedStateFlag()));
+    disconnect(flagDisallowRandomTransition, SIGNAL(released()), this, SLOT(toggleDisallowRandomTransitionFlag()));
+    disconnect(flagDisallowReturnToState, SIGNAL(released()), this, SLOT(toggleDisallowReturnToStateFlag()));
+    disconnect(flagAbutEndState, SIGNAL(released()), this, SLOT(toggleAbutEndStateFlag()));
+    disconnect(transitionUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
+    disconnect(transitionUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)));
+    disconnect(transitionUI, SIGNAL(transitionEffectRenamed(QString)), this, SLOT(transitionEffectRenamed(QString)));
+    disconnect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+}
+
+void TransitionsUI::loadData(BehaviorFile *parentfile, hkbStateMachine *parent, hkbStateMachineTransitionInfoArray::HkTransition *data, int index){
+    disconnectSignals();
+    if (data && parent && parentfile){
+        bsData = (hkbStateMachineTransitionInfoArray::HkTransition *)data;
+        parentObj = parent;
+        file = parentfile;
+        transitionIndex = index;
+        QString name = file->getEventNameAt(bsData->triggerInterval.enterEventId);
+        loadTableValue(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, name);
+        name = file->getEventNameAt(bsData->triggerInterval.exitEventId);
+        loadTableValue(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, name);
+        enterTimeTI->setValue(bsData->triggerInterval.enterTime);
+        exitTimeTI->setValue(bsData->triggerInterval.exitTime);
+        name = file->getEventNameAt(bsData->initiateInterval.enterEventId);
+        loadTableValue(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, name);
+        name = file->getEventNameAt(bsData->initiateInterval.exitEventId);
+        loadTableValue(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, name);
+        enterTimeII->setValue(bsData->initiateInterval.enterTime);
+        exitTimeII->setValue(bsData->initiateInterval.exitTime);
+        if (bsData->transition.data()){
+            transition->setChecked(true);
+            transition->setText(static_cast<hkbBlendingTransitionEffect *>(bsData->transition.data())->getName());
+        }else{
+            transition->setChecked(false);
+            transition->setText("NULL");
+        }
+        if (bsData->condition.data()){
+            condition->setText(static_cast<hkbStringCondition *>(bsData->condition.data())->conditionString);
+        }else{
+            condition->setText("");
+        }
+        name = file->getEventNameAt(bsData->eventId);
+        loadTableValue(EVENT_ID_ROW, name);
+        toStateId->clear();
+        toStateId->addItems(parentObj->getStateNames());
+        toStateId->setCurrentIndex(parentObj->getStateNames().indexOf(parentObj->getStateName(bsData->toStateId)));
+        //fromNestedStateId->clear();
+        //fromNestedStateId->addItems(parentObj->getStateNames());
+        toNestedStateId->clear();
+        toNestedStateId->addItems(parentObj->getNestedStateNames(bsData->toStateId));
+        toNestedStateId->setCurrentIndex(parentObj->getNestedStateNames(bsData->toStateId).indexOf(parentObj->getNestedStateName(bsData->toStateId, bsData->toNestedStateId)));
+        priority->setValue(bsData->priority);
+        QStringList flags = bsData->flags.split("|");
+        flagGlobalWildcard->setChecked(false);
+        flagUseNestedState->setChecked(false);
+        flagDisallowRandomTransition->setChecked(false);
+        flagDisallowReturnToState->setChecked(false);
+        flagAbutEndState->setChecked(false);
+        toNestedStateId->setDisabled(true);
+        if (flags.isEmpty()){
+            if (bsData->flags == "FLAG_IS_GLOBAL_WILDCARD"){
+                flagGlobalWildcard->setChecked(true);
+            }else if (bsData->flags == "FLAG_TO_NESTED_STATE_ID_IS_VALID"){
+                flagUseNestedState->setChecked(true);
+                toNestedStateId->setDisabled(false);
+            }else if (bsData->flags == "FLAG_DISALLOW_RANDOM_TRANSITION"){
+                flagDisallowRandomTransition->setChecked(true);
+            }else if (bsData->flags == "FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE"){
+                flagDisallowReturnToState->setChecked(true);
+            }else if (bsData->flags == "FLAG_ABUT_AT_END_OF_FROM_GENERATOR"){
+                flagAbutEndState->setChecked(true);
+            }
+        }else{
+            for (int i = 0; i < flags.size(); i++){
+                if (flags.at(i) == "FLAG_IS_GLOBAL_WILDCARD"){
+                    flagGlobalWildcard->setChecked(true);
+                }else if (flags.at(i) == "FLAG_TO_NESTED_STATE_ID_IS_VALID"){
+                    flagUseNestedState->setChecked(true);
+                    toNestedStateId->setDisabled(false);
+                }else if (flags.at(i) == "FLAG_DISALLOW_RANDOM_TRANSITION"){
+                    flagDisallowRandomTransition->setChecked(true);
+                }else if (flags.at(i) == "FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE"){
+                    flagDisallowReturnToState->setChecked(true);
+                }else if (flags.at(i) == "FLAG_ABUT_AT_END_OF_FROM_GENERATOR"){
+                    flagAbutEndState->setChecked(true);
+                }
+            }
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::loadData(): The data, parent file or parent state machine is NULL!!"));
+    }
+    connectSignals();
 }
 
 void TransitionsUI::setTriggerIntervalEnterEventId(int index, const QString &name){
-    //
+    if (bsData){
+        bsData->triggerInterval.enterEventId = index - 1;
+        table->item(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+        if (bsData->triggerInterval.enterEventId < 0){
+            bsData->flags.remove("FLAG_USE_TRIGGER_INTERVAL");
+        }else{
+            if (!bsData->flags.contains("FLAG_USE_TRIGGER_INTERVAL")){
+                bsData->flags.append("|FLAG_USE_TRIGGER_INTERVAL");
+            }
+        }
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setTriggerIntervalEnterEventId(): The data is NULL!!"));
+    }
 }
 
 void TransitionsUI::setTriggerIntervalExitEventId(int index, const QString &name){
-    //
+    if (bsData){
+        bsData->triggerInterval.exitEventId = index - 1;
+        table->item(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+        if (bsData->triggerInterval.exitEventId < 0){
+            bsData->flags.remove("FLAG_USE_TRIGGER_INTERVAL");
+        }else{
+            if (!bsData->flags.contains("FLAG_USE_TRIGGER_INTERVAL")){
+                bsData->flags.append("|FLAG_USE_TRIGGER_INTERVAL");
+            }
+        }
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setTriggerIntervalExitEventId(): The data is NULL!!"));
+    }
 }
 
 void TransitionsUI::setTriggerIntervalEnterTime(){
-    //
+    if (bsData){
+        bsData->triggerInterval.enterTime = enterTimeTI->value();
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setTriggerIntervalEnterTime(): The data is NULL!!"));
+    }
 }
 
 void TransitionsUI::setTriggerIntervalExitTime(){
-    //
+    if (bsData){
+        bsData->triggerInterval.exitTime = exitTimeTI->value();
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setTriggerIntervalExitTime(): The data is NULL!!"));
+    }
 }
 
 void TransitionsUI::setInitiateIntervalEnterEventId(int index, const QString &name){
-    //
+    if (bsData){
+        bsData->initiateInterval.enterEventId = index - 1;
+        table->item(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+        if (bsData->initiateInterval.enterEventId < 0){
+            bsData->flags.remove("FLAG_USE_INITIATE_INTERVAL");
+        }else{
+            if (!bsData->flags.contains("FLAG_USE_INITIATE_INTERVAL")){
+                bsData->flags.append("|FLAG_USE_INITIATE_INTERVAL");
+            }
+        }
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setInitiateIntervalEnterEventId(): The data is NULL!!"));
+    }
 }
 
 void TransitionsUI::setInitiateIntervalExitEventId(int index, const QString &name){
-    //
+    if (bsData){
+        bsData->initiateInterval.exitEventId = index - 1;
+        table->item(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+        if (bsData->initiateInterval.exitEventId < 0){
+            bsData->flags.remove("FLAG_USE_INITIATE_INTERVAL");
+        }else{
+            if (!bsData->flags.contains("FLAG_USE_INITIATE_INTERVAL")){
+                bsData->flags.append("|FLAG_USE_INITIATE_INTERVAL");
+            }
+        }
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setInitiateIntervalExitEventId(): The data is NULL!!"));
+    }
 }
 
 void TransitionsUI::setInitiateIntervalEnterTime(){
-    //
+    if (bsData){
+        bsData->initiateInterval.enterTime = enterTimeII->value();
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setInitiateIntervalEnterTime(): The data is NULL!!"));
+    }
 }
 
 void TransitionsUI::setInitiateIntervalExitTime(){
-    //
+    if (bsData){
+        bsData->initiateInterval.exitTime = exitTimeII->value();
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setInitiateIntervalExitTime(): The data is NULL!!"));
+    }
 }
 
 void TransitionsUI::viewTransitionEffect(){
-    //
+    if (bsData){
+        transitionUI->loadData(bsData->transition.data());
+        setCurrentIndex(TRANSITION_EFFECT_WIDGET);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::viewTransitionEffect(): The data is NULL!!"));
+    }
+}
+
+void TransitionsUI::toggleTransitionEffect(bool enable){
+    if (bsData){
+        if (!enable){
+            bsData->transition = HkxSharedPtr();
+            static_cast<BehaviorFile *>(parentObj->getParentFile())->removeOtherData();
+        }else if (!bsData->transition.data()){
+            hkbBlendingTransitionEffect *effect = new hkbBlendingTransitionEffect(parentObj->getParentFile());
+            parentObj->getParentFile()->addObjectToFile(effect, -1);
+            bsData->transition = HkxSharedPtr(effect);
+            transition->setText(effect->getName());
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::toggleTransitionEffect(): The data is NULL!!"));
+    }
 }
 
 void TransitionsUI::setCondition(){
-    //
+    if (bsData && parentObj){
+        if (condition->text() != ""){
+            if (bsData->condition.data()){
+                static_cast<hkbStringCondition *>(bsData->condition.data())->conditionString = condition->text();
+            }else{
+                hkbStringCondition *con = new hkbStringCondition(static_cast<BehaviorFile *>(parentObj->getParentFile()), condition->text());
+                parentObj->getParentFile()->addObjectToFile(con, -1);
+                bsData->condition = HkxSharedPtr(con);
+            }
+        }else{
+            bsData->condition = HkxSharedPtr();
+            if (!bsData->flags.contains("FLAG_DISABLE_CONDITION")){
+                bsData->flags.append("|FLAG_DISABLE_CONDITION");
+            }
+        }
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setCondition(): The data or parent object is NULL!!"));
+    }
 }
 
 void TransitionsUI::setEventId(int index, const QString &name){
-    //
+    if (bsData){
+        bsData->eventId = index - 1;
+        if (name != ""){
+            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+        }else{
+            CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setEventId(): The event name is NULL!!"));
+        }
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setEventId(): The data is NULL!!"));
+    }
 }
 
 void TransitionsUI::setToStateId(const QString &name){
-    //
+    if (bsData && parentObj){
+        if (name != ""){
+            bsData->toStateId = parentObj->getStateId(name);
+            if (flagUseNestedState->isChecked()){
+                disconnect(toNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToNestedStateId(QString)));
+                toNestedStateId->clear();
+                toNestedStateId->addItems(parentObj->getNestedStateNames(bsData->toStateId));
+                toNestedStateId->setCurrentIndex(parentObj->getNestedStateNames(bsData->toStateId).indexOf(parentObj->getNestedStateName(bsData->toStateId, bsData->toNestedStateId)));
+                connect(toNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToNestedStateId(QString)), Qt::UniqueConnection);
+                emit transitionNamChanged("toNestedState_"+toNestedStateId->currentText(), transitionIndex);
+            }else{
+                emit transitionNamChanged("to_"+name, transitionIndex);
+            }
+        }else{
+            CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setToStateId(): The event name is NULL!!"));
+        }
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setToStateId(): The data or parent object is NULL!!"));
+    }
 }
 
 void TransitionsUI::setFromNestedStateId(const QString &name){
-    //
+    if (bsData && parentObj){
+        if (name != ""){
+            bsData->fromNestedStateId = parentObj->getNestedStateId(name, bsData->toStateId);
+        }else{
+            CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setFromNestedStateId(): The event name is NULL!!"));
+        }
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setFromNestedStateId(): The data or parent object is NULL!!"));
+    }
 }
 
 void TransitionsUI::setToNestedStateId(const QString &name){
-    //
+    if (bsData && parentObj){
+        if (name != ""){
+            bsData->toNestedStateId = parentObj->getNestedStateId(name, bsData->toStateId);
+            emit transitionNamChanged("toNestedState_"+toNestedStateId->currentText(), transitionIndex);
+        }else{
+            CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setToNestedStateId(): The event name is NULL!!"));
+        }
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setToNestedStateId(): The data or parent object is NULL!!"));
+    }
 }
 
 void TransitionsUI::setPriority(){
-    //
+    if (bsData){
+        bsData->priority = priority->value();
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::setPriority(): The data is NULL!!"));
+    }
 }
 
 void TransitionsUI::toggleGlobalWildcardFlag(){
-    //
+    if (bsData){
+        if (flagGlobalWildcard->isChecked()){
+            if (bsData->flags == ""){
+                bsData->flags.append("FLAG_IS_GLOBAL_WILDCARD");
+            }else if (!bsData->flags.contains("FLAG_IS_GLOBAL_WILDCARD")){
+                bsData->flags.append("|FLAG_IS_GLOBAL_WILDCARD");
+            }
+        }else{
+            if (bsData->flags == ""){
+                bsData->flags.remove("FLAG_IS_GLOBAL_WILDCARD");
+            }else{
+                bsData->flags.remove("|FLAG_IS_GLOBAL_WILDCARD");
+            }
+        }
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::toggleGlobalWildcardFlag(): The data is NULL!!"))
+    }
 }
 
 void TransitionsUI::toggleUseNestedStateFlag(){
-    //
+    if (bsData){
+        if (flagUseNestedState->isChecked()){
+            if (bsData->flags == ""){
+                bsData->flags.append("FLAG_TO_NESTED_STATE_ID_IS_VALID");
+            }else if (!bsData->flags.contains("FLAG_TO_NESTED_STATE_ID_IS_VALID")){
+                bsData->flags.append("|FLAG_TO_NESTED_STATE_ID_IS_VALID");
+            }
+            toNestedStateId->setDisabled(false);
+        }else{
+            if (bsData->flags == ""){
+                bsData->flags.remove("FLAG_TO_NESTED_STATE_ID_IS_VALID");
+            }else{
+                bsData->flags.remove("|FLAG_TO_NESTED_STATE_ID_IS_VALID");
+            }
+            toNestedStateId->setDisabled(true);
+        }
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::toggleUseNestedStateFlag(): The data is NULL!!"))
+    }
 }
 
 void TransitionsUI::toggleDisallowRandomTransitionFlag(){
-    //
+    if (bsData){
+        if (flagDisallowRandomTransition->isChecked()){
+            if (bsData->flags == ""){
+                bsData->flags.append("FLAG_DISALLOW_RANDOM_TRANSITION");
+            }else if (!bsData->flags.contains("FLAG_DISALLOW_RANDOM_TRANSITION")){
+                bsData->flags.append("|FLAG_DISALLOW_RANDOM_TRANSITION");
+            }
+        }else{
+            if (bsData->flags == ""){
+                bsData->flags.remove("FLAG_DISALLOW_RANDOM_TRANSITION");
+            }else{
+                bsData->flags.remove("|FLAG_DISALLOW_RANDOM_TRANSITION");
+            }
+        }
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::toggleDisallowRandomTransitionFlag(): The data is NULL!!"))
+    }
 }
 
 void TransitionsUI::toggleDisallowReturnToStateFlag(){
-    //
+    if (bsData){
+        if (flagDisallowReturnToState->isChecked()){
+            if (bsData->flags == ""){
+                bsData->flags.append("FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE");
+            }else if (!bsData->flags.contains("FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE")){
+                bsData->flags.append("|FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE");
+            }
+        }else{
+            if (bsData->flags == ""){
+                bsData->flags.remove("FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE");
+            }else{
+                bsData->flags.remove("|FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE");
+            }
+        }
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::toggleDisallowReturnToStateFlag(): The data is NULL!!"))
+    }
 }
 
 void TransitionsUI::toggleAbutEndStateFlag(){
-    //
+    if (bsData){
+        if (flagAbutEndState->isChecked()){
+            if (bsData->flags == ""){
+                bsData->flags.append("FLAG_ABUT_AT_END_OF_FROM_GENERATOR");
+            }else if (!bsData->flags.contains("FLAG_ABUT_AT_END_OF_FROM_GENERATOR")){
+                bsData->flags.append("|FLAG_ABUT_AT_END_OF_FROM_GENERATOR");
+            }
+        }else{
+            if (bsData->flags == ""){
+                bsData->flags.remove("FLAG_ABUT_AT_END_OF_FROM_GENERATOR");
+            }else{
+                bsData->flags.remove("|FLAG_ABUT_AT_END_OF_FROM_GENERATOR");
+            }
+        }
+        parentObj->getParentFile()->toggleChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::toggleAbutEndStateFlag(): The data is NULL!!"))
+    }
 }
 
 void TransitionsUI::eventTableElementSelected(int index, const QString &name){
-    //
+    if (bsData){
+        switch (table->currentRow()){
+        case TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW:
+            setTriggerIntervalEnterEventId(index, name);
+            break;
+        case TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW:
+            setTriggerIntervalExitEventId(index, name);
+            break;
+        case INITIATE_INTERVAL_ENTER_EVENT_ID_ROW:
+            setInitiateIntervalEnterEventId(index, name);
+            break;
+        case INITIATE_INTERVAL_EXIT_EVENT_ID_ROW:
+            setInitiateIntervalExitEventId(index, name);
+            break;
+        case EVENT_ID_ROW:
+            setEventId(index, name);
+            break;
+        default:
+            CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::eventTableElementSelected(): Event relayed to wrong table row!!"));
+            return;
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::eventTableElementSelected(): The data is NULL!!"));
+    }
+}
+
+void TransitionsUI::variableTableElementSelected(int index, const QString &name){
+    if (bsData){
+        switch (currentIndex()){
+        case TRANSITION_EFFECT_WIDGET:
+            transitionUI->setBindingVariable(index, name);
+            break;
+        default:
+            CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::variableTableElementSelected(): Event relayed to wrong widget!!"));
+            return;
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::variableTableElementSelected(): The data is NULL!!"));
+    }
 }
 
 void TransitionsUI::returnToWidget(){
@@ -279,29 +664,26 @@ void TransitionsUI::viewSelectedChild(int row, int column){
     if (bsData){
         if (row < BASE_NUMBER_OF_ROWS && row >= 0){
             if (column == VALUE_COLUMN){
-                if (row == TRANSITION_ROW){
-                    //if ()
-                    transition->loadData(static_cast<hkbBlendingTransitionEffect *>(bsData->transition.data()));
-                    setCurrentIndex(TRANSITION_EFFECT_WIDGET);
-                }else{
-                    switch (row){
-                    case TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW:
-                        index = bsData->triggerInterval.enterEventId;
-                        break;
-                    case TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW:
-                        index = bsData->triggerInterval.exitEventId;
-                        break;
-                    case INITIATE_INTERVAL_ENTER_EVENT_ID_ROW:
-                        index = bsData->initiateInterval.enterEventId;
-                        break;
-                    case INITIATE_INTERVAL_EXIT_EVENT_ID_ROW:
-                        index = bsData->initiateInterval.exitEventId;
-                        break;
-                    default:
-                        return;
-                    }
-                    emit viewEvents(index + 1);
+                switch (row){
+                case TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW:
+                    index = bsData->triggerInterval.enterEventId;
+                    break;
+                case TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW:
+                    index = bsData->triggerInterval.exitEventId;
+                    break;
+                case INITIATE_INTERVAL_ENTER_EVENT_ID_ROW:
+                    index = bsData->initiateInterval.enterEventId;
+                    break;
+                case INITIATE_INTERVAL_EXIT_EVENT_ID_ROW:
+                    index = bsData->initiateInterval.exitEventId;
+                    break;
+                case EVENT_ID_ROW:
+                    index = bsData->eventId;
+                    break;
+                default:
+                    return;
                 }
+                emit viewEvents(index + 1);
             }
         }
     }else{
@@ -309,104 +691,22 @@ void TransitionsUI::viewSelectedChild(int row, int column){
     }
 }
 
-void TransitionsUI::loadData(BehaviorFile *parentfile, hkbStateMachine *parent, hkbStateMachineTransitionInfoArray::HkTransition *data){
-    blockSignals(true);
-    if (data && parent && parentfile){
-        bsData = (hkbStateMachineTransitionInfoArray::HkTransition *)data;
-        parentObj = parent;
-        file = parentfile;
-        QString name = file->getEventNameAt(bsData->triggerInterval.enterEventId);
-        if (name != ""){
-            table->item(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+void TransitionsUI::transitionEffectRenamed(const QString &name){
+    if (name != ""){
+        transition->setText(name);
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::transitionEffectRenamed(): The name the empty string!!"));
+    }
+}
+
+void TransitionsUI::loadTableValue(int row, const QString &value){
+    if (table->item(row, VALUE_COLUMN)){
+        if (value != ""){
+            table->item(row, VALUE_COLUMN)->setText(value);
         }else{
-            table->item(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
-        }
-        name = file->getEventNameAt(bsData->triggerInterval.exitEventId);
-        if (name != ""){
-            table->item(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }else{
-            table->item(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
-        }
-        enterTimeTI->setValue(bsData->triggerInterval.enterTime);
-        exitTimeTI->setValue(bsData->triggerInterval.exitTime);
-        name = file->getEventNameAt(bsData->initiateInterval.enterEventId);
-        if (name != ""){
-            table->item(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }else{
-            table->item(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
-        }
-        name = file->getEventNameAt(bsData->initiateInterval.exitEventId);
-        if (name != ""){
-            table->item(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }else{
-            table->item(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
-        }
-        enterTimeII->setValue(bsData->initiateInterval.enterTime);
-        exitTimeII->setValue(bsData->initiateInterval.exitTime);
-        if (bsData->transition.data()){
-            table->item(TRANSITION_ROW, VALUE_COLUMN)->setText(static_cast<hkbBlendingTransitionEffect *>(bsData->transition.data())->getName());
-        }else{
-            table->item(TRANSITION_ROW, VALUE_COLUMN)->setText("NULL");
-        }
-        if (bsData->condition.data()){
-            condition->setText(static_cast<hkbStringCondition *>(bsData->condition.data())->conditionString);
-        }else{
-            condition->setText("");
-        }
-        name = file->getEventNameAt(bsData->eventId);
-        if (name != ""){
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }else{
-            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText("NONE");
-        }
-        toStateId->clear();
-        toStateId->addItems(parentObj->getStateNames());
-        toStateId->blockSignals(true);
-        toStateId->setCurrentIndex(parentObj->getStateNames().indexOf(parentObj->getStateName(bsData->toStateId)));
-        toStateId->blockSignals(false);
-        //fromNestedStateId->clear();
-        //fromNestedStateId->addItems(parentObj->getStateNames());
-        toNestedStateId->clear();
-        toNestedStateId->addItems(parentObj->getNestedStateNames(bsData->toStateId));
-        toNestedStateId->blockSignals(true);
-        toNestedStateId->setCurrentIndex(parentObj->getNestedStateNames(bsData->toStateId).indexOf(parentObj->getNestedStateName(bsData->toStateId, bsData->toNestedStateId)));
-        toNestedStateId->blockSignals(false);
-        priority->setValue(bsData->priority);
-        QStringList flags = bsData->flags.split("|");
-        flagGlobalWildcard->setChecked(false);
-        flagUseNestedState->setChecked(false);
-        flagDisallowRandomTransition->setChecked(false);
-        flagDisallowReturnToState->setChecked(false);
-        flagAbutEndState->setChecked(false);
-        if (flags.isEmpty()){
-            if (bsData->flags == "FLAG_GLOBAL_WILDCARD_ROW"){
-                flagGlobalWildcard->setChecked(true);
-            }else if (bsData->flags == "FLAG_USE_NESTED_STATE_ROW"){
-                flagUseNestedState->setChecked(true);
-            }else if (bsData->flags == "FLAG_DISALLOW_RANDOM_TRANSITION_ROW"){
-                flagDisallowRandomTransition->setChecked(true);
-            }else if (bsData->flags == "FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE_ROW"){
-                flagDisallowReturnToState->setChecked(true);
-            }else if (bsData->flags == "FLAG_ABUT_END_STATE_ROW"){
-                flagAbutEndState->setChecked(true);
-            }
-        }else{
-            for (int i = 0; i < flags.size(); i++){
-                if (flags.at(i) == "FLAG_GLOBAL_WILDCARD_ROW"){
-                    flagGlobalWildcard->setChecked(true);
-                }else if (flags.at(i) == "FLAG_USE_NESTED_STATE_ROW"){
-                    flagUseNestedState->setChecked(true);
-                }else if (flags.at(i) == "FLAG_DISALLOW_RANDOM_TRANSITION_ROW"){
-                    flagDisallowRandomTransition->setChecked(true);
-                }else if (flags.at(i) == "FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE_ROW"){
-                    flagDisallowReturnToState->setChecked(true);
-                }else if (flags.at(i) == "FLAG_ABUT_END_STATE_ROW"){
-                    flagAbutEndState->setChecked(true);
-                }
-            }
+            table->item(row, VALUE_COLUMN)->setText("NONE");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::loadData(): The data, parent file or parent state machine is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("TransitionsUI::loadTableValue(): There is no table item here!!"));
     }
-    blockSignals(false);
 }

@@ -66,7 +66,7 @@ QRectF TreeGraphicsItem::boundingRect() const{
 }
 
 QRectF TreeGraphicsItem::branchExpandCollapseBox() const{
-    return QRectF(boundingRect().width()*0.8, 0, boundingRect().width()*0.2, boundingRect().height());
+    return QRectF(boundingRect().width()*0.9, 0, boundingRect().width()*0.1, boundingRect().height());
 }
 
 void TreeGraphicsItem::setBrushColor(Qt::GlobalColor color){

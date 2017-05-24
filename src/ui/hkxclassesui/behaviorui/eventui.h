@@ -3,7 +3,7 @@
 
 #include <QGroupBox>
 
-class QFormLayout;
+class QGridLayout;
 class QLabel;
 class QPushButton;
 class QLineEdit;
@@ -18,6 +18,8 @@ class EventUI: public QGroupBox
 public:
     EventUI();
     void loadData(BehaviorFile *parentFile, hkEventPayload *event);
+    QSize sizeHint() const Q_DECL_OVERRIDE;
+    QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 signals:
     void viewEvents(int index);
     void returnToParent();
@@ -26,11 +28,13 @@ private slots:
     void setEventPayload();
     void emitViewEvent();
 private:
+    void connectSignals();
+    void disconnectSignals();
     void eventRenamed(const QString & name, int index);
 private:
     BehaviorFile *file;
     hkEventPayload *eventData;
-    QFormLayout *topLyt;
+    QGridLayout *topLyt;
     QPushButton *returnPB;
     QLabel *nameL;
     QPushButton *selectEvent;

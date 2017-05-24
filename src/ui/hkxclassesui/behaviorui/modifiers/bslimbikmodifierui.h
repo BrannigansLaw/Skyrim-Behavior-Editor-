@@ -14,8 +14,9 @@ class DoubleSpinBox;
 class QCheckBox;
 class ComboBox;
 class GenericTableWidget;
+class hkbVariableBindingSet;
 
-class BSLimbIKModifierUI
+class BSLimbIKModifierUI: QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
@@ -39,6 +40,7 @@ private:
     void variableRenamed(const QString & name, int index);
     bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type);
     void setBindingVariable(int index, const QString & name);
+    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
     static QStringList headerLabels;
     BSLimbIKModifier *bsData;
@@ -47,8 +49,8 @@ private:
     LineEdit *name;
     QCheckBox *enable;
     DoubleSpinBox *limitAngleDegrees;
-    ComboBox startBoneIndex;
-    ComboBox endBoneIndex;
+    ComboBox *startBoneIndex;
+    ComboBox *endBoneIndex;
     DoubleSpinBox *gain;
     DoubleSpinBox *boneRadius;
     DoubleSpinBox *castOffset;

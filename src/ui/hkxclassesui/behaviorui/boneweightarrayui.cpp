@@ -69,17 +69,17 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
                 if (bones->item(i, NAME_COLUMN)){
                     bones->item(i, NAME_COLUMN)->setText(boneNames.at(i));
                 }else{
-                    bones->setItem(i, NAME_COLUMN, new TableWidgetItem(boneNames.at(i)));
+                    bones->setItem(i, NAME_COLUMN, new QTableWidgetItem(boneNames.at(i)));
                 }
                 if (bones->item(i, VALUE_COLUMN)){
                     bones->item(i, VALUE_COLUMN)->setText(QString::number(bsData->boneWeights.at(i)));
                 }else{
-                    bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6)));
+                    bones->setItem(i, VALUE_COLUMN, new QTableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6)));
                 }
             }else{
                 bones->setRowCount(rowCount + 1);
-                bones->setItem(rowCount, NAME_COLUMN, new TableWidgetItem(boneNames.at(i)));
-                bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6)));
+                bones->setItem(rowCount, NAME_COLUMN, new QTableWidgetItem(boneNames.at(i)));
+                bones->setItem(i, VALUE_COLUMN, new QTableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6)));
             }
         }
         for (int j = bsData->boneWeights.size(); j < bones->rowCount(); j++){
@@ -99,7 +99,7 @@ void BoneWeightArrayUI::setBoneWeight(){
             if (bones->item(row, VALUE_COLUMN)){
                 bones->item(row, VALUE_COLUMN)->setText(QString::number(selectedBone->value(), char('f'), 6));
             }else{
-                bones->setItem(row, VALUE_COLUMN, new TableWidgetItem(QString::number(selectedBone->value(), char('f'), 6)));
+                bones->setItem(row, VALUE_COLUMN, new QTableWidgetItem(QString::number(selectedBone->value(), char('f'), 6)));
             }
         }
     }else{

@@ -29,7 +29,7 @@ BehaviorGraphUI::BehaviorGraphUI()
     : behaviorView(NULL),
       bsData(NULL),
       topLyt(new QGridLayout),
-      table(new TableWidget),
+      table(new TableWidget(QColor(Qt::cyan))),
       name(new LineEdit),
       variableMode(new ComboBox)
 {

@@ -27,6 +27,13 @@ class GenericTableWidget;
 class BlenderGeneratorUI;
 class BehaviorGraphUI;
 
+
+/**
+ * To add support for a new class we need to add it to the "DATA_TYPE_LOADED" enum, add it to the stacked layout in the correct order,
+ * connect it's name change signal to this, deal with any variable event name changes, add it to the list of widgets to be loaded and
+ * add it to the set behavior view function if necessary.
+ */
+
 class HkDataUI: public QGroupBox
 {
     Q_OBJECT
@@ -53,7 +60,7 @@ private:
     HkDataUI& operator=(const HkDataUI&);
     HkDataUI(const HkDataUI &);
 private:
-    enum {
+    enum DATA_TYPE_LOADED{
         NO_DATA_SELECTED = 0,
         BS_I_STATE_TAG_GEN = 1,
         MODIFIER_GENERATOR = 2,

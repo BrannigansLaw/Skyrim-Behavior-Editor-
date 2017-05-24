@@ -693,7 +693,7 @@ HkxSharedPtr * BehaviorFile::findHkxObject(long ref){
     return NULL;
 }
 
-bool BehaviorFile::addCharacterProperty(int index){
+int BehaviorFile::addCharacterProperty(int index){
     return static_cast<hkbBehaviorGraphData *>(graphData.data())->addVariable(character->getCharacterPropertyTypeAt(index), character->getCharacterPropertyNameAt(index), true);
 }
 
@@ -821,6 +821,19 @@ QStringList BehaviorFile::getModifierTypeNames() const{
     return list;
 }
 
+int BehaviorFile::getCharacterPropertyIndex(const QString &name) const{
+    hkbBehaviorGraphStringData *strings = NULL;
+    if (stringData.data()){
+        strings = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+        for (int i = 0; i < strings->characterPropertyNames.size(); i++){
+            if (strings->characterPropertyNames.at(i) == name){
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
 QStringList BehaviorFile::getCharacterPropertyNames() const{
     if (character){
         return character->getCharacterPropertyNames();
@@ -896,6 +909,13 @@ QStringList BehaviorFile::getCharacterPropertyTypenames() const{
         return static_cast<CharacterFile *>(character)->getCharacterPropertyTypenames();
     }
     return QStringList();
+}
+
+hkVariableType BehaviorFile::getCharacterPropertyTypeAt(int index) const{
+    if (character){
+        return static_cast<CharacterFile *>(character)->getCharacterPropertyTypeAt(index);
+    }
+    return VARIABLE_TYPE_INT8;
 }
 
 QStringList BehaviorFile::getVariableNames() const{

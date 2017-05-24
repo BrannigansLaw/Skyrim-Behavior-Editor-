@@ -11,7 +11,6 @@ class TransitionsUI;
 class hkbStateMachineStateInfo;
 class QGridLayout;
 class TableWidget;
-class TableWidgetItem;
 class SpinBox;
 class LineEdit;
 class ComboBox;
@@ -19,9 +18,6 @@ class QPushButton;
 class DoubleSpinBox;
 class QCheckBox;
 class EventUI;
-class HkTransition;
-class hkbStateMachineEventPropertyArray;
-class hkbStateMachine;
 class QGroupBox;
 
 class StateUI: public QStackedWidget
@@ -38,6 +34,7 @@ signals:
     void viewGenerators(int index);
     void returnToParent(bool reloadData);
     void viewVariables(int index);
+    void viewProperties(int index);
     void viewEvents(int index);
 private slots:
     void setName();
@@ -45,17 +42,22 @@ private slots:
     void setStateId();
     void setProbability();
     void setEnable();
-    void setEvent(int index, const QString & name);
-    void addEnterEvent();
-    void addExitEvent();
-    void addTransition();
-    void removeObjectChild();
+    void eventTableElementSelected(int index, const QString & name);
     void viewSelectedChild(int row, int column);
     void returnToWidget();
+    void transitionRenamed(const QString &name, int index);
 private:
-    void emitViewGenerators();
+    void connectSignals();
+    void disconnectSignals();
+    void variableTableElementSelected(int index, const QString &name);
+    void addEnterEvent();
+    void removeEnterEvent(int index);
+    void addExitEvent();
+    void removeExitEvent(int index);
+    void addTransition();
+    void removeTransition(int index);
     void loadDynamicTableRows();
-    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value);
+    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2);
     void eventRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
     void generatorRenamed(const QString & name, int index);
@@ -68,7 +70,6 @@ private:
     static QStringList headerLabels;
     int exitEventsButtonRow;
     int transitionsButtonRow;
-    int rowToRemove;
     BehaviorGraphView *behaviorView;
     hkbStateMachineStateInfo *bsData;
     int stateIndex;
@@ -83,12 +84,6 @@ private:
     DoubleSpinBox *probability;
     QCheckBox *enable;
     QCheckBox *enableTransitions;
-    QPushButton *addEnterEventPB;
-    QPushButton *removeEnterEventPB;
-    QPushButton *addExitEventPB;
-    QPushButton *removeExitEventPB;
-    QPushButton *addTransitionPB;
-    QPushButton *removeTransitionPB;
 };
 
 #endif // STATEUI_H

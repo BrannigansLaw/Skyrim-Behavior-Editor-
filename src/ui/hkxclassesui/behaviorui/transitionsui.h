@@ -5,7 +5,6 @@
 
 #include "src/hkxclasses/behavior/hkbstatemachinetransitioninfoarray.h"
 
-class BehaviorGraphView;
 class TableWidget;
 class LineEdit;
 class ComboBox;
@@ -19,10 +18,11 @@ class BlendingTransitionEffectUI;
 class QStackedLayout;
 class QPushButton;
 class HkTransition;
-class hkbGenerator;
 class ConditionLineEdit;
 class QGroupBox;
 class BehaviorFile;
+class CheckButtonCombo;
+class GenericTableWidget;
 
 class TransitionsUI: public QStackedWidget
 {
@@ -33,23 +33,21 @@ class TransitionsUI: public QStackedWidget
 public:
     TransitionsUI();
     virtual ~TransitionsUI(){}
-    void loadData(BehaviorFile *parentfile, hkbStateMachine *parent, hkbStateMachineTransitionInfoArray::HkTransition *data);
+    void loadData(BehaviorFile *parentfile, hkbStateMachine *parent, hkbStateMachineTransitionInfoArray::HkTransition *data, int index);
 signals:
+    void transitionNamChanged(const QString & newName, int index);
     void viewEvents(int index);
     void viewVariables(int index);
+    void viewProperties(int index);
     void returnToParent();
 private slots:
-    void setTriggerIntervalEnterEventId(int index, const QString &name);
-    void setTriggerIntervalExitEventId(int index, const QString &name);
     void setTriggerIntervalEnterTime();
     void setTriggerIntervalExitTime();
-    void setInitiateIntervalEnterEventId(int index, const QString &name);
-    void setInitiateIntervalExitEventId(int index, const QString &name);
     void setInitiateIntervalEnterTime();
     void setInitiateIntervalExitTime();
     void viewTransitionEffect();
+    void toggleTransitionEffect(bool enable);
     void setCondition();
-    void setEventId(int index, const QString &name);
     void setToStateId(const QString &name);
     void setFromNestedStateId(const QString &name);
     void setToNestedStateId(const QString &name);
@@ -59,10 +57,20 @@ private slots:
     void toggleDisallowRandomTransitionFlag();
     void toggleDisallowReturnToStateFlag();
     void toggleAbutEndStateFlag();
-    void eventTableElementSelected(int index, const QString &name);
     void returnToWidget();
     void viewSelectedChild(int row, int column);
+    void transitionEffectRenamed(const QString & name);
 private:
+    void connectSignals();
+    void disconnectSignals();
+    void eventTableElementSelected(int index, const QString &name);
+    void variableTableElementSelected(int index, const QString &name);
+    void setTriggerIntervalEnterEventId(int index, const QString &name);
+    void setTriggerIntervalExitEventId(int index, const QString &name);
+    void setInitiateIntervalEnterEventId(int index, const QString &name);
+    void setInitiateIntervalExitEventId(int index, const QString &name);
+    void setEventId(int index, const QString &name);
+    void loadTableValue(int row, const QString &value);
     void eventRenamed(const QString & name, int index);
     void stateRenamed(const QString & name, int index);
 private:
@@ -74,6 +82,7 @@ private:
     BehaviorFile *file;
     hkbStateMachine *parentObj;
     hkbStateMachineTransitionInfoArray::HkTransition *bsData;
+    int transitionIndex;
     QPushButton *returnPB;
     QGridLayout *topLyt;
     QGroupBox *groupBox;
@@ -82,7 +91,8 @@ private:
     DoubleSpinBox *exitTimeTI;
     DoubleSpinBox *enterTimeII;
     DoubleSpinBox *exitTimeII;
-    BlendingTransitionEffectUI *transition; //Need Generator transition effect too???
+    CheckButtonCombo *transition;
+    BlendingTransitionEffectUI *transitionUI; //Need Generator transition effect too???
     ConditionLineEdit *condition;
     ComboBox *toStateId;
     ComboBox *fromNestedStateId;

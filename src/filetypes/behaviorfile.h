@@ -39,14 +39,16 @@ public:
     QStringList getGeneratorTypeNames() const;
     QStringList getModifierNames() const;
     QStringList getModifierTypeNames() const;
+    int getCharacterPropertyIndex(const QString & name) const;
     QStringList getCharacterPropertyNames() const;
     QStringList getCharacterPropertyTypenames() const;
+    hkVariableType getCharacterPropertyTypeAt(int index) const;
     hkVariableType getVariableTypeAt(int index) const;
     bool addObjectToFile(HkxObject *obj, long ref = -1);
     QStringList getAllReferencedBehaviorFilePaths() const;
     QStringList getRagdollBoneNames() const;
     QStringList getRigBoneNames() const;
-    bool addCharacterProperty(int index);
+    int addCharacterProperty(int index);
     QString getVariableNameAt(int index) const;
     QString getEventNameAt(int index) const;
     QString getCharacterPropertyNameAt(int index) const;

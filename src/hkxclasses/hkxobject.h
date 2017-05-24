@@ -24,6 +24,7 @@ class HkxObject: public QSharedData
     friend class SkeletonUI;
     friend class BSIStateManagerModifier;
     friend class BoneWeightArrayUI;
+    friend class TransitionsUI;
 public:
     enum HkxType {
         TYPE_OTHER=0,

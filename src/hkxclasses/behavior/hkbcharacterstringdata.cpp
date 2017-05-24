@@ -27,7 +27,7 @@ QStringList hkbCharacterStringData::getAnimationNames() const{
 }
 
 QString hkbCharacterStringData::getCharacterPropertyNameAt(int index) const{
-    if (characterPropertyNames.size() < index && index >= 0){
+    if (characterPropertyNames.size() > index && index >= 0){
         return characterPropertyNames.at(index);
     }
     return "";

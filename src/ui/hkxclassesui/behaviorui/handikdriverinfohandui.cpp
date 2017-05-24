@@ -7,7 +7,8 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QMessageBox>
-#include <QCheckBox>
+
+#include "src/ui/genericdatawidgets.h"
 #include <QStackedLayout>
 #include <QHeaderView>
 #include <QSpinBox>
@@ -49,47 +50,47 @@ HandIkDriverInfoHandUI::HandIkDriverInfoHandUI()
     table->setColumnCount(3);
     table->setHorizontalHeaderLabels(headerLabels1);
     table->setCellWidget(0, 1, returnPB);
-    table->setItem(1, 0, new TableWidgetItem("elbowAxisLS"));
-    table->setItem(1, 1, new TableWidgetItem("hkVector4"));
+    table->setItem(1, 0, new QTableWidgetItem("elbowAxisLS"));
+    table->setItem(1, 1, new QTableWidgetItem("hkVector4"));
     table->setCellWidget(1, 2, elbowAxisLS);
-    table->setItem(2, 0, new TableWidgetItem("backHandNormalLS"));
-    table->setItem(2, 1, new TableWidgetItem("hkVector4"));
+    table->setItem(2, 0, new QTableWidgetItem("backHandNormalLS"));
+    table->setItem(2, 1, new QTableWidgetItem("hkVector4"));
     table->setCellWidget(2, 2, backHandNormalLS);
-    table->setItem(3, 0, new TableWidgetItem("handOffsetLS"));
-    table->setItem(3, 1, new TableWidgetItem("hkVector4"));
+    table->setItem(3, 0, new QTableWidgetItem("handOffsetLS"));
+    table->setItem(3, 1, new QTableWidgetItem("hkVector4"));
     table->setCellWidget(3, 2, handOffsetLS);
-    table->setItem(4, 0, new TableWidgetItem("handOrienationOffsetLS"));
-    table->setItem(4, 1, new TableWidgetItem("hkQuaternion"));
+    table->setItem(4, 0, new QTableWidgetItem("handOrienationOffsetLS"));
+    table->setItem(4, 1, new QTableWidgetItem("hkQuaternion"));
     table->setCellWidget(4, 2, handOrienationOffsetLS);
-    table->setItem(5, 0, new TableWidgetItem("maxElbowAngleDegrees"));
-    table->setItem(5, 1, new TableWidgetItem("hkReal"));
+    table->setItem(5, 0, new QTableWidgetItem("maxElbowAngleDegrees"));
+    table->setItem(5, 1, new QTableWidgetItem("hkReal"));
     table->setCellWidget(5, 2, maxElbowAngleDegrees);
-    table->setItem(6, 0, new TableWidgetItem("minElbowAngleDegrees"));
-    table->setItem(6, 1, new TableWidgetItem("hkReal"));
+    table->setItem(6, 0, new QTableWidgetItem("minElbowAngleDegrees"));
+    table->setItem(6, 1, new QTableWidgetItem("hkReal"));
     table->setCellWidget(6, 2, minElbowAngleDegrees);
-    table->setItem(7, 0, new TableWidgetItem("shoulderIndex"));
-    table->setItem(7, 1, new TableWidgetItem("hkInt32"));
+    table->setItem(7, 0, new QTableWidgetItem("shoulderIndex"));
+    table->setItem(7, 1, new QTableWidgetItem("hkInt32"));
     table->setCellWidget(7, 2, shoulderIndex);
-    table->setItem(8, 0, new TableWidgetItem("shoulderSiblingIndex"));
-    table->setItem(8, 1, new TableWidgetItem("hkInt32"));
+    table->setItem(8, 0, new QTableWidgetItem("shoulderSiblingIndex"));
+    table->setItem(8, 1, new QTableWidgetItem("hkInt32"));
     table->setCellWidget(8, 2, shoulderSiblingIndex);
-    table->setItem(9, 0, new TableWidgetItem("elbowIndex"));
-    table->setItem(9, 1, new TableWidgetItem("hkInt32"));
+    table->setItem(9, 0, new QTableWidgetItem("elbowIndex"));
+    table->setItem(9, 1, new QTableWidgetItem("hkInt32"));
     table->setCellWidget(9, 2, elbowIndex);
-    table->setItem(10, 0, new TableWidgetItem("elbowSiblingIndex"));
-    table->setItem(10, 1, new TableWidgetItem("hkInt32"));
+    table->setItem(10, 0, new QTableWidgetItem("elbowSiblingIndex"));
+    table->setItem(10, 1, new QTableWidgetItem("hkInt32"));
     table->setCellWidget(10, 2, elbowSiblingIndex);
-    table->setItem(11, 0, new TableWidgetItem("wristIndex"));
-    table->setItem(11, 1, new TableWidgetItem("hkInt32"));
+    table->setItem(11, 0, new QTableWidgetItem("wristIndex"));
+    table->setItem(11, 1, new QTableWidgetItem("hkInt32"));
     table->setCellWidget(11, 2, wristIndex);
-    table->setItem(12, 0, new TableWidgetItem("enforceEndPosition"));
-    table->setItem(12, 1, new TableWidgetItem("hkBool"));
+    table->setItem(12, 0, new QTableWidgetItem("enforceEndPosition"));
+    table->setItem(12, 1, new QTableWidgetItem("hkBool"));
     table->setCellWidget(12, 2, enforceEndPosition);
-    table->setItem(13, 0, new TableWidgetItem("enforceEndRotation"));
-    table->setItem(13, 1, new TableWidgetItem("hkBool"));
+    table->setItem(13, 0, new QTableWidgetItem("enforceEndRotation"));
+    table->setItem(13, 1, new QTableWidgetItem("hkBool"));
     table->setCellWidget(13, 2, enforceEndRotation);
-    table->setItem(14, 0, new TableWidgetItem("localFrameName"));
-    table->setItem(14, 1, new TableWidgetItem("hkStringPtr"));
+    table->setItem(14, 0, new QTableWidgetItem("localFrameName"));
+    table->setItem(14, 1, new QTableWidgetItem("hkStringPtr"));
     table->setCellWidget(14, 2, localFrameName);
     lyt->addWidget(table);
     setLayout(lyt);
