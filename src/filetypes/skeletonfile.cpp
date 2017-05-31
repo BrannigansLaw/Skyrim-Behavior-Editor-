@@ -41,6 +41,21 @@ QStringList SkeletonFile::getBonesFromSkeletonAt(int index) const{
     return QStringList();
 }
 
+int SkeletonFile::getNumberOfBones(bool ragdoll) const{
+    if (!skeletons.isEmpty()){
+        if (!ragdoll){
+            if (skeletons.first().data()){
+                return static_cast<hkaSkeleton *>(skeletons.first().data())->bones.size();
+            }
+        }else{
+            if (skeletons.size() > 1 && skeletons.at(1).data()){
+                return static_cast<hkaSkeleton *>(skeletons.at(1).data())->bones.size();
+            }
+        }
+    }
+    return -1;
+}
+
 bool SkeletonFile::addObjectToFile(HkxObject *obj, long ref){
     if (ref > largestRef){
         largestRef = ref;

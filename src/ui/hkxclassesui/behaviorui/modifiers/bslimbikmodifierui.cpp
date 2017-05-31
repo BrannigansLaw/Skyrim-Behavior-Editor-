@@ -24,6 +24,8 @@
 #define BINDING_COLUMN 2
 #define VALUE_COLUMN 3
 
+#define BINDING_ITEM_LABEL QString("Use Property     ")
+
 QStringList BSLimbIKModifierUI::headerLabels = {
     "Name",
     "Type",
@@ -119,13 +121,13 @@ void BSLimbIKModifierUI::loadData(HkxObject *data){
                 loadBinding(BONE_RADIUS_ROW, BINDING_COLUMN, varBind, "boneRadius");
                 loadBinding(CAST_OFFSET_ROW, BINDING_COLUMN, varBind, "castOffset");
             }else{
-                table->item(ENABLE_ROW, BINDING_COLUMN)->setText("NONE");
-                table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->setText("NONE");
-                table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->setText("NONE");
-                table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->setText("NONE");
-                table->item(GAIN_ROW, BINDING_COLUMN)->setText("NONE");
-                table->item(BONE_RADIUS_ROW, BINDING_COLUMN)->setText("NONE");
-                table->item(CAST_OFFSET_ROW, BINDING_COLUMN)->setText("NONE");
+                table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
+                table->item(LIMIT_ANGLE_DEGREES_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
+                table->item(START_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
+                table->item(END_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
+                table->item(GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
+                table->item(BONE_RADIUS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
+                table->item(CAST_OFFSET_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BehaviorGraphUI::loadData(): The data is an incorrect type!!"));
@@ -207,11 +209,15 @@ void BSLimbIKModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet 
             int index = varBind->getVariableIndexOfBinding(path);
             QString varName;
             if (index != -1){
-                varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
+                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index);
+                }else{
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
+                }
                 if (varName == ""){
                     varName = "NONE";
                 }
-                table->item(row, colunm)->setText(varName);
+                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::loadBinding(): The variable binding set is NULL!!"));

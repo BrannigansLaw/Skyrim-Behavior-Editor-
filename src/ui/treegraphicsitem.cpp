@@ -149,6 +149,7 @@ qreal TreeGraphicsItem::getYCoordinate(){
 bool TreeGraphicsItem::reorderChildren(){
     QList <QGraphicsItem *> children = childItems();
     QList <DataIconManager *> dataChildren = itemData->getChildren();
+    //QList <DataIconManager *> reparentedData;
     for (int j = 0; j < dataChildren.size(); j++){
         for (int k = j + 1; k < dataChildren.size(); k++){
             if (dataChildren.at(j) == dataChildren.at(k)){
@@ -159,11 +160,13 @@ bool TreeGraphicsItem::reorderChildren(){
     for (int i = 0; i < children.size(); i++){
         children[i]->setParentItem(NULL);
     }
-    if (children.size() == dataChildren.size()){//Fix this...
+    if (children.size() <= dataChildren.size()){//Fix this...
         for (int i = 0; i < dataChildren.size(); i++){
             for (int k = 0; k < children.size(); k++){
-                if (((TreeGraphicsItem *)children.at(k))->itemData == dataChildren.at(i)){
+                if (((TreeGraphicsItem *)children.at(k))->itemData == dataChildren.at(i)/* && !reparentedData.contains(dataChildren.at(i))*/){
                     children[k]->setParentItem(this);
+                    //reparentedData.append(dataChildren.at(i));
+                    break;
                 }
             }
         }

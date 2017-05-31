@@ -28,7 +28,7 @@ private slots:
     void setRootGenerator(int index, const QString &name);
 private:
     void setBehaviorView(BehaviorGraphView *view);
-    void connectToTableWidgets(GenericTableWidget *generators);
+    void connectToTables(GenericTableWidget *generators);
 private:
     static QStringList headerLabels;
     BehaviorGraphView *behaviorView;

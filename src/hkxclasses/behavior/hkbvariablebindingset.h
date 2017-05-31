@@ -33,6 +33,8 @@ public:
     void removeBinding(int varIndex);
     QString getPathOfBindingAt(int index);
     int getVariableIndexOfBinding(const QString & path) const;
+    hkBinding::BindingType getBindingType(int index) const;
+    hkBinding::BindingType getBindingType(const QString & path) const;
     bool write(HkxXMLWriter *writer);
 protected:
 private:

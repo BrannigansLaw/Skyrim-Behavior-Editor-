@@ -198,6 +198,9 @@ void HkDataUI::generatorNameChanged(const QString & newName, int index){
     case STATE_MACHINE:
         stateMachineUI->generatorRenamed(newName, index);
         break;
+    case MANUAL_SELECTOR_GENERATOR:
+        manSelGenUI->generatorRenamed(newName, index);
+        break;
     default:
         break;
     }
@@ -241,10 +244,13 @@ void HkDataUI::variableNameChanged(const QString & newName, int index){
     variablesTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
     case BLENDER_GENERATOR:
-        blenderGeneratorUI->renameVariable(newName, index);
+        blenderGeneratorUI->variableRenamed(newName, index);
         break;
     case STATE_MACHINE:
         stateMachineUI->variableRenamed(newName, index);
+        break;
+    case MANUAL_SELECTOR_GENERATOR:
+        manSelGenUI->variableRenamed(newName, index);
         break;
     default:
         break;
@@ -261,9 +267,28 @@ void HkDataUI::variableAdded(const QString & name, const QString & type){
 void HkDataUI::generatorRemoved(int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     generatorsTable->removeItem(index);
-    switch (stack->currentIndex()) {
-    case BLENDER_GENERATOR:
-        //reload active widget...
+    switch (stack->currentIndex()){
+    case HKB_BLENDER_GENERATOR:
+        blenderGeneratorUI->loadData(loadedData);
+        blenderGeneratorUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
+        break;
+    case BS_I_STATE_TAGGING_GENERATOR:
+        //
+        break;
+    case HKB_MODIFIER_GENERATOR:
+        //
+        break;
+    case HKB_MANUAL_SELECTOR_GENERATOR:
+        manSelGenUI->loadData(loadedData);
+        manSelGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
+        break;
+    case HKB_STATE_MACHINE:
+        stateMachineUI->loadData(loadedData);
+        stateMachineUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
+        break;
+    case HKB_BEHAVIOR_GRAPH:
+        behaviorGraphUI->loadData(loadedData);
+        behaviorGraphUI->connectToTables(generatorsTable);
         break;
     default:
         break;
@@ -287,9 +312,15 @@ void HkDataUI::modifierRemoved(int index){
 void HkDataUI::variableRemoved(int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     variablesTable->removeItem(index);
-    switch (stack->currentIndex()) {
-    case BLENDER_GENERATOR://reload active widget???
-        blenderGeneratorUI->renameVariable("NONE", index);
+    switch (stack->currentIndex()){
+    case BLENDER_GENERATOR:
+        blenderGeneratorUI->variableRenamed("NONE", index);
+        break;
+    case STATE_MACHINE:
+        stateMachineUI->variableRenamed("NONE", index);
+        break;
+    case MANUAL_SELECTOR_GENERATOR:
+        manSelGenUI->variableRenamed("NONE", index);
         break;
     default:
         break;
@@ -305,14 +336,13 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
         HkxObject *oldData = loadedData;
         sig = ((HkxObject *)((icon->itemData)))->getSignature();
         loadedData = ((HkxObject *)((icon->itemData)));
-        switch (sig) {
+        switch (sig){
         case HKB_BLENDER_GENERATOR:
             if (loadedData != oldData){
                 blenderGeneratorUI->loadData(loadedData);
             }
             stack->setCurrentIndex(BLENDER_GENERATOR);
-            blenderGeneratorUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
-            //connect(variablesTable, SIGNAL(elementSelected(int,QString)), blenderGeneratorUI, SLOT(setBindingVariable(int,QString)), Qt::UniqueConnection);
+            blenderGeneratorUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
             break;
         case BS_I_STATE_TAGGING_GENERATOR:
             if (loadedData != oldData){
@@ -331,20 +361,21 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
                 manSelGenUI->loadData(loadedData);
             }
             stack->setCurrentIndex(MANUAL_SELECTOR_GENERATOR);
+            manSelGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
             break;
         case HKB_STATE_MACHINE:
             if (loadedData != oldData){
                 stateMachineUI->loadData(loadedData);
             }
             stack->setCurrentIndex(STATE_MACHINE);
-            stateMachineUI->connectToTableWidgets(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
+            stateMachineUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
             break;
         case HKB_BEHAVIOR_GRAPH:
             if (loadedData != oldData){
                 behaviorGraphUI->loadData(loadedData);
             }
             stack->setCurrentIndex(BEHAVIOR_GRAPH);
-            behaviorGraphUI->connectToTableWidgets(generatorsTable);
+            behaviorGraphUI->connectToTables(generatorsTable);
             break;
         default:
             stack->setCurrentIndex(NO_DATA_SELECTED);
@@ -367,7 +398,7 @@ BehaviorGraphView *HkDataUI::setBehaviorView(BehaviorGraphView *view){
     behaviorView = view;
     iSTGUI->behaviorView = view;
     modGenUI->behaviorView = view;
-    manSelGenUI->behaviorView = view;
+    manSelGenUI->setBehaviorView(view);
     stateMachineUI->setBehaviorView(view);
     blenderGeneratorUI->setBehaviorView(view);
     behaviorGraphUI->setBehaviorView(view);

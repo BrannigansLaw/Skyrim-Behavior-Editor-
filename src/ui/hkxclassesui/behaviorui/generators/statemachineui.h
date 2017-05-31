@@ -68,7 +68,7 @@ private:
     void loadDynamicTableRows();
     void setBindingVariable(int index, const QString & name);
     void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString &tip1, const QString &tip2);
-    void connectToTableWidgets(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events);
+    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events);
     void variableRenamed(const QString & name, int index);
     void eventRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);

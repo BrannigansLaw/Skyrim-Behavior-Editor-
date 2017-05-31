@@ -66,6 +66,13 @@ QStringList CharacterFile::getRigBoneNames() const{
     return QStringList();
 }
 
+int CharacterFile::getNumberOfBones(bool ragdoll) const{
+    if (skeleton){
+        return skeleton->getNumberOfBones(ragdoll);
+    }
+    return -1;
+}
+
 QString CharacterFile::getRagdollName() const{
     hkbCharacterStringData *ptr = static_cast<hkbCharacterStringData *>(stringData.data());
     if (ptr){

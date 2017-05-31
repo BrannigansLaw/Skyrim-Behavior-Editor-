@@ -8,16 +8,16 @@
 class BoneWeightArrayUI;
 class TableWidget;
 class hkbBlenderGeneratorChild;
-class QVBoxLayout;
 class HkxObject;
 class DoubleSpinBox;
 class QCheckBox;
-class QStackedLayout;
 class ComboBox;
 class QPushButton;
 class BehaviorGraphView;
 class QGroupBox;
 class QGridLayout;
+class CheckButtonCombo;
+class hkbVariableBindingSet;
 
 class BlenderGeneratorChildUI: public QStackedWidget
 {
@@ -33,21 +33,27 @@ signals:
     void viewProperties(int index);
     void returnToParent(bool reloadData);
 private slots:
-    void setBindingVariable(int index, const QString & name);
     void setWeight();
     void setWorldFromModelWeight();
-    void setGenerator(int index, const QString & name);
     void viewSelected(int row, int column);
+    void viewBoneWeights();
+    void toggleBoneWeights(bool enable);
     void returnToWidget();
 private:
+    void connectSignals();
+    void disconnectSignals();
+    void setGenerator(int index, const QString & name);
+    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path);
+    void setBindingVariable(int index, const QString & name);
     void variableRenamed(const QString & name, int index);
     void generatorRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type);
+    void selectTableToView(bool viewproperties, const QString & path);
+    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
 private:
     enum ACTIVE_WIDGET {
         MAIN_WIDGET = 0,
-        BONE_WEIGHTS_ARRAY_WIDGET = 1
+        BONE_WEIGHT_ARRAY_WIDGET = 1
     };
     static QStringList headerLabels;
     BehaviorGraphView *behaviorView;
@@ -57,7 +63,8 @@ private:
     QGroupBox *groupBox;
     QPushButton *returnPB;
     TableWidget *table;
-    BoneWeightArrayUI *boneWeights;
+    CheckButtonCombo *boneWeights;
+    BoneWeightArrayUI *boneWeightArrayUI;
     DoubleSpinBox *weight;
     DoubleSpinBox *worldFromModelWeight;
 };

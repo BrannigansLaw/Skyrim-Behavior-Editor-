@@ -17,6 +17,7 @@ public:
     void write();
     QString getRootObjectReferenceString();
     QStringList getBonesFromSkeletonAt(int index) const;
+    int getNumberOfBones(bool ragdoll = false) const;
 protected:
     bool parse();
     bool link();

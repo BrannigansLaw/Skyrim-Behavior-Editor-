@@ -103,6 +103,7 @@ TransitionsUI::TransitionsUI()
     table->setCellWidget(INITIATE_INTERVAL_EXIT_TIME_ROW, VALUE_COLUMN, exitTimeII);
     table->setItem(TRANSITION_ROW, NAME_COLUMN, new TableWidgetItem("transition"));
     table->setItem(TRANSITION_ROW, TYPE_COLUMN, new TableWidgetItem("hkbTransitionEffect", Qt::AlignCenter));
+    table->setItem(TRANSITION_ROW, VALUE_COLUMN, new TableWidgetItem("", Qt::AlignCenter, QColor(Qt::gray)));
     table->setCellWidget(TRANSITION_ROW, VALUE_COLUMN, transition);
     table->setItem(CONDITION_ROW, NAME_COLUMN, new TableWidgetItem("condition"));
     table->setItem(CONDITION_ROW, TYPE_COLUMN, new TableWidgetItem("hkbStringCondition", Qt::AlignCenter));

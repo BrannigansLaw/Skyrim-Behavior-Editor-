@@ -5,14 +5,12 @@
 
 #include "src/utility.h"
 
-class QuadVariableWidget;
 class TableWidget;
 class hkbBlenderGenerator;
 class QGridLayout;
 class HkxObject;
 class DoubleSpinBox;
 class QCheckBox;
-class QStackedLayout;
 class SpinBox;
 class QPushButton;
 class QGroupBox;
@@ -21,6 +19,7 @@ class LineEdit;
 class BehaviorGraphView;
 class ComboBox;
 class GenericTableWidget;
+class hkbVariableBindingSet;
 
 class BlenderGeneratorUI: public QStackedWidget
 {
@@ -36,7 +35,6 @@ signals:
     void viewGenerators(int index);
     void viewProperties(int index);
 private slots:
-    void setBindingVariable(int index, const QString & name);
     void setName();
     void setReferencePoseWeightThreshold();
     void setBlendParameter();
@@ -50,16 +48,25 @@ private slots:
     void setFlagIsParametricBlendCyclic();
     void setFlagForceDensePose();
     void setSubtractLastChild();
-    void addChild();
-    void removeSelectedChild();
     void viewSelectedChild(int row, int column);
     void returnToWidget(bool reloadData);
+    void variableTableElementSelected(int index, const QString &name);
+    void generatorTableElementSelected(int index, const QString &name);
 private:
-    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *generators);
-    void renameVariable(const QString & name, int index);
+    void connectSignals();
+    void disconnectSignals();
+    void addChildWithGenerator();
+    void removeChild(int index);
+    void selectTableToView(bool viewproperties, const QString & path);
+    void loadDynamicTableRows();
+    void setBindingVariable(int index, const QString & name);
+    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString &tip1, const QString &tip2);
+    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
+    void variableRenamed(const QString & name, int index);
     void generatorRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type);
+    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
+    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
     enum ACTIVE_WIDGET {
         MAIN_WIDGET = 0,
@@ -81,15 +88,12 @@ private:
     };
     static QStringList types;
     static QStringList headerLabels;
-    int rowIndexOfChildToRemove;
     BehaviorGraphView *behaviorView;
     hkbBlenderGenerator *bsData;
     QGroupBox *groupBox;
     BlenderGeneratorChildUI *childUI;
     QGridLayout *topLyt;
-    QPushButton *addChildPB;
     ComboBox *typeSelectorCB;
-    QPushButton *removeChildPB;
     TableWidget *table;
     LineEdit *name;
     DoubleSpinBox *referencePoseWeightThreshold;

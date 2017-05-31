@@ -38,7 +38,6 @@ signals:
     void viewEvents(int index);
 private slots:
     void setName();
-    void setGenerator(int index, const QString &name);
     void setStateId();
     void setProbability();
     void setEnable();
@@ -49,6 +48,7 @@ private slots:
 private:
     void connectSignals();
     void disconnectSignals();
+    void setGenerator(int index, const QString &name);
     void variableTableElementSelected(int index, const QString &name);
     void addEnterEvent();
     void removeEnterEvent(int index);

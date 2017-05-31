@@ -141,8 +141,6 @@ void BlendingTransitionEffectUI::disconnectSignals(){
 void BlendingTransitionEffectUI::loadData(HkxObject *data){
     disconnectSignals();
     hkbVariableBindingSet *varBind = NULL;
-    QString varName;
-    int ind = 0;
     if (data && data->getSignature() == HKB_BLENDING_TRANSITION_EFFECT){
         bsData = static_cast<hkbBlendingTransitionEffect *>(data);
         name->setText(bsData->name);
@@ -156,16 +154,11 @@ void BlendingTransitionEffectUI::loadData(HkxObject *data){
         eventMode->setCurrentIndex(bsData->EventMode.indexOf(bsData->eventMode));
         varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
         if (varBind){
-            ind = varBind->getVariableIndexOfBinding("duration");
-            if (ind != -1){
-                varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(ind);
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(DURATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+varName);
-            }
+            loadBinding(DURATION_ROW, BINDING_COLUMN, varBind, "duration");
+            loadBinding(TO_GENERATOR_START_TIME_FRACTION_ROW, BINDING_COLUMN, varBind, "toGeneratorStartTimeFraction");
         }else{
             table->item(DURATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
+            table->item(TO_GENERATOR_START_TIME_FRACTION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }
         QStringList flags = bsData->flags.split("|");
         flagSync->setChecked(false);
@@ -213,6 +206,30 @@ void BlendingTransitionEffectUI::setName(){
         emit transitionEffectRenamed(bsData->name);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlendingTransitionEffectUI::setName(): The data is NULL!!"));
+    }
+}
+
+void BlendingTransitionEffectUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+    if (bsData){
+        if (varBind){
+            int index = varBind->getVariableIndexOfBinding(path);
+            QString varName;
+            if (index != -1){
+                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index);
+                }else{
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
+                }
+                if (varName == ""){
+                    varName = "NONE";
+                }
+                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            }
+        }else{
+            CRITICAL_ERROR_MESSAGE(QString("BlendingTransitionEffectUI::loadBinding(): The variable binding set is NULL!!"));
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("BlendingTransitionEffectUI::loadBinding(): The data is NULL!!"));
     }
 }
 
@@ -436,9 +453,8 @@ bool BlendingTransitionEffectUI::setBinding(int index, int row, const QString & 
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
-                bsData->getParentFile()->addObjectToFile(varBind, -1);
             }
-            if (type == VARIABLE_TYPE_POINTER || isProperty){
+            if (isProperty){
                 varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY);
             }else{
                 varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);

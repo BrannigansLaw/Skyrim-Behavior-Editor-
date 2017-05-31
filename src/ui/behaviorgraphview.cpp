@@ -450,9 +450,9 @@ void BehaviorGraphView::append(T *obj){
         }
         if (!newIcon){
             newIcon = addItemToGraph(getSelectedItem(), obj, -1);
-            if (!newIcon){
+            /*if (!newIcon){
                 delete obj;
-            }
+            }*/
         }
         if (((TreeGraphicsItem *)getSelectedItem()->parentItem())){
             ((HkxObject *)((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData)->evaulateDataValidity();

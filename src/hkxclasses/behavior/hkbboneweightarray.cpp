@@ -9,11 +9,15 @@ uint hkbBoneWeightArray::refCount = 0;
 
 QString hkbBoneWeightArray::classname = "hkbBoneWeightArray";
 
-hkbBoneWeightArray::hkbBoneWeightArray(HkxFile *parent, long ref)
+hkbBoneWeightArray::hkbBoneWeightArray(HkxFile *parent, int size, long ref)
     : HkDynamicObject(parent, ref)
 {
     setType(HKB_BONE_WEIGHT_ARRAY, TYPE_OTHER);
     getParentFile()->addObjectToFile(this, ref);
+    //boneWeights.reserve(size);
+    for (int i = 0; i < size; i++){
+        boneWeights.append(0);
+    }
     refCount++;
 }
 

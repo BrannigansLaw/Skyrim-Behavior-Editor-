@@ -333,7 +333,6 @@ void StateUI::addEnterEvent(){
         enterEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
         if (!enterEvents){
             enterEvents = new hkbStateMachineEventPropertyArray(bsData->getParentFile(), -1);
-            bsData->getParentFile()->addObjectToFile(enterEvents, -1);
             bsData->enterNotifyEvents = HkxSharedPtr(enterEvents);
         }
         enterEvents->addEvent();
@@ -371,7 +370,6 @@ void StateUI::addExitEvent(){
         exitEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
         if (!exitEvents){
             exitEvents = new hkbStateMachineEventPropertyArray(bsData->getParentFile(), -1);
-            bsData->getParentFile()->addObjectToFile(exitEvents, -1);
             bsData->exitNotifyEvents = HkxSharedPtr(exitEvents);
         }
         exitEvents->addEvent();
@@ -409,7 +407,6 @@ void StateUI::addTransition(){
         trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
         if (!trans){
             trans = new hkbStateMachineTransitionInfoArray(bsData->getParentFile(), bsData->getParentStateMachine(), -1);
-            bsData->getParentFile()->addObjectToFile(trans, -1);
             bsData->transitions = HkxSharedPtr(trans);
         }
         trans->addTransition();
@@ -521,22 +518,19 @@ void StateUI::setGenerator(int index, const QString & name){
         if (behaviorView){
             gen = static_cast<hkbStateMachine *>(bsData->getParentStateMachine());
             ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
-            if (ptr && name != ptr->getName()){
-                CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"));
-            }else if (!gen){
-                CRITICAL_ERROR_MESSAGE(QString("The currently loaded 'hkbStateMachineStateInfo' has no parent 'hkbStateMachine'!!!"));
-            }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), (DataIconManager *)bsData->generator.data(), ptr, false)){
-                WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+            if (ptr){
+                if (name != ptr->getName()){
+                    CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"));
+                }else if (!gen){
+                    CRITICAL_ERROR_MESSAGE(QString("The currently loaded 'hkbStateMachineStateInfo' has no parent 'hkbStateMachine'!!!"));
+                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), (DataIconManager *)bsData->generator.data(), ptr, false)){
+                    WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+                }
             }else{
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData((DataIconManager *)bsData->generator.data()), stateIndex);
                 }else{
                     CRITICAL_ERROR_MESSAGE(QString("StateUI::setGenerator(): The selected icon is NULL!!"));
-                }
-                if (bsData->parentSM.data()){
-                    static_cast<hkbStateMachine *>(bsData->parentSM.data())->removeObjectAt(stateIndex);
-                }else{
-                    CRITICAL_ERROR_MESSAGE(QString("StateUI::setGenerator(): The state is orphaned!!"));
                 }
                 behaviorView->removeGeneratorData();
                 table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);

@@ -21,6 +21,7 @@ public:
     QString getRootBehaviorPath() const;
     QString getRigName() const;
     QStringList getRigBoneNames() const;
+    int getNumberOfBones(bool ragdoll = false) const;
     QString getRagdollName() const;
     QStringList getRagdollBoneNames() const;
     QStringList getAnimationNames() const;

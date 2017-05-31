@@ -50,7 +50,7 @@ BehaviorGraphUI::BehaviorGraphUI()
     setLayout(topLyt);
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
     connect(variableMode, SIGNAL(activated(int)), this, SLOT(setVariableMode(int)), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
 }
 
 void BehaviorGraphUI::loadData(HkxObject *data){
@@ -145,12 +145,12 @@ void BehaviorGraphUI::setBehaviorView(BehaviorGraphView *view){
     behaviorView = view;
 }
 
-void BehaviorGraphUI::connectToTableWidgets(GenericTableWidget *generators){
+void BehaviorGraphUI::connectToTables(GenericTableWidget *generators){
     if (generators){
         disconnect(generators, SIGNAL(elementSelected(int,QString)), 0, 0);
         connect(generators, SIGNAL(elementSelected(int,QString)), this, SLOT(setRootGenerator(int,QString)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewGenerators(int)), generators, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BehaviorGraphUI::connectToTableWidgets(): The argument is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("BehaviorGraphUI::connectToTables(): The argument is NULL!!"));
     }
 }

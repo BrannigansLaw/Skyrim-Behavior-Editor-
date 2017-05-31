@@ -17,7 +17,7 @@ class BoneWeightArrayUI: public QGroupBox
     Q_OBJECT
 public:
     BoneWeightArrayUI();
-    virtual ~BoneWeightArrayUI();
+    virtual ~BoneWeightArrayUI(){}
     void loadData(HkxObject *data, bool isRagdoll = false);
 signals:
     void returnToParent();

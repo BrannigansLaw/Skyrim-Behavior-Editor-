@@ -126,6 +126,13 @@ QStringList BehaviorFile::getRigBoneNames() const{
     return QStringList();
 }
 
+int BehaviorFile::getNumberOfBones(bool ragdoll) const{
+    if (character){
+        return character->getNumberOfBones(ragdoll);
+    }
+    return -1;
+}
+
 QStringList BehaviorFile::getRagdollBoneNames() const{
     if (character){
         return character->getRagdollBoneNames();

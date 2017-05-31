@@ -105,6 +105,21 @@ int hkbVariableBindingSet::getVariableIndexOfBinding(const QString & path) const
     return -1;
 }
 
+hkbVariableBindingSet::hkBinding::BindingType hkbVariableBindingSet::getBindingType(int index) const{
+    if (index < bindings.size() && index >= 0){
+        return bindings.at(index).bindingType;
+    }
+}
+
+hkbVariableBindingSet::hkBinding::BindingType hkbVariableBindingSet::getBindingType(const QString & path) const{
+    for (int i = 0; i < bindings.size(); i++){
+        if (bindings.at(i).memberPath == path){
+            return bindings.at(i).bindingType;
+        }
+    }
+    return hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE;
+}
+
 bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);

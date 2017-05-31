@@ -142,12 +142,12 @@ StateMachineUI::StateMachineUI()
     table->setCellWidget(SELF_TRANSITION_MODE_ROW, VALUE_COLUMN, selfTransitionMode);
     table->setItem(ADD_STATE_ROW, NAME_COLUMN, new TableWidgetItem("Add State With Generator", Qt::AlignCenter, QColor(Qt::green), QBrush(Qt::black), "Double click to add a new state with a generator of the type specified in the adjacent combo box"));
     table->setCellWidget(ADD_STATE_ROW, TYPE_COLUMN, typeSelectorCB);
-    table->setItem(ADD_STATE_ROW, BINDING_COLUMN, new TableWidgetItem("Remove Selected State", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black)));
-    table->setItem(ADD_STATE_ROW, VALUE_COLUMN, new TableWidgetItem("Edit Selected State", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black)));
+    table->setItem(ADD_STATE_ROW, BINDING_COLUMN, new TableWidgetItem("Remove Selected State", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black), "Double click to remove the selected state"));
+    table->setItem(ADD_STATE_ROW, VALUE_COLUMN, new TableWidgetItem("Edit Selected State", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black), "Double click to edit the selected state"));
     table->setItem(INITIAL_ADD_TRANSITION_ROW, NAME_COLUMN, new TableWidgetItem("Add Transition", Qt::AlignCenter, QColor(Qt::green), QBrush(Qt::black), "Double click to add a new transition"));
     table->setItem(INITIAL_ADD_TRANSITION_ROW, TYPE_COLUMN, new TableWidgetItem("hkbStateMachineTransitionInfoArray", Qt::AlignCenter, QColor(Qt::gray)));
-    table->setItem(INITIAL_ADD_TRANSITION_ROW, BINDING_COLUMN, new TableWidgetItem("Remove Selected Transition", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black)));
-    table->setItem(INITIAL_ADD_TRANSITION_ROW, VALUE_COLUMN, new TableWidgetItem("Edit Selected Transition", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black)));
+    table->setItem(INITIAL_ADD_TRANSITION_ROW, BINDING_COLUMN, new TableWidgetItem("Remove Selected Transition", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black), "Double click to remove the selected transition"));
+    table->setItem(INITIAL_ADD_TRANSITION_ROW, VALUE_COLUMN, new TableWidgetItem("Edit Selected Transition", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black), "Double click to edit the selected transition"));
     topLyt->addWidget(table, 1, 0, 8, 3);
     groupBox->setLayout(topLyt);
     //Order here must correspond with the ACTIVE_WIDGET Enumerated type!!!
@@ -227,9 +227,9 @@ void StateMachineUI::loadData(HkxObject *data){
         startStateId->setCurrentIndex(startStateId->findText(bsData->getStateName(bsData->startStateId), Qt::MatchCaseSensitive));
         varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
         if (varBind){
-            loadBinding(START_STATE_ID_ROW, BINDING_COLUMN, varBind, BINDING_ITEM_LABEL+"startStateId");
-            loadBinding(SYNC_VARIABLE_INDEX_ROW, BINDING_COLUMN, varBind, BINDING_ITEM_LABEL+"syncVariableIndex");
-            loadBinding(WRAP_AROUND_STATE_ID_ROW, BINDING_COLUMN, varBind, BINDING_ITEM_LABEL+"wrapAroundStateId");
+            loadBinding(START_STATE_ID_ROW, BINDING_COLUMN, varBind, "startStateId");
+            loadBinding(SYNC_VARIABLE_INDEX_ROW, BINDING_COLUMN, varBind, "syncVariableIndex");
+            loadBinding(WRAP_AROUND_STATE_ID_ROW, BINDING_COLUMN, varBind, "wrapAroundStateId");
         }else{
             table->item(START_STATE_ID_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             table->item(SYNC_VARIABLE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
@@ -262,7 +262,7 @@ void StateMachineUI::loadData(HkxObject *data){
 }
 
 void StateMachineUI::loadDynamicTableRows(){
-    table->setSortingEnabled(false);
+    //table->setSortingEnabled(false);//Not sure...
     if (bsData){
         int temp = ADD_STATE_ROW + bsData->getNumberOfStates() + 1 - transitionsButtonRow;
         if (temp > 0){
@@ -298,7 +298,7 @@ void StateMachineUI::loadDynamicTableRows(){
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadDynamicTableRows(): The data is NULL!!"));
     }
-    table->setSortingEnabled(true);
+    //table->setSortingEnabled(true);
 }
 
 void StateMachineUI::setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2){
@@ -440,9 +440,8 @@ bool StateMachineUI::setBinding(int index, int row, const QString & variableName
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
-                bsData->getParentFile()->addObjectToFile(varBind, -1);
             }
-            if (type == VARIABLE_TYPE_POINTER || isProperty){
+            if (isProperty){
                 varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY);
             }else{
                 varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
@@ -818,7 +817,6 @@ void StateMachineUI::addTransition(){
         trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->wildcardTransitions.data());
         if (!trans){
             trans = new hkbStateMachineTransitionInfoArray(bsData->getParentFile(), bsData, -1);
-            bsData->getParentFile()->addObjectToFile(trans, -1);
             bsData->wildcardTransitions = HkxSharedPtr(trans);
         }
         trans->addTransition();
@@ -839,7 +837,7 @@ void StateMachineUI::returnToWidget(){
     setCurrentIndex(MAIN_WIDGET);
 }
 
-void StateMachineUI::connectToTableWidgets(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events){
+void StateMachineUI::connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events){
     if (generators && variables && events && properties){
         disconnect(events, SIGNAL(elementSelected(int,QString)), 0, 0);
         disconnect(variables, SIGNAL(elementSelected(int,QString)), 0, 0);
@@ -854,7 +852,7 @@ void StateMachineUI::connectToTableWidgets(GenericTableWidget *generators, Gener
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::connectToTableWidgets(): One or more arguments are NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -909,7 +907,11 @@ void StateMachineUI::loadBinding(int row, int colunm, hkbVariableBindingSet *var
             int index = varBind->getVariableIndexOfBinding(path);
             QString varName;
             if (index != -1){
-                varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
+                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index);
+                }else{
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
+                }
                 if (varName == ""){
                     varName = "NONE";
                 }

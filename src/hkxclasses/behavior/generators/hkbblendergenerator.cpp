@@ -5,13 +5,10 @@
 /*
  * CLASS: hkbBlenderGenerator
 */
-
+//{FLAG_SYNC=1, FLAG_SMOOTH_GENERATOR_WEIGHTS=4, FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS=8, FLAG_PARAMETRIC_BLEND=16, FLAG_IS_PARAMETRIC_BLEND_CYCLIC=32, FLAG_FORCE_DENSE_POSE=64};
 uint hkbBlenderGenerator::refCount = 0;
 
 QString hkbBlenderGenerator::classname = "hkbBlenderGenerator";
-
-//QStringList hkbBlenderGenerator::Flags = {"0", "FLAG_SYNC", "FLAG_SMOOTH_GENERATOR_WEIGHTS", "FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS", "FLAG_PARAMETRIC_BLEND", "FLAG_IS_PARAMETRIC_BLEND_CYCLIC", "FLAG_FORCE_DENSE_POSE"};
-QStringList hkbBlenderGenerator::Flags = {"0", "1", "2", "8", "16", "32", "64"};
 
 hkbBlenderGenerator::hkbBlenderGenerator(HkxFile *parent, long ref)
     : hkbGenerator(parent, ref),
@@ -21,7 +18,7 @@ hkbBlenderGenerator::hkbBlenderGenerator(HkxFile *parent, long ref)
       minCyclicBlendParameter(0),
       maxCyclicBlendParameter(0),
       indexOfSyncMasterChild(-1),
-      flags(Flags.first()),
+      flags("0"),
       subtractLastChild(false)
 {
     setType(HKB_BLENDER_GENERATOR, TYPE_GENERATOR);
@@ -304,16 +301,10 @@ bool hkbBlenderGenerator::evaulateDataValidity(){
             valid = false;
         }
     }
-    QStringList list = flags.split('|');
-    for (int i = 0; i < list.size(); i++){
-        if (!Flags.contains(list.at(i))){
-            valid = false;
-        }
-    }
     if (!HkDynamicObject::evaulateDataValidity()){
         return false;
-    }else if (!Flags.contains(flags)){
     }else if (name == ""){
+    }else if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){
     }else if (children.isEmpty()){
     }else if (valid){
         setDataValidity(true);

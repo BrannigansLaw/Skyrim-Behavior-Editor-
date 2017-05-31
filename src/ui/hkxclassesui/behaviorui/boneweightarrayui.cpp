@@ -21,20 +21,22 @@ BoneWeightArrayUI::BoneWeightArrayUI()
       label(new QLabel("Selected Bone Weight:"))
 {
     setTitle("hkbBoneWeightArray");
+    bones->setSelectionBehavior(QAbstractItemView::SelectRows);
     bones->setColumnCount(2);
     bones->setHorizontalHeaderLabels(headerLabels);
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(bones, 1, 0, 8, 3);
-    topLyt->addWidget(label, 10, 1, 1, 1);
-    topLyt->addWidget(selectedBone, 10, 2, 1, 1);
+    topLyt->addWidget(label, 10, 0, 2, 1);
+    topLyt->addWidget(selectedBone, 10, 2, 2, 1);
     setLayout(topLyt);
+    //label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    //selectedBone->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    selectedBone->setMinimum(0);
+    selectedBone->setMaximum(1);
+    selectedBone->setSingleStep(0.05);
     connect(selectedBone, SIGNAL(editingFinished()), this, SLOT(setBoneWeight()));
     connect(bones, SIGNAL(cellClicked(int,int)), this, SLOT(loadBoneWeight(int,int)));
     connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
-}
-
-BoneWeightArrayUI::~BoneWeightArrayUI(){
-    //
 }
 
 void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
@@ -62,24 +64,24 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
                 CRITICAL_ERROR_MESSAGE(QString("BoneWeightArrayUI::loadData(): Parent file type is unrecognized!!!"))
             }
         }
-        for (int i = 0; i < bsData->boneWeights.size(), i < boneNames.size(); i++){
+        for (int i = 0; i < bsData->boneWeights.size() && i < boneNames.size(); i++){
             rowCount = bones->rowCount();
             if (rowCount > i){
                 bones->setRowHidden(i, false);
                 if (bones->item(i, NAME_COLUMN)){
                     bones->item(i, NAME_COLUMN)->setText(boneNames.at(i));
                 }else{
-                    bones->setItem(i, NAME_COLUMN, new QTableWidgetItem(boneNames.at(i)));
+                    bones->setItem(i, NAME_COLUMN, new TableWidgetItem(boneNames.at(i), Qt::AlignCenter, QColor(Qt::white)));
                 }
                 if (bones->item(i, VALUE_COLUMN)){
-                    bones->item(i, VALUE_COLUMN)->setText(QString::number(bsData->boneWeights.at(i)));
+                    bones->item(i, VALUE_COLUMN)->setText(QString::number(bsData->boneWeights.at(i), char('f'), 6));
                 }else{
-                    bones->setItem(i, VALUE_COLUMN, new QTableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6)));
+                    bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
                 }
             }else{
                 bones->setRowCount(rowCount + 1);
-                bones->setItem(rowCount, NAME_COLUMN, new QTableWidgetItem(boneNames.at(i)));
-                bones->setItem(i, VALUE_COLUMN, new QTableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6)));
+                bones->setItem(rowCount, NAME_COLUMN, new TableWidgetItem(boneNames.at(i), Qt::AlignCenter, QColor(Qt::white)));
+                bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
             }
         }
         for (int j = bsData->boneWeights.size(); j < bones->rowCount(); j++){
@@ -99,7 +101,7 @@ void BoneWeightArrayUI::setBoneWeight(){
             if (bones->item(row, VALUE_COLUMN)){
                 bones->item(row, VALUE_COLUMN)->setText(QString::number(selectedBone->value(), char('f'), 6));
             }else{
-                bones->setItem(row, VALUE_COLUMN, new QTableWidgetItem(QString::number(selectedBone->value(), char('f'), 6)));
+                bones->setItem(row, VALUE_COLUMN, new TableWidgetItem(QString::number(selectedBone->value(), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
             }
         }
     }else{

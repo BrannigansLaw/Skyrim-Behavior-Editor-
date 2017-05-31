@@ -41,10 +41,9 @@ void TreeGraphicsScene::setCanDeleteRoot(bool value){
 }*/
 
 void TreeGraphicsScene::selectIcon(TreeGraphicsItem *icon, bool expand){
-    TreeGraphicsItem *lastSelectedIcon = selectedIcon;
     QList <TreeGraphicsItem *> branch;
-    if (lastSelectedIcon){
-        lastSelectedIcon->unselect();
+    if (selectedIcon){
+        selectedIcon->unselect();
     }
     selectedIcon = icon;
     if (selectedIcon){
@@ -56,7 +55,6 @@ void TreeGraphicsScene::selectIcon(TreeGraphicsItem *icon, bool expand){
                 expandBranch(selectedIcon);
             }
             if (!selectedIcon->isPrimaryIcon()){
-                lastSelectedIcon = selectedIcon;
                 selectedIcon = selectedIcon->getPrimaryIcon();
                 if (!selectedIcon->isVisible()){
                     branch = selectedIcon->getAllIconsInBranch();
@@ -218,7 +216,7 @@ bool TreeGraphicsScene::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconM
             if (iconToReplace){
                 removeItemFromGraph(iconToReplace, oldIconParent->itemData->getIndexOfObj(dataToReplace), removeData);
             }
-            if (replacementIcon){//Fix bugs 19, 20 here?
+            if (replacementIcon){
                 oldParent = replacementIcon->setParent(oldIconParent, index);
                 addItemToGraph(oldParent, replacementData, oldIconParent->itemData->getIndexOfObj(replacementData));
                 oldIconParent->itemData->insertObjectAt(oldIconParent->itemData->getIndexOfObj(dataToReplace), replacementData);
@@ -226,7 +224,9 @@ bool TreeGraphicsScene::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconM
                 addItemToGraph(oldIconParent, replacementData, oldIconParent->itemData->getIndexOfObj(dataToReplace));
             }
             if (indexOfReplacementData > indexOfOldData){
-                oldIconParent->reorderChildren();
+                if (!oldIconParent->reorderChildren()){
+                    return false;
+                }
             }
             return true;
         }
@@ -287,7 +287,9 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
                 itemToDeleteParent->reposition();
             }else if (removeData){
                 itemToDeleteParent->itemData->removeObjectAt(indexToRemove);
-                itemToDeleteParent->reorderChildren();
+                if (!itemToDeleteParent->reorderChildren()){
+                    return false;
+                }
             }
         }else if (canDeleteRoot){  //Icon with no parent must be the root...
             delete item;

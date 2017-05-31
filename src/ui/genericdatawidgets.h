@@ -19,6 +19,7 @@
 #include <QCheckBox>
 #include <QHeaderView>
 #include <QSizePolicy>
+#include <QLabel>
 
 class Validator: public QValidator
 {
@@ -83,6 +84,9 @@ public slots:
         if (disableButton){
             pushButton->setEnabled(checked);
         }
+        disconnect(checkBox, SIGNAL(clicked(bool)), this, SLOT(setChecked(bool)));
+        checkBox->setChecked(checked);
+        connect(checkBox, SIGNAL(clicked(bool)), this, SLOT(setChecked(bool)));
         emit enabled(checked);
     }
 private:

@@ -10,6 +10,7 @@ class BehaviorFile;
 class hkaSkeleton: public HkxObject
 {
     friend class SkeletonUI;
+    friend class SkeletonFile;
 public:
     hkaSkeleton(HkxFile *parent, long ref = 0);
     virtual ~hkaSkeleton();

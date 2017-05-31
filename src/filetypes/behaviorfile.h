@@ -48,6 +48,7 @@ public:
     QStringList getAllReferencedBehaviorFilePaths() const;
     QStringList getRagdollBoneNames() const;
     QStringList getRigBoneNames() const;
+    int getNumberOfBones(bool ragdoll = false) const;
     int addCharacterProperty(int index);
     QString getVariableNameAt(int index) const;
     QString getEventNameAt(int index) const;
