@@ -160,8 +160,8 @@ bool hkbHandIkDriverInfo::write(HkxXMLWriter *writer){
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("backHandNormalLS"), hands[i].backHandNormalLS.getValueAsString());
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("handOffsetLS"), hands[i].handOffsetLS.getValueAsString());
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("handOrienationOffsetLS"), hands[i].handOrienationOffsetLS.getValueAsString());
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxElbowAngleDegrees"), QString::number(hands.at(i).maxElbowAngleDegrees));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minElbowAngleDegrees"), QString::number(hands.at(i).minElbowAngleDegrees));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxElbowAngleDegrees"), QString::number(hands.at(i).maxElbowAngleDegrees, char('f'), 6));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minElbowAngleDegrees"), QString::number(hands.at(i).minElbowAngleDegrees, char('f'), 6));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("shoulderIndex"), QString::number(hands.at(i).shoulderIndex));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("shoulderSiblingIndex"), QString::number(hands.at(i).shoulderSiblingIndex));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("elbowIndex"), QString::number(hands.at(i).elbowIndex));

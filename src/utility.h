@@ -15,6 +15,7 @@
 #define VIEW_MODIFIERS_TABLE_TIP "Double click to view the table of modifiers"
 #define VIEW_EVENTS_TABLE_TIP "Double click to view the table of events"
 #define VIEW_VARIABLES_TABLE_TIP "Double click to view the table of variables, check the box to view the table of character properties instead"
+#define DRAG_DROP_N_SWAP "Hold click to start drag, release click to swap dragged item with item under the mouse cursor"
 
 enum hkVariableType {
     VARIABLE_TYPE_BOOL,
@@ -47,7 +48,7 @@ struct hkQuadVariable
     }
 
     QString getValueAsString(){
-        return "("+QString::number(x)+" "+QString::number(y)+" "+QString::number(z)+" "+QString::number(w)+")";
+        return "("+QString::number(x, char('f'), 6)+" "+QString::number(y, char('f'), 6)+" "+QString::number(z, char('f'), 6)+" "+QString::number(w, char('f'), 6)+")";
     }
     qreal x;
     qreal y;

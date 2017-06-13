@@ -30,5 +30,24 @@ int main(int argc, char *argv[])
         }
     }
     CRITICAL_ERROR_MESSAGE(QString(QString::number(linecount)))*/
+
+    /*int numFiles = 100000;
+    QProgressDialog progress("Copying files...", "Abort Copy", 0, numFiles, 0);
+    progress.setWindowModality(Qt::WindowModal);
+    for (int i = 0; i < numFiles; i++) {
+        progress.setValue(i);
+        if (progress.wasCanceled())
+            break;
+    }
+    progress.setValue(numFiles);*/
+    /*QProgressDialog dialog("Opening project...", "", 0, 100);
+    dialog.setMinimumDuration(0);
+    dialog.setWindowModality(Qt::WindowModal);
+    dialog.setLabelText("Character data loaded sucessfully!!!");
+    dialog.setValue(40);
+    dialog.setLabelText("Loading skeleton data...");
+    dialog.setValue(50);
+    dialog.setLabelText("Project loaded sucessfully!!!");
+    dialog.setValue(dialog.maximum());*/
     return a.exec();
 }

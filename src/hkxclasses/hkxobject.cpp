@@ -105,12 +105,6 @@ void HkxObject::writeToLog(const QString & message, bool isError){
     }
 }
 
-void HkxObject::setProgressData(const QString & message, int value){
-    if (getParentFile()){
-        getParentFile()->setProgressData(message, value);
-    }
-}
-
 bool HkxObject::readReferences(const QByteArray &line, QList <HkxSharedPtr> & children){
     int size = 0;
     int start;

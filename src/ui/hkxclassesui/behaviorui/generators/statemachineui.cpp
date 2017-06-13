@@ -326,10 +326,12 @@ void StateMachineUI::setRowItems(int row, const QString & name, const QString & 
 
 void StateMachineUI::setName(){
     if (bsData){
-        bsData->name = name->text();
-        ((DataIconManager *)(bsData))->updateIconNames();
-        bsData->getParentFile()->toggleChanged(true);
-        emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
+        if (bsData->name != name->text()){
+            bsData->name = name->text();
+            static_cast<DataIconManager*>((bsData))->updateIconNames();
+            bsData->getParentFile()->toggleChanged(true);
+            emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setName(): The data is NULL!!"));
     }
@@ -442,9 +444,13 @@ bool StateMachineUI::setBinding(int index, int row, const QString & variableName
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY);
+                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                }
             }else{
-                varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
+                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
@@ -709,10 +715,13 @@ void StateMachineUI::generatorTableElementSelected(int index, const QString &nam
 }
 
 void StateMachineUI::generatorRenamed(const QString &name, int index){
-    if (name == ""){
-        WARNING_MESSAGE(QString("StateMachineUI::generatorRenamed(): The new variable name is the empty string!!"));
+    switch (currentIndex()){
+    case STATE_WIDGET:
+        stateUI->generatorRenamed(name, index);
+        break;
+    default:
+        WARNING_MESSAGE(QString("StateMachineUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!"));;
     }
-    stateUI->generatorRenamed(name, index);
 }
 
 void StateMachineUI::addStateWithGenerator(){
@@ -908,7 +917,8 @@ void StateMachineUI::loadBinding(int row, int colunm, hkbVariableBindingSet *var
             QString varName;
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index);
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
+                    table->item(row, colunm)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }

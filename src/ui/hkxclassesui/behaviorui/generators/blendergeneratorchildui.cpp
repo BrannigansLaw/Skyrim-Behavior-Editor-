@@ -10,14 +10,9 @@
 #include "src/ui/behaviorgraphview.h"
 #include "src/ui/treegraphicsitem.h"
 
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QMessageBox>
-
 #include "src/ui/genericdatawidgets.h"
 #include <QStackedLayout>
 #include <QHeaderView>
-#include <QSpinBox>
 #include <QGroupBox>
 
 #define BASE_NUMBER_OF_ROWS 4
@@ -133,10 +128,10 @@ void BlenderGeneratorChildUI::loadData(HkxObject *data, int childindex){
                 table->item(WORLD_FROM_MODEL_WEIGHT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)))
+            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::loadData(): The data passed to the UI is NULL!!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::loadData(): The data passed to the UI is NULL!!!"));
     }
     connectSignals();
 }
@@ -148,7 +143,8 @@ void BlenderGeneratorChildUI::loadBinding(int row, int colunm, hkbVariableBindin
             QString varName;
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index);
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
+                    table->item(row, colunm)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -174,23 +170,27 @@ void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
             ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
             if (ptr){
                 if (name != ptr->getName()){
-                    CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"))
+                    CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"));
+                    return;
                 }else if (!gen){
-                    CRITICAL_ERROR_MESSAGE(QString("The currently loaded 'hkbBlenderGeneratorChild' has no parent 'hkbBlenderGenerator' or 'hkbPoseMatchingGenerator'!!!"))
-                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), (DataIconManager *)bsData->generator.data(), ptr, false)){
-                    WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"))
+                    CRITICAL_ERROR_MESSAGE(QString("The currently loaded 'hkbBlenderGeneratorChild' has no parent 'hkbBlenderGenerator' or 'hkbPoseMatchingGenerator'!!!"));
+                    return;
+                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generator.data()), ptr, false)){
+                    WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+                    return;
                 }
             }else{
                 if (behaviorView->getSelectedItem()){
-                    behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData((DataIconManager *)bsData->generator.data()), childIndex);
+                    behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->generator.data())), childIndex);
                 }else{
-                    CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setGenerator(): The selected icon is NULL!!"));
+                    CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setGenerator(): The selected icon is NULL!!"));;
+                    return;
                 }
-                behaviorView->removeGeneratorData();
-                table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-                bsData->getParentFile()->toggleChanged(true);
-                emit returnToParent(true);
             }
+            behaviorView->removeGeneratorData();
+            table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
+            bsData->getParentFile()->toggleChanged(true);
+            emit returnToParent(true);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setGenerator(): The 'behaviorView' pointer is NULL!!"))
         }
@@ -293,7 +293,7 @@ void BlenderGeneratorChildUI::toggleBoneWeights(bool enable){
             bsData->boneWeights = HkxSharedPtr();
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
         }else if (enable && !bsData->boneWeights.data()){
-            bsData->boneWeights = HkxSharedPtr(new hkbBoneWeightArray(bsData->getParentFile(), static_cast<BehaviorFile *>(bsData->getParentFile())->getNumberOfBones()));
+            bsData->boneWeights = HkxSharedPtr(new hkbBoneWeightArray(bsData->getParentFile(), -1, static_cast<BehaviorFile *>(bsData->getParentFile())->getNumberOfBones()));
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::toggleBoneWeights(): The data is NULL!!"));
@@ -358,7 +358,7 @@ void BlenderGeneratorChildUI::returnToWidget(){
 
 void BlenderGeneratorChildUI::variableRenamed(const QString & name, int index){
     if (bsData){
-        index--;
+        //index--;
         hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
         if (bind){
             int bindIndex = bind->getVariableIndexOfBinding("boneWeights");
@@ -381,7 +381,7 @@ void BlenderGeneratorChildUI::variableRenamed(const QString & name, int index){
 
 void BlenderGeneratorChildUI::generatorRenamed(const QString &name, int index){
     if (bsData){
-        index--;
+        //index--;
         if (index == static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator)){
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
         }

@@ -16,7 +16,13 @@ QStringList hkbTwistModifier::RotationAxisCoordinates = {"ROTATION_AXIS_IN_MODEL
 hkbTwistModifier::hkbTwistModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
       userData(0),
-      enable(true)
+      enable(true),
+      twistAngle(0),
+      startBoneIndex(-1),
+      endBoneIndex(-1),
+      setAngleMethod(SetAngleMethod.first()),
+      rotationAxisCoordinates(RotationAxisCoordinates.first()),
+      isAdditive(true)
 {
     setType(HKB_TWIST_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
@@ -115,7 +121,7 @@ bool hkbTwistModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("axisOfRotation"), axisOfRotation.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("twistAngle"), QString::number(twistAngle));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("twistAngle"), QString::number(twistAngle, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("startBoneIndex"), QString::number(startBoneIndex));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("endBoneIndex"), QString::number(endBoneIndex));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("setAngleMethod"), setAngleMethod);

@@ -137,11 +137,11 @@ bool hkbPoweredRagdollControlsModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("controlData"), "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxForce"), QString::number(maxForce));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("tau"), QString::number(tau));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("damping"), QString::number(damping));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("proportionalRecoveryVelocity"), QString::number(proportionalRecoveryVelocity));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("constantRecoveryVelocity"), QString::number(constantRecoveryVelocity));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxForce"), QString::number(maxForce, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("tau"), QString::number(tau, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("damping"), QString::number(damping, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("proportionalRecoveryVelocity"), QString::number(proportionalRecoveryVelocity, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("constantRecoveryVelocity"), QString::number(constantRecoveryVelocity, char('f'), 6));
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
         if (bones.data()){

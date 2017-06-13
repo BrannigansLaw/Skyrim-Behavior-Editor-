@@ -30,7 +30,8 @@ protected:
 private:
     qreal getYCoordinate();
     void reposition();
-    bool isDescendant(TreeGraphicsItem *icon) const;
+    bool isDataDescendant(TreeGraphicsItem *icon) const;
+    bool isDataDescendant(DataIconManager *data) const;
     bool isPrimaryIcon() const;
     TreeGraphicsItem * getPrimaryIcon() const;
     TreeGraphicsItem * setParent(TreeGraphicsItem *newParent, int indexToInsert = -1);

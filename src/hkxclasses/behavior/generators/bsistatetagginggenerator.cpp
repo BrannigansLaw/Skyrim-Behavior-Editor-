@@ -58,7 +58,7 @@ bool BSiStateTaggingGenerator::hasChildren() const{
 QList<DataIconManager *> BSiStateTaggingGenerator::getChildren() const{
     QList<DataIconManager *> list;
     if (pDefaultGenerator.data()){
-        list.append((DataIconManager *)pDefaultGenerator.data());
+        list.append(static_cast<DataIconManager*>(pDefaultGenerator.data()));
     }
     return list;
 }

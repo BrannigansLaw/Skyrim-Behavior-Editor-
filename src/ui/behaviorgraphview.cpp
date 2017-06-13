@@ -352,7 +352,7 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     connect(removeObjBranchAct, SIGNAL(triggered()), this, SLOT(deleteSelectedObjectBranchSlot()));
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(popUpMenuRequested(QPoint)));
     if (ui){
-        ui->setBehaviorView(this);
+        ui->loadBehaviorView(this);
         connect(this, SIGNAL(iconSelected(TreeGraphicsItem *)), ui, SLOT(changeCurrentDataWidget(TreeGraphicsItem *)));
     }
 }
@@ -374,7 +374,7 @@ bool BehaviorGraphView::confirmationDialogue(const QString & message, QWidget *p
 
 TreeGraphicsItem * BehaviorGraphView::getSelectedIconsChildIcon(HkxObject *child){
     if (getSelectedItem()){
-        return getSelectedItem()->getChildWithData((DataIconManager *)child);
+        return getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(child));
     }
     return NULL;
 }
@@ -402,6 +402,17 @@ void BehaviorGraphView::removeOtherData(){
     behavior->removeOtherData();
 }
 
+bool BehaviorGraphView::refocus(){
+    if (getSelectedItem()){
+        resetMatrix();
+        scale(1, 1);
+        centerOn(getSelectedItem());
+        return true;
+    }else{
+        return false;
+    }
+}
+
 void BehaviorGraphView::deleteSelectedObjectBranchSlot(){
     if (getSelectedItem()){
         getSelectedItem()->unselect();
@@ -426,9 +437,15 @@ void BehaviorGraphView::append(T *obj){
         TreeGraphicsItem *newIcon = NULL;
         HkxObject *selectedItemData = ((HkxObject *)(getSelectedItem()->itemData));
         HkxSignature sig = selectedItemData->getSignature();
-        if (getSelectedItem()->itemData->hasChildren() && sig != HKB_STATE_MACHINE && sig != HKB_BLENDER_GENERATOR && sig != BS_BONE_SWITCH_GENERATOR && sig != HKB_POSE_MATCHING_GENERATOR && sig != HKB_MODIFIER_LIST){
+        if (getSelectedItem()->itemData->hasChildren() && sig != HKB_STATE_MACHINE && sig != HKB_MANUAL_SELECTOR_GENERATOR && sig != HKB_BLENDER_GENERATOR && sig != BS_BONE_SWITCH_GENERATOR && sig != HKB_POSE_MATCHING_GENERATOR && sig != HKB_MODIFIER_LIST){
             if (!confirmationDialogue("WARNING! THIS WILL REPLACE THE CURRENT GENERATOR/MODIFIER!!!\n\nARE YOU SURE YOU WANT TO DO THIS?", this)){
-                delete obj;
+                if (obj->getType() == HkxObject::TYPE_GENERATOR){
+                    behavior->removeGeneratorData();
+                }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
+                    behavior->removeModifierData();
+                }else if (obj->getType() == HkxObject::TYPE_OTHER){
+                    behavior->removeOtherData();
+                }
                 return;
             }
             if (!getSelectedItem()->childItems().isEmpty()){
@@ -465,6 +482,7 @@ void BehaviorGraphView::append(T *obj){
     }else{
         delete obj;
     }
+    removeObjects();
 }
 
 void BehaviorGraphView::appendStateMachine(){
@@ -722,7 +740,7 @@ void BehaviorGraphView::appendBSPassByTargetTriggerModifier(){
 template <typename T>
 void BehaviorGraphView::wrap(T *obj){
     if (getSelectedItem() && ((TreeGraphicsItem *)getSelectedItem()->parentItem()) && ((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData){
-        TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), (DataIconManager *)(obj), -1, true);
+        TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), static_cast<DataIconManager*>((obj)), -1, true);
         behavior->changed = true;
         getSelectedItem()->reposition();
         treeScene->selectIcon(newIcon, false);
@@ -851,5 +869,5 @@ void BehaviorGraphView::popUpMenuRequested(const QPoint &pos){
 }
 
 BehaviorGraphView::~BehaviorGraphView(){
-    ui->setBehaviorView(NULL);
+    ui->loadBehaviorView(NULL);
 }

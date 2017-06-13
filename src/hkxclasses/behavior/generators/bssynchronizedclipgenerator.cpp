@@ -62,7 +62,7 @@ bool BSSynchronizedClipGenerator::hasChildren() const{
 QList<DataIconManager *> BSSynchronizedClipGenerator::getChildren() const{
     QList<DataIconManager *> list;
     if (pClipGenerator.data()){
-        list.append((DataIconManager *)pClipGenerator.data());
+        list.append(static_cast<DataIconManager*>(pClipGenerator.data()));
     }
     return list;
 }
@@ -167,8 +167,8 @@ bool BSSynchronizedClipGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pClipGenerator"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("SyncAnimPrefix"), SyncAnimPrefix);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bSyncClipIgnoreMarkPlacement"), getBoolAsString(bSyncClipIgnoreMarkPlacement));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fGetToMarkTime"), QString::number(fGetToMarkTime));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fMarkErrorThreshold"), QString::number(fMarkErrorThreshold));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fGetToMarkTime"), QString::number(fGetToMarkTime, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fMarkErrorThreshold"), QString::number(fMarkErrorThreshold, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bLeadCharacter"), getBoolAsString(bLeadCharacter));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bReorientSupportChar"), getBoolAsString(bReorientSupportChar));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bApplyMotionFromRoot"), getBoolAsString(bApplyMotionFromRoot));

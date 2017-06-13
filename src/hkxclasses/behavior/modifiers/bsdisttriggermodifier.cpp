@@ -103,8 +103,8 @@ bool BSDistTriggerModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("targetPosition"), targetPosition.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("distance"), QString::number(distance));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("distanceTrigger"), QString::number(distanceTrigger));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("distance"), QString::number(distance, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("distanceTrigger"), QString::number(distanceTrigger, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("triggerEvent"), "");
         writer->writeLine(writer->object, true);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(triggerEvent.id));

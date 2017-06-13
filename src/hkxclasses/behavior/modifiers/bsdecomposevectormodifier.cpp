@@ -106,10 +106,10 @@ bool BSDecomposeVectorModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("vector"), vector.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("x"), QString::number(x));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("y"), QString::number(y));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("z"), QString::number(z));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("w"), QString::number(w));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("x"), QString::number(x, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("y"), QString::number(y, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("z"), QString::number(z, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("w"), QString::number(w, char('f'), 6));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");

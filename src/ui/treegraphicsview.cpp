@@ -9,7 +9,7 @@ TreeGraphicsView::TreeGraphicsView(QMenu *menu)
     : popUpMenu(menu),
       treeScene(new TreeGraphicsScene()),
       minScale(0.001),
-      maxScale(4),
+      maxScale(0.5),
       initScale(1),
       iconFocusScale(1.5),
       currentScale(1),
@@ -57,11 +57,13 @@ void TreeGraphicsView::mouseReleaseEvent(QMouseEvent *event){
 }
 
 void TreeGraphicsView::contractAllBranches(){
+    treeScene->rootIcon->setIsExpanded(false);
     treeScene->contractBranch(treeScene->rootIcon, true);
 }
 
 void TreeGraphicsView::expandAllBranches(){
     treeScene->expandBranch(treeScene->rootIcon, true);
+    treeScene->rootIcon->reposition();
 }
 
 void TreeGraphicsView::selectRoot(){

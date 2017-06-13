@@ -38,6 +38,8 @@ class BehaviorGraphView: public TreeGraphicsView
     friend class TransitionsUI;
     friend class TreeGraphicsItem;
     friend class BlenderGeneratorUI;
+    friend class BSBoneSwitchGeneratorUI;
+    friend class BSBoneSwitchGeneratorBoneDataUI;
 
     friend class MainWindow;
 public:
@@ -48,6 +50,7 @@ public:
     void removeGeneratorData();
     void removeModifierData();
     void removeOtherData();
+    bool refocus();
 signals:
     void addedGenerator(const QString & name, const QString & type);
     void addedModifier(const QString & name, const QString & type);

@@ -39,7 +39,9 @@ QString hkbBehaviorGraphData::getClassname(){
 int hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name, bool isProperty){
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
-    if (name != "" && (isProperty || !strData->variableNames.contains(name))){
+    int index = -1;
+    bool varAdded = false;
+    if (name != "" /* && (isProperty || !strData->variableNames.contains(name))*/){
         hkVariableInfo varInfo;
         switch (type){
         case VARIABLE_TYPE_BOOL:
@@ -59,36 +61,43 @@ int hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name,
             break;
         case VARIABLE_TYPE_POINTER:
             varInfo.type = "VARIABLE_TYPE_POINTER";
-            varData->variantVariableValues.append(HkxSharedPtr());
             break;
         case VARIABLE_TYPE_VECTOR4:
             varInfo.type = "VARIABLE_TYPE_VECTOR4";
-            varData->quadVariableValues.append(hkQuadVariable());
             break;
         case VARIABLE_TYPE_QUATERNION:
             varInfo.type = "VARIABLE_TYPE_QUATERNION";
-            varData->quadVariableValues.append(hkQuadVariable());
             break;
         default:
             return -2;
         }
         if (isProperty){
-            if (!strData->characterPropertyNames.contains(name)){
+            index = strData->characterPropertyNames.indexOf(name);
+            if (index == -1){
                 strData->characterPropertyNames.append(name);
                 characterPropertyInfos.append(varInfo);
-                return strData->characterPropertyNames.size() - 1;
-            }else{
-                return -1;
+                index = strData->characterPropertyNames.size() - 1;
+                varAdded = true;
             }
         }else{
-            strData->variableNames.append(name);
-            variableInfos.append(varInfo);
-            varData->wordVariableValues.append(0);
-            return strData->variableNames.size() - 1;
+            index = strData->variableNames.indexOf(name);
+            if (index == -1){
+                strData->variableNames.append(name);
+                variableInfos.append(varInfo);
+                varData->wordVariableValues.append(0);
+                index = strData->variableNames.size() - 1;
+                varAdded = true;
+            }
         }
-    }else{
-        return -1;
+        if (varAdded){
+            if (type > VARIABLE_TYPE_POINTER){
+                varData->quadVariableValues.append(hkQuadVariable());
+            }else if (type == VARIABLE_TYPE_POINTER){
+                varData->variantVariableValues.append(HkxSharedPtr());
+            }
+        }
     }
+    return index;
 }
 
 void hkbBehaviorGraphData::addVariable(hkVariableType type){
@@ -352,6 +361,16 @@ hkVariableType hkbBehaviorGraphData::getCharacterPropertyTypeAt(int index) const
         }
     }
     return VARIABLE_TYPE_INT8;
+}
+
+QString hkbBehaviorGraphData::getCharacterPropertyNameAt(int index) const{
+    hkbBehaviorGraphStringData *strdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    if (strdata){
+        if (strdata->characterPropertyNames.size() > index && index > -1){
+            return strdata->characterPropertyNames.at(index);
+        }
+    }
+    return "";
 }
 
 bool hkbBehaviorGraphData::readData(const HkxXmlReader &reader, long index){

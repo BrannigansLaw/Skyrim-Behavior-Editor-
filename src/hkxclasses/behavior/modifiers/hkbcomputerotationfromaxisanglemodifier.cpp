@@ -94,7 +94,7 @@ bool hkbComputeRotationFromAxisAngleModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("rotationOut"), rotationOut.getValueAsString());
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("axis"), axis.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("angleDegrees"), QString::number(angleDegrees));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("angleDegrees"), QString::number(angleDegrees, char('f'), 6));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");

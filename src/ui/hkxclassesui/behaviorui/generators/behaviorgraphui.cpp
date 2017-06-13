@@ -79,9 +79,11 @@ void BehaviorGraphUI::loadData(HkxObject *data){
 
 void BehaviorGraphUI::setName(){
     if (bsData){
-        bsData->name = name->text();//Make sure name is valid...
-        ((DataIconManager *)(bsData))->updateIconNames();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->name != name->text()){
+            bsData->name = name->text();//Make sure name is valid...
+            static_cast<DataIconManager*>((bsData))->updateIconNames();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BehaviorGraphUI::setName(): The data is NULL!!"));
     }
@@ -113,26 +115,31 @@ void BehaviorGraphUI::viewSelectedChild(int row, int column){
 void BehaviorGraphUI::setRootGenerator(int index, const QString &name){
     DataIconManager *ptr = NULL;
     if (bsData){
+        int indexOfGenerator = bsData->getIndexOfObj(static_cast<DataIconManager*>(bsData->rootGenerator.data()));
         if (behaviorView){
             ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
             if (ptr){
                 if (name != ptr->getName()){
                     CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"));
+                    return;
                 }else if (ptr->getSignature() != HKB_STATE_MACHINE){
                     WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nThe selected object is not a hkbStateMachine!!!"));
-                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), (DataIconManager *)bsData->rootGenerator.data(), ptr, false)){
+                    return;
+                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->rootGenerator.data()), ptr, false)){
                     WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+                    return;
                 }
             }else{
                 if (behaviorView->getSelectedItem()){
-                    behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData((DataIconManager *)bsData->rootGenerator.data()), 0);
+                    behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->rootGenerator.data())), indexOfGenerator);
                 }else{
                     CRITICAL_ERROR_MESSAGE(QString("BehaviorGraphUI::setGenerator(): The selected icon is NULL!!"));
+                    return;
                 }
-                behaviorView->removeGeneratorData();
-                table->item(ROOT_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-                bsData->getParentFile()->toggleChanged(true);
             }
+            behaviorView->removeGeneratorData();
+            table->item(ROOT_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
+            bsData->getParentFile()->toggleChanged(true);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BehaviorGraphUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));
         }

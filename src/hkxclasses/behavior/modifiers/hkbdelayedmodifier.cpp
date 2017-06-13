@@ -60,7 +60,7 @@ bool hkbDelayedModifier::hasChildren() const{
 QList<DataIconManager *> hkbDelayedModifier::getChildren() const{
     QList<DataIconManager *> list;
     if (modifier.data()){
-        list.append((DataIconManager *)modifier.data());
+        list.append(static_cast<DataIconManager*>(modifier.data()));
     }
     return list;
 }
@@ -144,9 +144,9 @@ bool hkbDelayedModifier::write(HkxXMLWriter *writer){
             refString = "null";
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("modifier"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("delaySeconds"), QString::number(delaySeconds));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("durationSeconds"), QString::number(durationSeconds));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("secondsElapsed"), QString::number(secondsElapsed));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("delaySeconds"), QString::number(delaySeconds, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("durationSeconds"), QString::number(durationSeconds, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("secondsElapsed"), QString::number(secondsElapsed, char('f'), 6));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");

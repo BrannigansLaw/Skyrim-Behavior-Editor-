@@ -26,7 +26,9 @@ class hkbStateMachine;
 class GenericTableWidget;
 class BlenderGeneratorUI;
 class BehaviorGraphUI;
-
+class BSLimbIKModifierUI;
+class BSBoneSwitchGeneratorUI;
+class BSOffsetAnimationGeneratorUI;
 
 /**
  * To add support for a new class we need to add it to the "DATA_TYPE_LOADED" enum, add it to the stacked layout in the correct order,
@@ -40,8 +42,9 @@ class HkDataUI: public QGroupBox
 public:
     HkDataUI(const QString & title);
     virtual ~HkDataUI(){}
-    BehaviorGraphView * setBehaviorView(BehaviorGraphView *view);
+    BehaviorGraphView * loadBehaviorView(BehaviorGraphView *view);
     void setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *variables);
+    void unloadDataWidget();
 public slots:
     void changeCurrentDataWidget(TreeGraphicsItem *icon);
     void modifierAdded(const QString & name, const QString & type);
@@ -68,6 +71,9 @@ private:
         STATE_MACHINE = 4,
         BLENDER_GENERATOR = 5,
         BEHAVIOR_GRAPH,
+        BS_LIMB_IK_MOD,
+        BS_BONE_SWITCH_GENERATOR,
+        BS_OFFSET_ANIMATION_GENERATOR
     };
     static QStringList generatorTypes;
     static QStringList modifierTypes;
@@ -84,12 +90,15 @@ private:
     GenericTableWidget *eventsTable;
     GenericTableWidget *characterPropertiesTable;
     QLabel *noDataL;
-    BSiStateTaggingGeneratorUI *iSTGUI;
+    BSiStateTaggingGeneratorUI *iStateTagGenUI;
     ModifierGeneratorUI *modGenUI;
     ManualSelectorGeneratorUI *manSelGenUI;
     StateMachineUI *stateMachineUI;
     BlenderGeneratorUI *blenderGeneratorUI;
     BehaviorGraphUI *behaviorGraphUI;
+    BSLimbIKModifierUI *limbIKModUI;
+    BSBoneSwitchGeneratorUI *boneSwitchUI;
+    BSOffsetAnimationGeneratorUI *offsetAnimGenUI;
 };
 
 #endif // HKDATAUI_H

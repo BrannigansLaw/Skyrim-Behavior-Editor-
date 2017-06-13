@@ -63,10 +63,27 @@ void ProjectUI::setFilePath(const QString & path){
     lastFileSelectedPath = path+"\\behaviors";
 }
 
+void ProjectUI::setDisabled(bool disable){
+    if (disable){
+        skeleton->setEnabled(false);
+        footIK->setEnabled(false);
+        handIK->setEnabled(false);
+        enableFootIKCB->setEnabled(false);
+        enableHandIKCB->setEnabled(false);
+    }else{
+        skeleton->setEnabled(true);
+        footIK->setEnabled(true);
+        handIK->setEnabled(true);
+        enableFootIKCB->setEnabled(true);
+        enableHandIKCB->setEnabled(true);
+    }
+}
+
 void ProjectUI::setProject(ProjectFile *file){
     project = file;
-    if (file){
-        fileView->setRootIndex(fileSys->setRootPath(lastFileSelectedPath));
+    if (project && project->character){
+        QString s = project->fileName().remove(project->fileName().lastIndexOf("/", -1), project->fileName().size());
+        fileView->setRootIndex(fileSys->setRootPath(project->fileName().remove(project->fileName().lastIndexOf("/", -1), project->fileName().size())+"/"+project->character->getBehaviorDirectoryName()));
     }
 }
 

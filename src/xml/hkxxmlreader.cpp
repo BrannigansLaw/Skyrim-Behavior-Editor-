@@ -16,6 +16,7 @@ HkxXmlReader::HkxXmlReader(HkxFile *file)
 }
 
 bool HkxXmlReader::parse(){
+    lineNumber = 0;
     if (!hkxXmlFile->open(QIODevice::ReadOnly)){
         isEOF = true;
         hkxXmlFile->writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" failed to open!", true);
@@ -30,7 +31,7 @@ bool HkxXmlReader::parse(){
     }
     HkxXmlParseLine result = NoError;
     while (!atEnd()){
-        //hkxXmlFile->setProgressData("Parsing XML line number "+QString::number(lineNumber), 20);
+        //hkxXmlFile->//setProgressData("Parsing XML line number "+QString::number(lineNumber), 20);
         result = readNextLine();
         if (result != NoError && result != EmptyLine && result != EmptyLineEndFile){
             hkxXmlFile->writeToLog("HkxXmlReader: parse() failed because readNextLine() failed!", true);
@@ -41,7 +42,7 @@ bool HkxXmlReader::parse(){
         hkxXmlFile->writeToLog("HkxXmlReader: parse() failed because there are orphaned element tags!!!", true);
         return false;
     }
-    hkxXmlFile->setProgressData("XML parsed successfully!", 40);
+    //hkxXmlFile->//setProgressData("XML parsed successfully!", 40);
     return true;
 }
 

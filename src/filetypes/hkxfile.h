@@ -17,7 +17,6 @@ class HkxFile: public QFile
     friend class HkxXMLWriter;
 public:
     void writeToLog(const QString & message, bool isError = false);
-    void setProgressData(const QString & message, int value);
     HkxFile(MainWindow *window, const QString & name);
     virtual ~HkxFile();
     void closeFile();

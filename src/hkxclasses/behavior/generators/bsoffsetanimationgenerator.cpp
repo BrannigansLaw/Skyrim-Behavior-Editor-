@@ -74,10 +74,10 @@ bool BSOffsetAnimationGenerator::hasChildren() const{
 QList<DataIconManager *> BSOffsetAnimationGenerator::getChildren() const{
     QList<DataIconManager *> list;
     if (pDefaultGenerator.data()){
-        list.append((DataIconManager *)pDefaultGenerator.data());
+        list.append(static_cast<DataIconManager*>(pDefaultGenerator.data()));
     }
     if (pOffsetClipGenerator.data()){
-        list.append((DataIconManager *)pOffsetClipGenerator.data());
+        list.append(static_cast<DataIconManager*>(pOffsetClipGenerator.data()));
     }
     return list;
 }
@@ -167,9 +167,9 @@ bool BSOffsetAnimationGenerator::write(HkxXMLWriter *writer){
             refString = "null";
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pOffsetClipGenerator"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fOffsetVariable"), QString::number(fOffsetVariable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fOffsetVariable"), QString::number(fOffsetRangeStart));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fOffsetVariable"), QString::number(fOffsetRangeEnd));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fOffsetVariable"), QString::number(fOffsetVariable, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fOffsetVariable"), QString::number(fOffsetRangeStart, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fOffsetVariable"), QString::number(fOffsetRangeEnd, char('f'), 6));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");

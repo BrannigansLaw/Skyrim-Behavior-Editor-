@@ -13,6 +13,7 @@ class hkbCharacterStringData: public HkxObject
     friend class hkbCharacterData;
     friend class CharacterFile;
     friend class CharacterPropertiesUI;
+    friend class BehaviorFile;
 public:
     hkbCharacterStringData(HkxFile *parent, long ref = 0);
     virtual ~hkbCharacterStringData();

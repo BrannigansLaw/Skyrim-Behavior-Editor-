@@ -44,10 +44,28 @@ QString CharacterFile::getRootBehaviorPath() const{
     return "";
 }
 
+QString CharacterFile::getBehaviorDirectoryName() const{
+    hkbCharacterStringData *ptr = static_cast<hkbCharacterStringData *>(stringData.data());
+    if (ptr){
+        int index = ptr->behaviorFilename.indexOf("\\");
+        if (index > -1){
+            return ptr->behaviorFilename.section("\\", 0, 0);
+        }else{
+            index = ptr->behaviorFilename.indexOf("/");
+            if (index > -1){
+                return ptr->behaviorFilename.section("/", 0, 0);
+            }else{
+                return ptr->behaviorFilename;
+            }
+        }
+    }
+    return "";
+}
+
 QString CharacterFile::getRigName() const{
     hkbCharacterStringData *ptr = static_cast<hkbCharacterStringData *>(stringData.data());
     if (ptr){
-        return ptr->rigName;
+        return QString(ptr->rigName).replace("\\", "/");
     }
     return "";
 }
@@ -97,6 +115,13 @@ QStringList CharacterFile::getAnimationNames() const{
 
 QString CharacterFile::getCharacterPropertyNameAt(int index) const{
     return static_cast<hkbCharacterStringData *>(stringData.data())->getCharacterPropertyNameAt(index);
+}
+
+int CharacterFile::getCharacterPropertyIndex(const QString &name) const{
+    if (stringData.data() && stringData->getSignature() == HKB_CHARACTER_STRING_DATA){
+        return static_cast<hkbCharacterStringData *>(stringData.data())->characterPropertyNames.indexOf(name);
+    }
+    return -1;
 }
 
 QStringList CharacterFile::getCharacterPropertyNames() const{
@@ -156,7 +181,7 @@ bool CharacterFile::parse(){
     HkxSignature signature;
     QByteArray value;
     long ref = 0;
-    setProgressData("Creating HKX objects...", 60);
+    //setProgressData("Creating HKX objects...", 60);
     while (index < getReader().getNumElements()){
         value = getReader().getNthAttributeNameAt(index, 1);
         if (value == "class"){
@@ -213,7 +238,7 @@ bool CharacterFile::parse(){
     }
     closeFile();
     getReader().clear();
-    setProgressData("Linking HKX objects...", 80);
+    //setProgressData("Linking HKX objects...", 80);
     if (!link()){
         writeToLog("CharacterFile: parse() failed because link() failed!", true);
         return false;

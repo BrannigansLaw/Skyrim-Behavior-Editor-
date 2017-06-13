@@ -68,7 +68,7 @@ bool ProjectFile::parse(){
     HkxSignature signature;
     QByteArray value;
     long ref = 0;
-    setProgressData("Creating HKX objects...", 60);
+    //setProgressData("Creating HKX objects...", 60);
     while (index < getReader().getNumElements()){
         value = getReader().getNthAttributeNameAt(index, 1);
         if (value == "class"){
@@ -105,7 +105,7 @@ bool ProjectFile::parse(){
     }
     closeFile();
     getReader().clear();
-    setProgressData("Linking HKX objects...", 80);
+    //setProgressData("Linking HKX objects...", 80);
     if (!link()){
         writeToLog("ProjectFile: parse() failed because link() failed!", true);
         return false;

@@ -155,7 +155,10 @@ SOURCES += \
     src/ui/hkxclassesui/behaviorui/eventui.cpp \
     src/ui/hkxclassesui/behaviorui/behaviorgraphicon.cpp \
     src/ui/hkxclassesui/behaviorui/generators/behaviorgraphui.cpp \
-    src/ui/hkxclassesui/behaviorui/modifiers/bslimbikmodifierui.cpp
+    src/ui/hkxclassesui/behaviorui/modifiers/bslimbikmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/generators/bsboneswitchgeneratorui.cpp \
+    src/ui/hkxclassesui/behaviorui/generators/bsboneswitchgeneratorbonedataui.cpp \
+    src/ui/hkxclassesui/behaviorui/generators/bsoffsetanimationgeneratorui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -293,4 +296,7 @@ HEADERS  += \
     src/ui/hkxclassesui/behaviorui/eventui.h \
     src/ui/hkxclassesui/behaviorui/behaviorgraphicon.h \
     src/ui/hkxclassesui/behaviorui/generators/behaviorgraphui.h \
-    src/ui/hkxclassesui/behaviorui/modifiers/bslimbikmodifierui.h
+    src/ui/hkxclassesui/behaviorui/modifiers/bslimbikmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/generators/bsboneswitchgeneratorui.h \
+    src/ui/hkxclassesui/behaviorui/generators/bsboneswitchgeneratorbonedataui.h \
+    src/ui/hkxclassesui/behaviorui/generators/bsoffsetanimationgeneratorui.h

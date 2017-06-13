@@ -113,7 +113,7 @@ bool BSTweenerModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("tweenPosition"), getBoolAsString(tweenPosition));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("tweenRotation"), getBoolAsString(tweenRotation));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("useTweenDuration"), getBoolAsString(useTweenDuration));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("tweenDuration"), QString::number(tweenDuration));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("tweenDuration"), QString::number(tweenDuration, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("targetPosition"), targetPosition.getValueAsString());
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("targetRotation"), targetRotation.getValueAsString());
         writer->writeLine(writer->object, false);

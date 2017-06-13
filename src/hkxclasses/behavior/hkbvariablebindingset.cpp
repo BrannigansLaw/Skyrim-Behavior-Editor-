@@ -39,12 +39,7 @@ bool hkbVariableBindingSet::addBinding(const QString & path, const QString & nam
                 if (index > -1){
                     bindings[i].variableIndex = index;
                 }else{
-                    index = static_cast<BehaviorFile *>(getParentFile())->getCharacterPropertyIndex(name);
-                    if (index > -1){
-                        bindings[i].variableIndex = index;
-                    }else{
-                        return false;
-                    }
+                    return false;
                 }
             }
             bindings[i].bindingType = type;
@@ -70,6 +65,7 @@ bool hkbVariableBindingSet::addBinding(const QString & path, const QString & nam
         }
         return true;
     }
+    return true;
 }
 
 void hkbVariableBindingSet::removeBinding(const QString & path){
@@ -99,7 +95,11 @@ QString hkbVariableBindingSet::getPathOfBindingAt(int index){
 int hkbVariableBindingSet::getVariableIndexOfBinding(const QString & path) const{
     for (int i = 0; i < bindings.size(); i++){
         if (bindings.at(i).memberPath == path){
-            return bindings.at(i).variableIndex;
+            if (bindings.at(i).bindingType == hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
+                return static_cast<BehaviorFile *>(getParentFile())->findCharacterPropertyIndexFromCharacter(bindings.at(i).variableIndex);
+            }else{
+                return bindings.at(i).variableIndex;
+            }
         }
     }
     return -1;
@@ -109,6 +109,7 @@ hkbVariableBindingSet::hkBinding::BindingType hkbVariableBindingSet::getBindingT
     if (index < bindings.size() && index >= 0){
         return bindings.at(index).bindingType;
     }
+    return hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE;
 }
 
 hkbVariableBindingSet::hkBinding::BindingType hkbVariableBindingSet::getBindingType(const QString & path) const{

@@ -37,7 +37,7 @@ GenericTableWidget::GenericTableWidget(const QString & title)
     setLayout(lyt);
     connect(selectPB, SIGNAL(released()), this, SLOT(itemSelected()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellChanged(int,int)), this, SLOT(itemSelected()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(itemSelected()), Qt::UniqueConnection);
+    //connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(itemSelected()), Qt::UniqueConnection);
     connect(cancelPB, SIGNAL(released()), this, SLOT(hide()), Qt::UniqueConnection);
     //connect(newPB, SIGNAL(released()), this, SLOT(itemAdded()), Qt::UniqueConnection);
 }

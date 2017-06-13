@@ -6,6 +6,7 @@
 class BSOffsetAnimationGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
+    friend class BSOffsetAnimationGeneratorUI;
 public:
     BSOffsetAnimationGenerator(HkxFile *parent, long ref = 0);
     virtual ~BSOffsetAnimationGenerator();

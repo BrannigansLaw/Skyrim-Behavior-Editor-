@@ -23,6 +23,7 @@ public:
     hkQuadVariable getQuadVariable(int index, bool *ok) const;
     HkxObject * getVariantVariable(int index) const;
     hkVariableType getCharacterPropertyTypeAt(int index) const;
+    QString getCharacterPropertyNameAt(int index) const;
     hkVariableType getVariableTypeAt(int index) const;
     bool write(HkxXMLWriter *writer);
     QStringList getVariableTypeNames() const;

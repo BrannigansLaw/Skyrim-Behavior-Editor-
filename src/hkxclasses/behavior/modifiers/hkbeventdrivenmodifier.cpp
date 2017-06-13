@@ -57,7 +57,7 @@ bool hkbEventDrivenModifier::hasChildren() const{
 QList<DataIconManager *> hkbEventDrivenModifier::getChildren() const{
     QList<DataIconManager *> list;
     if (modifier.data()){
-        list.append((DataIconManager *)modifier.data());
+        list.append(static_cast<DataIconManager*>(modifier.data()));
     }
     return list;
 }

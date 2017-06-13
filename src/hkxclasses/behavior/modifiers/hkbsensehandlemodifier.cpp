@@ -211,8 +211,8 @@ bool hkbSenseHandleModifier::write(HkxXMLWriter *writer){
                 refString = "null";
             }
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minDistance"), QString::number(ranges.at(i).minDistance));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxDistance"), QString::number(ranges.at(i).maxDistance));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minDistance"), QString::number(ranges.at(i).minDistance, char('f'), 6));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxDistance"), QString::number(ranges.at(i).maxDistance, char('f'), 6));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("ignoreHandle"), getBoolAsString(ranges.at(i).ignoreHandle));
             writer->writeLine(writer->object, false);
         }
@@ -233,9 +233,9 @@ bool hkbSenseHandleModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("handleIn"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("localFrameName"), localFrameName);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensorLocalFrameName"), sensorLocalFrameName);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minDistance"), QString::number(minDistance));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxDistance"), QString::number(maxDistance));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("distanceOut"), QString::number(distanceOut));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minDistance"), QString::number(minDistance, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxDistance"), QString::number(maxDistance, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("distanceOut"), QString::number(distanceOut, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("collisionFilterInfo"), QString::number(collisionFilterInfo));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensorRagdollBoneIndex"), QString::number(sensorRagdollBoneIndex));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensorAnimationBoneIndex"), QString::number(sensorAnimationBoneIndex));

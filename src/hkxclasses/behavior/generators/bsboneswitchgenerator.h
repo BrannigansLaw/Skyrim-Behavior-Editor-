@@ -6,6 +6,7 @@
 class BSBoneSwitchGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
+    friend class BSBoneSwitchGeneratorUI;
 public:
     BSBoneSwitchGenerator(HkxFile *parent, long ref = 0);
     virtual ~BSBoneSwitchGenerator();

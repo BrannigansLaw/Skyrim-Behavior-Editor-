@@ -278,9 +278,11 @@ void StateUI::setRowItems(int row, const QString & name, const QString & classna
 
 void StateUI::setName(){
     if (bsData){
-        bsData->name = name->text();
-        bsData->getParentFile()->toggleChanged(true);
-        emit stateNameChanged(name->text(), stateIndex);
+        if (bsData->name != name->text()){
+            bsData->name = name->text();
+            bsData->getParentFile()->toggleChanged(true);
+            emit stateNameChanged(name->text(), stateIndex);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateUI::setName(): The data is NULL!!"));
     }
@@ -322,7 +324,7 @@ void StateUI::eventTableElementSelected(int index, const QString & name){
         transitionUI->eventTableElementSelected(index, name);
         break;
     default:
-        WARNING_MESSAGE(QString("StateMachineUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));;
+        WARNING_MESSAGE(QString("StateMachineUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));
     }
     loadDynamicTableRows(); //Inefficient...
 }
@@ -521,22 +523,26 @@ void StateUI::setGenerator(int index, const QString & name){
             if (ptr){
                 if (name != ptr->getName()){
                     CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"));
+                    return;
                 }else if (!gen){
                     CRITICAL_ERROR_MESSAGE(QString("The currently loaded 'hkbStateMachineStateInfo' has no parent 'hkbStateMachine'!!!"));
-                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), (DataIconManager *)bsData->generator.data(), ptr, false)){
+                    return;
+                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generator.data()), ptr, false)){
                     WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+                    return;
                 }
             }else{
                 if (behaviorView->getSelectedItem()){
-                    behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData((DataIconManager *)bsData->generator.data()), stateIndex);
+                    behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->generator.data())), stateIndex);
                 }else{
                     CRITICAL_ERROR_MESSAGE(QString("StateUI::setGenerator(): The selected icon is NULL!!"));
+                    return;
                 }
-                behaviorView->removeGeneratorData();
-                table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-                bsData->getParentFile()->toggleChanged(true);
-                emit returnToParent(true);
             }
+            behaviorView->removeGeneratorData();
+            table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
+            bsData->getParentFile()->toggleChanged(true);
+            emit returnToParent(true);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("StateUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));
         }

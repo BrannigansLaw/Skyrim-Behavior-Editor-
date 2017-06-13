@@ -113,8 +113,8 @@ bool hkbGeneratorTransitionEffect::write(HkxXMLWriter *writer){
             refString = "null";
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("transitionGenerator"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendInDuration"), QString::number(blendInDuration));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendOutDuration"), QString::number(blendOutDuration));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendInDuration"), QString::number(blendInDuration, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendOutDuration"), QString::number(blendOutDuration, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("syncToGeneratorStartTime"), getBoolAsString(syncToGeneratorStartTime));
         writer->writeLine(writer->object, false);
         setIsWritten();

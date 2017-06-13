@@ -102,7 +102,7 @@ bool BSPassByTargetTriggerModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("targetPosition"), targetPosition.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("radius"), QString::number(radius));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("radius"), QString::number(radius, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("movementDirection"), movementDirection.getValueAsString());
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("triggerEvent"), "");
         writer->writeLine(writer->object, true);

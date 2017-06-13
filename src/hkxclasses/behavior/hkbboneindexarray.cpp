@@ -66,9 +66,11 @@ bool hkbBoneIndexArray::write(HkxXMLWriter *writer){
         list2 = {"boneIndices", QString::number(boneIndices.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < boneIndices.size(); i++){
-            bones = bones+" "+QString::number(boneIndices.at(i));
+            bones = bones+QString::number(boneIndices.at(i), char('f'), 6);
             if (i > 0 && i % 16 == 0){
                 bones = bones+"\n";
+            }else{
+                bones = bones+" ";
             }
         }
         if (boneIndices.size() > 0){

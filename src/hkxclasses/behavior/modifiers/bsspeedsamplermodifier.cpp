@@ -101,9 +101,9 @@ bool BSSpeedSamplerModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("state"), QString::number(state));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("direction"), QString::number(direction));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("goalSpeed"), QString::number(goalSpeed));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("speedOut"), QString::number(speedOut));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("direction"), QString::number(direction, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("goalSpeed"), QString::number(goalSpeed, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("speedOut"), QString::number(speedOut, char('f'), 6));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");

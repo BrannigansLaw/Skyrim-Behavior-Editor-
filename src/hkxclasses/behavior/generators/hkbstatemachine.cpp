@@ -237,7 +237,7 @@ QList<DataIconManager *> hkbStateMachine::getChildren() const{
     for (int i = 0; i < states.size(); i++){
         child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
         if (child->generator.data()){
-            list.append((DataIconManager *)child->generator.data());
+            list.append(static_cast<DataIconManager*>(child->generator.data()));
         }
     }
     return list;
@@ -405,9 +405,11 @@ bool hkbStateMachine::write(HkxXMLWriter *writer){
         list2 = {"states", QString::number(states.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < states.size(); i++){
-            refString = refString+" "+states.at(i).data()->getReferenceString();
+            refString = refString+states.at(i).data()->getReferenceString();
             if (i > 0 && i % 16 == 0){
                 refString = refString+"\n";
+            }else{
+                refString = refString+" ";
             }
         }
         if (states.size() > 0){

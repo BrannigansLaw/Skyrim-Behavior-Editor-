@@ -125,7 +125,7 @@ QList<DataIconManager *> hkbBlenderGenerator::getChildren() const{
     for (int i = 0; i < children.size(); i++){
         child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
         if (child->generator.data()){
-            list.append((DataIconManager *)child->generator.data());
+            list.append(static_cast<DataIconManager*>(child->generator.data()));
         }
     }
     return list;
@@ -223,10 +223,10 @@ bool hkbBlenderGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("referencePoseWeightThreshold"), QString::number(referencePoseWeightThreshold));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendParameter"), QString::number(blendParameter));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minCyclicBlendParameter"), QString::number(minCyclicBlendParameter));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxCyclicBlendParameter"), QString::number(maxCyclicBlendParameter));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("referencePoseWeightThreshold"), QString::number(referencePoseWeightThreshold, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendParameter"), QString::number(blendParameter, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minCyclicBlendParameter"), QString::number(minCyclicBlendParameter, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxCyclicBlendParameter"), QString::number(maxCyclicBlendParameter, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("indexOfSyncMasterChild"), QString::number(indexOfSyncMasterChild));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("flags"), flags);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("subtractLastChild"), getBoolAsString(subtractLastChild));
@@ -235,9 +235,11 @@ bool hkbBlenderGenerator::write(HkxXMLWriter *writer){
         list2 = {"children", QString::number(children.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < children.size(); i++){
-            refString = refString+" "+children.at(i).data()->getReferenceString();
+            refString = refString+children.at(i).data()->getReferenceString();
             if (i > 0 && i % 16 == 0){
                 refString = refString+"\n";
+            }else{
+                refString = refString+" ";
             }
         }
         if (children.size() > 0){

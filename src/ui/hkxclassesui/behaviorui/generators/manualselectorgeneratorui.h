@@ -36,6 +36,7 @@ private slots:
     void setBindingVariable(int index, const QString & name);
     void setGenerator(int index, const QString & name);
     void viewSelectedChild(int row, int column);
+    void swapGeneratorIndices(int index1, int index2);
 private:
     void connectSignals();
     void disconnectSignals();

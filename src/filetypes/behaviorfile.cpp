@@ -77,6 +77,7 @@
 #include "src/hkxclasses/behavior/modifiers/hkbproxymodifier.h"
 
 #include "src/hkxclasses/hkxobject.h"
+#include "src/hkxclasses/behavior/hkbcharacterstringdata.h"
 #include "src/hkxclasses/behavior/hkbgeneratortransitioneffect.h"
 #include "src/hkxclasses/behavior/hkbeventrangedataarray.h"
 #include "src/hkxclasses/behavior/hkbboneweightarray.h"
@@ -192,7 +193,7 @@ bool BehaviorFile::parse(){
     HkxSignature signature;
     QByteArray value;
     long ref = 0;
-    setProgressData("Creating HKX objects...", 60);
+    //setProgressData("Creating HKX objects...", 60);
     while (index < getReader().getNumElements()){
         value = getReader().getNthAttributeNameAt(index, 1);
         if (value == "class"){
@@ -563,7 +564,7 @@ bool BehaviorFile::parse(){
     }
     closeFile();
     getReader().clear();
-    setProgressData("Linking HKX objects...", 80);
+    //setProgressData("Linking HKX objects...", 80);
     if (!link()){
         writeToLog("BehaviorFile: parse() failed because link() failed!", true);
         return false;
@@ -718,9 +719,15 @@ QString BehaviorFile::getEventNameAt(int index) const{
     return "";
 }
 
-QString BehaviorFile::getCharacterPropertyNameAt(int index) const{
-    if (character){
-        return character->getCharacterPropertyNameAt(index);
+QString BehaviorFile::getCharacterPropertyNameAt(int index, bool fromBehaviorFile) const{
+    if (fromBehaviorFile){
+        if (graphData.data()){
+            return static_cast<hkbBehaviorGraphData *>(graphData.data())->getCharacterPropertyNameAt(index);
+        }
+    }else{
+        if (character){
+            return character->getCharacterPropertyNameAt(index);
+        }
     }
     return "";
 }
@@ -828,7 +835,7 @@ QStringList BehaviorFile::getModifierTypeNames() const{
     return list;
 }
 
-int BehaviorFile::getCharacterPropertyIndex(const QString &name) const{
+int BehaviorFile::getCharacterPropertyIndexFromBehavior(const QString &name) const{
     hkbBehaviorGraphStringData *strings = NULL;
     if (stringData.data()){
         strings = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
@@ -836,6 +843,34 @@ int BehaviorFile::getCharacterPropertyIndex(const QString &name) const{
             if (strings->characterPropertyNames.at(i) == name){
                 return i;
             }
+        }
+    }
+    return -1;
+}
+
+int BehaviorFile::getCharacterPropertyIndex(const QString &name) const{
+    hkbCharacterStringData *strings = NULL;
+    if (character && character->stringData.data()){
+        strings = static_cast<hkbCharacterStringData *>(character->stringData.data());
+        for (int i = 0; i < strings->characterPropertyNames.size(); i++){
+            if (strings->characterPropertyNames.at(i) == name){
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
+int BehaviorFile::findCharacterPropertyIndexFromCharacter(int indexOfBehaviorProperty) const{
+    hkbCharacterStringData *strings = NULL;
+    QString name;
+    hkbBehaviorGraphStringData *behaviorstrings = NULL;
+    if (character && stringData.data()){
+        strings = static_cast<hkbCharacterStringData *>(character->stringData.data());
+        behaviorstrings = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+        if (!behaviorstrings->characterPropertyNames.isEmpty() && indexOfBehaviorProperty < behaviorstrings->characterPropertyNames.size() && indexOfBehaviorProperty >= 0 && !strings->characterPropertyNames.isEmpty()){
+            name = behaviorstrings->characterPropertyNames.at(indexOfBehaviorProperty);
+            return strings->characterPropertyNames.indexOf(name);
         }
     }
     return -1;

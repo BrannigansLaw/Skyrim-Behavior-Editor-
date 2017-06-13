@@ -6,11 +6,9 @@
 class HkxObject;
 class BehaviorGraphView;
 class hkbModifierGenerator;
-class QVBoxLayout;
+class QGridLayout;
 class TableWidget;
 class LineEdit;
-class ComboBox;
-class QPushButton;
 class GenericTableWidget;
 
 class ModifierGeneratorUI: public QGroupBox
@@ -18,31 +16,32 @@ class ModifierGeneratorUI: public QGroupBox
     Q_OBJECT
     friend class HkDataUI;
 public:
-    ModifierGeneratorUI(GenericTableWidget *genTable, GenericTableWidget *modTable);
+    ModifierGeneratorUI();
     virtual ~ModifierGeneratorUI(){}
     void loadData(HkxObject *data);
-    void setGeneratorTable(GenericTableWidget *genTable);
-    void setModifierTable(GenericTableWidget *modTable);
 signals:
     void generatorNameChanged(const QString & newName, int index);
-    void viewGeneratorTable(int index);
+    void viewGenerators(int index);
+    void viewModifiers(int index);
 private slots:
     void setName();
-    void setModifier(int index);
-    void setGenerator(int index);
-    void viewGenerators();
-    void viewModifiers();
+    void setModifier(int index, const QString & name);
+    void setGenerator(int index, const QString & name);
+    void viewSelected(int row, int column);
 private:
-    static QStringList headerLabels1;
-    GenericTableWidget *generatorTable;
-    GenericTableWidget *modifiersTable;
+    void connectSignals();
+    void disconnectSignals();
+    void generatorRenamed(const QString & name, int index);
+    void modifierRenamed(const QString & name, int index);
+    void connectToTables(GenericTableWidget *modifiers, GenericTableWidget *generators);
+    void setBehaviorView(BehaviorGraphView *view);
+private:
+    static QStringList headerLabels;
     BehaviorGraphView *behaviorView;
     hkbModifierGenerator *bsData;
-    QVBoxLayout *lyt;
+    QGridLayout *topLyt;
     TableWidget *table;
     LineEdit *name;
-    QPushButton *modifier;
-    QPushButton *generator;
 };
 
 #endif // MODIFIERGENERATORUI_H

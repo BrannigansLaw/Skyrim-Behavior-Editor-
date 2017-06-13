@@ -112,12 +112,12 @@ bool BSLimbIKModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleDegrees"), QString::number(limitAngleDegrees));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleDegrees"), QString::number(limitAngleDegrees, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("startBoneIndex"), QString::number(startBoneIndex));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("endBoneIndex"), QString::number(endBoneIndex));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("gain"), QString::number(gain));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("boneRadius"), QString::number(boneRadius));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("castOffset"), QString::number(castOffset));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("gain"), QString::number(gain, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("boneRadius"), QString::number(boneRadius, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("castOffset"), QString::number(castOffset, char('f'), 6));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");

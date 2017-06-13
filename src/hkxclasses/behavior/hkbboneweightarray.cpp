@@ -9,7 +9,7 @@ uint hkbBoneWeightArray::refCount = 0;
 
 QString hkbBoneWeightArray::classname = "hkbBoneWeightArray";
 
-hkbBoneWeightArray::hkbBoneWeightArray(HkxFile *parent, int size, long ref)
+hkbBoneWeightArray::hkbBoneWeightArray(HkxFile *parent, long ref, int size)
     : HkDynamicObject(parent, ref)
 {
     setType(HKB_BONE_WEIGHT_ARRAY, TYPE_OTHER);
@@ -72,9 +72,11 @@ bool hkbBoneWeightArray::write(HkxXMLWriter *writer){
         list2 = {"boneWeights", QString::number(boneWeights.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < boneWeights.size(); i++){
-            bones = bones+" "+QString::number(boneWeights.at(i));
+            bones = bones+QString::number(boneWeights.at(i), char('f'), 6);
             if (i > 0 && i % 16 == 0){
                 bones = bones+"\n";
+            }else{
+                bones = bones+" ";
             }
         }
         if (boneWeights.size() > 0){

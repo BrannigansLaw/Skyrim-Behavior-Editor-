@@ -165,7 +165,7 @@ bool hkbStateMachineStateInfo::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("generator"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("stateId"), QString::number(stateId));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("probability"), QString::number(probability));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("probability"), QString::number(probability, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->object, false);
         setIsWritten();

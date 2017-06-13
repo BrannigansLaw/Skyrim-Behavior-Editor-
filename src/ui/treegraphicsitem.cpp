@@ -214,14 +214,30 @@ void TreeGraphicsItem::reposition(){
     scene()->update();
 }
 
-bool TreeGraphicsItem::isDescendant(TreeGraphicsItem *icon) const{
+bool TreeGraphicsItem::isDataDescendant(TreeGraphicsItem *icon) const{
     if (icon){
         TreeGraphicsItem *parent = (TreeGraphicsItem *)parentItem();
         if (parent){
             if (parent->hasSameData(icon)){
                 return true;
             }else{
-                if (parent->isDescendant(icon)){
+                if (parent->isDataDescendant(icon)){
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool TreeGraphicsItem::isDataDescendant(DataIconManager *data) const{
+    if (data){
+        TreeGraphicsItem *parent = (TreeGraphicsItem *)parentItem();
+        if (parent){
+            if (parent->hasSameData(data)){
+                return true;
+            }else{
+                if (parent->isDataDescendant(data)){
                     return true;
                 }
             }
@@ -375,7 +391,7 @@ TreeGraphicsItem *TreeGraphicsItem::getChildWithData(DataIconManager *data){
     return NULL;
 }*/
 
-//Returns the icon that is closest to "this" that references "data"...
+/*Returns the icon that is closest to "this" that references "data"...
 TreeGraphicsItem *TreeGraphicsItem::getReplacementIcon(DataIconManager *data){
     QList <QGraphicsItem *> children;
     QList <QGraphicsItem *> tempList;
@@ -402,6 +418,25 @@ TreeGraphicsItem *TreeGraphicsItem::getReplacementIcon(DataIconManager *data){
         }
         child = parent;
         parent = (TreeGraphicsItem *)parent->parentItem();
+    }
+    return NULL;
+}*/
+
+TreeGraphicsItem *TreeGraphicsItem::getReplacementIcon(DataIconManager *data){
+    QList <QGraphicsItem *> children;
+    QList <QGraphicsItem *> tempList;
+    TreeGraphicsItem *parent = NULL;
+    parent = static_cast<TreeGraphicsScene *>(scene())->rootIcon;
+    if (parent){
+        children = parent->childItems();
+        while (!children.isEmpty()){
+            if (((TreeGraphicsItem *)children.first())->hasSameData(data) && ((TreeGraphicsItem *)children.first()) != this){
+                return ((TreeGraphicsItem *)children.first());
+            }
+            tempList = children.first()->childItems();
+            children.removeFirst();
+            children = tempList + children;
+        }
     }
     return NULL;
 }

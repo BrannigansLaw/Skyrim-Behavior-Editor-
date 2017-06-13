@@ -39,7 +39,9 @@ public:
     QStringList getGeneratorTypeNames() const;
     QStringList getModifierNames() const;
     QStringList getModifierTypeNames() const;
-    int getCharacterPropertyIndex(const QString & name) const;
+    int getCharacterPropertyIndexFromBehavior(const QString & name) const;
+    int getCharacterPropertyIndex(const QString &name) const;
+    int findCharacterPropertyIndexFromCharacter(int indexOfBehaviorProperty) const;
     QStringList getCharacterPropertyNames() const;
     QStringList getCharacterPropertyTypenames() const;
     hkVariableType getCharacterPropertyTypeAt(int index) const;
@@ -52,7 +54,7 @@ public:
     int addCharacterProperty(int index);
     QString getVariableNameAt(int index) const;
     QString getEventNameAt(int index) const;
-    QString getCharacterPropertyNameAt(int index) const;
+    QString getCharacterPropertyNameAt(int index, bool fromBehaviorFile) const;
 protected:
     bool parse();
     bool link();

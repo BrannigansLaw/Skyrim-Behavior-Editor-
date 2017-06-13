@@ -77,7 +77,7 @@ QList<DataIconManager *> hkbModifierList::getChildren() const{
     QList<DataIconManager *> list;
     for (int i = 0; i < modifiers.size(); i++){
         if (modifiers.at(i).data()){
-            list.append((DataIconManager *)modifiers.at(i).data());
+            list.append(static_cast<DataIconManager*>(modifiers.at(i).data()));
         }
     }
     return list;
@@ -148,9 +148,11 @@ bool hkbModifierList::write(HkxXMLWriter *writer){
         list2 = {"modifiers", QString::number(modifiers.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < modifiers.size(); i++){
-            refString = refString+" "+modifiers.at(i).data()->getReferenceString();
+            refString = refString+modifiers.at(i).data()->getReferenceString();
             if (i > 0 && i % 16 == 0){
                 refString = refString+"\n";
+            }else{
+                refString = refString+" ";
             }
         }
         if (modifiers.size() > 0){

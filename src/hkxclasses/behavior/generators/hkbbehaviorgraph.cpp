@@ -67,7 +67,7 @@ bool hkbBehaviorGraph::hasChildren() const{
 QList<DataIconManager *> hkbBehaviorGraph::getChildren() const{
     QList<DataIconManager *> list;
     if (rootGenerator.data()){
-        list.append((DataIconManager *)rootGenerator.data());
+        list.append(static_cast<DataIconManager*>(rootGenerator.data()));
     }
     return list;
 }

@@ -47,12 +47,12 @@ bool BSBoneSwitchGenerator::insertObjectAt(int index, DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
         if (index == 0){
             pDefaultGenerator = HkxSharedPtr((HkxObject *)obj);
+        }else if (index == 1){
+            objChild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index - 1).data());
+            objChild->pGenerator = HkxSharedPtr((HkxObject *)obj);
         }else if (index >= ChildrenA.size() || index == -1){
             objChild = new BSBoneSwitchGeneratorBoneData(getParentFile(), -1);
             ChildrenA.append(HkxSharedPtr(objChild));
-            objChild->pGenerator = HkxSharedPtr((HkxObject *)obj);
-        }else if (index == 1){
-            objChild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index - 1).data());
             objChild->pGenerator = HkxSharedPtr((HkxObject *)obj);
         }else if (index > -1){
             objChild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index - 1).data());
@@ -83,13 +83,13 @@ bool BSBoneSwitchGenerator::hasChildren() const{
 QList<DataIconManager *> BSBoneSwitchGenerator::getChildren() const{
     QList<DataIconManager *> list;
     if (pDefaultGenerator.data()){
-        list.append((DataIconManager *)pDefaultGenerator.data());
+        list.append(static_cast<DataIconManager*>(pDefaultGenerator.data()));
     }
     BSBoneSwitchGeneratorBoneData *child;
     for (int i = 0; i < ChildrenA.size(); i++){
         child = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data());
         if (child->pGenerator.data()){
-            list.append((DataIconManager *)child->pGenerator.data());
+            list.append(static_cast<DataIconManager*>(child->pGenerator.data()));
         }
     }
     return list;
@@ -186,9 +186,11 @@ bool BSBoneSwitchGenerator::write(HkxXMLWriter *writer){
         list2 = {"ChildrenA", QString::number(ChildrenA.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < ChildrenA.size(); i++){
-            refString = refString+" "+ChildrenA.at(i).data()->getReferenceString();
+            refString = refString+ChildrenA.at(i).data()->getReferenceString();
             if (i > 0 && i % 16 == 0){
                 refString = refString+"\n";
+            }else{
+                refString = refString+" ";
             }
         }
         if (ChildrenA.size() > 0){

@@ -336,9 +336,13 @@ bool BlenderGeneratorUI::setBinding(int index, int row, const QString & variable
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY);
+                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                }
             }else{
-                varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
+                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
@@ -403,10 +407,12 @@ void BlenderGeneratorUI::setBindingVariable(int index, const QString & name){
 
 void BlenderGeneratorUI::setName(){
     if (bsData){
-        bsData->name = name->text();
-        ((DataIconManager *)(bsData))->updateIconNames();
-        emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->name != name->text()){
+            bsData->name = name->text();
+            static_cast<DataIconManager*>((bsData))->updateIconNames();
+            emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setName(): The data is NULL!!"))
     }
@@ -765,7 +771,8 @@ void BlenderGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindingSet 
             QString varName;
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index);
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
+                    table->item(row, colunm)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }

@@ -213,13 +213,13 @@ bool hkbFootIkDriverInfo::write(HkxXMLWriter *writer){
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("kneeAxisLS"), legs[i].kneeAxisLS.getValueAsString());
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("footEndLS"), legs[i].footEndLS.getValueAsString());
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("footPlantedAnkleHeightMS"), QString::number(legs.at(i).footPlantedAnkleHeightMS));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("footRaisedAnkleHeightMS"), QString::number(legs.at(i).footRaisedAnkleHeightMS));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxAnkleHeightMS"), QString::number(legs.at(i).maxAnkleHeightMS));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minAnkleHeightMS"), QString::number(legs.at(i).minAnkleHeightMS));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxKneeAngleDegrees"), QString::number(legs.at(i).maxKneeAngleDegrees));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minKneeAngleDegrees"), QString::number(legs.at(i).minKneeAngleDegrees));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxAnkleAngleDegrees"), QString::number(legs.at(i).maxAnkleAngleDegrees));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("footPlantedAnkleHeightMS"), QString::number(legs.at(i).footPlantedAnkleHeightMS, char('f'), 6));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("footRaisedAnkleHeightMS"), QString::number(legs.at(i).footRaisedAnkleHeightMS, char('f'), 6));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxAnkleHeightMS"), QString::number(legs.at(i).maxAnkleHeightMS, char('f'), 6));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minAnkleHeightMS"), QString::number(legs.at(i).minAnkleHeightMS, char('f'), 6));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxKneeAngleDegrees"), QString::number(legs.at(i).maxKneeAngleDegrees, char('f'), 6));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minKneeAngleDegrees"), QString::number(legs.at(i).minKneeAngleDegrees, char('f'), 6));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxAnkleAngleDegrees"), QString::number(legs.at(i).maxAnkleAngleDegrees, char('f'), 6));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("hipIndex"), QString::number(legs.at(i).hipIndex));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("kneeIndex"), QString::number(legs.at(i).kneeIndex));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("ankleIndex"), QString::number(legs.at(i).ankleIndex));
@@ -228,14 +228,14 @@ bool hkbFootIkDriverInfo::write(HkxXMLWriter *writer){
         if (legs.size() > 0){
             writer->writeLine(writer->parameter, false);
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("raycastDistanceUp"), QString::number(raycastDistanceUp));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("raycastDistanceDown"), QString::number(raycastDistanceDown));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("originalGroundHeightMS"), QString::number(originalGroundHeightMS));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("verticalOffset"), QString::number(verticalOffset));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("raycastDistanceUp"), QString::number(raycastDistanceUp, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("raycastDistanceDown"), QString::number(raycastDistanceDown, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("originalGroundHeightMS"), QString::number(originalGroundHeightMS, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("verticalOffset"), QString::number(verticalOffset, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("collisionFilterInfo"), QString::number(collisionFilterInfo));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("forwardAlignFraction"), QString::number(forwardAlignFraction));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sidewaysAlignFraction"), QString::number(sidewaysAlignFraction));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sidewaysSampleWidth"), QString::number(sidewaysSampleWidth));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("forwardAlignFraction"), QString::number(forwardAlignFraction, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sidewaysAlignFraction"), QString::number(sidewaysAlignFraction, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sidewaysSampleWidth"), QString::number(sidewaysSampleWidth, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lockFeetWhenPlanted"), getBoolAsString(lockFeetWhenPlanted));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("useCharacterUpVector"), getBoolAsString(useCharacterUpVector));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("isQuadrupedNarrow"), getBoolAsString(isQuadrupedNarrow));

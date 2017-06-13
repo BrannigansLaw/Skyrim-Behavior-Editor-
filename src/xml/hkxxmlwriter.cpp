@@ -36,7 +36,7 @@ void HkxXMLWriter::setFile(HkxFile *file){
 bool HkxXMLWriter::writeToXMLFile(){
     bool isGood = false;
     if (hkxXmlFile){
-        newfile.setFileName(hkxXmlFile->fileName().insert(hkxXmlFile->fileName().indexOf('.'), "_out"));
+        newfile.setFileName(hkxXmlFile->fileName()/*.insert(hkxXmlFile->fileName().indexOf('.'), "_out")*/);
         if (!newfile.open(QIODevice::WriteOnly | QIODevice::Text)){
             hkxXmlFile->writeToLog("HkxXMLWriter: writeToXMLFile()!\nUnable to open a new file!!!", true);
             return false;

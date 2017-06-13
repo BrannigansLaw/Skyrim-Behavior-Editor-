@@ -77,7 +77,7 @@ QList<DataIconManager *> hkbManualSelectorGenerator::getChildren() const{
     QList<DataIconManager *> list;
     for (int i = 0; i < generators.size(); i++){
         if (generators.at(i).data()){
-            list.append((DataIconManager *)generators.at(i).data());
+            list.append(static_cast<DataIconManager*>(generators.at(i).data()));
         }
     }
     return list;
@@ -152,9 +152,11 @@ bool hkbManualSelectorGenerator::write(HkxXMLWriter *writer){
         list2 = {"generators", QString::number(generators.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < generators.size(); i++){
-            refString = refString+" "+generators.at(i).data()->getReferenceString();
+            refString = refString+generators.at(i).data()->getReferenceString();
             if (i > 0 && i % 16 == 0){
                 refString = refString+"\n";
+            }else{
+                refString = refString+" ";
             }
         }
         if (generators.size() > 0){

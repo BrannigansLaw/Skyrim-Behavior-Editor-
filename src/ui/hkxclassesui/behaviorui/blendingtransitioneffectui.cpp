@@ -201,9 +201,11 @@ void BlendingTransitionEffectUI::loadData(HkxObject *data){
 
 void BlendingTransitionEffectUI::setName(){
     if (bsData){
-        bsData->name = name->text();
-        bsData->getParentFile()->toggleChanged(true);
-        emit transitionEffectRenamed(bsData->name);
+        if (bsData->name != name->text()){
+            bsData->name = name->text();
+            bsData->getParentFile()->toggleChanged(true);
+            emit transitionEffectRenamed(bsData->name);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlendingTransitionEffectUI::setName(): The data is NULL!!"));
     }
@@ -216,7 +218,8 @@ void BlendingTransitionEffectUI::loadBinding(int row, int colunm, hkbVariableBin
             QString varName;
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index);
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
+                    table->item(row, colunm)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }

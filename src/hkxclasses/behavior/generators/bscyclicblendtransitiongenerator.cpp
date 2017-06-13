@@ -61,7 +61,7 @@ bool BSCyclicBlendTransitionGenerator::hasChildren() const{
 QList<DataIconManager *> BSCyclicBlendTransitionGenerator::getChildren() const{
     QList<DataIconManager *> list;
     if (pBlenderGenerator.data()){
-        list.append((DataIconManager *)pBlenderGenerator.data());
+        list.append(static_cast<DataIconManager*>(pBlenderGenerator.data()));
     }
     return list;
 }
@@ -195,8 +195,8 @@ bool BSCyclicBlendTransitionGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fBlendParameter"), QString::number(fBlendParameter));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fTransitionDuration"), QString::number(fTransitionDuration));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fBlendParameter"), QString::number(fBlendParameter, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fTransitionDuration"), QString::number(fTransitionDuration, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fBlendParameter"), eBlendCurve);
         writer->writeLine(writer->object, false);
         setIsWritten();

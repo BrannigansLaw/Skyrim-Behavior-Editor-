@@ -93,8 +93,8 @@ bool hkbRotateCharacterModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("degreesPerSecond"), QString::number(degreesPerSecond));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("speedMultiplier"), QString::number(speedMultiplier));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("degreesPerSecond"), QString::number(degreesPerSecond, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("speedMultiplier"), QString::number(speedMultiplier, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("axisOfRotation"), axisOfRotation.getValueAsString());
         writer->writeLine(writer->object, false);
         setIsWritten();

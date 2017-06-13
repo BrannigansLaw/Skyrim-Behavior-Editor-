@@ -96,7 +96,7 @@ bool BSTimerModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("alarmTimeSeconds"), QString::number(alarmTimeSeconds));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("alarmTimeSeconds"), QString::number(alarmTimeSeconds, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("alarmEvent"), "");
         writer->writeLine(writer->object, true);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(alarmEvent.id));

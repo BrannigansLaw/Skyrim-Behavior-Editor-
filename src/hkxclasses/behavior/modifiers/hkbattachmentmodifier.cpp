@@ -62,10 +62,10 @@ bool hkbAttachmentModifier::hasChildren() const{
 QList<DataIconManager *> hkbAttachmentModifier::getChildren() const{
     QList<DataIconManager *> list;
     if (pDefaultGenerator.data()){
-        list.append((DataIconManager *)pDefaultGenerator.data());
+        list.append(static_cast<DataIconManager*>(pDefaultGenerator.data()));
     }
     if (pOffsetClipGenerator.data()){
-        list.append((DataIconManager *)pOffsetClipGenerator.data());
+        list.append(static_cast<DataIconManager*>(pOffsetClipGenerator.data()));
     }
     return list;
 }

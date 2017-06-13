@@ -16,7 +16,7 @@ public:
     virtual ~ProjectFile();
     bool addObjectToFile(HkxObject *obj, long ref = -1);
     void write();
-    QString getRootObjectReferenceString();
+    //QString getRootObjectReferenceString();
     QString getCharacterFilePathAt(int index) const;
     void setCharacterFile(CharacterFile *file);
 protected:

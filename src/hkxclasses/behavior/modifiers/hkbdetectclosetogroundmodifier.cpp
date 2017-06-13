@@ -127,8 +127,8 @@ bool hkbDetectCloseToGroundModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
         writer->writeLine(writer->object, false);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("closeToGroundHeight"), QString::number(closeToGroundHeight));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("raycastDistanceDown"), QString::number(raycastDistanceDown));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("closeToGroundHeight"), QString::number(closeToGroundHeight, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("raycastDistanceDown"), QString::number(raycastDistanceDown, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("collisionFilterInfo"), QString::number(collisionFilterInfo));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("boneIndex"), QString::number(boneIndex));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("animBoneIndex"), QString::number(animBoneIndex));

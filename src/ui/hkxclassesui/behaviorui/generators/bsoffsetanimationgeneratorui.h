@@ -1,59 +1,61 @@
-#ifndef BSISTATETAGGINGGENERATORUI_H
-#define BSISTATETAGGINGGENERATORUI_H
+#ifndef BSOFFSETANIMATIONGENERATORUI_H
+#define BSOFFSETANIMATIONGENERATORUI_H
 
 #include <QGroupBox>
 
 #include "src/utility.h"
 
+class HkxObject;
 class BehaviorGraphView;
+class BSOffsetAnimationGenerator;
+class QGridLayout;
 class TableWidget;
 class LineEdit;
-class BSiStateTaggingGenerator;
-class QGridLayout;
-class HkxObject;
-class SpinBox;
 class GenericTableWidget;
+class DoubleSpinBox;
 class hkbVariableBindingSet;
 
-class BSiStateTaggingGeneratorUI: public QGroupBox
+class BSOffsetAnimationGeneratorUI: public QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
 public:
-    BSiStateTaggingGeneratorUI();
-    virtual ~BSiStateTaggingGeneratorUI(){}
+    BSOffsetAnimationGeneratorUI();
+    virtual ~BSOffsetAnimationGeneratorUI(){}
     void loadData(HkxObject *data);
 signals:
+    void generatorNameChanged(const QString & newName, int index);
     void viewVariables(int index);
     void viewGenerators(int index);
     void viewProperties(int index);
-    void generatorNameChanged(const QString & newName, int index);
 private slots:
     void setName();
-    void setIStateToSetAs();
-    void setIPriority();
     void setBindingVariable(int index, const QString & name);
+    void setGenerator(int index, const QString & name);
+    void setFOffsetVariable();
+    void setFOffsetRangeStart();
+    void setFOffsetRangeEnd();
     void viewSelected(int row, int column);
-    void setDefaultGenerator(int index, const QString & name);
 private:
     void connectSignals();
     void disconnectSignals();
-    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *generators);
-    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path);
     void variableRenamed(const QString & name, int index);
     void generatorRenamed(const QString & name, int index);
-    void setBehaviorView(BehaviorGraphView *view);
     void selectTableToView(bool viewproperties, const QString & path);
     bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
+    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path);
+    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
+    void setBehaviorView(BehaviorGraphView *view);
 private:
     static QStringList headerLabels;
     BehaviorGraphView *behaviorView;
-    BSiStateTaggingGenerator *bsData;
+    BSOffsetAnimationGenerator *bsData;
     QGridLayout *topLyt;
     TableWidget *table;
     LineEdit *name;
-    SpinBox *iStateToSetAs;
-    SpinBox *iPriority;
+    DoubleSpinBox *fOffsetVariable;
+    DoubleSpinBox *fOffsetRangeStart;
+    DoubleSpinBox *fOffsetRangeEnd;
 };
 
-#endif // BSISTATETAGGINGGENERATORUI_H
+#endif // BSOFFSETANIMATIONGENERATORUI_H

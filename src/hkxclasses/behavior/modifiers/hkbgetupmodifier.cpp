@@ -112,8 +112,8 @@ bool hkbGetUpModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("groundNormal"), groundNormal.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("duration"), QString::number(duration));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("alignWithGroundDuration"), QString::number(alignWithGroundDuration));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("duration"), QString::number(duration, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("alignWithGroundDuration"), QString::number(alignWithGroundDuration, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("rootBoneIndex"), QString::number(rootBoneIndex));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("otherBoneIndex"), QString::number(otherBoneIndex));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("anotherBoneIndex"), QString::number(anotherBoneIndex));

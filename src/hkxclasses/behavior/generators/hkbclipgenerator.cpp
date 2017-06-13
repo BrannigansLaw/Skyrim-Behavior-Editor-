@@ -12,9 +12,10 @@ QString hkbClipGenerator::classname = "hkbClipGenerator";
 QStringList hkbClipGenerator::PlaybackMode = {"MODE_SINGLE_PLAY", "MODE_LOOPING", "MODE_USER_CONTROLLED", "MODE_PING_PONG", "MODE_COUNT"};
 QStringList hkbClipGenerator::ClipFlags = {"0", "FLAG_CONTINUE_MOTION_AT_END", "FLAG_SYNC_HALF_CYCLE_IN_PING_PONG_MODE", "FLAG_MIRROR", "FLAG_FORCE_DENSE_POSE", "FLAG_DONT_CONVERT_ANNOTATIONS_TO_TRIGGERS", "FLAG_IGNORE_MOTION"};
 
-hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref)
+hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, const QString &animationname)
     : hkbGenerator(parent, ref),
       userData(0),
+      animationName(animationname),
       cropStartAmountLocalTime(0),
       cropEndAmountLocalTime(0),
       startTime(0),
@@ -141,12 +142,12 @@ bool hkbClipGenerator::write(HkxXMLWriter *writer){
             refString = "null";
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("triggers"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("cropStartAmountLocalTime"), QString::number(cropStartAmountLocalTime));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("cropEndAmountLocalTime"), QString::number(cropEndAmountLocalTime));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("startTime"), QString::number(startTime));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("playbackSpeed"), QString::number(playbackSpeed));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enforcedDuration"), QString::number(enforcedDuration));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userControlledTimeFraction"), QString::number(userControlledTimeFraction));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("cropStartAmountLocalTime"), QString::number(cropStartAmountLocalTime, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("cropEndAmountLocalTime"), QString::number(cropEndAmountLocalTime, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("startTime"), QString::number(startTime, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("playbackSpeed"), QString::number(playbackSpeed, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enforcedDuration"), QString::number(enforcedDuration, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userControlledTimeFraction"), QString::number(userControlledTimeFraction, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("animationBindingIndex"), QString::number(animationBindingIndex));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("mode"), mode);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("flags"), flags);

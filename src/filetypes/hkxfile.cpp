@@ -73,10 +73,6 @@ void HkxFile::writeToLog(const QString & message, bool isError){
     }
 }
 
-void HkxFile::setProgressData(const QString & message, int value){
-    ui->setProgressData(message, value);
-}
-
 HkxFile::~HkxFile(){
     //
 }

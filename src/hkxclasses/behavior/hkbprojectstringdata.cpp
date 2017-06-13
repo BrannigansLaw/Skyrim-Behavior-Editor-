@@ -24,7 +24,7 @@ QString hkbProjectStringData::getClassname(){
 
 QString hkbProjectStringData::getCharacterFilePathAt(int index) const{
     if (index < characterFilenames.size()){
-        return characterFilenames.at(index);
+        return QString(characterFilenames.at(index)).replace("\\", "/");
     }
     return "";
 }

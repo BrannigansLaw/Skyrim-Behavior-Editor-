@@ -19,7 +19,11 @@
 #include "src/ui/hkxclassesui/behaviorui/generators/statemachineui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/stateui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/behaviorgraphui.h"
+#include "src/ui/hkxclassesui/behaviorui/generators/bsoffsetanimationgeneratorui.h"
+#include "src/ui/hkxclassesui/behaviorui/generators/bsboneswitchgeneratorui.h"
+#include "src/ui/hkxclassesui/behaviorui/generators/bsboneswitchgeneratorbonedataui.h"
 #include "src/ui/hkxclassesui/behaviorui/transitionsui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bslimbikmodifierui.h"
 
 #include <QPushButton>
 #include <QMessageBox>
@@ -114,40 +118,42 @@ HkDataUI::HkDataUI(const QString &title)
       eventsTable(new GenericTableWidget("Select an Event!")),
       characterPropertiesTable(new GenericTableWidget("Select a Character Property!")),
       noDataL(new QLabel("No Data Selected!")),
-      iSTGUI(new BSiStateTaggingGeneratorUI),
-      modGenUI(new ModifierGeneratorUI(NULL, NULL)),
+      iStateTagGenUI(new BSiStateTaggingGeneratorUI),
+      modGenUI(new ModifierGeneratorUI),
       manSelGenUI(new ManualSelectorGeneratorUI),
       stateMachineUI(new StateMachineUI),
       blenderGeneratorUI(new BlenderGeneratorUI),
-      behaviorGraphUI(new BehaviorGraphUI)
+      behaviorGraphUI(new BehaviorGraphUI),
+      limbIKModUI(new BSLimbIKModifierUI),
+      boneSwitchUI(new BSBoneSwitchGeneratorUI),
+      offsetAnimGenUI(new BSOffsetAnimationGeneratorUI)
 {
     setTitle(title);
-    //generatorsTable->setTypes(generatorTypes);
-    //modifiersTable->setTypes(modifierTypes);
-    //variablesTable->setTypes(variableTypes);
-    //eventsTable->setTypes(QStringList("hkEvents"));
-    //characterPropertiesTable->setTypes(variableTypes);
     stack->addWidget(noDataL);
-    stack->addWidget(iSTGUI);
+    stack->addWidget(iStateTagGenUI);
     stack->addWidget(modGenUI);
     stack->addWidget(manSelGenUI);
     stack->addWidget(stateMachineUI);
     stack->addWidget(blenderGeneratorUI);
     stack->addWidget(behaviorGraphUI);
+    stack->addWidget(limbIKModUI);
+    stack->addWidget(boneSwitchUI);
+    stack->addWidget(offsetAnimGenUI);
     verLyt->addLayout(stack, 5);
     setLayout(verLyt);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    connect(iSTGUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
-    connect(modGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
-    connect(manSelGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
-    connect(iSTGUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
-    connect(blenderGeneratorUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)));
+    connect(stateMachineUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(modGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(manSelGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(iStateTagGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(blenderGeneratorUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(behaviorGraphUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(boneSwitchUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(offsetAnimGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
 
-    /*connect(blenderGeneratorUI, SIGNAL(viewVariables(int)), variablesTable, SLOT(showTable(int)));
-    connect(blenderGeneratorUI, SIGNAL(viewProperties(int)), characterPropertiesTable, SLOT(showTable(int)));
-    connect(blenderGeneratorUI, SIGNAL(viewGenerators(int)), generatorsTable, SLOT(showTable(int)));*/
+    connect(limbIKModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
 
-    connect(behaviorView, SIGNAL(iconSelected(TreeGraphicsItem*)), this, SLOT(changeCurrentDataWidget(TreeGraphicsItem*)));
+    connect(behaviorView, SIGNAL(iconSelected(TreeGraphicsItem*)), this, SLOT(changeCurrentDataWidget(TreeGraphicsItem*)), Qt::UniqueConnection);
 }
 
 void HkDataUI::setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *variables){
@@ -156,12 +162,22 @@ void HkDataUI::setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *varia
     }
     eventsUI = events;
     variablesUI = variables;
-    connect(eventsUI, SIGNAL(eventAdded(QString)), this, SLOT(eventAdded(QString)));
-    connect(eventsUI, SIGNAL(eventRemoved(int)), this, SLOT(eventRemoved(int)));
-    connect(eventsUI, SIGNAL(eventNameChanged(QString,int)), this, SLOT(eventNameChanged(QString,int)));
-    connect(variablesUI, SIGNAL(variableAdded(QString,QString)), this, SLOT(variableAdded(QString,QString)));
-    connect(variablesUI, SIGNAL(variableRemoved(int)), this, SLOT(variableRemoved(int)));
-    connect(variablesUI, SIGNAL(variableNameChanged(QString,int)), this, SLOT(variableNameChanged(QString,int)));
+    connect(eventsUI, SIGNAL(eventAdded(QString)), this, SLOT(eventAdded(QString)), Qt::UniqueConnection);
+    connect(eventsUI, SIGNAL(eventRemoved(int)), this, SLOT(eventRemoved(int)), Qt::UniqueConnection);
+    connect(eventsUI, SIGNAL(eventNameChanged(QString,int)), this, SLOT(eventNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(variablesUI, SIGNAL(variableAdded(QString,QString)), this, SLOT(variableAdded(QString,QString)), Qt::UniqueConnection);
+    connect(variablesUI, SIGNAL(variableRemoved(int)), this, SLOT(variableRemoved(int)), Qt::UniqueConnection);
+    connect(variablesUI, SIGNAL(variableNameChanged(QString,int)), this, SLOT(variableNameChanged(QString,int)), Qt::UniqueConnection);
+}
+
+void HkDataUI::unloadDataWidget(){
+    disconnect(variablesTable, SIGNAL(elementSelected(int,QString)), 0, 0);
+    disconnect(characterPropertiesTable, SIGNAL(elementSelected(int,QString)), 0, 0);
+    disconnect(generatorsTable, SIGNAL(elementSelected(int,QString)), 0, 0);
+    disconnect(modifiersTable, SIGNAL(elementSelected(int,QString)), 0, 0);
+    disconnect(eventsTable, SIGNAL(elementSelected(int,QString)), 0, 0);
+    loadedData = NULL;
+    stack->setCurrentIndex(DATA_TYPE_LOADED::NO_DATA_SELECTED);
 }
 
 void HkDataUI::modifierAdded(const QString & name, const QString & type){
@@ -173,8 +189,8 @@ void HkDataUI::modifierNameChanged(const QString & newName, int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     modifiersTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
-    case MODIFIER_GENERATOR:
-        //rename modifier in table...
+    case DATA_TYPE_LOADED::MODIFIER_GENERATOR:
+        modGenUI->modifierRenamed(newName, index);
         break;
     default:
         break;
@@ -192,14 +208,26 @@ void HkDataUI::generatorNameChanged(const QString & newName, int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     generatorsTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
-    case BLENDER_GENERATOR:
+    case DATA_TYPE_LOADED::BLENDER_GENERATOR:
         blenderGeneratorUI->generatorRenamed(newName, index);
         break;
-    case STATE_MACHINE:
+    case DATA_TYPE_LOADED::STATE_MACHINE:
         stateMachineUI->generatorRenamed(newName, index);
         break;
-    case MANUAL_SELECTOR_GENERATOR:
+    case DATA_TYPE_LOADED::MANUAL_SELECTOR_GENERATOR:
         manSelGenUI->generatorRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::MODIFIER_GENERATOR:
+        modGenUI->generatorRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN:
+        iStateTagGenUI->generatorRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR:
+        boneSwitchUI->generatorRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR:
+        offsetAnimGenUI->generatorRenamed(newName, index);
         break;
     default:
         break;
@@ -211,7 +239,7 @@ void HkDataUI::eventNameChanged(const QString & newName, int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     eventsTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
-    case STATE_MACHINE:
+    case DATA_TYPE_LOADED::STATE_MACHINE:
         stateMachineUI->eventRenamed(newName, index);
         break;
     default:
@@ -230,7 +258,7 @@ void HkDataUI::eventRemoved(int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     eventsTable->removeItem(index);
     switch (stack->currentIndex()) {
-    case STATE_MACHINE:
+    case DATA_TYPE_LOADED::STATE_MACHINE:
         stateMachineUI->eventRenamed("NONE", index);
         break;
     default:
@@ -243,14 +271,26 @@ void HkDataUI::variableNameChanged(const QString & newName, int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     variablesTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
-    case BLENDER_GENERATOR:
+    case DATA_TYPE_LOADED::BLENDER_GENERATOR:
         blenderGeneratorUI->variableRenamed(newName, index);
         break;
-    case STATE_MACHINE:
+    case DATA_TYPE_LOADED::STATE_MACHINE:
         stateMachineUI->variableRenamed(newName, index);
         break;
-    case MANUAL_SELECTOR_GENERATOR:
+    case DATA_TYPE_LOADED::MANUAL_SELECTOR_GENERATOR:
         manSelGenUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN:
+        iStateTagGenUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_LIMB_IK_MOD:
+        limbIKModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR:
+        boneSwitchUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR:
+        offsetAnimGenUI->variableRenamed(newName, index);
         break;
     default:
         break;
@@ -268,27 +308,37 @@ void HkDataUI::generatorRemoved(int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     generatorsTable->removeItem(index);
     switch (stack->currentIndex()){
-    case HKB_BLENDER_GENERATOR:
+    case DATA_TYPE_LOADED::BLENDER_GENERATOR:
         blenderGeneratorUI->loadData(loadedData);
-        blenderGeneratorUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
+        //blenderGeneratorUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
         break;
-    case BS_I_STATE_TAGGING_GENERATOR:
-        //
+    case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR:
+        boneSwitchUI->loadData(loadedData);
+        //boneSwitchUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
         break;
-    case HKB_MODIFIER_GENERATOR:
-        //
+    case DATA_TYPE_LOADED::MODIFIER_GENERATOR:
+        modGenUI->loadData(loadedData);
+        //modGenUI->connectToTables(modifiersTable, generatorsTable);
         break;
-    case HKB_MANUAL_SELECTOR_GENERATOR:
+    case DATA_TYPE_LOADED::MANUAL_SELECTOR_GENERATOR:
         manSelGenUI->loadData(loadedData);
-        manSelGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
+        //manSelGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
         break;
-    case HKB_STATE_MACHINE:
+    case DATA_TYPE_LOADED::STATE_MACHINE:
         stateMachineUI->loadData(loadedData);
-        stateMachineUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
+        //stateMachineUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
         break;
-    case HKB_BEHAVIOR_GRAPH:
+    case DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN:
+        iStateTagGenUI->loadData(loadedData);
+        //iStateTagGenUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
+        break;
+    case DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR:
+        offsetAnimGenUI->loadData(loadedData);
+        //iStateTagGenUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
+        break;
+    case DATA_TYPE_LOADED::BEHAVIOR_GRAPH:
         behaviorGraphUI->loadData(loadedData);
-        behaviorGraphUI->connectToTables(generatorsTable);
+        //behaviorGraphUI->connectToTables(generatorsTable);
         break;
     default:
         break;
@@ -313,14 +363,26 @@ void HkDataUI::variableRemoved(int index){
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     variablesTable->removeItem(index);
     switch (stack->currentIndex()){
-    case BLENDER_GENERATOR:
+    case DATA_TYPE_LOADED::BLENDER_GENERATOR:
         blenderGeneratorUI->variableRenamed("NONE", index);
         break;
-    case STATE_MACHINE:
+    case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR:
+        boneSwitchUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::STATE_MACHINE:
         stateMachineUI->variableRenamed("NONE", index);
         break;
-    case MANUAL_SELECTOR_GENERATOR:
+    case DATA_TYPE_LOADED::MANUAL_SELECTOR_GENERATOR:
         manSelGenUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN:
+        iStateTagGenUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_LIMB_IK_MOD:
+        limbIKModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR:
+        offsetAnimGenUI->variableRenamed("NONE", index);
         break;
     default:
         break;
@@ -337,57 +399,78 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
         sig = ((HkxObject *)((icon->itemData)))->getSignature();
         loadedData = ((HkxObject *)((icon->itemData)));
         switch (sig){
-        case HKB_BLENDER_GENERATOR:
+        case HkxSignature::HKB_BLENDER_GENERATOR:
             if (loadedData != oldData){
                 blenderGeneratorUI->loadData(loadedData);
             }
-            stack->setCurrentIndex(BLENDER_GENERATOR);
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BLENDER_GENERATOR);
             blenderGeneratorUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
             break;
-        case BS_I_STATE_TAGGING_GENERATOR:
+        case HkxSignature::BS_BONE_SWITCH_GENERATOR:
             if (loadedData != oldData){
-                iSTGUI->loadData(loadedData);
+                boneSwitchUI->loadData(loadedData);
             }
-            stack->setCurrentIndex(BS_I_STATE_TAG_GEN);
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR);
+            boneSwitchUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
             break;
-        case HKB_MODIFIER_GENERATOR:
+        case HkxSignature::HKB_MODIFIER_GENERATOR:
             if (loadedData != oldData){
                 modGenUI->loadData(loadedData);
             }
-            stack->setCurrentIndex(MODIFIER_GENERATOR);
+            stack->setCurrentIndex(DATA_TYPE_LOADED::MODIFIER_GENERATOR);
+            modGenUI->connectToTables(modifiersTable, generatorsTable);
             break;
-        case HKB_MANUAL_SELECTOR_GENERATOR:
+        case HkxSignature::BS_I_STATE_TAGGING_GENERATOR:
+            if (loadedData != oldData){
+                iStateTagGenUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN);
+            iStateTagGenUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
+            break;
+        case HkxSignature::BS_LIMB_IK_MODIFIER:
+            if (loadedData != oldData){
+                limbIKModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_LIMB_IK_MOD);
+            limbIKModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_MANUAL_SELECTOR_GENERATOR:
             if (loadedData != oldData){
                 manSelGenUI->loadData(loadedData);
             }
-            stack->setCurrentIndex(MANUAL_SELECTOR_GENERATOR);
+            stack->setCurrentIndex(DATA_TYPE_LOADED::MANUAL_SELECTOR_GENERATOR);
             manSelGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
             break;
-        case HKB_STATE_MACHINE:
+        case HkxSignature::BS_OFFSET_ANIMATION_GENERATOR:
+            if (loadedData != oldData){
+                offsetAnimGenUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR);
+            offsetAnimGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_STATE_MACHINE:
             if (loadedData != oldData){
                 stateMachineUI->loadData(loadedData);
             }
-            stack->setCurrentIndex(STATE_MACHINE);
+            stack->setCurrentIndex(DATA_TYPE_LOADED::STATE_MACHINE);
             stateMachineUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
             break;
-        case HKB_BEHAVIOR_GRAPH:
+        case HkxSignature::HKB_BEHAVIOR_GRAPH:
             if (loadedData != oldData){
                 behaviorGraphUI->loadData(loadedData);
             }
-            stack->setCurrentIndex(BEHAVIOR_GRAPH);
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BEHAVIOR_GRAPH);
             behaviorGraphUI->connectToTables(generatorsTable);
             break;
         default:
-            stack->setCurrentIndex(NO_DATA_SELECTED);
-            break;
+            unloadDataWidget();
         }
     }else{
-        stack->setCurrentIndex(NO_DATA_SELECTED);
-        loadedData = NULL;
+        unloadDataWidget();
     }
 }
 
-BehaviorGraphView *HkDataUI::setBehaviorView(BehaviorGraphView *view){
+BehaviorGraphView *HkDataUI::loadBehaviorView(BehaviorGraphView *view){
     BehaviorGraphView *oldView = behaviorView;
     if (oldView){
         //disconnect(oldView, 0, this, 0);
@@ -396,12 +479,14 @@ BehaviorGraphView *HkDataUI::setBehaviorView(BehaviorGraphView *view){
         setMinimumSize(parentWidget()->size()*0.99);
     }
     behaviorView = view;
-    iSTGUI->behaviorView = view;
-    modGenUI->behaviorView = view;
+    iStateTagGenUI->setBehaviorView(view);
+    modGenUI->setBehaviorView(view);
     manSelGenUI->setBehaviorView(view);
     stateMachineUI->setBehaviorView(view);
     blenderGeneratorUI->setBehaviorView(view);
     behaviorGraphUI->setBehaviorView(view);
+    boneSwitchUI->setBehaviorView(view);
+    offsetAnimGenUI->setBehaviorView(view);
     if (behaviorView){
         generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "NULL");
         modifiersTable->loadTable(behaviorView->behavior->getModifierNames(), behaviorView->behavior->getModifierTypeNames(), "NULL");

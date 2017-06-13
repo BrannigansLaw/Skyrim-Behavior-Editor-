@@ -52,21 +52,25 @@ public:
     MainWindow();
     virtual ~MainWindow();
     void writeToLog(const QString & message, bool isError = false);
-    void setProgressData(const QString & message, int value);
 protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
     void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
 private:
     PlainTextEdit *debugLog;
+    QString hkxcmdPath;
+    QString skyrimDirectory;
     QGridLayout *topLyt;
     QMenuBar *topMB;
-    QAction *openProjectA;
-    //QAction *openBehaviorA;
     QMenu *fileM;
+    QAction *openProjectA;
     QAction *saveA;
+    QAction *exportToSkyrimDirA;
+    QAction *saveProjectA;
+    QAction *exitA;
     QMenu *viewM;
     QAction *expandA;
     QAction *collapseA;
+    QAction *refocusA;
     QTabWidget *tabs;
     ProjectFile *projectFile;
     CharacterFile *characterFile;
@@ -82,7 +86,6 @@ private:
     EventsUI *eventsWid;
     QGroupBox *logGB;
     QVBoxLayout *logGBLyt;
-    QProgressDialog *progressD;
     QString lastFileSelected;
     QString lastFileSelectedPath;
 private slots:
@@ -90,16 +93,23 @@ private slots:
     void openBehaviorFile(const QModelIndex & index);
     void expandBranches();
     void collapseBranches();
+    void refocus();
     void save();
-    void saveAll();
+    void saveProject();
+    void packAndExportToSkyrimDirectory();
     //void saveAs();
-    //void exit();
+    void exit();
     void changedTabs(int index);
     void closeTab(int index);
 private:
-    bool openBehavior(const QString & filename, QProgressDialog *dialog);
-    void setProgressData(const QString & message, int max, int min, int value);
+    enum HKXCMD_RETURN{
+        HKXCMD_SUCCESS = 0
+    };
+    void saveFile(int index);
+    bool openBehavior(const QString & filename);
     bool exitProgram();
+    bool findSkyrimDirectory();
+    MainWindow::HKXCMD_RETURN packHKX(const QString &filepath, const QString &outputDirectory);
     //void drawIcons();
     void readSettings();
     void writeSettings();

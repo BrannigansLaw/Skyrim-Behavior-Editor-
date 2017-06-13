@@ -92,8 +92,8 @@ bool hkbEventsFromRangeModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("inputValue"), QString::number(inputValue));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lowerBound"), QString::number(lowerBound));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("inputValue"), QString::number(inputValue, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lowerBound"), QString::number(lowerBound, char('f'), 6));
         if (eventRanges.data()){
             refString = eventRanges.data()->getReferenceString();
         }else{

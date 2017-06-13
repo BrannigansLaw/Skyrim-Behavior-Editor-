@@ -145,8 +145,8 @@ bool hkbBlendingTransitionEffect::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("selfTransitionMode"), selfTransitionMode);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("eventMode"), eventMode);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("duration"), QString::number(duration));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("toGeneratorStartTimeFraction"), QString::number(toGeneratorStartTimeFraction));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("duration"), QString::number(duration, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("toGeneratorStartTimeFraction"), QString::number(toGeneratorStartTimeFraction, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("flags"), flags);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("endMode"), endMode);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendCurve"), blendCurve);

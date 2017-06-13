@@ -100,10 +100,10 @@ bool BSInterpValueModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("source"), QString::number(source));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("target"), QString::number(target));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("result"), QString::number(result));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("gain"), QString::number(gain));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("source"), QString::number(source, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("target"), QString::number(target, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("result"), QString::number(result, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("gain"), QString::number(gain, char('f'), 6));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");

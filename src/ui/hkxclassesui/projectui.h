@@ -22,6 +22,7 @@ public:
     void setProject(ProjectFile *file);
     void loadData();
     void setFilePath(const QString & path);
+    void setDisabled(bool disable);
 signals:
     void openFile(const QModelIndex & index);
 protected:

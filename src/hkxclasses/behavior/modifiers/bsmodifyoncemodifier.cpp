@@ -75,10 +75,10 @@ bool BSModifyOnceModifier::hasChildren() const{
 QList<DataIconManager *> BSModifyOnceModifier::getChildren() const{
     QList<DataIconManager *> list;
     if (pOnActivateModifier.data()){
-        list.append((DataIconManager *)pOnActivateModifier.data());
+        list.append(static_cast<DataIconManager*>(pOnActivateModifier.data()));
     }
     if (pOnDeactivateModifier.data()){
-        list.append((DataIconManager *)pOnDeactivateModifier.data());
+        list.append(static_cast<DataIconManager*>(pOnDeactivateModifier.data()));
     }
     return list;
 }

@@ -252,7 +252,6 @@ bool BSLookAtModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lookAtTarget"), getBoolAsString(lookAtTarget));
-
         list1 = {writer->name, writer->numelements};
         list2 = {"bones", QString::number(bones.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
@@ -260,9 +259,9 @@ bool BSLookAtModifier::write(HkxXMLWriter *writer){
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("index"), QString::number(bones.at(i).index));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fwdAxisLS"), bones[i].fwdAxisLS.getValueAsString());
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleDegrees"), QString::number(bones.at(i).limitAngleDegrees));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("onGain"), QString::number(bones.at(i).onGain));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("offGain"), QString::number(bones.at(i).offGain));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleDegrees"), QString::number(bones.at(i).limitAngleDegrees, char('f'), 6));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("onGain"), QString::number(bones.at(i).onGain, char('f'), 6));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("offGain"), QString::number(bones.at(i).offGain, char('f'), 6));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enabled"), getBoolAsString(bones.at(i).enabled));
             writer->writeLine(writer->object, false);
         }
@@ -275,9 +274,9 @@ bool BSLookAtModifier::write(HkxXMLWriter *writer){
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("index"), QString::number(eyeBones.at(i).index));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fwdAxisLS"), eyeBones[i].fwdAxisLS.getValueAsString());
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleDegrees"), QString::number(eyeBones.at(i).limitAngleDegrees));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("onGain"), QString::number(eyeBones.at(i).onGain));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("offGain"), QString::number(eyeBones.at(i).offGain));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleDegrees"), QString::number(eyeBones.at(i).limitAngleDegrees, char('f'), 6));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("onGain"), QString::number(eyeBones.at(i).onGain, char('f'), 6));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("offGain"), QString::number(eyeBones.at(i).offGain, char('f'), 6));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enabled"), getBoolAsString(eyeBones.at(i).enabled));
             writer->writeLine(writer->object, false);
         }
@@ -287,8 +286,8 @@ bool BSLookAtModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleDegrees"), QString::number(limitAngleDegrees));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleThresholdDegrees"), QString::number(limitAngleThresholdDegrees));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("continueLookOutsideOfLimit"), getBoolAsString(continueLookOutsideOfLimit));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("onGain"), QString::number(onGain));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("offGain"), QString::number(offGain));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("onGain"), QString::number(onGain, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("offGain"), QString::number(offGain, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("useBoneGains"), getBoolAsString(useBoneGains));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("targetLocation"), targetLocation.getValueAsString());
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("targetOutsideLimits"), getBoolAsString(targetOutsideLimits));
@@ -304,9 +303,9 @@ bool BSLookAtModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lookAtCamera"), getBoolAsString(lookAtCamera));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lookAtCameraX"), QString::number(lookAtCameraX));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lookAtCameraY"), QString::number(lookAtCameraY));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lookAtCameraZ"), QString::number(lookAtCameraZ));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lookAtCameraX"), QString::number(lookAtCameraX, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lookAtCameraY"), QString::number(lookAtCameraY, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lookAtCameraZ"), QString::number(lookAtCameraZ, char('f'), 6));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");

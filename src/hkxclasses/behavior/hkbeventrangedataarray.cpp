@@ -103,7 +103,7 @@ bool hkbEventRangeDataArray::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < eventData.size(); i++){
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("upperBound"), QString::number(eventData.at(i).upperBound));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("upperBound"), QString::number(eventData.at(i).upperBound, char('f'), 6));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("event"), "");
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventData.at(i).event.id));

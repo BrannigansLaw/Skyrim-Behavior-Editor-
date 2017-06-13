@@ -20,6 +20,7 @@ public:
     DataIconManager * getSelectedData() const;
     bool reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData, bool removeData = true);
     bool removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove, bool removeData = true, bool removeAllSameData = false);
+    TreeGraphicsItem * addItemToGraph(TreeGraphicsItem *selectedIcon, DataIconManager *data, int indexToInsert, bool inject = false, bool allowDuplicates = false);
 signals:
     void iconSelected(TreeGraphicsItem *selected);
 protected:
@@ -29,7 +30,6 @@ protected:
     void contractAllBranches();
     void expandAllBranches();
     void selectRoot();
-    TreeGraphicsItem * addItemToGraph(TreeGraphicsItem *selectedIcon, DataIconManager *data, int indexToInsert, bool inject = false, bool allowDuplicates = false);
 private:
     QMenu *popUpMenu;
     TreeGraphicsScene *treeScene;

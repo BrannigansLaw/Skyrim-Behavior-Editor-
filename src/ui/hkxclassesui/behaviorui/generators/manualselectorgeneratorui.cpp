@@ -57,6 +57,12 @@ ManualSelectorGeneratorUI::ManualSelectorGeneratorUI()
       selectedGeneratorIndex(new SpinBox),
       currentGeneratorIndex(new SpinBox)
 {
+    table->setAcceptDrops(true);
+    table->viewport()->setAcceptDrops(true);
+    table->setDragDropOverwriteMode(true);
+    table->setDropIndicatorShown(true);
+    table->setDragDropMode(QAbstractItemView::InternalMove);
+    table->setRowSwapRange(BASE_NUMBER_OF_ROWS);
     setTitle("hkbManualSelectorGenerator");
     typeSelectorCB->insertItems(0, types);
     table->setRowCount(BASE_NUMBER_OF_ROWS);
@@ -67,12 +73,12 @@ ManualSelectorGeneratorUI::ManualSelectorGeneratorUI()
     table->setItem(NAME_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setCellWidget(NAME_ROW, VALUE_COLUMN, name);
     table->setItem(SELECTED_GENERATOR_INDEX_ROW, NAME_COLUMN, new TableWidgetItem("selectedGeneratorIndex"));
-    table->setItem(SELECTED_GENERATOR_INDEX_ROW, TYPE_COLUMN, new TableWidgetItem("hkiNT32", Qt::AlignCenter));
+    table->setItem(SELECTED_GENERATOR_INDEX_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
     table->setItem(SELECTED_GENERATOR_INDEX_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setItem(SELECTED_GENERATOR_INDEX_ROW, VALUE_COLUMN, new TableWidgetItem("", Qt::AlignCenter, QColor(Qt::lightGray)));
     table->setCellWidget(SELECTED_GENERATOR_INDEX_ROW, VALUE_COLUMN, selectedGeneratorIndex);
     table->setItem(CURRENT_GENERATOR_INDEX_ROW, NAME_COLUMN, new TableWidgetItem("currentGeneratorIndex"));
-    table->setItem(CURRENT_GENERATOR_INDEX_ROW, TYPE_COLUMN, new TableWidgetItem("hkiNT32", Qt::AlignCenter));
+    table->setItem(CURRENT_GENERATOR_INDEX_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
     table->setItem(CURRENT_GENERATOR_INDEX_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setItem(CURRENT_GENERATOR_INDEX_ROW, VALUE_COLUMN, new TableWidgetItem("", Qt::AlignCenter, QColor(Qt::lightGray)));
     table->setCellWidget(CURRENT_GENERATOR_INDEX_ROW, VALUE_COLUMN, currentGeneratorIndex);
@@ -90,6 +96,7 @@ void ManualSelectorGeneratorUI::connectSignals(){
     connect(selectedGeneratorIndex, SIGNAL(clicked(bool)), this, SLOT(setSelectedGeneratorIndex()), Qt::UniqueConnection);
     connect(currentGeneratorIndex, SIGNAL(editingFinished()), this, SLOT(setCurrentGeneratorIndex()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    connect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)), Qt::UniqueConnection);
 }
 
 void ManualSelectorGeneratorUI::disconnectSignals(){
@@ -97,6 +104,7 @@ void ManualSelectorGeneratorUI::disconnectSignals(){
     disconnect(selectedGeneratorIndex, SIGNAL(clicked(bool)), this, SLOT(setSelectedGeneratorIndex()));
     disconnect(currentGeneratorIndex, SIGNAL(editingFinished()), this, SLOT(setCurrentGeneratorIndex()));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    disconnect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)));
 }
 
 void ManualSelectorGeneratorUI::loadData(HkxObject *data){
@@ -105,6 +113,7 @@ void ManualSelectorGeneratorUI::loadData(HkxObject *data){
     if (data){
         if (data->getSignature() == HKB_MANUAL_SELECTOR_GENERATOR){
             bsData = static_cast<hkbManualSelectorGenerator *>(data);
+            name->setText(bsData->name);
             selectedGeneratorIndex->setValue(bsData->selectedGeneratorIndex);
             currentGeneratorIndex->setValue(bsData->currentGeneratorIndex);
             varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
@@ -151,7 +160,7 @@ void ManualSelectorGeneratorUI::setRowItems(int row, const QString & name, const
     if (table->item(row, NAME_COLUMN)){
         table->item(row, NAME_COLUMN)->setText(name);
     }else{
-        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name));
+        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name, Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::cyan), QBrush(Qt::black), DRAG_DROP_N_SWAP));
     }
     if (table->item(row, TYPE_COLUMN)){
         table->item(row, TYPE_COLUMN)->setText(classname);
@@ -199,9 +208,13 @@ bool ManualSelectorGeneratorUI::setBinding(int index, int row, const QString & v
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY);
+                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    CRITICAL_ERROR_MESSAGE(QString("ManualSelectorGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                }
             }else{
-                varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
+                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    CRITICAL_ERROR_MESSAGE(QString("ManualSelectorGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
@@ -223,13 +236,13 @@ void ManualSelectorGeneratorUI::setBindingVariable(int index, const QString & na
             if (table->item(SELECTED_GENERATOR_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                 isProperty = true;
             }
-            setBinding(index, row, name, "selectedGeneratorIndex", VARIABLE_TYPE_REAL, isProperty);
+            setBinding(index, row, name, "selectedGeneratorIndex", VARIABLE_TYPE_INT32, isProperty);
             break;
         case CURRENT_GENERATOR_INDEX_ROW:
             if (table->item(CURRENT_GENERATOR_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                 isProperty = true;
             }
-            setBinding(index, row, name, "currentGeneratorIndex", VARIABLE_TYPE_REAL, isProperty);
+            setBinding(index, row, name, "currentGeneratorIndex", VARIABLE_TYPE_INT32, isProperty);
             break;
         default:
             return;
@@ -247,7 +260,8 @@ void ManualSelectorGeneratorUI::loadBinding(int row, int colunm, hkbVariableBind
             QString varName;
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index);
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
+                    table->item(row, colunm)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -287,7 +301,6 @@ void ManualSelectorGeneratorUI::variableRenamed(const QString &name, int index){
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::variableRenamed(): The data is NULL!!"))
     }
 }
-
 
 void ManualSelectorGeneratorUI::generatorRenamed(const QString &name, int index){
     int generatorIndex = table->currentRow() - BASE_NUMBER_OF_ROWS;
@@ -331,10 +344,12 @@ void ManualSelectorGeneratorUI::selectTableToView(bool viewproperties, const QSt
 
 void ManualSelectorGeneratorUI::setName(){
     if (bsData){
-        bsData->name = name->text();
-        ((DataIconManager *)(bsData))->updateIconNames();
-        emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->name != name->text()){
+            bsData->name = name->text();
+            static_cast<DataIconManager*>((bsData))->updateIconNames();
+            bsData->getParentFile()->toggleChanged(true);
+            emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ManualSelectorGeneratorUI::setName(): The data is NULL!!"))
     }
@@ -400,6 +415,32 @@ void ManualSelectorGeneratorUI::viewSelectedChild(int row, int column){
     }
 }
 
+void ManualSelectorGeneratorUI::swapGeneratorIndices(int index1, int index2){
+    if (bsData){
+        index1 = index1 - BASE_NUMBER_OF_ROWS;
+        index2 = index2 - BASE_NUMBER_OF_ROWS;
+        if (bsData->generators.size() > index1 && bsData->generators.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
+            bsData->generators.swap(index1, index2);
+            behaviorView->getSelectedItem()->reorderChildren();
+            if (bsData->selectedGeneratorIndex == index1){
+                bsData->selectedGeneratorIndex = index2;
+            }else if (bsData->selectedGeneratorIndex == index2){
+                bsData->selectedGeneratorIndex = index1;
+            }
+            if (bsData->currentGeneratorIndex == index1){
+                bsData->currentGeneratorIndex = index2;
+            }else if (bsData->currentGeneratorIndex == index2){
+                bsData->currentGeneratorIndex = index1;
+            }
+            bsData->getParentFile()->toggleChanged(true);
+        }else{
+            WARNING_MESSAGE(QString("ManualSelectorGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!"))
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("ManualSelectorGeneratorUI::swapGeneratorIndices(): The data is NULL!!"))
+    }
+}
+
 void ManualSelectorGeneratorUI::setGenerator(int index, const QString &name){
     DataIconManager *ptr = NULL;
     int generatorIndex = table->currentRow() - BASE_NUMBER_OF_ROWS;
@@ -409,21 +450,24 @@ void ManualSelectorGeneratorUI::setGenerator(int index, const QString &name){
                 ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
                 if (ptr){
                     if (name != ptr->getName()){
-                        CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"))
-                    }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), (DataIconManager *)bsData->generators.at(generatorIndex).data(), ptr, false)){
+                        CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"));
+                        return;
+                    }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generators.at(generatorIndex).data()), ptr, false)){
                         WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+                        return;
                     }
                 }else{
                     if (behaviorView->getSelectedItem()){
-                        behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData((DataIconManager *)bsData->generators.at(generatorIndex).data()), generatorIndex);
+                        behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->generators.at(generatorIndex).data())), generatorIndex);
                     }else{
                         CRITICAL_ERROR_MESSAGE(QString("ManualSelectorGeneratorUI::setGenerator(): The selected icon is NULL!!"));
+                        return;
                     }
-                    behaviorView->removeGeneratorData();
-                    table->item(table->currentRow(), NAME_COLUMN)->setText(name);
-                    bsData->getParentFile()->toggleChanged(true);
-                    loadDynamicTableRows();
                 }
+                behaviorView->removeGeneratorData();
+                table->item(table->currentRow(), NAME_COLUMN)->setText(name);
+                bsData->getParentFile()->toggleChanged(true);
+                loadDynamicTableRows();
             }else{
                 CRITICAL_ERROR_MESSAGE(QString("ManualSelectorGeneratorUI::setGenerator(): Invalid generator index selected!!"))
             }

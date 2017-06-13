@@ -215,16 +215,16 @@ bool hkbStateMachineTransitionInfoArray::write(HkxXMLWriter *writer){
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enterEventId"), QString::number(transitions.at(i).triggerInterval.enterEventId));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("exitEventId"), QString::number(transitions.at(i).triggerInterval.exitEventId));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enterTime"), QString::number(transitions.at(i).triggerInterval.enterTime));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("exitTime"), QString::number(transitions.at(i).triggerInterval.exitTime));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enterTime"), QString::number(transitions.at(i).triggerInterval.enterTime, char('f'), 6));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("exitTime"), QString::number(transitions.at(i).triggerInterval.exitTime, char('f'), 6));
             writer->writeLine(writer->object, false);
             writer->writeLine(writer->parameter, false);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("initiateInterval"), "");
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enterEventId"), QString::number(transitions.at(i).initiateInterval.enterEventId));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("exitEventId"), QString::number(transitions.at(i).initiateInterval.exitEventId));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enterTime"), QString::number(transitions.at(i).initiateInterval.enterTime));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("exitTime"), QString::number(transitions.at(i).initiateInterval.exitTime));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enterTime"), QString::number(transitions.at(i).initiateInterval.enterTime, char('f'), 6));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("exitTime"), QString::number(transitions.at(i).initiateInterval.exitTime, char('f'), 6));
             writer->writeLine(writer->object, false);
             writer->writeLine(writer->parameter, false);
             if (transitions.at(i).transition.data()){

@@ -106,7 +106,7 @@ bool hkbAttributeModifier::write(HkxXMLWriter *writer){
         for (int i = 0; i < assignments.size(); i++){
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("attributeIndex"), QString::number(assignments.at(i).attributeIndex));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("attributeValue"), QString::number(assignments.at(i).attributeValue));
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("attributeValue"), QString::number(assignments.at(i).attributeValue, char('f'), 6));
             writer->writeLine(writer->object, false);
         }
         if (assignments.size() > 0){

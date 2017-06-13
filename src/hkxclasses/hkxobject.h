@@ -23,8 +23,6 @@ class HkxObject: public QSharedData
     friend class CharacterUI;
     friend class SkeletonUI;
     friend class BSIStateManagerModifier;
-    friend class BoneWeightArrayUI;
-    friend class TransitionsUI;
 public:
     enum HkxType {
         TYPE_OTHER=0,
@@ -34,7 +32,6 @@ public:
 public:
     virtual ~HkxObject();
     void writeToLog(const QString & message, bool isError = false);
-    void setProgressData(const QString & message, int value);
     HkxSignature getSignature() const;
     HkxType getType() const;
     virtual bool evaulateDataValidity();
@@ -45,9 +42,9 @@ public:
     virtual bool readData(const HkxXmlReader & reader, long index);
     QString getReferenceString() const;
     QString getBoolAsString(bool b) const;
+    HkxFile * getParentFile() const;
 protected:
     HkxObject(HkxFile *parent, long ref = -1);
-    HkxFile * getParentFile() const;
     void setDataValidity(bool isValid);
     void setType(HkxSignature sig, HkxType type);
     bool readMultipleVector4(const QByteArray &lineIn,  QVector <hkQuadVariable> & vectors);

@@ -13,12 +13,14 @@ class CharacterFile: public HkxFile
     friend class ProjectUI;
     friend class hkbVariableValueSet;
     friend class hkRootLevelContainer;
+    friend class BehaviorFile;
 public:
     CharacterFile(MainWindow *window, const QString & name);
     virtual ~CharacterFile();
     bool addObjectToFile(HkxObject *obj, long ref = -1);
     QString getRootObjectReferenceString();
     QString getRootBehaviorPath() const;
+    QString getBehaviorDirectoryName() const;
     QString getRigName() const;
     QStringList getRigBoneNames() const;
     int getNumberOfBones(bool ragdoll = false) const;
@@ -26,6 +28,7 @@ public:
     QStringList getRagdollBoneNames() const;
     QStringList getAnimationNames() const;
     QString getCharacterPropertyNameAt(int index) const;
+    int getCharacterPropertyIndex(const QString & name) const;
     QStringList getCharacterPropertyNames() const;
     QStringList getCharacterPropertyTypenames() const;
     hkVariableType getCharacterPropertyTypeAt(int index) const;

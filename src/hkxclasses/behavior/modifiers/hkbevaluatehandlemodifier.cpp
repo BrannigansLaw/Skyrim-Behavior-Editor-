@@ -124,8 +124,8 @@ bool hkbEvaluateHandleModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("handlePositionOut"), handlePositionOut.getValueAsString());
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("handleRotationOut"), handleRotationOut.getValueAsString());
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("isValidOut"), getBoolAsString(isValidOut));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("extrapolationTimeStep"), QString::number(extrapolationTimeStep));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("handleChangeSpeed"), QString::number(handleChangeSpeed));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("extrapolationTimeStep"), QString::number(extrapolationTimeStep, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("handleChangeSpeed"), QString::number(handleChangeSpeed, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("handleChangeMode"), handleChangeMode);
         writer->writeLine(writer->object, false);
         setIsWritten();

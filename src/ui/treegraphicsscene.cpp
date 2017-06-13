@@ -2,6 +2,7 @@
 #include "treegraphicsitem.h"
 #include "dataiconmanager.h"
 #include "src/ui/hkxclassesui/behaviorui/behaviorgraphicon.h"
+#include "src/ui/behaviorgraphview.h"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
@@ -62,7 +63,7 @@ void TreeGraphicsScene::selectIcon(TreeGraphicsItem *icon, bool expand){
                         expandBranch(branch.at(i));
                     }
                 }
-                views().first()->centerOn(selectedIcon);//May need to expand the branch???
+                static_cast<BehaviorGraphView *>(views().first())->refocus();//May need to expand the branch???
             }
             selectedIcon->reposition();
         }
@@ -86,6 +87,7 @@ void TreeGraphicsScene::contractBranch(TreeGraphicsItem *icon, bool contractAll)
             }
         }
     }
+    update();
 }
 
 void TreeGraphicsScene::expandBranch(TreeGraphicsItem *icon, bool expandAll){
@@ -119,7 +121,7 @@ bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicate
         parentIcons.append(rootIcon);
         while (!objects.isEmpty() && !numChildren.isEmpty() && !parentIcons.isEmpty()){
             newIcon = addItemToGraph(parentIcons.first(), objects.first(), 0, false, allowDuplicates, true);
-            if (newIcon && newIcon->isDescendant(newIcon)){
+            if (newIcon && newIcon->isDataDescendant(newIcon)){
                 return false;
             }
             if (objects.first()->hasIcons()){
@@ -183,7 +185,7 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
             delete newIcon;
             return NULL;
         }
-        if (newIcon->isDescendant(newIcon)){
+        if (newIcon->isDataDescendant(newIcon)){
             delete newIcon;
             return NULL;
         }
@@ -199,42 +201,45 @@ bool TreeGraphicsScene::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconM
     TreeGraphicsItem *replacementIcon = NULL;
     TreeGraphicsItem *oldParent = NULL;
     QList <DataIconManager *> dataChildren;
-    int indexOfReplacementData = -1;
-    int indexOfOldData = -1;
+    //int indexOfReplacementData = -1;
+    //int indexOfOldData = -1;
     int index = -1;
-    if (oldIconParent && dataToReplace != replacementData){
-        iconToReplace = oldIconParent->getChildWithData(dataToReplace);
-        if (replacementData == NULL){
-            removeItemFromGraph(iconToReplace, oldIconParent->itemData->getIndexOfObj(dataToReplace), removeData);
+    if (oldIconParent){
+        if (!dataToReplace){
+            addItemToGraph(oldIconParent, replacementData, oldIconParent->itemData->getIndexOfObj(dataToReplace));
             return true;
-        }else if (replacementData->icons.isEmpty() || (!oldIconParent->isDescendant(replacementData->icons.first()) && !oldIconParent->hasSameData(replacementData->icons.first()))){
-            dataChildren = oldIconParent->itemData->getChildren();
-            indexOfReplacementData = dataChildren.indexOf(replacementData);
-            indexOfOldData = dataChildren.indexOf(dataToReplace);
-            replacementIcon = oldIconParent->getReplacementIcon(replacementData);
-            index = oldIconParent->getIndexOfChild(iconToReplace);
-            if (iconToReplace){
+        }else if (dataToReplace != replacementData){
+            iconToReplace = oldIconParent->getChildWithData(dataToReplace);
+            if (replacementData == NULL){
                 removeItemFromGraph(iconToReplace, oldIconParent->itemData->getIndexOfObj(dataToReplace), removeData);
-            }
-            if (replacementIcon){
-                oldParent = replacementIcon->setParent(oldIconParent, index);
-                addItemToGraph(oldParent, replacementData, oldIconParent->itemData->getIndexOfObj(replacementData));
-                oldIconParent->itemData->insertObjectAt(oldIconParent->itemData->getIndexOfObj(dataToReplace), replacementData);
-            }else{
-                addItemToGraph(oldIconParent, replacementData, oldIconParent->itemData->getIndexOfObj(dataToReplace));
-            }
-            if (indexOfReplacementData > indexOfOldData){
+                return true;
+            }else if (replacementData->icons.isEmpty() || (!oldIconParent->isDataDescendant(replacementData) && !oldIconParent->hasSameData(replacementData))){
+                dataChildren = oldIconParent->itemData->getChildren();
+                //indexOfReplacementData = dataChildren.indexOf(replacementData);
+                //indexOfOldData = dataChildren.indexOf(dataToReplace);
+                replacementIcon = oldIconParent->getReplacementIcon(replacementData);
+                index = oldIconParent->getIndexOfChild(iconToReplace);
+                if (iconToReplace){
+                    removeItemFromGraph(iconToReplace, oldIconParent->itemData->getIndexOfObj(dataToReplace), removeData, false, replacementData);
+                }
+                if (replacementIcon){
+                    oldParent = replacementIcon->setParent(oldIconParent, index);
+                    addItemToGraph(oldParent, replacementData, oldIconParent->itemData->getIndexOfObj(replacementData));
+                    oldIconParent->itemData->insertObjectAt(oldIconParent->itemData->getIndexOfObj(dataToReplace), replacementData);
+                }else{
+                    addItemToGraph(oldIconParent, replacementData, oldIconParent->itemData->getIndexOfObj(dataToReplace));
+                }
                 if (!oldIconParent->reorderChildren()){
                     return false;
                 }
+                return true;
             }
-            return true;
         }
     }
     return false;
 }
 
-bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove, bool removeData, bool removeAllSameData){
+bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove, bool removeData, bool removeAllSameData, DataIconManager *dataToKeep){
     QList <QGraphicsItem *> children;   //Storage for all referenced icons in the branch whose root is "item"...
     QList <QGraphicsItem *> tempList;   //Storage for the children of the first icon stored in "children"...
     QList <QGraphicsItem *> iconsToRemove;  //Storage for all icons to be removed from the graph...
@@ -257,17 +262,22 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
                 for (; count < MAX_NUM_GRAPH_ICONS, !children.isEmpty(); count++){  //Start cycling through children...
                     itemToDelete = NULL;
                     iconChild = (TreeGraphicsItem *)children.first();
-                    tempList = iconChild->childItems();
-                    if (!tempList.isEmpty() && iconChild->isPrimaryIcon() && iconChild->hasIcons()){  //"item" has children and has data that is referenced by other icons...
-                        itemToDelete = iconChild->reconnectToNextDuplicate();   //Reconnect "item" to the parent of the next icon that references it's data...
-                        index = children.indexOf(itemToDelete);
-                        if (index != -1){//Problem here?
-                            children.replace(index, iconChild); //"itemToDelete" is the
-                        }
-                        iconsToRemove.append(itemToDelete);
+                    if (iconChild->hasSameData(dataToKeep)){
+                        iconChild->setParent(itemToDeleteParent, itemToDeleteParent->getIndexofIconWithData(item->itemData));
                         tempList.clear();
                     }else{
-                        iconsToRemove.append(iconChild);
+                        tempList = iconChild->childItems();
+                        if (!tempList.isEmpty() && iconChild->isPrimaryIcon() && iconChild->hasIcons()){  //"item" has children and has data that is referenced by other icons...
+                            itemToDelete = iconChild->reconnectToNextDuplicate();   //Reconnect "item" to the parent of the next icon that references it's data...
+                            index = children.indexOf(itemToDelete);
+                            if (index != -1){//Problem here?
+                                children.replace(index, iconChild); //"itemToDelete" is the
+                            }
+                            iconsToRemove.append(itemToDelete);
+                            tempList.clear();
+                        }else{
+                            iconsToRemove.append(iconChild);
+                        }
                     }
                     children.removeFirst();
                     children = tempList + children;

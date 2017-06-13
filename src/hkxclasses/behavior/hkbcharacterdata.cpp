@@ -391,9 +391,9 @@ bool hkbCharacterData::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, list1, list2, "");
 
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("characterControllerInfo"), "");
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("capsuleHeight"), QString::number(characterControllerInfo.capsuleHeight));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("capsuleRadius"), QString::number(characterControllerInfo.capsuleRadius));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("collisionFilterInfo"), QString::number(characterControllerInfo.collisionFilterInfo));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("capsuleHeight"), QString::number(characterControllerInfo.capsuleHeight, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("capsuleRadius"), QString::number(characterControllerInfo.capsuleRadius, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("collisionFilterInfo"), QString::number(characterControllerInfo.collisionFilterInfo, char('f'), 6));
         if (characterControllerInfo.characterControllerCinfo.data()){
             refString = characterControllerInfo.characterControllerCinfo.data()->getReferenceString();
         }
@@ -462,7 +462,7 @@ bool hkbCharacterData::write(HkxXMLWriter *writer){
             refString = "null";
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("mirroredSkeletonInfo"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("scale"), QString::number(scale));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("scale"), QString::number(scale, char('f'), 6));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");

@@ -20,6 +20,24 @@
 #include <QHeaderView>
 #include <QSizePolicy>
 #include <QLabel>
+#include <QProgressDialog>
+
+class ProgressDialog: public QProgressDialog
+{
+public:
+    ProgressDialog(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags())
+        : QProgressDialog(labelText, cancelButtonText, minimum, maximum, parent, f)
+    {
+        setMinimumSize(400, 50);
+        setMinimumDuration(0);
+        setWindowModality(Qt::WindowModal);
+    }
+
+    void setProgress(const QString &labelText, int value){
+        setLabelText(labelText);
+        setValue(value);
+    }
+};
 
 class Validator: public QValidator
 {
@@ -33,7 +51,8 @@ public:
     }
 };
 
-class LineEdit: public QLineEdit{
+class LineEdit: public QLineEdit
+{
     Q_OBJECT
 public:
     LineEdit(const QString & text = "", QWidget * par = 0)
@@ -142,6 +161,8 @@ public:
 class TableWidget: public QTableWidget
 {
     Q_OBJECT
+signals:
+    void itemDropped(int row1, int row2);
 public:
     TableWidget(const QColor & background = QColor(Qt::white), QWidget *parent = 0)
         : QTableWidget(parent)
@@ -162,9 +183,52 @@ public:
         setEditTriggers(QAbstractItemView::NoEditTriggers);
     }
 
+    void dropEvent(QDropEvent *event) Q_DECL_OVERRIDE{
+        QTableWidgetItem *item = itemAt(event->pos());
+        int oldRow = currentRow();
+        int newRow = row(item);
+        if ((oldRow >= range.min && newRow >= range.min) && (oldRow <= range.max && newRow <= range.max)){
+            if (swapRowItems(oldRow, newRow)){
+                emit itemDropped(oldRow, newRow);
+                return;
+            }
+        }
+        emit itemDropped(-1, -1);
+    }
+
+    bool swapRowItems(int row1, int row2){
+        if (rowCount() > row1 && rowCount() > row2 && row1 != row2 && row1 >= 0 && row2 >= 0){
+            QTableWidgetItem *item1 = NULL;
+            QTableWidgetItem *item2 = NULL;
+            for (int i = 0; i < columnCount(); i++){
+                item1 = takeItem(row1, i);
+                item2 = takeItem(row2, i);
+                setItem(row2, i, item1);
+                setItem(row1, i, item2);
+            }
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     QSize sizeHint() const{
         return QSize(100, 400);
     }
+
+    void setRowSwapRange(int min, int max = std::numeric_limits<int>::max()){
+        range.min = min;
+        range.max = max;
+    }
+
+private:
+    struct RowSwapRange{
+        RowSwapRange(): min(0), max(std::numeric_limits<int>::max()){}
+        int min;
+        int max;
+    };
+
+    RowSwapRange range;
 };
 
 class SpinBox: public QSpinBox
