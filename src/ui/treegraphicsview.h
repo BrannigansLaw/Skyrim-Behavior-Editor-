@@ -33,8 +33,8 @@ protected:
 private:
     QMenu *popUpMenu;
     TreeGraphicsScene *treeScene;
-    const qreal minScale;
-    const qreal maxScale;
+    //const qreal minScale;
+    //const qreal maxScale;
     const qreal initScale;
     const qreal iconFocusScale;
     qreal currentScale;

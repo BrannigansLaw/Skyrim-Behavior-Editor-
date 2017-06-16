@@ -12,6 +12,7 @@ class hkbBlenderGeneratorChild: public hkbGenerator
     friend class hkbPoseMatchingGenerator;
     friend class BlenderGeneratorUI;
     friend class BlenderGeneratorChildUI;
+    friend class PoseMatchingGeneratorUI;
 public:
     hkbBlenderGeneratorChild(HkxFile *parent, hkbGenerator *parentBG, long ref = 0);
     virtual ~hkbBlenderGeneratorChild();

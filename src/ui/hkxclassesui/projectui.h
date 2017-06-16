@@ -12,10 +12,12 @@ class QListView;
 class FootIkDriverInfoUI;
 class HandIkDriverInfoUI;
 class QCheckBox;
+class AnimationsUI;
 
 class ProjectUI: public QGroupBox
 {
     Q_OBJECT
+    friend class MainWindow;
 public:
     ProjectUI(ProjectFile *file);
     virtual ~ProjectUI();
@@ -33,7 +35,7 @@ private:
     ProjectFile *project;
     QGridLayout *lyt;
     CharacterPropertiesUI *characterProperties;
-    //AnimationsUI *animations;
+    AnimationsUI *animations;
     SkeletonUI *skeleton;
     QCheckBox *enableFootIKCB;
     QCheckBox *enableHandIKCB;

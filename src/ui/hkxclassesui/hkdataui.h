@@ -4,6 +4,7 @@
 #include <QGroupBox>
 
 class BehaviorGraphView;
+class AnimationsUI;
 class QVBoxLayout;
 class QHBoxLayout;
 class QPushButton;
@@ -29,6 +30,8 @@ class BehaviorGraphUI;
 class BSLimbIKModifierUI;
 class BSBoneSwitchGeneratorUI;
 class BSOffsetAnimationGeneratorUI;
+class BSCyclicBlendTransitionGeneratorUI;
+class PoseMatchingGeneratorUI;
 
 /**
  * To add support for a new class we need to add it to the "DATA_TYPE_LOADED" enum, add it to the stacked layout in the correct order,
@@ -43,7 +46,7 @@ public:
     HkDataUI(const QString & title);
     virtual ~HkDataUI(){}
     BehaviorGraphView * loadBehaviorView(BehaviorGraphView *view);
-    void setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *variables);
+    void setEventsVariablesAnimationsUI(EventsUI *events, BehaviorVariablesUI *variables, AnimationsUI *animations);
     void unloadDataWidget();
 public slots:
     void changeCurrentDataWidget(TreeGraphicsItem *icon);
@@ -56,6 +59,9 @@ public slots:
     void eventNameChanged(const QString & newName, int index);
     void eventAdded(const QString & name);
     void eventRemoved(int index);
+    void animationNameChanged(const QString & newName, int index);
+    void animationAdded(const QString & name);
+    void animationRemoved(int index);
     void variableNameChanged(const QString & newName, int index);
     void variableAdded(const QString & name, const QString & type);
     void variableRemoved(int index);
@@ -73,13 +79,16 @@ private:
         BEHAVIOR_GRAPH,
         BS_LIMB_IK_MOD,
         BS_BONE_SWITCH_GENERATOR,
-        BS_OFFSET_ANIMATION_GENERATOR
+        BS_OFFSET_ANIMATION_GENERATOR,
+        BS_CYCLIC_BLEND_TRANSITION_GENERATOR,
+        POSE_MATCHING_GENERATOR
     };
     static QStringList generatorTypes;
     static QStringList modifierTypes;
     static QStringList variableTypes;
     EventsUI *eventsUI;
     BehaviorVariablesUI *variablesUI;
+    AnimationsUI *animationsUI;
     BehaviorGraphView *behaviorView;
     QVBoxLayout *verLyt;
     QStackedLayout *stack;
@@ -89,6 +98,7 @@ private:
     GenericTableWidget *variablesTable;
     GenericTableWidget *eventsTable;
     GenericTableWidget *characterPropertiesTable;
+    GenericTableWidget *animationsTable;
     QLabel *noDataL;
     BSiStateTaggingGeneratorUI *iStateTagGenUI;
     ModifierGeneratorUI *modGenUI;
@@ -99,6 +109,8 @@ private:
     BSLimbIKModifierUI *limbIKModUI;
     BSBoneSwitchGeneratorUI *boneSwitchUI;
     BSOffsetAnimationGeneratorUI *offsetAnimGenUI;
+    BSCyclicBlendTransitionGeneratorUI *cyclicBlendTransGenUI;
+    PoseMatchingGeneratorUI *poseMatchGenUI;
 };
 
 #endif // HKDATAUI_H

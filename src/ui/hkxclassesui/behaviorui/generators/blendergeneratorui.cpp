@@ -420,8 +420,10 @@ void BlenderGeneratorUI::setName(){
 
 void BlenderGeneratorUI::setReferencePoseWeightThreshold(){
     if (bsData){
-        bsData->referencePoseWeightThreshold = referencePoseWeightThreshold->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->referencePoseWeightThreshold != referencePoseWeightThreshold->value()){
+            bsData->referencePoseWeightThreshold = referencePoseWeightThreshold->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setReferencePoseWeightThreshold(): The data is NULL!!"))
     }

@@ -158,7 +158,12 @@ SOURCES += \
     src/ui/hkxclassesui/behaviorui/modifiers/bslimbikmodifierui.cpp \
     src/ui/hkxclassesui/behaviorui/generators/bsboneswitchgeneratorui.cpp \
     src/ui/hkxclassesui/behaviorui/generators/bsboneswitchgeneratorbonedataui.cpp \
-    src/ui/hkxclassesui/behaviorui/generators/bsoffsetanimationgeneratorui.cpp
+    src/ui/hkxclassesui/behaviorui/generators/bsoffsetanimationgeneratorui.cpp \
+    src/ui/hkxclassesui/behaviorui/generators/bscyclicblendtransitiongeneratorui.cpp \
+    src/ui/hkxclassesui/behaviorui/generators/posematchinggeneratorui.cpp \
+    src/ui/hkxclassesui/behaviorui/generators/clipgeneratorui.cpp \
+    src/ui/hkxclassesui/behaviorui/cliptriggerui.cpp \
+    src/ui/hkxclassesui/behaviorui/animationsui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -299,4 +304,9 @@ HEADERS  += \
     src/ui/hkxclassesui/behaviorui/modifiers/bslimbikmodifierui.h \
     src/ui/hkxclassesui/behaviorui/generators/bsboneswitchgeneratorui.h \
     src/ui/hkxclassesui/behaviorui/generators/bsboneswitchgeneratorbonedataui.h \
-    src/ui/hkxclassesui/behaviorui/generators/bsoffsetanimationgeneratorui.h
+    src/ui/hkxclassesui/behaviorui/generators/bsoffsetanimationgeneratorui.h \
+    src/ui/hkxclassesui/behaviorui/generators/bscyclicblendtransitiongeneratorui.h \
+    src/ui/hkxclassesui/behaviorui/generators/posematchinggeneratorui.h \
+    src/ui/hkxclassesui/behaviorui/generators/clipgeneratorui.h \
+    src/ui/hkxclassesui/behaviorui/cliptriggerui.h \
+    src/ui/hkxclassesui/behaviorui/animationsui.h

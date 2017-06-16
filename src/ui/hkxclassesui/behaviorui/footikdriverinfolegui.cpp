@@ -47,41 +47,41 @@ FootIkDriverInfoLegUI::FootIkDriverInfoLegUI()
     table->setColumnCount(3);
     table->setHorizontalHeaderLabels(headerLabels1);
     table->setCellWidget(0, 1, returnPB);
-    table->setItem(1, 0, new TableWidgetItem("kneeAxisLS"));
-    table->setItem(2, 1, new TableWidgetItem("hkVector4"));
+    table->setItem(1, 0, new QTableWidgetItem("kneeAxisLS"));
+    table->setItem(2, 1, new QTableWidgetItem("hkVector4"));
     table->setCellWidget(1, 2, kneeAxisLS);
-    table->setItem(2, 0, new TableWidgetItem("footEndLS"));
-    table->setItem(2, 1, new TableWidgetItem("hkVector4"));
+    table->setItem(2, 0, new QTableWidgetItem("footEndLS"));
+    table->setItem(2, 1, new QTableWidgetItem("hkVector4"));
     table->setCellWidget(2, 2, footEndLS);
-    table->setItem(3, 0, new TableWidgetItem("footPlantedAnkleHeightMS"));
-    table->setItem(3, 1, new TableWidgetItem("hkReal"));
+    table->setItem(3, 0, new QTableWidgetItem("footPlantedAnkleHeightMS"));
+    table->setItem(3, 1, new QTableWidgetItem("hkReal"));
     table->setCellWidget(3, 2, footPlantedAnkleHeightMS);
-    table->setItem(4, 0, new TableWidgetItem("footRaisedAnkleHeightMS"));
-    table->setItem(4, 1, new TableWidgetItem("hkReal"));
+    table->setItem(4, 0, new QTableWidgetItem("footRaisedAnkleHeightMS"));
+    table->setItem(4, 1, new QTableWidgetItem("hkReal"));
     table->setCellWidget(4, 2, footRaisedAnkleHeightMS);
-    table->setItem(5, 0, new TableWidgetItem("maxAnkleHeightMS"));
-    table->setItem(5, 1, new TableWidgetItem("hkReal"));
+    table->setItem(5, 0, new QTableWidgetItem("maxAnkleHeightMS"));
+    table->setItem(5, 1, new QTableWidgetItem("hkReal"));
     table->setCellWidget(5, 2, maxAnkleHeightMS);
-    table->setItem(6, 0, new TableWidgetItem("minAnkleHeightMS"));
-    table->setItem(6, 1, new TableWidgetItem("hkReal"));
+    table->setItem(6, 0, new QTableWidgetItem("minAnkleHeightMS"));
+    table->setItem(6, 1, new QTableWidgetItem("hkReal"));
     table->setCellWidget(6, 2, minAnkleHeightMS);
-    table->setItem(7, 0, new TableWidgetItem("maxKneeAngleDegrees"));
-    table->setItem(7, 1, new TableWidgetItem("hkReal"));
+    table->setItem(7, 0, new QTableWidgetItem("maxKneeAngleDegrees"));
+    table->setItem(7, 1, new QTableWidgetItem("hkReal"));
     table->setCellWidget(7, 2, maxKneeAngleDegrees);
-    table->setItem(8, 0, new TableWidgetItem("minKneeAngleDegrees"));
-    table->setItem(8, 1, new TableWidgetItem("hkReal"));
+    table->setItem(8, 0, new QTableWidgetItem("minKneeAngleDegrees"));
+    table->setItem(8, 1, new QTableWidgetItem("hkReal"));
     table->setCellWidget(8, 2, minKneeAngleDegrees);
-    table->setItem(9, 0, new TableWidgetItem("maxAnkleAngleDegrees"));
-    table->setItem(9, 1, new TableWidgetItem("hkReal"));
+    table->setItem(9, 0, new QTableWidgetItem("maxAnkleAngleDegrees"));
+    table->setItem(9, 1, new QTableWidgetItem("hkReal"));
     table->setCellWidget(9, 2, maxAnkleAngleDegrees);
-    table->setItem(10, 0, new TableWidgetItem("hipIndex"));
-    table->setItem(10, 1, new TableWidgetItem("hkInt32"));
+    table->setItem(10, 0, new QTableWidgetItem("hipIndex"));
+    table->setItem(10, 1, new QTableWidgetItem("hkInt32"));
     table->setCellWidget(10, 2, hipIndex);
-    table->setItem(11, 0, new TableWidgetItem("kneeIndex"));
-    table->setItem(11, 1, new TableWidgetItem("hkInt32"));
+    table->setItem(11, 0, new QTableWidgetItem("kneeIndex"));
+    table->setItem(11, 1, new QTableWidgetItem("hkInt32"));
     table->setCellWidget(11, 2, kneeIndex);
-    table->setItem(12, 0, new TableWidgetItem("ankleIndex"));
-    table->setItem(12, 1, new TableWidgetItem("hkInt32"));
+    table->setItem(12, 0, new QTableWidgetItem("ankleIndex"));
+    table->setItem(12, 1, new QTableWidgetItem("hkInt32"));
     table->setCellWidget(12, 2, ankleIndex);
     lyt->addWidget(table);
     setLayout(lyt);
@@ -119,86 +119,86 @@ void FootIkDriverInfoLegUI::loadData(hkbFootIkDriverInfoLeg *data){
 }
 
 void FootIkDriverInfoLegUI::setKneeAxisLS(){
-    if (bsData){
-        bsData->kneeAxisLS = kneeAxisLS->getValue();
-        //bsData->getParentFile()->toggleChanged(true);
+    if (bsData && bsData->parent){
+        bsData->kneeAxisLS = kneeAxisLS->value();
+        bsData->parent->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setFootEndLS(){
-    if (bsData){
-        bsData->footEndLS = footEndLS->getValue();
-        //bsData->getParentFile()->toggleChanged(true);
+    if (bsData && bsData->parent){
+        bsData->footEndLS = footEndLS->value();
+        bsData->parent->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setFootPlantedAnkleHeightMS(){
-    if (bsData){
+    if (bsData && bsData->parent){
         bsData->footPlantedAnkleHeightMS = footPlantedAnkleHeightMS->value();
-        //bsData->getParentFile()->toggleChanged(true);
+        bsData->parent->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setFootRaisedAnkleHeightMS(){
-    if (bsData){
+    if (bsData && bsData->parent){
         bsData->footRaisedAnkleHeightMS = footRaisedAnkleHeightMS->value();
-        //bsData->getParentFile()->toggleChanged(true);
+        bsData->parent->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setMaxAnkleHeightMS(){
-    if (bsData){
+    if (bsData && bsData->parent){
         bsData->maxAnkleHeightMS = maxAnkleHeightMS->value();
-        //bsData->getParentFile()->toggleChanged(true);
+        bsData->parent->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setMinAnkleHeightMS(){
-    if (bsData){
+    if (bsData && bsData->parent){
         bsData->minAnkleHeightMS = minAnkleHeightMS->value();
-        //bsData->getParentFile()->toggleChanged(true);
+        bsData->parent->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setMaxKneeAngleDegrees(){
-    if (bsData){
+    if (bsData && bsData->parent){
         bsData->maxKneeAngleDegrees = maxKneeAngleDegrees->value();
-        //bsData->getParentFile()->toggleChanged(true);
+        bsData->parent->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setMinKneeAngleDegrees(){
-    if (bsData){
+    if (bsData && bsData->parent){
         bsData->minKneeAngleDegrees = minKneeAngleDegrees->value();
-        //bsData->getParentFile()->toggleChanged(true);
+        bsData->parent->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setMaxAnkleAngleDegrees(){
-    if (bsData){
+    if (bsData && bsData->parent){
         bsData->maxAnkleAngleDegrees = maxAnkleAngleDegrees->value();
-        //bsData->getParentFile()->toggleChanged(true);
+        bsData->parent->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setHipIndex(int index){
-    if (bsData){
+    if (bsData && bsData->parent){
         bsData->hipIndex = index - 1;
-        //bsData->getParentFile()->toggleChanged(true);
+        bsData->parent->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setKneeIndex(int index){
-    if (bsData){
+    if (bsData && bsData->parent){
         bsData->kneeIndex = index - 1;
-        //bsData->getParentFile()->toggleChanged(true);
+        bsData->parent->getParentFile()->toggleChanged(true);
     }
 }
 
 void FootIkDriverInfoLegUI::setAnkleIndex(int index){
-    if (bsData){
+    if (bsData && bsData->parent){
         bsData->ankleIndex = index - 1;
-        //bsData->getParentFile()->toggleChanged(true);
+        bsData->parent->getParentFile()->toggleChanged(true);
     }
 }
 

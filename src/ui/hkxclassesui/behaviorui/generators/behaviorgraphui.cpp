@@ -49,7 +49,7 @@ BehaviorGraphUI::BehaviorGraphUI()
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(variableMode, SIGNAL(activated(int)), this, SLOT(setVariableMode(int)), Qt::UniqueConnection);
+    connect(variableMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setVariableMode(int)), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
 }
 

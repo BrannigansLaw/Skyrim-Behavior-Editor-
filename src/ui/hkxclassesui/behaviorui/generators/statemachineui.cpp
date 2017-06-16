@@ -93,7 +93,7 @@ StateMachineUI::StateMachineUI()
     table->setItem(NAME_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setCellWidget(NAME_ROW, VALUE_COLUMN, name);
     table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, NAME_COLUMN, new TableWidgetItem("eventToSendWhenStateOrTransitionChanges"));
-    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, TYPE_COLUMN, new TableWidgetItem("hkEventPayload", Qt::AlignCenter));
+    table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
     table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setItem(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, VALUE_COLUMN, new TableWidgetItem("", Qt::AlignCenter, QColor(Qt::gray)));
     table->setCellWidget(EVENT_TO_SEND_WHEN_STATE_OR_TRANSITION_CHANGES_ROW, VALUE_COLUMN, eventToSendWhenStateOrTransitionChanges);
@@ -162,12 +162,12 @@ void StateMachineUI::connectSignals(){
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
     connect(wrapAroundStateId, SIGNAL(clicked(bool)), this, SLOT(setWrapAroundStateId(bool)), Qt::UniqueConnection);
     connect(maxSimultaneousTransitions, SIGNAL(editingFinished()), this, SLOT(setMaxSimultaneousTransitions()), Qt::UniqueConnection);
-    connect(startStateId, SIGNAL(activated(int)), this, SLOT(setStartStateId(int)), Qt::UniqueConnection);
-    connect(startStateMode, SIGNAL(activated(int)), this, SLOT(setStartStateMode(int)), Qt::UniqueConnection);
-    connect(selfTransitionMode, SIGNAL(activated(int)), this, SLOT(setSelfTransitionMode(int)), Qt::UniqueConnection);
+    connect(startStateId, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateId(int)), Qt::UniqueConnection);
+    connect(startStateMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateMode(int)), Qt::UniqueConnection);
+    connect(selfTransitionMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setSelfTransitionMode(int)), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-    connect(eventToSendWhenStateOrTransitionChanges, SIGNAL(pressed()), this, SLOT(viewEventToSendWhenStateOrTransitionChanges()));
-    connect(eventToSendWhenStateOrTransitionChanges, SIGNAL(enabled(bool)), this, SLOT(toggleEventToSendWhenStateOrTransitionChanges(bool)));
+    connect(eventToSendWhenStateOrTransitionChanges, SIGNAL(pressed()), this, SLOT(viewEventToSendWhenStateOrTransitionChanges()), Qt::UniqueConnection);
+    connect(eventToSendWhenStateOrTransitionChanges, SIGNAL(enabled(bool)), this, SLOT(toggleEventToSendWhenStateOrTransitionChanges(bool)), Qt::UniqueConnection);
     connect(eventUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
     connect(eventUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)), Qt::UniqueConnection);
     connect(stateUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
@@ -186,9 +186,9 @@ void StateMachineUI::disconnectSignals(){
     disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
     disconnect(wrapAroundStateId, SIGNAL(clicked(bool)), this, SLOT(setWrapAroundStateId(bool)));
     disconnect(maxSimultaneousTransitions, SIGNAL(editingFinished()), this, SLOT(setMaxSimultaneousTransitions()));
-    disconnect(startStateId, SIGNAL(activated(int)), this, SLOT(setStartStateId(int)));
-    disconnect(startStateMode, SIGNAL(activated(int)), this, SLOT(setStartStateMode(int)));
-    disconnect(selfTransitionMode, SIGNAL(activated(int)), this, SLOT(setSelfTransitionMode(int)));
+    disconnect(startStateId, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateId(int)));
+    disconnect(startStateMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateMode(int)));
+    disconnect(selfTransitionMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setSelfTransitionMode(int)));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
     disconnect(eventToSendWhenStateOrTransitionChanges, SIGNAL(pressed()), this, SLOT(viewEventToSendWhenStateOrTransitionChanges()));
     disconnect(eventToSendWhenStateOrTransitionChanges, SIGNAL(enabled(bool)), this, SLOT(toggleEventToSendWhenStateOrTransitionChanges(bool)));
@@ -786,13 +786,13 @@ void StateMachineUI::removeState(int index){
         }else{
             WARNING_MESSAGE(QString("StateMachineUI::removeState(): Invalid index of child to remove!!"));
         }
-        disconnect(startStateId, SIGNAL(activated(int)), this, SLOT(setStartStateId(int)));
+        disconnect(startStateId, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateId(int)));
         currentindex = startStateId->currentIndex();
         startStateId->removeItem(index);
         if (currentindex == index){
             startStateId->setCurrentIndex(0);
         }
-        connect(startStateId, SIGNAL(activated(int)), this, SLOT(setStartStateId(int)), Qt::UniqueConnection);
+        connect(startStateId, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateId(int)), Qt::UniqueConnection);
         loadDynamicTableRows();
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::removeState(): The data or behavior graph pointer is NULL!!"));
@@ -868,6 +868,9 @@ void StateMachineUI::connectToTables(GenericTableWidget *generators, GenericTabl
 void StateMachineUI::variableRenamed(const QString & name, int index){
     int bindIndex = -1;
     hkbVariableBindingSet *bind = NULL;
+    if (name == ""){
+        WARNING_MESSAGE(QString("StateMachineUI::variableRenamed(): The new variable name is the empty string!!"))
+    }
     if (bsData){
         index--;
         bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());

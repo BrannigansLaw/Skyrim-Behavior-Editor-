@@ -1,6 +1,7 @@
 #include "projectui.h"
 #include "src/ui/hkxclassesui/behaviorui/characterpropertiesui.h"
 #include "src/ui/hkxclassesui/behaviorui/skeletonui.h"
+#include "src/ui/hkxclassesui/behaviorui/animationsui.h"
 #include "src/ui/hkxclassesui/behaviorui/footikdriverinfoui.h"
 #include "src/ui/hkxclassesui/behaviorui/handikdriverinfoui.h"
 #include "src/filetypes/projectfile.h"
@@ -21,6 +22,7 @@ ProjectUI::ProjectUI(ProjectFile *file)
       lyt(new QGridLayout),
       characterProperties(new CharacterPropertiesUI("Character Properties")),
       skeleton(new SkeletonUI("Skeleton")),
+      animations(new AnimationsUI("Animations")),
       enableFootIKCB(new QCheckBox("Enable Foot IK")),
       enableHandIKCB(new QCheckBox("Enable Hand IK")),
       footIK(new FootIkDriverInfoUI),
@@ -44,10 +46,11 @@ ProjectUI::ProjectUI(ProjectFile *file)
     lyt->addWidget(fileView, 0, 0, 2, 1);
     lyt->addWidget(characterProperties, 0, 1, 2, 3);
     lyt->addWidget(skeleton, 0, 4, 2, 2);
-    lyt->addWidget(enableFootIKCB, 2, 0, 2, 3);
-    lyt->addWidget(enableHandIKCB, 2, 3, 2, 3);
-    lyt->addWidget(footIK, 3, 0, 2, 3);
-    lyt->addWidget(handIK, 3, 3, 2, 3);
+    lyt->addWidget(enableFootIKCB, 2, 0, 2, 2);
+    lyt->addWidget(enableHandIKCB, 2, 2, 2, 2);
+    lyt->addWidget(footIK, 3, 0, 2, 2);
+    lyt->addWidget(handIK, 3, 2, 2, 2);
+    lyt->addWidget(animations, 3, 4, 2, 2);
     setLayout(lyt);
     connect(fileView, SIGNAL(doubleClicked(QModelIndex)), this, SIGNAL(openFile(QModelIndex)));
     connect(enableFootIKCB, SIGNAL(clicked(bool)), this, SLOT(toggleFootIK(bool)));
@@ -66,12 +69,14 @@ void ProjectUI::setFilePath(const QString & path){
 void ProjectUI::setDisabled(bool disable){
     if (disable){
         skeleton->setEnabled(false);
+        animations->setEnabled(false);
         footIK->setEnabled(false);
         handIK->setEnabled(false);
         enableFootIKCB->setEnabled(false);
         enableHandIKCB->setEnabled(false);
     }else{
         skeleton->setEnabled(true);
+        animations->setEnabled(true);
         footIK->setEnabled(true);
         handIK->setEnabled(true);
         enableFootIKCB->setEnabled(true);
@@ -91,6 +96,7 @@ void ProjectUI::loadData(){
     if (project && project->character && project->character->skeleton && !project->character->skeleton->skeletons.isEmpty()){
         setTitle(project->fileName());
         characterProperties->loadData(project->character->getCharacterData());
+        animations->loadData(project->character->stringData.data());
         skeleton->loadData(project->character->skeleton->skeletons.first().data());
         if (project->character->footIkDriverInfo.data()){
             footIK->loadData(project->character->footIkDriverInfo.data());

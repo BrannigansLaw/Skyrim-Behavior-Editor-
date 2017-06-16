@@ -6,6 +6,7 @@
 class BSCyclicBlendTransitionGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
+    friend class BSCyclicBlendTransitionGeneratorUI;
 public:
     BSCyclicBlendTransitionGenerator(HkxFile *parent, long ref = 0);
     virtual ~BSCyclicBlendTransitionGenerator();

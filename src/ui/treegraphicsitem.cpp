@@ -286,7 +286,6 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
                 if (index < children.size()){
                     children.removeAt(index);
                 }
-                indexToInsert--;
                 children.insert(indexToInsert, this);
                 for (int i = 0; i < children.size(); i++){
                     children[i]->setParentItem(newParent);

@@ -144,8 +144,9 @@ void BehaviorVariablesUI::setVariableValue(int type){
         }/*else if (type == "VARIABLE_TYPE_POINTER"){
             loadedData->setWordVariableValueAt(index, intSB->value());
         }*/else if (type == 3){
-            loadedData->setQuadVariableValueAt(index, quadWidget->getValue());
+            loadedData->setQuadVariableValueAt(index, quadWidget->value());
         }
+        loadedData->getParentFile()->toggleChanged(true);
     }
 }
 
@@ -165,6 +166,7 @@ void BehaviorVariablesUI::renameSelectedVariable(int type){
         }
         table->item(table->currentRow(), 0)->setText(newName);
         loadedData->setVariableNameAt(table->currentRow(), newName);
+        loadedData->getParentFile()->toggleChanged(true);
         emit variableNameChanged(newName, table->currentRow());
     }
 }
@@ -369,6 +371,7 @@ void BehaviorVariablesUI::addVariable(){
         default:
             return;
         }
+        loadedData->getParentFile()->toggleChanged(true);
         emit variableAdded(vars->variableNames.last(), typeString);
     }
 }
@@ -383,6 +386,7 @@ void BehaviorVariablesUI::removeVariable(){
         if (stackLyt->currentIndex() == VARIABLE_WIDGET){
             stackLyt->setCurrentIndex(TABLE_WIDGET);
         }
+        loadedData->getParentFile()->toggleChanged(true);
         emit variableRemoved(index);
     }
 }

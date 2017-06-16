@@ -8,8 +8,8 @@
 TreeGraphicsView::TreeGraphicsView(QMenu *menu)
     : popUpMenu(menu),
       treeScene(new TreeGraphicsScene()),
-      minScale(0.001),
-      maxScale(0.5),
+      //minScale(0.001),
+      //maxScale(0.5),
       initScale(1),
       iconFocusScale(1.5),
       currentScale(1),
@@ -33,10 +33,10 @@ bool TreeGraphicsView::drawGraph(DataIconManager *rootData, bool allowDuplicates
 
 void TreeGraphicsView::wheelEvent(QWheelEvent *event){
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-    if (event->delta() > 0 && currentScale < maxScale){
+    if (event->delta() > 0/* && currentScale < maxScale*/){
         scale(scaleUpFactor, scaleUpFactor);
         currentScale = currentScale*scaleUpFactor;
-    }else if (currentScale > minScale){
+    }else/* if (currentScale > minScale)*/{
         scale(scaleDownFactor, scaleDownFactor);
         currentScale = currentScale*scaleDownFactor;
     }
@@ -83,7 +83,7 @@ DataIconManager *TreeGraphicsView::getSelectedData() const{
 
 bool TreeGraphicsView::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData, bool removeData){
     bool result = treeScene->reconnectIcon(oldIconParent, dataToReplace, replacementData, removeData);
-    oldIconParent->reposition();
+    //oldIconParent->reposition();
     return result;
 }
 

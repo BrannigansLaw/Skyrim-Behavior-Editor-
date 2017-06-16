@@ -44,7 +44,7 @@ GenericTableWidget::GenericTableWidget(const QString & title)
 
 void GenericTableWidget::loadTable(const QStringList & names, const QStringList & types, const QString & firstElement){
     int start = 0;
-    table->clear();
+    table->setRowCount(0);
     if (names.size() == types.size()){
         if (firstElement != ""){
             start = 1;
@@ -90,7 +90,7 @@ void GenericTableWidget::loadTable(const QStringList & names, const QStringList 
 
 void GenericTableWidget::loadTable(const QStringList & names, const QString & type, const QString & firstElement){
     int start = 0;
-    table->clear();
+    table->setRowCount(0);
     if (firstElement != ""){
         start = 1;
         if (table->rowCount() > 0){

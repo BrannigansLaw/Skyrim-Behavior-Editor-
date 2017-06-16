@@ -55,6 +55,7 @@ public:
     QString getVariableNameAt(int index) const;
     QString getEventNameAt(int index) const;
     QString getCharacterPropertyNameAt(int index, bool fromBehaviorFile) const;
+    QStringList getAnimationNames() const;
 protected:
     bool parse();
     bool link();

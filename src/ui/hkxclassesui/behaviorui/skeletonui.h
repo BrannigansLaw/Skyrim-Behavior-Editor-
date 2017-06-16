@@ -26,7 +26,7 @@ private slots:
 private:
     hkaSkeleton *bsData;
     QVBoxLayout *lyt;
-    QPushButton *backPB;
+    //QPushButton *backPB;
     TableWidget *bones;
     QSignalMapper *mapper;
 };

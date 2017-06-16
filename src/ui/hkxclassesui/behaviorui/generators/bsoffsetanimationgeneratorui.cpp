@@ -12,7 +12,7 @@
 
 #include <QHeaderView>
 
-#define BASE_NUMBER_OF_ROWS 3
+#define BASE_NUMBER_OF_ROWS 6
 
 #define NAME_ROW 0
 #define FOFFSET_VARIABLE_ROW 1
@@ -40,7 +40,10 @@ BSOffsetAnimationGeneratorUI::BSOffsetAnimationGeneratorUI()
       bsData(NULL),
       topLyt(new QGridLayout),
       table(new TableWidget(QColor(Qt::cyan))),
-      name(new LineEdit)
+      name(new LineEdit),
+      fOffsetVariable(new DoubleSpinBox),
+      fOffsetRangeStart(new DoubleSpinBox),
+      fOffsetRangeEnd(new DoubleSpinBox)
 {
     setTitle("BSOffsetAnimationGenerator");
     table->setRowCount(BASE_NUMBER_OF_ROWS);
@@ -245,6 +248,9 @@ void BSOffsetAnimationGeneratorUI::loadData(HkxObject *data){
         if (data->getSignature() == BS_OFFSET_ANIMATION_GENERATOR){
             bsData = static_cast<BSOffsetAnimationGenerator *>(data);
             name->setText(bsData->name);
+            fOffsetVariable->setValue(bsData->fOffsetVariable);
+            fOffsetRangeStart->setValue(bsData->fOffsetRangeStart);
+            fOffsetRangeEnd->setValue(bsData->fOffsetRangeEnd);
             if (bsData->pDefaultGenerator.data()){
                 table->item(PDEFAULT_GENERATOR_ROW, VALUE_COLUMN)->setText(static_cast<hkbGenerator *>(bsData->pDefaultGenerator.data())->getName());
             }else{
@@ -254,6 +260,16 @@ void BSOffsetAnimationGeneratorUI::loadData(HkxObject *data){
                 table->item(POFFSET_CLIP_GENERATOR_ROW, VALUE_COLUMN)->setText(static_cast<hkbGenerator *>(bsData->pOffsetClipGenerator.data())->getName());
             }else{
                 table->item(POFFSET_CLIP_GENERATOR_ROW, VALUE_COLUMN)->setText("NONE");
+            }
+            hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            if (varBind){
+                loadBinding(FOFFSET_VARIABLE_ROW, BINDING_COLUMN, varBind, "fOffsetVariable");
+                loadBinding(FOFFSET_RANGE_START_ROW, BINDING_COLUMN, varBind, "fOffsetRangeStart");
+                loadBinding(FOFFSET_RANGE_END_ROW, BINDING_COLUMN, varBind, "fOffsetRangeEnd");
+            }else{
+                table->item(FOFFSET_VARIABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
+                table->item(FOFFSET_RANGE_START_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
+                table->item(FOFFSET_RANGE_END_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)));
@@ -278,11 +294,14 @@ void BSOffsetAnimationGeneratorUI::setGenerator(int index, const QString & name)
                 gen = static_cast<DataIconManager*>(bsData->pOffsetClipGenerator.data());
                 row = POFFSET_CLIP_GENERATOR_ROW;
             }
-            ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
+            ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);//Check if the target data is already referenced? Must check if target is clipgen!!!
             indexOfGenerator = bsData->getIndexOfObj(gen);
             if (ptr){
                 if (name != ptr->getName()){
                     CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"));
+                    return;
+                }else if (row == POFFSET_CLIP_GENERATOR_ROW && ptr->getSignature() != HKB_CLIP_GENERATOR){
+                    WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nInvalid object type selected! You must select a clip generator for the 'pOffsetClipGenerator' data field!!!"));
                     return;
                 }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), gen, ptr, false)){
                     WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));

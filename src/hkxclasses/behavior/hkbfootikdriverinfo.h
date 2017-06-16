@@ -23,8 +23,9 @@ private:
     hkbFootIkDriverInfo(const hkbFootIkDriverInfo &);
 private:
     struct hkbFootIkDriverInfoLeg{
-        hkbFootIkDriverInfoLeg()
-            : footPlantedAnkleHeightMS(0),
+        hkbFootIkDriverInfoLeg(hkbFootIkDriverInfo *par = NULL)
+            : parent(par),
+              footPlantedAnkleHeightMS(0),
               footRaisedAnkleHeightMS(0),
               maxAnkleHeightMS(0),
               minAnkleHeightMS(0),
@@ -38,6 +39,7 @@ private:
             //
         }
 
+        hkbFootIkDriverInfo *parent;
         hkQuadVariable kneeAxisLS;
         hkQuadVariable footEndLS;
         qreal footPlantedAnkleHeightMS;

@@ -23,6 +23,7 @@ class BlenderGeneratorChildUI: public QStackedWidget
 {
     Q_OBJECT
     friend class BlenderGeneratorUI;
+    friend class PoseMatchingGeneratorUI;
 public:
     BlenderGeneratorChildUI();
     virtual ~BlenderGeneratorChildUI(){}

@@ -14,6 +14,7 @@ class hkbCharacterStringData: public HkxObject
     friend class CharacterFile;
     friend class CharacterPropertiesUI;
     friend class BehaviorFile;
+    friend class AnimationsUI;
 public:
     hkbCharacterStringData(HkxFile *parent, long ref = 0);
     virtual ~hkbCharacterStringData();
@@ -24,6 +25,7 @@ public:
     bool write(HkxXMLWriter *writer);
     QStringList getAnimationNames() const;
     QString getCharacterPropertyNameAt(int index) const;
+    void addAnimation();
 private:
     hkbCharacterStringData& operator=(const hkbCharacterStringData&);
     hkbCharacterStringData(const hkbCharacterStringData &);

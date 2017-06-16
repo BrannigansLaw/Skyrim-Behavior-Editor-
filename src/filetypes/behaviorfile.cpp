@@ -732,6 +732,13 @@ QString BehaviorFile::getCharacterPropertyNameAt(int index, bool fromBehaviorFil
     return "";
 }
 
+QStringList BehaviorFile::getAnimationNames() const{
+    if (character){
+        return character->getAnimationNames();
+    }
+    return QStringList();
+}
+
 void BehaviorFile::removeBindings(int varIndex){
     for (int i = 0; i < otherTypes.size(); i++){
         if (otherTypes.at(i).data()->getSignature() == HKB_VARIABLE_BINDING_SET){

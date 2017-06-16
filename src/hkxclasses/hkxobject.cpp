@@ -33,7 +33,7 @@ long HkxObject::getReference() const{
 }
 
 QString HkxObject::getReferenceString() const{
-    QString referenceString;
+    /*QString referenceString;
     if (reference > 999){
         referenceString = "#";
     }else if (reference > 99){
@@ -43,7 +43,8 @@ QString HkxObject::getReferenceString() const{
     }else{
         referenceString = "#000";
     }
-    return referenceString+QString::number(reference);
+    return referenceString+QString::number(reference);*/
+    return "#"+QString::number(reference);
 }
 
 QString HkxObject::getBoolAsString(bool b) const{

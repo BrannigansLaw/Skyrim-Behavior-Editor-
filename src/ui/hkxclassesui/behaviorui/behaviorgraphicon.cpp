@@ -107,7 +107,7 @@ void BehaviorGraphIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem 
         }else if (itemData->icons.first() == this){
             if (!childItems().isEmpty()){
                 painter->drawLine(horiz);
-                if (!isExpanded){
+                if (!isExpanded || !childItems().first()->isVisible()){
                     painter->drawLine(vert);
                 }
             }

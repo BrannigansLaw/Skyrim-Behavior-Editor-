@@ -38,6 +38,9 @@ public:
         checkbox->setChecked(checked);
     }
 
+    bool isChecked() const{
+        return checkbox->isChecked();
+    }
 private:
     QCheckBox *checkbox;
 };

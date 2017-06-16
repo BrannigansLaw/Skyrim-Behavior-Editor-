@@ -40,6 +40,7 @@ class BehaviorGraphView: public TreeGraphicsView
     friend class BlenderGeneratorUI;
     friend class BSBoneSwitchGeneratorUI;
     friend class BSBoneSwitchGeneratorBoneDataUI;
+    friend class PoseMatchingGeneratorUI;
 
     friend class MainWindow;
 public:

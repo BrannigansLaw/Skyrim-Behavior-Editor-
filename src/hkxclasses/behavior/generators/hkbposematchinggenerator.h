@@ -6,6 +6,7 @@
 class hkbPoseMatchingGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
+    friend class PoseMatchingGeneratorUI;
 public:
     hkbPoseMatchingGenerator(HkxFile *parent, long ref = 0);
     virtual ~hkbPoseMatchingGenerator();
@@ -19,6 +20,17 @@ public:
     int getIndexToInsertIcon(HkxObject *child) const;
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
+    enum BlenderFlag{
+        FLAG_NONE = 0,
+        FLAG_SYNC = 1,
+        FLAG_SMOOTH_GENERATOR_WEIGHTS = 4,
+        FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS = 8,
+        FLAG_PARAMETRIC_BLEND = 16,
+        FLAG_IS_PARAMETRIC_BLEND_CYCLIC = 32,
+        FLAG_FORCE_DENSE_POSE = 64,
+        INVALID_FLAG = 128
+    };
+    Q_DECLARE_FLAGS(BlenderFlags, BlenderFlag)
 private:
     QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
@@ -27,7 +39,6 @@ private:
     hkbPoseMatchingGenerator& operator=(const hkbPoseMatchingGenerator&);
     hkbPoseMatchingGenerator(const hkbPoseMatchingGenerator &);
 private:
-    static QStringList Flags;   //FLAG_SYNC=1;FLAG_SMOOTH_GENERATOR_WEIGHTS=4;FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS=8;FLAG_PARAMETRIC_BLEND=16;FLAG_IS_PARAMETRIC_BLEND_CYCLIC=32;FLAG_FORCE_DENSE_POSE=64
     static QStringList Mode;    //MODE_MATCH=0;MODE_PLAY=1
     static uint refCount;
     static QString classname;
@@ -54,5 +65,7 @@ private:
     int pelvisIndex;
     QString mode;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(hkbPoseMatchingGenerator::BlenderFlags)
 
 #endif // HKBPOSEMATCHINGGENERATOR_H

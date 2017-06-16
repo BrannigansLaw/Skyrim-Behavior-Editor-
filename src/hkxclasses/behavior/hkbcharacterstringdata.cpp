@@ -33,6 +33,30 @@ QString hkbCharacterStringData::getCharacterPropertyNameAt(int index) const{
     return "";
 }
 
+void hkbCharacterStringData::addAnimation(){
+    QString name = "NEW-ANIMATION-";
+    int num = 0;
+    int index;
+    for (int i = 0; i < animationNames.size(); i++){
+        if (animationNames.at(i) == name){
+            index = name.indexOf('_');
+            if (index > -1){
+                name.remove(name.indexOf('_'), name.size());
+            }
+            name.append("_"+QString::number(num));
+            num++;
+            if (num > 1){
+                if (num > 10){
+                    name = name+"_FUCKING RENAME YOUR ANIMATIONS PROPERLY!";
+                    break;
+                }
+                i = 0;
+            }
+        }
+    }
+    animationNames.append(name);
+}
+
 bool hkbCharacterStringData::readData(const HkxXmlReader &reader, long index){
     bool ok;
     int numElems = 0;

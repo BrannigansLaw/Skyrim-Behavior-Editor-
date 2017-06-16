@@ -9,6 +9,7 @@
 #include "src/ui/behaviorgraphview.h"
 #include "src/ui/hkxclassesui/behaviorui/behaviorvariablesui.h"
 #include "src/ui/hkxclassesui/behaviorui/eventsui.h"
+#include "src/ui/hkxclassesui/behaviorui/animationsui.h"
 #include "src/hkxclasses/behavior/generators/bsistatetagginggenerator.h"
 #include "src/hkxclasses/behavior/generators/hkbmodifiergenerator.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/bsistatetagginggeneratorui.h"
@@ -22,6 +23,8 @@
 #include "src/ui/hkxclassesui/behaviorui/generators/bsoffsetanimationgeneratorui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/bsboneswitchgeneratorui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/bsboneswitchgeneratorbonedataui.h"
+#include "src/ui/hkxclassesui/behaviorui/generators/bscyclicblendtransitiongeneratorui.h"
+#include "src/ui/hkxclassesui/behaviorui/generators/posematchinggeneratorui.h"
 #include "src/ui/hkxclassesui/behaviorui/transitionsui.h"
 #include "src/ui/hkxclassesui/behaviorui/modifiers/bslimbikmodifierui.h"
 
@@ -112,11 +115,15 @@ HkDataUI::HkDataUI(const QString &title)
       verLyt(new QVBoxLayout),
       stack(new QStackedLayout),
       loadedData(NULL),
+      eventsUI(NULL),
+      variablesUI(NULL),
+      animationsUI(NULL),
       generatorsTable(new GenericTableWidget("Select a hkbGenerator!")),
       modifiersTable(new GenericTableWidget("Select a hkbModifier!")),
       variablesTable(new GenericTableWidget("Select a Variable!")),
       eventsTable(new GenericTableWidget("Select an Event!")),
       characterPropertiesTable(new GenericTableWidget("Select a Character Property!")),
+      animationsTable(new GenericTableWidget("Select an Animation!")),
       noDataL(new QLabel("No Data Selected!")),
       iStateTagGenUI(new BSiStateTaggingGeneratorUI),
       modGenUI(new ModifierGeneratorUI),
@@ -126,7 +133,9 @@ HkDataUI::HkDataUI(const QString &title)
       behaviorGraphUI(new BehaviorGraphUI),
       limbIKModUI(new BSLimbIKModifierUI),
       boneSwitchUI(new BSBoneSwitchGeneratorUI),
-      offsetAnimGenUI(new BSOffsetAnimationGeneratorUI)
+      offsetAnimGenUI(new BSOffsetAnimationGeneratorUI),
+      cyclicBlendTransGenUI(new BSCyclicBlendTransitionGeneratorUI),
+      poseMatchGenUI(new PoseMatchingGeneratorUI)
 {
     setTitle(title);
     stack->addWidget(noDataL);
@@ -139,6 +148,8 @@ HkDataUI::HkDataUI(const QString &title)
     stack->addWidget(limbIKModUI);
     stack->addWidget(boneSwitchUI);
     stack->addWidget(offsetAnimGenUI);
+    stack->addWidget(cyclicBlendTransGenUI);
+    stack->addWidget(poseMatchGenUI);
     verLyt->addLayout(stack, 5);
     setLayout(verLyt);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -150,28 +161,35 @@ HkDataUI::HkDataUI(const QString &title)
     connect(behaviorGraphUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
     connect(boneSwitchUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
     connect(offsetAnimGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(cyclicBlendTransGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(poseMatchGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
 
     connect(limbIKModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
 
     connect(behaviorView, SIGNAL(iconSelected(TreeGraphicsItem*)), this, SLOT(changeCurrentDataWidget(TreeGraphicsItem*)), Qt::UniqueConnection);
 }
 
-void HkDataUI::setEventsVariablesUI(EventsUI *events, BehaviorVariablesUI *variables){
-    if (!events || !variables){
+void HkDataUI::setEventsVariablesAnimationsUI(EventsUI *events, BehaviorVariablesUI *variables, AnimationsUI *animations){
+    if (!events || !variables || !animations){
         return;
     }
     eventsUI = events;
     variablesUI = variables;
+    animationsUI = animations;
     connect(eventsUI, SIGNAL(eventAdded(QString)), this, SLOT(eventAdded(QString)), Qt::UniqueConnection);
     connect(eventsUI, SIGNAL(eventRemoved(int)), this, SLOT(eventRemoved(int)), Qt::UniqueConnection);
     connect(eventsUI, SIGNAL(eventNameChanged(QString,int)), this, SLOT(eventNameChanged(QString,int)), Qt::UniqueConnection);
     connect(variablesUI, SIGNAL(variableAdded(QString,QString)), this, SLOT(variableAdded(QString,QString)), Qt::UniqueConnection);
     connect(variablesUI, SIGNAL(variableRemoved(int)), this, SLOT(variableRemoved(int)), Qt::UniqueConnection);
     connect(variablesUI, SIGNAL(variableNameChanged(QString,int)), this, SLOT(variableNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
+    connect(animationsUI, SIGNAL(animationRemoved(int)), this, SLOT(animationRemoved(int)), Qt::UniqueConnection);
+    connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
 }
 
 void HkDataUI::unloadDataWidget(){
     disconnect(variablesTable, SIGNAL(elementSelected(int,QString)), 0, 0);
+    disconnect(animationsTable, SIGNAL(elementSelected(int,QString)), 0, 0);
     disconnect(characterPropertiesTable, SIGNAL(elementSelected(int,QString)), 0, 0);
     disconnect(generatorsTable, SIGNAL(elementSelected(int,QString)), 0, 0);
     disconnect(modifiersTable, SIGNAL(elementSelected(int,QString)), 0, 0);
@@ -181,31 +199,22 @@ void HkDataUI::unloadDataWidget(){
 }
 
 void HkDataUI::modifierAdded(const QString & name, const QString & type){
-    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     modifiersTable->addItem(name, type);
-    QCoreApplication::processEvents();
 }
 void HkDataUI::modifierNameChanged(const QString & newName, int index){
-    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     modifiersTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
     case DATA_TYPE_LOADED::MODIFIER_GENERATOR:
         modGenUI->modifierRenamed(newName, index);
         break;
-    default:
-        break;
     }
-    QCoreApplication::processEvents();
 }
 
 void HkDataUI::generatorAdded(const QString & name, const QString & type){
-    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     generatorsTable->addItem(name, type);
-    QCoreApplication::processEvents();
 }
 
 void HkDataUI::generatorNameChanged(const QString & newName, int index){
-    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     generatorsTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
     case DATA_TYPE_LOADED::BLENDER_GENERATOR:
@@ -229,46 +238,72 @@ void HkDataUI::generatorNameChanged(const QString & newName, int index){
     case DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR:
         offsetAnimGenUI->generatorRenamed(newName, index);
         break;
-    default:
+    case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+        cyclicBlendTransGenUI->generatorRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
+        poseMatchGenUI->generatorRenamed(newName, index);
         break;
     }
-    QCoreApplication::processEvents();
 }
 
 void HkDataUI::eventNameChanged(const QString & newName, int index){
-    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     eventsTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
     case DATA_TYPE_LOADED::STATE_MACHINE:
         stateMachineUI->eventRenamed(newName, index);
         break;
-    default:
+    /*case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+        cyclicBlendTransGenUI->eventRenamed(newName, index);
+        break;*/
+    case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
+        poseMatchGenUI->eventRenamed(newName, index);
         break;
     }
-    QCoreApplication::processEvents();
 }
 
 void HkDataUI::eventAdded(const QString & name){
-    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     eventsTable->addItem(name, "hkEvent");
-    QCoreApplication::processEvents();
 }
 
 void HkDataUI::eventRemoved(int index){
-    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     eventsTable->removeItem(index);
-    switch (stack->currentIndex()) {
+    switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::STATE_MACHINE:
         stateMachineUI->eventRenamed("NONE", index);
         break;
-    default:
+    /*case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+            cyclicBlendTransGenUI->eventRenamed(newName, index);
+            break;*/
+    case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
+        poseMatchGenUI->eventRenamed("NONE", index);
         break;
     }
-    QCoreApplication::processEvents();
+}
+
+void HkDataUI::animationNameChanged(const QString &newName, int index){
+    animationsTable->renameItem(index, newName);
+    switch (stack->currentIndex()){
+    /*case DATA_TYPE_LOADED::CLIP_GENERATOR:
+        clipGenUI->animationRenamed(newName, index);
+        break;*/
+    }
+}
+
+void HkDataUI::animationAdded(const QString &name){
+    animationsTable->addItem(name, "hkStringPtr");
+}
+
+void HkDataUI::animationRemoved(int index){
+    eventsTable->removeItem(index);
+    switch (stack->currentIndex()){
+    /*case DATA_TYPE_LOADED::CLIP_GENERATOR:
+        clipGenUI->animationRenamed(newName, index);
+        break;*/
+    }
 }
 
 void HkDataUI::variableNameChanged(const QString & newName, int index){
-    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     variablesTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
     case DATA_TYPE_LOADED::BLENDER_GENERATOR:
@@ -292,20 +327,20 @@ void HkDataUI::variableNameChanged(const QString & newName, int index){
     case DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR:
         offsetAnimGenUI->variableRenamed(newName, index);
         break;
-    default:
+    case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+        cyclicBlendTransGenUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
+        poseMatchGenUI->variableRenamed(newName, index);
         break;
     }
-    QCoreApplication::processEvents();
 }
 
 void HkDataUI::variableAdded(const QString & name, const QString & type){
-    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     variablesTable->addItem(name, type);
-    QCoreApplication::processEvents();
 }
 
 void HkDataUI::generatorRemoved(int index){
-    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     generatorsTable->removeItem(index);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::BLENDER_GENERATOR:
@@ -336,31 +371,31 @@ void HkDataUI::generatorRemoved(int index){
         offsetAnimGenUI->loadData(loadedData);
         //iStateTagGenUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
         break;
+    case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+        cyclicBlendTransGenUI->loadData(loadedData);
+        //cyclicBlendTransGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
+        break;
+    case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
+        poseMatchGenUI->loadData(loadedData);
+        //iStateTagGenUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
+        break;
     case DATA_TYPE_LOADED::BEHAVIOR_GRAPH:
         behaviorGraphUI->loadData(loadedData);
         //behaviorGraphUI->connectToTables(generatorsTable);
         break;
-    default:
-        break;
     }
-    QCoreApplication::processEvents();
 }
 
 void HkDataUI::modifierRemoved(int index){
-    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     modifiersTable->removeItem(index);
     switch (stack->currentIndex()) {
     case MODIFIER_GENERATOR:
         //reload active widget table for multi-modifier child class...
         break;
-    default:
-        break;
     }
-    QCoreApplication::processEvents();
 }
 
 void HkDataUI::variableRemoved(int index){
-    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 5);
     variablesTable->removeItem(index);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::BLENDER_GENERATOR:
@@ -384,12 +419,15 @@ void HkDataUI::variableRemoved(int index){
     case DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR:
         offsetAnimGenUI->variableRenamed("NONE", index);
         break;
-    default:
+    case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+        cyclicBlendTransGenUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
+        poseMatchGenUI->variableRenamed("NONE", index);
         break;
     }
     behaviorView->behavior->removeBindings(index);
     behaviorView->removeOtherData();
-    QCoreApplication::processEvents();
 }
 
 void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
@@ -455,6 +493,20 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             stack->setCurrentIndex(DATA_TYPE_LOADED::STATE_MACHINE);
             stateMachineUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
             break;
+        case HkxSignature::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+            if (loadedData != oldData){
+                cyclicBlendTransGenUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR);
+            cyclicBlendTransGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
+            break;
+        case HkxSignature::HKB_POSE_MATCHING_GENERATOR:
+            if (loadedData != oldData){
+                poseMatchGenUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR);
+            poseMatchGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
+            break;
         case HkxSignature::HKB_BEHAVIOR_GRAPH:
             if (loadedData != oldData){
                 behaviorGraphUI->loadData(loadedData);
@@ -487,11 +539,14 @@ BehaviorGraphView *HkDataUI::loadBehaviorView(BehaviorGraphView *view){
     behaviorGraphUI->setBehaviorView(view);
     boneSwitchUI->setBehaviorView(view);
     offsetAnimGenUI->setBehaviorView(view);
+    cyclicBlendTransGenUI->setBehaviorView(view);
+    poseMatchGenUI->setBehaviorView(view);
     if (behaviorView){
         generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "NULL");
         modifiersTable->loadTable(behaviorView->behavior->getModifierNames(), behaviorView->behavior->getModifierTypeNames(), "NULL");
         variablesTable->loadTable(behaviorView->behavior->getVariableNames(), behaviorView->behavior->getVariableTypenames(), "NONE");
-        eventsTable->loadTable(behaviorView->behavior->getEventNames(), "hkEvent", "NONE");
+        eventsTable->loadTable(behaviorView->behavior->getAnimationNames(), "hkStringPtr", "NONE");
+        animationsTable->loadTable(behaviorView->behavior->getEventNames(), "hkEvent", "NONE");
         characterPropertiesTable->loadTable(behaviorView->behavior->getCharacterPropertyNames(), behaviorView->behavior->getCharacterPropertyTypenames(), "NONE");//inefficient...
         connect(behaviorView, SIGNAL(addedGenerator(QString,QString)), this, SLOT(generatorAdded(QString,QString)), Qt::UniqueConnection);
         connect(behaviorView, SIGNAL(addedModifier(QString,QString)), this, SLOT(modifierAdded(QString,QString)), Qt::UniqueConnection);

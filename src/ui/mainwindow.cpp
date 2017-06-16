@@ -19,7 +19,7 @@
 #include <QtWidgets>
 
 #define MAX_REFERENCED_BEHAVIOR_FILES 30
-#define CONFIRM_CLOSE_PROJECT_WITHOUT_SAVING "WARNING: There are unsaved changes to the project files currently open!\nAre you sure you want to close them without saving?"
+#define CONFIRM_CLOSE_PROJECT_WITHOUT_SAVING "WARNING: There are unsaved changes to the project, character or behavior files currently open!\nAre you sure you want to close them without saving?"
 #define CONFIRM_CLOSE_FILE_WITHOUT_SAVING "WARNING: There are unsaved changes to the behavior file currently open!\nAre you sure you want to close it without saving?"
 
 MainWindow::MainWindow()
@@ -54,7 +54,12 @@ MainWindow::MainWindow()
 {
     //setStyleSheet("QComboBox {background: yellow};QWidget {background: darkGray}");
     projectUI->setDisabled(true);
+
+    //Change this for release!!!
     hkxcmdPath = "c:/users/wayne/desktop/hkxcmd.exe";
+    //hkxcmdPath = QDir::current()+"/hkxcmd.exe";
+    //Change this for release!!!
+
     openProjectA->setStatusTip("Open a hkx project file!");
     openProjectA->setShortcut(QKeySequence::Open);
     exportToSkyrimDirA->setStatusTip("Pack and export the current project to the working Skyrim directory!");
@@ -86,7 +91,7 @@ MainWindow::MainWindow()
     logGB->setLayout(logGBLyt);
     eventsWid->setHkDataUI(objectDataWid);
     variablesWid->setHkDataUI(objectDataWid);
-    objectDataWid->setEventsVariablesUI(eventsWid, variablesWid);
+    objectDataWid->setEventsVariablesAnimationsUI(eventsWid, variablesWid, projectUI->animations);
     iconGBLyt->addWidget(tabs);
     behaviorGraphViewGB->setLayout(iconGBLyt);
     objectDataSA->setWidgetResizable(true);
@@ -479,6 +484,9 @@ bool MainWindow::closeAll(){
         if (behaviorFiles.at(i)->getIsChanged()){
             unsavedChanges = true;
         }
+    }
+    if (characterFile->getIsChanged()){
+        unsavedChanges = true;
     }
     if (!unsavedChanges || closeAllDialogue() != QMessageBox::Cancel){
         projectUI->setDisabled(true);

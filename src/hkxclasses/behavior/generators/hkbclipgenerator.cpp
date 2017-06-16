@@ -10,7 +10,6 @@ uint hkbClipGenerator::refCount = 0;
 QString hkbClipGenerator::classname = "hkbClipGenerator";
 
 QStringList hkbClipGenerator::PlaybackMode = {"MODE_SINGLE_PLAY", "MODE_LOOPING", "MODE_USER_CONTROLLED", "MODE_PING_PONG", "MODE_COUNT"};
-QStringList hkbClipGenerator::ClipFlags = {"0", "FLAG_CONTINUE_MOTION_AT_END", "FLAG_SYNC_HALF_CYCLE_IN_PING_PONG_MODE", "FLAG_MIRROR", "FLAG_FORCE_DENSE_POSE", "FLAG_DONT_CONVERT_ANNOTATIONS_TO_TRIGGERS", "FLAG_IGNORE_MOTION"};
 
 hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, const QString &animationname)
     : hkbGenerator(parent, ref),
@@ -24,7 +23,7 @@ hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, const QString &ani
       userControlledTimeFraction(0),
       animationBindingIndex(-1),
       mode(PlaybackMode.first()),
-      flags(ClipFlags.first())
+      flags("0")
 {
     setType(HKB_CLIP_GENERATOR, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
@@ -136,8 +135,8 @@ bool hkbClipGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("animationName"), animationName);
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
+        if (triggers.data()){
+            refString = triggers.data()->getReferenceString();
         }else{
             refString = "null";
         }
@@ -189,15 +188,10 @@ void hkbClipGenerator::unlink(){
 
 bool hkbClipGenerator::evaulateDataValidity(){
     bool valid = true;
-    QStringList list = flags.split('|');
-    for (int i = 0; i < list.size(); i++){
-        if (!ClipFlags.contains(list.at(i))){
-            valid = false;
-        }
-    }
     if (!HkDynamicObject::evaulateDataValidity()){
         return false;
     }else if (!PlaybackMode.contains(mode)){
+    }else if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){
     }else if (triggers.data() && triggers.data()->getSignature() != HKB_CLIP_TRIGGER_ARRAY){
     }else if (name == ""){
     }else if (animationName == ""){
