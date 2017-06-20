@@ -16,7 +16,7 @@ class LineEdit;
 class ComboBox;
 class QPushButton;
 class DoubleSpinBox;
-class QCheckBox;
+class CheckBox;
 class EventUI;
 class QGroupBox;
 
@@ -82,8 +82,8 @@ private:
     LineEdit *name;
     SpinBox *stateId;
     DoubleSpinBox *probability;
-    QCheckBox *enable;
-    QCheckBox *enableTransitions;
+    CheckBox *enable;
+    CheckBox *enableTransitions;
 };
 
 #endif // STATEUI_H

@@ -68,11 +68,11 @@ TransitionsUI::TransitionsUI()
       fromNestedStateId(new ComboBox),
       toNestedStateId(new ComboBox),
       priority(new SpinBox),
-      flagGlobalWildcard(new QCheckBox),
-      flagUseNestedState(new QCheckBox),
-      flagDisallowRandomTransition(new QCheckBox),
-      flagDisallowReturnToState(new QCheckBox),
-      flagAbutEndState(new QCheckBox)
+      flagGlobalWildcard(new CheckBox),
+      flagUseNestedState(new CheckBox),
+      flagDisallowRandomTransition(new CheckBox),
+      flagDisallowReturnToState(new CheckBox),
+      flagAbutEndState(new CheckBox)
 {
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());

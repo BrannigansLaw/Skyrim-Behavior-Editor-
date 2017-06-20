@@ -77,13 +77,13 @@ BlenderGeneratorUI::BlenderGeneratorUI()
       minCyclicBlendParameter(new DoubleSpinBox),
       maxCyclicBlendParameter(new DoubleSpinBox),
       indexOfSyncMasterChild(new SpinBox),
-      flagSync(new QCheckBox),
-      flagSmoothGeneratorWeights(new QCheckBox),
-      flagDontDeactivateChildrenWithZeroWeights(new QCheckBox),
-      flagParametricBlend(new QCheckBox),
-      flagIsParametricBlendCyclic(new QCheckBox),
-      flagForceDensePose(new QCheckBox),
-      subtractLastChild(new QCheckBox)
+      flagSync(new CheckBox),
+      flagSmoothGeneratorWeights(new CheckBox),
+      flagDontDeactivateChildrenWithZeroWeights(new CheckBox),
+      flagParametricBlend(new CheckBox),
+      flagIsParametricBlendCyclic(new CheckBox),
+      flagForceDensePose(new CheckBox),
+      subtractLastChild(new CheckBox)
 {
     typeSelectorCB->insertItems(0, types);
     table->setRowCount(BASE_NUMBER_OF_ROWS);

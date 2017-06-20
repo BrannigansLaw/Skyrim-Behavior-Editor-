@@ -25,6 +25,9 @@
 #include "src/ui/hkxclassesui/behaviorui/generators/bsboneswitchgeneratorbonedataui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/bscyclicblendtransitiongeneratorui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/posematchinggeneratorui.h"
+#include "src/ui/hkxclassesui/behaviorui/generators/clipgeneratorui.h"
+#include "src/ui/hkxclassesui/behaviorui/generators/bssynchronizedclipgeneratorui.h"
+#include "src/ui/hkxclassesui/behaviorui/generators/behaviorreferencegeneratorui.h"
 #include "src/ui/hkxclassesui/behaviorui/transitionsui.h"
 #include "src/ui/hkxclassesui/behaviorui/modifiers/bslimbikmodifierui.h"
 
@@ -135,7 +138,10 @@ HkDataUI::HkDataUI(const QString &title)
       boneSwitchUI(new BSBoneSwitchGeneratorUI),
       offsetAnimGenUI(new BSOffsetAnimationGeneratorUI),
       cyclicBlendTransGenUI(new BSCyclicBlendTransitionGeneratorUI),
-      poseMatchGenUI(new PoseMatchingGeneratorUI)
+      poseMatchGenUI(new PoseMatchingGeneratorUI),
+      clipGenUI(new ClipGeneratorUI),
+      syncClipGenUI(new BSSynchronizedClipGeneratorUI),
+      behaviorRefGenUI(new BehaviorReferenceGeneratorUI)
 {
     setTitle(title);
     stack->addWidget(noDataL);
@@ -150,6 +156,9 @@ HkDataUI::HkDataUI(const QString &title)
     stack->addWidget(offsetAnimGenUI);
     stack->addWidget(cyclicBlendTransGenUI);
     stack->addWidget(poseMatchGenUI);
+    stack->addWidget(clipGenUI);
+    stack->addWidget(syncClipGenUI);
+    stack->addWidget(behaviorRefGenUI);
     verLyt->addLayout(stack, 5);
     setLayout(verLyt);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -163,8 +172,15 @@ HkDataUI::HkDataUI(const QString &title)
     connect(offsetAnimGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
     connect(cyclicBlendTransGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
     connect(poseMatchGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(clipGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(syncClipGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(behaviorRefGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
 
     connect(limbIKModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+
+    connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
+    connect(animationsUI, SIGNAL(animationRemoved(int)), this, SLOT(animationRemoved(int)), Qt::UniqueConnection);
 
     connect(behaviorView, SIGNAL(iconSelected(TreeGraphicsItem*)), this, SLOT(changeCurrentDataWidget(TreeGraphicsItem*)), Qt::UniqueConnection);
 }
@@ -244,6 +260,9 @@ void HkDataUI::generatorNameChanged(const QString & newName, int index){
     case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
         poseMatchGenUI->generatorRenamed(newName, index);
         break;
+    case DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR:
+        syncClipGenUI->generatorRenamed(newName, index);
+        break;
     }
 }
 
@@ -258,6 +277,9 @@ void HkDataUI::eventNameChanged(const QString & newName, int index){
         break;*/
     case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
         poseMatchGenUI->eventRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::CLIP_GENERATOR:
+        clipGenUI->eventRenamed(newName, index);
         break;
     }
 }
@@ -278,15 +300,18 @@ void HkDataUI::eventRemoved(int index){
     case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
         poseMatchGenUI->eventRenamed("NONE", index);
         break;
+    case DATA_TYPE_LOADED::CLIP_GENERATOR:
+        clipGenUI->eventRenamed("NONE", index);
+        break;
     }
 }
 
 void HkDataUI::animationNameChanged(const QString &newName, int index){
     animationsTable->renameItem(index, newName);
     switch (stack->currentIndex()){
-    /*case DATA_TYPE_LOADED::CLIP_GENERATOR:
+    case DATA_TYPE_LOADED::CLIP_GENERATOR:
         clipGenUI->animationRenamed(newName, index);
-        break;*/
+        break;
     }
 }
 
@@ -297,9 +322,9 @@ void HkDataUI::animationAdded(const QString &name){
 void HkDataUI::animationRemoved(int index){
     eventsTable->removeItem(index);
     switch (stack->currentIndex()){
-    /*case DATA_TYPE_LOADED::CLIP_GENERATOR:
-        clipGenUI->animationRenamed(newName, index);
-        break;*/
+    case DATA_TYPE_LOADED::CLIP_GENERATOR:
+        clipGenUI->animationRenamed("/", index);
+        break;
     }
 }
 
@@ -332,6 +357,12 @@ void HkDataUI::variableNameChanged(const QString & newName, int index){
         break;
     case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
         poseMatchGenUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::CLIP_GENERATOR:
+        clipGenUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR:
+        syncClipGenUI->variableRenamed(newName, index);
         break;
     }
 }
@@ -379,6 +410,14 @@ void HkDataUI::generatorRemoved(int index){
         poseMatchGenUI->loadData(loadedData);
         //iStateTagGenUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
         break;
+    case DATA_TYPE_LOADED::CLIP_GENERATOR:
+        clipGenUI->loadData(loadedData);
+        //clipGenUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable, animationsTables);
+        break;
+    case DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR:
+        syncClipGenUI->loadData(loadedData);
+        //syncClipGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
+        break;
     case DATA_TYPE_LOADED::BEHAVIOR_GRAPH:
         behaviorGraphUI->loadData(loadedData);
         //behaviorGraphUI->connectToTables(generatorsTable);
@@ -424,6 +463,12 @@ void HkDataUI::variableRemoved(int index){
         break;
     case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
         poseMatchGenUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::CLIP_GENERATOR:
+        clipGenUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR:
+        syncClipGenUI->variableRenamed("NONE", index);
         break;
     }
     behaviorView->behavior->removeBindings(index);
@@ -507,6 +552,26 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             stack->setCurrentIndex(DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR);
             poseMatchGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
             break;
+        case HkxSignature::HKB_CLIP_GENERATOR:
+            if (loadedData != oldData){
+                clipGenUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::CLIP_GENERATOR);
+            clipGenUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable, animationsTable);
+            break;
+        case HkxSignature::BS_SYNCHRONIZED_CLIP_GENERATOR:
+            if (loadedData != oldData){
+                syncClipGenUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR);
+            syncClipGenUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_BEHAVIOR_REFERENCE_GENERATOR:
+            if (loadedData != oldData){
+                behaviorRefGenUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BEHAVIOR_REFERENCE_GENERATOR);
+            break;
         case HkxSignature::HKB_BEHAVIOR_GRAPH:
             if (loadedData != oldData){
                 behaviorGraphUI->loadData(loadedData);
@@ -541,12 +606,13 @@ BehaviorGraphView *HkDataUI::loadBehaviorView(BehaviorGraphView *view){
     offsetAnimGenUI->setBehaviorView(view);
     cyclicBlendTransGenUI->setBehaviorView(view);
     poseMatchGenUI->setBehaviorView(view);
+    syncClipGenUI->setBehaviorView(view);
     if (behaviorView){
         generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "NULL");
         modifiersTable->loadTable(behaviorView->behavior->getModifierNames(), behaviorView->behavior->getModifierTypeNames(), "NULL");
         variablesTable->loadTable(behaviorView->behavior->getVariableNames(), behaviorView->behavior->getVariableTypenames(), "NONE");
-        eventsTable->loadTable(behaviorView->behavior->getAnimationNames(), "hkStringPtr", "NONE");
-        animationsTable->loadTable(behaviorView->behavior->getEventNames(), "hkEvent", "NONE");
+        animationsTable->loadTable(behaviorView->behavior->getAnimationNames(), "hkStringPtr", "NONE");
+        eventsTable->loadTable(behaviorView->behavior->getEventNames(), "hkEvent", "NONE");
         characterPropertiesTable->loadTable(behaviorView->behavior->getCharacterPropertyNames(), behaviorView->behavior->getCharacterPropertyTypenames(), "NONE");//inefficient...
         connect(behaviorView, SIGNAL(addedGenerator(QString,QString)), this, SLOT(generatorAdded(QString,QString)), Qt::UniqueConnection);
         connect(behaviorView, SIGNAL(addedModifier(QString,QString)), this, SLOT(modifierAdded(QString,QString)), Qt::UniqueConnection);

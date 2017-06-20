@@ -55,7 +55,7 @@ CharacterPropertiesUI::CharacterPropertiesUI(const QString &title)
       intName(new LineEdit),
       doubleName(new LineEdit),
       quadName(new LineEdit),
-      boolCB(new QCheckBox),
+      boolCB(new CheckBox),
       intSB(new SpinBox),
       doubleSB(new DoubleSpinBox),
       quadWidget(new QuadVariableWidget),
@@ -173,7 +173,7 @@ void CharacterPropertiesUI::removeVariableFromTable(int row){
     }
 }
 
-void CharacterPropertiesUI::loadVariable(QCheckBox *variableWid){
+void CharacterPropertiesUI::loadVariable(CheckBox *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
         hkbCharacterStringData *varNames = static_cast<hkbCharacterStringData *>(loadedData->stringData.data());

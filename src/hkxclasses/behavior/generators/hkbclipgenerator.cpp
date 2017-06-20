@@ -1,9 +1,7 @@
 #include "hkbclipgenerator.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
-/*
- * CLASS: hkbClipGenerator
-*/
+#include "src/hkxclasses/behavior/hkbcliptriggerarray.h"
 
 uint hkbClipGenerator::refCount = 0;
 
@@ -161,6 +159,13 @@ bool hkbClipGenerator::write(HkxXMLWriter *writer){
         }
     }
     return true;
+}
+
+int hkbClipGenerator::getNumberOfTriggers() const{
+    if (triggers.data()){
+        return static_cast<hkbClipTriggerArray *>(triggers.data())->triggers.size();
+    }
+    return 0;
 }
 
 bool hkbClipGenerator::link(){

@@ -1,7 +1,7 @@
 #ifndef CLIPGENERATORUI_H
 #define CLIPGENERATORUI_H
 
-#include <QGroupBox>
+#include <QStackedWidget>
 
 #include "src/utility.h"
 
@@ -11,14 +11,17 @@ class TableWidget;
 class hkbClipGenerator;
 class LineEdit;
 class DoubleSpinBox;
-class QCheckBox;
+class CheckBox;
 class ComboBox;
 class GenericTableWidget;
+class SpinBox;
 class hkbVariableBindingSet;
+class ClipTriggerUI;
+class QGroupBox;
 
-class ClipGeneratorUI: QGroupBox
+class ClipGeneratorUI: public QStackedWidget
 {
-    /*Q_OBJECT
+    Q_OBJECT
     friend class HkDataUI;
 public:
     ClipGeneratorUI();
@@ -28,40 +31,68 @@ signals:
     void viewVariables(int index);
     void viewProperties(int index);
     void viewEvents(int index);
-    void viewAnimations(int index);
+    void viewAnimations(const QString & name);
     void generatorNameChanged(const QString & newName, int index);
 private slots:
     void setName();
-    void setEnable();
-    void setLimitAngleDegrees();
-    void setStartBoneIndex(int index);
-    void setEndBoneIndex(int index);
-    void setGain();
-    void setBoneRadius();
-    void setCastOffset();
-    void viewSelected(int row, int column);
+    void setAnimationName(int, const QString & name);
+    void setCropStartAmountLocalTime();
+    void setCropEndAmountLocalTime();
+    void setStartTime();
+    void setPlaybackSpeed();
+    void setEnforcedDuration();
+    void setUserControlledTimeFraction();
+    void setAnimationBindingIndex();
+    void setMode(int index);
+    void setFlagContinueMotionAtEnd();
+    void setFlagSyncHalfCycleInPingPongMode();
+    void setFlagMirror();
+    void setFlagForceDensePose();
+    void setFlagDontConvertAnnotationsToTriggers();
+    void setFlagIgnoreMotion();
+    void viewSelectedChild(int row, int column);
     void setBindingVariable(int index, const QString & name);
+    void returnToWidget();
 private:
     void connectSignals();
     void disconnectSignals();
-    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties);
+    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2);
+    void addTrigger();
+    void removeTrigger(int index);
+    void eventRenamed(const QString & name, int index);
+    void animationRenamed(const QString & name, int index);
+    void loadDynamicTableRows();
+    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events, GenericTableWidget *animations);
     void variableRenamed(const QString & name, int index);
     void selectTableToView(bool viewproperties, const QString & path);
     bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
+    enum ACTIVE_WIDGET {
+        MAIN_WIDGET = 0,
+        CHILD_WIDGET = 1
+    };
     static QStringList headerLabels;
     hkbClipGenerator *bsData;
     QGridLayout *topLyt;
     TableWidget *table;
+    QGroupBox *groupBox;
+    ClipTriggerUI *triggerUI;
     LineEdit *name;
-    QCheckBox *enable;
-    DoubleSpinBox *limitAngleDegrees;
-    ComboBox *startBoneIndex;
-    ComboBox *endBoneIndex;
-    DoubleSpinBox *gain;
-    DoubleSpinBox *boneRadius;
-    DoubleSpinBox *castOffset;*/
+    DoubleSpinBox *cropStartAmountLocalTime;
+    DoubleSpinBox *cropEndAmountLocalTime;
+    DoubleSpinBox *startTime;
+    DoubleSpinBox *playbackSpeed;
+    DoubleSpinBox *enforcedDuration;
+    DoubleSpinBox *userControlledTimeFraction;
+    SpinBox *animationBindingIndex;
+    ComboBox *mode;
+    CheckBox *flagContinueMotionAtEnd;
+    CheckBox *flagSyncHalfCycleInPingPongMode;
+    CheckBox *flagMirror;
+    CheckBox *flagForceDensePose;
+    CheckBox *flagDontConvertAnnotationsToTriggers;
+    CheckBox *flagIgnoreMotion;
 };
 
 #endif // CLIPGENERATORUI_H

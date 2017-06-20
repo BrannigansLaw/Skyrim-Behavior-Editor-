@@ -318,7 +318,7 @@ void BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(int index, const QS
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->pBlenderGenerator.data())), indexOfGenerator);
                 }else{
-                    CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::setDefaultGenerator(): The selected icon is NULL!!"));
+                    CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(): The selected icon is NULL!!"));
                     return;
                 }
             }
@@ -326,10 +326,10 @@ void BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(int index, const QS
             table->item(BLENDER_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::setDefaultGenerator(): The 'behaviorView' pointer is NULL!!"))
+            CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(): The 'behaviorView' pointer is NULL!!"))
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::setDefaultGenerator(): The 'bsData' pointer is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(): The 'bsData' pointer is NULL!!"))
     }
 }
 

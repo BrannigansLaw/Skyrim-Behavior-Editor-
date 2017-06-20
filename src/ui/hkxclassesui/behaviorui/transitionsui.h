@@ -13,7 +13,7 @@ class QGridLayout;
 class HkxObject;
 class SpinBox;
 class DoubleSpinBox;
-class QCheckBox;
+class CheckBox;
 class BlendingTransitionEffectUI;
 class QStackedLayout;
 class QPushButton;
@@ -98,11 +98,11 @@ private:
     ComboBox *fromNestedStateId;
     ComboBox *toNestedStateId;
     SpinBox *priority;
-    QCheckBox *flagGlobalWildcard;
-    QCheckBox *flagUseNestedState;
-    QCheckBox *flagDisallowRandomTransition;
-    QCheckBox *flagDisallowReturnToState;
-    QCheckBox *flagAbutEndState;
+    CheckBox *flagGlobalWildcard;
+    CheckBox *flagUseNestedState;
+    CheckBox *flagDisallowRandomTransition;
+    CheckBox *flagDisallowReturnToState;
+    CheckBox *flagAbutEndState;
 };
 
 #endif // TRANSITIONSUI_H

@@ -32,6 +32,9 @@ class BSBoneSwitchGeneratorUI;
 class BSOffsetAnimationGeneratorUI;
 class BSCyclicBlendTransitionGeneratorUI;
 class PoseMatchingGeneratorUI;
+class ClipGeneratorUI;
+class BSSynchronizedClipGeneratorUI;
+class BehaviorReferenceGeneratorUI;
 
 /**
  * To add support for a new class we need to add it to the "DATA_TYPE_LOADED" enum, add it to the stacked layout in the correct order,
@@ -81,7 +84,10 @@ private:
         BS_BONE_SWITCH_GENERATOR,
         BS_OFFSET_ANIMATION_GENERATOR,
         BS_CYCLIC_BLEND_TRANSITION_GENERATOR,
-        POSE_MATCHING_GENERATOR
+        POSE_MATCHING_GENERATOR,
+        CLIP_GENERATOR,
+        SYNCHRONIZED_CLIP_GENERATOR,
+        BEHAVIOR_REFERENCE_GENERATOR
     };
     static QStringList generatorTypes;
     static QStringList modifierTypes;
@@ -111,6 +117,9 @@ private:
     BSOffsetAnimationGeneratorUI *offsetAnimGenUI;
     BSCyclicBlendTransitionGeneratorUI *cyclicBlendTransGenUI;
     PoseMatchingGeneratorUI *poseMatchGenUI;
+    ClipGeneratorUI *clipGenUI;
+    BSSynchronizedClipGeneratorUI *syncClipGenUI;
+    BehaviorReferenceGeneratorUI *behaviorRefGenUI;
 };
 
 #endif // HKDATAUI_H

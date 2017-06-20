@@ -11,7 +11,7 @@ class QFileSystemModel;
 class QListView;
 class FootIkDriverInfoUI;
 class HandIkDriverInfoUI;
-class QCheckBox;
+class CheckBox;
 class AnimationsUI;
 
 class ProjectUI: public QGroupBox
@@ -37,8 +37,8 @@ private:
     CharacterPropertiesUI *characterProperties;
     AnimationsUI *animations;
     SkeletonUI *skeleton;
-    QCheckBox *enableFootIKCB;
-    QCheckBox *enableHandIKCB;
+    CheckBox *enableFootIKCB;
+    CheckBox *enableHandIKCB;
     FootIkDriverInfoUI *footIK;
     HandIkDriverInfoUI *handIK;
     QFileSystemModel *fileSys;

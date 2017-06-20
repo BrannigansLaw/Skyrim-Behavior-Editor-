@@ -55,7 +55,7 @@ BehaviorVariablesUI::BehaviorVariablesUI(const QString &title)
       intName(new LineEdit),
       doubleName(new LineEdit),
       quadName(new LineEdit),
-      boolCB(new QCheckBox),
+      boolCB(new CheckBox),
       intSB(new SpinBox),
       doubleSB(new DoubleSpinBox),
       quadWidget(new QuadVariableWidget),
@@ -177,7 +177,7 @@ void BehaviorVariablesUI::removeVariableFromTable(int row){
     }
 }
 
-void BehaviorVariablesUI::loadVariable(QCheckBox *variableWid){
+void BehaviorVariablesUI::loadVariable(CheckBox *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
         hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());

@@ -14,6 +14,7 @@
 #define VIEW_GENERATORS_TABLE_TIP "Double click to view the table of generators"
 #define VIEW_MODIFIERS_TABLE_TIP "Double click to view the table of modifiers"
 #define VIEW_EVENTS_TABLE_TIP "Double click to view the table of events"
+#define VIEW_ANIMATIONS_TABLE_TIP "Double click to view the table of animations"
 #define VIEW_VARIABLES_TABLE_TIP "Double click to view the table of variables, check the box to view the table of character properties instead"
 #define DRAG_DROP_N_SWAP "Hold click to start drag, release click to swap dragged item with item under the mouse cursor"
 

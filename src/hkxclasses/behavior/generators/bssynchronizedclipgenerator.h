@@ -6,6 +6,7 @@
 class BSSynchronizedClipGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
+    friend class BSSynchronizedClipGeneratorUI;
 public:
     BSSynchronizedClipGenerator(HkxFile *parent, long ref = 0);
     virtual ~BSSynchronizedClipGenerator();
@@ -30,7 +31,7 @@ private:
     ulong userData;
     QString name;
     HkxSharedPtr pClipGenerator;
-    QString SyncAnimPrefix;
+    QString syncAnimPrefix;
     bool bSyncClipIgnoreMarkPlacement;
     qreal fGetToMarkTime;
     qreal fMarkErrorThreshold;

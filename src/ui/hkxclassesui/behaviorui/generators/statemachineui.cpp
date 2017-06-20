@@ -79,7 +79,7 @@ StateMachineUI::StateMachineUI()
       typeSelectorCB(new ComboBox),
       name(new LineEdit),
       startStateId(new ComboBox),
-      wrapAroundStateId(new QCheckBox),
+      wrapAroundStateId(new CheckBox),
       maxSimultaneousTransitions(new SpinBox),
       startStateMode(new ComboBox),
       selfTransitionMode(new ComboBox)

@@ -12,7 +12,7 @@ class QSignalMapper;
 class hkbCharacterStringData;
 class HkxObject;
 class LineEdit;
-class QCheckBox;
+class CheckBox;
 class QStackedLayout;
 
 class AnimationsUI: public QGroupBox

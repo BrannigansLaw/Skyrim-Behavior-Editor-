@@ -24,20 +24,29 @@
 
 class CheckBox: public QWidget
 {
+    Q_OBJECT
+signals:
+    void released();
 public:
-    CheckBox(const QString & text = "", QWidget * parent)
-        : QCheckBox(text, parent),
-          checkbox(new QCheckBox)
+    CheckBox(const QString & text = "", QWidget *parent = NULL)
+        : QWidget(parent),
+          checkbox(new QCheckBox(text, parent))
     {
-        QVBoxLayout *lyt = new QVBoxLayout;
+        QHBoxLayout *lyt = new QHBoxLayout;
+        lyt->addSpacing(1);
         lyt->addWidget(checkbox, Qt::AlignCenter);
+        lyt->addSpacing(1);
         setLayout(lyt);
+        connect(checkbox, SIGNAL(released()), this,  SIGNAL(released()));
     }
 
     void setChecked(bool checked){
         checkbox->setChecked(checked);
     }
 
+    bool isChecked() const{
+        return checkbox->isChecked();
+    }
 private:
     QCheckBox *checkbox;
 };
@@ -88,7 +97,7 @@ public:
     CheckButtonCombo(const QString & buttontip = "", const QString & boxtext = "Enable:", bool disablebutton = true, const QString & buttontext = "Edit", QWidget * par = 0)
         : QWidget(par),
           label(new QLabel(boxtext)),
-          checkBox(new QCheckBox),
+          checkBox(new CheckBox),
           pushButton(new QPushButton(buttontext)),
           disableButton(disablebutton)
     {
@@ -130,7 +139,7 @@ public slots:
     }
 private:
     QLabel *label;
-    QCheckBox *checkBox;
+    CheckBox *checkBox;
     QPushButton *pushButton;
     bool disableButton;
 };
@@ -399,6 +408,7 @@ private slots:
     void itemSelected();
     //void itemAdded();
     void showTable(int index);
+    void showTable(const QString & name);
 private:
     QGridLayout *lyt;
     QTableWidget *table;

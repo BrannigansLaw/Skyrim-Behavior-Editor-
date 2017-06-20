@@ -41,8 +41,8 @@ HandIkDriverInfoHandUI::HandIkDriverInfoHandUI()
       elbowIndex(new ComboBox),
       elbowSiblingIndex(new ComboBox),
       wristIndex(new ComboBox),
-      enforceEndPosition(new QCheckBox),
-      enforceEndRotation(new QCheckBox),
+      enforceEndPosition(new CheckBox),
+      enforceEndRotation(new CheckBox),
       localFrameName(new LineEdit)
 {
     setTitle("hkbHandIkDriverInfoHand");

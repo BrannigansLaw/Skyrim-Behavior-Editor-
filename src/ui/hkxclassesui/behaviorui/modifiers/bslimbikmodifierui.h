@@ -11,7 +11,7 @@ class TableWidget;
 class BSLimbIKModifier;
 class LineEdit;
 class DoubleSpinBox;
-class QCheckBox;
+class CheckBox;
 class ComboBox;
 class GenericTableWidget;
 class hkbVariableBindingSet;
@@ -54,7 +54,7 @@ private:
     QGridLayout *topLyt;
     TableWidget *table;
     LineEdit *name;
-    QCheckBox *enable;
+    CheckBox *enable;
     DoubleSpinBox *limitAngleDegrees;
     ComboBox *startBoneIndex;
     ComboBox *endBoneIndex;

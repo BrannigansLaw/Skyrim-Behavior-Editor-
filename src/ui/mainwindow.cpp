@@ -454,7 +454,7 @@ void MainWindow::exit(){
 void MainWindow::closeTab(int index){
     objectDataWid->unloadDataWidget();
     if (projectFile){
-        if (index == 0 && (!behaviorFiles.at(index)->getIsChanged() || closeAllDialogue() != QMessageBox::Cancel)){
+        if (index == 0 && (behaviorFiles.isEmpty() || (!behaviorFiles.at(index)->getIsChanged() || closeAllDialogue() != QMessageBox::Cancel))){
             closeAll();
         }else{
             index--;

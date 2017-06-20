@@ -172,6 +172,21 @@ void GenericTableWidget::showTable(int index){
     show();
 }
 
+void GenericTableWidget::showTable(const QString & name){
+    int index = -1;
+    for (int i = 0; i < table->rowCount(); i++){
+        if (table->item(i, 0) && table->item(i, 0)->text() == name){
+            lastSelectedRow = i;
+            break;
+        }
+    }
+    index = lastSelectedRow;
+    if (index < table->rowCount() && index >= 0){
+        table->setCurrentCell(index, 0);
+    }
+    show();
+}
+
 void GenericTableWidget::itemSelected(){
     QString name;
     int row = table->currentRow();

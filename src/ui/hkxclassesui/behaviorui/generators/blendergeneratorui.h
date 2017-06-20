@@ -10,7 +10,7 @@ class hkbBlenderGenerator;
 class QGridLayout;
 class HkxObject;
 class DoubleSpinBox;
-class QCheckBox;
+class CheckBox;
 class SpinBox;
 class QPushButton;
 class QGroupBox;
@@ -101,13 +101,13 @@ private:
     DoubleSpinBox *minCyclicBlendParameter;
     DoubleSpinBox *maxCyclicBlendParameter;
     SpinBox *indexOfSyncMasterChild;
-    QCheckBox *flagSync;
-    QCheckBox *flagSmoothGeneratorWeights;
-    QCheckBox *flagDontDeactivateChildrenWithZeroWeights;
-    QCheckBox *flagParametricBlend;
-    QCheckBox *flagIsParametricBlendCyclic;
-    QCheckBox *flagForceDensePose;
-    QCheckBox *subtractLastChild;
+    CheckBox *flagSync;
+    CheckBox *flagSmoothGeneratorWeights;
+    CheckBox *flagDontDeactivateChildrenWithZeroWeights;
+    CheckBox *flagParametricBlend;
+    CheckBox *flagIsParametricBlendCyclic;
+    CheckBox *flagForceDensePose;
+    CheckBox *subtractLastChild;
 };
 
 #endif // BLENDERGENERATORUI_H

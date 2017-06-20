@@ -10,7 +10,7 @@ class TableWidget;
 class hkbBlenderGeneratorChild;
 class HkxObject;
 class DoubleSpinBox;
-class QCheckBox;
+class CheckBox;
 class ComboBox;
 class QPushButton;
 class BehaviorGraphView;

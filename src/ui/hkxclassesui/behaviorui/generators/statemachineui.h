@@ -13,7 +13,7 @@ class SpinBox;
 class LineEdit;
 class ComboBox;
 class hkbStateMachine;
-class QCheckBox;
+class CheckBox;
 class StateUI;
 class TransitionsUI;
 class QGroupBox;
@@ -115,7 +115,7 @@ private:
     LineEdit *name;
     CheckButtonCombo *eventToSendWhenStateOrTransitionChanges;
     ComboBox *startStateId;
-    QCheckBox *wrapAroundStateId;
+    CheckBox *wrapAroundStateId;
     SpinBox *maxSimultaneousTransitions;
     ComboBox *startStateMode;
     ComboBox *selfTransitionMode;

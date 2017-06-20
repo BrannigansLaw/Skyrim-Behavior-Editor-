@@ -8,6 +8,7 @@ class hkbStringEventPayload: public HkxObject
     friend class StateMachineUI;
     friend class StateUI;
     friend class EventUI;
+    friend class ClipTriggerUI;
 public:
     hkbStringEventPayload(HkxFile *parent, const QString & string = "", long ref = -1);
     virtual ~hkbStringEventPayload();

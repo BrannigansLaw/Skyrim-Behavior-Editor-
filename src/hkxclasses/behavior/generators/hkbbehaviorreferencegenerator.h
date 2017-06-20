@@ -7,6 +7,7 @@ class hkbBehaviorReferenceGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
     friend class BehaviorFile;
+    friend class BehaviorReferenceGeneratorUI;
 public:
     hkbBehaviorReferenceGenerator(HkxFile *parent, long ref = 0);
     virtual ~hkbBehaviorReferenceGenerator();

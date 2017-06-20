@@ -14,7 +14,7 @@ class QGridLayout;
 class HkxObject;
 class SpinBox;
 class DoubleSpinBox;
-class QCheckBox;
+class CheckBox;
 class QPushButton;
 class hkbVariableBindingSet;
 
@@ -63,9 +63,9 @@ private:
     ComboBox *eventMode;
     DoubleSpinBox *duration;
     DoubleSpinBox *toGeneratorStartTimeFraction;
-    QCheckBox *flagSync;
-    QCheckBox *flagIgnoreFromWorldFromModel;
-    QCheckBox *flagIgnoreToWorldFromModel;
+    CheckBox *flagSync;
+    CheckBox *flagIgnoreFromWorldFromModel;
+    CheckBox *flagIgnoreToWorldFromModel;
     ComboBox *endMode;
     ComboBox *blendCurve;
 };

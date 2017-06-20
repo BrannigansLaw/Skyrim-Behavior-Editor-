@@ -41,9 +41,9 @@ FootIkDriverInfoUI::FootIkDriverInfoUI()
       forwardAlignFraction(new DoubleSpinBox),
       sidewaysAlignFraction(new DoubleSpinBox),
       sidewaysSampleWidth(new DoubleSpinBox),
-      lockFeetWhenPlanted(new QCheckBox),
-      useCharacterUpVector(new QCheckBox),
-      isQuadrupedNarrow(new QCheckBox)
+      lockFeetWhenPlanted(new CheckBox),
+      useCharacterUpVector(new CheckBox),
+      isQuadrupedNarrow(new CheckBox)
 {
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(3);

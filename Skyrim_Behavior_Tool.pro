@@ -163,7 +163,9 @@ SOURCES += \
     src/ui/hkxclassesui/behaviorui/generators/posematchinggeneratorui.cpp \
     src/ui/hkxclassesui/behaviorui/generators/clipgeneratorui.cpp \
     src/ui/hkxclassesui/behaviorui/cliptriggerui.cpp \
-    src/ui/hkxclassesui/behaviorui/animationsui.cpp
+    src/ui/hkxclassesui/behaviorui/animationsui.cpp \
+    src/ui/hkxclassesui/behaviorui/generators/bssynchronizedclipgeneratorui.cpp \
+    src/ui/hkxclassesui/behaviorui/generators/behaviorreferencegeneratorui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -309,4 +311,6 @@ HEADERS  += \
     src/ui/hkxclassesui/behaviorui/generators/posematchinggeneratorui.h \
     src/ui/hkxclassesui/behaviorui/generators/clipgeneratorui.h \
     src/ui/hkxclassesui/behaviorui/cliptriggerui.h \
-    src/ui/hkxclassesui/behaviorui/animationsui.h
+    src/ui/hkxclassesui/behaviorui/animationsui.h \
+    src/ui/hkxclassesui/behaviorui/generators/bssynchronizedclipgeneratorui.h \
+    src/ui/hkxclassesui/behaviorui/generators/behaviorreferencegeneratorui.h

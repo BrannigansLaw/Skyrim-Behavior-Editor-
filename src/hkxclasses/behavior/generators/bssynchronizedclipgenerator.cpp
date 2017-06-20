@@ -99,8 +99,8 @@ bool BSSynchronizedClipGenerator::readData(const HkxXmlReader &reader, long inde
                 writeToLog("BSiStateTaggingGenerator: readData()!\nFailed to properly read 'pClipGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "SyncAnimPrefix"){
-            SyncAnimPrefix = reader.getElementValueAt(index);
-            if (SyncAnimPrefix == ""){
+            syncAnimPrefix = reader.getElementValueAt(index);
+            if (syncAnimPrefix == ""){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'SyncAnimPrefix' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bSyncClipIgnoreMarkPlacement"){
@@ -165,7 +165,7 @@ bool BSSynchronizedClipGenerator::write(HkxXMLWriter *writer){
             refString = "null";
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pClipGenerator"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("SyncAnimPrefix"), SyncAnimPrefix);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("SyncAnimPrefix"), syncAnimPrefix);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bSyncClipIgnoreMarkPlacement"), getBoolAsString(bSyncClipIgnoreMarkPlacement));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fGetToMarkTime"), QString::number(fGetToMarkTime, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fMarkErrorThreshold"), QString::number(fMarkErrorThreshold, char('f'), 6));

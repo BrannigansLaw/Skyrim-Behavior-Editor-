@@ -28,7 +28,7 @@ EventsUI::EventsUI(const QString &title)
       removeObjectPB(new QPushButton("Remove Selected Event")),
       buttonLyt(new QHBoxLayout),
       eventName(new LineEdit),
-      flag(new QCheckBox("Flag As Sync Point")),
+      flag(new CheckBox("Flag As Sync Point")),
       eventWidget(new TableWidget),
       stackLyt(new QStackedLayout),
       returnPB(new QPushButton("Return To Parent"))

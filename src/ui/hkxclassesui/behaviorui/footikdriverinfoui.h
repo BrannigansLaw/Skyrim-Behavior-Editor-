@@ -9,7 +9,7 @@ class hkbFootIkDriverInfo;
 class QGridLayout;
 class HkxObject;
 class DoubleSpinBox;
-class QCheckBox;
+class CheckBox;
 class QStackedLayout;
 class SpinBox;
 class QPushButton;
@@ -65,9 +65,9 @@ private:
     DoubleSpinBox *forwardAlignFraction;
     DoubleSpinBox *sidewaysAlignFraction;
     DoubleSpinBox *sidewaysSampleWidth;
-    QCheckBox *lockFeetWhenPlanted;
-    QCheckBox *useCharacterUpVector;
-    QCheckBox *isQuadrupedNarrow;
+    CheckBox *lockFeetWhenPlanted;
+    CheckBox *useCharacterUpVector;
+    CheckBox *isQuadrupedNarrow;
 };
 
 #endif // FOOTIKDRIVERINFOUI_H

@@ -11,7 +11,7 @@ class TableWidget;
 class QPushButton;
 class hkbBehaviorGraphData;
 class HkxObject;
-class QCheckBox;
+class CheckBox;
 class ComboBox;
 class LineEdit;
 class QStackedLayout;
@@ -43,7 +43,7 @@ signals:
 private:
     BehaviorVariablesUI& operator=(const BehaviorVariablesUI&);
     BehaviorVariablesUI(const BehaviorVariablesUI &);
-    void loadVariable(QCheckBox *variableWid);
+    void loadVariable(CheckBox *variableWid);
     void loadVariable(SpinBox *variableWid);
     void loadVariable(DoubleSpinBox *variableWid);
     void loadVariable(QuadVariableWidget *variableWid);
@@ -77,7 +77,7 @@ private:
     LineEdit *intName;
     LineEdit *doubleName;
     LineEdit *quadName;
-    QCheckBox *boolCB;
+    CheckBox *boolCB;
     SpinBox *intSB;
     DoubleSpinBox *doubleSB;
     QuadVariableWidget *quadWidget;

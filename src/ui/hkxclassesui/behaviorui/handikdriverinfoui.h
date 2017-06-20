@@ -9,7 +9,7 @@ class hkbHandIkDriverInfo;
 class QGridLayout;
 class HkxObject;
 class DoubleSpinBox;
-class QCheckBox;
+class CheckBox;
 class QStackedLayout;
 class SpinBox;
 class QPushButton;

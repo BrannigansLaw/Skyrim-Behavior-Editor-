@@ -52,9 +52,9 @@ BlendingTransitionEffectUI::BlendingTransitionEffectUI()
       eventMode(new ComboBox),
       duration(new DoubleSpinBox),
       toGeneratorStartTimeFraction(new DoubleSpinBox),
-      flagSync(new QCheckBox),
-      flagIgnoreFromWorldFromModel(new QCheckBox),
-      flagIgnoreToWorldFromModel(new QCheckBox),
+      flagSync(new CheckBox),
+      flagIgnoreFromWorldFromModel(new CheckBox),
+      flagIgnoreToWorldFromModel(new CheckBox),
       endMode(new ComboBox),
       blendCurve(new ComboBox)
 {

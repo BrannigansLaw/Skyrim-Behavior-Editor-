@@ -6,6 +6,7 @@
 class hkbClipGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
+    friend class ClipGeneratorUI;
 public:
     hkbClipGenerator(HkxFile *parent, long ref = 0, const QString & animationname = "/");
     virtual ~hkbClipGenerator();
@@ -17,6 +18,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    int getNumberOfTriggers() const;
     enum ClipFlag{
         FLAG_NONE = 0,
         FLAG_CONTINUE_MOTION_AT_END = 1,

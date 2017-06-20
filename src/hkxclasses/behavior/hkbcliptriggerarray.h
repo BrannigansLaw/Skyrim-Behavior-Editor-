@@ -5,6 +5,9 @@
 
 class hkbClipTriggerArray: public HkxObject
 {
+    friend class hkbClipGenerator;
+    friend class ClipGeneratorUI;
+    friend class ClipTriggerUI;
 public:
     hkbClipTriggerArray(HkxFile *parent, long ref = -1);
     virtual ~hkbClipTriggerArray();

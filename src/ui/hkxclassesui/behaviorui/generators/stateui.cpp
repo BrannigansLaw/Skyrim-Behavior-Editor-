@@ -56,8 +56,8 @@ StateUI::StateUI()
       name(new LineEdit),
       stateId(new SpinBox),
       probability(new DoubleSpinBox),
-      enable(new QCheckBox),
-      enableTransitions(new QCheckBox("Enable Transitions"))
+      enable(new CheckBox),
+      enableTransitions(new CheckBox("Enable Transitions"))
 {
     stateId->setReadOnly(true);
     transitionUI->flagGlobalWildcard->setDisabled(true);

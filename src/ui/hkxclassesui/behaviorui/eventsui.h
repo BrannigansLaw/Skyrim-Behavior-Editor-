@@ -13,7 +13,7 @@ class hkbBehaviorGraphData;
 class HkxObject;
 class QStackedLayout;
 class LineEdit;
-class QCheckBox;
+class CheckBox;
 
 class EventsUI: public QGroupBox
 {
@@ -52,7 +52,7 @@ private:
     QPushButton *removeObjectPB;
     QHBoxLayout *buttonLyt;
     LineEdit *eventName;
-    QCheckBox *flag;
+    CheckBox *flag;
     TableWidget *eventWidget;
     QStackedLayout *stackLyt;
     QPushButton *returnPB;

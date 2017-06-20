@@ -11,7 +11,7 @@ class hkbHandIkDriverInfoHand;
 class QVBoxLayout;
 class HkxObject;
 class DoubleSpinBox;
-class QCheckBox;
+class CheckBox;
 class QStackedLayout;
 class ComboBox;
 class QPushButton;
@@ -61,8 +61,8 @@ private:
     ComboBox *elbowIndex;
     ComboBox *elbowSiblingIndex;
     ComboBox *wristIndex;
-    QCheckBox *enforceEndPosition;
-    QCheckBox *enforceEndRotation;
+    CheckBox *enforceEndPosition;
+    CheckBox *enforceEndRotation;
     LineEdit *localFrameName;
 };
 

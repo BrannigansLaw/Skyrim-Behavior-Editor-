@@ -11,7 +11,7 @@ class hkbFootIkDriverInfoLeg;
 class QVBoxLayout;
 class HkxObject;
 class DoubleSpinBox;
-class QCheckBox;
+class CheckBox;
 class QStackedLayout;
 class ComboBox;
 class QPushButton;

@@ -10,7 +10,7 @@ class BSBoneSwitchGenerator;
 class QGridLayout;
 class HkxObject;
 class DoubleSpinBox;
-class QCheckBox;
+class CheckBox;
 class SpinBox;
 class QPushButton;
 class QGroupBox;

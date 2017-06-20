@@ -10,7 +10,7 @@ class TableWidget;
 class BSBoneSwitchGeneratorBoneData;
 class HkxObject;
 class DoubleSpinBox;
-class QCheckBox;
+class CheckBox;
 class ComboBox;
 class QPushButton;
 class BehaviorGraphView;

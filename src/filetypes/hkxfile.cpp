@@ -28,6 +28,17 @@ void HkxFile::toggleChanged(bool wasEdited){
     changed = wasEdited;
 }
 
+QStringList HkxFile::getAllBehaviorFileNames() const{
+    QStringList list;
+    QDirIterator it(QFileInfo(*this).absolutePath()+"/");
+    while (it.hasNext()){
+        if (QFileInfo(it.next()).fileName().contains(".hkx")){
+            list.append(it.fileInfo().filePath().section("/", -2, -1));
+        }
+    }
+    return list;
+}
+
 HkxSharedPtr & HkxFile::getRootObject(){
     return rootObject;
 }

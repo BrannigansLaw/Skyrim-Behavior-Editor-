@@ -38,7 +38,7 @@ BSLimbIKModifierUI::BSLimbIKModifierUI()
       topLyt(new QGridLayout),
       table(new TableWidget(QColor(Qt::cyan))),
       name(new LineEdit),
-      enable(new QCheckBox),
+      enable(new CheckBox),
       limitAngleDegrees(new DoubleSpinBox),
       startBoneIndex(new ComboBox),
       endBoneIndex(new ComboBox),
