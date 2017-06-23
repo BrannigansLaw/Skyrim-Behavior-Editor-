@@ -1,5 +1,5 @@
-#ifndef BSLIMBIKMODIFIERUI_H
-#define BSLIMBIKMODIFIERUI_H
+#ifndef BSDIRECTATMODIFIERUI_H
+#define BSDIRECTATMODIFIERUI_H
 
 #include <QGroupBox>
 
@@ -8,21 +8,23 @@
 class HkxObject;
 class QGridLayout;
 class TableWidget;
-class BSLimbIKModifier;
+class BSDirectAtModifier;
 class LineEdit;
 class DoubleSpinBox;
 class CheckBox;
 class ComboBox;
 class GenericTableWidget;
 class hkbVariableBindingSet;
+class QuadVariableWidget;
+class SpinBox;
 
-class BSLimbIKModifierUI: QGroupBox
+class BSDirectAtModifierUI: QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
 public:
-    BSLimbIKModifierUI();
-    virtual ~BSLimbIKModifierUI(){}
+    BSDirectAtModifierUI();
+    virtual ~BSDirectAtModifierUI(){}
     void loadData(HkxObject *data);
 signals:
     void viewVariables(int index);
@@ -31,12 +33,25 @@ signals:
 private slots:
     void setName();
     void setEnable();
-    void setLimitAngleDegrees();
+    void setDirectAtTarget();
+    void setSourceBoneIndex(int index);
     void setStartBoneIndex(int index);
     void setEndBoneIndex(int index);
-    void setGain();
-    void setBoneRadius();
-    void setCastOffset();
+    void setLimitHeadingDegrees();
+    void setLimitPitchDegrees();
+    void setOffsetHeadingDegrees();
+    void setOffsetPitchDegrees();
+    void setOnGain();
+    void setOffGain();
+    void setTargetLocation();
+    void setUserInfo();
+    void setDirectAtCamera();
+    void setDirectAtCameraX();
+    void setDirectAtCameraY();
+    void setDirectAtCameraZ();
+    void setActive();
+    void setCurrentHeadingOffset();
+    void setCurrentPitchOffset();
     void viewSelected(int row, int column);
     void setBindingVariable(int index, const QString & name);
 private:
@@ -49,17 +64,30 @@ private:
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
     static QStringList headerLabels;
-    BSLimbIKModifier *bsData;
+    BSDirectAtModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;
     LineEdit *name;
     CheckBox *enable;
-    DoubleSpinBox *limitAngleDegrees;
+    CheckBox *directAtTarget;
+    ComboBox *sourceBoneIndex;
     ComboBox *startBoneIndex;
     ComboBox *endBoneIndex;
-    DoubleSpinBox *gain;
-    DoubleSpinBox *boneRadius;
-    DoubleSpinBox *castOffset;
+    DoubleSpinBox *limitHeadingDegrees;
+    DoubleSpinBox *limitPitchDegrees;
+    DoubleSpinBox *offsetHeadingDegrees;
+    DoubleSpinBox *offsetPitchDegrees;
+    DoubleSpinBox *onGain;
+    DoubleSpinBox *offGain;
+    QuadVariableWidget *targetLocation;
+    SpinBox *userInfo;
+    CheckBox *directAtCamera;
+    DoubleSpinBox *directAtCameraX;
+    DoubleSpinBox *directAtCameraY;
+    DoubleSpinBox *directAtCameraZ;
+    CheckBox *active;
+    DoubleSpinBox *currentHeadingOffset;
+    DoubleSpinBox *currentPitchOffset;
 };
 
-#endif // BSLIMBIKMODIFIERUI_H
+#endif // BSDIRECTATMODIFIERUI_H

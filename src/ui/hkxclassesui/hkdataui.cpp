@@ -30,6 +30,15 @@
 #include "src/ui/hkxclassesui/behaviorui/generators/behaviorreferencegeneratorui.h"
 #include "src/ui/hkxclassesui/behaviorui/transitionsui.h"
 #include "src/ui/hkxclassesui/behaviorui/modifiers/bslimbikmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bsdirectatmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/movecharactermodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/rotatecharactermodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/evaluateexpressionmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/modifierlistui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/eventdrivenmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/gethandleonbonemodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/evaluatehandlemodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/expressiondataarrayui.h"
 
 #include <QPushButton>
 #include <QMessageBox>
@@ -141,7 +150,15 @@ HkDataUI::HkDataUI(const QString &title)
       poseMatchGenUI(new PoseMatchingGeneratorUI),
       clipGenUI(new ClipGeneratorUI),
       syncClipGenUI(new BSSynchronizedClipGeneratorUI),
-      behaviorRefGenUI(new BehaviorReferenceGeneratorUI)
+      behaviorRefGenUI(new BehaviorReferenceGeneratorUI),
+      directAtModUI(new BSDirectAtModifierUI),
+      moveCharModUI(new MoveCharacterModifierUI),
+      rotateCharModUI(new RotateCharacterModifierUI),
+      evaluateExpModUI(new EvaluateExpressionModifierUI),
+      modListUI(new ModifierListUI),
+      eventDrivenModUI(new EventDrivenModifierUI),
+      getHandleOnBoneUI(new GetHandleOnBoneModifierUI),
+      evaluateHandleModUI(new EvaluateHandleModifierUI)
 {
     setTitle(title);
     stack->addWidget(noDataL);
@@ -159,6 +176,14 @@ HkDataUI::HkDataUI(const QString &title)
     stack->addWidget(clipGenUI);
     stack->addWidget(syncClipGenUI);
     stack->addWidget(behaviorRefGenUI);
+    stack->addWidget(directAtModUI);
+    stack->addWidget(moveCharModUI);
+    stack->addWidget(rotateCharModUI);
+    stack->addWidget(evaluateExpModUI);
+    stack->addWidget(modListUI);
+    stack->addWidget(eventDrivenModUI);
+    stack->addWidget(getHandleOnBoneUI);
+    stack->addWidget(evaluateHandleModUI);
     verLyt->addLayout(stack, 5);
     setLayout(verLyt);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -177,6 +202,14 @@ HkDataUI::HkDataUI(const QString &title)
     connect(behaviorRefGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
 
     connect(limbIKModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(directAtModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(moveCharModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(rotateCharModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(evaluateExpModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(modListUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(eventDrivenModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(getHandleOnBoneUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(evaluateHandleModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
 
     connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
     connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
@@ -219,9 +252,15 @@ void HkDataUI::modifierAdded(const QString & name, const QString & type){
 }
 void HkDataUI::modifierNameChanged(const QString & newName, int index){
     modifiersTable->renameItem(index, newName);
-    switch (stack->currentIndex()) {
+    switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::MODIFIER_GENERATOR:
         modGenUI->modifierRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::MODIFIER_LIST:
+        modListUI->modifierRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER:
+        eventDrivenModUI->modifierRenamed(newName, index);
         break;
     }
 }
@@ -281,6 +320,12 @@ void HkDataUI::eventNameChanged(const QString & newName, int index){
     case DATA_TYPE_LOADED::CLIP_GENERATOR:
         clipGenUI->eventRenamed(newName, index);
         break;
+    case DATA_TYPE_LOADED::EVALUATE_EXPRESSION_MODIFIER:
+        evaluateExpModUI->eventRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER:
+        eventDrivenModUI->eventRenamed(newName, index);
+        break;
     }
 }
 
@@ -302,6 +347,12 @@ void HkDataUI::eventRemoved(int index){
         break;
     case DATA_TYPE_LOADED::CLIP_GENERATOR:
         clipGenUI->eventRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::EVALUATE_EXPRESSION_MODIFIER:
+        evaluateExpModUI->eventRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER:
+        eventDrivenModUI->eventRenamed("NONE", index);
         break;
     }
 }
@@ -363,6 +414,30 @@ void HkDataUI::variableNameChanged(const QString & newName, int index){
         break;
     case DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR:
         syncClipGenUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::DIRECT_AT_MODIFIER:
+        directAtModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::MOVE_CHARACTER_MODIFIER:
+        moveCharModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::ROTATE_CHARACTER_MODIFIER:
+        rotateCharModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::EVALUATE_EXPRESSION_MODIFIER:
+        evaluateExpModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::MODIFIER_LIST:
+        modListUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER:
+        eventDrivenModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::GET_HANDLE_ON_BONE_MODIFIER:
+        getHandleOnBoneUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::EVALUATE_HANDLE_MODIFIER:
+        evaluateHandleModUI->variableRenamed(newName, index);
         break;
     }
 }
@@ -427,8 +502,14 @@ void HkDataUI::generatorRemoved(int index){
 
 void HkDataUI::modifierRemoved(int index){
     modifiersTable->removeItem(index);
-    switch (stack->currentIndex()) {
-    case MODIFIER_GENERATOR:
+    switch (stack->currentIndex()){
+    case DATA_TYPE_LOADED::MODIFIER_GENERATOR:
+        //reload active widget table for multi-modifier child class...
+        break;
+    case DATA_TYPE_LOADED::MODIFIER_LIST:
+        //reload active widget table for multi-modifier child class...
+        break;
+    case DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER:
         //reload active widget table for multi-modifier child class...
         break;
     }
@@ -469,6 +550,30 @@ void HkDataUI::variableRemoved(int index){
         break;
     case DATA_TYPE_LOADED::SYNCHRONIZED_CLIP_GENERATOR:
         syncClipGenUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::DIRECT_AT_MODIFIER:
+        directAtModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::MOVE_CHARACTER_MODIFIER:
+        moveCharModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::ROTATE_CHARACTER_MODIFIER:
+        rotateCharModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::EVALUATE_EXPRESSION_MODIFIER:
+        evaluateExpModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::MODIFIER_LIST:
+        modListUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER:
+        eventDrivenModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::GET_HANDLE_ON_BONE_MODIFIER:
+        getHandleOnBoneUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::EVALUATE_HANDLE_MODIFIER:
+        evaluateHandleModUI->variableRenamed("NONE", index);
         break;
     }
     behaviorView->behavior->removeBindings(index);
@@ -579,6 +684,62 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             stack->setCurrentIndex(DATA_TYPE_LOADED::BEHAVIOR_GRAPH);
             behaviorGraphUI->connectToTables(generatorsTable);
             break;
+        case HkxSignature::BS_DIRECT_AT_MODIFIER:
+            if (loadedData != oldData){
+                directAtModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::DIRECT_AT_MODIFIER);
+            directAtModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_MOVE_CHARACTER_MODIFIER:
+            if (loadedData != oldData){
+                moveCharModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::MOVE_CHARACTER_MODIFIER);
+            moveCharModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_ROTATE_CHARACTER_MODIFIER:
+            if (loadedData != oldData){
+                rotateCharModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::ROTATE_CHARACTER_MODIFIER);
+            rotateCharModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_EVALUATE_EXPRESSION_MODIFIER:
+            if (loadedData != oldData){
+                evaluateExpModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::EVALUATE_EXPRESSION_MODIFIER);
+            evaluateExpModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
+            break;
+        case HkxSignature::HKB_MODIFIER_LIST:
+            if (loadedData != oldData){
+                modListUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::MODIFIER_LIST);
+            modListUI->connectToTables(modifiersTable, variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_EVENT_DRIVEN_MODIFIER:
+            if (loadedData != oldData){
+                eventDrivenModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER);
+            eventDrivenModUI->connectToTables(modifiersTable, variablesTable, characterPropertiesTable, eventsTable);
+            break;
+        case HkxSignature::HKB_GET_HANDLE_ON_BONE_MODIFIER:
+            if (loadedData != oldData){
+                getHandleOnBoneUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::GET_HANDLE_ON_BONE_MODIFIER);
+            getHandleOnBoneUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_EVALUATE_HANDLE_MODIFIER:
+            if (loadedData != oldData){
+                evaluateHandleModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::EVALUATE_HANDLE_MODIFIER);
+            evaluateHandleModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
         default:
             unloadDataWidget();
         }
@@ -607,6 +768,8 @@ BehaviorGraphView *HkDataUI::loadBehaviorView(BehaviorGraphView *view){
     cyclicBlendTransGenUI->setBehaviorView(view);
     poseMatchGenUI->setBehaviorView(view);
     syncClipGenUI->setBehaviorView(view);
+    modListUI->setBehaviorView(view);
+    eventDrivenModUI->setBehaviorView(view);
     if (behaviorView){
         generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "NULL");
         modifiersTable->loadTable(behaviorView->behavior->getModifierNames(), behaviorView->behavior->getModifierTypeNames(), "NULL");

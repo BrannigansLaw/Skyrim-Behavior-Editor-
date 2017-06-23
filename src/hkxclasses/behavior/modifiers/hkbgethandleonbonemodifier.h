@@ -6,6 +6,7 @@
 class hkbGetHandleOnBoneModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class GetHandleOnBoneModifierUI;
 public:
     hkbGetHandleOnBoneModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbGetHandleOnBoneModifier();

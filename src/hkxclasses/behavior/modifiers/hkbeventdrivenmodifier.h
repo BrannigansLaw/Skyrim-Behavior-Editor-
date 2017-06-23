@@ -6,6 +6,7 @@
 class hkbEventDrivenModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class EventDrivenModifierUI;
 public:
     hkbEventDrivenModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbEventDrivenModifier();

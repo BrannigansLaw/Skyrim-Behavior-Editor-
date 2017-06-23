@@ -5,6 +5,9 @@
 
 class hkbExpressionDataArray: public HkxObject
 {
+    friend class ExpressionDataArrayUI;
+    friend class hkbEvaluateExpressionModifier;
+    friend class EvaluateExpressionModifierUI;
 private:
     enum ExpressionEventMode{
         EVENT_MODE_SEND_ONCE=0,
@@ -19,8 +22,9 @@ public:
     bool link();
     bool evaulateDataValidity();
     static QString getClassname();
-    void addExpression(const QString & exp, ExpressionEventMode mode);
+    void addExpression(const QString & exp = "", ExpressionEventMode mode = EVENT_MODE_SEND_ONCE);
     void removeExpression(const QString & exp);
+    void removeExpression(int index);
     bool write(HkxXMLWriter *writer);
 protected:
 private:

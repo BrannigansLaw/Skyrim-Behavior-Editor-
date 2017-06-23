@@ -18,6 +18,7 @@ public:
     QString getRootObjectReferenceString();
     QStringList getBonesFromSkeletonAt(int index) const;
     int getNumberOfBones(bool ragdoll = false) const;
+    QStringList getLocalFrameNames() const;
 protected:
     bool parse();
     bool link();

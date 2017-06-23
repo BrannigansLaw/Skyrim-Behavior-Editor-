@@ -48,6 +48,13 @@ struct hkQuadVariable
         //
     }
 
+    bool operator !=(const hkQuadVariable & rhs){
+        if (x != rhs.x || y != rhs.y || z != rhs.z || w != rhs.w){
+            return true;
+        }
+        return false;
+    }
+
     QString getValueAsString(){
         return "("+QString::number(x, char('f'), 6)+" "+QString::number(y, char('f'), 6)+" "+QString::number(z, char('f'), 6)+" "+QString::number(w, char('f'), 6)+")";
     }

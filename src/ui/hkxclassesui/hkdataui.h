@@ -35,6 +35,14 @@ class PoseMatchingGeneratorUI;
 class ClipGeneratorUI;
 class BSSynchronizedClipGeneratorUI;
 class BehaviorReferenceGeneratorUI;
+class BSDirectAtModifierUI;
+class MoveCharacterModifierUI;
+class RotateCharacterModifierUI;
+class EvaluateExpressionModifierUI;
+class ModifierListUI;
+class EventDrivenModifierUI;
+class GetHandleOnBoneModifierUI;
+class EvaluateHandleModifierUI;
 
 /**
  * To add support for a new class we need to add it to the "DATA_TYPE_LOADED" enum, add it to the stacked layout in the correct order,
@@ -87,7 +95,15 @@ private:
         POSE_MATCHING_GENERATOR,
         CLIP_GENERATOR,
         SYNCHRONIZED_CLIP_GENERATOR,
-        BEHAVIOR_REFERENCE_GENERATOR
+        BEHAVIOR_REFERENCE_GENERATOR,
+        DIRECT_AT_MODIFIER,
+        MOVE_CHARACTER_MODIFIER,
+        ROTATE_CHARACTER_MODIFIER,
+        EVALUATE_EXPRESSION_MODIFIER,
+        MODIFIER_LIST,
+        EVENT_DRIVEN_MODIFIER,
+        GET_HANDLE_ON_BONE_MODIFIER,
+        EVALUATE_HANDLE_MODIFIER
     };
     static QStringList generatorTypes;
     static QStringList modifierTypes;
@@ -120,6 +136,14 @@ private:
     ClipGeneratorUI *clipGenUI;
     BSSynchronizedClipGeneratorUI *syncClipGenUI;
     BehaviorReferenceGeneratorUI *behaviorRefGenUI;
+    BSDirectAtModifierUI *directAtModUI;
+    MoveCharacterModifierUI *moveCharModUI;
+    RotateCharacterModifierUI *rotateCharModUI;
+    EvaluateExpressionModifierUI *evaluateExpModUI;
+    ModifierListUI *modListUI;
+    EventDrivenModifierUI *eventDrivenModUI;
+    GetHandleOnBoneModifierUI *getHandleOnBoneUI;
+    EvaluateHandleModifierUI *evaluateHandleModUI;
 };
 
 #endif // HKDATAUI_H

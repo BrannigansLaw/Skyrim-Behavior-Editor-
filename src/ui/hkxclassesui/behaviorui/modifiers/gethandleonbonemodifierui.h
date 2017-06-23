@@ -1,5 +1,5 @@
-#ifndef BSLIMBIKMODIFIERUI_H
-#define BSLIMBIKMODIFIERUI_H
+#ifndef GETHANDLEONBONEMODIFIERUI_H
+#define GETHANDLEONBONEMODIFIERUI_H
 
 #include <QGroupBox>
 
@@ -8,7 +8,7 @@
 class HkxObject;
 class QGridLayout;
 class TableWidget;
-class BSLimbIKModifier;
+class hkbGetHandleOnBoneModifier;
 class LineEdit;
 class DoubleSpinBox;
 class CheckBox;
@@ -16,13 +16,13 @@ class ComboBox;
 class GenericTableWidget;
 class hkbVariableBindingSet;
 
-class BSLimbIKModifierUI: QGroupBox
+class GetHandleOnBoneModifierUI: QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
 public:
-    BSLimbIKModifierUI();
-    virtual ~BSLimbIKModifierUI(){}
+    GetHandleOnBoneModifierUI();
+    virtual ~GetHandleOnBoneModifierUI(){}
     void loadData(HkxObject *data);
 signals:
     void viewVariables(int index);
@@ -31,12 +31,9 @@ signals:
 private slots:
     void setName();
     void setEnable();
-    void setLimitAngleDegrees();
-    void setStartBoneIndex(int index);
-    void setEndBoneIndex(int index);
-    void setGain();
-    void setBoneRadius();
-    void setCastOffset();
+    void setLocalFrameName(const QString &name);
+    void setRagdollBoneIndex(int index);
+    void setAnimationBoneIndex(int index);
     void viewSelected(int row, int column);
     void setBindingVariable(int index, const QString & name);
 private:
@@ -49,17 +46,14 @@ private:
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
     static QStringList headerLabels;
-    BSLimbIKModifier *bsData;
+    hkbGetHandleOnBoneModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;
     LineEdit *name;
     CheckBox *enable;
-    DoubleSpinBox *limitAngleDegrees;
-    ComboBox *startBoneIndex;
-    ComboBox *endBoneIndex;
-    DoubleSpinBox *gain;
-    DoubleSpinBox *boneRadius;
-    DoubleSpinBox *castOffset;
+    ComboBox *localFrameName;
+    ComboBox *ragdollBoneIndex;
+    ComboBox *animationBoneIndex;
 };
 
-#endif // BSLIMBIKMODIFIERUI_H
+#endif // GETHANDLEONBONEMODIFIERUI_H

@@ -6,6 +6,7 @@
 class hkbMoveCharacterModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class MoveCharacterModifierUI;
 public:
     hkbMoveCharacterModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbMoveCharacterModifier();

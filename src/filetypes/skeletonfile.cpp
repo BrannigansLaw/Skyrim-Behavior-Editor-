@@ -56,6 +56,16 @@ int SkeletonFile::getNumberOfBones(bool ragdoll) const{
     return -1;
 }
 
+QStringList SkeletonFile::getLocalFrameNames() const{
+    QStringList names;
+    for (int i = 0; i < localFrames.size(); i++){
+        if (localFrames.at(i).data()){
+            names.append(static_cast<hkSimpleLocalFrame *>(localFrames.at(i).data())->name);
+        }
+    }
+    return names;
+}
+
 bool SkeletonFile::addObjectToFile(HkxObject *obj, long ref){
     if (ref > largestRef){
         largestRef = ref;

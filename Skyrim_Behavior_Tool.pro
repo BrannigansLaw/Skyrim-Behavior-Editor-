@@ -165,7 +165,16 @@ SOURCES += \
     src/ui/hkxclassesui/behaviorui/cliptriggerui.cpp \
     src/ui/hkxclassesui/behaviorui/animationsui.cpp \
     src/ui/hkxclassesui/behaviorui/generators/bssynchronizedclipgeneratorui.cpp \
-    src/ui/hkxclassesui/behaviorui/generators/behaviorreferencegeneratorui.cpp
+    src/ui/hkxclassesui/behaviorui/generators/behaviorreferencegeneratorui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsdirectatmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/movecharactermodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/rotatecharactermodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/evaluateexpressionmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/expressiondataarrayui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/modifierlistui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/eventdrivenmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/gethandleonbonemodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/evaluatehandlemodifierui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -313,4 +322,13 @@ HEADERS  += \
     src/ui/hkxclassesui/behaviorui/cliptriggerui.h \
     src/ui/hkxclassesui/behaviorui/animationsui.h \
     src/ui/hkxclassesui/behaviorui/generators/bssynchronizedclipgeneratorui.h \
-    src/ui/hkxclassesui/behaviorui/generators/behaviorreferencegeneratorui.h
+    src/ui/hkxclassesui/behaviorui/generators/behaviorreferencegeneratorui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsdirectatmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/movecharactermodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/rotatecharactermodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/evaluateexpressionmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/expressiondataarrayui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/modifierlistui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/eventdrivenmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/gethandleonbonemodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/evaluatehandlemodifierui.h

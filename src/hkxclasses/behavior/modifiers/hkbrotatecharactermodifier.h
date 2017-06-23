@@ -6,6 +6,7 @@
 class hkbRotateCharacterModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class RotateCharacterModifierUI;
 public:
     hkbRotateCharacterModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbRotateCharacterModifier();

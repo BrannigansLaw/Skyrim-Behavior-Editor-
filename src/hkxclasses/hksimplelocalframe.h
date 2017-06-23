@@ -6,6 +6,7 @@
 class hkSimpleLocalFrame: public HkxObject
 {
     friend class hkaSkeleton;
+    friend class SkeletonFile;
 public:
     hkSimpleLocalFrame(HkxFile *parent, const QString & string = "", long ref = -1);
     virtual ~hkSimpleLocalFrame();

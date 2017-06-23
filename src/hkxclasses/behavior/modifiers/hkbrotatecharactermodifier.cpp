@@ -17,7 +17,7 @@ hkbRotateCharacterModifier::hkbRotateCharacterModifier(HkxFile *parent, long ref
       degreesPerSecond(0),
       speedMultiplier(0)
 {
-    setType(HKB_TWIST_MODIFIER, TYPE_MODIFIER);
+    setType(HKB_ROTATE_CHARACTER_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
     name = "hkbRotateCharacterModifier"+QString::number(refCount);

@@ -1,6 +1,7 @@
 #include "hkbevaluateexpressionmodifier.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbexpressiondataarray.h"
 
 /*
  * CLASS: hkbEvaluateExpressionModifier
@@ -12,7 +13,7 @@ QString hkbEvaluateExpressionModifier::classname = "hkbEvaluateExpressionModifie
 
 hkbEvaluateExpressionModifier::hkbEvaluateExpressionModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
-      userData(0),
+      userData(2),
       enable(true)
 {
     setType(HKB_EVALUATE_EXPRESSION_MODIFIER, TYPE_MODIFIER);
@@ -97,6 +98,13 @@ bool hkbEvaluateExpressionModifier::write(HkxXMLWriter *writer){
         }
     }
     return true;
+}
+
+int hkbEvaluateExpressionModifier::getNumberOfExpressions() const{
+    if (expressions.data()){
+        return static_cast<hkbExpressionDataArray *>(expressions.data())->expressionsData.size();
+    }
+    return 0;
 }
 
 bool hkbEvaluateExpressionModifier::link(){

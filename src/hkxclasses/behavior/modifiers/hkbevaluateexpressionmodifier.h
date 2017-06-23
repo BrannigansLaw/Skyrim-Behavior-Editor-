@@ -6,6 +6,7 @@
 class hkbEvaluateExpressionModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class EvaluateExpressionModifierUI;
 public:
     hkbEvaluateExpressionModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbEvaluateExpressionModifier();
@@ -16,6 +17,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    int getNumberOfExpressions() const;
 private:
     hkbEvaluateExpressionModifier& operator=(const hkbEvaluateExpressionModifier&);
     hkbEvaluateExpressionModifier(const hkbEvaluateExpressionModifier &);

@@ -36,6 +36,12 @@ void hkbExpressionDataArray::removeExpression(const QString & exp){
     }
 }
 
+void hkbExpressionDataArray::removeExpression(int index){
+    if (index < expressionsData.size() && index > -1){
+        expressionsData.removeAt(index);
+    }
+}
+
 bool hkbExpressionDataArray::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);

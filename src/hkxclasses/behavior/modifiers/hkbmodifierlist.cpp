@@ -12,7 +12,7 @@ QString hkbModifierList::classname = "hkbModifierList";
 
 hkbModifierList::hkbModifierList(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
-      userData(0),
+      userData(1),
       enable(true)
 {
     setType(HKB_MODIFIER_LIST, TYPE_MODIFIER);

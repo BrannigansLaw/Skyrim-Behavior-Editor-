@@ -1,5 +1,5 @@
-#ifndef BSLIMBIKMODIFIERUI_H
-#define BSLIMBIKMODIFIERUI_H
+#ifndef MOVECHARACTERMODIFIERUI_H
+#define MOVECHARACTERMODIFIERUI_H
 
 #include <QGroupBox>
 
@@ -8,21 +8,20 @@
 class HkxObject;
 class QGridLayout;
 class TableWidget;
-class BSLimbIKModifier;
+class hkbMoveCharacterModifier;
 class LineEdit;
-class DoubleSpinBox;
+class QuadVariableWidget;
 class CheckBox;
-class ComboBox;
 class GenericTableWidget;
 class hkbVariableBindingSet;
 
-class BSLimbIKModifierUI: QGroupBox
+class MoveCharacterModifierUI: QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
 public:
-    BSLimbIKModifierUI();
-    virtual ~BSLimbIKModifierUI(){}
+    MoveCharacterModifierUI();
+    virtual ~MoveCharacterModifierUI(){}
     void loadData(HkxObject *data);
 signals:
     void viewVariables(int index);
@@ -31,12 +30,7 @@ signals:
 private slots:
     void setName();
     void setEnable();
-    void setLimitAngleDegrees();
-    void setStartBoneIndex(int index);
-    void setEndBoneIndex(int index);
-    void setGain();
-    void setBoneRadius();
-    void setCastOffset();
+    void setOffsetPerSecondMS();
     void viewSelected(int row, int column);
     void setBindingVariable(int index, const QString & name);
 private:
@@ -49,17 +43,12 @@ private:
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
     static QStringList headerLabels;
-    BSLimbIKModifier *bsData;
+    hkbMoveCharacterModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;
     LineEdit *name;
     CheckBox *enable;
-    DoubleSpinBox *limitAngleDegrees;
-    ComboBox *startBoneIndex;
-    ComboBox *endBoneIndex;
-    DoubleSpinBox *gain;
-    DoubleSpinBox *boneRadius;
-    DoubleSpinBox *castOffset;
+    QuadVariableWidget *offsetPerSecondMS;
 };
 
-#endif // BSLIMBIKMODIFIERUI_H
+#endif // MOVECHARACTERMODIFIERUI_H

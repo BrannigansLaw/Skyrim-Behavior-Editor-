@@ -105,9 +105,9 @@ void ClipTriggerUI::loadData(BehaviorFile *parentFile, hkbClipTriggerArray::HkTr
             }
             text = "NONE";
         }
-        QString varName = file->getEventNameAt(bsData->event.id);
-        if (varName != ""){
-            table->item(EVENT_ROW, VALUE_COLUMN)->setText(varName);
+        QString eventName = file->getEventNameAt(bsData->event.id);
+        if (eventName != ""){
+            table->item(EVENT_ROW, VALUE_COLUMN)->setText(eventName);
         }else{
             table->item(EVENT_ROW, VALUE_COLUMN)->setText("NONE");
         }

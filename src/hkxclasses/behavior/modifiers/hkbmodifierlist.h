@@ -6,6 +6,7 @@
 class hkbModifierList: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class ModifierListUI;
 public:
     hkbModifierList(HkxFile *parent, long ref = 0);
     virtual ~hkbModifierList();

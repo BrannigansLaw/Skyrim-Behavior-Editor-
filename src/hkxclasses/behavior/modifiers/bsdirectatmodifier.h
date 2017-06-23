@@ -6,6 +6,7 @@
 class BSDirectAtModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSDirectAtModifierUI;
 public:
     BSDirectAtModifier(HkxFile *parent, long ref = 0);
     virtual ~BSDirectAtModifier();

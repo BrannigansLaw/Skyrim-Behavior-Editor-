@@ -17,8 +17,6 @@ class TableWidget;
 class ClipTriggerUI: public QGroupBox
 {
     Q_OBJECT
-    friend class StateMachineUI;
-    friend class StateUI;
     friend class ClipGeneratorUI;
 public:
     ClipTriggerUI();

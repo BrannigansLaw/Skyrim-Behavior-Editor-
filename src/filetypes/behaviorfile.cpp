@@ -1,5 +1,6 @@
 #include "behaviorfile.h"
 #include "characterfile.h"
+#include "skeletonfile.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/xml/hkxxmlwriter.h"
 #include "src/ui/mainwindow.h"
@@ -735,6 +736,13 @@ QString BehaviorFile::getCharacterPropertyNameAt(int index, bool fromBehaviorFil
 QStringList BehaviorFile::getAnimationNames() const{
     if (character){
         return character->getAnimationNames();
+    }
+    return QStringList();
+}
+
+QStringList BehaviorFile::getLocalFrameNames() const{
+    if (character && character->skeleton){
+        return character->skeleton->getLocalFrameNames();
     }
     return QStringList();
 }

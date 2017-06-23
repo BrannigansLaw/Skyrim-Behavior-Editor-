@@ -1,5 +1,5 @@
-#ifndef BSLIMBIKMODIFIERUI_H
-#define BSLIMBIKMODIFIERUI_H
+#ifndef EVALUATEHANDLEMODIFIERUI_H
+#define EVALUATEHANDLEMODIFIERUI_H
 
 #include <QGroupBox>
 
@@ -8,21 +8,22 @@
 class HkxObject;
 class QGridLayout;
 class TableWidget;
-class BSLimbIKModifier;
+class hkbEvaluateHandleModifier;
 class LineEdit;
 class DoubleSpinBox;
 class CheckBox;
 class ComboBox;
 class GenericTableWidget;
 class hkbVariableBindingSet;
+class QuadVariableWidget;
 
-class BSLimbIKModifierUI: QGroupBox
+class EvaluateHandleModifierUI: QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
 public:
-    BSLimbIKModifierUI();
-    virtual ~BSLimbIKModifierUI(){}
+    EvaluateHandleModifierUI();
+    virtual ~EvaluateHandleModifierUI(){}
     void loadData(HkxObject *data);
 signals:
     void viewVariables(int index);
@@ -31,12 +32,12 @@ signals:
 private slots:
     void setName();
     void setEnable();
-    void setLimitAngleDegrees();
-    void setStartBoneIndex(int index);
-    void setEndBoneIndex(int index);
-    void setGain();
-    void setBoneRadius();
-    void setCastOffset();
+    void setHandlePositionOut();
+    void setHandleRotationOut();
+    void setIsValidOut();
+    void setExtrapolationTimeStep();
+    void setHandleChangeSpeed();
+    void setHandleChangeMode(int index);
     void viewSelected(int row, int column);
     void setBindingVariable(int index, const QString & name);
 private:
@@ -49,17 +50,17 @@ private:
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
     static QStringList headerLabels;
-    BSLimbIKModifier *bsData;
+    hkbEvaluateHandleModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;
     LineEdit *name;
     CheckBox *enable;
-    DoubleSpinBox *limitAngleDegrees;
-    ComboBox *startBoneIndex;
-    ComboBox *endBoneIndex;
-    DoubleSpinBox *gain;
-    DoubleSpinBox *boneRadius;
-    DoubleSpinBox *castOffset;
+    QuadVariableWidget *handlePositionOut;
+    QuadVariableWidget *handleRotationOut;
+    CheckBox *isValidOut;
+    DoubleSpinBox *extrapolationTimeStep;
+    DoubleSpinBox *handleChangeSpeed;
+    ComboBox *handleChangeMode;
 };
 
-#endif // BSLIMBIKMODIFIERUI_H
+#endif // EVALUATEHANDLEMODIFIERUI_H

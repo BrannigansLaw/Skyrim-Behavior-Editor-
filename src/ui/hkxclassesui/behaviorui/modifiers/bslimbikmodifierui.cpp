@@ -127,7 +127,7 @@ void BSLimbIKModifierUI::loadData(HkxObject *data){
     disconnectSignals();
     if (data){
         if (data->getSignature() == BS_LIMB_IK_MODIFIER){
-            boneNames.clear();
+            QStringList boneNames;
             boneNames.append("None");
             hkbVariableBindingSet *varBind = NULL;
             bsData = static_cast<BSLimbIKModifier *>(data);
@@ -189,8 +189,10 @@ void BSLimbIKModifierUI::setName(){
 
 void BSLimbIKModifierUI::setEnable(){
     if (bsData){
-        bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->enable != enable->isChecked()){
+            bsData->enable = enable->isChecked();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -198,8 +200,10 @@ void BSLimbIKModifierUI::setEnable(){
 
 void BSLimbIKModifierUI::setLimitAngleDegrees(){
     if (bsData){
-        bsData->limitAngleDegrees = limitAngleDegrees->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->limitAngleDegrees != limitAngleDegrees->value()){
+            bsData->limitAngleDegrees = limitAngleDegrees->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setLimitAngleDegrees(): The data is NULL!!"));
     }
@@ -225,8 +229,10 @@ void BSLimbIKModifierUI::setEndBoneIndex(int index){
 
 void BSLimbIKModifierUI::setGain(){
     if (bsData){
-        bsData->gain = gain->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->gain != gain->value()){
+            bsData->gain = gain->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setGain(): The data is NULL!!"));
     }
@@ -234,8 +240,10 @@ void BSLimbIKModifierUI::setGain(){
 
 void BSLimbIKModifierUI::setBoneRadius(){
     if (bsData){
-        bsData->boneRadius = boneRadius->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->boneRadius != boneRadius->value()){
+            bsData->boneRadius = boneRadius->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setBoneRadius(): The data is NULL!!"));
     }
@@ -243,8 +251,10 @@ void BSLimbIKModifierUI::setBoneRadius(){
 
 void BSLimbIKModifierUI::setCastOffset(){
     if (bsData){
-        bsData->castOffset = castOffset->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->castOffset != castOffset->value()){
+            bsData->castOffset = castOffset->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setCastOffset(): The data is NULL!!"));
     }
