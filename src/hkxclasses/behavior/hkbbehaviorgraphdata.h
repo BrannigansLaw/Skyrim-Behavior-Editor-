@@ -49,6 +49,7 @@ private:
         hkVariableInfo(){}
         struct hkRole
         {
+            hkRole(): role("ROLE_DEFAULT"), flags("0"){}
             QString role;
             QString flags;
         };

@@ -328,7 +328,7 @@ void BSDirectAtModifierUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->getParentFile()->toggleChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
+            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSDirectAtModifierUI::setName(): The data is NULL!!"));

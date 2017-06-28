@@ -171,7 +171,7 @@ void BSCyclicBlendTransitionGeneratorUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
+            emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
@@ -433,6 +433,16 @@ void BSCyclicBlendTransitionGeneratorUI::connectToTables(GenericTableWidget *gen
         connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::connectToTables(): One or more arguments are NULL!!"));
+    }
+}
+
+void BSCyclicBlendTransitionGeneratorUI::eventRenamed(const QString & name, int index){
+    if (bsData){
+        if (currentIndex() == EVENT_WIDGET){
+            eventUI->eventRenamed(name, index);
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::eventRenamed(): The data is NULL!!"));
     }
 }
 

@@ -6,6 +6,7 @@
 class BSComputeAddBoneAnimModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSComputeAddBoneAnimModifierUI;
 public:
     BSComputeAddBoneAnimModifier(HkxFile *parent, long ref = 0);
     virtual ~BSComputeAddBoneAnimModifier();

@@ -67,7 +67,7 @@ void HkxXMLWriter::writeHeader(const QString & version, const QString & encoding
     stream << "<?xml version=\""+version+"\" encoding=\""+encoding+"\"?>\n";
 }
 
-bool HkxXMLWriter::writeLine(const QString & tag, const QStringList & attribs, const QStringList & attribValues, const QString & value){
+bool HkxXMLWriter::writeLine(const QString & tag, const QStringList & attribs, const QStringList & attribValues, const QString & value, bool nullValueAllowed){
     if (tag == "" || attribs.size() != attribValues.size()){
         hkxXmlFile->writeToLog("HkxXMLWriter: writeLine()!\nXML tag is null or the number of attributes does not match the number of attribute values!!!");
         return false;
@@ -86,8 +86,12 @@ bool HkxXMLWriter::writeLine(const QString & tag, const QStringList & attribs, c
         if (attribValues.last().toInt(&ok) == 0 && attribValues.size() == 2 && ok){
             stream << "></"+tag+">\n";
         }else{
-            nestLevel++;
-            stream << ">\n";
+            if (nullValueAllowed){
+                stream << "></"+tag+">\n";
+            }else{
+                nestLevel++;
+                stream << ">\n";
+            }
         }
     }else{
         stream << ">"+value+"</"+tag+">\n";

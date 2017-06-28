@@ -18,7 +18,8 @@ hkbEvaluateHandleModifier::hkbEvaluateHandleModifier(HkxFile *parent, long ref)
       enable(true),
       isValidOut(false),
       extrapolationTimeStep(0),
-      handleChangeSpeed(0)
+      handleChangeSpeed(0),
+      handleChangeMode(HandleChangeMode.first())
 {
     setType(HKB_EVALUATE_HANDLE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);

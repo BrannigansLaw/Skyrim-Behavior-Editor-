@@ -132,6 +132,8 @@ void GetHandleOnBoneModifierUI::loadData(HkxObject *data){
                 ragdollBoneIndex->insertItems(0, boneNames);
             }
             ragdollBoneIndex->setCurrentIndex(bsData->ragdollBoneIndex + 1);
+            boneNames.clear();
+            boneNames.append("None");
             if (animationBoneIndex->count() == 0){
                 boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
                 animationBoneIndex->insertItems(0, boneNames);
@@ -164,7 +166,7 @@ void GetHandleOnBoneModifierUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->getParentFile()->toggleChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
+            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("GetHandleOnBoneModifierUI::setName(): The data is NULL!!"));

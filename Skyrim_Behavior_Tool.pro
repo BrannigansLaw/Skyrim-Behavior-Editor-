@@ -174,7 +174,16 @@ SOURCES += \
     src/ui/hkxclassesui/behaviorui/modifiers/modifierlistui.cpp \
     src/ui/hkxclassesui/behaviorui/modifiers/eventdrivenmodifierui.cpp \
     src/ui/hkxclassesui/behaviorui/modifiers/gethandleonbonemodifierui.cpp \
-    src/ui/hkxclassesui/behaviorui/modifiers/evaluatehandlemodifierui.cpp
+    src/ui/hkxclassesui/behaviorui/modifiers/evaluatehandlemodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/sensehandlemodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/rangesui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsdecomposevectormodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsisactivemodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/computedirectionmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bscomputeaddboneanimmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsdisttriggermodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsinterpvaluemodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/computerotationtotargetmodifierui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -331,4 +340,13 @@ HEADERS  += \
     src/ui/hkxclassesui/behaviorui/modifiers/modifierlistui.h \
     src/ui/hkxclassesui/behaviorui/modifiers/eventdrivenmodifierui.h \
     src/ui/hkxclassesui/behaviorui/modifiers/gethandleonbonemodifierui.h \
-    src/ui/hkxclassesui/behaviorui/modifiers/evaluatehandlemodifierui.h
+    src/ui/hkxclassesui/behaviorui/modifiers/evaluatehandlemodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/sensehandlemodifierui.h \
+    src/ui/hkxclassesui/behaviorui/rangesui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsdecomposevectormodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsisactivemodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/computedirectionmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bscomputeaddboneanimmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsdisttriggermodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsinterpvaluemodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/computerotationtotargetmodifierui.h

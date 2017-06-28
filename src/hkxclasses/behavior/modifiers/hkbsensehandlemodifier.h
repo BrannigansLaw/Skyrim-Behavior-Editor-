@@ -6,6 +6,8 @@
 class hkbSenseHandleModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class SenseHandleModifierUI;
+    friend class RangesUI;
 public:
     hkbSenseHandleModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbSenseHandleModifier();
@@ -16,6 +18,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    int getNumberOfRanges() const;
 private:
     hkbSenseHandleModifier& operator=(const hkbSenseHandleModifier&);
     hkbSenseHandleModifier(const hkbSenseHandleModifier &);

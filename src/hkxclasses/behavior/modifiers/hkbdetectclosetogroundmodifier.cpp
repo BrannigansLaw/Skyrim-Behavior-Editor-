@@ -12,7 +12,7 @@ QString hkbDetectCloseToGroundModifier::classname = "hkbDetectCloseToGroundModif
 
 hkbDetectCloseToGroundModifier::hkbDetectCloseToGroundModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
-      userData(0),
+      userData(1),
       enable(true),
       closeToGroundHeight(0),
       raycastDistanceDown(0),

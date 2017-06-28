@@ -12,7 +12,18 @@ QString BSIsActiveModifier::classname = "BSIsActiveModifier";
 
 BSIsActiveModifier::BSIsActiveModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
-      userData(0)
+      userData(2),
+      enable(true),
+      bIsActive0(false),
+      bInvertActive0(false),
+      bIsActive1(false),
+      bInvertActive1(false),
+      bIsActive2(false),
+      bInvertActive2(false),
+      bIsActive3(false),
+      bInvertActive3(false),
+      bIsActive4(false),
+      bInvertActive4(false)
 {
     setType(BS_IS_ACTIVE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);

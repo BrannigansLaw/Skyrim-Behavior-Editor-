@@ -9,7 +9,7 @@
 #include <QGridLayout>
 #include <QHeaderView>
 
-#define BASE_NUMBER_OF_ROWS 8
+#define BASE_NUMBER_OF_ROWS 9
 
 #define NAME_ROW 0
 #define ENABLE_ROW 1
@@ -179,7 +179,7 @@ void EvaluateHandleModifierUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->getParentFile()->toggleChanged(true);
-            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
+            emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::setName(): The data is NULL!!"));

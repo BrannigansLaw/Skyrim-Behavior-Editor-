@@ -12,7 +12,7 @@ QString hkbEventDrivenModifier::classname = "hkbEventDrivenModifier";
 
 hkbEventDrivenModifier::hkbEventDrivenModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
-      userData(0),
+      userData(1),
       enable(true)
 {
     setType(HKB_EVENT_DRIVEN_MODIFIER, TYPE_MODIFIER);

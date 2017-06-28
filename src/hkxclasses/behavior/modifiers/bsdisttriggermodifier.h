@@ -6,6 +6,7 @@
 class BSDistTriggerModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSDistTriggerModifierUI;
 public:
     BSDistTriggerModifier(HkxFile *parent, long ref = 0);
     virtual ~BSDistTriggerModifier();

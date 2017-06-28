@@ -719,7 +719,7 @@ bool MainWindow::exitProgram()
     return false;
 }
 
-void MainWindow::closeEvent(QCloseEvent *event){
+void MainWindow::closeEvent(QCloseEvent *){
     writeSettings();
     /*if (exitProgram()) {
         writeSettings();

@@ -15,7 +15,7 @@ QStringList hkbTwistModifier::RotationAxisCoordinates = {"ROTATION_AXIS_IN_MODEL
 
 hkbTwistModifier::hkbTwistModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
-      userData(0),
+      userData(1),
       enable(true),
       twistAngle(0),
       startBoneIndex(-1),

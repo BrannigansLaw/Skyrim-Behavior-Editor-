@@ -6,6 +6,7 @@
 class hkbComputeDirectionModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class ComputeDirectionModifierUI;
 public:
     hkbComputeDirectionModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbComputeDirectionModifier();

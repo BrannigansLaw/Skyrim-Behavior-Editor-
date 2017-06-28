@@ -112,6 +112,8 @@ bool hkbVariableValueSet::write(HkxXMLWriter *writer){
         for (int i = 0; i < variantVariableValues.size(); i++){
             if (variantVariableValues.at(i).data()){
                 refs = refs + variantVariableValues.at(i).data()->getReferenceString()+" ";
+            }else{
+                refs = refs + "null"+" ";
             }
         }
         writer->writeLine(refs);

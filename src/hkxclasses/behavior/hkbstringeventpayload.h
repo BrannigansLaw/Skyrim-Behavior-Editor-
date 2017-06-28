@@ -5,10 +5,6 @@
 
 class hkbStringEventPayload: public HkxObject
 {
-    friend class StateMachineUI;
-    friend class StateUI;
-    friend class EventUI;
-    friend class ClipTriggerUI;
 public:
     hkbStringEventPayload(HkxFile *parent, const QString & string = "", long ref = -1);
     virtual ~hkbStringEventPayload();
@@ -17,11 +13,12 @@ public:
     static QString getClassname();
     bool link(){return true;}
     bool write(HkxXMLWriter *writer);
+public:
+    QString data;
 protected:
 private:
     static uint refCount;
     static QString classname;
-    QString data;
 };
 
 #endif // HKBSTRINGEVENTPAYLOAD_H

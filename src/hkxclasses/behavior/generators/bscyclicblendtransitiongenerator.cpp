@@ -97,7 +97,7 @@ bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long
             if (!pBlenderGenerator.readReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'pBlenderGenerator' reference!\nObject Reference: "+ref);
             }
-        }else if (text == "EventToFreezeBlendValue"){
+        }else if (text == "eventToFreezeBlendValue"){
             index++;
             while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                 text = reader.getNthAttributeValueAt(index, 0);
@@ -114,7 +114,7 @@ bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long
                 }
                 index++;
             }
-        }else if (text == "EventToCrossBlend"){
+        }else if (text == "eventToCrossBlend"){
             index++;
             while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                 text = reader.getNthAttributeValueAt(index, 0);

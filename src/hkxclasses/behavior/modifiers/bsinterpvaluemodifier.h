@@ -6,6 +6,7 @@
 class BSInterpValueModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSInterpValueModifierUI;
 public:
     BSInterpValueModifier(HkxFile *parent, long ref = 0);
     virtual ~BSInterpValueModifier();

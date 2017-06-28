@@ -27,7 +27,7 @@ signals:
     void viewEvents(int index);
     void returnToParent();
 private slots:
-    void setEvent(int index, const QString &name);
+    void setEventId(int index, const QString &name);
     void setEventPayload();
     void setLocalTime();
     void setRelativeToEndOfClip();

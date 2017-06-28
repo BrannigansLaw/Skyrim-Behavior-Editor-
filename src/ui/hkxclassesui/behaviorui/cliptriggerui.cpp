@@ -32,6 +32,7 @@ QStringList ClipTriggerUI::headerLabels = {
 
 ClipTriggerUI::ClipTriggerUI()
     : file(NULL),
+      bsData(NULL),
       topLyt(new QGridLayout),
       returnPB(new QPushButton("Return")),
       table(new TableWidget),
@@ -67,7 +68,7 @@ ClipTriggerUI::ClipTriggerUI()
     table->setItem(ISANNOTATION_ROW, VALUE_COLUMN, new TableWidgetItem("", Qt::AlignCenter, QColor(Qt::lightGray)));
     table->setCellWidget(ISANNOTATION_ROW, VALUE_COLUMN, isAnnotation);
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
-    topLyt->addWidget(table, 1, 0, 6, 2);
+    topLyt->addWidget(table, 1, 0, 6, 3);
     setLayout(topLyt);
     connectSignals();
 }
@@ -134,7 +135,7 @@ QSize ClipTriggerUI::minimumSizeHint() const{
     return QSize(1200, 600);
 }*/
 
-void ClipTriggerUI::setEvent(int index, const QString & name){
+void ClipTriggerUI::setEventId(int index, const QString & name){
     if (bsData && file){
         index--;
         if (bsData->event.id != index){
@@ -143,7 +144,7 @@ void ClipTriggerUI::setEvent(int index, const QString & name){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ClipTriggerUI::setEvent(): Behavior file or event data is null!!!"));
+        CRITICAL_ERROR_MESSAGE(QString("ClipTriggerUI::setEventId(): Behavior file or event data is null!!!"));
     }
 }
 

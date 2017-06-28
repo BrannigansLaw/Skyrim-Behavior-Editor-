@@ -6,6 +6,7 @@
 class BSDecomposeVectorModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSDecomposeVectorModifierUI;
 public:
     BSDecomposeVectorModifier(HkxFile *parent, long ref = 0);
     virtual ~BSDecomposeVectorModifier();

@@ -6,6 +6,7 @@
 class BSIsActiveModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSIsActiveModifierUI;
 public:
     BSIsActiveModifier(HkxFile *parent, long ref = 0);
     virtual ~BSIsActiveModifier();

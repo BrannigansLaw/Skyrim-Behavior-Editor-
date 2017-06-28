@@ -38,6 +38,14 @@
 #include "src/ui/hkxclassesui/behaviorui/modifiers/eventdrivenmodifierui.h"
 #include "src/ui/hkxclassesui/behaviorui/modifiers/gethandleonbonemodifierui.h"
 #include "src/ui/hkxclassesui/behaviorui/modifiers/evaluatehandlemodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/sensehandlemodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bsdecomposevectormodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bsisactivemodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/computedirectionmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bscomputeaddboneanimmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bsdisttriggermodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bsinterpvaluemodifierui.h"
+
 #include "src/ui/hkxclassesui/behaviorui/expressiondataarrayui.h"
 
 #include <QPushButton>
@@ -158,7 +166,14 @@ HkDataUI::HkDataUI(const QString &title)
       modListUI(new ModifierListUI),
       eventDrivenModUI(new EventDrivenModifierUI),
       getHandleOnBoneUI(new GetHandleOnBoneModifierUI),
-      evaluateHandleModUI(new EvaluateHandleModifierUI)
+      evaluateHandleModUI(new EvaluateHandleModifierUI),
+      senseHandleModUI(new SenseHandleModifierUI),
+      decomposeVectorModUI(new BSDecomposeVectorModifierUI),
+      isActiveModUI(new BSIsActiveModifierUI),
+      computeDirMod(new ComputeDirectionModifierUI),
+      computeAddAnimUI(new BSComputeAddBoneAnimModifierUI),
+      distTriggerModUI(new BSDistTriggerModifierUI),
+      interpValueModUI(new BSInterpValueModifierUI)
 {
     setTitle(title);
     stack->addWidget(noDataL);
@@ -184,6 +199,13 @@ HkDataUI::HkDataUI(const QString &title)
     stack->addWidget(eventDrivenModUI);
     stack->addWidget(getHandleOnBoneUI);
     stack->addWidget(evaluateHandleModUI);
+    stack->addWidget(senseHandleModUI);
+    stack->addWidget(decomposeVectorModUI);
+    stack->addWidget(isActiveModUI);
+    stack->addWidget(computeDirMod);
+    stack->addWidget(computeAddAnimUI);
+    stack->addWidget(distTriggerModUI);
+    stack->addWidget(interpValueModUI);
     verLyt->addLayout(stack, 5);
     setLayout(verLyt);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -210,6 +232,13 @@ HkDataUI::HkDataUI(const QString &title)
     connect(eventDrivenModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(getHandleOnBoneUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(evaluateHandleModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(senseHandleModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(decomposeVectorModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(isActiveModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(computeDirMod, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(computeAddAnimUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(distTriggerModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(interpValueModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
 
     connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
     connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
@@ -251,6 +280,7 @@ void HkDataUI::modifierAdded(const QString & name, const QString & type){
     modifiersTable->addItem(name, type);
 }
 void HkDataUI::modifierNameChanged(const QString & newName, int index){
+    index++;
     modifiersTable->renameItem(index, newName);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::MODIFIER_GENERATOR:
@@ -270,6 +300,7 @@ void HkDataUI::generatorAdded(const QString & name, const QString & type){
 }
 
 void HkDataUI::generatorNameChanged(const QString & newName, int index){
+    index++;
     generatorsTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
     case DATA_TYPE_LOADED::BLENDER_GENERATOR:
@@ -306,6 +337,7 @@ void HkDataUI::generatorNameChanged(const QString & newName, int index){
 }
 
 void HkDataUI::eventNameChanged(const QString & newName, int index){
+    index++;
     eventsTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
     case DATA_TYPE_LOADED::STATE_MACHINE:
@@ -326,6 +358,12 @@ void HkDataUI::eventNameChanged(const QString & newName, int index){
     case DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER:
         eventDrivenModUI->eventRenamed(newName, index);
         break;
+    case DATA_TYPE_LOADED::SENSE_HANDLE_MODIFIER:
+        senseHandleModUI->eventRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER:
+        distTriggerModUI->eventRenamed(newName, index);
+        break;
     }
 }
 
@@ -334,6 +372,7 @@ void HkDataUI::eventAdded(const QString & name){
 }
 
 void HkDataUI::eventRemoved(int index){
+    index++;
     eventsTable->removeItem(index);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::STATE_MACHINE:
@@ -354,10 +393,17 @@ void HkDataUI::eventRemoved(int index){
     case DATA_TYPE_LOADED::EVENT_DRIVEN_MODIFIER:
         eventDrivenModUI->eventRenamed("NONE", index);
         break;
+    case DATA_TYPE_LOADED::SENSE_HANDLE_MODIFIER:
+        senseHandleModUI->eventRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER:
+        distTriggerModUI->eventRenamed("NONE", index);
+        break;
     }
 }
 
 void HkDataUI::animationNameChanged(const QString &newName, int index){
+    index++;
     animationsTable->renameItem(index, newName);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::CLIP_GENERATOR:
@@ -371,6 +417,7 @@ void HkDataUI::animationAdded(const QString &name){
 }
 
 void HkDataUI::animationRemoved(int index){
+    index++;
     eventsTable->removeItem(index);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::CLIP_GENERATOR:
@@ -380,6 +427,7 @@ void HkDataUI::animationRemoved(int index){
 }
 
 void HkDataUI::variableNameChanged(const QString & newName, int index){
+    index++;
     variablesTable->renameItem(index, newName);
     switch (stack->currentIndex()) {
     case DATA_TYPE_LOADED::BLENDER_GENERATOR:
@@ -439,6 +487,27 @@ void HkDataUI::variableNameChanged(const QString & newName, int index){
     case DATA_TYPE_LOADED::EVALUATE_HANDLE_MODIFIER:
         evaluateHandleModUI->variableRenamed(newName, index);
         break;
+    case DATA_TYPE_LOADED::SENSE_HANDLE_MODIFIER:
+        senseHandleModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_DECOMPOSE_VECTOR_MODIFIER:
+        decomposeVectorModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_IS_ACTIVE_MODIFIER:
+        isActiveModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::COMPUTE_DIRECTION_MODIFIER:
+        computeDirMod->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_COMPUTE_ADD_BONE_ANIM_MODIFIER:
+        computeAddAnimUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER:
+        distTriggerModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_INTERP_VALUE_MODIFIER:
+        interpValueModUI->variableRenamed(newName, index);
+        break;
     }
 }
 
@@ -447,6 +516,7 @@ void HkDataUI::variableAdded(const QString & name, const QString & type){
 }
 
 void HkDataUI::generatorRemoved(int index){
+    //index++;
     generatorsTable->removeItem(index);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::BLENDER_GENERATOR:
@@ -501,6 +571,7 @@ void HkDataUI::generatorRemoved(int index){
 }
 
 void HkDataUI::modifierRemoved(int index){
+    //index++;
     modifiersTable->removeItem(index);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::MODIFIER_GENERATOR:
@@ -516,6 +587,7 @@ void HkDataUI::modifierRemoved(int index){
 }
 
 void HkDataUI::variableRemoved(int index){
+    index++;
     variablesTable->removeItem(index);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::BLENDER_GENERATOR:
@@ -574,6 +646,27 @@ void HkDataUI::variableRemoved(int index){
         break;
     case DATA_TYPE_LOADED::EVALUATE_HANDLE_MODIFIER:
         evaluateHandleModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::SENSE_HANDLE_MODIFIER:
+        senseHandleModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_DECOMPOSE_VECTOR_MODIFIER:
+        decomposeVectorModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_IS_ACTIVE_MODIFIER:
+        isActiveModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::COMPUTE_DIRECTION_MODIFIER:
+        computeDirMod->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_COMPUTE_ADD_BONE_ANIM_MODIFIER:
+        computeAddAnimUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER:
+        distTriggerModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_INTERP_VALUE_MODIFIER:
+        interpValueModUI->variableRenamed("NONE", index);
         break;
     }
     behaviorView->behavior->removeBindings(index);
@@ -739,6 +832,55 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             }
             stack->setCurrentIndex(DATA_TYPE_LOADED::EVALUATE_HANDLE_MODIFIER);
             evaluateHandleModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_SENSE_HANDLE_MODIFIER:
+            if (loadedData != oldData){
+                senseHandleModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::SENSE_HANDLE_MODIFIER);
+            senseHandleModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
+            break;
+        case HkxSignature::BS_DECOMPOSE_VECTOR_MODIFIER:
+            if (loadedData != oldData){
+                decomposeVectorModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_DECOMPOSE_VECTOR_MODIFIER);
+            decomposeVectorModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::BS_IS_ACTIVE_MODIFIER:
+            if (loadedData != oldData){
+                isActiveModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_IS_ACTIVE_MODIFIER);
+            isActiveModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_COMPUTE_DIRECTION_MODIFIER:
+            if (loadedData != oldData){
+                computeDirMod->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::COMPUTE_DIRECTION_MODIFIER);
+            computeDirMod->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::BS_COMPUTE_ADD_BONE_ANIM_MODIFIER:
+            if (loadedData != oldData){
+                computeAddAnimUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_COMPUTE_ADD_BONE_ANIM_MODIFIER);
+            computeAddAnimUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::BS_DIST_TRIGGER_MODIFER:
+            if (loadedData != oldData){
+                distTriggerModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER);
+            distTriggerModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
+            break;
+        case HkxSignature::BS_INTERP_VALUE_MODIFIER:
+            if (loadedData != oldData){
+                interpValueModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_INTERP_VALUE_MODIFIER);
+            interpValueModUI->connectToTables(variablesTable, characterPropertiesTable);
             break;
         default:
             unloadDataWidget();

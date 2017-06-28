@@ -95,11 +95,13 @@ QString hkbVariableBindingSet::getPathOfBindingAt(int index){
 int hkbVariableBindingSet::getVariableIndexOfBinding(const QString & path) const{
     for (int i = 0; i < bindings.size(); i++){
         if (bindings.at(i).memberPath == path){
-            if (bindings.at(i).bindingType == hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                return static_cast<BehaviorFile *>(getParentFile())->findCharacterPropertyIndexFromCharacter(bindings.at(i).variableIndex);
+            /*if (bindings.at(i).bindingType == hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
+                //return static_cast<BehaviorFile *>(getParentFile())->findCharacterPropertyIndexFromCharacter(bindings.at(i).variableIndex);
+                return static_cast<BehaviorFile *>(getParentFile())->getCharacterPropertyIndex(static_cast<BehaviorFile *>(getParentFile())->getCharacterPropertyNameAt(bindings.at(i).variableIndex, true));
             }else{
                 return bindings.at(i).variableIndex;
-            }
+            }*/
+            return bindings.at(i).variableIndex;
         }
     }
     return -1;

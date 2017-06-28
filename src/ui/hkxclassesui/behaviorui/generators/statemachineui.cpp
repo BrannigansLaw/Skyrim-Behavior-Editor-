@@ -330,7 +330,7 @@ void StateMachineUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->getParentFile()->toggleChanged(true);
-            emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData) + 1);
+            emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setName(): The data is NULL!!"));
@@ -895,18 +895,21 @@ void StateMachineUI::variableRenamed(const QString & name, int index){
 
 void StateMachineUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        eventUI->eventRenamed(name, index);
-        if (index == bsData->returnToPreviousStateEventId){
-            table->item(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
-        if (index == bsData->randomTransitionEventId){
-            table->item(RANDOM_TRANSITION_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
-        if (index == bsData->transitionToNextHigherStateEventId){
-            table->item(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        }
-        if (index == bsData->transitionToNextLowerStateEventId){
-            table->item(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+        if (currentIndex() == MAIN_WIDGET){
+            if (index == bsData->returnToPreviousStateEventId){
+                table->item(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+            }
+            if (index == bsData->randomTransitionEventId){
+                table->item(RANDOM_TRANSITION_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+            }
+            if (index == bsData->transitionToNextHigherStateEventId){
+                table->item(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+            }
+            if (index == bsData->transitionToNextLowerStateEventId){
+                table->item(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+            }
+        }else{
+            eventUI->eventRenamed(name, index);
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::eventRenamed(): The data is NULL!!"));

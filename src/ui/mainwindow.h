@@ -53,7 +53,7 @@ public:
     virtual ~MainWindow();
     void writeToLog(const QString & message, bool isError = false);
 protected:
-    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
+    void closeEvent(QCloseEvent *) Q_DECL_OVERRIDE;
     void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
 private:
     PlainTextEdit *debugLog;

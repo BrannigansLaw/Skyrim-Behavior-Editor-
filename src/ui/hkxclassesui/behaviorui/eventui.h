@@ -15,6 +15,7 @@ class EventUI: public QGroupBox
     Q_OBJECT
     friend class StateMachineUI;
     friend class StateUI;
+    friend class BSCyclicBlendTransitionGeneratorUI;
 public:
     EventUI();
     void loadData(BehaviorFile *parentFile, hkEventPayload *event);

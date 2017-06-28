@@ -12,7 +12,7 @@ QString hkbDampingModifier::classname = "hkbDampingModifier";
 
 hkbDampingModifier::hkbDampingModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
-      userData(0),
+      userData(1),
       enable(true),
       kP(0),
       kI(0),

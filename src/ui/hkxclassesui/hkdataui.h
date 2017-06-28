@@ -43,6 +43,13 @@ class ModifierListUI;
 class EventDrivenModifierUI;
 class GetHandleOnBoneModifierUI;
 class EvaluateHandleModifierUI;
+class SenseHandleModifierUI;
+class BSDecomposeVectorModifierUI;
+class BSIsActiveModifierUI;
+class ComputeDirectionModifierUI;
+class BSComputeAddBoneAnimModifierUI;
+class BSDistTriggerModifierUI;
+class BSInterpValueModifierUI;
 
 /**
  * To add support for a new class we need to add it to the "DATA_TYPE_LOADED" enum, add it to the stacked layout in the correct order,
@@ -103,7 +110,14 @@ private:
         MODIFIER_LIST,
         EVENT_DRIVEN_MODIFIER,
         GET_HANDLE_ON_BONE_MODIFIER,
-        EVALUATE_HANDLE_MODIFIER
+        EVALUATE_HANDLE_MODIFIER,
+        SENSE_HANDLE_MODIFIER,
+        BS_DECOMPOSE_VECTOR_MODIFIER,
+        BS_IS_ACTIVE_MODIFIER,
+        COMPUTE_DIRECTION_MODIFIER,
+        BS_COMPUTE_ADD_BONE_ANIM_MODIFIER,
+        BS_DIST_TRIGGER_MODIFER,
+        BS_INTERP_VALUE_MODIFIER
     };
     static QStringList generatorTypes;
     static QStringList modifierTypes;
@@ -144,6 +158,13 @@ private:
     EventDrivenModifierUI *eventDrivenModUI;
     GetHandleOnBoneModifierUI *getHandleOnBoneUI;
     EvaluateHandleModifierUI *evaluateHandleModUI;
+    SenseHandleModifierUI *senseHandleModUI;
+    BSDecomposeVectorModifierUI *decomposeVectorModUI;
+    BSIsActiveModifierUI *isActiveModUI;
+    ComputeDirectionModifierUI *computeDirMod;
+    BSComputeAddBoneAnimModifierUI *computeAddAnimUI;
+    BSDistTriggerModifierUI *distTriggerModUI;
+    BSInterpValueModifierUI *interpValueModUI;
 };
 
 #endif // HKDATAUI_H

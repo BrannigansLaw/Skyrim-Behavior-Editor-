@@ -44,6 +44,9 @@ QString HkxObject::getReferenceString() const{
         referenceString = "#000";
     }
     return referenceString+QString::number(reference);*/
+    if (reference < 0){
+        return "null";
+    }
     return "#"+QString::number(reference);
 }
 
@@ -141,6 +144,7 @@ bool HkxObject::readReferences(const QByteArray &line, QList <HkxSharedPtr> & ch
                 start++;
             }
             if (value == "null"){
+                children.append(HkxSharedPtr(NULL));
                 ok = true;
             } else {
                 return false;

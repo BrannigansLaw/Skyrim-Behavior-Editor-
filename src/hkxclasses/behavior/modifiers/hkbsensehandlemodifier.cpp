@@ -24,7 +24,8 @@ hkbSenseHandleModifier::hkbSenseHandleModifier(HkxFile *parent, long ref)
       sensorAnimationBoneIndex(-1),
       extrapolateSensorPosition(false),
       keepFirstSensedHandle(false),
-      foundHandleOut(false)
+      foundHandleOut(false),
+      sensingMode(SensingMode.first())
 {
     setType(HKB_SENSE_HANDLE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
@@ -142,17 +143,17 @@ bool hkbSenseHandleModifier::readData(const HkxXmlReader &reader, long index){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'distanceOut' data field!\nObject Reference: "+ref);
             }
         }else if (text == "collisionFilterInfo"){
-            collisionFilterInfo = reader.getElementValueAt(index).toULong(&ok);
+            collisionFilterInfo = reader.getElementValueAt(index).toLong(&ok);
             if (!ok){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'collisionFilterInfo' data field!\nObject Reference: "+ref);
             }
         }else if (text == "sensorRagdollBoneIndex"){
-            sensorRagdollBoneIndex = reader.getElementValueAt(index).toULong(&ok);
+            sensorRagdollBoneIndex = reader.getElementValueAt(index).toLong(&ok);
             if (!ok){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'sensorRagdollBoneIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "sensorAnimationBoneIndex"){
-            sensorAnimationBoneIndex = reader.getElementValueAt(index).toULong(&ok);
+            sensorAnimationBoneIndex = reader.getElementValueAt(index).toLong(&ok);
             if (!ok){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'sensorAnimationBoneIndex' data field!\nObject Reference: "+ref);
             }
@@ -231,8 +232,8 @@ bool hkbSenseHandleModifier::write(HkxXMLWriter *writer){
             refString = "null";
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("handleIn"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("localFrameName"), localFrameName);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensorLocalFrameName"), sensorLocalFrameName);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("localFrameName"), localFrameName, true);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensorLocalFrameName"), sensorLocalFrameName, true);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minDistance"), QString::number(minDistance, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxDistance"), QString::number(maxDistance, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("distanceOut"), QString::number(distanceOut, char('f'), 6));
@@ -256,6 +257,10 @@ bool hkbSenseHandleModifier::write(HkxXMLWriter *writer){
         }
     }
     return true;
+}
+
+int hkbSenseHandleModifier::getNumberOfRanges() const{
+    return ranges.size();
 }
 
 bool hkbSenseHandleModifier::link(){

@@ -1,0 +1,11 @@
+#ifndef COMPUTEROTATIONTOTARGETMODIFIERUI_H
+#define COMPUTEROTATIONTOTARGETMODIFIERUI_H
+
+
+class ComputeRotationToTargetModifierUI
+{
+public:
+    ComputeRotationToTargetModifierUI();
+};
+
+#endif // COMPUTEROTATIONTOTARGETMODIFIERUI_H
