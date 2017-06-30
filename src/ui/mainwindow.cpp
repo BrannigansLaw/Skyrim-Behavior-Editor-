@@ -29,6 +29,7 @@ MainWindow::MainWindow()
       debugLog(new PlainTextEdit(this)),
       openProjectA(new QAction("Open Project", this)),
       exportToSkyrimDirA(new QAction("Export Project To Skyrim Directory", this)),
+      exportCurrentFileA(new QAction("Export Current File To Skyrim Directory", this)),
       fileM(new QMenu("File", this)),
       saveA(new QAction("Save Viewed Behavior File", this)),
       saveProjectA(new QAction("Save Project", this)),
@@ -64,6 +65,8 @@ MainWindow::MainWindow()
     openProjectA->setShortcut(QKeySequence::Open);
     exportToSkyrimDirA->setStatusTip("Pack and export the current project to the working Skyrim directory!");
     exportToSkyrimDirA->setShortcut(QKeySequence::Copy);
+    exportCurrentFileA->setStatusTip("Pack and export the current file to the working Skyrim directory!");
+    exportCurrentFileA->setShortcut(QKeySequence::Paste);
     saveA->setStatusTip("Save file!");
     saveA->setShortcut(QKeySequence::Save);
     saveProjectA->setStatusTip("Save project!");
@@ -72,6 +75,7 @@ MainWindow::MainWindow()
     exitA->setShortcut(QKeySequence::Close);
     fileM->addAction(openProjectA);
     fileM->addAction(exportToSkyrimDirA);
+    fileM->addAction(exportCurrentFileA);
     fileM->addAction(saveA);
     fileM->addAction(saveProjectA);
     fileM->addAction(exitA);
@@ -117,7 +121,8 @@ MainWindow::MainWindow()
     }*/
     connect(openProjectA, SIGNAL(triggered(bool)), this, SLOT(openProject()));
     connect(saveA, SIGNAL(triggered(bool)), this, SLOT(save()));
-    connect(exportToSkyrimDirA, SIGNAL(triggered(bool)), this, SLOT(packAndExportToSkyrimDirectory()));
+    connect(exportToSkyrimDirA, SIGNAL(triggered(bool)), this, SLOT(packAndExportProjectToSkyrimDirectory()));
+    connect(exportCurrentFileA, SIGNAL(triggered(bool)), this, SLOT(packAndExportFileToSkyrimDirectory()));
     connect(saveProjectA, SIGNAL(triggered(bool)), this, SLOT(saveProject()));
     connect(expandA, SIGNAL(triggered(bool)), this, SLOT(expandBranches()));
     connect(collapseA, SIGNAL(triggered(bool)), this, SLOT(collapseBranches()));
@@ -328,117 +333,46 @@ void MainWindow::saveProject(){
     }
 }
 
-void MainWindow::packAndExportToSkyrimDirectory(){
+void MainWindow::packAndExportProjectToSkyrimDirectory(){
     if (projectFile){
         QTime t;
         t.start();
         writeToLog("\n-------------------------\nExporting the current project to the Skyrim game directory...");
         ProgressDialog dialog("Exporting the current project to the Skyrim game directory...", "", 0, 100, this);
-        QDir dir(skyrimDirectory);
         QString path = skyrimDirectory+"/data/meshes/actors";
         QString projectFolder = path+"/"+lastFileSelectedPath.section("/", -1, -1);
-        QString projectName = lastFileSelectedPath.section("/", -1, -1);
-        QString tempPath;
-        if (dir.exists()){
-            dir.setPath(path);
-            if (!dir.exists()){
-                //The current project does not exist in the game directory... Export the whole project as is...
-                if (!dir.mkpath(path)){
-                    WARNING_MESSAGE(QString("Failed to make the correct folders in the Skyrim directory!"));
-                    return;
-                }
-                dialog.setProgress("Converting entire project...This may take a few seconds...", 20);
-                if (packHKX(lastFileSelected, projectFolder+"/"+projectName) != HKXCMD_SUCCESS){
-                    WARNING_MESSAGE(QString("Failed to convert and export the files to the correct folders in the Skyrim directory!"));
-                    return;
-                }
-                dialog.setProgress("Project export sucessful!!", dialog.maximum());
-            }else{
-                dir.setPath(projectFolder);
-                if (dir.exists()){
-                    //An older version of the project exists, overwrite the relevant files starting with the project file...
-                    dialog.setProgress("Replacing existing project file: "+projectFile->fileName().section("/", -1, -1), 5);
-                    tempPath = path+"/"+projectName+"/"+lastFileSelected.section("/", -1, -1);
-                    dir.setPath(tempPath);
-                    if (QFile::exists(tempPath)){
-                        if (!dir.remove(tempPath)){//Might not be necessary since hkxcmd.exe seems to overwrite automatically...
-                            WARNING_MESSAGE(QString("Failed to overwrite:"+tempPath+"!"));
-                        }
-                    }
-                    dialog.setProgress("Converting project file...", 8);
-                    if (packHKX(lastFileSelected, tempPath) != HKXCMD_SUCCESS){
-                        WARNING_MESSAGE(QString("Failed to convert and export the project file to the Skyrim directory!"));
-                        return;
-                    }
-                    dialog.setProgress("Project file exported sucessfully!!!", 10);
-                    //Overwrite the character file...
-                    tempPath = projectFolder+"/"+projectFile->getCharacterFilePathAt(0);
-                    dir.setPath(tempPath);
-                    dialog.setProgress("Replacing existing character file: "+characterFile->fileName().section("/", -1, -1), 15);
-                    if (QFile::exists(tempPath)){
-                        if (!dir.remove(tempPath)){
-                            WARNING_MESSAGE(QString("Failed to overwrite:"+tempPath+"!"));
-                        }
-                    }
-                    dialog.setProgress("Converting character file...", 20);
-                    if (packHKX(lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0), tempPath) != HKXCMD_SUCCESS){
-                        WARNING_MESSAGE(QString("Failed to convert and export the character file to the correct folder in the Skyrim directory!"));
-                    }
-                    dialog.setProgress("Character file exported sucessfully!", 23);
-                    tempPath = projectFolder+"/"+characterFile->getRigName();
-                    dir.setPath(tempPath);
-                    //Ensure a skeleton file exists in the target game directory...
-                    dialog.setProgress("Searching for skeleton file...", 25);
-                    if (!QFile::exists(tempPath)){
-                        dialog.setProgress("Skeleton file not found! Exporting...", 28);
-                        if (packHKX(lastFileSelectedPath+"/"+characterFile->getRigName(), tempPath) != HKXCMD_SUCCESS){
-                            WARNING_MESSAGE(QString("Failed to convert and export the skeleton file to the correct folder in the Skyrim directory!"));
-                            return;
-                        }
-                        dialog.setProgress("Skeleton file exported sucessfully!", 30);
-                    }
-                    //Overwrite the behavior files...
-                    tempPath = projectFolder+"/"+characterFile->getBehaviorDirectoryName();
-                    dir.setPath(tempPath);
-                    dialog.setProgress("Searching for behavior directory...", 35);
-                    if (!QFile::exists(tempPath)){
-                        dialog.setProgress("Behavior directory not found! Creating one...", 40);
-                        dialog.setProgress("Converting behavior files...This may take a few seconds...", 50);
-                        if (packHKX(lastFileSelectedPath+"/"+characterFile->getBehaviorDirectoryName(), tempPath) != HKXCMD_SUCCESS){
-                            WARNING_MESSAGE(QString("Failed to convert and export the behavior directory to the correct folder in the Skyrim directory!"));
-                            return;
-                        }
-                        dialog.setProgress("Behavior files exported sucessfully!", dialog.maximum());
-                    }else{
-                        //remove directory and export files...
-                        tempPath = projectFolder+"/"+characterFile->getBehaviorDirectoryName();
-                        dir.setPath(tempPath);
-                        dialog.setProgress("Replacing existing behavior directory...", 35);
-                        if (QFile::exists(tempPath)){
-                            if (!dir.removeRecursively()){
-                                WARNING_MESSAGE(QString("Failed to overwrite:"+tempPath+"!"));
-                            }
-                        }
-                        dialog.setProgress("Converting behavior files...This may take a few seconds...", 40);
-                        if (packHKX(lastFileSelectedPath+"/"+characterFile->getBehaviorDirectoryName(), tempPath) != HKXCMD_SUCCESS){
-                            WARNING_MESSAGE(QString("Failed to convert and export the behavior directory to the correct folder in the Skyrim directory!"));
-                            return;
-                        }
-                        dialog.setProgress("Behavior files exported sucessfully!", dialog.maximum());
-                    }
-                }else{
-                    dialog.setProgress("Converting entire project...This may take a few seconds...", 20);
-                    if (packHKX(lastFileSelectedPath, projectFolder) != HKXCMD_SUCCESS){
-                        WARNING_MESSAGE(QString("Failed to convert and export the files to the correct folders in the Skyrim directory!"));
-                        return;
-                    }
-                    dialog.setProgress("Behavior files exported sucessfully!", dialog.maximum());
-                }
-            }
-        }else{
-            WARNING_MESSAGE(QString("Skyrim Directory not found!"));
+        dialog.setProgress("Converting entire project...This may take a few seconds...", 20);
+        if (hkxcmd(lastFileSelectedPath, projectFolder) != HKXCMD_SUCCESS){
+            WARNING_MESSAGE(QString("Failed to convert and export the files to the correct folders in the Skyrim directory!"));
+            return;
         }
+        dialog.setProgress("Project export sucessful!!", dialog.maximum());
         writeToLog("\n-------------------------\nTime taken to export the project is approximately "+QString::number(t.elapsed())+" milliseconds\n-------------------------\n");
+    }else{
+        WARNING_MESSAGE(QString("No project open!"));
+    }
+}
+
+void MainWindow::packAndExportFileToSkyrimDirectory(){
+    if (projectFile){
+        int index = tabs->currentIndex() - 1;
+        if (characterFile && index >= 0 && index < behaviorFiles.size()){
+            QTime t;
+            t.start();
+            writeToLog("\n-------------------------\nExporting the current file to the Skyrim game directory...");
+            //ProgressDialog dialog("Exporting the current file to the Skyrim game directory...", "", 0, 100, this);
+            QString path = skyrimDirectory+"/data/meshes/actors";
+            QString projectFolder = path+"/"+lastFileSelectedPath.section("/", -1, -1);
+            QString filename = behaviorFiles.at(index)->fileName().section("/", -1, -1);
+            QString temppath = projectFolder+"/"+characterFile->getBehaviorDirectoryName()+"/"+filename;
+            if (hkxcmd(lastFileSelectedPath+"/"+characterFile->getBehaviorDirectoryName()+"/"+filename, temppath) != HKXCMD_SUCCESS){
+                //dialog.setProgress("Behavior file export failed!", dialog.maximum());
+                WARNING_MESSAGE(QString("Failed to convert and export the behavior directory to the correct folder in the Skyrim directory!"));
+                return;
+            }
+            //dialog.setProgress("Behavior file exported sucessfully!", dialog.maximum());
+            writeToLog("\n-------------------------\nTime taken to export the file is approximately "+QString::number(t.elapsed())+" milliseconds\n-------------------------\n");
+        }
     }else{
         WARNING_MESSAGE(QString("No project open!"));
     }
@@ -545,6 +479,37 @@ void MainWindow::openProject(){
         return;
     }
     lastFileSelected = filename;
+    if (hkxcmd(filename.section("/", 0, -2), "", "-v:xml") != HKXCMD_SUCCESS){
+        WARNING_MESSAGE(QString("Failed to convert and export the files to the correct folders in the Skyrim directory!"));
+        return;
+    }
+    //remove all hkx files then rename the rest to hkx files...
+    {
+        QDirIterator it(filename.section("/", 0, -2), QDirIterator::Subdirectories);
+        QString temp;
+        while (it.hasNext()){
+            temp = it.next();
+            if (temp.contains(".hkx")){
+                if (!QDir(temp).remove(temp)){
+                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The file "+temp+" could not be removed!!!"));
+                    return;
+                }
+            }
+        }
+    }
+    {
+        QDirIterator it(filename.section("/", 0, -2), QDirIterator::Subdirectories);
+        QString temp;
+        while (it.hasNext()){
+            temp = it.next();
+            if (temp.contains(".xml")){
+                if (!QDir(temp).rename(temp, QString(temp).replace(".xml", ".hkx"))){
+                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The file "+temp+" could not be renamed!!!"));
+                    return;
+                }
+            }
+        }
+    }
     QTime t;
     t.start();
     objectDataWid->changeCurrentDataWidget(NULL);
@@ -692,9 +657,9 @@ bool MainWindow::findSkyrimDirectory(){
     return false;
 }
 
-MainWindow::HKXCMD_RETURN MainWindow::packHKX(const QString &filepath, const QString &outputDirectory){
+MainWindow::HKXCMD_RETURN MainWindow::hkxcmd(const QString &filepath, const QString &outputDirectory, const QString &flags){
     QString command;
-    command = "\"\""+hkxcmdPath+"\"\" convert \""+filepath+"\" \""+outputDirectory+"\" -f SAVE_CONCISE";
+    command = "\"\""+hkxcmdPath+"\"\" convert \""+filepath+"\" \""+outputDirectory+"\" "+flags;
     command.replace("/", "\\");
     command = "cmd /c "+command;
     QProcess processHKXCMD;

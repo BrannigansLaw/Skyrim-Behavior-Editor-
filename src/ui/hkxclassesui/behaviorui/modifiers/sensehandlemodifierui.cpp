@@ -115,7 +115,7 @@ SenseHandleModifierUI::SenseHandleModifierUI()
       rangeUI(new RangesUI),
       groupBox(new QGroupBox),
       topLyt(new QGridLayout),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       enable(new CheckBox),
       sensorLocalOffset(new QuadVariableWidget),
@@ -206,7 +206,7 @@ SenseHandleModifierUI::SenseHandleModifierUI()
     table->setItem(FOUND_HANDLE_OUT_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(FOUND_HANDLE_OUT_ROW, VALUE_COLUMN, foundHandleOut);
     table->setItem(ADD_RANGE_ROW, NAME_COLUMN, new TableWidgetItem("Add Range", Qt::AlignCenter, QColor(Qt::green), QBrush(Qt::black), "Double click to add a new range"));
-    table->setItem(ADD_RANGE_ROW, BINDING_COLUMN, new TableWidgetItem("hkRange", Qt::AlignCenter));
+    table->setItem(ADD_RANGE_ROW, TYPE_COLUMN, new TableWidgetItem("hkRange", Qt::AlignCenter));
     table->setItem(ADD_RANGE_ROW, BINDING_COLUMN, new TableWidgetItem("Remove Selected Range", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black), "Double click to remove the selected range"));
     table->setItem(ADD_RANGE_ROW, VALUE_COLUMN, new TableWidgetItem("Edit Selected Range", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black), "Double click to edit the selected range"));
     topLyt->addWidget(table, 1, 0, 8, 3);

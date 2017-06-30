@@ -46,7 +46,7 @@ BSCyclicBlendTransitionGeneratorUI::BSCyclicBlendTransitionGeneratorUI()
       groupBox(new QGroupBox("BSCyclicBlendTransitionGenerator")),
       eventUI(new EventUI),
       topLyt(new QGridLayout),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       eventToFreezeBlendValue(new CheckButtonCombo("Click to edit")),
       eventToCrossBlend(new CheckButtonCombo("Click to edit")),

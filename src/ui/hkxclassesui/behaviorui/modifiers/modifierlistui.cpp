@@ -89,7 +89,7 @@ ModifierListUI::ModifierListUI()
     : behaviorView(NULL),
       bsData(NULL),
       topLyt(new QGridLayout),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       enable(new CheckBox),
       typeSelectorCB(new ComboBox)
@@ -114,7 +114,7 @@ ModifierListUI::ModifierListUI()
     table->setItem(ENABLE_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     //table->setItem(ENABLE_ROW, VALUE_COLUMN, new TableWidgetItem("", Qt::AlignCenter, QColor(Qt::lightGray)));
     table->setCellWidget(ENABLE_ROW, VALUE_COLUMN, enable);
-    table->setItem(ADD_MODIFIER_ROW, NAME_COLUMN, new TableWidgetItem("Add Generator", Qt::AlignCenter, QColor(Qt::green), QBrush(Qt::black), "Double click to add a new modifier of the type specified in the adjacent combo box"));
+    table->setItem(ADD_MODIFIER_ROW, NAME_COLUMN, new TableWidgetItem("Add Modifier", Qt::AlignCenter, QColor(Qt::green), QBrush(Qt::black), "Double click to add a new modifier of the type specified in the adjacent combo box"));
     table->setCellWidget(ADD_MODIFIER_ROW, TYPE_COLUMN, typeSelectorCB);
     table->setItem(ADD_MODIFIER_ROW, BINDING_COLUMN, new TableWidgetItem("Remove Selected Modifier", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black), "Double click to remove the selected modifier"));
     table->setItem(ADD_MODIFIER_ROW, VALUE_COLUMN, new TableWidgetItem("Change Selected Modifier", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black), "Double click to change the selected modifier"));
@@ -187,7 +187,7 @@ void ModifierListUI::setRowItems(int row, const QString & name, const QString & 
     if (table->item(row, NAME_COLUMN)){
         table->item(row, NAME_COLUMN)->setText(name);
     }else{
-        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name, Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::cyan), QBrush(Qt::black), DRAG_DROP_N_SWAP));
+        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name, Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::white), QBrush(Qt::black), DRAG_DROP_N_SWAP));
     }
     if (table->item(row, TYPE_COLUMN)){
         table->item(row, TYPE_COLUMN)->setText(classname);

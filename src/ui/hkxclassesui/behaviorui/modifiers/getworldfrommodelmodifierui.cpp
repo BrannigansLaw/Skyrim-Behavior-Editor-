@@ -1,7 +1,7 @@
-#include "movecharactermodifierui.h"
+#include "getworldfrommodelmodifierui.h"
 
 #include "src/hkxclasses/hkxobject.h"
-#include "src/hkxclasses/behavior/modifiers/hkbmovecharactermodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbgetworldfrommodelmodifier.h"
 #include "src/hkxclasses/behavior/hkbvariablebindingset.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/ui/genericdatawidgets.h"
@@ -9,11 +9,12 @@
 #include <QGridLayout>
 #include <QHeaderView>
 
-#define BASE_NUMBER_OF_ROWS 3
+#define BASE_NUMBER_OF_ROWS 4
 
 #define NAME_ROW 0
 #define ENABLE_ROW 1
-#define OFFSET_PER_SECOND_MS_ROW 2
+#define TRANSLATION_OUT_ROW 2
+#define ROTATION_OUT_ROW 3
 
 #define NAME_COLUMN 0
 #define TYPE_COLUMN 1
@@ -22,22 +23,23 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList MoveCharacterModifierUI::headerLabels = {
+QStringList GetWorldFromModelModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
     "Value"
 };
 
-MoveCharacterModifierUI::MoveCharacterModifierUI()
+GetWorldFromModelModifierUI::GetWorldFromModelModifierUI()
     : bsData(NULL),
       topLyt(new QGridLayout),
       table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       enable(new CheckBox),
-      offsetPerSecondMS(new QuadVariableWidget)
+      translationOut(new QuadVariableWidget),
+      rotationOut(new QuadVariableWidget)
 {
-    setTitle("hkbMoveCharacterModifier");
+    setTitle("hkbGetWorldFromModelModifier");
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
     table->setHorizontalHeaderLabels(headerLabels);
@@ -49,29 +51,35 @@ MoveCharacterModifierUI::MoveCharacterModifierUI()
     table->setItem(ENABLE_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool", Qt::AlignCenter));
     table->setItem(ENABLE_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(ENABLE_ROW, VALUE_COLUMN, enable);
-    table->setItem(OFFSET_PER_SECOND_MS_ROW, NAME_COLUMN, new TableWidgetItem("offsetPerSecondMS"));
-    table->setItem(OFFSET_PER_SECOND_MS_ROW, TYPE_COLUMN, new TableWidgetItem("hkVector4", Qt::AlignCenter));
-    table->setItem(OFFSET_PER_SECOND_MS_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
-    table->setCellWidget(OFFSET_PER_SECOND_MS_ROW, VALUE_COLUMN, offsetPerSecondMS);
+    table->setItem(TRANSLATION_OUT_ROW, NAME_COLUMN, new TableWidgetItem("translationOut"));
+    table->setItem(TRANSLATION_OUT_ROW, TYPE_COLUMN, new TableWidgetItem("hkVector4", Qt::AlignCenter));
+    table->setItem(TRANSLATION_OUT_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
+    table->setCellWidget(TRANSLATION_OUT_ROW, VALUE_COLUMN, translationOut);
+    table->setItem(ROTATION_OUT_ROW, NAME_COLUMN, new TableWidgetItem("rotationOut"));
+    table->setItem(ROTATION_OUT_ROW, TYPE_COLUMN, new TableWidgetItem("hkQuaternion", Qt::AlignCenter));
+    table->setItem(ROTATION_OUT_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
+    table->setCellWidget(ROTATION_OUT_ROW, VALUE_COLUMN, rotationOut);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
 }
 
-void MoveCharacterModifierUI::connectSignals(){
+void GetWorldFromModelModifierUI::connectSignals(){
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
     connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(offsetPerSecondMS, SIGNAL(editingFinished()), this, SLOT(setOffsetPerSecondMS()), Qt::UniqueConnection);
+    connect(translationOut, SIGNAL(editingFinished()), this, SLOT(setTranslationOut()), Qt::UniqueConnection);
+    connect(rotationOut, SIGNAL(editingFinished()), this, SLOT(setRotationOut()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
 }
 
-void MoveCharacterModifierUI::disconnectSignals(){
+void GetWorldFromModelModifierUI::disconnectSignals(){
     disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
     disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(offsetPerSecondMS, SIGNAL(editingFinished()), this, SLOT(setOffsetPerSecondMS()));
+    disconnect(translationOut, SIGNAL(editingFinished()), this, SLOT(setTranslationOut()));
+    disconnect(rotationOut, SIGNAL(editingFinished()), this, SLOT(setRotationOut()));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
 }
 
-void MoveCharacterModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties){
+void GetWorldFromModelModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties){
     if (variables && properties){
         disconnect(variables, SIGNAL(elementSelected(int,QString)), 0, 0);
         disconnect(properties, SIGNAL(elementSelected(int,QString)), 0, 0);
@@ -80,37 +88,40 @@ void MoveCharacterModifierUI::connectToTables(GenericTableWidget *variables, Gen
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::connectToTables(): One or more arguments are NULL!!"))
     }
 }
 
-void MoveCharacterModifierUI::loadData(HkxObject *data){
+void GetWorldFromModelModifierUI::loadData(HkxObject *data){
     disconnectSignals();
     if (data){
-        if (data->getSignature() == HKB_MOVE_CHARACTER_MODIFIER){
+        if (data->getSignature() == HKB_GET_WORLD_FROM_MODEL_MODIFIER){
             hkbVariableBindingSet *varBind = NULL;
-            bsData = static_cast<hkbMoveCharacterModifier *>(data);
+            bsData = static_cast<hkbGetWorldFromModelModifier *>(data);
             name->setText(bsData->name);
             enable->setChecked(bsData->enable);
-            offsetPerSecondMS->setValue(bsData->offsetPerSecondMS);
+            translationOut->setValue(bsData->translationOut);
+            rotationOut->setValue(bsData->rotationOut);
             varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(OFFSET_PER_SECOND_MS_ROW, BINDING_COLUMN, varBind, "offsetPerSecondMS");
+                loadBinding(TRANSLATION_OUT_ROW, BINDING_COLUMN, varBind, "translationOut");
+                loadBinding(ROTATION_OUT_ROW, BINDING_COLUMN, varBind, "rotationOut");
             }else{
                 table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(OFFSET_PER_SECOND_MS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
+                table->item(TRANSLATION_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
+                table->item(ROTATION_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::loadData(): The data is an incorrect type!!"));
+            CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::loadData(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
 
-void MoveCharacterModifierUI::setName(){
+void GetWorldFromModelModifierUI::setName(){
     if (bsData){
         if (bsData->name != name->text()){
             bsData->name = name->text();
@@ -119,33 +130,44 @@ void MoveCharacterModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::setName(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setName(): The data is NULL!!"));
     }
 }
 
-void MoveCharacterModifierUI::setEnable(){
+void GetWorldFromModelModifierUI::setEnable(){
     if (bsData){
         if (bsData->enable != enable->isChecked()){
             bsData->enable = enable->isChecked();
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::setEnable(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
-void MoveCharacterModifierUI::setOffsetPerSecondMS(){
+void GetWorldFromModelModifierUI::setTranslationOut(){
     if (bsData){
-        if (bsData->offsetPerSecondMS != offsetPerSecondMS->value()){
-            bsData->offsetPerSecondMS = offsetPerSecondMS->value();
+        if (bsData->translationOut != translationOut->value()){
+            bsData->translationOut = translationOut->value();
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::setLimitAngleDegrees(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::settranslationOut(): The data is NULL!!"));
     }
 }
 
-void MoveCharacterModifierUI::viewSelected(int row, int column){
+void GetWorldFromModelModifierUI::setRotationOut(){
+    if (bsData){
+        if (bsData->rotationOut != rotationOut->value()){
+            bsData->rotationOut = rotationOut->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setrotationOut(): The data is NULL!!"));
+    }
+}
+
+void GetWorldFromModelModifierUI::viewSelected(int row, int column){
     if (bsData){
         bool isProperty = false;
         if (column == BINDING_COLUMN){
@@ -156,22 +178,28 @@ void MoveCharacterModifierUI::viewSelected(int row, int column){
                 }
                 selectTableToView(isProperty, "enable");
                 break;
-            case OFFSET_PER_SECOND_MS_ROW:
-                if (table->item(OFFSET_PER_SECOND_MS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
+            case TRANSLATION_OUT_ROW:
+                if (table->item(TRANSLATION_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                     isProperty = true;
                 }
-                selectTableToView(isProperty, "offsetPerSecondMS");
+                selectTableToView(isProperty, "translationOut");
+                break;
+            case ROTATION_OUT_ROW:
+                if (table->item(ROTATION_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
+                    isProperty = true;
+                }
+                selectTableToView(isProperty, "rotationOut");
                 break;
             default:
                 return;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
     }
 }
 
-void MoveCharacterModifierUI::selectTableToView(bool viewisProperty, const QString & path){
+void GetWorldFromModelModifierUI::selectTableToView(bool viewisProperty, const QString & path){
     if (bsData){
         if (viewisProperty){
             if (bsData->variableBindingSet.data()){
@@ -187,11 +215,11 @@ void MoveCharacterModifierUI::selectTableToView(bool viewisProperty, const QStri
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::selectTableToView(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
-void MoveCharacterModifierUI::variableRenamed(const QString & name, int index){
+void GetWorldFromModelModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
         hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
@@ -200,17 +228,21 @@ void MoveCharacterModifierUI::variableRenamed(const QString & name, int index){
             if (bindIndex == index){
                 table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
             }
-            bindIndex = bind->getVariableIndexOfBinding("offsetPerSecondMS");
+            bindIndex = bind->getVariableIndexOfBinding("translationOut");
             if (bindIndex == index){
-                table->item(OFFSET_PER_SECOND_MS_ROW, BINDING_COLUMN)->setText(name);
+                table->item(TRANSLATION_OUT_ROW, BINDING_COLUMN)->setText(name);
+            }
+            bindIndex = bind->getVariableIndexOfBinding("rotationOut");
+            if (bindIndex == index){
+                table->item(ROTATION_OUT_ROW, BINDING_COLUMN)->setText(name);
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
     }
 }
 
-bool MoveCharacterModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
+bool GetWorldFromModelModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
     hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
     if (bsData){
         if (index == 0){
@@ -224,11 +256,11 @@ bool MoveCharacterModifierUI::setBinding(int index, int row, const QString &vari
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -237,12 +269,12 @@ bool MoveCharacterModifierUI::setBinding(int index, int row, const QString &vari
             WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::setBinding(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
 
-void MoveCharacterModifierUI::setBindingVariable(int index, const QString &name){
+void GetWorldFromModelModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
         bool isProperty = false;
         int row = table->currentRow();
@@ -253,22 +285,28 @@ void MoveCharacterModifierUI::setBindingVariable(int index, const QString &name)
             }
             setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
             break;
-        case OFFSET_PER_SECOND_MS_ROW:
-            if (table->item(OFFSET_PER_SECOND_MS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
+        case TRANSLATION_OUT_ROW:
+            if (table->item(TRANSLATION_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                 isProperty = true;
             }
-            setBinding(index, row, name, "offsetPerSecondMS", VARIABLE_TYPE_VECTOR4, isProperty);
+            setBinding(index, row, name, "translationOut", VARIABLE_TYPE_VECTOR4, isProperty);
+            break;
+        case ROTATION_OUT_ROW:
+            if (table->item(ROTATION_OUT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
+                isProperty = true;
+            }
+            setBinding(index, row, name, "rotationOut", VARIABLE_TYPE_QUATERNION, isProperty);
             break;
         default:
             return;
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::setBindingVariable(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
-void MoveCharacterModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void GetWorldFromModelModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -286,9 +324,9 @@ void MoveCharacterModifierUI::loadBinding(int row, int colunm, hkbVariableBindin
                 table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::loadBinding(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

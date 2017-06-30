@@ -51,7 +51,7 @@ StateUI::StateUI()
       topLyt(new QGridLayout),
       transitionUI(new TransitionsUI()),
       eventUI(new EventUI()),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       returnPB(new QPushButton("Return")),
       name(new LineEdit),
       stateId(new SpinBox),

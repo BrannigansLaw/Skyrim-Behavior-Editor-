@@ -6,6 +6,7 @@
 class hkbGetWorldFromModelModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class GetWorldFromModelModifierUI;
 public:
     hkbGetWorldFromModelModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbGetWorldFromModelModifier();

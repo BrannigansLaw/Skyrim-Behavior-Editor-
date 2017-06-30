@@ -58,7 +58,7 @@ BSBoneSwitchGeneratorUI::BSBoneSwitchGeneratorUI()
       childUI(new BSBoneSwitchGeneratorBoneDataUI),
       topLyt(new QGridLayout),
       typeSelectorCB(new ComboBox),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit)
 {
     typeSelectorCB->insertItems(0, types);

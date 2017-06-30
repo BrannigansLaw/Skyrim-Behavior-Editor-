@@ -65,6 +65,7 @@ private:
     QAction *openProjectA;
     QAction *saveA;
     QAction *exportToSkyrimDirA;
+    QAction *exportCurrentFileA;
     QAction *saveProjectA;
     QAction *exitA;
     QMenu *viewM;
@@ -96,7 +97,8 @@ private slots:
     void refocus();
     void save();
     void saveProject();
-    void packAndExportToSkyrimDirectory();
+    void packAndExportProjectToSkyrimDirectory();
+    void packAndExportFileToSkyrimDirectory();
     //void saveAs();
     void exit();
     void changedTabs(int index);
@@ -109,7 +111,7 @@ private:
     bool openBehavior(const QString & filename);
     bool exitProgram();
     bool findSkyrimDirectory();
-    MainWindow::HKXCMD_RETURN packHKX(const QString &filepath, const QString &outputDirectory);
+    MainWindow::HKXCMD_RETURN hkxcmd(const QString &filepath, const QString &outputDirectory, const QString &flags = "-f SAVE_CONCISE");
     //void drawIcons();
     void readSettings();
     void writeSettings();

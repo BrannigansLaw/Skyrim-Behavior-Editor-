@@ -6,6 +6,7 @@
 class hkbGetUpModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class GetUpModifierUI;
 public:
     hkbGetUpModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbGetUpModifier();

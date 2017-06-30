@@ -174,7 +174,7 @@ public:
 class TableWidgetItem: public QTableWidgetItem
 {
 public:
-    TableWidgetItem(const QString & text, int align = Qt::AlignLeft | Qt::AlignVCenter, const QColor & backgroundColor = QColor(Qt::cyan), const QBrush & textColor = QBrush(Qt::black), const QString & tip = "", bool checkable = false)
+    TableWidgetItem(const QString & text, int align = Qt::AlignLeft | Qt::AlignVCenter, const QColor & backgroundColor = QColor(Qt::white), const QBrush & textColor = QBrush(Qt::black), const QString & tip = "", bool checkable = false)
         : QTableWidgetItem(text)
     {
         if (checkable){

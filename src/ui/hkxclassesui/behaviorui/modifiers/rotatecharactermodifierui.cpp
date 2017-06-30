@@ -34,14 +34,14 @@ QStringList RotateCharacterModifierUI::headerLabels = {
 RotateCharacterModifierUI::RotateCharacterModifierUI()
     : bsData(NULL),
       topLyt(new QGridLayout),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       enable(new CheckBox),
       degreesPerSecond(new DoubleSpinBox),
       speedMultiplier(new DoubleSpinBox),
       axisOfRotation(new QuadVariableWidget)
 {
-    setTitle("hkbMoveCharacterModifier");
+    setTitle("hkbRotateCharacterModifier");
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
     table->setHorizontalHeaderLabels(headerLabels);

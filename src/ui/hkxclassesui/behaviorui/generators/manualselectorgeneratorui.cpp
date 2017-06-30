@@ -51,7 +51,7 @@ ManualSelectorGeneratorUI::ManualSelectorGeneratorUI()
     : behaviorView(NULL),
       bsData(NULL),
       topLyt(new QGridLayout),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       typeSelectorCB(new ComboBox),
       selectedGeneratorIndex(new SpinBox),
@@ -160,7 +160,7 @@ void ManualSelectorGeneratorUI::setRowItems(int row, const QString & name, const
     if (table->item(row, NAME_COLUMN)){
         table->item(row, NAME_COLUMN)->setText(name);
     }else{
-        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name, Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::cyan), QBrush(Qt::black), DRAG_DROP_N_SWAP));
+        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name, Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::white), QBrush(Qt::black), DRAG_DROP_N_SWAP));
     }
     if (table->item(row, TYPE_COLUMN)){
         table->item(row, TYPE_COLUMN)->setText(classname);

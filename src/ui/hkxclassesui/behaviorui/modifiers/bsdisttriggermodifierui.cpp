@@ -37,7 +37,7 @@ QStringList BSDistTriggerModifierUI::headerLabels = {
 BSDistTriggerModifierUI::BSDistTriggerModifierUI()
     : bsData(NULL),
       topLyt(new QGridLayout),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       enable(new CheckBox),
       targetPosition(new QuadVariableWidget),

@@ -183,7 +183,9 @@ SOURCES += \
     src/ui/hkxclassesui/behaviorui/modifiers/bscomputeaddboneanimmodifierui.cpp \
     src/ui/hkxclassesui/behaviorui/modifiers/bsdisttriggermodifierui.cpp \
     src/ui/hkxclassesui/behaviorui/modifiers/bsinterpvaluemodifierui.cpp \
-    src/ui/hkxclassesui/behaviorui/modifiers/computerotationtotargetmodifierui.cpp
+    src/ui/hkxclassesui/behaviorui/modifiers/computerotationtotargetmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/getupmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/getworldfrommodelmodifierui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -349,4 +351,6 @@ HEADERS  += \
     src/ui/hkxclassesui/behaviorui/modifiers/bscomputeaddboneanimmodifierui.h \
     src/ui/hkxclassesui/behaviorui/modifiers/bsdisttriggermodifierui.h \
     src/ui/hkxclassesui/behaviorui/modifiers/bsinterpvaluemodifierui.h \
-    src/ui/hkxclassesui/behaviorui/modifiers/computerotationtotargetmodifierui.h
+    src/ui/hkxclassesui/behaviorui/modifiers/computerotationtotargetmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/getupmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/getworldfrommodelmodifierui.h

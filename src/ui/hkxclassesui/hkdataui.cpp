@@ -45,6 +45,8 @@
 #include "src/ui/hkxclassesui/behaviorui/modifiers/bscomputeaddboneanimmodifierui.h"
 #include "src/ui/hkxclassesui/behaviorui/modifiers/bsdisttriggermodifierui.h"
 #include "src/ui/hkxclassesui/behaviorui/modifiers/bsinterpvaluemodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/getupmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/getworldfrommodelmodifierui.h"
 
 #include "src/ui/hkxclassesui/behaviorui/expressiondataarrayui.h"
 
@@ -173,7 +175,9 @@ HkDataUI::HkDataUI(const QString &title)
       computeDirMod(new ComputeDirectionModifierUI),
       computeAddAnimUI(new BSComputeAddBoneAnimModifierUI),
       distTriggerModUI(new BSDistTriggerModifierUI),
-      interpValueModUI(new BSInterpValueModifierUI)
+      interpValueModUI(new BSInterpValueModifierUI),
+      getUpModUI(new GetUpModifierUI),
+      getWorldFromModelModUI(new GetWorldFromModelModifierUI)
 {
     setTitle(title);
     stack->addWidget(noDataL);
@@ -206,6 +210,8 @@ HkDataUI::HkDataUI(const QString &title)
     stack->addWidget(computeAddAnimUI);
     stack->addWidget(distTriggerModUI);
     stack->addWidget(interpValueModUI);
+    stack->addWidget(getUpModUI);
+    stack->addWidget(getWorldFromModelModUI);
     verLyt->addLayout(stack, 5);
     setLayout(verLyt);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -239,6 +245,8 @@ HkDataUI::HkDataUI(const QString &title)
     connect(computeAddAnimUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(distTriggerModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(interpValueModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(getUpModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(getWorldFromModelModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
 
     connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
     connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
@@ -508,6 +516,12 @@ void HkDataUI::variableNameChanged(const QString & newName, int index){
     case DATA_TYPE_LOADED::BS_INTERP_VALUE_MODIFIER:
         interpValueModUI->variableRenamed(newName, index);
         break;
+    case DATA_TYPE_LOADED::GET_UP_MODIFIER:
+        getUpModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::GET_WORLD_FROM_MODEL_MODIFIER:
+        getWorldFromModelModUI->variableRenamed(newName, index);
+        break;
     }
 }
 
@@ -667,6 +681,12 @@ void HkDataUI::variableRemoved(int index){
         break;
     case DATA_TYPE_LOADED::BS_INTERP_VALUE_MODIFIER:
         interpValueModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::GET_UP_MODIFIER:
+        getUpModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::GET_WORLD_FROM_MODEL_MODIFIER:
+        getWorldFromModelModUI->variableRenamed("NONE", index);
         break;
     }
     behaviorView->behavior->removeBindings(index);
@@ -881,6 +901,20 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             }
             stack->setCurrentIndex(DATA_TYPE_LOADED::BS_INTERP_VALUE_MODIFIER);
             interpValueModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_GET_UP_MODIFIER:
+            if (loadedData != oldData){
+                getUpModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::GET_UP_MODIFIER);
+            getUpModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_GET_WORLD_FROM_MODEL_MODIFIER:
+            if (loadedData != oldData){
+                getWorldFromModelModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::GET_WORLD_FROM_MODEL_MODIFIER);
+            getWorldFromModelModUI->connectToTables(variablesTable, characterPropertiesTable);
             break;
         default:
             unloadDataWidget();

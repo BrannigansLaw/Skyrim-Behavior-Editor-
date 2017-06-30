@@ -42,7 +42,7 @@ QStringList ComputeDirectionModifierUI::headerLabels = {
 ComputeDirectionModifierUI::ComputeDirectionModifierUI()
     : bsData(NULL),
       topLyt(new QGridLayout),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       enable(new CheckBox),
       pointIn(new QuadVariableWidget),

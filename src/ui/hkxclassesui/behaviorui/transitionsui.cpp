@@ -57,7 +57,7 @@ TransitionsUI::TransitionsUI()
       returnPB(new QPushButton("Return")),
       topLyt(new QGridLayout),
       groupBox(new QGroupBox("hkbStateMachineTransitionInfoArray")),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       enterTimeTI(new DoubleSpinBox),
       exitTimeTI(new DoubleSpinBox),
       enterTimeII(new DoubleSpinBox),

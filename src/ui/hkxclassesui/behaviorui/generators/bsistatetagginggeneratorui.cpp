@@ -37,7 +37,7 @@ BSiStateTaggingGeneratorUI::BSiStateTaggingGeneratorUI()
     : behaviorView(NULL),
       bsData(NULL),
       topLyt(new QGridLayout),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       iStateToSetAs(new SpinBox),
       iPriority(new SpinBox)

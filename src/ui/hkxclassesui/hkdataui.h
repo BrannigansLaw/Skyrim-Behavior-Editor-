@@ -50,6 +50,8 @@ class ComputeDirectionModifierUI;
 class BSComputeAddBoneAnimModifierUI;
 class BSDistTriggerModifierUI;
 class BSInterpValueModifierUI;
+class GetUpModifierUI;
+class GetWorldFromModelModifierUI;
 
 /**
  * To add support for a new class we need to add it to the "DATA_TYPE_LOADED" enum, add it to the stacked layout in the correct order,
@@ -117,7 +119,9 @@ private:
         COMPUTE_DIRECTION_MODIFIER,
         BS_COMPUTE_ADD_BONE_ANIM_MODIFIER,
         BS_DIST_TRIGGER_MODIFER,
-        BS_INTERP_VALUE_MODIFIER
+        BS_INTERP_VALUE_MODIFIER,
+        GET_UP_MODIFIER,
+        GET_WORLD_FROM_MODEL_MODIFIER
     };
     static QStringList generatorTypes;
     static QStringList modifierTypes;
@@ -165,6 +169,8 @@ private:
     BSComputeAddBoneAnimModifierUI *computeAddAnimUI;
     BSDistTriggerModifierUI *distTriggerModUI;
     BSInterpValueModifierUI *interpValueModUI;
+    GetUpModifierUI *getUpModUI;
+    GetWorldFromModelModifierUI *getWorldFromModelModUI;
 };
 
 #endif // HKDATAUI_H

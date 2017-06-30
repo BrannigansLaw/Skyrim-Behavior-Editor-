@@ -41,7 +41,7 @@ BSBoneSwitchGeneratorBoneDataUI::BSBoneSwitchGeneratorBoneDataUI()
       topLyt(new QGridLayout),
       groupBox(new QGroupBox("BSBoneSwitchGeneratorBoneData")),
       returnPB(new QPushButton("Return")),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       spBoneWeight(new CheckButtonCombo("Click to edit")),
       boneWeightArrayUI(new BoneWeightArrayUI)
 {

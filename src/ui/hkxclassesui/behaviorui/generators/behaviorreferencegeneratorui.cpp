@@ -29,7 +29,7 @@ QStringList BehaviorReferenceGeneratorUI::headerLabels = {
 BehaviorReferenceGeneratorUI::BehaviorReferenceGeneratorUI()
     : bsData(NULL),
       topLyt(new QGridLayout),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       behaviorName(new ComboBox)
 {

@@ -75,7 +75,7 @@ StateMachineUI::StateMachineUI()
       eventUI(new EventUI),
       stateUI(new StateUI),
       transitionUI(new TransitionsUI),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       typeSelectorCB(new ComboBox),
       name(new LineEdit),
       startStateId(new ComboBox),

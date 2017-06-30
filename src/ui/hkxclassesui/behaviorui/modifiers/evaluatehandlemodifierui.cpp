@@ -38,7 +38,7 @@ QStringList EvaluateHandleModifierUI::headerLabels = {
 EvaluateHandleModifierUI::EvaluateHandleModifierUI()
     : bsData(NULL),
       topLyt(new QGridLayout),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       enable(new CheckBox),
       handlePositionOut(new QuadVariableWidget),

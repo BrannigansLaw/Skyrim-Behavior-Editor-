@@ -39,7 +39,7 @@ BSOffsetAnimationGeneratorUI::BSOffsetAnimationGeneratorUI()
     : behaviorView(NULL),
       bsData(NULL),
       topLyt(new QGridLayout),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       fOffsetVariable(new DoubleSpinBox),
       fOffsetRangeStart(new DoubleSpinBox),

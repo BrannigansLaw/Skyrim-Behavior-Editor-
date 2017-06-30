@@ -70,7 +70,7 @@ BlenderGeneratorUI::BlenderGeneratorUI()
       childUI(new BlenderGeneratorChildUI),
       topLyt(new QGridLayout),
       typeSelectorCB(new ComboBox),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       referencePoseWeightThreshold(new DoubleSpinBox),
       blendParameter(new DoubleSpinBox),

@@ -56,7 +56,7 @@ ClipGeneratorUI::ClipGeneratorUI()
       triggerUI(new ClipTriggerUI),
       groupBox(new QGroupBox),
       topLyt(new QGridLayout),
-      table(new TableWidget(QColor(Qt::cyan))),
+      table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       cropStartAmountLocalTime(new DoubleSpinBox),
       cropEndAmountLocalTime(new DoubleSpinBox),
