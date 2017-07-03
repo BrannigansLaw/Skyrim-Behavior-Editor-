@@ -27,6 +27,7 @@ class CheckBox: public QWidget
     Q_OBJECT
 signals:
     void released();
+    void clicked(bool b);
 public:
     CheckBox(const QString & text = "", QWidget *parent = NULL)
         : QWidget(parent),
@@ -38,6 +39,7 @@ public:
         lyt->addSpacing(1);
         setLayout(lyt);
         connect(checkbox, SIGNAL(released()), this,  SIGNAL(released()));
+        connect(checkbox, SIGNAL(clicked(bool)), this, SIGNAL(clicked(bool)));
     }
 
     void setChecked(bool checked){

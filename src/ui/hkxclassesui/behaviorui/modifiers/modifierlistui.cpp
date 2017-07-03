@@ -144,7 +144,7 @@ void ModifierListUI::loadData(HkxObject *data){
         if (data->getSignature() == HKB_MODIFIER_LIST){
             bsData = static_cast<hkbModifierList *>(data);
             name->setText(bsData->name);
-            enable->setEnabled(bsData->enable);
+            enable->setChecked(bsData->enable);
             varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");

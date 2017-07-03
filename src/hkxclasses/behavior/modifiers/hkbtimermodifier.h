@@ -6,6 +6,7 @@
 class hkbTimerModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class TimerModifierUI;
 public:
     hkbTimerModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbTimerModifier();

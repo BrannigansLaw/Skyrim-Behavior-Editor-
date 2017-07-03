@@ -47,6 +47,13 @@
 #include "src/ui/hkxclassesui/behaviorui/modifiers/bsinterpvaluemodifierui.h"
 #include "src/ui/hkxclassesui/behaviorui/modifiers/getupmodifierui.h"
 #include "src/ui/hkxclassesui/behaviorui/modifiers/getworldfrommodelmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/twistmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/timermodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/dampingmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/rigidbodyragdollcontrolsmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/poweredragdollcontrolsmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/combinetransformsmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/computerotationfromaxisanglemodifierui.h"
 
 #include "src/ui/hkxclassesui/behaviorui/expressiondataarrayui.h"
 
@@ -146,6 +153,7 @@ HkDataUI::HkDataUI(const QString &title)
       eventsTable(new GenericTableWidget("Select an Event!")),
       characterPropertiesTable(new GenericTableWidget("Select a Character Property!")),
       animationsTable(new GenericTableWidget("Select an Animation!")),
+      ragdollBonesTable(new GenericTableWidget("Select a Ragdoll Bone!")),
       noDataL(new QLabel("No Data Selected!")),
       iStateTagGenUI(new BSiStateTaggingGeneratorUI),
       modGenUI(new ModifierGeneratorUI),
@@ -177,7 +185,14 @@ HkDataUI::HkDataUI(const QString &title)
       distTriggerModUI(new BSDistTriggerModifierUI),
       interpValueModUI(new BSInterpValueModifierUI),
       getUpModUI(new GetUpModifierUI),
-      getWorldFromModelModUI(new GetWorldFromModelModifierUI)
+      getWorldFromModelModUI(new GetWorldFromModelModifierUI),
+      twistModUI(new TwistModifierUI),
+      timerModUI(new TimerModifierUI),
+      dampingModUI(new DampingModifierUI),
+      rigidRagdollControlsModUI(new RigidBodyRagdollControlsModifierUI),
+      poweredRagdollControlsModUI(new PoweredRagdollControlsModifierUI),
+      combineTransModUI(new CombineTransformsModifierUI),
+      computeRotationAxisAngleModUI(new ComputeRotationFromAxisAngleModifierUI)
 {
     setTitle(title);
     stack->addWidget(noDataL);
@@ -212,9 +227,17 @@ HkDataUI::HkDataUI(const QString &title)
     stack->addWidget(interpValueModUI);
     stack->addWidget(getUpModUI);
     stack->addWidget(getWorldFromModelModUI);
+    stack->addWidget(twistModUI);
+    stack->addWidget(timerModUI);
+    stack->addWidget(dampingModUI);
+    stack->addWidget(rigidRagdollControlsModUI);
+    stack->addWidget(poweredRagdollControlsModUI);
+    stack->addWidget(combineTransModUI);
+    stack->addWidget(computeRotationAxisAngleModUI);
     verLyt->addLayout(stack, 5);
     setLayout(verLyt);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     connect(stateMachineUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
     connect(modGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
     connect(manSelGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
@@ -247,6 +270,13 @@ HkDataUI::HkDataUI(const QString &title)
     connect(interpValueModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(getUpModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(getWorldFromModelModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(twistModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(timerModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(dampingModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(rigidRagdollControlsModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(poweredRagdollControlsModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(combineTransModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(computeRotationAxisAngleModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
 
     connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
     connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
@@ -280,6 +310,7 @@ void HkDataUI::unloadDataWidget(){
     disconnect(generatorsTable, SIGNAL(elementSelected(int,QString)), 0, 0);
     disconnect(modifiersTable, SIGNAL(elementSelected(int,QString)), 0, 0);
     disconnect(eventsTable, SIGNAL(elementSelected(int,QString)), 0, 0);
+    disconnect(ragdollBonesTable, SIGNAL(elementSelected(int,QString)), 0, 0);
     loadedData = NULL;
     stack->setCurrentIndex(DATA_TYPE_LOADED::NO_DATA_SELECTED);
 }
@@ -522,6 +553,27 @@ void HkDataUI::variableNameChanged(const QString & newName, int index){
     case DATA_TYPE_LOADED::GET_WORLD_FROM_MODEL_MODIFIER:
         getWorldFromModelModUI->variableRenamed(newName, index);
         break;
+    case DATA_TYPE_LOADED::TWIST_MODIFIER:
+        twistModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::TIMER_MODIFIER:
+        timerModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::DAMPING_MODIFIER:
+        dampingModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER:
+        rigidRagdollControlsModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::POWERED_RAGDOLL_CONTROLS_MODIFIER:
+        poweredRagdollControlsModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::COMBINE_TRANSFORMS_MODIFIER:
+        combineTransModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER:
+        computeRotationAxisAngleModUI->variableRenamed(newName, index);
+        break;
     }
 }
 
@@ -687,6 +739,27 @@ void HkDataUI::variableRemoved(int index){
         break;
     case DATA_TYPE_LOADED::GET_WORLD_FROM_MODEL_MODIFIER:
         getWorldFromModelModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::TWIST_MODIFIER:
+        twistModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::TIMER_MODIFIER:
+        timerModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::DAMPING_MODIFIER:
+        dampingModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER:
+        rigidRagdollControlsModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::POWERED_RAGDOLL_CONTROLS_MODIFIER:
+        poweredRagdollControlsModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::COMBINE_TRANSFORMS_MODIFIER:
+        combineTransModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER:
+        computeRotationAxisAngleModUI->variableRenamed("NONE", index);
         break;
     }
     behaviorView->behavior->removeBindings(index);
@@ -916,6 +989,55 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             stack->setCurrentIndex(DATA_TYPE_LOADED::GET_WORLD_FROM_MODEL_MODIFIER);
             getWorldFromModelModUI->connectToTables(variablesTable, characterPropertiesTable);
             break;
+        case HkxSignature::HKB_TWIST_MODIFIER:
+            if (loadedData != oldData){
+                twistModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::TWIST_MODIFIER);
+            twistModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_TIMER_MODIFIER:
+            if (loadedData != oldData){
+                timerModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::TIMER_MODIFIER);
+            timerModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
+            break;
+        case HkxSignature::HKB_DAMPING_MODIFIER:
+            if (loadedData != oldData){
+                dampingModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::DAMPING_MODIFIER);
+            dampingModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER:
+            if (loadedData != oldData){
+                rigidRagdollControlsModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER);
+            rigidRagdollControlsModUI->connectToTables(variablesTable, characterPropertiesTable, ragdollBonesTable);
+            break;
+        case HkxSignature::HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER:
+            if (loadedData != oldData){
+                poweredRagdollControlsModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::POWERED_RAGDOLL_CONTROLS_MODIFIER);
+            poweredRagdollControlsModUI->connectToTables(variablesTable, characterPropertiesTable, ragdollBonesTable);
+            break;
+        case HkxSignature::HKB_COMBINE_TRANSFORMS_MODIFIER:
+            if (loadedData != oldData){
+                combineTransModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::COMBINE_TRANSFORMS_MODIFIER);
+            combineTransModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER:
+            if (loadedData != oldData){
+                computeRotationAxisAngleModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER);
+            computeRotationAxisAngleModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
         default:
             unloadDataWidget();
         }
@@ -950,8 +1072,9 @@ BehaviorGraphView *HkDataUI::loadBehaviorView(BehaviorGraphView *view){
         generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "NULL");
         modifiersTable->loadTable(behaviorView->behavior->getModifierNames(), behaviorView->behavior->getModifierTypeNames(), "NULL");
         variablesTable->loadTable(behaviorView->behavior->getVariableNames(), behaviorView->behavior->getVariableTypenames(), "NONE");
-        animationsTable->loadTable(behaviorView->behavior->getAnimationNames(), "hkStringPtr", "NONE");
+        animationsTable->loadTable(behaviorView->behavior->getAnimationNames(), "hkStringPtr", "NONE");//inefficient...
         eventsTable->loadTable(behaviorView->behavior->getEventNames(), "hkEvent", "NONE");
+        ragdollBonesTable->loadTable(behaviorView->behavior->getRagdollBoneNames(), "hkInt32", "NONE");//inefficient...
         characterPropertiesTable->loadTable(behaviorView->behavior->getCharacterPropertyNames(), behaviorView->behavior->getCharacterPropertyTypenames(), "NONE");//inefficient...
         connect(behaviorView, SIGNAL(addedGenerator(QString,QString)), this, SLOT(generatorAdded(QString,QString)), Qt::UniqueConnection);
         connect(behaviorView, SIGNAL(addedModifier(QString,QString)), this, SLOT(modifierAdded(QString,QString)), Qt::UniqueConnection);

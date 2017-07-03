@@ -6,6 +6,7 @@
 class hkbCombineTransformsModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class CombineTransformsModifierUI;
 public:
     hkbCombineTransformsModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbCombineTransformsModifier();

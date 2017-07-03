@@ -185,7 +185,15 @@ SOURCES += \
     src/ui/hkxclassesui/behaviorui/modifiers/bsinterpvaluemodifierui.cpp \
     src/ui/hkxclassesui/behaviorui/modifiers/computerotationtotargetmodifierui.cpp \
     src/ui/hkxclassesui/behaviorui/modifiers/getupmodifierui.cpp \
-    src/ui/hkxclassesui/behaviorui/modifiers/getworldfrommodelmodifierui.cpp
+    src/ui/hkxclassesui/behaviorui/modifiers/getworldfrommodelmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/twistmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/timermodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/dampingmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/rigidbodyragdollcontrolsmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/boneindexarrayui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/poweredragdollcontrolsmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/combinetransformsmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/computerotationfromaxisanglemodifierui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -353,4 +361,12 @@ HEADERS  += \
     src/ui/hkxclassesui/behaviorui/modifiers/bsinterpvaluemodifierui.h \
     src/ui/hkxclassesui/behaviorui/modifiers/computerotationtotargetmodifierui.h \
     src/ui/hkxclassesui/behaviorui/modifiers/getupmodifierui.h \
-    src/ui/hkxclassesui/behaviorui/modifiers/getworldfrommodelmodifierui.h
+    src/ui/hkxclassesui/behaviorui/modifiers/getworldfrommodelmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/twistmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/timermodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/dampingmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/rigidbodyragdollcontrolsmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/boneindexarrayui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/poweredragdollcontrolsmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/combinetransformsmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/computerotationfromaxisanglemodifierui.h

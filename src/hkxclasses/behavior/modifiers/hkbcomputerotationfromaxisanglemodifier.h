@@ -6,6 +6,7 @@
 class hkbComputeRotationFromAxisAngleModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class ComputeRotationFromAxisAngleModifierUI;
 public:
     hkbComputeRotationFromAxisAngleModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbComputeRotationFromAxisAngleModifier();

@@ -83,17 +83,17 @@ BSOffsetAnimationGeneratorUI::BSOffsetAnimationGeneratorUI()
 
 void BSOffsetAnimationGeneratorUI::connectSignals(){
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(fOffsetVariable, SIGNAL(clicked(bool)), this, SLOT(setFOffsetVariable()), Qt::UniqueConnection);
+    connect(fOffsetVariable, SIGNAL(editingFinished()), this, SLOT(setFOffsetVariable()), Qt::UniqueConnection);
     connect(fOffsetRangeStart, SIGNAL(editingFinished()), this, SLOT(setFOffsetRangeStart()), Qt::UniqueConnection);
-    connect(fOffsetRangeEnd, SIGNAL(clicked(bool)), this, SLOT(setFOffsetRangeEnd()), Qt::UniqueConnection);
+    connect(fOffsetRangeEnd, SIGNAL(editingFinished()), this, SLOT(setFOffsetRangeEnd()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
 }
 
 void BSOffsetAnimationGeneratorUI::disconnectSignals(){
     disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(fOffsetVariable, SIGNAL(clicked(bool)), this, SLOT(setFOffsetVariable()));
+    disconnect(fOffsetVariable, SIGNAL(editingFinished()), this, SLOT(setFOffsetVariable()));
     disconnect(fOffsetRangeStart, SIGNAL(editingFinished()), this, SLOT(setFOffsetRangeStart()));
-    disconnect(fOffsetRangeEnd, SIGNAL(clicked(bool)), this, SLOT(setFOffsetRangeEnd()));
+    disconnect(fOffsetRangeEnd, SIGNAL(editingFinished()), this, SLOT(setFOffsetRangeEnd()));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
 }
 

@@ -93,7 +93,7 @@ ManualSelectorGeneratorUI::ManualSelectorGeneratorUI()
 
 void ManualSelectorGeneratorUI::connectSignals(){
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(selectedGeneratorIndex, SIGNAL(clicked(bool)), this, SLOT(setSelectedGeneratorIndex()), Qt::UniqueConnection);
+    connect(selectedGeneratorIndex, SIGNAL(editingFinished()), this, SLOT(setSelectedGeneratorIndex()), Qt::UniqueConnection);
     connect(currentGeneratorIndex, SIGNAL(editingFinished()), this, SLOT(setCurrentGeneratorIndex()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
     connect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)), Qt::UniqueConnection);
@@ -101,7 +101,7 @@ void ManualSelectorGeneratorUI::connectSignals(){
 
 void ManualSelectorGeneratorUI::disconnectSignals(){
     disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(selectedGeneratorIndex, SIGNAL(clicked(bool)), this, SLOT(setSelectedGeneratorIndex()));
+    disconnect(selectedGeneratorIndex, SIGNAL(editingFinished()), this, SLOT(setSelectedGeneratorIndex()));
     disconnect(currentGeneratorIndex, SIGNAL(editingFinished()), this, SLOT(setCurrentGeneratorIndex()));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
     disconnect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)));

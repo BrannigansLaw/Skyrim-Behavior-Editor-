@@ -6,6 +6,7 @@
 class hkbTwistModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class TwistModifierUI;
 public:
     hkbTwistModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbTwistModifier();

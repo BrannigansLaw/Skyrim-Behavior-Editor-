@@ -27,7 +27,8 @@ MainWindow::MainWindow()
       topLyt(new QGridLayout(this)),
       topMB(new QMenuBar(this)),
       debugLog(new PlainTextEdit(this)),
-      openProjectA(new QAction("Open Project", this)),
+      openPackedProjectA(new QAction("Open Packed Project", this)),
+      openUnpackedProjectA(new QAction("Open Unpacked Project", this)),
       exportToSkyrimDirA(new QAction("Export Project To Skyrim Directory", this)),
       exportCurrentFileA(new QAction("Export Current File To Skyrim Directory", this)),
       fileM(new QMenu("File", this)),
@@ -58,33 +59,36 @@ MainWindow::MainWindow()
 
     //Change this for release!!!
     hkxcmdPath = "c:/users/wayne/desktop/hkxcmd.exe";
-    //hkxcmdPath = QDir::current()+"/hkxcmd.exe";
+    //hkxcmdPath = QDir::currentPath()+"/hkxcmd.exe";
     //Change this for release!!!
 
-    openProjectA->setStatusTip("Open a hkx project file!");
-    openProjectA->setShortcut(QKeySequence::Open);
+    openPackedProjectA->setStatusTip("Open a hkx project file!");
+    //openPackedProjectA->setShortcut(QKeySequence::Open);
+    openUnpackedProjectA->setStatusTip("Open a hkx xml project file!");
+    //openUnpackedProjectA->setShortcut(QKeySequence::Open);
     exportToSkyrimDirA->setStatusTip("Pack and export the current project to the working Skyrim directory!");
-    exportToSkyrimDirA->setShortcut(QKeySequence::Copy);
+    //exportToSkyrimDirA->setShortcut(QKeySequence::Copy);
     exportCurrentFileA->setStatusTip("Pack and export the current file to the working Skyrim directory!");
-    exportCurrentFileA->setShortcut(QKeySequence::Paste);
+    //exportCurrentFileA->setShortcut(QKeySequence::Paste);
     saveA->setStatusTip("Save file!");
-    saveA->setShortcut(QKeySequence::Save);
+    //saveA->setShortcut(QKeySequence::Save);
     saveProjectA->setStatusTip("Save project!");
-    saveProjectA->setShortcut(QKeySequence::SaveAs);
+    //saveProjectA->setShortcut(QKeySequence::SaveAs);
     exitA->setStatusTip("Exit!");
-    exitA->setShortcut(QKeySequence::Close);
-    fileM->addAction(openProjectA);
+    //exitA->setShortcut(QKeySequence::Close);
+    fileM->addAction(openPackedProjectA);
+    fileM->addAction(openUnpackedProjectA);
     fileM->addAction(exportToSkyrimDirA);
     fileM->addAction(exportCurrentFileA);
     fileM->addAction(saveA);
     fileM->addAction(saveProjectA);
     fileM->addAction(exitA);
     expandA->setStatusTip("Expand all branches!");
-    expandA->setShortcut(QKeySequence::ZoomIn);
+    //expandA->setShortcut(QKeySequence::ZoomIn);
     collapseA->setStatusTip("Collapse all branches!");
-    collapseA->setShortcut(QKeySequence::ZoomOut);
+    //collapseA->setShortcut(QKeySequence::ZoomOut);
     refocusA->setStatusTip("Centers the behavior view on the selected item!");
-    refocusA->setShortcut(QKeySequence::Back);
+    //refocusA->setShortcut(QKeySequence::Back);
     viewM->addAction(expandA);
     viewM->addAction(collapseA);
     viewM->addAction(refocusA);
@@ -119,7 +123,8 @@ MainWindow::MainWindow()
     /*if (!findHKXCMD()){
         WARNING_MESSAGE(QString("The hkxcmd executable was not found!"));
     }*/
-    connect(openProjectA, SIGNAL(triggered(bool)), this, SLOT(openProject()));
+    connect(openPackedProjectA, SIGNAL(triggered(bool)), this, SLOT(openPackedProject()));
+    connect(openUnpackedProjectA, SIGNAL(triggered(bool)), this, SLOT(openUnpackedProject()));
     connect(saveA, SIGNAL(triggered(bool)), this, SLOT(save()));
     connect(exportToSkyrimDirA, SIGNAL(triggered(bool)), this, SLOT(packAndExportProjectToSkyrimDirectory()));
     connect(exportCurrentFileA, SIGNAL(triggered(bool)), this, SLOT(packAndExportFileToSkyrimDirectory()));
@@ -412,6 +417,78 @@ void MainWindow::closeTab(int index){
     }
 }
 
+void MainWindow::openProject(QString & filepath){
+    if (tabs->count() > 0){
+        closeAll();
+    }
+    lastFileSelected = filepath;
+    QTime t;
+    t.start();
+    objectDataWid->changeCurrentDataWidget(NULL);
+    int time = t.elapsed();
+    projectFile = new ProjectFile(this, filepath);
+    ProgressDialog dialog("Opening project..."+projectFile->fileName().section("/", -1, -1), "", 0, 100, this);
+    if (!projectFile->parse()){
+        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The project file "+filepath+" could not be parsed!!!"));
+        delete projectFile;
+        projectFile = NULL;
+        return;
+    }
+    writeToLog("\n-------------------------\nTime taken to open file \""+filepath+
+                               "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
+    dialog.setProgress("Loading character data...", 10);
+    int index = filepath.lastIndexOf("\\", -1);
+    if (index > -1){
+        lastFileSelectedPath = filepath.remove(index, filepath.size() - index);
+    }else{
+        index = filepath.lastIndexOf("/", -1);
+        if (index > -1){
+            lastFileSelectedPath = filepath.remove(index, filepath.size() - index);
+        }else{
+            lastFileSelectedPath = filepath;
+        }
+    }
+    projectUI->setFilePath(lastFileSelectedPath);
+    time = t.elapsed();
+    characterFile = new CharacterFile(this, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));
+    if (!characterFile->parse()){
+        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The character file "+projectFile->getCharacterFilePathAt(0)+" could not be parsed!!!"));
+        delete projectFile;
+        projectFile = NULL;
+        delete characterFile;
+        characterFile = NULL;
+        return;
+    }
+    dialog.setProgress("Character data loaded sucessfully!!!", 40);
+    projectFile->setCharacterFile(characterFile);
+    writeToLog("\n-------------------------\nTime taken to open file \""+lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0)+
+                               "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
+    time = t.elapsed();
+    dialog.setProgress("Loading skeleton data...", 50);
+    skeletonFile = new SkeletonFile(this, lastFileSelectedPath+"/"+characterFile->getRigName());
+    if (!skeletonFile->parse()){
+        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The skeleton file "+characterFile->getRigName()+" could not be parsed!!!"));
+        delete projectFile;
+        projectFile = NULL;
+        delete characterFile;
+        characterFile = NULL;
+        delete skeletonFile;
+        skeletonFile = NULL;
+        return;
+    }
+    dialog.setProgress("Skeleton data loaded sucessfully!!!", 90);
+    characterFile->setSkeletonFile(skeletonFile);
+    tabs->addTab(projectUI, "Character Data");
+    projectUI->setProject(projectFile);
+    projectUI->loadData();
+    writeToLog("\n-------------------------\nTime taken to open file \""+lastFileSelectedPath+"/"+characterFile->getRigName()+
+                               "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
+    writeToLog("\n-------------------------\nTime taken to open project \""+filepath+
+                              "\" is approximately "+QString::number(t.elapsed())+" milliseconds\n-------------------------\n");
+    projectUI->setDisabled(false);
+    dialog.setProgress("Project loaded sucessfully!!!", dialog.maximum());
+}
+
 bool MainWindow::closeAll(){
     bool unsavedChanges = false;
     for (int i = 0; i < behaviorGraphs.size(); i++){
@@ -470,15 +547,11 @@ void MainWindow::writeToLog(const QString &message, bool isError){
     debugLog->setTextCursor(tempTC);
 }
 
-void MainWindow::openProject(){
-    if (tabs->count() > 0){
-        closeAll();
-    }
+void MainWindow::openPackedProject(){
     QString filename = QFileDialog::getOpenFileName(this, tr("Open hkx project file..."), lastFileSelected, tr("hkx Files (*.hkx)"));
     if (filename == ""){
         return;
     }
-    lastFileSelected = filename;
     if (hkxcmd(filename.section("/", 0, -2), "", "-v:xml") != HKXCMD_SUCCESS){
         WARNING_MESSAGE(QString("Failed to convert and export the files to the correct folders in the Skyrim directory!"));
         return;
@@ -491,7 +564,7 @@ void MainWindow::openProject(){
             temp = it.next();
             if (temp.contains(".hkx")){
                 if (!QDir(temp).remove(temp)){
-                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The file "+temp+" could not be removed!!!"));
+                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openPackedProject(): The file "+temp+" could not be removed!!!"));
                     return;
                 }
             }
@@ -504,77 +577,21 @@ void MainWindow::openProject(){
             temp = it.next();
             if (temp.contains(".xml")){
                 if (!QDir(temp).rename(temp, QString(temp).replace(".xml", ".hkx"))){
-                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The file "+temp+" could not be renamed!!!"));
+                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openPackedProject(): The file "+temp+" could not be renamed!!!"));
                     return;
                 }
             }
         }
     }
-    QTime t;
-    t.start();
-    objectDataWid->changeCurrentDataWidget(NULL);
-    int time = t.elapsed();
-    projectFile = new ProjectFile(this, filename);
-    ProgressDialog dialog("Opening project..."+projectFile->fileName().section("/", -1, -1), "", 0, 100, this);
-    if (!projectFile->parse()){
-        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The project file "+filename+" could not be parsed!!!"));
-        delete projectFile;
-        projectFile = NULL;
+    openProject(filename);
+}
+
+void MainWindow::openUnpackedProject(){
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open hkx xml project file..."), lastFileSelected, tr("hkx Files (*.hkx)"));
+    if (filename == ""){
         return;
     }
-    writeToLog("\n-------------------------\nTime taken to open file \""+filename+
-                               "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
-    dialog.setProgress("Loading character data...", 10);
-    int index = filename.lastIndexOf("\\", -1);
-    if (index > -1){
-        lastFileSelectedPath = filename.remove(index, filename.size() - index);
-    }else{
-        index = filename.lastIndexOf("/", -1);
-        if (index > -1){
-            lastFileSelectedPath = filename.remove(index, filename.size() - index);
-        }else{
-            lastFileSelectedPath = filename;
-        }
-    }
-    projectUI->setFilePath(lastFileSelectedPath);
-    time = t.elapsed();
-    characterFile = new CharacterFile(this, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));
-    if (!characterFile->parse()){
-        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The character file "+projectFile->getCharacterFilePathAt(0)+" could not be parsed!!!"));
-        delete projectFile;
-        projectFile = NULL;
-        delete characterFile;
-        characterFile = NULL;
-        return;
-    }
-    dialog.setProgress("Character data loaded sucessfully!!!", 40);
-    projectFile->setCharacterFile(characterFile);
-    writeToLog("\n-------------------------\nTime taken to open file \""+lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0)+
-                               "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
-    time = t.elapsed();
-    dialog.setProgress("Loading skeleton data...", 50);
-    skeletonFile = new SkeletonFile(this, lastFileSelectedPath+"/"+characterFile->getRigName());
-    if (!skeletonFile->parse()){
-        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The skeleton file "+characterFile->getRigName()+" could not be parsed!!!"));
-        delete projectFile;
-        projectFile = NULL;
-        delete characterFile;
-        characterFile = NULL;
-        delete skeletonFile;
-        skeletonFile = NULL;
-        return;
-    }
-    dialog.setProgress("Skeleton data loaded sucessfully!!!", 90);
-    characterFile->setSkeletonFile(skeletonFile);
-    tabs->addTab(projectUI, "Character Data");
-    projectUI->setProject(projectFile);
-    projectUI->loadData();
-    writeToLog("\n-------------------------\nTime taken to open file \""+lastFileSelectedPath+"/"+characterFile->getRigName()+
-                               "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
-    writeToLog("\n-------------------------\nTime taken to open project \""+filename+
-                              "\" is approximately "+QString::number(t.elapsed())+" milliseconds\n-------------------------\n");
-    projectUI->setDisabled(false);
-    dialog.setProgress("Project loaded sucessfully!!!", dialog.maximum());
+    openProject(filename);
 }
 
 bool MainWindow::openBehavior(const QString & filename){

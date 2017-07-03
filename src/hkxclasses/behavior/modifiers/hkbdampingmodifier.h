@@ -6,6 +6,7 @@
 class hkbDampingModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class DampingModifierUI;
 public:
     hkbDampingModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbDampingModifier();

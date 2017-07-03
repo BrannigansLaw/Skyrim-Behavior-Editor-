@@ -136,6 +136,7 @@ bool hkbModifierGenerator::write(HkxXMLWriter *writer){
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         if (modifier.data()){
             refString = modifier.data()->getReferenceString();
         }else{

@@ -52,6 +52,13 @@ class BSDistTriggerModifierUI;
 class BSInterpValueModifierUI;
 class GetUpModifierUI;
 class GetWorldFromModelModifierUI;
+class TwistModifierUI;
+class TimerModifierUI;
+class DampingModifierUI;
+class RigidBodyRagdollControlsModifierUI;
+class PoweredRagdollControlsModifierUI;
+class CombineTransformsModifierUI;
+class ComputeRotationFromAxisAngleModifierUI;
 
 /**
  * To add support for a new class we need to add it to the "DATA_TYPE_LOADED" enum, add it to the stacked layout in the correct order,
@@ -91,11 +98,11 @@ private:
 private:
     enum DATA_TYPE_LOADED{
         NO_DATA_SELECTED = 0,
-        BS_I_STATE_TAG_GEN = 1,
-        MODIFIER_GENERATOR = 2,
-        MANUAL_SELECTOR_GENERATOR = 3,
-        STATE_MACHINE = 4,
-        BLENDER_GENERATOR = 5,
+        BS_I_STATE_TAG_GEN,
+        MODIFIER_GENERATOR,
+        MANUAL_SELECTOR_GENERATOR,
+        STATE_MACHINE,
+        BLENDER_GENERATOR,
         BEHAVIOR_GRAPH,
         BS_LIMB_IK_MOD,
         BS_BONE_SWITCH_GENERATOR,
@@ -121,7 +128,14 @@ private:
         BS_DIST_TRIGGER_MODIFER,
         BS_INTERP_VALUE_MODIFIER,
         GET_UP_MODIFIER,
-        GET_WORLD_FROM_MODEL_MODIFIER
+        GET_WORLD_FROM_MODEL_MODIFIER,
+        TWIST_MODIFIER,
+        TIMER_MODIFIER,
+        DAMPING_MODIFIER,
+        RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER,
+        POWERED_RAGDOLL_CONTROLS_MODIFIER,
+        COMBINE_TRANSFORMS_MODIFIER,
+        COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER
     };
     static QStringList generatorTypes;
     static QStringList modifierTypes;
@@ -139,6 +153,7 @@ private:
     GenericTableWidget *eventsTable;
     GenericTableWidget *characterPropertiesTable;
     GenericTableWidget *animationsTable;
+    GenericTableWidget *ragdollBonesTable;
     QLabel *noDataL;
     BSiStateTaggingGeneratorUI *iStateTagGenUI;
     ModifierGeneratorUI *modGenUI;
@@ -171,6 +186,13 @@ private:
     BSInterpValueModifierUI *interpValueModUI;
     GetUpModifierUI *getUpModUI;
     GetWorldFromModelModifierUI *getWorldFromModelModUI;
+    TwistModifierUI *twistModUI;
+    TimerModifierUI *timerModUI;
+    DampingModifierUI *dampingModUI;
+    RigidBodyRagdollControlsModifierUI *rigidRagdollControlsModUI;
+    PoweredRagdollControlsModifierUI *poweredRagdollControlsModUI;
+    CombineTransformsModifierUI *combineTransModUI;
+    ComputeRotationFromAxisAngleModifierUI *computeRotationAxisAngleModUI;
 };
 
 #endif // HKDATAUI_H

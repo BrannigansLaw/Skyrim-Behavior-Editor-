@@ -89,7 +89,7 @@ int hkbStateMachine::getStateId(const QString &statename) const{
     for (int i = 0; i < states.size(); i++){
         state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
         if (state->name == statename){
-            return i;
+            return state->stateId;
         }
     }
     return -1;

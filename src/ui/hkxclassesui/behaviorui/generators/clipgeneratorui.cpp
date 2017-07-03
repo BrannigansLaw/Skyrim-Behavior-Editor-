@@ -148,7 +148,7 @@ ClipGeneratorUI::ClipGeneratorUI()
     table->setItem(FLAG_IGNORE_MOTION_ROW, VALUE_COLUMN, new TableWidgetItem("", Qt::AlignCenter, QColor(Qt::lightGray)));
     table->setCellWidget(FLAG_IGNORE_MOTION_ROW, VALUE_COLUMN, flagIgnoreMotion);
     table->setItem(ADD_TRIGGER_ROW, NAME_COLUMN, new TableWidgetItem("Add Trigger", Qt::AlignCenter, QColor(Qt::green), QBrush(Qt::black), "Double click to add a new clip trigger"));
-    table->setItem(ADD_TRIGGER_ROW, BINDING_COLUMN, new TableWidgetItem("hkTrigger", Qt::AlignCenter));
+    table->setItem(ADD_TRIGGER_ROW, TYPE_COLUMN, new TableWidgetItem("hkTrigger", Qt::AlignCenter));
     table->setItem(ADD_TRIGGER_ROW, BINDING_COLUMN, new TableWidgetItem("Remove Selected Trigger", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black), "Double click to remove the selected trigger"));
     table->setItem(ADD_TRIGGER_ROW, VALUE_COLUMN, new TableWidgetItem("Edit Selected Trigger", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black), "Double click to edit the selected trigger"));
     topLyt->addWidget(table, 1, 0, 8, 3);
@@ -772,7 +772,7 @@ void ClipGeneratorUI::connectToTables(GenericTableWidget *variables, GenericTabl
         disconnect(properties, SIGNAL(elementSelected(int,QString)), 0, 0);
         disconnect(animations, SIGNAL(elementSelected(int,QString)), 0, 0);
         connect(variables, SIGNAL(elementSelected(int,QString)), this, SLOT(setBindingVariable(int,QString)), Qt::UniqueConnection);
-        connect(events, SIGNAL(elementSelected(int,QString)), triggerUI, SLOT(setEvent(int,QString)), Qt::UniqueConnection);
+        connect(events, SIGNAL(elementSelected(int,QString)), triggerUI, SLOT(setEventId(int,QString)), Qt::UniqueConnection);
         connect(properties, SIGNAL(elementSelected(int,QString)), this, SLOT(setBindingVariable(int,QString)), Qt::UniqueConnection);
         connect(animations, SIGNAL(elementSelected(int,QString)), this, SLOT(setAnimationName(int,QString)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);

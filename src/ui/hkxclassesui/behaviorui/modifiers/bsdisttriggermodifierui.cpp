@@ -227,7 +227,7 @@ void BSDistTriggerModifierUI::setTriggerEventId(int index, const QString & name)
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::setHandleChangeMode(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::setTriggerEventId(): The data is NULL!!"));
     }
 }
 

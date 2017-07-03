@@ -62,7 +62,8 @@ private:
     QGridLayout *topLyt;
     QMenuBar *topMB;
     QMenu *fileM;
-    QAction *openProjectA;
+    QAction *openPackedProjectA;
+    QAction *openUnpackedProjectA;
     QAction *saveA;
     QAction *exportToSkyrimDirA;
     QAction *exportCurrentFileA;
@@ -90,7 +91,8 @@ private:
     QString lastFileSelected;
     QString lastFileSelectedPath;
 private slots:
-    void openProject();
+    void openPackedProject();
+    void openUnpackedProject();
     void openBehaviorFile(const QModelIndex & index);
     void expandBranches();
     void collapseBranches();
@@ -107,6 +109,7 @@ private:
     enum HKXCMD_RETURN{
         HKXCMD_SUCCESS = 0
     };
+    void openProject(QString &filepath);
     void saveFile(int index);
     bool openBehavior(const QString & filename);
     bool exitProgram();

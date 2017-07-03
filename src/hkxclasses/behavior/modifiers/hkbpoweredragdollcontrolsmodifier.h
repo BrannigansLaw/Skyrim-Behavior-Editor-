@@ -6,6 +6,7 @@
 class hkbPoweredRagdollControlsModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class PoweredRagdollControlsModifierUI;
 public:
     hkbPoweredRagdollControlsModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbPoweredRagdollControlsModifier();

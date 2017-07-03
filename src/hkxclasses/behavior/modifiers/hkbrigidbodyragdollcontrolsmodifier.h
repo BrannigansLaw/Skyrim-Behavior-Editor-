@@ -6,6 +6,7 @@
 class hkbRigidBodyRagdollControlsModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class RigidBodyRagdollControlsModifierUI;
 public:
     hkbRigidBodyRagdollControlsModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbRigidBodyRagdollControlsModifier();

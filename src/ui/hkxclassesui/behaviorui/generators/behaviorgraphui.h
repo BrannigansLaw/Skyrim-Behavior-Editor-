@@ -20,6 +20,7 @@ public:
     BehaviorGraphUI();
     void loadData(HkxObject *data);
 signals:
+    void generatorNameChanged(const QString & newName, int index);
     void viewGenerators(int index);
 private slots:
     void setName();

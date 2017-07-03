@@ -71,7 +71,7 @@ GetUpModifierUI::GetUpModifierUI()
     table->setItem(ALIGN_WITH_GROUND_DURATION_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
     table->setItem(ALIGN_WITH_GROUND_DURATION_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(ALIGN_WITH_GROUND_DURATION_ROW, VALUE_COLUMN, alignWithGroundDuration);
-    table->setItem(ROOT_BONE_INDEX_ROW, NAME_COLUMN, new TableWidgetItem("gain"));
+    table->setItem(ROOT_BONE_INDEX_ROW, NAME_COLUMN, new TableWidgetItem("rootBoneIndex"));
     table->setItem(ROOT_BONE_INDEX_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
     table->setItem(ROOT_BONE_INDEX_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(ROOT_BONE_INDEX_ROW, VALUE_COLUMN, rootBoneIndex);
@@ -138,17 +138,17 @@ void GetUpModifierUI::loadData(HkxObject *data){
             duration->setValue(bsData->duration);
             alignWithGroundDuration->setValue(bsData->alignWithGroundDuration);
             if (rootBoneIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
+                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRagdollBoneNames();
                 rootBoneIndex->insertItems(0, boneNames);
             }
             rootBoneIndex->setCurrentIndex(bsData->rootBoneIndex + 1);
             if (otherBoneIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
+                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRagdollBoneNames();
                 otherBoneIndex->insertItems(0, boneNames);
             }
             otherBoneIndex->setCurrentIndex(bsData->otherBoneIndex + 1);
             if (anotherBoneIndex->count() == 0){
-                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
+                boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRagdollBoneNames();
                 anotherBoneIndex->insertItems(0, boneNames);
             }
             anotherBoneIndex->setCurrentIndex(bsData->anotherBoneIndex + 1);
