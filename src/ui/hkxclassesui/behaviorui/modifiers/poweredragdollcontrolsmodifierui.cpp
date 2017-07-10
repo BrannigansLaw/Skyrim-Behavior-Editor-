@@ -135,14 +135,13 @@ void PoweredRagdollControlsModifierUI::connectSignals(){
     connect(damping, SIGNAL(editingFinished()), this, SLOT(setDamping()), Qt::UniqueConnection);
     connect(proportionalRecoveryVelocity, SIGNAL(released()), this, SLOT(setProportionalRecoveryVelocity()), Qt::UniqueConnection);
     connect(constantRecoveryVelocity, SIGNAL(released()), this, SLOT(setConstantRecoveryVelocity()), Qt::UniqueConnection);
-    connect(bones, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone0()), Qt::UniqueConnection);
-    connect(poseMatchingBone0, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone1()), Qt::UniqueConnection);
-    connect(poseMatchingBone1, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone2()), Qt::UniqueConnection);
-    connect(poseMatchingBone2, SIGNAL(editingFinished()), this, SLOT(setMode()), Qt::UniqueConnection);
+    connect(poseMatchingBone0, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone0()), Qt::UniqueConnection);
+    connect(poseMatchingBone1, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone1()), Qt::UniqueConnection);
+    connect(poseMatchingBone2, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone2()), Qt::UniqueConnection);
     connect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)), Qt::UniqueConnection);
     connect(bones, SIGNAL(pressed()), this, SLOT(viewBones()), Qt::UniqueConnection);
     connect(bones, SIGNAL(enabled(bool)), this, SLOT(toggleBones(bool)), Qt::UniqueConnection);
-    connect(bones, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+    connect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
     connect(boneWeights, SIGNAL(pressed()), this, SLOT(viewBoneWeights()), Qt::UniqueConnection);
     connect(boneWeights, SIGNAL(enabled(bool)), this, SLOT(toggleBoneWeights(bool)), Qt::UniqueConnection);
     connect(boneWeightsUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
@@ -157,14 +156,13 @@ void PoweredRagdollControlsModifierUI::disconnectSignals(){
     disconnect(damping, SIGNAL(editingFinished()), this, SLOT(setDamping()));
     disconnect(proportionalRecoveryVelocity, SIGNAL(released()), this, SLOT(setProportionalRecoveryVelocity()));
     disconnect(constantRecoveryVelocity, SIGNAL(released()), this, SLOT(setConstantRecoveryVelocity()));
-    disconnect(bones, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone0()));
-    disconnect(poseMatchingBone0, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone1()));
-    disconnect(poseMatchingBone1, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone2()));
-    disconnect(poseMatchingBone2, SIGNAL(editingFinished()), this, SLOT(setMode()));
+    disconnect(poseMatchingBone0, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone0()));
+    disconnect(poseMatchingBone1, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone1()));
+    disconnect(poseMatchingBone2, SIGNAL(editingFinished()), this, SLOT(setPoseMatchingBone2()));
     disconnect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)));
     disconnect(bones, SIGNAL(pressed()), this, SLOT(viewBones()));
     disconnect(bones, SIGNAL(enabled(bool)), this, SLOT(toggleBones(bool)));
-    disconnect(bones, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+    disconnect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
     disconnect(boneWeights, SIGNAL(pressed()), this, SLOT(viewBoneWeights()));
     disconnect(boneWeights, SIGNAL(enabled(bool)), this, SLOT(toggleBoneWeights(bool)));
     disconnect(boneWeightsUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
@@ -181,7 +179,7 @@ void PoweredRagdollControlsModifierUI::connectToTables(GenericTableWidget *varia
         connect(ragdollBones, SIGNAL(elementSelected(int,QString)), boneIndexUI, SLOT(setRagdollBone(int,QString)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(boneIndexUI, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::connectToTables(): One or more arguments are NULL!!"))
     }
@@ -413,6 +411,7 @@ void PoweredRagdollControlsModifierUI::toggleBoneWeights(bool enable){
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
         }else if (enable && !bsData->boneWeights.data()){
             bsData->boneWeights = HkxSharedPtr(new hkbBoneWeightArray(bsData->getParentFile(), -1, static_cast<BehaviorFile *>(bsData->getParentFile())->getNumberOfBones()));
+            boneWeights->setText("Click to Edit");
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::toggleBoneWeights(): The data is NULL!!"));

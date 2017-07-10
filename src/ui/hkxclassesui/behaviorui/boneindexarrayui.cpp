@@ -72,8 +72,9 @@ void BoneIndexArrayUI::loadDynamicTableRows(){
         }
         QStringList bones = static_cast<BehaviorFile *>(bsData->getParentFile())->getRagdollBoneNames();
         for (int i = ADD_RAGDOLL_BONE_ROW + 1, j = 0; j < bsData->boneIndices.size(); i++, j++){
-            if (j < bones.size() && j >= 0){
-                setRowItems(i, bones.at(j), "Remove", "Edit", "Double click to remove this ragdoll bone", VIEW_BONES_TABLE_TIP);
+            temp = bsData->boneIndices.at(j);
+            if (temp < bones.size() && temp >= 0){
+                setRowItems(i, bones.at(temp), "Remove", "Edit", "Double click to remove this ragdoll bone", VIEW_BONES_TABLE_TIP);
             }else{
                 CRITICAL_ERROR_MESSAGE(QString("BoneIndexArrayUI::loadDynamicTableRows(): Invalid bone index found!!"));
             }
@@ -121,7 +122,7 @@ void BoneIndexArrayUI::viewSelectedChild(int row, int column){
             result = row - BASE_NUMBER_OF_ROWS;
             if (bsData->boneIndices.size() > result && result >= 0){
                 if (column == VALUE_COLUMN){
-                    emit viewRagdollBones(bsData->boneIndices.at(result));
+                    emit viewRagdollBones(bsData->boneIndices.at(result) + 1);
                 }else if (column == TYPE_COLUMN){
                     if (MainWindow::yesNoDialogue("Are you sure you want to remove the ragdoll bone \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
                         removeRagdollBone(result);

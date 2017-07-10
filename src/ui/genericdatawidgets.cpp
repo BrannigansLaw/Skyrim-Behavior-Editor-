@@ -23,7 +23,7 @@ GenericTableWidget::GenericTableWidget(const QString & title)
     table->setStyleSheet("QHeaderView::section { background-color:grey }");
     table->verticalHeader()->setVisible(true);
     table->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    //table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     table->horizontalHeader()->setSectionsClickable(false);
     table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);

@@ -195,7 +195,7 @@ void RigidBodyRagdollControlsModifierUI::connectToTables(GenericTableWidget *var
         connect(ragdollBones, SIGNAL(elementSelected(int,QString)), boneIndexUI, SLOT(setRagdollBone(int,QString)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(boneIndexUI, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("RigidBodyRagdollControlsModifierUI::connectToTables(): One or more arguments are NULL!!"))
     }
@@ -447,7 +447,7 @@ void RigidBodyRagdollControlsModifierUI::toggleBones(bool enable){
             hkbBoneIndexArray *indices = new hkbBoneIndexArray(bsData->getParentFile());
             bsData->getParentFile()->addObjectToFile(indices, -1);
             bsData->bones = HkxSharedPtr(indices);
-            //bones->setText(indices->getName());
+            bones->setText("Click to Edit");
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("RigidBodyRagdollControlsModifierUI::toggleBones(): The data is NULL!!"));

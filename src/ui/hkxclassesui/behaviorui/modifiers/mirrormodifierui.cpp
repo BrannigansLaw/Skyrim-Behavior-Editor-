@@ -1,7 +1,7 @@
-#include "movecharactermodifierui.h"
+#include "mirrormodifierui.h"
 
 #include "src/hkxclasses/hkxobject.h"
-#include "src/hkxclasses/behavior/modifiers/hkbmovecharactermodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbMirrorModifier.h"
 #include "src/hkxclasses/behavior/hkbvariablebindingset.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/ui/genericdatawidgets.h"
@@ -13,7 +13,7 @@
 
 #define NAME_ROW 0
 #define ENABLE_ROW 1
-#define OFFSET_PER_SECOND_MS_ROW 2
+#define IS_ADDITIVE_ROW 2
 
 #define NAME_COLUMN 0
 #define TYPE_COLUMN 1
@@ -22,22 +22,22 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList MoveCharacterModifierUI::headerLabels = {
+QStringList MirrorModifierUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
     "Value"
 };
 
-MoveCharacterModifierUI::MoveCharacterModifierUI()
+MirrorModifierUI::MirrorModifierUI()
     : bsData(NULL),
       topLyt(new QGridLayout),
       table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       enable(new CheckBox),
-      offsetPerSecondMS(new QuadVariableWidget)
+      isAdditive(new CheckBox)
 {
-    setTitle("hkbMoveCharacterModifier");
+    setTitle("hkbMirrorModifier");
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
     table->setHorizontalHeaderLabels(headerLabels);
@@ -49,29 +49,29 @@ MoveCharacterModifierUI::MoveCharacterModifierUI()
     table->setItem(ENABLE_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool", Qt::AlignCenter));
     table->setItem(ENABLE_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(ENABLE_ROW, VALUE_COLUMN, enable);
-    table->setItem(OFFSET_PER_SECOND_MS_ROW, NAME_COLUMN, new TableWidgetItem("offsetPerSecondMS"));
-    table->setItem(OFFSET_PER_SECOND_MS_ROW, TYPE_COLUMN, new TableWidgetItem("hkVector4", Qt::AlignCenter));
-    table->setItem(OFFSET_PER_SECOND_MS_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
-    table->setCellWidget(OFFSET_PER_SECOND_MS_ROW, VALUE_COLUMN, offsetPerSecondMS);
+    table->setItem(IS_ADDITIVE_ROW, NAME_COLUMN, new TableWidgetItem("isAdditive"));
+    table->setItem(IS_ADDITIVE_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool", Qt::AlignCenter));
+    table->setItem(IS_ADDITIVE_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
+    table->setCellWidget(IS_ADDITIVE_ROW, VALUE_COLUMN, isAdditive);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
 }
 
-void MoveCharacterModifierUI::connectSignals(){
+void MirrorModifierUI::connectSignals(){
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
     connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
-    connect(offsetPerSecondMS, SIGNAL(editingFinished()), this, SLOT(setOffsetPerSecondMS()), Qt::UniqueConnection);
+    connect(isAdditive, SIGNAL(editingFinished()), this, SLOT(setIsAdditive()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
 }
 
-void MoveCharacterModifierUI::disconnectSignals(){
+void MirrorModifierUI::disconnectSignals(){
     disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
     disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
-    disconnect(offsetPerSecondMS, SIGNAL(editingFinished()), this, SLOT(setOffsetPerSecondMS()));
+    disconnect(isAdditive, SIGNAL(editingFinished()), this, SLOT(setIsAdditive()));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
 }
 
-void MoveCharacterModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties){
+void MirrorModifierUI::connectToTables(GenericTableWidget *variables, GenericTableWidget *properties){
     if (variables && properties){
         disconnect(variables, SIGNAL(elementSelected(int,QString)), 0, 0);
         disconnect(properties, SIGNAL(elementSelected(int,QString)), 0, 0);
@@ -80,37 +80,37 @@ void MoveCharacterModifierUI::connectToTables(GenericTableWidget *variables, Gen
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::connectToTables(): One or more arguments are NULL!!"))
     }
 }
 
-void MoveCharacterModifierUI::loadData(HkxObject *data){
+void MirrorModifierUI::loadData(HkxObject *data){
     disconnectSignals();
     if (data){
-        if (data->getSignature() == HKB_MOVE_CHARACTER_MODIFIER){
+        if (data->getSignature() == HKB_MIRROR_MODIFIER){
             hkbVariableBindingSet *varBind = NULL;
-            bsData = static_cast<hkbMoveCharacterModifier *>(data);
+            bsData = static_cast<hkbMirrorModifier *>(data);
             name->setText(bsData->name);
             enable->setChecked(bsData->enable);
-            offsetPerSecondMS->setValue(bsData->offsetPerSecondMS);
+            isAdditive->setChecked(bsData->isAdditive);
             varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
-                loadBinding(OFFSET_PER_SECOND_MS_ROW, BINDING_COLUMN, varBind, "offsetPerSecondMS");
+                loadBinding(IS_ADDITIVE_ROW, BINDING_COLUMN, varBind, "isAdditive");
             }else{
                 table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(OFFSET_PER_SECOND_MS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
+                table->item(IS_ADDITIVE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::loadData(): The data is an incorrect type!!"));
+            CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::loadData(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
 
-void MoveCharacterModifierUI::setName(){
+void MirrorModifierUI::setName(){
     if (bsData){
         if (bsData->name != name->text()){
             bsData->name = name->text();
@@ -119,33 +119,33 @@ void MoveCharacterModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::setName(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::setName(): The data is NULL!!"));
     }
 }
 
-void MoveCharacterModifierUI::setEnable(){
+void MirrorModifierUI::setEnable(){
     if (bsData){
         if (bsData->enable != enable->isChecked()){
             bsData->enable = enable->isChecked();
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::setEnable(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
-void MoveCharacterModifierUI::setOffsetPerSecondMS(){
+void MirrorModifierUI::setIsAdditive(){
     if (bsData){
-        if (bsData->offsetPerSecondMS != offsetPerSecondMS->value()){
-            bsData->offsetPerSecondMS = offsetPerSecondMS->value();
+        if (bsData->isAdditive != isAdditive->isChecked()){
+            bsData->isAdditive = isAdditive->isChecked();
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::setOffsetPerSecondMS(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::setIsAdditive(): The data is NULL!!"));
     }
 }
 
-void MoveCharacterModifierUI::viewSelected(int row, int column){
+void MirrorModifierUI::viewSelected(int row, int column){
     if (bsData){
         bool isProperty = false;
         if (column == BINDING_COLUMN){
@@ -156,22 +156,22 @@ void MoveCharacterModifierUI::viewSelected(int row, int column){
                 }
                 selectTableToView(isProperty, "enable");
                 break;
-            case OFFSET_PER_SECOND_MS_ROW:
-                if (table->item(OFFSET_PER_SECOND_MS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
+            case IS_ADDITIVE_ROW:
+                if (table->item(IS_ADDITIVE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                     isProperty = true;
                 }
-                selectTableToView(isProperty, "offsetPerSecondMS");
+                selectTableToView(isProperty, "isAdditive");
                 break;
             default:
                 return;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
     }
 }
 
-void MoveCharacterModifierUI::selectTableToView(bool viewisProperty, const QString & path){
+void MirrorModifierUI::selectTableToView(bool viewisProperty, const QString & path){
     if (bsData){
         if (viewisProperty){
             if (bsData->variableBindingSet.data()){
@@ -187,11 +187,11 @@ void MoveCharacterModifierUI::selectTableToView(bool viewisProperty, const QStri
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::selectTableToView(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
-void MoveCharacterModifierUI::variableRenamed(const QString & name, int index){
+void MirrorModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
         hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
@@ -200,17 +200,17 @@ void MoveCharacterModifierUI::variableRenamed(const QString & name, int index){
             if (bindIndex == index){
                 table->item(ENABLE_ROW, BINDING_COLUMN)->setText(name);
             }
-            bindIndex = bind->getVariableIndexOfBinding("offsetPerSecondMS");
+            bindIndex = bind->getVariableIndexOfBinding("isAdditive");
             if (bindIndex == index){
-                table->item(OFFSET_PER_SECOND_MS_ROW, BINDING_COLUMN)->setText(name);
+                table->item(IS_ADDITIVE_ROW, BINDING_COLUMN)->setText(name);
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
     }
 }
 
-bool MoveCharacterModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
+bool MirrorModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
     hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
     if (bsData){
         if (index == 0){
@@ -224,11 +224,11 @@ bool MoveCharacterModifierUI::setBinding(int index, int row, const QString &vari
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -237,12 +237,12 @@ bool MoveCharacterModifierUI::setBinding(int index, int row, const QString &vari
             WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::setBinding(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
 
-void MoveCharacterModifierUI::setBindingVariable(int index, const QString &name){
+void MirrorModifierUI::setBindingVariable(int index, const QString &name){
     if (bsData){
         bool isProperty = false;
         int row = table->currentRow();
@@ -253,22 +253,22 @@ void MoveCharacterModifierUI::setBindingVariable(int index, const QString &name)
             }
             setBinding(index, row, name, "enable", VARIABLE_TYPE_BOOL, isProperty);
             break;
-        case OFFSET_PER_SECOND_MS_ROW:
-            if (table->item(OFFSET_PER_SECOND_MS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
+        case IS_ADDITIVE_ROW:
+            if (table->item(IS_ADDITIVE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                 isProperty = true;
             }
-            setBinding(index, row, name, "offsetPerSecondMS", VARIABLE_TYPE_VECTOR4, isProperty);
+            setBinding(index, row, name, "isAdditive", VARIABLE_TYPE_BOOL, isProperty);
             break;
         default:
             return;
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::setBindingVariable(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
-void MoveCharacterModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void MirrorModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -286,9 +286,9 @@ void MoveCharacterModifierUI::loadBinding(int row, int colunm, hkbVariableBindin
                 table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MoveCharacterModifierUI::loadBinding(): The data is NULL!!"));
+        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

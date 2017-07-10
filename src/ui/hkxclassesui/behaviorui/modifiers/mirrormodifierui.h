@@ -1,5 +1,5 @@
-#ifndef COMPUTEROTATIONTOTARGETMODIFIERUI_H
-#define COMPUTEROTATIONTOTARGETMODIFIERUI_H
+#ifndef MIRRORMODIFIERUI_H
+#define MIRRORMODIFIERUI_H
 
 #include <QGroupBox>
 
@@ -8,21 +8,19 @@
 class HkxObject;
 class QGridLayout;
 class TableWidget;
-class hkbComputeRotationToTargetModifier;
+class hkbMirrorModifier;
 class LineEdit;
-class QuadVariableWidget;
 class CheckBox;
 class GenericTableWidget;
 class hkbVariableBindingSet;
-class DoubleSpinBox;
 
-class ComputeRotationToTargetModifierUI: QGroupBox
+class MirrorModifierUI: QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
 public:
-    ComputeRotationToTargetModifierUI();
-    virtual ~ComputeRotationToTargetModifierUI(){}
+    MirrorModifierUI();
+    virtual ~MirrorModifierUI(){}
     void loadData(HkxObject *data);
 signals:
     void viewVariables(int index);
@@ -31,13 +29,7 @@ signals:
 private slots:
     void setName();
     void setEnable();
-    void setRotationOut();
-    void setTargetPosition();
-    void setCurrentPosition();
-    void setCurrentRotation();
-    void setLocalAxisOfRotation();
-    void setLocalFacingDirection();
-    void setResultIsDelta();
+    void setIsAdditive();
     void viewSelected(int row, int column);
     void setBindingVariable(int index, const QString & name);
 private:
@@ -50,18 +42,12 @@ private:
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
     static QStringList headerLabels;
-    hkbComputeRotationToTargetModifier *bsData;
+    hkbMirrorModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;
     LineEdit *name;
     CheckBox *enable;
-    QuadVariableWidget *rotationOut;
-    QuadVariableWidget *targetPosition;
-    QuadVariableWidget *currentPosition;
-    QuadVariableWidget *currentRotation;
-    QuadVariableWidget *localAxisOfRotation;
-    QuadVariableWidget *localFacingDirection;
-    CheckBox *resultIsDelta;
+    CheckBox *isAdditive;
 };
 
-#endif // COMPUTEROTATIONTOTARGETMODIFIERUI_H
+#endif // MIRRORMODIFIERUI_H

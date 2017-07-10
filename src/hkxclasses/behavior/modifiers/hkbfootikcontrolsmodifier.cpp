@@ -120,7 +120,7 @@ bool hkbFootIkControlsModifier::readData(const HkxXmlReader &reader, long index)
                 return false;
             }
             for (int j = 0; j < numlegs; j++){
-                legs.append(BSLeg());
+                legs.append(hkLeg());
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                     if (text == "groundPosition"){
                         legs.last().groundPosition = readVector4(reader.getElementValueAt(index), &ok);
@@ -245,6 +245,10 @@ bool hkbFootIkControlsModifier::write(HkxXMLWriter *writer){
         }
     }
     return true;
+}
+
+int hkbFootIkControlsModifier::getNumberOfLegs() const{
+    return legs.size();
 }
 
 bool hkbFootIkControlsModifier::link(){

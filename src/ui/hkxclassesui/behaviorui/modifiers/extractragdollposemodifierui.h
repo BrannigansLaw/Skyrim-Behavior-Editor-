@@ -1,5 +1,5 @@
-#ifndef COMPUTEROTATIONTOTARGETMODIFIERUI_H
-#define COMPUTEROTATIONTOTARGETMODIFIERUI_H
+#ifndef EXTRACTRAGDOLLPOSEMODIFIERUI_H
+#define EXTRACTRAGDOLLPOSEMODIFIERUI_H
 
 #include <QGroupBox>
 
@@ -8,21 +8,22 @@
 class HkxObject;
 class QGridLayout;
 class TableWidget;
-class hkbComputeRotationToTargetModifier;
+class hkbExtractRagdollPoseModifier;
 class LineEdit;
-class QuadVariableWidget;
+class DoubleSpinBox;
 class CheckBox;
+class ComboBox;
 class GenericTableWidget;
 class hkbVariableBindingSet;
-class DoubleSpinBox;
+class QuadVariableWidget;
 
-class ComputeRotationToTargetModifierUI: QGroupBox
+class ExtractRagdollPoseModifierUI: QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
 public:
-    ComputeRotationToTargetModifierUI();
-    virtual ~ComputeRotationToTargetModifierUI(){}
+    ExtractRagdollPoseModifierUI();
+    virtual ~ExtractRagdollPoseModifierUI(){}
     void loadData(HkxObject *data);
 signals:
     void viewVariables(int index);
@@ -31,13 +32,10 @@ signals:
 private slots:
     void setName();
     void setEnable();
-    void setRotationOut();
-    void setTargetPosition();
-    void setCurrentPosition();
-    void setCurrentRotation();
-    void setLocalAxisOfRotation();
-    void setLocalFacingDirection();
-    void setResultIsDelta();
+    void setPoseMatchingBone0(int index);
+    void setPoseMatchingBone1(int index);
+    void setPoseMatchingBone2(int index);
+    void setEnableComputeWorldFromModel();
     void viewSelected(int row, int column);
     void setBindingVariable(int index, const QString & name);
 private:
@@ -50,18 +48,15 @@ private:
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
     static QStringList headerLabels;
-    hkbComputeRotationToTargetModifier *bsData;
+    hkbExtractRagdollPoseModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;
     LineEdit *name;
     CheckBox *enable;
-    QuadVariableWidget *rotationOut;
-    QuadVariableWidget *targetPosition;
-    QuadVariableWidget *currentPosition;
-    QuadVariableWidget *currentRotation;
-    QuadVariableWidget *localAxisOfRotation;
-    QuadVariableWidget *localFacingDirection;
-    CheckBox *resultIsDelta;
+    ComboBox *poseMatchingBone0;
+    ComboBox *poseMatchingBone1;
+    ComboBox *poseMatchingBone2;
+    CheckBox *enableComputeWorldFromModel;
 };
 
-#endif // COMPUTEROTATIONTOTARGETMODIFIERUI_H
+#endif // EXTRACTRAGDOLLPOSEMODIFIERUI_H

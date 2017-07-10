@@ -98,6 +98,7 @@ bool ProjectFile::parse(){
                     }
                 }else{
                     writeToLog("ProjectFile: parse()!\nUnknown signature detected!\nUnknown object class name is: "+getReader().getNthAttributeValueAt(index, 1)+"\nUnknown object signature is: "+QString::number(signature, 16));
+                    return false;
                 }
             }
         }

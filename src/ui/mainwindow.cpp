@@ -58,9 +58,8 @@ MainWindow::MainWindow()
     projectUI->setDisabled(true);
 
     //Change this for release!!!
-    hkxcmdPath = "c:/users/wayne/desktop/hkxcmd.exe";
-    //hkxcmdPath = QDir::currentPath()+"/hkxcmd.exe";
-    //Change this for release!!!
+    //hkxcmdPath = "c:/users/wayne/desktop/hkxcmd.exe";
+    hkxcmdPath = QDir::currentPath()+"/hkxcmd.exe";
 
     openPackedProjectA->setStatusTip("Open a hkx project file!");
     //openPackedProjectA->setShortcut(QKeySequence::Open);
@@ -120,9 +119,6 @@ MainWindow::MainWindow()
     if (!findSkyrimDirectory()){
         WARNING_MESSAGE(QString("The TESV executable was not found!"));
     }
-    /*if (!findHKXCMD()){
-        WARNING_MESSAGE(QString("The hkxcmd executable was not found!"));
-    }*/
     connect(openPackedProjectA, SIGNAL(triggered(bool)), this, SLOT(openPackedProject()));
     connect(openUnpackedProjectA, SIGNAL(triggered(bool)), this, SLOT(openUnpackedProject()));
     connect(saveA, SIGNAL(triggered(bool)), this, SLOT(save()));
@@ -139,7 +135,12 @@ MainWindow::MainWindow()
 }
 
 MainWindow::~MainWindow(){
-    //
+    for (int i = 0; i < behaviorFiles.size(); i++){
+        delete behaviorFiles.at(i);
+    }
+    delete characterFile;
+    delete skeletonFile;
+    delete projectFile;
 }
 
 QMessageBox::StandardButton MainWindow::yesNoDialogue(const QString & message){
@@ -384,9 +385,9 @@ void MainWindow::packAndExportFileToSkyrimDirectory(){
 }
 
 void MainWindow::exit(){
-    if (exitProgram()) {
+    /*if (exitProgram()) {
         writeSettings();
-    }
+    }*/
     QApplication::exit(0);
 }
 
@@ -429,7 +430,7 @@ void MainWindow::openProject(QString & filepath){
     projectFile = new ProjectFile(this, filepath);
     ProgressDialog dialog("Opening project..."+projectFile->fileName().section("/", -1, -1), "", 0, 100, this);
     if (!projectFile->parse()){
-        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The project file "+filepath+" could not be parsed!!!"));
+        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The project file "+filepath+" could not be parsed!!!\nYou have tried to open non-project file or the project file is corrupted!"));
         delete projectFile;
         projectFile = NULL;
         return;
@@ -490,46 +491,48 @@ void MainWindow::openProject(QString & filepath){
 }
 
 bool MainWindow::closeAll(){
-    bool unsavedChanges = false;
-    for (int i = 0; i < behaviorGraphs.size(); i++){
-        if (behaviorFiles.at(i)->getIsChanged()){
+    if (projectFile){
+        bool unsavedChanges = false;
+        for (int i = 0; i < behaviorGraphs.size(); i++){
+            if (behaviorFiles.at(i)->getIsChanged()){
+                unsavedChanges = true;
+            }
+        }
+        if (characterFile->getIsChanged()){
             unsavedChanges = true;
         }
-    }
-    if (characterFile->getIsChanged()){
-        unsavedChanges = true;
-    }
-    if (!unsavedChanges || closeAllDialogue() != QMessageBox::Cancel){
-        projectUI->setDisabled(true);
-        objectDataWid->unloadDataWidget();
-        tabs->clear();
-        for (int j = 0; j < behaviorGraphs.size(); j++){
-            if (behaviorGraphs.at(j)){
-                delete behaviorGraphs.at(j);
+        if (!unsavedChanges || closeAllDialogue() != QMessageBox::Cancel){
+            projectUI->setDisabled(true);
+            objectDataWid->unloadDataWidget();
+            tabs->clear();
+            for (int j = 0; j < behaviorGraphs.size(); j++){
+                if (behaviorGraphs.at(j)){
+                    delete behaviorGraphs.at(j);
+                }
             }
-        }
-        behaviorGraphs.clear();
-        for (int j = 0; j < behaviorFiles.size(); j++){
-            if (behaviorFiles.at(j)){
-                delete behaviorFiles.at(j);
+            behaviorGraphs.clear();
+            for (int j = 0; j < behaviorFiles.size(); j++){
+                if (behaviorFiles.at(j)){
+                    delete behaviorFiles.at(j);
+                }
             }
+            behaviorFiles.clear();
+            if (projectFile){
+                delete projectFile;
+                projectFile = NULL;
+            }
+            if (characterFile){
+                delete characterFile;
+                characterFile = NULL;
+            }
+            if (skeletonFile){
+                delete skeletonFile;
+                skeletonFile = NULL;
+            }
+            return true;
+        }else{
+            return false;
         }
-        behaviorFiles.clear();
-        if (projectFile){
-            delete projectFile;
-            projectFile = NULL;
-        }
-        if (characterFile){
-            delete characterFile;
-            characterFile = NULL;
-        }
-        if (skeletonFile){
-            delete skeletonFile;
-            skeletonFile = NULL;
-        }
-        return true;
-    }else{
-        return false;
     }
 }
 
@@ -575,7 +578,12 @@ void MainWindow::openPackedProject(){
         QString temp;
         while (it.hasNext()){
             temp = it.next();
-            if (temp.contains(".xml")){
+            if (temp.contains("-out.xml")){
+                if (!QDir(temp).rename(temp, QString(temp).replace("-out.xml", ".hkx"))){
+                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openPackedProject(): The file "+temp+" could not be renamed!!!"));
+                    return;
+                }
+            }else if (temp.contains(".xml")){
                 if (!QDir(temp).rename(temp, QString(temp).replace(".xml", ".hkx"))){
                     CRITICAL_ERROR_MESSAGE(QString("MainWindow::openPackedProject(): The file "+temp+" could not be renamed!!!"));
                     return;
@@ -637,8 +645,7 @@ void MainWindow::openBehaviorFile(const QModelIndex & index){
     }
 }
 
-void MainWindow::readSettings()
-{
+void MainWindow::readSettings(){
     QSettings settings("QtProject", "Skyrim Behavior Editor");
     settings.beginGroup("Main Window");
     QPoint pos = settings.value("pos", QPoint(500, 500)).toPoint();
@@ -648,8 +655,7 @@ void MainWindow::readSettings()
     settings.endGroup();
 }
 
-void MainWindow::writeSettings()
-{
+void MainWindow::writeSettings(){
     QSettings settings("QtProject", "Skyrim Behavior Editor");
     settings.beginGroup("Main Window");
     settings.setValue("pos", pos());
@@ -665,10 +671,22 @@ bool MainWindow::findSkyrimDirectory(){
     for (int i = 0; i < drives.size(); i++){
         driveName = drives.at(i).absolutePath();
         dir.setPath(driveName);
-        path = driveName+"Steam Games/steamapps/common/Skyrim";
+        path = driveName+"Program Files/Steam/steamapps/common/Skyrim";
         if (dir.exists(path)){
             skyrimDirectory = path;
             return true;
+        }else{
+            path = driveName+"Steam/steamapps/common/Skyrim";
+            if (dir.exists(path)){
+                skyrimDirectory = path;
+                return true;
+            }else{
+                path = driveName+"Steam Games/steamapps/common/Skyrim";
+                if (dir.exists(path)){
+                    skyrimDirectory = path;
+                    return true;
+                }
+            }
         }
     }
     return false;
@@ -676,9 +694,9 @@ bool MainWindow::findSkyrimDirectory(){
 
 MainWindow::HKXCMD_RETURN MainWindow::hkxcmd(const QString &filepath, const QString &outputDirectory, const QString &flags){
     QString command;
-    command = "\"\""+hkxcmdPath+"\"\" convert \""+filepath+"\" \""+outputDirectory+"\" "+flags;
+    command = "\""+hkxcmdPath+"\" convert \""+filepath+"\" \""+outputDirectory+"\" "+flags;
     command.replace("/", "\\");
-    command = "cmd /c "+command;
+    //command = "cmd /c "+command;
     QProcess processHKXCMD;
     HKXCMD_RETURN value = (HKXCMD_RETURN)processHKXCMD.execute(command);
     if (value != HKXCMD_SUCCESS){
@@ -687,8 +705,7 @@ MainWindow::HKXCMD_RETURN MainWindow::hkxcmd(const QString &filepath, const QStr
     return value;
 }
 
-bool MainWindow::exitProgram()
-{
+bool MainWindow::exitProgram(){
     QMessageBox::StandardButton ret;
     if (closeAll()){
         ret = QMessageBox::warning(this, tr("Application"), "Close the application?", QMessageBox::Ok | QMessageBox::Cancel);
@@ -701,14 +718,14 @@ bool MainWindow::exitProgram()
     return false;
 }
 
-void MainWindow::closeEvent(QCloseEvent *){
+void MainWindow::closeEvent(QCloseEvent *event){
     writeSettings();
-    /*if (exitProgram()) {
+    if (exitProgram()) {
         writeSettings();
         event->accept();
     }else {
         event->ignore();
-    }*/
+    }
 }
 
 void MainWindow::paintEvent(QPaintEvent *){

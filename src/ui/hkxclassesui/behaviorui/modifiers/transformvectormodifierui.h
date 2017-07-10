@@ -1,5 +1,5 @@
-#ifndef COMPUTEROTATIONTOTARGETMODIFIERUI_H
-#define COMPUTEROTATIONTOTARGETMODIFIERUI_H
+#ifndef TRANSFORMVECTORMODIFIERUI_H
+#define TRANSFORMVECTORMODIFIERUI_H
 
 #include <QGroupBox>
 
@@ -8,7 +8,7 @@
 class HkxObject;
 class QGridLayout;
 class TableWidget;
-class hkbComputeRotationToTargetModifier;
+class hkbTransformVectorModifier;
 class LineEdit;
 class QuadVariableWidget;
 class CheckBox;
@@ -16,13 +16,13 @@ class GenericTableWidget;
 class hkbVariableBindingSet;
 class DoubleSpinBox;
 
-class ComputeRotationToTargetModifierUI: QGroupBox
+class TransformVectorModifierUI: QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
 public:
-    ComputeRotationToTargetModifierUI();
-    virtual ~ComputeRotationToTargetModifierUI(){}
+    TransformVectorModifierUI();
+    virtual ~TransformVectorModifierUI(){}
     void loadData(HkxObject *data);
 signals:
     void viewVariables(int index);
@@ -31,13 +31,14 @@ signals:
 private slots:
     void setName();
     void setEnable();
-    void setRotationOut();
-    void setTargetPosition();
-    void setCurrentPosition();
-    void setCurrentRotation();
-    void setLocalAxisOfRotation();
-    void setLocalFacingDirection();
-    void setResultIsDelta();
+    void setRotation();
+    void setTranslation();
+    void setVectorIn();
+    void setVectorOut();
+    void setRotateOnly();
+    void setInverse();
+    void setComputeOnActivate();
+    void setComputeOnModify();
     void viewSelected(int row, int column);
     void setBindingVariable(int index, const QString & name);
 private:
@@ -50,18 +51,19 @@ private:
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
     static QStringList headerLabels;
-    hkbComputeRotationToTargetModifier *bsData;
+    hkbTransformVectorModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;
     LineEdit *name;
     CheckBox *enable;
-    QuadVariableWidget *rotationOut;
-    QuadVariableWidget *targetPosition;
-    QuadVariableWidget *currentPosition;
-    QuadVariableWidget *currentRotation;
-    QuadVariableWidget *localAxisOfRotation;
-    QuadVariableWidget *localFacingDirection;
-    CheckBox *resultIsDelta;
+    QuadVariableWidget *rotation;
+    QuadVariableWidget *translation;
+    QuadVariableWidget *vectorIn;
+    QuadVariableWidget *vectorOut;
+    CheckBox *rotateOnly;
+    CheckBox *inverse;
+    CheckBox *computeOnActivate;
+    CheckBox *computeOnModify;
 };
 
-#endif // COMPUTEROTATIONTOTARGETMODIFIERUI_H
+#endif // TRANSFORMVECTORMODIFIERUI_H

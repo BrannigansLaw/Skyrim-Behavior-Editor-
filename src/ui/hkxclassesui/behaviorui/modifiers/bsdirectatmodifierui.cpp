@@ -150,7 +150,7 @@ BSDirectAtModifierUI::BSDirectAtModifierUI()
     table->setItem(DIRECT_AT_CAMERA_Z_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(DIRECT_AT_CAMERA_Z_ROW, VALUE_COLUMN, directAtCameraZ);
     table->setItem(ACTIVE_ROW, NAME_COLUMN, new TableWidgetItem("active"));
-    table->setItem(ACTIVE_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
+    table->setItem(ACTIVE_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool", Qt::AlignCenter));
     table->setItem(ACTIVE_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(ACTIVE_ROW, VALUE_COLUMN, active);
     table->setItem(CURRENT_HEADING_OFFSET_ROW, NAME_COLUMN, new TableWidgetItem("currentHeadingOffset"));

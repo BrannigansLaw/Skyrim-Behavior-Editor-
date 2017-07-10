@@ -54,6 +54,13 @@
 #include "src/ui/hkxclassesui/behaviorui/modifiers/poweredragdollcontrolsmodifierui.h"
 #include "src/ui/hkxclassesui/behaviorui/modifiers/combinetransformsmodifierui.h"
 #include "src/ui/hkxclassesui/behaviorui/modifiers/computerotationfromaxisanglemodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/computerotationtotargetmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/transformvectormodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/lookatmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/keyframebonesmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/footikcontrolsmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/mirrormodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/extractragdollposemodifierui.h"
 
 #include "src/ui/hkxclassesui/behaviorui/expressiondataarrayui.h"
 
@@ -192,7 +199,14 @@ HkDataUI::HkDataUI(const QString &title)
       rigidRagdollControlsModUI(new RigidBodyRagdollControlsModifierUI),
       poweredRagdollControlsModUI(new PoweredRagdollControlsModifierUI),
       combineTransModUI(new CombineTransformsModifierUI),
-      computeRotationAxisAngleModUI(new ComputeRotationFromAxisAngleModifierUI)
+      computeRotationAxisAngleModUI(new ComputeRotationFromAxisAngleModifierUI),
+      computeRotationToTargetModUI(new ComputeRotationToTargetModifierUI),
+      transformVectorModUI(new TransformVectorModifierUI),
+      lookAtModUI(new LookAtModifierUI),
+      keyframeBonesModUI(new KeyframeBonesModifierUI),
+      footIKControlsModUI(new FootIkControlsModifierUI),
+      mirrorModUI(new MirrorModifierUI),
+      extractRagdollPoseModUI(new ExtractRagdollPoseModifierUI)
 {
     setTitle(title);
     stack->addWidget(noDataL);
@@ -234,6 +248,13 @@ HkDataUI::HkDataUI(const QString &title)
     stack->addWidget(poweredRagdollControlsModUI);
     stack->addWidget(combineTransModUI);
     stack->addWidget(computeRotationAxisAngleModUI);
+    stack->addWidget(computeRotationToTargetModUI);
+    stack->addWidget(transformVectorModUI);
+    stack->addWidget(lookAtModUI);
+    stack->addWidget(keyframeBonesModUI);
+    stack->addWidget(footIKControlsModUI);
+    stack->addWidget(mirrorModUI);
+    stack->addWidget(extractRagdollPoseModUI);
     verLyt->addLayout(stack, 5);
     setLayout(verLyt);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -277,6 +298,13 @@ HkDataUI::HkDataUI(const QString &title)
     connect(poweredRagdollControlsModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(combineTransModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(computeRotationAxisAngleModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(computeRotationToTargetModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(transformVectorModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(lookAtModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(keyframeBonesModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(footIKControlsModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(mirrorModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(extractRagdollPoseModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
 
     connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
     connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
@@ -574,6 +602,27 @@ void HkDataUI::variableNameChanged(const QString & newName, int index){
     case DATA_TYPE_LOADED::COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER:
         computeRotationAxisAngleModUI->variableRenamed(newName, index);
         break;
+    case DATA_TYPE_LOADED::COMPUTE_ROTATION_TO_TARGET_MODIFIER:
+        computeRotationToTargetModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::TRANSFORM_VECTOR_MODIFIER:
+        transformVectorModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::LOOK_AT_MODIFIER:
+        lookAtModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::KEY_FRAME_BONES_MODIFIER:
+        keyframeBonesModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::FOOT_IK_CONTROLS_MODIFIER:
+        footIKControlsModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::MIRROR_MODIFIER:
+        mirrorModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::EXTRACT_RAGDOLL_POSE_MODIFIER:
+        extractRagdollPoseModUI->variableRenamed(newName, index);
+        break;
     }
 }
 
@@ -760,6 +809,27 @@ void HkDataUI::variableRemoved(int index){
         break;
     case DATA_TYPE_LOADED::COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER:
         computeRotationAxisAngleModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::COMPUTE_ROTATION_TO_TARGET_MODIFIER:
+        computeRotationToTargetModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::TRANSFORM_VECTOR_MODIFIER:
+        transformVectorModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::LOOK_AT_MODIFIER:
+        lookAtModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::KEY_FRAME_BONES_MODIFIER:
+        keyframeBonesModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::FOOT_IK_CONTROLS_MODIFIER:
+        footIKControlsModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::MIRROR_MODIFIER:
+        mirrorModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::EXTRACT_RAGDOLL_POSE_MODIFIER:
+        extractRagdollPoseModUI->variableRenamed("NONE", index);
         break;
     }
     behaviorView->behavior->removeBindings(index);
@@ -1037,6 +1107,55 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             }
             stack->setCurrentIndex(DATA_TYPE_LOADED::COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER);
             computeRotationAxisAngleModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_COMPUTE_ROTATION_TO_TARGET_MODIFIER:
+            if (loadedData != oldData){
+                computeRotationToTargetModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::COMPUTE_ROTATION_TO_TARGET_MODIFIER);
+            computeRotationToTargetModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_TRANSFORM_VECTOR_MODIFIER:
+            if (loadedData != oldData){
+                transformVectorModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::TRANSFORM_VECTOR_MODIFIER);
+            transformVectorModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_LOOK_AT_MODIFIER:
+            if (loadedData != oldData){
+                lookAtModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::LOOK_AT_MODIFIER);
+            lookAtModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_KEY_FRAME_BONES_MODIFIER:
+            if (loadedData != oldData){
+                keyframeBonesModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::KEY_FRAME_BONES_MODIFIER);
+            keyframeBonesModUI->connectToTables(variablesTable, characterPropertiesTable, ragdollBonesTable);
+            break;
+        case HkxSignature::HKB_FOOT_IK_CONTROLS_MODIFIER:
+            if (loadedData != oldData){
+                footIKControlsModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::FOOT_IK_CONTROLS_MODIFIER);
+            footIKControlsModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
+            break;
+        case HkxSignature::HKB_MIRROR_MODIFIER:
+            if (loadedData != oldData){
+                mirrorModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::MIRROR_MODIFIER);
+            mirrorModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_EXTRACT_RAGDOLL_POSE_MODIFIER:
+            if (loadedData != oldData){
+                extractRagdollPoseModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::EXTRACT_RAGDOLL_POSE_MODIFIER);
+            extractRagdollPoseModUI->connectToTables(variablesTable, characterPropertiesTable);
             break;
         default:
             unloadDataWidget();

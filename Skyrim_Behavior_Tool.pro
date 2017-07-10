@@ -19,6 +19,12 @@ TEMPLATE = app
 # add the desired -O3 if not present
 #QMAKE_CXXFLAGS_DEBUG *= -O3
 
+VERSION = 0.90
+QMAKE_TARGET_COMPANY = WK Inc.
+#QMAKE_TARGET_PRODUCT = "Skyrim Behavior Editor"
+QMAKE_TARGET_DESCRIPTION = Skyrim Behavior Editor
+QMAKE_TARGET_COPYRIGHT = Wayne Kelly
+
 SOURCES += \
     src/main.cpp \
     src/filetypes/hkxfile.cpp \
@@ -193,7 +199,16 @@ SOURCES += \
     src/ui/hkxclassesui/behaviorui/boneindexarrayui.cpp \
     src/ui/hkxclassesui/behaviorui/modifiers/poweredragdollcontrolsmodifierui.cpp \
     src/ui/hkxclassesui/behaviorui/modifiers/combinetransformsmodifierui.cpp \
-    src/ui/hkxclassesui/behaviorui/modifiers/computerotationfromaxisanglemodifierui.cpp
+    src/ui/hkxclassesui/behaviorui/modifiers/computerotationfromaxisanglemodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/transformvectormodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/lookatmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/keyframebonesmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/keyframeinfoui.cpp \
+    src/ui/hkxclassesui/behaviorui/legui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/footikcontrolsmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/mirrormodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/extractragdollposemodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bstimermodifierui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -369,4 +384,13 @@ HEADERS  += \
     src/ui/hkxclassesui/behaviorui/boneindexarrayui.h \
     src/ui/hkxclassesui/behaviorui/modifiers/poweredragdollcontrolsmodifierui.h \
     src/ui/hkxclassesui/behaviorui/modifiers/combinetransformsmodifierui.h \
-    src/ui/hkxclassesui/behaviorui/modifiers/computerotationfromaxisanglemodifierui.h
+    src/ui/hkxclassesui/behaviorui/modifiers/computerotationfromaxisanglemodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/transformvectormodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/lookatmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/keyframebonesmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/keyframeinfoui.h \
+    src/ui/hkxclassesui/behaviorui/legui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/footikcontrolsmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/mirrormodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/extractragdollposemodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bstimermodifierui.h

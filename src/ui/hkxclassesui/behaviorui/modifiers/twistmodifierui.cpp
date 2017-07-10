@@ -135,8 +135,7 @@ void TwistModifierUI::loadData(HkxObject *data){
     disconnectSignals();
     if (data){
         if (data->getSignature() == HKB_TWIST_MODIFIER){
-            QStringList boneNames;
-            boneNames.append("None");
+            QStringList boneNames("None");
             hkbVariableBindingSet *varBind = NULL;
             bsData = static_cast<hkbTwistModifier *>(data);
             name->setText(bsData->name);

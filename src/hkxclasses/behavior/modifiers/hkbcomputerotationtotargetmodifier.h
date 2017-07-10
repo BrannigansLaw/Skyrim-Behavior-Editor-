@@ -6,6 +6,7 @@
 class hkbComputeRotationToTargetModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class ComputeRotationToTargetModifierUI;
 public:
     hkbComputeRotationToTargetModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbComputeRotationToTargetModifier();

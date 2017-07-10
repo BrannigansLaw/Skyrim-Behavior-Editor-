@@ -1,9 +1,9 @@
-#ifndef RANGESUI_H
-#define RANGESUI_H
+#ifndef LEGUI_H
+#define LEGUI_H
 
 #include <QGroupBox>
 
-#include "src/hkxclasses/behavior/modifiers/hkbsensehandlemodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbfootikcontrolsmodifier.h"
 
 class QGridLayout;
 class QLabel;
@@ -14,14 +14,15 @@ class DoubleSpinBox;
 class CheckBox;
 class TableWidget;
 class hkbVariableBindingSet;
+class QuadVariableWidget;
 
-class RangesUI: public QGroupBox
+class LegUI: public QGroupBox
 {
     Q_OBJECT
-    friend class SenseHandleModifierUI;
+    friend class FootIkControlsModifierUI;
 public:
-    RangesUI();
-    void loadData(BehaviorFile *parentFile, hkbSenseHandleModifier::hkRanges *ranges, hkbSenseHandleModifier *par, int index);
+    LegUI();
+    void loadData(BehaviorFile *parentFile, hkbFootIkControlsModifier::hkLeg *leg, hkbFootIkControlsModifier *par, int index);
 signals:
     void viewEvents(int index);
     void viewProperties(int index);
@@ -30,9 +31,10 @@ signals:
 private slots:
     void setEventId(int index, const QString &name);
     void setEventPayload();
-    void setMinDistance();
-    void setMaxDistance();
-    void setIgnoreHandle();
+    void setGroundPosition();
+    void setVerticalError();
+    void setHitSomething();
+    void setIsPlantedMS();
     void viewSelectedChild(int row, int column);
 private:
     void connectSignals();
@@ -46,16 +48,17 @@ private:
 private:
     static QStringList headerLabels;
     BehaviorFile *file;
-    hkbSenseHandleModifier::hkRanges *bsData;
-    hkbSenseHandleModifier *parent;
-    int rangeIndex;
+    hkbFootIkControlsModifier::hkLeg *bsData;
+    hkbFootIkControlsModifier *parent;
+    int legIndex;
     QGridLayout *topLyt;
     QPushButton *returnPB;
     TableWidget *table;
+    QuadVariableWidget *groundPosition;
     QLineEdit *payload;
-    DoubleSpinBox *minDistance;
-    DoubleSpinBox *maxDistance;
-    CheckBox *ignoreHandle;
+    DoubleSpinBox *verticalError;
+    CheckBox *hitSomething;
+    CheckBox *isPlantedMS;
 };
 
-#endif // RANGESUI_H
+#endif // LEGUI_H

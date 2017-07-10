@@ -59,6 +59,13 @@ class RigidBodyRagdollControlsModifierUI;
 class PoweredRagdollControlsModifierUI;
 class CombineTransformsModifierUI;
 class ComputeRotationFromAxisAngleModifierUI;
+class ComputeRotationToTargetModifierUI;
+class TransformVectorModifierUI;
+class LookAtModifierUI;
+class KeyframeBonesModifierUI;
+class FootIkControlsModifierUI;
+class MirrorModifierUI;
+class ExtractRagdollPoseModifierUI;
 
 /**
  * To add support for a new class we need to add it to the "DATA_TYPE_LOADED" enum, add it to the stacked layout in the correct order,
@@ -135,7 +142,14 @@ private:
         RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER,
         POWERED_RAGDOLL_CONTROLS_MODIFIER,
         COMBINE_TRANSFORMS_MODIFIER,
-        COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER
+        COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER,
+        COMPUTE_ROTATION_TO_TARGET_MODIFIER,
+        TRANSFORM_VECTOR_MODIFIER,
+        LOOK_AT_MODIFIER,
+        KEY_FRAME_BONES_MODIFIER,
+        FOOT_IK_CONTROLS_MODIFIER,
+        MIRROR_MODIFIER,
+        EXTRACT_RAGDOLL_POSE_MODIFIER
     };
     static QStringList generatorTypes;
     static QStringList modifierTypes;
@@ -193,6 +207,13 @@ private:
     PoweredRagdollControlsModifierUI *poweredRagdollControlsModUI;
     CombineTransformsModifierUI *combineTransModUI;
     ComputeRotationFromAxisAngleModifierUI *computeRotationAxisAngleModUI;
+    ComputeRotationToTargetModifierUI *computeRotationToTargetModUI;
+    TransformVectorModifierUI *transformVectorModUI;
+    LookAtModifierUI *lookAtModUI;
+    KeyframeBonesModifierUI *keyframeBonesModUI;
+    FootIkControlsModifierUI *footIKControlsModUI;
+    MirrorModifierUI *mirrorModUI;
+    ExtractRagdollPoseModifierUI *extractRagdollPoseModUI;
 };
 
 #endif // HKDATAUI_H

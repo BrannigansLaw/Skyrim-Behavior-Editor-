@@ -1,9 +1,9 @@
-#ifndef RANGESUI_H
-#define RANGESUI_H
+#ifndef KEYFRAMEINFOUI_H
+#define KEYFRAMEINFOUI_H
 
 #include <QGroupBox>
 
-#include "src/hkxclasses/behavior/modifiers/hkbsensehandlemodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbkeyframebonesmodifier.h"
 
 class QGridLayout;
 class QLabel;
@@ -14,25 +14,25 @@ class DoubleSpinBox;
 class CheckBox;
 class TableWidget;
 class hkbVariableBindingSet;
+class QuadVariableWidget;
+class ComboBox;
 
-class RangesUI: public QGroupBox
+class KeyframeInfoUI: public QGroupBox
 {
     Q_OBJECT
-    friend class SenseHandleModifierUI;
+    friend class KeyframeBonesModifierUI;
 public:
-    RangesUI();
-    void loadData(BehaviorFile *parentFile, hkbSenseHandleModifier::hkRanges *ranges, hkbSenseHandleModifier *par, int index);
+    KeyframeInfoUI();
+    void loadData(BehaviorFile *parentFile, hkbKeyframeBonesModifier::hkKeyframeInfo *key, hkbKeyframeBonesModifier *par, int index);
 signals:
-    void viewEvents(int index);
     void viewProperties(int index);
     void viewVariables(int index);
     void returnToParent();
 private slots:
-    void setEventId(int index, const QString &name);
-    void setEventPayload();
-    void setMinDistance();
-    void setMaxDistance();
-    void setIgnoreHandle();
+    void setKeyframedPosition();
+    void setKeyframedRotation();
+    void setBoneIndex(int index);
+    void setIsValid();
     void viewSelectedChild(int row, int column);
 private:
     void connectSignals();
@@ -41,21 +41,20 @@ private:
     void setBindingVariable(int index, const QString & name);
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path);
     void selectTableToView(bool viewproperties, const QString & path);
-    void eventRenamed(const QString & name, int index);
     void variableRenamed(const QString & name, int index);
 private:
     static QStringList headerLabels;
     BehaviorFile *file;
-    hkbSenseHandleModifier::hkRanges *bsData;
-    hkbSenseHandleModifier *parent;
-    int rangeIndex;
+    hkbKeyframeBonesModifier::hkKeyframeInfo *bsData;
+    hkbKeyframeBonesModifier *parent;
+    int keyframeIndex;
     QGridLayout *topLyt;
     QPushButton *returnPB;
     TableWidget *table;
-    QLineEdit *payload;
-    DoubleSpinBox *minDistance;
-    DoubleSpinBox *maxDistance;
-    CheckBox *ignoreHandle;
+    QuadVariableWidget *keyframedPosition;
+    QuadVariableWidget *keyframedRotation;
+    ComboBox *boneIndex;
+    CheckBox *isValid;
 };
 
-#endif // RANGESUI_H
+#endif // KEYFRAMEINFOUI_H

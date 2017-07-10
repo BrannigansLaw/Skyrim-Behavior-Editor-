@@ -6,6 +6,7 @@
 class hkbMirrorModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class MirrorModifierUI;
 public:
     hkbMirrorModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbMirrorModifier();

@@ -6,6 +6,7 @@
 class hkbExtractRagdollPoseModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class ExtractRagdollPoseModifierUI;
 public:
     hkbExtractRagdollPoseModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbExtractRagdollPoseModifier();

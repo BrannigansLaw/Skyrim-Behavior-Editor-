@@ -6,6 +6,7 @@
 class hkbLookAtModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class LookAtModifierUI;
 public:
     hkbLookAtModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbLookAtModifier();

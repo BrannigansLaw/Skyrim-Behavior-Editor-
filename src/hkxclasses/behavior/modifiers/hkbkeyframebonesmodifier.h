@@ -6,6 +6,8 @@
 class hkbKeyframeBonesModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class KeyframeInfoUI;
+    friend class KeyframeBonesModifierUI;
 public:
     hkbKeyframeBonesModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbKeyframeBonesModifier();
@@ -16,6 +18,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    int getNumberOfKeyframeInfos() const;
 private:
     hkbKeyframeBonesModifier& operator=(const hkbKeyframeBonesModifier&);
     hkbKeyframeBonesModifier(const hkbKeyframeBonesModifier &);

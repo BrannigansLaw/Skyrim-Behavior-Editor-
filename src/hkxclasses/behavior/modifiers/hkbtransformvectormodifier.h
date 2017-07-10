@@ -6,6 +6,7 @@
 class hkbTransformVectorModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class TransformVectorModifierUI;
 public:
     hkbTransformVectorModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbTransformVectorModifier();

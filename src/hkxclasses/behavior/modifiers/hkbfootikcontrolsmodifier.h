@@ -6,6 +6,8 @@
 class hkbFootIkControlsModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class LegUI;
+    friend class FootIkControlsModifierUI;
 public:
     hkbFootIkControlsModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbFootIkControlsModifier();
@@ -16,12 +18,13 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    int getNumberOfLegs()const;
 private:
     hkbFootIkControlsModifier& operator=(const hkbFootIkControlsModifier&);
     hkbFootIkControlsModifier(const hkbFootIkControlsModifier &);
 private:
-    struct BsControlData{
-        BsControlData()
+    struct hkControlData{
+        hkControlData()
             : onOffGain(0),
               groundAscendingGain(0),
               groundDescendingGain(0),
@@ -52,8 +55,8 @@ private:
         qreal ankleOrientationGain;
     };
 
-    struct BSLeg{
-        BSLeg()
+    struct hkLeg{
+        hkLeg()
             : id(-1),
               verticalError(0),
               hitSomething(false),
@@ -75,8 +78,8 @@ private:
     long userData;
     QString name;
     bool enable;
-    BsControlData gains;
-    QList <BSLeg> legs;
+    hkControlData gains;
+    QList <hkLeg> legs;
     hkQuadVariable errorOutTranslation;
     hkQuadVariable alignWithGroundRotation;
 };

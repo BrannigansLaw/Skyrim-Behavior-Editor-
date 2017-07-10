@@ -148,6 +148,10 @@ bool hkbKeyframeBonesModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+int hkbKeyframeBonesModifier::getNumberOfKeyframeInfos() const{
+    return keyframeInfo.size();
+}
+
 bool hkbKeyframeBonesModifier::link(){
     if (!getParentFile()){
         return false;
