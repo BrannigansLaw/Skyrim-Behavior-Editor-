@@ -1,5 +1,5 @@
-#ifndef BSTIMERMODIFIERUI_H
-#define BSTIMERMODIFIERUI_H
+#ifndef BSEVENTEVERYNEVENTSMODIFIERUI_H
+#define BSEVENTEVERYNEVENTSMODIFIERUI_H
 
 #include <QGroupBox>
 
@@ -8,7 +8,7 @@
 class HkxObject;
 class QGridLayout;
 class TableWidget;
-class BSTimerModifier;
+class BSEventEveryNEventsModifier;
 class LineEdit;
 class QLineEdit;
 class DoubleSpinBox;
@@ -16,15 +16,15 @@ class CheckBox;
 class ComboBox;
 class GenericTableWidget;
 class hkbVariableBindingSet;
-class QuadVariableWidget;
+class SpinBox;
 
-class BSTimerModifierUI: QGroupBox
+class BSEventEveryNEventsModifierUI: QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
 public:
-    BSTimerModifierUI();
-    virtual ~BSTimerModifierUI(){}
+    BSEventEveryNEventsModifierUI();
+    virtual ~BSEventEveryNEventsModifierUI(){}
     void loadData(HkxObject *data);
 signals:
     void viewVariables(int index);
@@ -34,15 +34,19 @@ signals:
 private slots:
     void setName();
     void setEnable();
-    void setAlarmTimeSeconds();
-    void setAlarmEventId(int index, const QString & name);
-    void setAlarmEventPayload();
-    void setResetAlarm();
+    void setEventToCheckForPayload();
+    void setEventToSendPayload();
+    void setNumberOfEventsBeforeSend();
+    void setMinimumNumberOfEventsBeforeSend();
+    void setRandomizeNumberOfEvents();
+    void eventTableElementSelected(int index, const QString &name);
     void viewSelected(int row, int column);
     void setBindingVariable(int index, const QString & name);
 private:
     void connectSignals();
     void disconnectSignals();
+    void setEventToCheckForId(int index, const QString & name);
+    void setEventToSendId(int index, const QString & name);
     void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events);
     void variableRenamed(const QString & name, int index);
     void eventRenamed(const QString & name, int index);
@@ -51,14 +55,16 @@ private:
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
     static QStringList headerLabels;
-    BSTimerModifier *bsData;
+    BSEventEveryNEventsModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;
     LineEdit *name;
     CheckBox *enable;
-    DoubleSpinBox *alarmTimeSeconds;
-    QLineEdit *alarmEventPayload;
-    CheckBox *resetAlarm;
+    QLineEdit *eventToCheckForPayload;
+    QLineEdit *eventToSendPayload;
+    SpinBox *numberOfEventsBeforeSend;
+    SpinBox *minimumNumberOfEventsBeforeSend;
+    CheckBox *randomizeNumberOfEvents;
 };
 
-#endif // BSTIMERMODIFIERUI_H
+#endif // BSEVENTEVERYNEVENTSMODIFIERUI_H

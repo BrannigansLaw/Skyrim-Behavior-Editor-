@@ -6,6 +6,7 @@
 class hkbDelayedModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class DelayedModifierUI;
 public:
     hkbDelayedModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbDelayedModifier();

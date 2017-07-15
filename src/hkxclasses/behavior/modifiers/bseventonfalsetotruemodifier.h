@@ -6,6 +6,7 @@
 class BSEventOnFalseToTrueModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSEventOnFalseToTrueModifierUI;
 public:
     BSEventOnFalseToTrueModifier(HkxFile *parent, long ref = 0);
     virtual ~BSEventOnFalseToTrueModifier();

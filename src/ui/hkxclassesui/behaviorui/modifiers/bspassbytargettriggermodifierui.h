@@ -1,5 +1,5 @@
-#ifndef BSTIMERMODIFIERUI_H
-#define BSTIMERMODIFIERUI_H
+#ifndef BSPASSBYTARGETTRIGGERMODIFIERUI_H
+#define BSPASSBYTARGETTRIGGERMODIFIERUI_H
 
 #include <QGroupBox>
 
@@ -8,7 +8,7 @@
 class HkxObject;
 class QGridLayout;
 class TableWidget;
-class BSTimerModifier;
+class BSPassByTargetTriggerModifier;
 class LineEdit;
 class QLineEdit;
 class DoubleSpinBox;
@@ -18,13 +18,13 @@ class GenericTableWidget;
 class hkbVariableBindingSet;
 class QuadVariableWidget;
 
-class BSTimerModifierUI: QGroupBox
+class BSPassByTargetTriggerModifierUI: QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
 public:
-    BSTimerModifierUI();
-    virtual ~BSTimerModifierUI(){}
+    BSPassByTargetTriggerModifierUI();
+    virtual ~BSPassByTargetTriggerModifierUI(){}
     void loadData(HkxObject *data);
 signals:
     void viewVariables(int index);
@@ -34,10 +34,11 @@ signals:
 private slots:
     void setName();
     void setEnable();
-    void setAlarmTimeSeconds();
-    void setAlarmEventId(int index, const QString & name);
-    void setAlarmEventPayload();
-    void setResetAlarm();
+    void setTargetPosition();
+    void setRadius();
+    void setMovementDirection();
+    void setTriggerEventId(int index, const QString & name);
+    void setTriggerEventPayload();
     void viewSelected(int row, int column);
     void setBindingVariable(int index, const QString & name);
 private:
@@ -51,14 +52,15 @@ private:
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
     static QStringList headerLabels;
-    BSTimerModifier *bsData;
+    BSPassByTargetTriggerModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;
     LineEdit *name;
     CheckBox *enable;
-    DoubleSpinBox *alarmTimeSeconds;
-    QLineEdit *alarmEventPayload;
-    CheckBox *resetAlarm;
+    QuadVariableWidget *targetPosition;
+    DoubleSpinBox *radius;
+    QuadVariableWidget *movementDirection;
+    QLineEdit *triggerEventPayload;
 };
 
-#endif // BSTIMERMODIFIERUI_H
+#endif // BSPASSBYTARGETTRIGGERMODIFIERUI_H

@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     w.setWindowTitle("Skyrim Behavior Tool");
     w.show();
 
-    ulong linecount = 0;
+    /*ulong linecount = 0;
     QDirIterator dirIt("C:/Users/Wayne/Documents/Skyrim-Behavior-Editor-", QDirIterator::Subdirectories);
     while (dirIt.hasNext()){
         dirIt.next();
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
             }
         }
     }
-    CRITICAL_ERROR_MESSAGE(QString(QString::number(linecount)))
+    CRITICAL_ERROR_MESSAGE(QString(QString::number(linecount)))*/
 
     return a.exec();
 }

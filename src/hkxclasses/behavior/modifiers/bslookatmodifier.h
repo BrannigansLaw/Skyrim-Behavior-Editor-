@@ -6,6 +6,8 @@
 class BSLookAtModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSBoneUI;
+    friend class BSLookAtModifierUI;
 public:
     BSLookAtModifier(HkxFile *parent, long ref = 0);
     virtual ~BSLookAtModifier();
@@ -16,6 +18,8 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    int getNumberOfBones() const;
+    int getNumberOfEyeBones() const;
 private:
     BSLookAtModifier& operator=(const BSLookAtModifier&);
     BSLookAtModifier(const BSLookAtModifier &);

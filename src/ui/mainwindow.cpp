@@ -533,6 +533,8 @@ bool MainWindow::closeAll(){
         }else{
             return false;
         }
+    }else{
+        return true;
     }
 }
 

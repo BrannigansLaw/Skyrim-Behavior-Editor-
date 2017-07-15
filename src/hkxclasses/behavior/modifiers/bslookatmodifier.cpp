@@ -14,13 +14,13 @@ BSLookAtModifier::BSLookAtModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
       userData(0),
       enable(true),
-      lookAtTarget(true),
+      lookAtTarget(false),
       limitAngleDegrees(0),
       limitAngleThresholdDegrees(0),
-      continueLookOutsideOfLimit(true),
+      continueLookOutsideOfLimit(false),
       onGain(0),
       offGain(0),
-      useBoneGains(true),
+      useBoneGains(false),
       targetOutsideLimits(false),
       id(-1),
       lookAtCamera(false),
@@ -317,6 +317,14 @@ bool BSLookAtModifier::write(HkxXMLWriter *writer){
         }
     }
     return true;
+}
+
+int BSLookAtModifier::getNumberOfBones() const{
+    return bones.size();
+}
+
+int BSLookAtModifier::getNumberOfEyeBones() const{
+    return eyeBones.size();
 }
 
 bool BSLookAtModifier::link(){

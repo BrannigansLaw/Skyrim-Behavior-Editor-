@@ -6,6 +6,7 @@
 class BSEventEveryNEventsModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSEventEveryNEventsModifierUI;
 public:
     BSEventEveryNEventsModifier(HkxFile *parent, long ref = 0);
     virtual ~BSEventEveryNEventsModifier();

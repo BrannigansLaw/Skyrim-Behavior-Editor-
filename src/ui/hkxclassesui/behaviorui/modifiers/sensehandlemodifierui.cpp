@@ -236,6 +236,7 @@ void SenseHandleModifierUI::connectSignals(){
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
     connect(rangeUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)), Qt::UniqueConnection);
     connect(rangeUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
+    connect(rangeUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
     connect(rangeUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
 }
 
@@ -258,6 +259,7 @@ void SenseHandleModifierUI::disconnectSignals(){
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
     disconnect(rangeUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)));
     disconnect(rangeUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
+    disconnect(rangeUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)));
     disconnect(rangeUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
 }
 

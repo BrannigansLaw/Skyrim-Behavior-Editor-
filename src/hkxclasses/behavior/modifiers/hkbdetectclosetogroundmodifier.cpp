@@ -20,7 +20,7 @@ hkbDetectCloseToGroundModifier::hkbDetectCloseToGroundModifier(HkxFile *parent, 
       boneIndex(-1),
       animBoneIndex(-1)
 {
-    setType(HKB_EVENT_DRIVEN_MODIFIER, TYPE_MODIFIER);
+    setType(HKB_DETECT_CLOSE_TO_GROUND_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
     name = "hkbDetectCloseToGroundModifier"+QString::number(refCount);

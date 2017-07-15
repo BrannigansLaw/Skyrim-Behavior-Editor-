@@ -10,13 +10,14 @@
 #include <QGridLayout>
 #include <QHeaderView>
 
-#define BASE_NUMBER_OF_ROWS 5
+#define BASE_NUMBER_OF_ROWS 6
 
 #define NAME_ROW 0
 #define ENABLE_ROW 1
 #define ALARM_TIME_SECONDS_ROW 2
 #define ALARM_EVENT_ID_ROW 3
 #define ALARM_EVENT_PAYLOAD_ROW 4
+#define RESET_ALARM_ROW 5
 
 #define NAME_COLUMN 0
 #define TYPE_COLUMN 1
@@ -39,7 +40,8 @@ BSTimerModifierUI::BSTimerModifierUI()
       name(new LineEdit),
       enable(new CheckBox),
       alarmTimeSeconds(new DoubleSpinBox),
-      alarmEventPayload(new QLineEdit)
+      alarmEventPayload(new QLineEdit),
+      resetAlarm(new CheckBox)
 {
     setTitle("BSTimerModifierUI");
     table->setRowCount(BASE_NUMBER_OF_ROWS);
@@ -60,11 +62,15 @@ BSTimerModifierUI::BSTimerModifierUI()
     table->setItem(ALARM_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("alarmEventId"));
     table->setItem(ALARM_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
     table->setItem(ALARM_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
-    table->setItem(ALARM_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_EVENTS_TABLE_TIP));
+    table->setItem(ALARM_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_EVENTS_TABLE_TIP));
     table->setItem(ALARM_EVENT_PAYLOAD_ROW, NAME_COLUMN, new TableWidgetItem("alarmEventPayload"));
-    table->setItem(ALARM_EVENT_PAYLOAD_ROW, TYPE_COLUMN, new TableWidgetItem("hkEventPayload", Qt::AlignCenter));
+    table->setItem(ALARM_EVENT_PAYLOAD_ROW, TYPE_COLUMN, new TableWidgetItem("hkbStringEventPayload", Qt::AlignCenter));
     table->setItem(ALARM_EVENT_PAYLOAD_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setCellWidget(ALARM_EVENT_PAYLOAD_ROW, VALUE_COLUMN, alarmEventPayload);
+    table->setItem(RESET_ALARM_ROW, NAME_COLUMN, new TableWidgetItem("resetAlarm"));
+    table->setItem(RESET_ALARM_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool", Qt::AlignCenter));
+    table->setItem(RESET_ALARM_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
+    table->setCellWidget(RESET_ALARM_ROW, VALUE_COLUMN, resetAlarm);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
 }
@@ -74,6 +80,7 @@ void BSTimerModifierUI::connectSignals(){
     connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
     connect(alarmTimeSeconds, SIGNAL(editingFinished()), this, SLOT(setAlarmTimeSeconds()), Qt::UniqueConnection);
     connect(alarmEventPayload, SIGNAL(editingFinished()), this, SLOT(setAlarmEventPayload()), Qt::UniqueConnection);
+    connect(enable, SIGNAL(released()), this, SLOT(setResetAlarm()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
 }
 
@@ -82,6 +89,7 @@ void BSTimerModifierUI::disconnectSignals(){
     disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
     disconnect(alarmTimeSeconds, SIGNAL(editingFinished()), this, SLOT(setAlarmTimeSeconds()));
     disconnect(alarmEventPayload, SIGNAL(editingFinished()), this, SLOT(setAlarmEventPayload()));
+    disconnect(resetAlarm, SIGNAL(released()), this, SLOT(setResetAlarm()));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
 }
 
@@ -104,7 +112,7 @@ void BSTimerModifierUI::connectToTables(GenericTableWidget *variables, GenericTa
 void BSTimerModifierUI::loadData(HkxObject *data){
     disconnectSignals();
     if (data){
-        if (data->getSignature() == HKB_TIMER_MODIFIER){
+        if (data->getSignature() == BS_TIMER_MODIFIER){
             bsData = static_cast<BSTimerModifier *>(data);
             hkbVariableBindingSet *varBind = NULL;
             hkbStringEventPayload *payload = static_cast<hkbStringEventPayload *>(bsData->alarmEvent.payload.data());
@@ -122,13 +130,16 @@ void BSTimerModifierUI::loadData(HkxObject *data){
             }else{
                 alarmEventPayload->setText("");
             }
+            resetAlarm->setChecked(bsData->resetAlarm);
             varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
                 loadBinding(ALARM_TIME_SECONDS_ROW, BINDING_COLUMN, varBind, "alarmTimeSeconds");
+                loadBinding(RESET_ALARM_ROW, BINDING_COLUMN, varBind, "resetAlarm");
             }else{
                 table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
                 table->item(ALARM_TIME_SECONDS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
+                table->item(RESET_ALARM_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::loadData(): The data is an incorrect type!!"));
@@ -208,6 +219,17 @@ void BSTimerModifierUI::setAlarmEventPayload(){
     }
 }
 
+void BSTimerModifierUI::setResetAlarm(){
+    if (bsData){
+        if (bsData->resetAlarm != resetAlarm->isChecked()){
+            bsData->resetAlarm = resetAlarm->isChecked();
+            bsData->getParentFile()->toggleChanged(true);
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::setResetAlarm(): The data is NULL!!"));
+    }
+}
+
 void BSTimerModifierUI::viewSelected(int row, int column){
     if (bsData){
         bool isProperty = false;
@@ -224,6 +246,12 @@ void BSTimerModifierUI::viewSelected(int row, int column){
                     isProperty = true;
                 }
                 selectTableToView(isProperty, "alarmTimeSeconds");
+                break;
+            case RESET_ALARM_ROW:
+                if (table->item(RESET_ALARM_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
+                    isProperty = true;
+                }
+                selectTableToView(isProperty, "resetAlarm");
                 break;
             default:
                 return;
@@ -280,6 +308,10 @@ void BSTimerModifierUI::variableRenamed(const QString & name, int index){
             if (bindIndex == index){
                 table->item(ALARM_TIME_SECONDS_ROW, BINDING_COLUMN)->setText(name);
             }
+            bindIndex = bind->getVariableIndexOfBinding("resetAlarm");
+            if (bindIndex == index){
+                table->item(RESET_ALARM_ROW, BINDING_COLUMN)->setText(name);
+            }
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
@@ -334,6 +366,12 @@ void BSTimerModifierUI::setBindingVariable(int index, const QString &name){
                 isProperty = true;
             }
             setBinding(index, row, name, "alarmTimeSeconds", VARIABLE_TYPE_REAL, isProperty);
+            break;
+        case RESET_ALARM_ROW:
+            if (table->item(RESET_ALARM_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
+                isProperty = true;
+            }
+            setBinding(index, row, name, "resetAlarm", VARIABLE_TYPE_BOOL, isProperty);
             break;
         default:
             return;

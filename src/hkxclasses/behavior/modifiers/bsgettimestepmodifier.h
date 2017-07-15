@@ -6,6 +6,7 @@
 class BSGetTimeStepModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSGetTimeStepModifierUI;
 public:
     BSGetTimeStepModifier(HkxFile *parent, long ref = 0);
     virtual ~BSGetTimeStepModifier();

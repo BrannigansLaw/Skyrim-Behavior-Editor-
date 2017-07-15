@@ -1,5 +1,5 @@
-#ifndef BSTIMERMODIFIERUI_H
-#define BSTIMERMODIFIERUI_H
+#ifndef BSEVENTONDEACTIVATEMODIFIERUI_H
+#define BSEVENTONDEACTIVATEMODIFIERUI_H
 
 #include <QGroupBox>
 
@@ -8,7 +8,7 @@
 class HkxObject;
 class QGridLayout;
 class TableWidget;
-class BSTimerModifier;
+class BSEventOnDeactivateModifier;
 class LineEdit;
 class QLineEdit;
 class DoubleSpinBox;
@@ -18,13 +18,13 @@ class GenericTableWidget;
 class hkbVariableBindingSet;
 class QuadVariableWidget;
 
-class BSTimerModifierUI: QGroupBox
+class BSEventOnDeactivateModifierUI: QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
 public:
-    BSTimerModifierUI();
-    virtual ~BSTimerModifierUI(){}
+    BSEventOnDeactivateModifierUI();
+    virtual ~BSEventOnDeactivateModifierUI(){}
     void loadData(HkxObject *data);
 signals:
     void viewVariables(int index);
@@ -34,10 +34,8 @@ signals:
 private slots:
     void setName();
     void setEnable();
-    void setAlarmTimeSeconds();
-    void setAlarmEventId(int index, const QString & name);
-    void setAlarmEventPayload();
-    void setResetAlarm();
+    void setEventId(int index, const QString & name);
+    void setEventPayload();
     void viewSelected(int row, int column);
     void setBindingVariable(int index, const QString & name);
 private:
@@ -51,14 +49,12 @@ private:
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
     static QStringList headerLabels;
-    BSTimerModifier *bsData;
+    BSEventOnDeactivateModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;
     LineEdit *name;
     CheckBox *enable;
-    DoubleSpinBox *alarmTimeSeconds;
-    QLineEdit *alarmEventPayload;
-    CheckBox *resetAlarm;
+    QLineEdit *eventPayload;
 };
 
-#endif // BSTIMERMODIFIERUI_H
+#endif // BSEVENTONDEACTIVATEMODIFIERUI_H

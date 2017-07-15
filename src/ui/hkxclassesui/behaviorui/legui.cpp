@@ -135,10 +135,10 @@ void LegUI::loadData(BehaviorFile *parentFile, hkbFootIkControlsModifier::hkLeg 
         isPlantedMS->setChecked(bsData->isPlantedMS);
         hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data());
         if (varBind){
-            loadBinding(GROUND_POSITION_ROW, BINDING_COLUMN, varBind, "ranges:"+QString::number(legIndex)+"/groundPosition");
-            loadBinding(VERTICAL_ERROR_ROW, BINDING_COLUMN, varBind, "ranges:"+QString::number(legIndex)+"/verticalError");
-            loadBinding(HIT_SOMETHING_ROW, BINDING_COLUMN, varBind, "ranges:"+QString::number(legIndex)+"/hitSomething");
-            loadBinding(IS_PLANTED_MS_ROW, BINDING_COLUMN, varBind, "ranges:"+QString::number(legIndex)+"/isPlantedMS");
+            loadBinding(GROUND_POSITION_ROW, BINDING_COLUMN, varBind, "legs:"+QString::number(legIndex)+"/groundPosition");
+            loadBinding(VERTICAL_ERROR_ROW, BINDING_COLUMN, varBind, "legs:"+QString::number(legIndex)+"/verticalError");
+            loadBinding(HIT_SOMETHING_ROW, BINDING_COLUMN, varBind, "legs:"+QString::number(legIndex)+"/hitSomething");
+            loadBinding(IS_PLANTED_MS_ROW, BINDING_COLUMN, varBind, "legs:"+QString::number(legIndex)+"/isPlantedMS");
         }else{
             table->item(GROUND_POSITION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             table->item(VERTICAL_ERROR_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
@@ -217,25 +217,25 @@ void LegUI::setBindingVariable(int index, const QString & name){
             if (table->item(GROUND_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                 isProperty = true;
             }
-            setBinding(index, row, name, "ranges:"+QString::number(legIndex)+"/groundPosition", VARIABLE_TYPE_VECTOR4, isProperty);
+            setBinding(index, row, name, "legs:"+QString::number(legIndex)+"/groundPosition", VARIABLE_TYPE_VECTOR4, isProperty);
             break;
         case VERTICAL_ERROR_ROW:
             if (table->item(VERTICAL_ERROR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                 isProperty = true;
             }
-            setBinding(index, row, name, "ranges:"+QString::number(legIndex)+"/verticalError", VARIABLE_TYPE_REAL, isProperty);
+            setBinding(index, row, name, "legs:"+QString::number(legIndex)+"/verticalError", VARIABLE_TYPE_REAL, isProperty);
             break;
         case HIT_SOMETHING_ROW:
             if (table->item(HIT_SOMETHING_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                 isProperty = true;
             }
-            setBinding(index, row, name, "ranges:"+QString::number(legIndex)+"/hitSomething", VARIABLE_TYPE_BOOL, isProperty);
+            setBinding(index, row, name, "legs:"+QString::number(legIndex)+"/hitSomething", VARIABLE_TYPE_BOOL, isProperty);
             break;
         case IS_PLANTED_MS_ROW:
             if (table->item(IS_PLANTED_MS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                 isProperty = true;
             }
-            setBinding(index, row, name, "ranges:"+QString::number(legIndex)+"/isPlantedMS", VARIABLE_TYPE_BOOL, isProperty);
+            setBinding(index, row, name, "legs:"+QString::number(legIndex)+"/isPlantedMS", VARIABLE_TYPE_BOOL, isProperty);
             break;
         default:
             return;
@@ -337,25 +337,25 @@ void LegUI::viewSelectedChild(int row, int column){
                 if (table->item(GROUND_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                     properties = true;
                 }
-                selectTableToView(properties, "ranges:"+QString::number(legIndex)+"/groundPosition");
+                selectTableToView(properties, "legs:"+QString::number(legIndex)+"/groundPosition");
                 break;
             case VERTICAL_ERROR_ROW:
                 if (table->item(VERTICAL_ERROR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                     properties = true;
                 }
-                selectTableToView(properties, "ranges:"+QString::number(legIndex)+"/verticalError");
+                selectTableToView(properties, "legs:"+QString::number(legIndex)+"/verticalError");
                 break;
             case HIT_SOMETHING_ROW:
                 if (table->item(HIT_SOMETHING_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                     properties = true;
                 }
-                selectTableToView(properties, "ranges:"+QString::number(legIndex)+"/hitSomething");
+                selectTableToView(properties, "legs:"+QString::number(legIndex)+"/hitSomething");
                 break;
             case IS_PLANTED_MS_ROW:
                 if (table->item(IS_PLANTED_MS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                     properties = true;
                 }
-                selectTableToView(properties, "ranges:"+QString::number(legIndex)+"/isPlantedMS");
+                selectTableToView(properties, "legs:"+QString::number(legIndex)+"/isPlantedMS");
                 break;
             }
         }else if (row == EVENT_ID_ROW && column == VALUE_COLUMN){
@@ -406,19 +406,19 @@ void LegUI::variableRenamed(const QString & name, int index){
         //index--;
         bind = static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data());
         if (bind){
-            bindIndex = bind->getVariableIndexOfBinding("ranges:"+QString::number(legIndex)+"/groundPosition");
+            bindIndex = bind->getVariableIndexOfBinding("legs:"+QString::number(legIndex)+"/groundPosition");
             if (bindIndex == index){
                 table->item(GROUND_POSITION_ROW, BINDING_COLUMN)->setText(name);
             }
-            bindIndex = bind->getVariableIndexOfBinding("ranges:"+QString::number(legIndex)+"/verticalError");
+            bindIndex = bind->getVariableIndexOfBinding("legs:"+QString::number(legIndex)+"/verticalError");
             if (bindIndex == index){
                 table->item(VERTICAL_ERROR_ROW, BINDING_COLUMN)->setText(name);
             }
-            bindIndex = bind->getVariableIndexOfBinding("ranges:"+QString::number(legIndex)+"/hitSomething");
+            bindIndex = bind->getVariableIndexOfBinding("legs:"+QString::number(legIndex)+"/hitSomething");
             if (bindIndex == index){
                 table->item(HIT_SOMETHING_ROW, BINDING_COLUMN)->setText(name);
             }
-            bindIndex = bind->getVariableIndexOfBinding("ranges:"+QString::number(legIndex)+"/isPlantedMS");
+            bindIndex = bind->getVariableIndexOfBinding("legs:"+QString::number(legIndex)+"/isPlantedMS");
             if (bindIndex == index){
                 table->item(IS_PLANTED_MS_ROW, BINDING_COLUMN)->setText(name);
             }

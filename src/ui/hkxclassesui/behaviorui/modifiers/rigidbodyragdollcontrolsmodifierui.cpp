@@ -132,7 +132,7 @@ RigidBodyRagdollControlsModifierUI::RigidBodyRagdollControlsModifierUI()
     table->setCellWidget(DURATION_TO_BLEND_ROW, VALUE_COLUMN, durationToBlend);
     table->setItem(BONES_ROW, NAME_COLUMN, new TableWidgetItem("bones"));
     table->setItem(BONES_ROW, TYPE_COLUMN, new TableWidgetItem("hkbBoneIndexArray", Qt::AlignCenter));
-    table->setItem(BONES_ROW, VALUE_COLUMN, new TableWidgetItem("", Qt::AlignCenter, QColor(Qt::gray)));
+    table->setItem(BONES_ROW, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter, QColor(Qt::gray)));
     table->setCellWidget(BONES_ROW, VALUE_COLUMN, bones);
     topLyt->addWidget(table, 0, 0, 8, 3);
     groupBox->setLayout(topLyt);

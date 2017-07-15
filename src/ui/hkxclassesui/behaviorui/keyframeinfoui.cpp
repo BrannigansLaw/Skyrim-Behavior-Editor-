@@ -107,10 +107,10 @@ void KeyframeInfoUI::loadData(BehaviorFile *parentFile, hkbKeyframeBonesModifier
         isValid->setChecked(bsData->isValid);
         hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data());
         if (varBind){
-            loadBinding(KEYFRAMED_POSITION_ROW, BINDING_COLUMN, varBind, "ranges:"+QString::number(keyframeIndex)+"/keyframedPosition");
-            loadBinding(KEYFRAMED_ROTATION_ROW, BINDING_COLUMN, varBind, "ranges:"+QString::number(keyframeIndex)+"/keyframedRotation");
-            loadBinding(BONE_INDEX_ROW, BINDING_COLUMN, varBind, "ranges:"+QString::number(keyframeIndex)+"/boneIndex");
-            loadBinding(IS_VALID_ROW, BINDING_COLUMN, varBind, "ranges:"+QString::number(keyframeIndex)+"/isValid");
+            loadBinding(KEYFRAMED_POSITION_ROW, BINDING_COLUMN, varBind, "keyframeInfo:"+QString::number(keyframeIndex)+"/keyframedPosition");
+            loadBinding(KEYFRAMED_ROTATION_ROW, BINDING_COLUMN, varBind, "keyframeInfo:"+QString::number(keyframeIndex)+"/keyframedRotation");
+            loadBinding(BONE_INDEX_ROW, BINDING_COLUMN, varBind, "keyframeInfo:"+QString::number(keyframeIndex)+"/boneIndex");
+            loadBinding(IS_VALID_ROW, BINDING_COLUMN, varBind, "keyframeInfo:"+QString::number(keyframeIndex)+"/isValid");
         }else{
             table->item(KEYFRAMED_POSITION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             table->item(KEYFRAMED_ROTATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
@@ -189,25 +189,25 @@ void KeyframeInfoUI::setBindingVariable(int index, const QString & name){
             if (table->item(KEYFRAMED_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                 isProperty = true;
             }
-            setBinding(index, row, name, "ranges:"+QString::number(keyframeIndex)+"/keyframedPosition", VARIABLE_TYPE_VECTOR4, isProperty);
+            setBinding(index, row, name, "keyframeInfo:"+QString::number(keyframeIndex)+"/keyframedPosition", VARIABLE_TYPE_VECTOR4, isProperty);
             break;
         case KEYFRAMED_ROTATION_ROW:
             if (table->item(KEYFRAMED_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                 isProperty = true;
             }
-            setBinding(index, row, name, "ranges:"+QString::number(keyframeIndex)+"/keyframedRotation", VARIABLE_TYPE_QUATERNION, isProperty);
+            setBinding(index, row, name, "keyframeInfo:"+QString::number(keyframeIndex)+"/keyframedRotation", VARIABLE_TYPE_QUATERNION, isProperty);
             break;
         case BONE_INDEX_ROW:
             if (table->item(BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                 isProperty = true;
             }
-            setBinding(index, row, name, "ranges:"+QString::number(keyframeIndex)+"/boneIndex", VARIABLE_TYPE_INT32, isProperty);
+            setBinding(index, row, name, "keyframeInfo:"+QString::number(keyframeIndex)+"/boneIndex", VARIABLE_TYPE_INT32, isProperty);
             break;
         case IS_VALID_ROW:
             if (table->item(IS_VALID_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                 isProperty = true;
             }
-            setBinding(index, row, name, "ranges:"+QString::number(keyframeIndex)+"/isValid", VARIABLE_TYPE_BOOL, isProperty);
+            setBinding(index, row, name, "keyframeInfo:"+QString::number(keyframeIndex)+"/isValid", VARIABLE_TYPE_BOOL, isProperty);
             break;
         default:
             return;
@@ -269,25 +269,25 @@ void KeyframeInfoUI::viewSelectedChild(int row, int column){
                 if (table->item(KEYFRAMED_POSITION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                     properties = true;
                 }
-                selectTableToView(properties, "ranges:"+QString::number(keyframeIndex)+"/keyframedPosition");
+                selectTableToView(properties, "keyframeInfo:"+QString::number(keyframeIndex)+"/keyframedPosition");
                 break;
             case KEYFRAMED_ROTATION_ROW:
                 if (table->item(KEYFRAMED_ROTATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                     properties = true;
                 }
-                selectTableToView(properties, "ranges:"+QString::number(keyframeIndex)+"/keyframedRotation");
+                selectTableToView(properties, "keyframeInfo:"+QString::number(keyframeIndex)+"/keyframedRotation");
                 break;
             case BONE_INDEX_ROW:
                 if (table->item(BONE_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                     properties = true;
                 }
-                selectTableToView(properties, "ranges:"+QString::number(keyframeIndex)+"/boneIndex");
+                selectTableToView(properties, "keyframeInfo:"+QString::number(keyframeIndex)+"/boneIndex");
                 break;
             case IS_VALID_ROW:
                 if (table->item(IS_VALID_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                     properties = true;
                 }
-                selectTableToView(properties, "ranges:"+QString::number(keyframeIndex)+"/isValid");
+                selectTableToView(properties, "keyframeInfo:"+QString::number(keyframeIndex)+"/isValid");
                 break;
             }
         }
@@ -326,19 +326,19 @@ void KeyframeInfoUI::variableRenamed(const QString & name, int index){
         //index--;
         bind = static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data());
         if (bind){
-            bindIndex = bind->getVariableIndexOfBinding("ranges:"+QString::number(keyframeIndex)+"/keyframedPosition");
+            bindIndex = bind->getVariableIndexOfBinding("keyframeInfo:"+QString::number(keyframeIndex)+"/keyframedPosition");
             if (bindIndex == index){
                 table->item(KEYFRAMED_POSITION_ROW, BINDING_COLUMN)->setText(name);
             }
-            bindIndex = bind->getVariableIndexOfBinding("ranges:"+QString::number(keyframeIndex)+"/keyframedRotation");
+            bindIndex = bind->getVariableIndexOfBinding("keyframeInfo:"+QString::number(keyframeIndex)+"/keyframedRotation");
             if (bindIndex == index){
                 table->item(KEYFRAMED_ROTATION_ROW, BINDING_COLUMN)->setText(name);
             }
-            bindIndex = bind->getVariableIndexOfBinding("ranges:"+QString::number(keyframeIndex)+"/boneIndex");
+            bindIndex = bind->getVariableIndexOfBinding("keyframeInfo:"+QString::number(keyframeIndex)+"/boneIndex");
             if (bindIndex == index){
                 table->item(BONE_INDEX_ROW, BINDING_COLUMN)->setText(name);
             }
-            bindIndex = bind->getVariableIndexOfBinding("ranges:"+QString::number(keyframeIndex)+"/isValid");
+            bindIndex = bind->getVariableIndexOfBinding("keyframeInfo:"+QString::number(keyframeIndex)+"/isValid");
             if (bindIndex == index){
                 table->item(IS_VALID_ROW, BINDING_COLUMN)->setText(name);
             }

@@ -6,6 +6,7 @@
 class BSPassByTargetTriggerModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSPassByTargetTriggerModifierUI;
 public:
     BSPassByTargetTriggerModifier(HkxFile *parent, long ref = 0);
     virtual ~BSPassByTargetTriggerModifier();

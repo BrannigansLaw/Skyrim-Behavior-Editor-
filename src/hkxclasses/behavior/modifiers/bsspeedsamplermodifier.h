@@ -6,6 +6,7 @@
 class BSSpeedSamplerModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSSpeedSamplerModifierUI;
 public:
     BSSpeedSamplerModifier(HkxFile *parent, long ref = 0);
     virtual ~BSSpeedSamplerModifier();

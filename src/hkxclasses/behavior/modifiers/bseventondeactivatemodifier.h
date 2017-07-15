@@ -6,6 +6,7 @@
 class BSEventOnDeactivateModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSEventOnDeactivateModifierUI;
 public:
     BSEventOnDeactivateModifier(HkxFile *parent, long ref = 0);
     virtual ~BSEventOnDeactivateModifier();

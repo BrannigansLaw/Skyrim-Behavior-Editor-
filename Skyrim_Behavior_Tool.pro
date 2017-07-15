@@ -208,7 +208,18 @@ SOURCES += \
     src/ui/hkxclassesui/behaviorui/modifiers/footikcontrolsmodifierui.cpp \
     src/ui/hkxclassesui/behaviorui/modifiers/mirrormodifierui.cpp \
     src/ui/hkxclassesui/behaviorui/modifiers/extractragdollposemodifierui.cpp \
-    src/ui/hkxclassesui/behaviorui/modifiers/bstimermodifierui.cpp
+    src/ui/hkxclassesui/behaviorui/modifiers/bstimermodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsgettimestepmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/delayedmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsragdollcontactlistenermodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bseventondeactivatemodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsspeedsamplermodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bspassbytargettriggermodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/bsboneui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bslookatmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/detectclosetogroundmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bseventeveryneventsmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bseventonfalsetotruemodifierui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -393,4 +404,15 @@ HEADERS  += \
     src/ui/hkxclassesui/behaviorui/modifiers/footikcontrolsmodifierui.h \
     src/ui/hkxclassesui/behaviorui/modifiers/mirrormodifierui.h \
     src/ui/hkxclassesui/behaviorui/modifiers/extractragdollposemodifierui.h \
-    src/ui/hkxclassesui/behaviorui/modifiers/bstimermodifierui.h
+    src/ui/hkxclassesui/behaviorui/modifiers/bstimermodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsgettimestepmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/delayedmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsragdollcontactlistenermodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bseventondeactivatemodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsspeedsamplermodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bspassbytargettriggermodifierui.h \
+    src/ui/hkxclassesui/behaviorui/bsboneui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bslookatmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/detectclosetogroundmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bseventeveryneventsmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bseventonfalsetotruemodifierui.h

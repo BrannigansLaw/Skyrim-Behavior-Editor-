@@ -66,6 +66,17 @@ class KeyframeBonesModifierUI;
 class FootIkControlsModifierUI;
 class MirrorModifierUI;
 class ExtractRagdollPoseModifierUI;
+class BSTimerModifierUI;
+class BSGetTimeStepModifierUI;
+class DelayedModifierUI;
+class BSRagdollContactListenerModifierUI;
+class BSEventOnDeactivateModifierUI;
+class BSSpeedSamplerModifierUI;
+class BSPassByTargetTriggerModifierUI;
+class BSLookAtModifierUI;
+class DetectCloseToGroundModifierUI;
+class BSEventEveryNEventsModifierUI;
+class BSEventOnFalseToTrueModifierUI;
 
 /**
  * To add support for a new class we need to add it to the "DATA_TYPE_LOADED" enum, add it to the stacked layout in the correct order,
@@ -149,7 +160,18 @@ private:
         KEY_FRAME_BONES_MODIFIER,
         FOOT_IK_CONTROLS_MODIFIER,
         MIRROR_MODIFIER,
-        EXTRACT_RAGDOLL_POSE_MODIFIER
+        EXTRACT_RAGDOLL_POSE_MODIFIER,
+        BS_TIMER_MODIFIER,
+        BS_GET_TIME_STEP_MODIFIER,
+        DELAYED_MODIFIER,
+        BS_RAGDOLL_CONTACT_LISTENER_MODIFIER,
+        BS_EVENT_ON_DEACTIVATE_MODIFIER,
+        BS_SPEED_SAMPLER_MODIFIER,
+        BS_PASS_BY_TARGET_TRIGGER_MODIFIER,
+        BS_LOOK_AT_MODIFIER,
+        DETECT_CLOSE_TO_GROUND_MODIFIER,
+        BS_EVENT_EVERY_N_EVENTS_MODIFIER,
+        BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER
     };
     static QStringList generatorTypes;
     static QStringList modifierTypes;
@@ -214,6 +236,17 @@ private:
     FootIkControlsModifierUI *footIKControlsModUI;
     MirrorModifierUI *mirrorModUI;
     ExtractRagdollPoseModifierUI *extractRagdollPoseModUI;
+    BSTimerModifierUI *bsTimerModUI;
+    BSGetTimeStepModifierUI *getTimeStepModUI;
+    DelayedModifierUI *delayedModUI;
+    BSRagdollContactListenerModifierUI *ragdollContactListenerModUI;
+    BSEventOnDeactivateModifierUI *eventOnDeactivateModUI;
+    BSSpeedSamplerModifierUI *speedSamplerModUI;
+    BSPassByTargetTriggerModifierUI *passByTargetTriggerModUI;
+    BSLookAtModifierUI *bsLookAtModUI;
+    DetectCloseToGroundModifierUI *detectCloseToGroundModUI;
+    BSEventEveryNEventsModifierUI *eventEveryNEventsModUI;
+    BSEventOnFalseToTrueModifierUI *eventOnFalseToTrueModUI;
 };
 
 #endif // HKDATAUI_H

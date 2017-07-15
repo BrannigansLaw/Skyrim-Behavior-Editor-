@@ -61,6 +61,17 @@
 #include "src/ui/hkxclassesui/behaviorui/modifiers/footikcontrolsmodifierui.h"
 #include "src/ui/hkxclassesui/behaviorui/modifiers/mirrormodifierui.h"
 #include "src/ui/hkxclassesui/behaviorui/modifiers/extractragdollposemodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bstimermodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bsgettimestepmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/delayedmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bsragdollcontactlistenermodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bseventondeactivatemodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bsspeedsamplermodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bspassbytargettriggermodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bslookatmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/detectclosetogroundmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bseventeveryneventsmodifierui.h"
+#include "src/ui/hkxclassesui/behaviorui/modifiers/bseventonfalsetotruemodifierui.h"
 
 #include "src/ui/hkxclassesui/behaviorui/expressiondataarrayui.h"
 
@@ -206,7 +217,18 @@ HkDataUI::HkDataUI(const QString &title)
       keyframeBonesModUI(new KeyframeBonesModifierUI),
       footIKControlsModUI(new FootIkControlsModifierUI),
       mirrorModUI(new MirrorModifierUI),
-      extractRagdollPoseModUI(new ExtractRagdollPoseModifierUI)
+      extractRagdollPoseModUI(new ExtractRagdollPoseModifierUI),
+      bsTimerModUI(new BSTimerModifierUI),
+      getTimeStepModUI(new BSGetTimeStepModifierUI),
+      delayedModUI(new DelayedModifierUI),
+      ragdollContactListenerModUI(new BSRagdollContactListenerModifierUI),
+      eventOnDeactivateModUI(new BSEventOnDeactivateModifierUI),
+      speedSamplerModUI(new BSSpeedSamplerModifierUI),
+      passByTargetTriggerModUI(new BSPassByTargetTriggerModifierUI),
+      bsLookAtModUI(new BSLookAtModifierUI),
+      detectCloseToGroundModUI(new DetectCloseToGroundModifierUI),
+      eventEveryNEventsModUI(new BSEventEveryNEventsModifierUI),
+      eventOnFalseToTrueModUI(new BSEventOnFalseToTrueModifierUI)
 {
     setTitle(title);
     stack->addWidget(noDataL);
@@ -255,6 +277,17 @@ HkDataUI::HkDataUI(const QString &title)
     stack->addWidget(footIKControlsModUI);
     stack->addWidget(mirrorModUI);
     stack->addWidget(extractRagdollPoseModUI);
+    stack->addWidget(bsTimerModUI);
+    stack->addWidget(getTimeStepModUI);
+    stack->addWidget(delayedModUI);
+    stack->addWidget(ragdollContactListenerModUI);
+    stack->addWidget(eventOnDeactivateModUI);
+    stack->addWidget(speedSamplerModUI);
+    stack->addWidget(passByTargetTriggerModUI);
+    stack->addWidget(bsLookAtModUI);
+    stack->addWidget(detectCloseToGroundModUI);
+    stack->addWidget(eventEveryNEventsModUI);
+    stack->addWidget(eventOnFalseToTrueModUI);
     verLyt->addLayout(stack, 5);
     setLayout(verLyt);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -305,6 +338,17 @@ HkDataUI::HkDataUI(const QString &title)
     connect(footIKControlsModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(mirrorModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(extractRagdollPoseModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(bsTimerModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(getTimeStepModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(delayedModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(ragdollContactListenerModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(eventOnDeactivateModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(speedSamplerModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(passByTargetTriggerModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(bsLookAtModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(detectCloseToGroundModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(eventEveryNEventsModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(eventOnFalseToTrueModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
 
     connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
     connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
@@ -431,6 +475,33 @@ void HkDataUI::eventNameChanged(const QString & newName, int index){
     case DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER:
         distTriggerModUI->eventRenamed(newName, index);
         break;
+    case DATA_TYPE_LOADED::TIMER_MODIFIER:
+        timerModUI->eventRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_TIMER_MODIFIER:
+        bsTimerModUI->eventRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER:
+        ragdollContactListenerModUI->eventRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_EVENT_ON_DEACTIVATE_MODIFIER:
+        eventOnDeactivateModUI->eventRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_PASS_BY_TARGET_TRIGGER_MODIFIER:
+        passByTargetTriggerModUI->eventRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_LOOK_AT_MODIFIER:
+        bsLookAtModUI->eventRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::DETECT_CLOSE_TO_GROUND_MODIFIER:
+        detectCloseToGroundModUI->eventRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_EVENT_EVERY_N_EVENTS_MODIFIER:
+        eventEveryNEventsModUI->eventRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER:
+        eventOnFalseToTrueModUI->eventRenamed(newName, index);
+        break;
     }
 }
 
@@ -465,6 +536,33 @@ void HkDataUI::eventRemoved(int index){
         break;
     case DATA_TYPE_LOADED::BS_DIST_TRIGGER_MODIFER:
         distTriggerModUI->eventRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::TIMER_MODIFIER:
+        timerModUI->eventRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_TIMER_MODIFIER:
+        bsTimerModUI->eventRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER:
+        ragdollContactListenerModUI->eventRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_EVENT_ON_DEACTIVATE_MODIFIER:
+        eventOnDeactivateModUI->eventRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_PASS_BY_TARGET_TRIGGER_MODIFIER:
+        passByTargetTriggerModUI->eventRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_LOOK_AT_MODIFIER:
+        bsLookAtModUI->eventRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::DETECT_CLOSE_TO_GROUND_MODIFIER:
+        detectCloseToGroundModUI->eventRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_EVENT_EVERY_N_EVENTS_MODIFIER:
+        eventEveryNEventsModUI->eventRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER:
+        eventOnFalseToTrueModUI->eventRenamed("NONE", index);
         break;
     }
 }
@@ -622,6 +720,39 @@ void HkDataUI::variableNameChanged(const QString & newName, int index){
         break;
     case DATA_TYPE_LOADED::EXTRACT_RAGDOLL_POSE_MODIFIER:
         extractRagdollPoseModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_TIMER_MODIFIER:
+        bsTimerModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_GET_TIME_STEP_MODIFIER:
+        getTimeStepModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::DELAYED_MODIFIER:
+        delayedModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER:
+        ragdollContactListenerModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_EVENT_ON_DEACTIVATE_MODIFIER:
+        eventOnDeactivateModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_SPEED_SAMPLER_MODIFIER:
+        speedSamplerModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_PASS_BY_TARGET_TRIGGER_MODIFIER:
+        passByTargetTriggerModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_LOOK_AT_MODIFIER:
+        bsLookAtModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::DETECT_CLOSE_TO_GROUND_MODIFIER:
+        detectCloseToGroundModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_EVENT_EVERY_N_EVENTS_MODIFIER:
+        eventEveryNEventsModUI->variableRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER:
+        eventOnFalseToTrueModUI->variableRenamed(newName, index);
         break;
     }
 }
@@ -830,6 +961,39 @@ void HkDataUI::variableRemoved(int index){
         break;
     case DATA_TYPE_LOADED::EXTRACT_RAGDOLL_POSE_MODIFIER:
         extractRagdollPoseModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_TIMER_MODIFIER:
+        bsTimerModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_GET_TIME_STEP_MODIFIER:
+        getTimeStepModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::DELAYED_MODIFIER:
+        delayedModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER:
+        ragdollContactListenerModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_EVENT_ON_DEACTIVATE_MODIFIER:
+        eventOnDeactivateModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_SPEED_SAMPLER_MODIFIER:
+        speedSamplerModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_PASS_BY_TARGET_TRIGGER_MODIFIER:
+        passByTargetTriggerModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_LOOK_AT_MODIFIER:
+        bsLookAtModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::DETECT_CLOSE_TO_GROUND_MODIFIER:
+        detectCloseToGroundModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_EVENT_EVERY_N_EVENTS_MODIFIER:
+        eventEveryNEventsModUI->variableRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER:
+        eventOnFalseToTrueModUI->variableRenamed("NONE", index);
         break;
     }
     behaviorView->behavior->removeBindings(index);
@@ -1157,6 +1321,83 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             stack->setCurrentIndex(DATA_TYPE_LOADED::EXTRACT_RAGDOLL_POSE_MODIFIER);
             extractRagdollPoseModUI->connectToTables(variablesTable, characterPropertiesTable);
             break;
+        case HkxSignature::BS_TIMER_MODIFIER:
+            if (loadedData != oldData){
+                bsTimerModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_TIMER_MODIFIER);
+            bsTimerModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
+            break;
+        case HkxSignature::BS_GET_TIME_STEP_MODIFIER:
+            if (loadedData != oldData){
+                getTimeStepModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_GET_TIME_STEP_MODIFIER);
+            getTimeStepModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::HKB_DELAYED_MODIFIER:
+            if (loadedData != oldData){
+                delayedModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::DELAYED_MODIFIER);
+            delayedModUI->connectToTables(modifiersTable, variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER:
+            if (loadedData != oldData){
+                ragdollContactListenerModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_RAGDOLL_CONTACT_LISTENER_MODIFIER);
+            ragdollContactListenerModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable, ragdollBonesTable);
+            break;
+        case HkxSignature::BS_EVENT_ON_DEACTIVATE_MODIFIER:
+            if (loadedData != oldData){
+                eventOnDeactivateModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_EVENT_ON_DEACTIVATE_MODIFIER);
+            eventOnDeactivateModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
+            break;
+        case HkxSignature::BS_SPEED_SAMPLER_MODIFIER:
+            if (loadedData != oldData){
+                speedSamplerModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_SPEED_SAMPLER_MODIFIER);
+            speedSamplerModUI->connectToTables(variablesTable, characterPropertiesTable);
+            break;
+        case HkxSignature::BS_PASS_BY_TARGET_TRIGGER_MODIFIER:
+            if (loadedData != oldData){
+                passByTargetTriggerModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_PASS_BY_TARGET_TRIGGER_MODIFIER);
+            passByTargetTriggerModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
+            break;
+        case HkxSignature::BS_LOOK_AT_MODIFIER:
+            if (loadedData != oldData){
+                bsLookAtModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_LOOK_AT_MODIFIER);
+            bsLookAtModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
+            break;
+        case HkxSignature::HKB_DETECT_CLOSE_TO_GROUND_MODIFIER:
+            if (loadedData != oldData){
+                detectCloseToGroundModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::DETECT_CLOSE_TO_GROUND_MODIFIER);
+            detectCloseToGroundModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
+            break;
+        case HkxSignature::BS_EVENT_EVERY_N_EVENTS_MODIFIER:
+            if (loadedData != oldData){
+                eventEveryNEventsModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_EVENT_EVERY_N_EVENTS_MODIFIER);
+            eventEveryNEventsModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
+            break;
+        case HkxSignature::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER:
+            if (loadedData != oldData){
+                eventOnFalseToTrueModUI->loadData(loadedData);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER);
+            eventOnFalseToTrueModUI->connectToTables(variablesTable, characterPropertiesTable, eventsTable);
+            break;
         default:
             unloadDataWidget();
         }
@@ -1187,6 +1428,7 @@ BehaviorGraphView *HkDataUI::loadBehaviorView(BehaviorGraphView *view){
     syncClipGenUI->setBehaviorView(view);
     modListUI->setBehaviorView(view);
     eventDrivenModUI->setBehaviorView(view);
+    delayedModUI->setBehaviorView(view);
     if (behaviorView){
         generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "NULL");
         modifiersTable->loadTable(behaviorView->behavior->getModifierNames(), behaviorView->behavior->getModifierTypeNames(), "NULL");

@@ -6,6 +6,7 @@
 class hkbDetectCloseToGroundModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class DetectCloseToGroundModifierUI;
 public:
     hkbDetectCloseToGroundModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbDetectCloseToGroundModifier();

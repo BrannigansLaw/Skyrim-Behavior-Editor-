@@ -1,5 +1,5 @@
-#ifndef BSTIMERMODIFIERUI_H
-#define BSTIMERMODIFIERUI_H
+#ifndef DETECTCLOSETOGROUNDMODIFIERUI_H
+#define DETECTCLOSETOGROUNDMODIFIERUI_H
 
 #include <QGroupBox>
 
@@ -8,7 +8,7 @@
 class HkxObject;
 class QGridLayout;
 class TableWidget;
-class BSTimerModifier;
+class hkbDetectCloseToGroundModifier;
 class LineEdit;
 class QLineEdit;
 class DoubleSpinBox;
@@ -18,13 +18,13 @@ class GenericTableWidget;
 class hkbVariableBindingSet;
 class QuadVariableWidget;
 
-class BSTimerModifierUI: QGroupBox
+class DetectCloseToGroundModifierUI: QGroupBox
 {
     Q_OBJECT
     friend class HkDataUI;
 public:
-    BSTimerModifierUI();
-    virtual ~BSTimerModifierUI(){}
+    DetectCloseToGroundModifierUI();
+    virtual ~DetectCloseToGroundModifierUI(){}
     void loadData(HkxObject *data);
 signals:
     void viewVariables(int index);
@@ -34,10 +34,13 @@ signals:
 private slots:
     void setName();
     void setEnable();
-    void setAlarmTimeSeconds();
-    void setAlarmEventId(int index, const QString & name);
-    void setAlarmEventPayload();
-    void setResetAlarm();
+    void setCloseToGroundEventId(int index, const QString & name);
+    void setCloseToGroundEventPayload();
+    void setCloseToGroundHeight();
+    void setRaycastDistanceDown();
+    void setCollisionFilterInfo(int index);
+    void setBoneIndex(int index);
+    void setAnimBoneIndex(int index);
     void viewSelected(int row, int column);
     void setBindingVariable(int index, const QString & name);
 private:
@@ -50,15 +53,19 @@ private:
     bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
+    static QStringList collisionLayers;
     static QStringList headerLabels;
-    BSTimerModifier *bsData;
+    hkbDetectCloseToGroundModifier *bsData;
     QGridLayout *topLyt;
     TableWidget *table;
     LineEdit *name;
     CheckBox *enable;
-    DoubleSpinBox *alarmTimeSeconds;
-    QLineEdit *alarmEventPayload;
-    CheckBox *resetAlarm;
+    QLineEdit *closeToGroundEventPayload;
+    DoubleSpinBox *closeToGroundHeight;
+    DoubleSpinBox *raycastDistanceDown;
+    ComboBox *collisionFilterInfo;
+    ComboBox *boneIndex;
+    ComboBox *animBoneIndex;
 };
 
-#endif // BSTIMERMODIFIERUI_H
+#endif // DETECTCLOSETOGROUNDMODIFIERUI_H

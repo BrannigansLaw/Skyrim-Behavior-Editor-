@@ -6,6 +6,7 @@
 class BSRagdollContactListenerModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSRagdollContactListenerModifierUI;
 public:
     BSRagdollContactListenerModifier(HkxFile *parent, long ref = 0);
     virtual ~BSRagdollContactListenerModifier();
