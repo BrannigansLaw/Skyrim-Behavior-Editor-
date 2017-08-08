@@ -224,10 +224,8 @@ void BSIsActiveModifierUI::setName(){
 
 void BSIsActiveModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -235,10 +233,8 @@ void BSIsActiveModifierUI::setEnable(){
 
 void BSIsActiveModifierUI::setIsActive0(){
     if (bsData){
-        if (bsData->bIsActive0 != bIsActive0->isChecked()){
-            bsData->bIsActive0 = bIsActive0->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bIsActive0 = bIsActive0->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setIsActive0(): The data is NULL!!"));
     }
@@ -246,10 +242,8 @@ void BSIsActiveModifierUI::setIsActive0(){
 
 void BSIsActiveModifierUI::setInvertActive0(){
     if (bsData){
-        if (bsData->bInvertActive0 != bInvertActive0->isChecked()){
-            bsData->bInvertActive0 = bInvertActive0->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bInvertActive0 = bInvertActive0->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setInvertActive0(): The data is NULL!!"));
     }
@@ -257,10 +251,8 @@ void BSIsActiveModifierUI::setInvertActive0(){
 
 void BSIsActiveModifierUI::setIsActive1(){
     if (bsData){
-        if (bsData->bIsActive1 != bIsActive1->isChecked()){
-            bsData->bIsActive1 = bIsActive1->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bIsActive1 = bIsActive1->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setIsActive1(): The data is NULL!!"));
     }
@@ -268,10 +260,8 @@ void BSIsActiveModifierUI::setIsActive1(){
 
 void BSIsActiveModifierUI::setInvertActive1(){
     if (bsData){
-        if (bsData->bInvertActive1 != bInvertActive1->isChecked()){
-            bsData->bInvertActive1 = bInvertActive1->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bInvertActive1 = bInvertActive1->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setInvertActive1(): The data is NULL!!"));
     }
@@ -279,10 +269,8 @@ void BSIsActiveModifierUI::setInvertActive1(){
 
 void BSIsActiveModifierUI::setIsActive2(){
     if (bsData){
-        if (bsData->bIsActive2 != bIsActive2->isChecked()){
-            bsData->bIsActive2 = bIsActive2->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bIsActive2 = bIsActive2->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setIsActive2(): The data is NULL!!"));
     }
@@ -290,10 +278,8 @@ void BSIsActiveModifierUI::setIsActive2(){
 
 void BSIsActiveModifierUI::setInvertActive2(){
     if (bsData){
-        if (bsData->bInvertActive2 != bInvertActive2->isChecked()){
-            bsData->bInvertActive2 = bInvertActive2->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bInvertActive2 = bInvertActive2->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setInvertActive2(): The data is NULL!!"));
     }
@@ -301,10 +287,8 @@ void BSIsActiveModifierUI::setInvertActive2(){
 
 void BSIsActiveModifierUI::setIsActive3(){
     if (bsData){
-        if (bsData->bIsActive3 != bIsActive3->isChecked()){
-            bsData->bIsActive3 = bIsActive3->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bIsActive3 = bIsActive3->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setIsActive3(): The data is NULL!!"));
     }
@@ -312,10 +296,8 @@ void BSIsActiveModifierUI::setIsActive3(){
 
 void BSIsActiveModifierUI::setInvertActive3(){
     if (bsData){
-        if (bsData->bInvertActive3 != bInvertActive3->isChecked()){
-            bsData->bInvertActive3 = bInvertActive3->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bInvertActive3 = bInvertActive3->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setInvertActive3(): The data is NULL!!"));
     }
@@ -323,10 +305,8 @@ void BSIsActiveModifierUI::setInvertActive3(){
 
 void BSIsActiveModifierUI::setIsActive4(){
     if (bsData){
-        if (bsData->bIsActive4 != bIsActive4->isChecked()){
-            bsData->bIsActive4 = bIsActive4->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bIsActive4 = bIsActive4->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setIsActive4(): The data is NULL!!"));
     }
@@ -334,10 +314,8 @@ void BSIsActiveModifierUI::setIsActive4(){
 
 void BSIsActiveModifierUI::setInvertActive4(){
     if (bsData){
-        if (bsData->bInvertActive4 != bInvertActive4->isChecked()){
-            bsData->bInvertActive4 = bInvertActive4->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bInvertActive4 = bInvertActive4->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setInvertActive4(): The data is NULL!!"));
     }
@@ -622,11 +600,11 @@ void BSIsActiveModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSe
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

@@ -55,15 +55,15 @@ KeyframeInfoUI::KeyframeInfoUI()
     table->setCellWidget(KEYFRAMED_POSITION_ROW, VALUE_COLUMN, keyframedPosition);
     table->setItem(KEYFRAMED_ROTATION_ROW, NAME_COLUMN, new TableWidgetItem("keyframedRotation"));
     table->setItem(KEYFRAMED_ROTATION_ROW, TYPE_COLUMN, new TableWidgetItem("hkQuaternion", Qt::AlignCenter));
-    table->setItem(KEYFRAMED_ROTATION_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
+    table->setItem(KEYFRAMED_ROTATION_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(KEYFRAMED_ROTATION_ROW, VALUE_COLUMN, keyframedRotation);
     table->setItem(BONE_INDEX_ROW, NAME_COLUMN, new TableWidgetItem("boneIndex"));
     table->setItem(BONE_INDEX_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
-    table->setItem(BONE_INDEX_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
+    table->setItem(BONE_INDEX_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(BONE_INDEX_ROW, VALUE_COLUMN, boneIndex);
     table->setItem(IS_VALID_ROW, NAME_COLUMN, new TableWidgetItem("isValid"));
     table->setItem(IS_VALID_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool", Qt::AlignCenter));
-    table->setItem(IS_VALID_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
+    table->setItem(IS_VALID_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(IS_VALID_ROW, VALUE_COLUMN, isValid);
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 6, 3);
@@ -135,11 +135,11 @@ void KeyframeInfoUI::loadBinding(int row, int colunm, hkbVariableBindingSet *var
                 }else{
                     varName = static_cast<BehaviorFile *>(file)->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("KeyframeInfoUI::loadBinding(): The variable binding set is NULL!!"));
         }

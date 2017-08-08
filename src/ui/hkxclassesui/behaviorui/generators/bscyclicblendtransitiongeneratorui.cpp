@@ -181,8 +181,10 @@ void BSCyclicBlendTransitionGeneratorUI::setName(){
 
 void BSCyclicBlendTransitionGeneratorUI::setBlendParameter(){
     if (bsData){
-        bsData->fBlendParameter = fBlendParameter->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->fBlendParameter != fBlendParameter->value()){
+            bsData->fBlendParameter = fBlendParameter->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setBlendParameter(): The data is NULL!!"))
     }
@@ -190,8 +192,10 @@ void BSCyclicBlendTransitionGeneratorUI::setBlendParameter(){
 
 void BSCyclicBlendTransitionGeneratorUI::setTransitionDuration(){
     if (bsData){
-        bsData->fTransitionDuration = fTransitionDuration->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->fTransitionDuration != fTransitionDuration->value()){
+            bsData->fTransitionDuration = fTransitionDuration->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setTransitionDuration(): The data is NULL!!"))
     }
@@ -221,6 +225,7 @@ void BSCyclicBlendTransitionGeneratorUI::toggleEventToFreezeBlendValue(bool enab
             bsData->eventToFreezeBlendValue.id = -1;
             bsData->eventToFreezeBlendValue.payload = HkxSharedPtr();
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
+            bsData->getParentFile()->toggleChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::toggleEventToFreezeBlendValue(): The data is NULL!!"));
@@ -242,6 +247,7 @@ void BSCyclicBlendTransitionGeneratorUI::toggleEventToCrossBlend(bool enable){
             bsData->eventToCrossBlend.id = -1;
             bsData->eventToCrossBlend.payload = HkxSharedPtr();
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
+            bsData->getParentFile()->toggleChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::toggleEventToCrossBlend(): The data is NULL!!"));
@@ -345,11 +351,11 @@ void BSCyclicBlendTransitionGeneratorUI::loadBinding(int row, int colunm, hkbVar
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::loadBinding(): The variable binding set is NULL!!"));
         }

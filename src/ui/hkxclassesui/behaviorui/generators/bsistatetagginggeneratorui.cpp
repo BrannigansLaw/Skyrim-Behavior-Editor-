@@ -141,15 +141,23 @@ void BSiStateTaggingGeneratorUI::setName(){
 
 void BSiStateTaggingGeneratorUI::setIStateToSetAs(){
     if (bsData){
-        bsData->iStateToSetAs = iStateToSetAs->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->iStateToSetAs != iStateToSetAs->value()){
+            bsData->iStateToSetAs = iStateToSetAs->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("BSiStateTaggingGeneratorUI::setIStateToSetAs(): The 'bsData' pointer is NULL!!"))
     }
 }
 
 void BSiStateTaggingGeneratorUI::setIPriority(){
     if (bsData){
-        bsData->iPriority = iPriority->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->iPriority != iPriority->value()){
+            bsData->iPriority = iPriority->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("BSiStateTaggingGeneratorUI::setIPriority(): The 'bsData' pointer is NULL!!"))
     }
 }
 
@@ -199,11 +207,11 @@ void BSiStateTaggingGeneratorUI::loadBinding(int row, int colunm, hkbVariableBin
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSiStateTaggingGeneratorUI::loadBinding(): The variable binding set is NULL!!"));
         }

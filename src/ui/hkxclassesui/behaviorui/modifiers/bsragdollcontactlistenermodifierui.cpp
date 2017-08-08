@@ -173,10 +173,8 @@ void BSRagdollContactListenerModifierUI::setName(){
 
 void BSRagdollContactListenerModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSRagdollContactListenerModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -227,6 +225,7 @@ void BSRagdollContactListenerModifierUI::toggleBones(bool enable){
             bsData->bones = HkxSharedPtr(indices);
             bones->setText("Click to Edit");
         }
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSRagdollContactListenerModifierUI::toggleBones(): The data is NULL!!"));
     }
@@ -373,11 +372,11 @@ void BSRagdollContactListenerModifierUI::loadBinding(int row, int colunm, hkbVar
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSRagdollContactListenerModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

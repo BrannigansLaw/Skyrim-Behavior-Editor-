@@ -108,14 +108,6 @@ void ExpressionDataArrayUI::loadData(BehaviorFile *parentFile, hkbExpressionData
     connectSignals();
 }
 
-/*QSize ExpressionDataArrayUI::sizeHint() const{
-    return QSize(1600, 800);
-}
-
-QSize ExpressionDataArrayUI::minimumSizeHint() const{
-    return QSize(1200, 600);
-}*/
-
 void ExpressionDataArrayUI::setExpression(){
     if (bsData && file){
         if (bsData->expression != expression->text()){

@@ -1,6 +1,7 @@
 #include "hkbeventsfromrangemodifier.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbeventrangedataarray.h"
 
 /*
  * CLASS: hkbEventsFromRangeModifier
@@ -111,6 +112,13 @@ bool hkbEventsFromRangeModifier::write(HkxXMLWriter *writer){
         }
     }
     return true;
+}
+
+int hkbEventsFromRangeModifier::getNumberOfRanges() const{
+    if (eventRanges.data()){
+        return static_cast<hkbEventRangeDataArray *>(eventRanges.data())->eventData.size();
+    }
+    return 0;
 }
 
 bool hkbEventsFromRangeModifier::link(){

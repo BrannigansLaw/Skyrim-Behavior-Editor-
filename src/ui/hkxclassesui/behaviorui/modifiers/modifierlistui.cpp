@@ -75,7 +75,8 @@ QStringList ModifierListUI::types = {
     "hkbDetectCloseToGroundModifier",
     "BSLookAtModifier",
     "BSTimerModifier",
-    "BSPassByTargetTriggerModifier"
+    "BSPassByTargetTriggerModifier",
+    "hkbHandIKControlsModifier"
 };
 
 QStringList ModifierListUI::headerLabels = {
@@ -286,11 +287,11 @@ void ModifierListUI::loadBinding(int row, int colunm, hkbVariableBindingSet *var
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("ModifierListUI::loadBinding(): The variable binding set is NULL!!"));
         }
@@ -374,10 +375,8 @@ void ModifierListUI::setName(){
 
 void ModifierListUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ModifierListUI::setEnable(): The data is NULL!!"));
     }
@@ -577,6 +576,8 @@ void ModifierListUI::addModifier(){
             behaviorView->appendBSTimerModifier();
         }else if (text == "BSPassByTargetTriggerModifier"){
             behaviorView->appendBSPassByTargetTriggerModifier();
+        }else if (text == "hkbHandIKControlsModifier"){
+            behaviorView->appendHandIKControlsModifier();
         }else{
             CRITICAL_ERROR_MESSAGE(QString("ModifierListUI::addModifier(): Invalid type!!"))
         }

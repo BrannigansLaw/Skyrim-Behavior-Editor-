@@ -18,8 +18,6 @@ class ExpressionDataArrayUI: public QGroupBox
 public:
     ExpressionDataArrayUI();
     void loadData(BehaviorFile *parentFile, hkbExpressionDataArray::hkExpression *exp);
-    //QSize sizeHint() const Q_DECL_OVERRIDE;
-    //QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 signals:
     void viewEvents(int index);
     void viewVariables(int index);

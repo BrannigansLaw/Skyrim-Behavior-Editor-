@@ -36,28 +36,18 @@ HkxSharedPtr * CharacterFile::findCharacterPropertyValues(long ref){
     return NULL;
 }
 
-QString CharacterFile::getRootBehaviorPath() const{
+/*QString CharacterFile::getRelativeRootBehaviorPath() const{
     hkbCharacterStringData *ptr = static_cast<hkbCharacterStringData *>(stringData.data());
     if (ptr){
-        return ptr->behaviorFilename;
+        return ptr->behaviorFilename.section("\\", -3, -2);
     }
     return "";
-}
+}*/
 
 QString CharacterFile::getBehaviorDirectoryName() const{
     hkbCharacterStringData *ptr = static_cast<hkbCharacterStringData *>(stringData.data());
     if (ptr){
-        int index = ptr->behaviorFilename.indexOf("\\");
-        if (index > -1){
-            return ptr->behaviorFilename.section("\\", 0, 0);
-        }else{
-            index = ptr->behaviorFilename.indexOf("/");
-            if (index > -1){
-                return ptr->behaviorFilename.section("/", 0, 0);
-            }else{
-                return ptr->behaviorFilename;
-            }
-        }
+        return QString(ptr->behaviorFilename).replace("\\", "/").section("/", -2, -2);
     }
     return "";
 }
@@ -65,7 +55,7 @@ QString CharacterFile::getBehaviorDirectoryName() const{
 QString CharacterFile::getRigName() const{
     hkbCharacterStringData *ptr = static_cast<hkbCharacterStringData *>(stringData.data());
     if (ptr){
-        return QString(ptr->rigName).replace("\\", "/");
+        return QString(ptr->rigName).replace("\\", "/").section("/", -2, -1);
     }
     return "";
 }
@@ -290,6 +280,7 @@ void CharacterFile::addFootIK(){
         }else{
             static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo = footIkDriverInfo;
         }
+        toggleChanged(true);
     }
 }
 
@@ -303,18 +294,21 @@ void CharacterFile::addHandIK(){
         }else{
             static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo = handIkDriverInfo;
         }
+        toggleChanged(true);
     }
 }
 
 void CharacterFile::disableFootIK(){
     if (characterData.data() && !static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo.data()){
         static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo = HkxSharedPtr();
+        toggleChanged(true);
     }
 }
 
 void CharacterFile::disableHandIK(){
     if (characterData.data() && !static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo.data()){
         static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo = HkxSharedPtr();
+        toggleChanged(true);
     }
 }
 

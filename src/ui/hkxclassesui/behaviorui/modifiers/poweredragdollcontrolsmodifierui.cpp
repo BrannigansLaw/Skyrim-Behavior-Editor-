@@ -117,7 +117,7 @@ PoweredRagdollControlsModifierUI::PoweredRagdollControlsModifierUI()
     table->setCellWidget(MODE_ROW, VALUE_COLUMN, mode);
     table->setItem(BONE_WEIGHTS_ROW, NAME_COLUMN, new TableWidgetItem("boneWeights"));
     table->setItem(BONE_WEIGHTS_ROW, TYPE_COLUMN, new TableWidgetItem("hkbBoneWeightArray", Qt::AlignCenter));
-    table->setItem(BONE_WEIGHTS_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
+    table->setItem(BONE_WEIGHTS_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(BONE_WEIGHTS_ROW, VALUE_COLUMN, boneWeights);
     topLyt->addWidget(table, 0, 0, 8, 3);
     groupBox->setLayout(topLyt);
@@ -244,6 +244,7 @@ void PoweredRagdollControlsModifierUI::loadData(HkxObject *data){
                 loadBinding(POSE_MATCHING_BONE_0_ROW, BINDING_COLUMN, varBind, "poseMatchingBone0");
                 loadBinding(POSE_MATCHING_BONE_1_ROW, BINDING_COLUMN, varBind, "poseMatchingBone1");
                 loadBinding(POSE_MATCHING_BONE_2_ROW, BINDING_COLUMN, varBind, "poseMatchingBone2");
+                loadBinding(BONE_WEIGHTS_ROW, BINDING_COLUMN, varBind, "boneWeights");
             }else{
                 table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
                 table->item(MAX_FORCE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
@@ -254,6 +255,7 @@ void PoweredRagdollControlsModifierUI::loadData(HkxObject *data){
                 table->item(POSE_MATCHING_BONE_0_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
                 table->item(POSE_MATCHING_BONE_1_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
                 table->item(POSE_MATCHING_BONE_2_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
+                table->item(BONE_WEIGHTS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
             CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::loadData(): The data is an incorrect type!!"));
@@ -279,10 +281,8 @@ void PoweredRagdollControlsModifierUI::setName(){
 
 void PoweredRagdollControlsModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -390,6 +390,7 @@ void PoweredRagdollControlsModifierUI::toggleBones(bool enable){
             bsData->bones = HkxSharedPtr(indices);
             //bones->setText(indices->getName());
         }
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::toggleBones(): The data is NULL!!"));
     }
@@ -413,6 +414,7 @@ void PoweredRagdollControlsModifierUI::toggleBoneWeights(bool enable){
             bsData->boneWeights = HkxSharedPtr(new hkbBoneWeightArray(bsData->getParentFile(), -1, static_cast<BehaviorFile *>(bsData->getParentFile())->getNumberOfBones()));
             boneWeights->setText("Click to Edit");
         }
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::toggleBoneWeights(): The data is NULL!!"));
     }
@@ -486,6 +488,12 @@ void PoweredRagdollControlsModifierUI::viewSelected(int row, int column){
                 }
                 selectTableToView(isProperty, "poseMatchingBone2");
                 break;
+            case BONE_WEIGHTS_ROW:
+                if (table->item(BONE_WEIGHTS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
+                    isProperty = true;
+                }
+                selectTableToView(isProperty, "boneWeights");
+                break;
             default:
                 return;
             }
@@ -555,6 +563,10 @@ void PoweredRagdollControlsModifierUI::variableRenamed(const QString & name, int
             bindIndex = bind->getVariableIndexOfBinding("poseMatchingBone2");
             if (bindIndex == index){
                 table->item(POSE_MATCHING_BONE_2_ROW, BINDING_COLUMN)->setText(name);
+            }
+            bindIndex = bind->getVariableIndexOfBinding("boneWeights");
+            if (bindIndex == index){
+                table->item(BONE_WEIGHTS_ROW, BINDING_COLUMN)->setText(name);
             }
         }
     }else{
@@ -653,6 +665,12 @@ void PoweredRagdollControlsModifierUI::setBindingVariable(int index, const QStri
             }
             setBinding(index, row, name, "poseMatchingBone2", VARIABLE_TYPE_INT32, isProperty);
             break;
+        case BONE_WEIGHTS_ROW:
+            if (table->item(BONE_WEIGHTS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
+                isProperty = true;
+            }
+            setBinding(index, row, name, "boneWeights", VARIABLE_TYPE_POINTER, isProperty);
+            break;
         default:
             return;
         }
@@ -678,11 +696,11 @@ void PoweredRagdollControlsModifierUI::loadBinding(int row, int colunm, hkbVaria
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

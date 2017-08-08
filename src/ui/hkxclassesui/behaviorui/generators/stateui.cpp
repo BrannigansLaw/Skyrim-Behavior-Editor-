@@ -290,8 +290,15 @@ void StateUI::setName(){
 
 void StateUI::setStateId(){
     if (bsData){
-        bsData->setStateId(stateId->value());//Update parent state machine???
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->setStateId(stateId->value())){
+            emit stateIdChanged(stateIndex, bsData->stateId, bsData->name);
+            bsData->getParentFile()->toggleChanged(true);
+        }else{
+            WARNING_MESSAGE(QString("StateUI::setStateId(): Another state has the selected state ID!!! The state ID for this state was not changed!!!"));
+            disconnect(stateId, SIGNAL(editingFinished()), this, SLOT(setStateId()));
+            stateId->setValue(bsData->stateId);
+            connect(stateId, SIGNAL(editingFinished()), this, SLOT(setStateId()), Qt::UniqueConnection);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateUI::setStateId(): The data is NULL!!"));
     }
@@ -299,8 +306,10 @@ void StateUI::setStateId(){
 
 void StateUI::setProbability(){
     if (bsData){
-        bsData->probability = probability->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->probability != probability->value()){
+            bsData->probability = probability->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("StateUI::setProbability(): The data is NULL!!"));
     }

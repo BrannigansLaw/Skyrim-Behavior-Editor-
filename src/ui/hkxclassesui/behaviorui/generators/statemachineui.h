@@ -50,6 +50,7 @@ private slots:
     void setMaxSimultaneousTransitions();
     void setStartStateMode(int index);
     void setSelfTransitionMode(int index);
+    void setStateIDForRow(int index, int newID, const QString &statename);
     void viewSelectedChild(int row, int column);
     void eventTableElementSelected(int index, const QString &name);
     void variableTableElementSelected(int index, const QString &name);
@@ -60,6 +61,7 @@ private slots:
     void toggleEventToSendWhenStateOrTransitionChanges(bool enable);
     void stateRenamed(const QString & name, int stateIndex);
     void transitionRenamed(const QString &name, int index);
+    void swapGeneratorIndices(int index1, int index2);
 private:
     void connectSignals();
     void disconnectSignals();
@@ -88,17 +90,18 @@ private:
     };
     enum Generator_Type {
         STATE_MACHINE = 0,
-        MANUAL_SELECTOR_GENERATOR = 1,
-        BLENDER_GENERATOR = 2,
-        I_STATE_TAGGING_GENERATOR = 3,
-        BONE_SWITCH_GENERATOR = 4,
-        CYCLIC_BLEND_TRANSITION_GENERATOR = 5,
-        SYNCHRONIZED_CLIP_GENERATOR = 6,
-        MODIFIER_GENERATOR = 7,
-        OFFSET_ANIMATION_GENERATOR = 8,
-        POSE_MATCHING_GENERATOR = 9,
-        CLIP_GENERATOR = 10,
-        BEHAVIOR_REFERENCE_GENERATOR = 11
+        MANUAL_SELECTOR_GENERATOR,
+        BLENDER_GENERATOR,
+        I_STATE_TAGGING_GENERATOR,
+        BONE_SWITCH_GENERATOR,
+        CYCLIC_BLEND_TRANSITION_GENERATOR,
+        SYNCHRONIZED_CLIP_GENERATOR,
+        MODIFIER_GENERATOR,
+        OFFSET_ANIMATION_GENERATOR,
+        POSE_MATCHING_GENERATOR,
+        CLIP_GENERATOR,
+        BEHAVIOR_REFERENCE_GENERATOR,
+        GAMEBYRO_SEQUENCE_GENERATOR
     };
     static QStringList types;
     static QStringList headerLabels;

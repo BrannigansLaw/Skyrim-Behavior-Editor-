@@ -365,10 +365,8 @@ void BSLookAtModifierUI::setName(){
 
 void BSLookAtModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSLookAtModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -376,10 +374,8 @@ void BSLookAtModifierUI::setEnable(){
 
 void BSLookAtModifierUI::setLookAtTarget(){
     if (bsData){
-        if (bsData->lookAtTarget != lookAtTarget->isChecked()){
-            bsData->lookAtTarget = lookAtTarget->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->lookAtTarget = lookAtTarget->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSLookAtModifierUI::setLookAtTarget(): The data is NULL!!"));
     }
@@ -409,10 +405,8 @@ void BSLookAtModifierUI::setLimitAngleThresholdDegrees(){
 
 void BSLookAtModifierUI::setContinueLookOutsideOfLimit(){
     if (bsData){
-        if (bsData->continueLookOutsideOfLimit != continueLookOutsideOfLimit->isChecked()){
-            bsData->continueLookOutsideOfLimit = continueLookOutsideOfLimit->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->continueLookOutsideOfLimit = continueLookOutsideOfLimit->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSLookAtModifierUI::setContinueLookOutsideOfLimit(): The data is NULL!!"));
     }
@@ -442,10 +436,8 @@ void BSLookAtModifierUI::setOffGain(){
 
 void BSLookAtModifierUI::setUseBoneGains(){
     if (bsData){
-        if (bsData->useBoneGains != useBoneGains->isChecked()){
-            bsData->useBoneGains = useBoneGains->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->useBoneGains = useBoneGains->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSLookAtModifierUI::setUseBoneGains(): The data is NULL!!"));
     }
@@ -464,10 +456,8 @@ void BSLookAtModifierUI::setTargetLocation(){
 
 void BSLookAtModifierUI::setTargetOutsideLimits(){
     if (bsData){
-        if (bsData->targetOutsideLimits != targetOutsideLimits->isChecked()){
-            bsData->targetOutsideLimits = targetOutsideLimits->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->targetOutsideLimits = targetOutsideLimits->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSLookAtModifierUI::setTargetOutsideLimits(): The data is NULL!!"));
     }
@@ -506,10 +496,8 @@ void BSLookAtModifierUI::setTargetOutOfLimitEventPayload(){
 
 void BSLookAtModifierUI::setLookAtCamera(){
     if (bsData){
-        if (bsData->lookAtCamera != lookAtCamera->isChecked()){
-            bsData->lookAtCamera = lookAtCamera->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->lookAtCamera = lookAtCamera->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSLookAtModifierUI::setLookAtCamera(): The data is NULL!!"));
     }
@@ -1000,11 +988,11 @@ void BSLookAtModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet 
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSLookAtModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

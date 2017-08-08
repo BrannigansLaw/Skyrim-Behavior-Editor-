@@ -24,7 +24,7 @@ class HandIkDriverInfoHandUI: public QGroupBox
 public:
     HandIkDriverInfoHandUI();
     virtual ~HandIkDriverInfoHandUI(){}
-    void loadData(hkbHandIkDriverInfoHand *data);
+    void loadData(hkbHandIkDriverInfoHand *data, hkbHandIkDriverInfo *par);
     void loadBoneList(QStringList &bones);
 signals:
     void returnToParent();
@@ -46,6 +46,7 @@ private slots:
 private:
     static QStringList headerLabels1;
     hkbHandIkDriverInfo::hkbHandIkDriverInfoHand *bsData;
+    hkbHandIkDriverInfo *parent;
     QVBoxLayout *lyt;
     QStackedLayout *stackLyt;
     QPushButton *returnPB;

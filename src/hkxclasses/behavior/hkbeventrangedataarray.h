@@ -3,8 +3,13 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
+//class hkbEventsFromRangeModifier;
+
 class hkbEventRangeDataArray: public HkxObject
 {
+    friend class EventRangeDataUI;
+    friend class EventsFromRangeModifierUI;
+    friend class hkbEventsFromRangeModifier;
 public:
     hkbEventRangeDataArray(HkxFile *parent, long ref = -1);
     virtual ~hkbEventRangeDataArray();
@@ -14,6 +19,7 @@ public:
     static QString getClassname();
     int getLastEventDataIndex() const;
     bool write(HkxXMLWriter *writer);
+    int getNumberOfRanges() const;
 protected:
 private:
     struct hkbEventRangeData
@@ -35,6 +41,7 @@ private:
 private:
     static uint refCount;
     static QString classname;
+    //hkbEventsFromRangeModifier *parent;
     QList <hkbEventRangeData> eventData;
 };
 

@@ -37,7 +37,8 @@ QStringList ManualSelectorGeneratorUI::types = {
     "BSOffsetAnimationGenerator",
     "hkbPoseMatchingGenerator",
     "hkbClipGenerator",
-    "hkbBehaviorReferenceGenerator"
+    "hkbBehaviorReferenceGenerator",
+    "BGSGamebryoSequenceGenerator"
 };
 
 QStringList ManualSelectorGeneratorUI::headerLabels = {
@@ -265,11 +266,11 @@ void ManualSelectorGeneratorUI::loadBinding(int row, int colunm, hkbVariableBind
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("ManualSelectorGeneratorUI::loadBinding(): The variable binding set is NULL!!"));
         }
@@ -357,8 +358,10 @@ void ManualSelectorGeneratorUI::setName(){
 
 void ManualSelectorGeneratorUI::setSelectedGeneratorIndex(){
     if (bsData){
-        bsData->selectedGeneratorIndex = selectedGeneratorIndex->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->selectedGeneratorIndex != selectedGeneratorIndex->value()){
+            bsData->selectedGeneratorIndex = selectedGeneratorIndex->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ManualSelectorGeneratorUI::setSelectedGeneratorIndex(): The data is NULL!!"))
     }
@@ -366,8 +369,10 @@ void ManualSelectorGeneratorUI::setSelectedGeneratorIndex(){
 
 void ManualSelectorGeneratorUI::setCurrentGeneratorIndex(){
     if (bsData){
-        bsData->currentGeneratorIndex = currentGeneratorIndex->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->currentGeneratorIndex != currentGeneratorIndex->value()){
+            bsData->currentGeneratorIndex = currentGeneratorIndex->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ManualSelectorGeneratorUI::setCurrentGeneratorIndex(): The data is NULL!!"))
     }
@@ -421,7 +426,11 @@ void ManualSelectorGeneratorUI::swapGeneratorIndices(int index1, int index2){
         index2 = index2 - BASE_NUMBER_OF_ROWS;
         if (bsData->generators.size() > index1 && bsData->generators.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
             bsData->generators.swap(index1, index2);
-            behaviorView->getSelectedItem()->reorderChildren();
+            if (behaviorView->getSelectedItem()){
+                behaviorView->getSelectedItem()->reorderChildren();
+            }else{
+                CRITICAL_ERROR_MESSAGE(QString("ManualSelectorGeneratorUI::swapGeneratorIndices(): No item selected!!"));
+            }
             if (bsData->selectedGeneratorIndex == index1){
                 bsData->selectedGeneratorIndex = index2;
             }else if (bsData->selectedGeneratorIndex == index2){
@@ -519,6 +528,9 @@ void ManualSelectorGeneratorUI::addGenerator(){
             break;
         case BEHAVIOR_REFERENCE_GENERATOR:
             behaviorView->appendBehaviorReferenceGenerator();
+            break;
+        case GAMEBYRO_SEQUENCE_GENERATOR:
+            behaviorView->appendBGSGamebryoSequenceGenerator();
             break;
         default:
             CRITICAL_ERROR_MESSAGE(QString("ManualSelectorGeneratorUI::addGenerator(): Invalid typeEnum!!"))

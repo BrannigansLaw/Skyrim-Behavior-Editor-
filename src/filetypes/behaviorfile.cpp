@@ -76,6 +76,7 @@
 #include "src/hkxclasses/behavior/modifiers/hkbmovecharactermodifier.h"
 #include "src/hkxclasses/behavior/modifiers/hkbtransformvectormodifier.h"
 #include "src/hkxclasses/behavior/modifiers/hkbproxymodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbhandikcontrolsmodifier.h"
 
 #include "src/hkxclasses/hkxobject.h"
 #include "src/hkxclasses/behavior/hkbcharacterstringdata.h"
@@ -111,6 +112,281 @@ BehaviorFile::BehaviorFile(MainWindow *window, CharacterFile *characterData, con
       largestRef(0)
 {
     getReader().setFile(this);
+}
+
+void BehaviorFile::generateNewBehavior(){
+    hkRootLevelContainer *root = new hkRootLevelContainer(this);
+    hkbBehaviorGraph *graph = new hkbBehaviorGraph(this);
+    graph->name = fileName().section("/", -1, -1);
+    graph->name.replace(".hkx", ".hkb");
+    behaviorGraph = HkxSharedPtr(graph);
+    stringData = HkxSharedPtr(new hkbBehaviorGraphStringData(this));
+    variableValues = HkxSharedPtr(new hkbVariableValueSet(this));
+    hkbBehaviorGraphData *data = new hkbBehaviorGraphData(this);
+    graphData = HkxSharedPtr(data);
+    graph->data = graphData;
+    data->stringData = stringData;
+    data->variableInitialValues = variableValues;
+    root->namedVariants.append(hkRootLevelContainer::hkRootLevelContainerNamedVariant());
+    root->namedVariants.last().variant = behaviorGraph;
+    setRootObject(HkxSharedPtr(root));
+}
+
+void BehaviorFile::generateDefaultCharacterData(){
+    generateNewBehavior();
+    hkbBehaviorGraphData *data = static_cast<hkbBehaviorGraphData *>(graphData.data());
+    if (data){
+        //Add common variables...
+        data->addVariable(VARIABLE_TYPE_REAL, "Speed"); //Protected variable...
+        data->addVariable(VARIABLE_TYPE_REAL, "Direction"); //Protected variable...
+        data->addVariable(VARIABLE_TYPE_INT32, "iState");
+        data->addVariable(VARIABLE_TYPE_REAL, "TurnDelta"); //Protected variable...
+        data->addVariable(VARIABLE_TYPE_REAL, "SpeedSampled");
+        data->addVariable(VARIABLE_TYPE_REAL, "SpeedDamped");
+        data->addVariable(VARIABLE_TYPE_REAL, "TurnDeltaDamped");
+        data->addVariable(VARIABLE_TYPE_REAL, "weaponSpeedMult"); //Protected variable...
+        data->addVariable(VARIABLE_TYPE_BOOL, "bAnimationDriven");
+        data->addVariable(VARIABLE_TYPE_BOOL, "bAllowRotation");
+        data->addVariable(VARIABLE_TYPE_BOOL, "IsAttacking");
+        data->addVariable(VARIABLE_TYPE_BOOL, "IsStaggering");
+        data->addVariable(VARIABLE_TYPE_BOOL, "IsRecoiling");
+        data->addVariable(VARIABLE_TYPE_BOOL, "bFootIKEnable");   //Creatures use this, humans don't...
+        data->addVariable(VARIABLE_TYPE_BOOL, "bHumanoidFootIKEnable");   //Humans use this, creatures don't...
+        data->addVariable(VARIABLE_TYPE_REAL, "staggerMagnitude");
+        data->addVariable(VARIABLE_TYPE_REAL, "staggerDirection");
+        data->addVariable(VARIABLE_TYPE_BOOL, "bHeadTrackingOn");   //Creatures use this, humans don't...
+        data->addVariable(VARIABLE_TYPE_BOOL, "bHeadTracking"); //Protected variable...
+        data->addVariable(VARIABLE_TYPE_VECTOR4, "TargetLocation");
+        data->addVariable(VARIABLE_TYPE_REAL, "turnSpeedMult");   //Creatures use this, humans???
+        //Add common events...
+        data->addEvent("moveStart");
+        data->addEvent("moveStop");
+        data->addEvent("bleedOutStart");
+        data->addEvent("bleedOutStop");
+        data->addEvent("blockAnticipateStart");
+        data->addEvent("blockHitStart");
+        data->addEvent("NPC_BumpedFromRight");
+        data->addEvent("NPC_BumpedFromLeft");
+        data->addEvent("NPC_BumpedFromBack");
+        data->addEvent("NPC_BumpedFromFront");
+        data->addEvent("Ragdoll");
+        data->addEvent("DeathAnim");
+        data->addEvent("WeapEquip");
+        data->addEvent("WeapSoloEquip");
+        data->addEvent("Magic_Equip");
+        data->addEvent("attackStartDualWield");
+        data->addEvent("attackPowerStartH2HCombo");
+        data->addEvent("attackPowerStartDualWield");
+        data->addEvent("StaffBashRelease");
+        data->addEvent("JumpFallDirectional");
+        data->addEvent("JumpFall");
+        data->addEvent("MC_WeapOutRightReplaceForceEquip");
+        data->addEvent("WeapSoloEquip");
+        data->addEvent("torchEquip");
+        data->addEvent("ShdEquip");
+        data->addEvent("swimForceEquip");
+        data->addEvent("WeapOutLeftReplaceForceEquip");
+        data->addEvent("torchForceEquip");
+        data->addEvent("MagicWeap_ForceEquip");
+        data->addEvent("WeapOutRightReplaceForceEquip");
+        data->addEvent("Magic_Solo_Equip");
+        data->addEvent("MagicForceEquipLeft");
+        data->addEvent("MagicForceEquipRight");
+        data->addEvent("MagicForceEquip");
+        data->addEvent("GetUpBegin");
+        data->addEvent("IdlePlayer");
+        data->addEvent("IdleStop");
+        data->addEvent("IdleStopInstant");
+        data->addEvent("JumpDirectionalStart");
+        data->addEvent("JumpStandingStart");
+        data->addEvent("JumpLandDirectional");
+        data->addEvent("JumpLandEnd");
+        data->addEvent("JumpLand");
+        data->addEvent("blockStart");
+        data->addEvent("attackStart_MC_1HMLeft");
+        data->addEvent("attackStartSprintLeftHand");
+        data->addEvent("attackStartH2HLeft");
+        data->addEvent("MLh_SpellSelfStart");
+        data->addEvent("MLh_SpellAimedStart");
+        data->addEvent("MLh_WardStart");
+        data->addEvent("MLh_SpellSelfConcentrationStart");
+        data->addEvent("MLh_SpellAimedConcentrationStart");
+        data->addEvent("RitualSpellStart");
+        data->addEvent("RitualSpellAimConcentrationStart");
+        data->addEvent("DualMagic_SpellAimedStart");
+        data->addEvent("DualMagic_SpellSelfStart");
+        data->addEvent("DualMagic_SpellAimedStart");
+        data->addEvent("DualMagic_SpellAimedConcentrationStart");
+        data->addEvent("DualMagic_WardStart");
+        data->addEvent("DualMagic_SpellSelfConcentrationStart");
+        data->addEvent("MLh_SpellTelekinesisStart");
+        data->addEvent("bashStart");
+        data->addEvent("attackStartLeftHand");
+        data->addEvent("RitualSpellOut");
+        data->addEvent("MLh_Equipped_Event");
+        data->addEvent("attackPowerStart_MC_1HMLeft");
+        data->addEvent("attackPowerStart_SprintLeftHand");
+        data->addEvent("attackPowerStartForwardLeftHand");
+        data->addEvent("attackPowerStartRightLeftHand");
+        data->addEvent("attackPowerStartLeftLeftHand");
+        data->addEvent("attackPowerStartBackLeftHand");
+        data->addEvent("attackPowerStartInPlaceLeftHand");
+        data->addEvent("attackPowerStartForwardH2HLeftHand");
+        data->addEvent("MLh_SpellReady_event");
+        data->addEvent("blockStop");
+        data->addEvent("bashRelease");
+        data->addEvent("attackReleaseL");
+        data->addEvent("MLH_SpellRelease_event");
+        data->addEvent("NPC_TurnRight90");
+        data->addEvent("NPC_TurnRight180");
+        data->addEvent("NPC_TurnLeft90");
+        data->addEvent("NPC_TurnLeft180");
+        data->addEvent("NPC_TurnToWalkRight90");
+        data->addEvent("NPC_TurnToWalkRight180");
+        data->addEvent("NPC_TurnToWalkLeft90");
+        data->addEvent("NPC_TurnToWalkLeft180");
+        data->addEvent("recoilStart");
+        data->addEvent("recoilLargeStart");
+        data->addEvent("IdleForceDefaultState");
+        data->addEvent("attackStart_MC_1HMRight");
+        data->addEvent("bowAttackStart");
+        data->addEvent("attackStartSprint");
+        data->addEvent("attackStartH2HRight");
+        data->addEvent("MRh_SpellSelfStart");
+        data->addEvent("MRh_SpellAimedStart");
+        data->addEvent("MRh_WardStart");
+        data->addEvent("MRh_SpellSelfConcentrationStart");
+        data->addEvent("MRh_SpellAimedConcentrationStart");
+        data->addEvent("MRh_SpellTelekinesisStart");
+        data->addEvent("BashFail");
+        data->addEvent("attackStart");
+        data->addEvent("attackStop");
+        data->addEvent("MRh_Equipped_Event");
+        data->addEvent("attackPowerStart_MC_1HMRight");
+        data->addEvent("attackPowerStart_2HMSprint");
+        data->addEvent("attackPowerStart_2HWSprint");
+        data->addEvent("attackPowerStart_Sprint");
+        data->addEvent("attackPowerStartForwardH2HRightHand");
+        data->addEvent("attackPowerStartInPlace");
+        data->addEvent("attackPowerStartForward");
+        data->addEvent("attackPowerStartRight");
+        data->addEvent("attackPowerStartLeft");
+        data->addEvent("attackPowerStartBackward");
+        data->addEvent("bashPowerStart");
+        data->addEvent("MRh_SpellReady_event");
+        data->addEvent("MRH_SpellRelease_event");
+        data->addEvent("attackRelease");
+        data->addEvent("UnequipNoAnim");
+        data->addEvent("Unequip");
+        data->addEvent("SneakStart");
+        data->addEvent("SneakStop");
+        data->addEvent("BlockBashSprint");
+        data->addEvent("SneakSprintStartRoll");
+        data->addEvent("SprintStart");
+        data->addEvent("sprintStop");
+        data->addEvent("00NextClip");
+        data->addEvent("StaggerPlayer");
+        data->addEvent("staggerStart");
+        data->addEvent("MountedStaggerStart");
+        data->addEvent("SwimStart");
+        data->addEvent("swimStop");
+        data->addEvent("MountedSwimStart");
+        data->addEvent("MountedSwimStop");
+        data->addEvent("TurnLeft");
+        data->addEvent("TurnRight");
+        data->addEvent("turnStop");
+        data->addEvent("NPCshoutStart");
+        data->addEvent("shoutStart");
+        data->addEvent("shoutStop");
+        data->addEvent("shoutSprintMediumStart");
+        data->addEvent("shoutSprintLongStart");
+        data->addEvent("shoutSprintLongestStart");
+        data->addEvent("shoutReleaseSlowTime");
+        data->addEvent("CombatReady_BreathExhaleShort");
+        data->addEvent("MT_BreathExhaleShort");
+        data->addEvent("wardAbsorb");
+        data->addEvent("WardBreak");
+        //Events raised in the character behaviors that the game engine probably responds to in some way...
+        data->addEvent("AddRagdollToWorld");
+        data->addEvent("RemoveCharacterControllerFromWorld");
+        data->addEvent("AddCharacterControllerToWorld");
+        data->addEvent("InterruptCast");
+        data->addEvent("Reanimated");
+        data->addEvent("HeadTrackingOff");
+        data->addEvent("HeadTrackingOn");
+        data->addEvent("tailUnequip");
+        data->addEvent("arrowDetach");
+        data->addEvent("EnableBumper");
+        data->addEvent("DisableBumper");
+        data->addEvent("weaponSheathe");
+        data->addEvent("JumpUp");
+        data->addEvent("MTState");
+        data->addEvent("AnimObjectUnequip");
+        data->addEvent("tailMTState");
+        data->addEvent("bowReset");
+        data->addEvent("BeginWeaponSheathe");
+        data->addEvent("tailCombatLocomotion");
+        data->addEvent("tailSneakLocomotion");
+        data->addEvent("tailCombatIdle");
+        data->addEvent("tailSneakIdle");
+        data->addEvent("weaponDraw");
+        data->addEvent("PairedKillTarget");
+        data->addEvent("PairEnd");
+        data->addEvent("MountEnd");
+        data->addEvent("StartAnimatedCamera");
+        data->addEvent("AnimObjLoad");
+        data->addEvent("AnimObjDraw");
+        data->addEvent("EndAnimatedCamera");
+        data->addEvent("StartAnimatedCameraDelta");
+        data->addEvent("2_PairEnd");
+        data->addEvent("ExitCartBegin");
+        data->addEvent("ExitCartEnd");
+        data->addEvent("SoundPlay.NPCWerewolfTransformation");
+        data->addEvent("ZeroOutCameraPitch");
+        data->addEvent("PowerAttack_Start_end");
+        data->addEvent("CastOKStop");
+        data->addEvent("slowdownStart");
+        data->addEvent("FootRight");
+        data->addEvent("FootLeft");
+        data->addEvent("preHitFrame");
+        data->addEvent("weaponSwing");
+        data->addEvent("HitFrame");
+        data->addEvent("AttackWinStart");
+        data->addEvent("AttackWinEnd");
+        /*data->addEvent("SoundPlay.WPNSwingUnarmed");
+        data->addEvent("SoundPlay.NPCHumanCombatIdleA");
+        data->addEvent("SoundPlay.NPCHumanCombatIdleB");
+        data->addEvent("SoundPlay.NPCHumanCombatIdleC");
+        data->addEvent("2_SoundPlay.NPCKill1HMDualWieldA");
+        data->addEvent("NPCSoundPlay.NPCKillStruggle");
+        data->addEvent("NPCSoundPlay.NPCKillShove");
+        data->addEvent("NPCSoundPlay.NPCKillChop");
+        data->addEvent("NPCSoundPlay.NPCKillSmash");
+        data->addEvent("NPCSoundPlay.NPCKillMeleeB");
+        data->addEvent("NPCSoundPlay.NPCKillGore");
+        data->addEvent("NPCSoundPlay.NPCKillBodyfall");
+        data->addEvent("NPCSoundPlay.NPCKillStabIn");
+        data->addEvent("NPCSoundPlay.WPNBlockBlade2HandVsOtherSD");
+        data->addEvent("SoundPlay.WPNBowZoomIn");*/
+        data->addEvent("2_KillMoveStart");
+        data->addEvent("2_DeathEmote");
+        data->addEvent("2_KillMoveEnd");
+        data->addEvent("2_KillActor");
+        data->addEvent("MRh_SpellFire_Event");
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("BehaviorFile::generateDefaultCharacterData(): The behavior graph data failed to construct!"));
+    }
+}
+
+QStringList BehaviorFile::getAllBehaviorFileNames() const{
+    QStringList list;
+    QDirIterator it(QFileInfo(*this).absolutePath()+"/");
+    while (it.hasNext()){
+        if (QFileInfo(it.next()).fileName().contains(".hkx")){
+            list.append(it.fileInfo().filePath().section("/", -2, -1));
+        }
+    }
+    return list;
 }
 
 HkxObject * BehaviorFile::getRootStateMachine() const{
@@ -512,6 +788,10 @@ bool BehaviorFile::parse(){
                     }
                 }else if (signature == BS_PASS_BY_TARGET_TRIGGER_MODIFIER){
                     if (!appendAndReadData(index, new BSLookAtModifier(this, ref))){
+                        return false;
+                    }
+                }else if (signature == HKB_HAND_IK_CONTROLS_MODIFIER){
+                    if (!appendAndReadData(index, new hkbHandIkControlsModifier(this, ref))){
                         return false;
                     }
                 }else if (signature == BS_TIMER_MODIFIER){

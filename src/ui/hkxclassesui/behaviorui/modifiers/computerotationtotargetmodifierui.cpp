@@ -191,10 +191,8 @@ void ComputeRotationToTargetModifierUI::setName(){
 
 void ComputeRotationToTargetModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ComputeRotationToTargetModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -268,10 +266,8 @@ void ComputeRotationToTargetModifierUI::setLocalFacingDirection(){
 
 void ComputeRotationToTargetModifierUI::setResultIsDelta(){
     if (bsData){
-        if (bsData->resultIsDelta != resultIsDelta->isChecked()){
-            bsData->resultIsDelta = resultIsDelta->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->resultIsDelta = resultIsDelta->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ComputeRotationToTargetModifierUI::setresultIsDelta(): The data is NULL!!"));
     }
@@ -508,11 +504,11 @@ void ComputeRotationToTargetModifierUI::loadBinding(int row, int colunm, hkbVari
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("ComputeRotationToTargetModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

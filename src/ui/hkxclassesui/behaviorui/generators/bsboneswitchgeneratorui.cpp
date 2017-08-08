@@ -41,7 +41,8 @@ QStringList BSBoneSwitchGeneratorUI::types = {
     "BSOffsetAnimationGenerator",
     "hkbPoseMatchingGenerator",
     "hkbClipGenerator",
-    "hkbBehaviorReferenceGenerator"
+    "hkbBehaviorReferenceGenerator",
+    "BGSGamebryoSequenceGenerator"
 };
 
 QStringList BSBoneSwitchGeneratorUI::headerLabels = {
@@ -61,6 +62,12 @@ BSBoneSwitchGeneratorUI::BSBoneSwitchGeneratorUI()
       table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit)
 {
+    table->setAcceptDrops(true);
+    table->viewport()->setAcceptDrops(true);
+    table->setDragDropOverwriteMode(true);
+    table->setDropIndicatorShown(true);
+    table->setDragDropMode(QAbstractItemView::InternalMove);
+    table->setRowSwapRange(BASE_NUMBER_OF_ROWS);
     typeSelectorCB->insertItems(0, types);
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
@@ -88,6 +95,7 @@ BSBoneSwitchGeneratorUI::BSBoneSwitchGeneratorUI()
 void BSBoneSwitchGeneratorUI::connectSignals(){
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    connect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)), Qt::UniqueConnection);
     connect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)), Qt::UniqueConnection);
     connect(childUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
     connect(childUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
@@ -97,6 +105,7 @@ void BSBoneSwitchGeneratorUI::connectSignals(){
 void BSBoneSwitchGeneratorUI::disconnectSignals(){
     disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    disconnect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)));
     disconnect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)));
     disconnect(childUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
     disconnect(childUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)));
@@ -183,6 +192,26 @@ void BSBoneSwitchGeneratorUI::setName(){
     }
 }
 
+void BSBoneSwitchGeneratorUI::swapGeneratorIndices(int index1, int index2){
+    if (bsData){
+        index1 = index1 - BASE_NUMBER_OF_ROWS;
+        index2 = index2 - BASE_NUMBER_OF_ROWS;
+        if (bsData->ChildrenA.size() > index1 && bsData->ChildrenA.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
+            bsData->ChildrenA.swap(index1, index2);
+            if (behaviorView->getSelectedItem()){
+                behaviorView->getSelectedItem()->reorderChildren();
+            }else{
+                CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::swapGeneratorIndices(): No item selected!!"));
+            }
+            bsData->getParentFile()->toggleChanged(true);
+        }else{
+            WARNING_MESSAGE(QString("BSBoneSwitchGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!"))
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::swapGeneratorIndices(): The data is NULL!!"))
+    }
+}
+
 void BSBoneSwitchGeneratorUI::addChildWithGenerator(){
     Generator_Type typeEnum;
     if (bsData && behaviorView){
@@ -223,6 +252,9 @@ void BSBoneSwitchGeneratorUI::addChildWithGenerator(){
             break;
         case BEHAVIOR_REFERENCE_GENERATOR:
             behaviorView->appendBehaviorReferenceGenerator();
+            break;
+        case GAMEBYRO_SEQUENCE_GENERATOR:
+            behaviorView->appendBGSGamebryoSequenceGenerator();
             break;
         default:
             CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::addChild(): Invalid typeEnum!!"))

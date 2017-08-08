@@ -28,7 +28,9 @@ ProjectUI::ProjectUI(ProjectFile *file)
       footIK(new FootIkDriverInfoUI),
       handIK(new HandIkDriverInfoUI),
       fileSys(new QFileSystemModel),
-      fileView(new QListView)
+      fileView(new QListView),
+      addBehaviorFile(new QPushButton("Add New Behavior")),
+      initializeWithCharacterData(new CheckBox("Use Character Events/Variables"))
 {
     if (file){
         fileView->setRootIndex(fileSys->setRootPath(lastFileSelectedPath));
@@ -41,20 +43,23 @@ ProjectUI::ProjectUI(ProjectFile *file)
     fileSys->setNameFilters(filters);
     fileSys->setNameFilterDisables(false);
     fileView->setModel(fileSys);
-    lyt->setSizeConstraint(QLayout::SetNoConstraint);
-    fileView->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored, QSizePolicy::DefaultType));
-    lyt->addWidget(fileView, 0, 0, 2, 1);
-    lyt->addWidget(characterProperties, 0, 1, 2, 3);
+    //lyt->setSizeConstraint(QLayout::SetNoConstraint);
+    //fileView->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum, QSizePolicy::CheckBox));
+    lyt->addWidget(addBehaviorFile, 0, 0, 1, 1);
+    lyt->addWidget(initializeWithCharacterData, 0, 1, 1, 1);
+    lyt->addWidget(fileView, 1, 0, 2, 2);
+    lyt->addWidget(characterProperties, 0, 2, 2, 2);
     lyt->addWidget(skeleton, 0, 4, 2, 2);
-    lyt->addWidget(enableFootIKCB, 2, 0, 2, 2);
-    lyt->addWidget(enableHandIKCB, 2, 2, 2, 2);
-    lyt->addWidget(footIK, 3, 0, 2, 2);
-    lyt->addWidget(handIK, 3, 2, 2, 2);
-    lyt->addWidget(animations, 3, 4, 2, 2);
+    lyt->addWidget(enableFootIKCB, 3, 0, 1, 1);
+    lyt->addWidget(enableHandIKCB, 3, 2, 1, 1);
+    lyt->addWidget(footIK, 4, 0, 2, 2);
+    lyt->addWidget(handIK, 4, 2, 2, 2);
+    lyt->addWidget(animations, 4, 4, 2, 2);
     setLayout(lyt);
-    connect(fileView, SIGNAL(doubleClicked(QModelIndex)), this, SIGNAL(openFile(QModelIndex)));
-    connect(enableFootIKCB, SIGNAL(clicked(bool)), this, SLOT(toggleFootIK(bool)));
-    connect(enableHandIKCB, SIGNAL(clicked(bool)), this, SLOT(toggleHandIK(bool)));
+    connect(fileView, SIGNAL(doubleClicked(QModelIndex)), this, SIGNAL(openFile(QModelIndex)), Qt::UniqueConnection);
+    connect(enableFootIKCB, SIGNAL(clicked(bool)), this, SLOT(toggleFootIK(bool)), Qt::UniqueConnection);
+    connect(enableHandIKCB, SIGNAL(clicked(bool)), this, SLOT(toggleHandIK(bool)), Qt::UniqueConnection);
+    connect(addBehaviorFile, SIGNAL(released()), this, SLOT(addNewBehaviorFile()), Qt::UniqueConnection);
 }
 
 ProjectUI::~ProjectUI()
@@ -63,7 +68,7 @@ ProjectUI::~ProjectUI()
 }
 
 void ProjectUI::setFilePath(const QString & path){
-    lastFileSelectedPath = path+"\\behaviors";
+    lastFileSelectedPath = path;
 }
 
 void ProjectUI::setDisabled(bool disable){
@@ -87,8 +92,7 @@ void ProjectUI::setDisabled(bool disable){
 void ProjectUI::setProject(ProjectFile *file){
     project = file;
     if (project && project->character){
-        QString s = project->fileName().remove(project->fileName().lastIndexOf("/", -1), project->fileName().size());
-        fileView->setRootIndex(fileSys->setRootPath(project->fileName().remove(project->fileName().lastIndexOf("/", -1), project->fileName().size())+"/"+project->character->getBehaviorDirectoryName()));
+        fileView->setRootIndex(fileSys->setRootPath(lastFileSelectedPath+"/"+project->character->getBehaviorDirectoryName()));
     }
 }
 
@@ -137,4 +141,8 @@ void ProjectUI::toggleHandIK(bool toggle){
             project->character->disableHandIK();
         }
     }
+}
+
+void ProjectUI::addNewBehaviorFile(){
+    emit addBehavior(initializeWithCharacterData->isChecked());
 }

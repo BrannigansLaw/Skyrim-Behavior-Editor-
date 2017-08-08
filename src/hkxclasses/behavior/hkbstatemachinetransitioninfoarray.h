@@ -26,7 +26,7 @@ public:
     bool write(HkxXMLWriter *writer);
     struct HkTransition
     {
-        HkTransition(): eventId(-1), toStateId(0), fromNestedStateId(0), toNestedStateId(0), priority(0){}
+        HkTransition(): eventId(-1), toStateId(0), fromNestedStateId(0), toNestedStateId(0), priority(0), flags("0"){}
 
         struct HkInterval
         {

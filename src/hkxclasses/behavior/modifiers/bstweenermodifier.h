@@ -6,6 +6,7 @@
 class BSTweenerModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSTweenerModifierUI;
 public:
     BSTweenerModifier(HkxFile *parent, long ref = 0);
     virtual ~BSTweenerModifier();

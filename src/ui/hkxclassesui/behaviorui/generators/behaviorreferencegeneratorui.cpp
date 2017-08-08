@@ -64,7 +64,7 @@ void BehaviorReferenceGeneratorUI::loadData(HkxObject *data){
         if (data->getSignature() == HKB_BEHAVIOR_REFERENCE_GENERATOR){
             bsData = static_cast<hkbBehaviorReferenceGenerator *>(data);
             name->setText(bsData->name);
-            QStringList behaviors = bsData->getParentFile()->getAllBehaviorFileNames();
+            QStringList behaviors = static_cast<BehaviorFile *>(bsData->getParentFile())->getAllBehaviorFileNames();
             if (behaviorName->count() != behaviors.size()){
                 behaviorName->clear();
                 behaviorName->insertItems(0, behaviors);

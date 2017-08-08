@@ -19,7 +19,7 @@ public:
     virtual ~CharacterFile();
     bool addObjectToFile(HkxObject *obj, long ref = -1);
     QString getRootObjectReferenceString();
-    QString getRootBehaviorPath() const;
+    //QString getRelativeRootBehaviorPath() const;
     QString getBehaviorDirectoryName() const;
     QString getRigName() const;
     QStringList getRigBoneNames() const;

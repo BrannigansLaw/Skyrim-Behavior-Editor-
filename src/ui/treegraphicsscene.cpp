@@ -170,6 +170,13 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
                 }
             }
         }
+        if (!selectedIcon->isPrimaryIcon()){
+            if (selectedIcon->getPrimaryIcon()){
+                selectedIcon = selectedIcon->getPrimaryIcon();
+            }else{
+                return NULL;    //Error...
+            }
+        }
         if (!inject){
             if (isFirstDraw){
                 newIcon = new BehaviorGraphIcon(selectedIcon, data, selectedIcon->getIndexofIconWithData(data));
@@ -207,6 +214,7 @@ bool TreeGraphicsScene::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconM
     if (oldIconParent){
         if (!dataToReplace){
             addItemToGraph(oldIconParent, replacementData, oldIconParent->itemData->getIndexOfObj(dataToReplace));
+            oldIconParent->reposition();
             return true;
         }else if (dataToReplace != replacementData){
             iconToReplace = oldIconParent->getChildWithData(dataToReplace);

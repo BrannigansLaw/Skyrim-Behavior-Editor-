@@ -55,8 +55,8 @@ TreeGraphicsItem::~TreeGraphicsItem(){
     itemData->removeIcon(this);
     if (scene()){
         scene()->removeItem(this);
+        //scene()->removeItem(path);
     }
-    //scene()->removeItem(path); crashing here...
     delete path;
     setParentItem(NULL);
 }
@@ -104,13 +104,6 @@ void TreeGraphicsItem::unselect(){
 
 void TreeGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     if (boundingRect().contains(event->pos())){
-        //DEBUG CODE START
-        /*QList <QGraphicsItem *> list = childItems();
-        QList <TreeGraphicsItem *> children;
-        for (int i = 0; i < list.size(); i++){
-            children.append((TreeGraphicsItem *)list.at(i));
-        }*/
-        //DEBUG CODE END
         if (branchExpandCollapseBox().contains(event->pos())){
             ((TreeGraphicsScene *)scene())->selectIcon(this, true);
         }else{
@@ -247,8 +240,10 @@ bool TreeGraphicsItem::isDataDescendant(DataIconManager *data) const{
 }
 
 bool TreeGraphicsItem::isPrimaryIcon() const{
-    if (itemData->icons.first() == this && itemData->icons.size() > 1){
-        return true;
+    if (!itemData->icons.isEmpty()){
+        if (itemData->icons.first() == this && itemData->icons.size() > 1){ //Use or???
+            return true;
+        }
     }
     return false;
 }
@@ -344,7 +339,7 @@ int TreeGraphicsItem::getIconIndex(){
 }
 
 //Returns the index that "this" should be inserted into it's associated DataIconManager's icon list...
-int TreeGraphicsItem::determineInsertionIndex() const{
+/*int TreeGraphicsItem::determineInsertionIndex() const{
     QList <QGraphicsItem *> children;
     QList <QGraphicsItem *> tempList;
     TreeGraphicsItem *parent = NULL;
@@ -372,7 +367,7 @@ int TreeGraphicsItem::determineInsertionIndex() const{
         parent = (TreeGraphicsItem *)parent->parentItem();
     }
     return -1;
-}
+}*/
 
 //Returns the first child of "this" whose data is equal to "data"...
 TreeGraphicsItem *TreeGraphicsItem::getChildWithData(DataIconManager *data){

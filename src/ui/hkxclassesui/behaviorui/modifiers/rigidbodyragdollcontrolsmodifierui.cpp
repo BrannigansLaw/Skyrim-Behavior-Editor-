@@ -132,7 +132,7 @@ RigidBodyRagdollControlsModifierUI::RigidBodyRagdollControlsModifierUI()
     table->setCellWidget(DURATION_TO_BLEND_ROW, VALUE_COLUMN, durationToBlend);
     table->setItem(BONES_ROW, NAME_COLUMN, new TableWidgetItem("bones"));
     table->setItem(BONES_ROW, TYPE_COLUMN, new TableWidgetItem("hkbBoneIndexArray", Qt::AlignCenter));
-    table->setItem(BONES_ROW, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter, QColor(Qt::gray)));
+    table->setItem(BONES_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter, QColor(Qt::gray)));
     table->setCellWidget(BONES_ROW, VALUE_COLUMN, bones);
     topLyt->addWidget(table, 0, 0, 8, 3);
     groupBox->setLayout(topLyt);
@@ -286,10 +286,8 @@ void RigidBodyRagdollControlsModifierUI::setName(){
 
 void RigidBodyRagdollControlsModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("RigidBodyRagdollControlsModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -449,6 +447,7 @@ void RigidBodyRagdollControlsModifierUI::toggleBones(bool enable){
             bsData->bones = HkxSharedPtr(indices);
             bones->setText("Click to Edit");
         }
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("RigidBodyRagdollControlsModifierUI::toggleBones(): The data is NULL!!"));
     }
@@ -794,11 +793,11 @@ void RigidBodyRagdollControlsModifierUI::loadBinding(int row, int colunm, hkbVar
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("RigidBodyRagdollControlsModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

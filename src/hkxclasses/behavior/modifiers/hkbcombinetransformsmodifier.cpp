@@ -14,9 +14,9 @@ hkbCombineTransformsModifier::hkbCombineTransformsModifier(HkxFile *parent, long
     : hkbModifier(parent, ref),
       userData(0),
       enable(true),
-      invertLeftTransform(true),
-      invertRightTransform(true),
-      invertResult(true)
+      invertLeftTransform(false),
+      invertRightTransform(false),
+      invertResult(false)
 {
     setType(HKB_COMBINE_TRANSFORMS_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);

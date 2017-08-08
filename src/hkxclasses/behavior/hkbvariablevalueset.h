@@ -12,6 +12,7 @@ class hkbVariableValueSet: public HkxObject
     friend class BehaviorVariablesUI;
     friend class hkbCharacterData;
     friend class CharacterPropertiesUI;
+    friend class BehaviorFile;
 public:
     hkbVariableValueSet(HkxFile *parent, long ref = 0);
     virtual ~hkbVariableValueSet();

@@ -41,7 +41,7 @@ private:
     bool hasSameData(TreeGraphicsItem *icon) const;
     bool hasSameData(DataIconManager *data) const;
     int getIconIndex();
-    int determineInsertionIndex() const;
+    //int determineInsertionIndex() const;
     //TreeGraphicsItem *getChildWithData(DataIconManager *data, int index);
     TreeGraphicsItem *getReplacementIcon(DataIconManager *data);
     int getIndexOfChild(TreeGraphicsItem *child) const;

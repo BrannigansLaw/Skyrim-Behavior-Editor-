@@ -202,10 +202,8 @@ void TwistModifierUI::setName(){
 
 void TwistModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("TwistModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -271,10 +269,8 @@ void TwistModifierUI::setRotationAxisCoordinates(int index){
 
 void TwistModifierUI::setIsAdditive(){
     if (bsData){
-        if (bsData->isAdditive != isAdditive->isChecked()){
-            bsData->isAdditive = isAdditive->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->isAdditive = isAdditive->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("TwistModifierUI::setIsAdditive(): The data is NULL!!"));
     }
@@ -479,11 +475,11 @@ void TwistModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *va
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("TwistModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

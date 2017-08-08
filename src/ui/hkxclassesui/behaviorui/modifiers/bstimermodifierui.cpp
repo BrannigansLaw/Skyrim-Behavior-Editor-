@@ -165,10 +165,8 @@ void BSTimerModifierUI::setName(){
 
 void BSTimerModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -221,10 +219,8 @@ void BSTimerModifierUI::setAlarmEventPayload(){
 
 void BSTimerModifierUI::setResetAlarm(){
     if (bsData){
-        if (bsData->resetAlarm != resetAlarm->isChecked()){
-            bsData->resetAlarm = resetAlarm->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->resetAlarm = resetAlarm->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::setResetAlarm(): The data is NULL!!"));
     }
@@ -394,11 +390,11 @@ void BSTimerModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

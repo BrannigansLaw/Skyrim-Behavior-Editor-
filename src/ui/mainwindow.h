@@ -105,10 +105,12 @@ private slots:
     void exit();
     void changedTabs(int index);
     void closeTab(int index);
+    void addNewBehavior(bool initData);
 private:
     enum HKXCMD_RETURN{
         HKXCMD_SUCCESS = 0
     };
+    QString generateUniqueBehaviorName();
     void openProject(QString &filepath);
     void saveFile(int index);
     bool openBehavior(const QString & filename);

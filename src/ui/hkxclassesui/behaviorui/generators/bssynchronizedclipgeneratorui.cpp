@@ -411,11 +411,11 @@ void BSSynchronizedClipGeneratorUI::loadBinding(int row, int colunm, hkbVariable
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSSynchronizedClipGeneratorUI::loadBinding(): The variable binding set is NULL!!"));
         }

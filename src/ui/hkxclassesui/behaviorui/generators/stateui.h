@@ -31,6 +31,7 @@ public:
     void loadData(HkxObject *data, int stateindex);
 signals:
     void stateNameChanged(const QString & newName, int index);
+    void stateIdChanged(int stateIndex, int newID, const QString & statename);
     void viewGenerators(int index);
     void returnToParent(bool reloadData);
     void viewVariables(int index);

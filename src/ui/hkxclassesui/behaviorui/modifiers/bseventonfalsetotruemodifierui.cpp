@@ -259,10 +259,8 @@ void BSEventOnFalseToTrueModifierUI::setName(){
 
 void BSEventOnFalseToTrueModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSEventOnFalseToTrueModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -270,10 +268,8 @@ void BSEventOnFalseToTrueModifierUI::setEnable(){
 
 void BSEventOnFalseToTrueModifierUI::setEnableEvent1(){
     if (bsData){
-        if (bsData->bEnableEvent1 != bEnableEvent1->isChecked()){
-            bsData->bEnableEvent1 = bEnableEvent1->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bEnableEvent1 = bEnableEvent1->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSEventOnFalseToTrueModifierUI::setbEnableEvent1(): The data is NULL!!"));
     }
@@ -281,10 +277,8 @@ void BSEventOnFalseToTrueModifierUI::setEnableEvent1(){
 
 void BSEventOnFalseToTrueModifierUI::setVariableToTest1(){
     if (bsData){
-        if (bsData->bVariableToTest1 != bVariableToTest1->isChecked()){
-            bsData->bVariableToTest1 = bVariableToTest1->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bVariableToTest1 = bVariableToTest1->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSEventOnFalseToTrueModifierUI::setbVariableToTest1(): The data is NULL!!"));
     }
@@ -326,10 +320,8 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend1Payload(){
 
 void BSEventOnFalseToTrueModifierUI::setEnableEvent2(){
     if (bsData){
-        if (bsData->bEnableEvent2 != bEnableEvent2->isChecked()){
-            bsData->bEnableEvent2 = bEnableEvent2->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bEnableEvent2 = bEnableEvent2->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSEventOnFalseToTrueModifierUI::setbEnableEvent2(): The data is NULL!!"));
     }
@@ -337,10 +329,8 @@ void BSEventOnFalseToTrueModifierUI::setEnableEvent2(){
 
 void BSEventOnFalseToTrueModifierUI::setVariableToTest2(){
     if (bsData){
-        if (bsData->bVariableToTest2 != bVariableToTest2->isChecked()){
-            bsData->bVariableToTest2 = bVariableToTest2->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bVariableToTest2 = bVariableToTest2->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSEventOnFalseToTrueModifierUI::setbVariableToTest2(): The data is NULL!!"));
     }
@@ -382,10 +372,8 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend2Payload(){
 
 void BSEventOnFalseToTrueModifierUI::setEnableEvent3(){
     if (bsData){
-        if (bsData->bEnableEvent3 != bEnableEvent3->isChecked()){
-            bsData->bEnableEvent3 = bEnableEvent3->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bEnableEvent3 = bEnableEvent3->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSEventOnFalseToTrueModifierUI::setbEnableEvent3(): The data is NULL!!"));
     }
@@ -393,10 +381,8 @@ void BSEventOnFalseToTrueModifierUI::setEnableEvent3(){
 
 void BSEventOnFalseToTrueModifierUI::setVariableToTest3(){
     if (bsData){
-        if (bsData->bVariableToTest3 != bVariableToTest3->isChecked()){
-            bsData->bVariableToTest3 = bVariableToTest3->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->bVariableToTest3 = bVariableToTest3->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSEventOnFalseToTrueModifierUI::setbVariableToTest3(): The data is NULL!!"));
     }
@@ -692,11 +678,11 @@ void BSEventOnFalseToTrueModifierUI::loadBinding(int row, int colunm, hkbVariabl
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSEventOnFalseToTrueModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

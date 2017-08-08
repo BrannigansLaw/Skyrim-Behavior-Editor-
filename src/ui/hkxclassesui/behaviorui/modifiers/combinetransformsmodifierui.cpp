@@ -213,10 +213,8 @@ void CombineTransformsModifierUI::setName(){
 
 void CombineTransformsModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -290,10 +288,8 @@ void CombineTransformsModifierUI::setRightRotation(){
 
 void CombineTransformsModifierUI::setInvertLeftTransform(){
     if (bsData){
-        if (bsData->invertLeftTransform != invertLeftTransform->isChecked()){
-            bsData->invertLeftTransform = invertLeftTransform->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->invertLeftTransform = invertLeftTransform->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setInvertLeftTransform(): The data is NULL!!"));
     }
@@ -301,10 +297,8 @@ void CombineTransformsModifierUI::setInvertLeftTransform(){
 
 void CombineTransformsModifierUI::setInvertRightTransform(){
     if (bsData){
-        if (bsData->invertRightTransform != invertRightTransform->isChecked()){
-            bsData->invertRightTransform = invertRightTransform->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->invertRightTransform = invertRightTransform->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setInvertRightTransform(): The data is NULL!!"));
     }
@@ -312,10 +306,8 @@ void CombineTransformsModifierUI::setInvertRightTransform(){
 
 void CombineTransformsModifierUI::setInvertResult(){
     if (bsData){
-        if (bsData->invertResult != invertResult->isChecked()){
-            bsData->invertResult = invertResult->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->invertResult = invertResult->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setInvertResult(): The data is NULL!!"));
     }
@@ -584,11 +576,11 @@ void CombineTransformsModifierUI::loadBinding(int row, int colunm, hkbVariableBi
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

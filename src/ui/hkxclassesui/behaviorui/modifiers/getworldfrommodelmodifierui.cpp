@@ -136,10 +136,8 @@ void GetWorldFromModelModifierUI::setName(){
 
 void GetWorldFromModelModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -318,11 +316,11 @@ void GetWorldFromModelModifierUI::loadBinding(int row, int colunm, hkbVariableBi
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

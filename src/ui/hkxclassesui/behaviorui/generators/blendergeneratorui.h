@@ -52,6 +52,7 @@ private slots:
     void returnToWidget(bool reloadData);
     void variableTableElementSelected(int index, const QString &name);
     void generatorTableElementSelected(int index, const QString &name);
+    void swapGeneratorIndices(int index1, int index2);
 private:
     void connectSignals();
     void disconnectSignals();
@@ -84,7 +85,8 @@ private:
         OFFSET_ANIMATION_GENERATOR,
         POSE_MATCHING_GENERATOR,
         CLIP_GENERATOR,
-        BEHAVIOR_REFERENCE_GENERATOR
+        BEHAVIOR_REFERENCE_GENERATOR,
+        GAMEBYRO_SEQUENCE_GENERATOR
     };
     static QStringList types;
     static QStringList headerLabels;

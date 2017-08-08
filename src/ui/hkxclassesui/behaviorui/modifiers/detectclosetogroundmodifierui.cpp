@@ -122,7 +122,7 @@ DetectCloseToGroundModifierUI::DetectCloseToGroundModifierUI()
     table->setItem(ENABLE_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(ENABLE_ROW, VALUE_COLUMN, enable);
     table->setItem(CLOSE_TO_GROUND_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("closeToGroundEventId"));
-    table->setItem(CLOSE_TO_GROUND_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(CLOSE_TO_GROUND_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
     table->setItem(CLOSE_TO_GROUND_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setItem(CLOSE_TO_GROUND_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_EVENTS_TABLE_TIP));
     table->setItem(CLOSE_TO_GROUND_EVENT_PAYLOAD_ROW, NAME_COLUMN, new TableWidgetItem("closeToGroundEventPayload"));
@@ -271,10 +271,8 @@ void DetectCloseToGroundModifierUI::setName(){
 
 void DetectCloseToGroundModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -581,11 +579,11 @@ void DetectCloseToGroundModifierUI::loadBinding(int row, int colunm, hkbVariable
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

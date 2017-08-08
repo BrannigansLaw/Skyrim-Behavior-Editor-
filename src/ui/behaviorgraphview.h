@@ -123,6 +123,7 @@ private slots:
     void appendBSTimerModifier();
     void appendBSLookAtModifier();
     void appendBSPassByTargetTriggerModifier();
+    void appendHandIKControlsModifier();
 
     void wrapStateMachine();
     void wrapBlenderGenerator();
@@ -226,6 +227,7 @@ private:
     QAction *appendBSTimerModifierAct;
     QAction *appendBSLookAtModifierAct;
     QAction *appendBSPassByTargetTriggerModifierAct;
+    QAction *appendHandIKControlsModifierAct;
     QAction *removeObjBranchAct;
 };
 

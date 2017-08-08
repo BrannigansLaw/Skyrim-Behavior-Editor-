@@ -13,6 +13,7 @@ class FootIkDriverInfoUI;
 class HandIkDriverInfoUI;
 class CheckBox;
 class AnimationsUI;
+class QPushButton;
 
 class ProjectUI: public QGroupBox
 {
@@ -27,10 +28,12 @@ public:
     void setDisabled(bool disable);
 signals:
     void openFile(const QModelIndex & index);
+    void addBehavior(bool initData);
 protected:
 private slots:
     void toggleFootIK(bool toggle);
     void toggleHandIK(bool toggle);
+    void addNewBehaviorFile();
 private:
     ProjectFile *project;
     QGridLayout *lyt;
@@ -43,6 +46,8 @@ private:
     HandIkDriverInfoUI *handIK;
     QFileSystemModel *fileSys;
     QListView *fileView;
+    QPushButton *addBehaviorFile;
+    CheckBox *initializeWithCharacterData;
     QString lastFileSelectedPath;
 };
 

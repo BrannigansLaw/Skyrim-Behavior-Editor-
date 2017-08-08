@@ -78,6 +78,7 @@
 #include "src/hkxclasses/behavior/modifiers/hkbmovecharactermodifier.h"
 #include "src/hkxclasses/behavior/modifiers/hkbtransformvectormodifier.h"
 #include "src/hkxclasses/behavior/modifiers/hkbproxymodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbhandikcontrolsmodifier.h"
 
 #include "src/hkxclasses/hkxobject.h"
 #include "src/hkxclasses/behavior/hkbgeneratortransitioneffect.h"
@@ -194,6 +195,7 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
       appendBSTimerModifierAct(new QAction("BS Timer Modifier", appendModifierMenu)),
       appendBSLookAtModifierAct(new QAction("BS Look At Modifier", appendModifierMenu)),
       appendBSPassByTargetTriggerModifierAct(new QAction("BS Pass By Target Trigger Modifier", appendModifierMenu)),
+      appendHandIKControlsModifierAct(new QAction("Hand IK Controls Modifier", appendModifierMenu)),
       removeObjBranchAct(new QAction("Remove Selected Object and Children", contextMenu))
 {
     contextMenu->addMenu(appendGeneratorMenu);
@@ -274,6 +276,7 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     appendModifierMenu->addAction(appendBSTimerModifierAct);
     appendModifierMenu->addAction(appendBSLookAtModifierAct);
     appendModifierMenu->addAction(appendBSPassByTargetTriggerModifierAct);
+    appendModifierMenu->addAction(appendHandIKControlsModifierAct);
     contextMenu->addAction(removeObjBranchAct);
     //setContextMenu(contextMenu);
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -349,6 +352,7 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     connect(appendDetectCloseToGroundModifierAct, SIGNAL(triggered()), this, SLOT(appendDetectCloseToGroundModifier()));
     connect(appendBSTimerModifierAct, SIGNAL(triggered()), this, SLOT(appendBSTimerModifier()));
     connect(appendBSLookAtModifierAct, SIGNAL(triggered()), this, SLOT(appendBSLookAtModifier()));
+    connect(appendHandIKControlsModifierAct, SIGNAL(triggered()), this, SLOT(appendHandIKControlsModifier()));
     connect(removeObjBranchAct, SIGNAL(triggered()), this, SLOT(deleteSelectedObjectBranchSlot()));
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(popUpMenuRequested(QPoint)));
     if (ui){
@@ -737,6 +741,10 @@ void BehaviorGraphView::appendBSPassByTargetTriggerModifier(){
     append(new BSPassByTargetTriggerModifier(behavior));
 }
 
+void BehaviorGraphView::appendHandIKControlsModifier(){
+    append(new hkbHandIkControlsModifier(behavior));
+}
+
 template <typename T>
 void BehaviorGraphView::wrap(T *obj){
     if (getSelectedItem() && ((TreeGraphicsItem *)getSelectedItem()->parentItem()) && ((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData){
@@ -833,7 +841,7 @@ void BehaviorGraphView::popUpMenuRequested(const QPoint &pos){
             enableAllMenuActions(appendGeneratorMenu);
             disableAllMenuActions(wrapGeneratorMenu);
             wrapBSCyclicBlendTransitionGeneratorAct->setDisabled(false);
-        }else if (sig == HKB_CLIP_GENERATOR || sig == HKB_BEHAVIOR_REFERENCE_GENERATOR|| sig == BGS_GAMEBYRO_SEQUENCE_GENERATOR){
+        }else if (sig == HKB_CLIP_GENERATOR || sig == HKB_BEHAVIOR_REFERENCE_GENERATOR || sig == BGS_GAMEBYRO_SEQUENCE_GENERATOR){
             appendGeneratorMenu->menuAction()->setDisabled(true);
             appendBlenderMenu->menuAction()->setDisabled(true);
             enableAllMenuActions(wrapGeneratorMenu);

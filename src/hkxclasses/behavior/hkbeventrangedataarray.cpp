@@ -133,6 +133,10 @@ bool hkbEventRangeDataArray::write(HkxXMLWriter *writer){
     return true;
 }
 
+int hkbEventRangeDataArray::getNumberOfRanges() const{
+    return eventData.size();
+}
+
 bool hkbEventRangeDataArray::link(){
     if (!getParentFile()){
         return false;

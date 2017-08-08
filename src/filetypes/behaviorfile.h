@@ -57,10 +57,13 @@ public:
     QString getCharacterPropertyNameAt(int index, bool fromBehaviorFile) const;
     QStringList getAnimationNames() const;
     QStringList getLocalFrameNames() const;
+    QStringList getAllBehaviorFileNames() const;
 protected:
     bool parse();
     bool link();
 private:
+    void generateDefaultCharacterData();
+    void generateNewBehavior();
     HkxObject * getBehaviorGraphData() const;
     hkbBehaviorGraph * getBehaviorGraph() const;
     HkxObject * getRootStateMachine() const;

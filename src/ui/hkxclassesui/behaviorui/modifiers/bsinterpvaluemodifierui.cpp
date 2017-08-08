@@ -111,7 +111,7 @@ void BSInterpValueModifierUI::connectToTables(GenericTableWidget *variables, Gen
 void BSInterpValueModifierUI::loadData(HkxObject *data){
     disconnectSignals();
     if (data){
-        if (data->getSignature() == BS_IS_ACTIVE_MODIFIER){
+        if (data->getSignature() == BS_INTERP_VALUE_MODIFIER){
             hkbVariableBindingSet *varBind = NULL;
             bsData = static_cast<BSInterpValueModifier *>(data);
             name->setText(bsData->name);
@@ -158,10 +158,8 @@ void BSInterpValueModifierUI::setName(){
 
 void BSInterpValueModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSInterpValueModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -394,11 +392,11 @@ void BSInterpValueModifierUI::loadBinding(int row, int colunm, hkbVariableBindin
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSInterpValueModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

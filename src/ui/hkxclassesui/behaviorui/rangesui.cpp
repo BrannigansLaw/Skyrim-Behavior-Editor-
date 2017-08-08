@@ -51,8 +51,8 @@ RangesUI::RangesUI()
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
     table->setHorizontalHeaderLabels(headerLabels);
-    table->setItem(EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("event"));
-    table->setItem(EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("eventId"));
+    table->setItem(EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
     table->setItem(EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setItem(EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_EVENTS_TABLE_TIP));
     table->setItem(PAYLOAD_ROW, NAME_COLUMN, new TableWidgetItem("payload"));
@@ -61,15 +61,15 @@ RangesUI::RangesUI()
     table->setCellWidget(PAYLOAD_ROW, VALUE_COLUMN, payload);
     table->setItem(MINIMUM_DISTANCE_ROW, NAME_COLUMN, new TableWidgetItem("minDistance"));
     table->setItem(MINIMUM_DISTANCE_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
-    table->setItem(MINIMUM_DISTANCE_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
+    table->setItem(MINIMUM_DISTANCE_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(MINIMUM_DISTANCE_ROW, VALUE_COLUMN, minDistance);
     table->setItem(MAXIMUM_DISTANCE_ROW, NAME_COLUMN, new TableWidgetItem("maxDistance"));
     table->setItem(MAXIMUM_DISTANCE_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
-    table->setItem(MAXIMUM_DISTANCE_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
+    table->setItem(MAXIMUM_DISTANCE_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(MAXIMUM_DISTANCE_ROW, VALUE_COLUMN, maxDistance);
     table->setItem(IGNORE_HANDLE_ROW, NAME_COLUMN, new TableWidgetItem("ignoreHandle"));
     table->setItem(IGNORE_HANDLE_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool", Qt::AlignCenter));
-    table->setItem(IGNORE_HANDLE_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
+    table->setItem(IGNORE_HANDLE_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(IGNORE_HANDLE_ROW, VALUE_COLUMN, ignoreHandle);
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 6, 3);
@@ -152,11 +152,11 @@ void RangesUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, 
                 }else{
                     varName = static_cast<BehaviorFile *>(file)->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("RangesUI::loadBinding(): The variable binding set is NULL!!"));
         }

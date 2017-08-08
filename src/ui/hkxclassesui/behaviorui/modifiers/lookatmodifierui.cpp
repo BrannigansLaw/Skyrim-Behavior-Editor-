@@ -322,10 +322,8 @@ void LookAtModifierUI::setName(){
 
 void LookAtModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -494,10 +492,8 @@ void LookAtModifierUI::setNeckIndex(int index){
 
 void LookAtModifierUI::setIsOn(){
     if (bsData){
-        if (bsData->isOn != isOn->isChecked()){
-            bsData->isOn = isOn->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->isOn = isOn->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setisOn(): The data is NULL!!"));
     }
@@ -505,10 +501,8 @@ void LookAtModifierUI::setIsOn(){
 
 void LookAtModifierUI::setIndividualLimitsOn(){
     if (bsData){
-        if (bsData->individualLimitsOn != individualLimitsOn->isChecked()){
-            bsData->individualLimitsOn = individualLimitsOn->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->individualLimitsOn = individualLimitsOn->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setindividualLimitsOn(): The data is NULL!!"));
     }
@@ -516,10 +510,8 @@ void LookAtModifierUI::setIndividualLimitsOn(){
 
 void LookAtModifierUI::setIsTargetInsideLimitCone(){
     if (bsData){
-        if (bsData->isTargetInsideLimitCone != isTargetInsideLimitCone->isChecked()){
-            bsData->isTargetInsideLimitCone = isTargetInsideLimitCone->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->isTargetInsideLimitCone = isTargetInsideLimitCone->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setisTargetInsideLimitCone(): The data is NULL!!"));
     }
@@ -932,11 +924,11 @@ void LookAtModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *v
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

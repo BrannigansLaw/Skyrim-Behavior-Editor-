@@ -43,11 +43,17 @@ hkbStateMachine * hkbStateMachineStateInfo::getParentStateMachine() const{
     return NULL;
 }
 
-void hkbStateMachineStateInfo::setStateId(ushort id){
+bool hkbStateMachineStateInfo::setStateId(ushort id){
     hkbStateMachine *parent = static_cast<hkbStateMachine *>(parentSM.data());
     hkbStateMachineStateInfo *state = NULL;
     hkbStateMachineTransitionInfoArray *trans = NULL;
     if (parent){
+        for (int i = 0; i < parent->states.size(); i++){
+            state = static_cast<hkbStateMachineStateInfo *>(parent->states.at(i).data());
+            if (state && state->stateId == id){
+                return false;
+            }
+        }
         for (int i = 0; i < parent->states.size(); i++){
             state = static_cast<hkbStateMachineStateInfo *>(parent->states.at(i).data());
             trans = static_cast<hkbStateMachineTransitionInfoArray *>(state->transitions.data());
@@ -69,6 +75,7 @@ void hkbStateMachineStateInfo::setStateId(ushort id){
         }
     }
     stateId = id;
+    return true;
 }
 
 bool hkbStateMachineStateInfo::readData(const HkxXmlReader &reader, long index){

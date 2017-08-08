@@ -24,7 +24,6 @@ public:
     QString getRootObjectReferenceString();
     bool getIsChanged() const;
     void toggleChanged(bool wasEdited);
-    QStringList getAllBehaviorFileNames() const;
 protected:
     HkxSharedPtr & getRootObject();
     virtual bool parse();

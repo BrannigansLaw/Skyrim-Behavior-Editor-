@@ -274,10 +274,8 @@ void KeyframeBonesModifierUI::setName(){
 
 void KeyframeBonesModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("KeyframeBonesModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -294,6 +292,7 @@ void KeyframeBonesModifierUI::toggleKeyframedBonesList(bool enable){
             bsData->keyframedBonesList = HkxSharedPtr(indices);
             //bones->setText(indices->getName());
         }
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("KeyframeBonesModifierUI::toggleKeyframedBonesList(): The data is NULL!!"));
     }
@@ -332,7 +331,7 @@ void KeyframeBonesModifierUI::viewSelectedChild(int row, int column){
                     keyframeInfoUI->loadData(((BehaviorFile *)(bsData->getParentFile())), &bsData->keyframeInfo[result], bsData, result);
                     setCurrentIndex(KEYFRAME_WIDGET);
                 }else if (column == BINDING_COLUMN){
-                    if (MainWindow::yesNoDialogue("Are you sure you want to remove the range \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
+                    if (MainWindow::yesNoDialogue("Are you sure you want to remove the KeyFrameInfo \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
                         removeKeyframeInfo(result);
                     }
                 }
@@ -386,11 +385,11 @@ void KeyframeBonesModifierUI::loadBinding(int row, int colunm, hkbVariableBindin
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("KeyframeBonesModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

@@ -200,10 +200,8 @@ void BSEventEveryNEventsModifierUI::setName(){
 
 void BSEventEveryNEventsModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -301,10 +299,8 @@ void BSEventEveryNEventsModifierUI::setMinimumNumberOfEventsBeforeSend(){
 
 void BSEventEveryNEventsModifierUI::setRandomizeNumberOfEvents(){
     if (bsData){
-        if (bsData->randomizeNumberOfEvents != randomizeNumberOfEvents->isChecked()){
-            bsData->randomizeNumberOfEvents = randomizeNumberOfEvents->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->randomizeNumberOfEvents = randomizeNumberOfEvents->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::setrandomizeNumberOfEvents(): The data is NULL!!"));
     }
@@ -510,11 +506,11 @@ void BSEventEveryNEventsModifierUI::loadBinding(int row, int colunm, hkbVariable
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

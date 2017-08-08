@@ -6,6 +6,7 @@
 class BGSGamebryoSequenceGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
+    friend class BGSGamebryoSequenceGeneratorUI;
 public:
     BGSGamebryoSequenceGenerator(HkxFile *parent, long ref = 0);
     virtual ~BGSGamebryoSequenceGenerator();

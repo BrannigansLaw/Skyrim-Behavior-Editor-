@@ -122,7 +122,7 @@ void HandIkDriverInfoUI::removeSelectedHand(){
 void HandIkDriverInfoUI::viewSelectedHand(int row, int column){
     int result = row - BASE_NUMBER_OF_ROWS;
     if (bsData && bsData->hands.size() > result && column == 2){
-        handUI->loadData((hkbHandIkDriverInfoHand *)bsData->getHandAt(result));
+        handUI->loadData((hkbHandIkDriverInfoHand *)bsData->getHandAt(result), bsData);
         setCurrentIndex(HAND_IK_DRIVER_INFO_HAND);
     }
 }

@@ -145,9 +145,11 @@ void GenericTableWidget::addItem(const QString & name, const QString & type){
 }
 
 void GenericTableWidget::renameItem(int index, const QString & newname){
+    table->blockSignals(true);
     if (index < table->rowCount() && index >= 0){
         table->item(index, 0)->setText(newname);
     }
+    table->blockSignals(false);
 }
 
 void GenericTableWidget::removeItem(int index){

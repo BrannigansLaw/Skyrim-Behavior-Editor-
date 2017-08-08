@@ -66,7 +66,8 @@ QStringList PoseMatchingGeneratorUI::types = {
     "BSOffsetAnimationGenerator",
     "hkbPoseMatchingGenerator",
     "hkbClipGenerator",
-    "hkbBehaviorReferenceGenerator"
+    "hkbBehaviorReferenceGenerator",
+    "BGSGamebryoSequenceGenerator"
 };
 
 QStringList PoseMatchingGeneratorUI::headerLabels = {
@@ -108,6 +109,12 @@ PoseMatchingGeneratorUI::PoseMatchingGeneratorUI()
       pelvisIndex(new ComboBox),
       mode(new ComboBox)
 {
+    table->setAcceptDrops(true);
+    table->viewport()->setAcceptDrops(true);
+    table->setDragDropOverwriteMode(true);
+    table->setDropIndicatorShown(true);
+    table->setDragDropMode(QAbstractItemView::InternalMove);
+    table->setRowSwapRange(BASE_NUMBER_OF_ROWS);
     typeSelectorCB->insertItems(0, types);
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
@@ -192,11 +199,11 @@ PoseMatchingGeneratorUI::PoseMatchingGeneratorUI()
     table->setItem(MIN_SWITCH_TIME_FULL_ERROR_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(MIN_SWITCH_TIME_FULL_ERROR_ROW, VALUE_COLUMN, minSwitchTimeFullError);
     table->setItem(START_PLAYING_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("startPlayingEventId"));
-    table->setItem(START_PLAYING_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(START_PLAYING_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
     table->setItem(START_PLAYING_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setItem(START_PLAYING_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_EVENTS_TABLE_TIP));
     table->setItem(START_MATCHING_EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("startMatchingEventId"));
-    table->setItem(START_MATCHING_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(START_MATCHING_EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
     table->setItem(START_MATCHING_EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setItem(START_MATCHING_EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_EVENTS_TABLE_TIP));
     table->setItem(ROOT_BONE_INDEX_ROW, NAME_COLUMN, new TableWidgetItem("rootBoneIndex"));
@@ -256,6 +263,7 @@ void PoseMatchingGeneratorUI::connectSignals(){
     connect(pelvisIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setPelvisIndex(int)), Qt::UniqueConnection);
     connect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    connect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)), Qt::UniqueConnection);
     connect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)), Qt::UniqueConnection);
     connect(childUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
     connect(childUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
@@ -287,6 +295,7 @@ void PoseMatchingGeneratorUI::disconnectSignals(){
     disconnect(pelvisIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setPelvisIndex(int)));
     disconnect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    disconnect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)));
     disconnect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)));
     disconnect(childUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
     disconnect(childUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)));
@@ -629,8 +638,10 @@ void PoseMatchingGeneratorUI::setName(){
 
 void PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(){
     if (bsData){
-        bsData->referencePoseWeightThreshold = referencePoseWeightThreshold->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->referencePoseWeightThreshold != referencePoseWeightThreshold->value()){
+            bsData->referencePoseWeightThreshold = referencePoseWeightThreshold->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(): The data is NULL!!"))
     }
@@ -638,8 +649,10 @@ void PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(){
 
 void PoseMatchingGeneratorUI::setBlendParameter(){
     if (bsData){
-        bsData->blendParameter = blendParameter->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->blendParameter != blendParameter->value()){
+            bsData->blendParameter = blendParameter->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setBlendParameter(): The data is NULL!!"))
     }
@@ -647,8 +660,10 @@ void PoseMatchingGeneratorUI::setBlendParameter(){
 
 void PoseMatchingGeneratorUI::setMinCyclicBlendParameter(){
     if (bsData){
-        bsData->minCyclicBlendParameter = minCyclicBlendParameter->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->minCyclicBlendParameter != minCyclicBlendParameter->value()){
+            bsData->minCyclicBlendParameter = minCyclicBlendParameter->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setMinCyclicBlendParameter(): The data is NULL!!"))
     }
@@ -656,8 +671,10 @@ void PoseMatchingGeneratorUI::setMinCyclicBlendParameter(){
 
 void PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(){
     if (bsData){
-        bsData->maxCyclicBlendParameter = maxCyclicBlendParameter->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->maxCyclicBlendParameter != maxCyclicBlendParameter->value()){
+            bsData->maxCyclicBlendParameter = maxCyclicBlendParameter->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(): The data is NULL!!"))
     }
@@ -665,8 +682,10 @@ void PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(){
 
 void PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(){
     if (bsData){
-        bsData->indexOfSyncMasterChild = indexOfSyncMasterChild->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->indexOfSyncMasterChild != indexOfSyncMasterChild->value()){
+            bsData->indexOfSyncMasterChild = indexOfSyncMasterChild->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(): The data is NULL!!"))
     }
@@ -797,8 +816,10 @@ void PoseMatchingGeneratorUI::setSubtractLastChild(){
 
 void PoseMatchingGeneratorUI::setWorldFromModelRotation(){
     if (bsData){
-        bsData->worldFromModelRotation = worldFromModelRotation->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->worldFromModelRotation != worldFromModelRotation->value()){
+            bsData->worldFromModelRotation = worldFromModelRotation->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setWorldFromModelRotation(): The data is NULL!!"))
     }
@@ -806,8 +827,10 @@ void PoseMatchingGeneratorUI::setWorldFromModelRotation(){
 
 void PoseMatchingGeneratorUI::setBlendSpeed(){
     if (bsData){
-        bsData->blendSpeed = blendSpeed->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->blendSpeed != blendSpeed->value()){
+            bsData->blendSpeed = blendSpeed->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setBlendSpeed(): The data is NULL!!"))
     }
@@ -815,8 +838,10 @@ void PoseMatchingGeneratorUI::setBlendSpeed(){
 
 void PoseMatchingGeneratorUI::setMinSpeedToSwitch(){
     if (bsData){
-        bsData->minSpeedToSwitch = minSpeedToSwitch->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->minSpeedToSwitch != minSpeedToSwitch->value()){
+            bsData->minSpeedToSwitch = minSpeedToSwitch->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setMinSpeedToSwitch(): The data is NULL!!"))
     }
@@ -824,8 +849,10 @@ void PoseMatchingGeneratorUI::setMinSpeedToSwitch(){
 
 void PoseMatchingGeneratorUI::setMinSwitchTimeNoError(){
     if (bsData){
-        bsData->minSwitchTimeNoError = minSwitchTimeNoError->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->minSwitchTimeNoError != minSwitchTimeNoError->value()){
+            bsData->minSwitchTimeNoError = minSwitchTimeNoError->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setMinSwitchTimeNoError(): The data is NULL!!"))
     }
@@ -833,8 +860,10 @@ void PoseMatchingGeneratorUI::setMinSwitchTimeNoError(){
 
 void PoseMatchingGeneratorUI::setMinSwitchTimeFullError(){
     if (bsData){
-        bsData->minSwitchTimeFullError = minSwitchTimeFullError->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->minSwitchTimeFullError != minSwitchTimeFullError->value()){
+            bsData->minSwitchTimeFullError = minSwitchTimeFullError->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setMinSwitchTimeFullError(): The data is NULL!!"))
     }
@@ -905,6 +934,26 @@ void PoseMatchingGeneratorUI::setMode(int index){
     }
 }
 
+void PoseMatchingGeneratorUI::swapGeneratorIndices(int index1, int index2){
+    if (bsData){
+        index1 = index1 - BASE_NUMBER_OF_ROWS;
+        index2 = index2 - BASE_NUMBER_OF_ROWS;
+        if (bsData->children.size() > index1 && bsData->children.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
+            bsData->children.swap(index1, index2);
+            if (behaviorView->getSelectedItem()){
+                behaviorView->getSelectedItem()->reorderChildren();
+            }else{
+                CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::swapGeneratorIndices(): No item selected!!"));
+            }
+            bsData->getParentFile()->toggleChanged(true);
+        }else{
+            WARNING_MESSAGE(QString("PoseMatchingGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!"));
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::swapGeneratorIndices(): The data is NULL!!"));
+    }
+}
+
 void PoseMatchingGeneratorUI::addChildWithGenerator(){
     Generator_Type typeEnum;
     if (bsData && behaviorView){
@@ -945,6 +994,9 @@ void PoseMatchingGeneratorUI::addChildWithGenerator(){
             break;
         case BEHAVIOR_REFERENCE_GENERATOR:
             behaviorView->appendBehaviorReferenceGenerator();
+            break;
+        case GAMEBYRO_SEQUENCE_GENERATOR:
+            behaviorView->appendBGSGamebryoSequenceGenerator();
             break;
         default:
             CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::addChild(): Invalid typeEnum!!"))
@@ -1193,11 +1245,11 @@ void PoseMatchingGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindin
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::loadBinding(): The variable binding set is NULL!!"));
         }

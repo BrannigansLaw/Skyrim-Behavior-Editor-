@@ -581,10 +581,8 @@ void SenseHandleModifierUI::setName(){
 
 void SenseHandleModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("SenseHandleModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -696,10 +694,8 @@ void SenseHandleModifierUI::setSensingMode(int index){
 
 void SenseHandleModifierUI::setExtrapolateSensorPosition(){
     if (bsData){
-        if (bsData->extrapolateSensorPosition != extrapolateSensorPosition->isChecked()){
-            bsData->extrapolateSensorPosition = extrapolateSensorPosition->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->extrapolateSensorPosition = extrapolateSensorPosition->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("SenseHandleModifierUI::setExtrapolateSensorPosition(): The data is NULL!!"));
     }
@@ -707,10 +703,8 @@ void SenseHandleModifierUI::setExtrapolateSensorPosition(){
 
 void SenseHandleModifierUI::setKeepFirstSensedHandle(){
     if (bsData){
-        if (bsData->keepFirstSensedHandle != keepFirstSensedHandle->isChecked()){
-            bsData->keepFirstSensedHandle = keepFirstSensedHandle->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->keepFirstSensedHandle = keepFirstSensedHandle->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("SenseHandleModifierUI::setKeepFirstSensedHandle(): The data is NULL!!"));
     }
@@ -718,10 +712,8 @@ void SenseHandleModifierUI::setKeepFirstSensedHandle(){
 
 void SenseHandleModifierUI::setFoundHandleOut(){
     if (bsData){
-        if (bsData->foundHandleOut != foundHandleOut->isChecked()){
-            bsData->foundHandleOut = foundHandleOut->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->foundHandleOut = foundHandleOut->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("SenseHandleModifierUI::setFoundHandleOut(): The data is NULL!!"));
     }
@@ -877,11 +869,11 @@ void SenseHandleModifierUI::loadBinding(int row, int colunm, hkbVariableBindingS
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("SenseHandleModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

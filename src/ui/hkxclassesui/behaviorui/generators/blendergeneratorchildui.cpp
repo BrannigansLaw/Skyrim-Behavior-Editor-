@@ -148,11 +148,11 @@ void BlenderGeneratorChildUI::loadBinding(int row, int colunm, hkbVariableBindin
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::loadBinding(): The variable binding set is NULL!!"));
         }
@@ -262,8 +262,10 @@ void BlenderGeneratorChildUI::setBindingVariable(int index, const QString & name
 
 void BlenderGeneratorChildUI::setWeight(){
     if (bsData){
-        bsData->weight = weight->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->weight != weight->value()){
+            bsData->weight = weight->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setWeight(): The 'bsData' pointer is NULL!!"))
     }
@@ -271,8 +273,10 @@ void BlenderGeneratorChildUI::setWeight(){
 
 void BlenderGeneratorChildUI::setWorldFromModelWeight(){
     if (bsData){
-        bsData->worldFromModelWeight = worldFromModelWeight->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->worldFromModelWeight != worldFromModelWeight->value()){
+            bsData->worldFromModelWeight = worldFromModelWeight->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setWorldFromModelWeight(): The 'bsData' pointer is NULL!!"))
     }

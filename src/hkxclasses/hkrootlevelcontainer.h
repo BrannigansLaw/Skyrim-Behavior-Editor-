@@ -24,7 +24,7 @@ private:
     static uint refCount;
     struct hkRootLevelContainerNamedVariant
     {
-        hkRootLevelContainerNamedVariant(QString varname = "default", QString classname = "default"):name(varname), className(classname){}
+        hkRootLevelContainerNamedVariant(QString varname = "hkbBehaviorGraph", QString classname = "hkbBehaviorGraph"):name(varname), className(classname){}
         QString name;
         QString className;
         HkxSharedPtr variant;  //This can be one of many (any?) types.

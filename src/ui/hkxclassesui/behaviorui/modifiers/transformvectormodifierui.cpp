@@ -202,10 +202,8 @@ void TransformVectorModifierUI::setName(){
 
 void TransformVectorModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -257,10 +255,8 @@ void TransformVectorModifierUI::setVectorOut(){
 
 void TransformVectorModifierUI::setRotateOnly(){
     if (bsData){
-        if (bsData->rotateOnly != rotateOnly->isChecked()){
-            bsData->rotateOnly = rotateOnly->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->rotateOnly = rotateOnly->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setrotateOnly(): The data is NULL!!"));
     }
@@ -268,10 +264,8 @@ void TransformVectorModifierUI::setRotateOnly(){
 
 void TransformVectorModifierUI::setInverse(){
     if (bsData){
-        if (bsData->inverse != inverse->isChecked()){
-            bsData->inverse = inverse->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->inverse = inverse->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setinverse(): The data is NULL!!"));
     }
@@ -279,10 +273,8 @@ void TransformVectorModifierUI::setInverse(){
 
 void TransformVectorModifierUI::setComputeOnActivate(){
     if (bsData){
-        if (bsData->computeOnActivate != computeOnActivate->isChecked()){
-            bsData->computeOnActivate = computeOnActivate->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->computeOnActivate = computeOnActivate->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setcomputeOnActivate(): The data is NULL!!"));
     }
@@ -290,10 +282,8 @@ void TransformVectorModifierUI::setComputeOnActivate(){
 
 void TransformVectorModifierUI::setComputeOnModify(){
     if (bsData){
-        if (bsData->computeOnModify != computeOnModify->isChecked()){
-            bsData->computeOnModify = computeOnModify->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->computeOnModify = computeOnModify->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setcomputeOnModify(): The data is NULL!!"));
     }
@@ -546,11 +536,11 @@ void TransformVectorModifierUI::loadBinding(int row, int colunm, hkbVariableBind
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

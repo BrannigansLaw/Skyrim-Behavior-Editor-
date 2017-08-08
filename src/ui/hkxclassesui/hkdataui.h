@@ -77,6 +77,11 @@ class BSLookAtModifierUI;
 class DetectCloseToGroundModifierUI;
 class BSEventEveryNEventsModifierUI;
 class BSEventOnFalseToTrueModifierUI;
+class BSModifyOnceModifierUI;
+class HandIkControlsModifierUI;
+class BSTweenerModifierUI;
+class BGSGamebryoSequenceGeneratorUI;
+class EventsFromRangeModifierUI;
 
 /**
  * To add support for a new class we need to add it to the "DATA_TYPE_LOADED" enum, add it to the stacked layout in the correct order,
@@ -171,7 +176,12 @@ private:
         BS_LOOK_AT_MODIFIER,
         DETECT_CLOSE_TO_GROUND_MODIFIER,
         BS_EVENT_EVERY_N_EVENTS_MODIFIER,
-        BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER
+        BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER,
+        BS_MODIFY_ONCE_MODIFIER,
+        HAND_IK_CONTROLS_MODIFIER,
+        BS_TWEENER_MODIFIER,
+        BGS_GAMEBYRO_SEQUENCE_GENERATOR,
+        EVENTS_FROM_RANGE_MODIFIER
     };
     static QStringList generatorTypes;
     static QStringList modifierTypes;
@@ -247,6 +257,11 @@ private:
     DetectCloseToGroundModifierUI *detectCloseToGroundModUI;
     BSEventEveryNEventsModifierUI *eventEveryNEventsModUI;
     BSEventOnFalseToTrueModifierUI *eventOnFalseToTrueModUI;
+    BSModifyOnceModifierUI *modifyOnceModUI;
+    HandIkControlsModifierUI *handIKControlsModUI;
+    BSTweenerModifierUI *tweenerModUI;
+    BGSGamebryoSequenceGeneratorUI *gamebryoSequenceGenUI;
+    EventsFromRangeModifierUI *eventsFromRangeModUI;
 };
 
 #endif // HKDATAUI_H

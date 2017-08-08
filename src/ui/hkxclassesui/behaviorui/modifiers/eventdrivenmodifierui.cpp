@@ -167,10 +167,8 @@ void EventDrivenModifierUI::setName(){
 
 void EventDrivenModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("EventDrivenModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -198,10 +196,8 @@ void EventDrivenModifierUI::setDeactivateEventId(int index, const QString & name
 
 void EventDrivenModifierUI::setActiveByDefault(){
     if (bsData){
-        if (bsData->activeByDefault != activeByDefault->isChecked()){
-            bsData->activeByDefault = activeByDefault->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->activeByDefault = activeByDefault->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("EventDrivenModifierUI::setActiveByDefault(): The data is NULL!!"));
     }
@@ -267,11 +263,11 @@ void EventDrivenModifierUI::loadBinding(int row, int colunm, hkbVariableBindingS
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("EventDrivenModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

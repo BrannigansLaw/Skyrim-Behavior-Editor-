@@ -85,16 +85,18 @@ TreeGraphicsItem * DataIconManager::reconnectToNext(){
 }
 
 void DataIconManager::appendIcon(TreeGraphicsItem *icon){
-    int index = -1;
-    if (icon && icons.isEmpty() || !icons.contains(icon)){
-        if (icons.size() > 1){
-            index = icon->determineInsertionIndex();
-            if (index > -1 && index < icons.size()){
-                icons.insert(index, icon);
-                return;
-            }
+    //int index = -1;
+    if (icon){
+        if (icons.isEmpty() || !icons.contains(icon)){
+            /*if (icons.size() > 1){
+                index = icon->determineInsertionIndex();
+                if (index > -1 && index < icons.size()){
+                    icons.insert(index, icon);
+                    return;
+                }
+            }*/
+            icons.append(icon);
         }
-        icons.append(icon);
     }
 }
 

@@ -259,7 +259,7 @@ bool hkbCharacterStringData::write(HkxXMLWriter *writer){
         for (int i = 0; i < animationFilenames.size(); i++){
             writer->writeLine(writer->string, QStringList(), QStringList(), animationFilenames.at(i));
         }
-        if (characterPropertyNames.size() > 0){
+        if (animationFilenames.size() > 0){
             writer->writeLine(writer->parameter, false);
         }
         list3 = {writer->name, writer->numelements};

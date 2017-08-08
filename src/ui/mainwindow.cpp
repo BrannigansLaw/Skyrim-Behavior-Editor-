@@ -119,19 +119,20 @@ MainWindow::MainWindow()
     if (!findSkyrimDirectory()){
         WARNING_MESSAGE(QString("The TESV executable was not found!"));
     }
-    connect(openPackedProjectA, SIGNAL(triggered(bool)), this, SLOT(openPackedProject()));
-    connect(openUnpackedProjectA, SIGNAL(triggered(bool)), this, SLOT(openUnpackedProject()));
-    connect(saveA, SIGNAL(triggered(bool)), this, SLOT(save()));
-    connect(exportToSkyrimDirA, SIGNAL(triggered(bool)), this, SLOT(packAndExportProjectToSkyrimDirectory()));
-    connect(exportCurrentFileA, SIGNAL(triggered(bool)), this, SLOT(packAndExportFileToSkyrimDirectory()));
-    connect(saveProjectA, SIGNAL(triggered(bool)), this, SLOT(saveProject()));
-    connect(expandA, SIGNAL(triggered(bool)), this, SLOT(expandBranches()));
-    connect(collapseA, SIGNAL(triggered(bool)), this, SLOT(collapseBranches()));
-    connect(refocusA, SIGNAL(triggered(bool)), this, SLOT(refocus()));
-    connect(exitA, SIGNAL(triggered(bool)), this, SLOT(exit()));
-    connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(changedTabs(int)));
-    connect(tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
-    connect(projectUI, SIGNAL(openFile(QModelIndex)), this, SLOT(openBehaviorFile(QModelIndex)));
+    connect(openPackedProjectA, SIGNAL(triggered(bool)), this, SLOT(openPackedProject()), Qt::UniqueConnection);
+    connect(openUnpackedProjectA, SIGNAL(triggered(bool)), this, SLOT(openUnpackedProject()), Qt::UniqueConnection);
+    connect(saveA, SIGNAL(triggered(bool)), this, SLOT(save()), Qt::UniqueConnection);
+    connect(exportToSkyrimDirA, SIGNAL(triggered(bool)), this, SLOT(packAndExportProjectToSkyrimDirectory()), Qt::UniqueConnection);
+    connect(exportCurrentFileA, SIGNAL(triggered(bool)), this, SLOT(packAndExportFileToSkyrimDirectory()), Qt::UniqueConnection);
+    connect(saveProjectA, SIGNAL(triggered(bool)), this, SLOT(saveProject()), Qt::UniqueConnection);
+    connect(expandA, SIGNAL(triggered(bool)), this, SLOT(expandBranches()), Qt::UniqueConnection);
+    connect(collapseA, SIGNAL(triggered(bool)), this, SLOT(collapseBranches()), Qt::UniqueConnection);
+    connect(refocusA, SIGNAL(triggered(bool)), this, SLOT(refocus()), Qt::UniqueConnection);
+    connect(exitA, SIGNAL(triggered(bool)), this, SLOT(exit()), Qt::UniqueConnection);
+    connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(changedTabs(int)), Qt::UniqueConnection);
+    connect(tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)), Qt::UniqueConnection);
+    connect(projectUI, SIGNAL(openFile(QModelIndex)), this, SLOT(openBehaviorFile(QModelIndex)), Qt::UniqueConnection);
+    connect(projectUI, SIGNAL(addBehavior(bool)), this, SLOT(addNewBehavior(bool)), Qt::UniqueConnection);
 }
 
 MainWindow::~MainWindow(){
@@ -273,14 +274,14 @@ void MainWindow::saveFile(int index){
                 QFile backup(filename);
                 if (backup.exists()){
                     if (!backup.remove()){
-                        CRITICAL_ERROR_MESSAGE(QString("Failed to remove to old backup file "+backupPath.section("/",-1,-1)+"!"));
+                        WARNING_MESSAGE(QString("Failed to remove to old backup file "+backupPath.section("/",-1,-1)+"!"));
                     }
                 }
                 if (!behaviorFiles.at(index)->copy(behaviorFiles.at(index)->fileName(), filename)){
-                    CRITICAL_ERROR_MESSAGE(QString("Backup failed!"));
+                    WARNING_MESSAGE(QString("Backup failed!"));
                 }else{
                     if (!behaviorFiles.at(index)->remove()){
-                        CRITICAL_ERROR_MESSAGE(QString("Failed to remove to old file "+backupPath.section("/",-1,-1)+"!"));
+                        WARNING_MESSAGE(QString("Failed to remove to old file "+backupPath.section("/",-1,-1)+"!"));
                     }
                     dialog.setProgress("Backup finished...", 20);
                 }
@@ -418,6 +419,75 @@ void MainWindow::closeTab(int index){
     }
 }
 
+QString MainWindow::generateUniqueBehaviorName(){
+    if (characterFile){
+        QString name = "BehaviorFile_0.hkx";
+        int num = 1;
+        int index;
+        QStringList behaviornames;
+        QDirIterator it(lastFileSelectedPath+"/"+characterFile->getBehaviorDirectoryName());
+        while (it.hasNext()){
+            if (QFileInfo(it.next()).fileName().contains(".hkx")){
+                behaviornames.append(it.fileInfo().fileName());
+            }
+        }
+        for (int i = 0; i < behaviornames.size(); i++){
+            if (behaviornames.at(i) == name){
+                index = name.lastIndexOf('_');
+                if (index > -1){
+                    name.remove(index + 1, name.size());
+                }
+                name.append(QString::number(num)+".hkx");
+                num++;
+                if (num > 1){
+                    i = 0;
+                }
+            }
+        }
+        return lastFileSelectedPath+"/"+characterFile->getBehaviorDirectoryName()+"/"+name;
+    }else{
+        WARNING_MESSAGE(QString("MainWindow::generateUniqueBehaviorName(): Null characterFile!"));
+    }
+    return "";
+}
+
+void MainWindow::addNewBehavior(bool initData){
+    ProgressDialog dialog("Creating new behavior file in the current project...", "", 0, 100, this);
+    objectDataWid->unloadDataWidget();
+    if (projectFile){
+        if (characterFile){
+            QString filename = generateUniqueBehaviorName();
+            if (filename != ""){
+                behaviorFiles.append(new BehaviorFile(this, characterFile, filename));
+                if (initData){
+                    behaviorFiles.last()->generateDefaultCharacterData();
+                }else{
+                    behaviorFiles.last()->generateNewBehavior();
+                }
+                dialog.setProgress("Drawing behavior graph...", 50);
+                behaviorGraphs.append(new BehaviorGraphView(objectDataWid, behaviorFiles.last()));
+                tabs->addTab(behaviorGraphs.last(), filename.section("/", -1, -1));
+                if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(behaviorFiles.last()->getBehaviorGraph()))){
+                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::addNewBehavior(): The behavior graph was drawn incorrectly!"));
+                }
+                tabs->setCurrentIndex(tabs->count() - 1);
+                dialog.setProgress("Writing to file...", 50);
+                behaviorFiles.last()->toggleChanged(true);
+                saveFile(tabs->count() - 2);
+                dialog.setProgress("Behavior file creation sucessful!!", dialog.maximum());
+                return;
+            }else{
+                WARNING_MESSAGE(QString("Name generation failed!"));
+            }
+        }else{
+            WARNING_MESSAGE(QString("No character file open!"));
+        }
+    }else{
+        WARNING_MESSAGE(QString("No project open!"));
+    }
+    dialog.setProgress("Behavior file creation failed!!", dialog.maximum());
+}
+
 void MainWindow::openProject(QString & filepath){
     if (tabs->count() > 0){
         closeAll();
@@ -488,6 +558,7 @@ void MainWindow::openProject(QString & filepath){
                               "\" is approximately "+QString::number(t.elapsed())+" milliseconds\n-------------------------\n");
     projectUI->setDisabled(false);
     dialog.setProgress("Project loaded sucessfully!!!", dialog.maximum());
+    //changedTabs(0);
 }
 
 bool MainWindow::closeAll(){
@@ -607,6 +678,12 @@ void MainWindow::openUnpackedProject(){
 bool MainWindow::openBehavior(const QString & filename){
     if (filename != ""){
         if (projectFile){
+            for (int i = 0; i < behaviorFiles.size(); i++){
+                if (behaviorFiles.at(i)->fileName() == filename){
+                    WARNING_MESSAGE(QString("MainWindow::openBehavior(): The selected behavior file is already open!"));
+                    return true;
+                }
+            }
             ProgressDialog dialog("Opening "+filename, "", 0, 100, this);
             objectDataWid->changeCurrentDataWidget(NULL);
             dialog.setProgress("Beginning XML parse...", 5);
@@ -643,7 +720,7 @@ void MainWindow::openBehaviorFile(const QModelIndex & index){
         writeToLog("\n-------------------------\nTime taken to open behavior \""+fileName+
                               "\" is approximately "+QString::number(t.elapsed())+" milliseconds\n-------------------------\n");
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openBehaviorFile(): The behavior file "+fileName+" failded to open correctly!"));
+        WARNING_MESSAGE(QString("MainWindow::openBehaviorFile(): The behavior file "+fileName+" failded to open!"));
     }
 }
 

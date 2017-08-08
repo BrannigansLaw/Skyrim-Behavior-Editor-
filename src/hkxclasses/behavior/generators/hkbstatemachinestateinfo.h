@@ -23,7 +23,7 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-	void setStateId(ushort id);
+    bool setStateId(ushort id);
     hkbStateMachine * getParentStateMachine() const;
     hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&);
     hkbStateMachineStateInfo(const hkbStateMachineStateInfo &);

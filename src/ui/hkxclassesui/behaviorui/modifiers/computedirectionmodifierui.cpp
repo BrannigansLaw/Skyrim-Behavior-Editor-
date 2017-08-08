@@ -235,10 +235,8 @@ void ComputeDirectionModifierUI::setName(){
 
 void ComputeDirectionModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -301,10 +299,8 @@ void ComputeDirectionModifierUI::setVerticalOffset(){
 
 void ComputeDirectionModifierUI::setReverseGroundAngle(){
     if (bsData){
-        if (bsData->reverseGroundAngle != reverseGroundAngle->isChecked()){
-            bsData->reverseGroundAngle = reverseGroundAngle->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->reverseGroundAngle = reverseGroundAngle->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setReverseGroundAngle(): The data is NULL!!"));
     }
@@ -312,10 +308,8 @@ void ComputeDirectionModifierUI::setReverseGroundAngle(){
 
 void ComputeDirectionModifierUI::setReverseUpAngle(){
     if (bsData){
-        if (bsData->reverseUpAngle != reverseUpAngle->isChecked()){
-            bsData->reverseUpAngle = reverseUpAngle->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->reverseUpAngle = reverseUpAngle->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setReverseUpAngle(): The data is NULL!!"));
     }
@@ -323,10 +317,8 @@ void ComputeDirectionModifierUI::setReverseUpAngle(){
 
 void ComputeDirectionModifierUI::setProjectPoint(){
     if (bsData){
-        if (bsData->projectPoint != projectPoint->isChecked()){
-            bsData->projectPoint = projectPoint->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->projectPoint = projectPoint->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setProjectPoint(): The data is NULL!!"));
     }
@@ -334,10 +326,8 @@ void ComputeDirectionModifierUI::setProjectPoint(){
 
 void ComputeDirectionModifierUI::setNormalizePoint(){
     if (bsData){
-        if (bsData->normalizePoint != normalizePoint->isChecked()){
-            bsData->normalizePoint = normalizePoint->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->normalizePoint = normalizePoint->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setNormalizePoint(): The data is NULL!!"));
     }
@@ -345,10 +335,8 @@ void ComputeDirectionModifierUI::setNormalizePoint(){
 
 void ComputeDirectionModifierUI::setComputeOnlyOnce(){
     if (bsData){
-        if (bsData->computeOnlyOnce != computeOnlyOnce->isChecked()){
-            bsData->computeOnlyOnce = computeOnlyOnce->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->computeOnlyOnce = computeOnlyOnce->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setComputeOnlyOnce(): The data is NULL!!"));
     }
@@ -356,10 +344,8 @@ void ComputeDirectionModifierUI::setComputeOnlyOnce(){
 
 void ComputeDirectionModifierUI::setComputedOutput(){
     if (bsData){
-        if (bsData->computedOutput != computedOutput->isChecked()){
-            bsData->computedOutput = computedOutput->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->computedOutput = computedOutput->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setComputedOutput(): The data is NULL!!"));
     }
@@ -660,11 +646,11 @@ void ComputeDirectionModifierUI::loadBinding(int row, int colunm, hkbVariableBin
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

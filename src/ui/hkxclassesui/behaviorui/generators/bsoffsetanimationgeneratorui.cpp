@@ -128,8 +128,10 @@ void BSOffsetAnimationGeneratorUI::setName(){
 
 void BSOffsetAnimationGeneratorUI::setFOffsetVariable(){
     if (bsData){
-        bsData->fOffsetVariable = fOffsetVariable->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->fOffsetVariable != fOffsetVariable->value()){
+            bsData->fOffsetVariable = fOffsetVariable->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setFOffsetVariable(): The data is NULL!!"))
     }
@@ -137,8 +139,10 @@ void BSOffsetAnimationGeneratorUI::setFOffsetVariable(){
 
 void BSOffsetAnimationGeneratorUI::setFOffsetRangeStart(){
     if (bsData){
-        bsData->fOffsetRangeStart = fOffsetRangeStart->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->fOffsetRangeStart != fOffsetRangeStart->value()){
+            bsData->fOffsetRangeStart = fOffsetRangeStart->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setFOffsetRangeStart(): The data is NULL!!"))
     }
@@ -146,8 +150,10 @@ void BSOffsetAnimationGeneratorUI::setFOffsetRangeStart(){
 
 void BSOffsetAnimationGeneratorUI::setFOffsetRangeEnd(){
     if (bsData){
-        bsData->fOffsetRangeEnd = fOffsetRangeEnd->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->fOffsetRangeEnd != fOffsetRangeEnd->value()){
+            bsData->fOffsetRangeEnd = fOffsetRangeEnd->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setFOffsetRangeEnd(): The data is NULL!!"))
     }
@@ -229,11 +235,11 @@ void BSOffsetAnimationGeneratorUI::loadBinding(int row, int colunm, hkbVariableB
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::loadBinding(): The variable binding set is NULL!!"));
         }

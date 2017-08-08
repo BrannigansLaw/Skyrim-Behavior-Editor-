@@ -6,6 +6,7 @@
 class BSModifyOnceModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class BSModifyOnceModifierUI;
 public:
     BSModifyOnceModifier(HkxFile *parent, long ref = 0);
     virtual ~BSModifyOnceModifier();

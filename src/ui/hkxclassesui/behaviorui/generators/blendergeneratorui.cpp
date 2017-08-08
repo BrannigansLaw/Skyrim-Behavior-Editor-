@@ -53,7 +53,8 @@ QStringList BlenderGeneratorUI::types = {
     "BSOffsetAnimationGenerator",
     "hkbPoseMatchingGenerator",
     "hkbClipGenerator",
-    "hkbBehaviorReferenceGenerator"
+    "hkbBehaviorReferenceGenerator",
+    "BGSGamebryoSequenceGenerator"
 };
 
 QStringList BlenderGeneratorUI::headerLabels = {
@@ -85,6 +86,12 @@ BlenderGeneratorUI::BlenderGeneratorUI()
       flagForceDensePose(new CheckBox),
       subtractLastChild(new CheckBox)
 {
+    table->setAcceptDrops(true);
+    table->viewport()->setAcceptDrops(true);
+    table->setDragDropOverwriteMode(true);
+    table->setDropIndicatorShown(true);
+    table->setDragDropMode(QAbstractItemView::InternalMove);
+    table->setRowSwapRange(BASE_NUMBER_OF_ROWS);
     typeSelectorCB->insertItems(0, types);
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
@@ -175,6 +182,7 @@ void BlenderGeneratorUI::connectSignals(){
     connect(flagForceDensePose, SIGNAL(released()), this, SLOT(setFlagForceDensePose()), Qt::UniqueConnection);
     connect(subtractLastChild, SIGNAL(released()), this, SLOT(setSubtractLastChild()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    connect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)), Qt::UniqueConnection);
     connect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)), Qt::UniqueConnection);
     connect(childUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
     connect(childUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
@@ -196,6 +204,7 @@ void BlenderGeneratorUI::disconnectSignals(){
     disconnect(flagForceDensePose, SIGNAL(released()), this, SLOT(setFlagForceDensePose()));
     disconnect(subtractLastChild, SIGNAL(released()), this, SLOT(setSubtractLastChild()));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    disconnect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)));
     disconnect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)));
     disconnect(childUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
     disconnect(childUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)));
@@ -431,8 +440,10 @@ void BlenderGeneratorUI::setReferencePoseWeightThreshold(){
 
 void BlenderGeneratorUI::setBlendParameter(){
     if (bsData){
-        bsData->blendParameter = blendParameter->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->blendParameter != blendParameter->value()){
+            bsData->blendParameter = blendParameter->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setBlendParameter(): The data is NULL!!"))
     }
@@ -440,8 +451,10 @@ void BlenderGeneratorUI::setBlendParameter(){
 
 void BlenderGeneratorUI::setMinCyclicBlendParameter(){
     if (bsData){
-        bsData->minCyclicBlendParameter = minCyclicBlendParameter->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->minCyclicBlendParameter != minCyclicBlendParameter->value()){
+            bsData->minCyclicBlendParameter = minCyclicBlendParameter->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setMinCyclicBlendParameter(): The data is NULL!!"))
     }
@@ -449,8 +462,10 @@ void BlenderGeneratorUI::setMinCyclicBlendParameter(){
 
 void BlenderGeneratorUI::setMaxCyclicBlendParameter(){
     if (bsData){
-        bsData->maxCyclicBlendParameter = maxCyclicBlendParameter->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->maxCyclicBlendParameter != maxCyclicBlendParameter->value()){
+            bsData->maxCyclicBlendParameter = maxCyclicBlendParameter->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setMaxCyclicBlendParameter(): The data is NULL!!"))
     }
@@ -458,8 +473,10 @@ void BlenderGeneratorUI::setMaxCyclicBlendParameter(){
 
 void BlenderGeneratorUI::setIndexOfSyncMasterChild(){
     if (bsData){
-        bsData->indexOfSyncMasterChild = indexOfSyncMasterChild->value();
-        bsData->getParentFile()->toggleChanged(true);
+        if (bsData->indexOfSyncMasterChild != indexOfSyncMasterChild->value()){
+            bsData->indexOfSyncMasterChild = indexOfSyncMasterChild->value();
+            bsData->getParentFile()->toggleChanged(true);
+        }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setIndexOfSyncMasterChild(): The data is NULL!!"))
     }
@@ -588,6 +605,26 @@ void BlenderGeneratorUI::setSubtractLastChild(){
     }
 }
 
+void BlenderGeneratorUI::swapGeneratorIndices(int index1, int index2){
+    if (bsData){
+        index1 = index1 - BASE_NUMBER_OF_ROWS;
+        index2 = index2 - BASE_NUMBER_OF_ROWS;
+        if (bsData->children.size() > index1 && bsData->children.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
+            bsData->children.swap(index1, index2);
+            if (behaviorView->getSelectedItem()){
+                behaviorView->getSelectedItem()->reorderChildren();
+            }else{
+                CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::swapGeneratorIndices(): No item selected!!"));
+            }
+            bsData->getParentFile()->toggleChanged(true);
+        }else{
+            WARNING_MESSAGE(QString("BlenderGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!"));
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::swapGeneratorIndices(): The data is NULL!!"));
+    }
+}
+
 void BlenderGeneratorUI::addChildWithGenerator(){
     Generator_Type typeEnum;
     if (bsData && behaviorView){
@@ -628,6 +665,9 @@ void BlenderGeneratorUI::addChildWithGenerator(){
             break;
         case BEHAVIOR_REFERENCE_GENERATOR:
             behaviorView->appendBehaviorReferenceGenerator();
+            break;
+        case GAMEBYRO_SEQUENCE_GENERATOR:
+            behaviorView->appendBGSGamebryoSequenceGenerator();
             break;
         default:
             CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::addChild(): Invalid typeEnum!!"))
@@ -778,11 +818,11 @@ void BlenderGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindingSet 
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::loadBinding(): The variable binding set is NULL!!"));
         }

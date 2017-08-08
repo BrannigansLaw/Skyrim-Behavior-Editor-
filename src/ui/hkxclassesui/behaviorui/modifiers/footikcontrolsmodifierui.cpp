@@ -491,10 +491,8 @@ void FootIkControlsModifierUI::setName(){
 
 void FootIkControlsModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -816,11 +814,11 @@ void FootIkControlsModifierUI::loadBinding(int row, int colunm, hkbVariableBindi
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

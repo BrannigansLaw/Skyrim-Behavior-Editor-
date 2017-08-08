@@ -53,8 +53,8 @@ LegUI::LegUI()
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
     table->setHorizontalHeaderLabels(headerLabels);
-    table->setItem(EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("event"));
-    table->setItem(EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkEvent", Qt::AlignCenter));
+    table->setItem(EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("eventId"));
+    table->setItem(EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
     table->setItem(EVENT_ID_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setItem(EVENT_ID_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_EVENTS_TABLE_TIP));
     table->setItem(PAYLOAD_ROW, NAME_COLUMN, new TableWidgetItem("payload"));
@@ -63,19 +63,19 @@ LegUI::LegUI()
     table->setCellWidget(PAYLOAD_ROW, VALUE_COLUMN, payload);
     table->setItem(GROUND_POSITION_ROW, NAME_COLUMN, new TableWidgetItem("groundPosition"));
     table->setItem(GROUND_POSITION_ROW, TYPE_COLUMN, new TableWidgetItem("hkVector4", Qt::AlignCenter));
-    table->setItem(GROUND_POSITION_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
+    table->setItem(GROUND_POSITION_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(GROUND_POSITION_ROW, VALUE_COLUMN, groundPosition);
     table->setItem(VERTICAL_ERROR_ROW, NAME_COLUMN, new TableWidgetItem("verticalError"));
     table->setItem(VERTICAL_ERROR_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
-    table->setItem(VERTICAL_ERROR_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
+    table->setItem(VERTICAL_ERROR_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(VERTICAL_ERROR_ROW, VALUE_COLUMN, verticalError);
     table->setItem(HIT_SOMETHING_ROW, NAME_COLUMN, new TableWidgetItem("hitSomething"));
     table->setItem(HIT_SOMETHING_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool", Qt::AlignCenter));
-    table->setItem(HIT_SOMETHING_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
+    table->setItem(HIT_SOMETHING_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(HIT_SOMETHING_ROW, VALUE_COLUMN, hitSomething);
     table->setItem(IS_PLANTED_MS_ROW, NAME_COLUMN, new TableWidgetItem("isPlantedMS"));
     table->setItem(IS_PLANTED_MS_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool", Qt::AlignCenter));
-    table->setItem(IS_PLANTED_MS_ROW, BINDING_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
+    table->setItem(IS_PLANTED_MS_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
     table->setCellWidget(IS_PLANTED_MS_ROW, VALUE_COLUMN, isPlantedMS);
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(table, 1, 0, 6, 3);
@@ -163,11 +163,11 @@ void LegUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, con
                 }else{
                     varName = static_cast<BehaviorFile *>(file)->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("LegUI::loadBinding(): The variable binding set is NULL!!"));
         }

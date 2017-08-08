@@ -170,10 +170,8 @@ void ExtractRagdollPoseModifierUI::setName(){
 
 void ExtractRagdollPoseModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -208,10 +206,8 @@ void ExtractRagdollPoseModifierUI::setPoseMatchingBone2(int index){
 
 void ExtractRagdollPoseModifierUI::setEnableComputeWorldFromModel(){
     if (bsData){
-        if (bsData->enableComputeWorldFromModel != enableComputeWorldFromModel->isChecked()){
-            bsData->enableComputeWorldFromModel = enableComputeWorldFromModel->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enableComputeWorldFromModel = enableComputeWorldFromModel->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::setenableComputeWorldFromModel(): The data is NULL!!"));
     }
@@ -400,11 +396,11 @@ void ExtractRagdollPoseModifierUI::loadBinding(int row, int colunm, hkbVariableB
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

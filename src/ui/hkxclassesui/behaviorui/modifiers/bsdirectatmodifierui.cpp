@@ -337,10 +337,8 @@ void BSDirectAtModifierUI::setName(){
 
 void BSDirectAtModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSDirectAtModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -348,10 +346,8 @@ void BSDirectAtModifierUI::setEnable(){
 
 void BSDirectAtModifierUI::setDirectAtTarget(){
     if (bsData){
-        if (bsData->directAtTarget != directAtTarget->isChecked()){
-            bsData->directAtTarget = directAtTarget->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->directAtTarget = directAtTarget->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSDirectAtModifierUI::setDirectAtTarget(): The data is NULL!!"));
     }
@@ -474,10 +470,8 @@ void BSDirectAtModifierUI::setUserInfo(){
 
 void BSDirectAtModifierUI::setDirectAtCamera(){
     if (bsData){
-        if (bsData->directAtCamera != directAtCamera->isChecked()){
-            bsData->directAtCamera = directAtCamera->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->directAtCamera = directAtCamera->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSDirectAtModifierUI::setDirectAtCamera(): The data is NULL!!"));
     }
@@ -518,10 +512,8 @@ void BSDirectAtModifierUI::setDirectAtCameraZ(){
 
 void BSDirectAtModifierUI::setActive(){
     if (bsData){
-        if (bsData->active != active->isChecked()){
-            bsData->active = active->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->active = active->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BSDirectAtModifierUI::setActive(): The data is NULL!!"));
     }
@@ -970,11 +962,11 @@ void BSDirectAtModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSe
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BSDirectAtModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

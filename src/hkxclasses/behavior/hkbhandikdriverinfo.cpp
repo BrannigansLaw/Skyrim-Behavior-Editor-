@@ -169,7 +169,7 @@ bool hkbHandIkDriverInfo::write(HkxXMLWriter *writer){
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("wristIndex"), QString::number(hands.at(i).wristIndex));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enforceEndPosition"), getBoolAsString(hands.at(i).enforceEndPosition));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enforceEndRotation"), getBoolAsString(hands.at(i).enforceEndRotation));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("localFrameName"), hands.at(i).localFrameName);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("localFrameName"), hands.at(i).localFrameName, true);
             writer->writeLine(writer->object, false);
         }
         if (hands.size() > 0){

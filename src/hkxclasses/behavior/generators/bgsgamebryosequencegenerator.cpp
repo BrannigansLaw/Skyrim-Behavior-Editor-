@@ -81,7 +81,7 @@ bool BGSGamebryoSequenceGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pSequence"), pSequence);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pSequence"), pSequence, true);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("eBlendModeFunction"), eBlendModeFunction);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fPercent"), QString::number(fPercent, char('f'), 6));
         writer->writeLine(writer->object, false);

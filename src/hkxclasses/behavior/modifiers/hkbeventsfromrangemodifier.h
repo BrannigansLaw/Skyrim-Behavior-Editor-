@@ -6,6 +6,7 @@
 class hkbEventsFromRangeModifier: public hkbModifier
 {
     friend class BehaviorGraphView;
+    friend class EventsFromRangeModifierUI;
 public:
     hkbEventsFromRangeModifier(HkxFile *parent, long ref = 0);
     virtual ~hkbEventsFromRangeModifier();
@@ -16,6 +17,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    int getNumberOfRanges() const;
 private:
     hkbEventsFromRangeModifier& operator=(const hkbEventsFromRangeModifier&);
     hkbEventsFromRangeModifier(const hkbEventsFromRangeModifier &);

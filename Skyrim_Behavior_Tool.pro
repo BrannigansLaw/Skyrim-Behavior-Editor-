@@ -219,7 +219,15 @@ SOURCES += \
     src/ui/hkxclassesui/behaviorui/modifiers/bslookatmodifierui.cpp \
     src/ui/hkxclassesui/behaviorui/modifiers/detectclosetogroundmodifierui.cpp \
     src/ui/hkxclassesui/behaviorui/modifiers/bseventeveryneventsmodifierui.cpp \
-    src/ui/hkxclassesui/behaviorui/modifiers/bseventonfalsetotruemodifierui.cpp
+    src/ui/hkxclassesui/behaviorui/modifiers/bseventonfalsetotruemodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsmodifyoncemodifierui.cpp \
+    src/hkxclasses/behavior/modifiers/hkbhandikcontrolsmodifier.cpp \
+    src/ui/hkxclassesui/behaviorui/handui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/handikcontrolsmodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/bstweenermodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/generators/bgsgamebryosequencegeneratorui.cpp \
+    src/ui/hkxclassesui/behaviorui/modifiers/eventsfromrangemodifierui.cpp \
+    src/ui/hkxclassesui/behaviorui/eventrangedataui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -415,4 +423,12 @@ HEADERS  += \
     src/ui/hkxclassesui/behaviorui/modifiers/bslookatmodifierui.h \
     src/ui/hkxclassesui/behaviorui/modifiers/detectclosetogroundmodifierui.h \
     src/ui/hkxclassesui/behaviorui/modifiers/bseventeveryneventsmodifierui.h \
-    src/ui/hkxclassesui/behaviorui/modifiers/bseventonfalsetotruemodifierui.h
+    src/ui/hkxclassesui/behaviorui/modifiers/bseventonfalsetotruemodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bsmodifyoncemodifierui.h \
+    src/hkxclasses/behavior/modifiers/hkbhandikcontrolsmodifier.h \
+    src/ui/hkxclassesui/behaviorui/handui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/handikcontrolsmodifierui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/bstweenermodifierui.h \
+    src/ui/hkxclassesui/behaviorui/generators/bgsgamebryosequencegeneratorui.h \
+    src/ui/hkxclassesui/behaviorui/modifiers/eventsfromrangemodifierui.h \
+    src/ui/hkxclassesui/behaviorui/eventrangedataui.h

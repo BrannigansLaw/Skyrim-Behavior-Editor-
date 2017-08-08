@@ -24,9 +24,8 @@ private:
     hkbHandIkDriverInfo(const hkbHandIkDriverInfo &);
 private:
     struct hkbHandIkDriverInfoHand{
-        hkbHandIkDriverInfoHand(hkbHandIkDriverInfo *par = NULL)
-            : parent(par),
-              maxElbowAngleDegrees(0),
+        hkbHandIkDriverInfoHand()
+            : maxElbowAngleDegrees(0),
               minElbowAngleDegrees(0),
               shoulderIndex(-1),
               shoulderSiblingIndex(-1),
@@ -39,7 +38,6 @@ private:
             //
         }
 
-        hkbHandIkDriverInfo *parent;
         hkQuadVariable elbowAxisLS;
         hkQuadVariable backHandNormalLS;
         hkQuadVariable handOffsetLS;

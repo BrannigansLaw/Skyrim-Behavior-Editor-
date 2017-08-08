@@ -164,10 +164,8 @@ void DelayedModifierUI::setName(){
 
 void DelayedModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("DelayedModifierUI::setEnable(): The data is NULL!!"));
     }

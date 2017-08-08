@@ -15,7 +15,7 @@ BSEventOnDeactivateModifier::BSEventOnDeactivateModifier(HkxFile *parent, long r
       userData(0),
       enable(true)
 {
-    setType(HKB_EVENT_DRIVEN_MODIFIER, TYPE_MODIFIER);
+    setType(BS_EVENT_ON_DEACTIVATE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
     name = "BSEventOnDeactivateModifier"+QString::number(refCount);

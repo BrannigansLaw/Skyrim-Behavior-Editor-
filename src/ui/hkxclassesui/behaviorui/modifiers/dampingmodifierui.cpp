@@ -257,10 +257,8 @@ void DampingModifierUI::setName(){
 
 void DampingModifierUI::setEnable(){
     if (bsData){
-        if (bsData->enable != enable->isChecked()){
-            bsData->enable = enable->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enable = enable->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("DampingModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -301,10 +299,8 @@ void DampingModifierUI::setKD(){
 
 void DampingModifierUI::setEnableScalarDamping(){
     if (bsData){
-        if (bsData->enableScalarDamping != enableScalarDamping->isChecked()){
-            bsData->enableScalarDamping = enableScalarDamping->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enableScalarDamping = enableScalarDamping->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("DampingModifierUI::setenableScalarDamping(): The data is NULL!!"));
     }
@@ -312,10 +308,8 @@ void DampingModifierUI::setEnableScalarDamping(){
 
 void DampingModifierUI::setEnableVectorDamping(){
     if (bsData){
-        if (bsData->enableVectorDamping != enableVectorDamping->isChecked()){
-            bsData->enableVectorDamping = enableVectorDamping->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
-        }
+        bsData->enableVectorDamping = enableVectorDamping->isChecked();
+        bsData->getParentFile()->toggleChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE(QString("DampingModifierUI::setenableVectorDamping(): The data is NULL!!"));
     }
@@ -736,11 +730,11 @@ void DampingModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
-                if (varName == ""){
-                    varName = "NONE";
-                }
-                table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
+            if (varName == ""){
+                varName = "NONE";
+            }
+            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE(QString("DampingModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }

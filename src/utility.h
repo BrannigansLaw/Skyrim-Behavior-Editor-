@@ -56,7 +56,7 @@ struct hkQuadVariable
         return false;
     }
 
-    QString getValueAsString(){
+    QString getValueAsString() const{
         return "("+QString::number(x, char('f'), 6)+" "+QString::number(y, char('f'), 6)+" "+QString::number(z, char('f'), 6)+" "+QString::number(w, char('f'), 6)+")";
     }
     qreal x;
@@ -116,6 +116,7 @@ enum HkxSignature: unsigned long long {
     BS_SYNCHRONIZED_CLIP_GENERATOR = 0xd83bea64,
     BGS_GAMEBYRO_SEQUENCE_GENERATOR = 0xc8df2d77,
     //Behavior::Modifiers
+    HKB_HAND_IK_CONTROLS_MODIFIER = 0x9f0488bb,
     HKB_GET_WORLD_FROM_MODEL_MODIFIER = 0x873fc6f7,
     BS_DIST_TRIGGER_MODIFER = 0xb34d2bbd,
     HKB_FOOT_IK_CONTROLS_MODIFIER = 0xe5b6f544,

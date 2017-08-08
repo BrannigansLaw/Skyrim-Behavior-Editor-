@@ -389,8 +389,8 @@ bool hkbCharacterData::write(HkxXMLWriter *writer){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("characterControllerInfo"), "");
+        writer->writeLine(writer->object, true);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("capsuleHeight"), QString::number(characterControllerInfo.capsuleHeight, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("capsuleRadius"), QString::number(characterControllerInfo.capsuleRadius, char('f'), 6));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("collisionFilterInfo"), QString::number(characterControllerInfo.collisionFilterInfo, char('f'), 6));
