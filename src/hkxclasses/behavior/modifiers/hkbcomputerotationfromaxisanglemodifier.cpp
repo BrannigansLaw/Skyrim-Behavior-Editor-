@@ -19,7 +19,7 @@ hkbComputeRotationFromAxisAngleModifier::hkbComputeRotationFromAxisAngleModifier
     setType(HKB_COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbComputeRotationFromAxisAngleModifier"+QString::number(refCount);
+    name = "ComputeRotationFromAxisAngleModifier"+QString::number(refCount);
 }
 
 QString hkbComputeRotationFromAxisAngleModifier::getClassname(){

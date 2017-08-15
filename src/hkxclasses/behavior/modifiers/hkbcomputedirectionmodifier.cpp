@@ -27,7 +27,7 @@ hkbComputeDirectionModifier::hkbComputeDirectionModifier(HkxFile *parent, long r
     setType(HKB_COMPUTE_DIRECTION_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbComputeDirectionModifier"+QString::number(refCount);
+    name = "ComputeDirectionModifier"+QString::number(refCount);
 }
 
 QString hkbComputeDirectionModifier::getClassname(){

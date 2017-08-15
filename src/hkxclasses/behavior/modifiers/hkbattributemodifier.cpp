@@ -18,7 +18,7 @@ hkbAttributeModifier::hkbAttributeModifier(HkxFile *parent, long ref)
     setType(HKB_ATTRIBUTE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbAttributeModifier"+QString::number(refCount);
+    name = "AttributeModifier"+QString::number(refCount);
 }
 
 QString hkbAttributeModifier::getClassname(){

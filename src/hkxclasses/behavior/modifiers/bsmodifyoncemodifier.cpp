@@ -18,7 +18,7 @@ BSModifyOnceModifier::BSModifyOnceModifier(HkxFile *parent, long ref)
     setType(BS_MODIFY_ONCE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSModifyOnceModifier"+QString::number(refCount);
+    name = "ModifyOnceModifier"+QString::number(refCount);
 }
 
 QString BSModifyOnceModifier::getClassname(){

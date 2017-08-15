@@ -20,7 +20,7 @@ BSDistTriggerModifier::BSDistTriggerModifier(HkxFile *parent, long ref)
     setType(BS_DIST_TRIGGER_MODIFER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSDistTriggerModifier"+QString::number(refCount);
+    name = "DistTriggerModifier"+QString::number(refCount);
 }
 
 QString BSDistTriggerModifier::getClassname(){

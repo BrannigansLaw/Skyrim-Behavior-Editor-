@@ -19,7 +19,7 @@ hkbComputeRotationToTargetModifier::hkbComputeRotationToTargetModifier(HkxFile *
     setType(HKB_COMPUTE_ROTATION_TO_TARGET_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbComputeRotationToTargetModifier"+QString::number(refCount);
+    name = "ComputeRotationToTargetModifier"+QString::number(refCount);
 }
 
 QString hkbComputeRotationToTargetModifier::getClassname(){

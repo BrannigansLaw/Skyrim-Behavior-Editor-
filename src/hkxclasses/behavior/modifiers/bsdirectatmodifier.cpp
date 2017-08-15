@@ -36,7 +36,7 @@ BSDirectAtModifier::BSDirectAtModifier(HkxFile *parent, long ref)
     setType(BS_DIRECT_AT_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSDirectAtModifier"+QString::number(refCount);
+    name = "DirectAtModifier"+QString::number(refCount);
 }
 
 QString BSDirectAtModifier::getClassname(){

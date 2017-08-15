@@ -20,7 +20,7 @@ hkbGetHandleOnBoneModifier::hkbGetHandleOnBoneModifier(HkxFile *parent, long ref
     setType(HKB_GET_HANDLE_ON_BONE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbGetHandleOnBoneModifier"+QString::number(refCount);
+    name = "GetHandleOnBoneModifier"+QString::number(refCount);
 }
 
 QString hkbGetHandleOnBoneModifier::getClassname(){

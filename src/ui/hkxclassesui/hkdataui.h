@@ -83,6 +83,8 @@ class BSTweenerModifierUI;
 class BGSGamebryoSequenceGeneratorUI;
 class EventsFromRangeModifierUI;
 
+class MainWindow;
+
 /**
  * To add support for a new class we need to add it to the "DATA_TYPE_LOADED" enum, add it to the stacked layout in the correct order,
  * connect it's name change signal to this, deal with any variable event name changes, add it to the list of widgets to be loaded and
@@ -93,7 +95,7 @@ class HkDataUI: public QGroupBox
 {
     Q_OBJECT
 public:
-    HkDataUI(const QString & title);
+    HkDataUI(MainWindow *mainui, const QString & title);
     virtual ~HkDataUI(){}
     BehaviorGraphView * loadBehaviorView(BehaviorGraphView *view);
     void setEventsVariablesAnimationsUI(EventsUI *events, BehaviorVariablesUI *variables, AnimationsUI *animations);
@@ -186,6 +188,7 @@ private:
     static QStringList generatorTypes;
     static QStringList modifierTypes;
     static QStringList variableTypes;
+    MainWindow *mainUI;
     EventsUI *eventsUI;
     BehaviorVariablesUI *variablesUI;
     AnimationsUI *animationsUI;

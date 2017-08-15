@@ -31,7 +31,7 @@ hkbLookAtModifier::hkbLookAtModifier(HkxFile *parent, long ref)
     setType(HKB_LOOK_AT_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbLookAtModifier"+QString::number(refCount);
+    name = "LookAtModifier"+QString::number(refCount);
 }
 
 QString hkbLookAtModifier::getClassname(){

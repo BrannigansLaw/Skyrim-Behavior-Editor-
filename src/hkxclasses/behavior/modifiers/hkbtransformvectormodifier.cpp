@@ -22,7 +22,7 @@ hkbTransformVectorModifier::hkbTransformVectorModifier(HkxFile *parent, long ref
     setType(HKB_TRANSFORM_VECTOR_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbTransformVectorModifier"+QString::number(refCount);
+    name = "TransformVectorModifier"+QString::number(refCount);
 }
 
 QString hkbTransformVectorModifier::getClassname(){

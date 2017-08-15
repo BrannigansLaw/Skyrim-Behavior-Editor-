@@ -417,6 +417,13 @@ bool BehaviorGraphView::refocus(){
     }
 }
 
+QString BehaviorGraphView::getBehaviorFilename() const{
+    if (behavior){
+        return behavior->fileName();
+    }
+    return "";
+}
+
 void BehaviorGraphView::deleteSelectedObjectBranchSlot(){
     if (getSelectedItem()){
         getSelectedItem()->unselect();

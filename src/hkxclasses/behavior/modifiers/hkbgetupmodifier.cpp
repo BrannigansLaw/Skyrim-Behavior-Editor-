@@ -23,7 +23,7 @@ hkbGetUpModifier::hkbGetUpModifier(HkxFile *parent, long ref)
     setType(HKB_GET_UP_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbGetUpModifier"+QString::number(refCount);
+    name = "GetUpModifier"+QString::number(refCount);
 }
 
 QString hkbGetUpModifier::getClassname(){

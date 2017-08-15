@@ -19,7 +19,7 @@ BSGetTimeStepModifier::BSGetTimeStepModifier(HkxFile *parent, long ref)
     setType(BS_GET_TIME_STEP_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSGetTimeStepModifier"+QString::number(refCount);
+    name = "GetTimeStepModifier"+QString::number(refCount);
 }
 
 QString BSGetTimeStepModifier::getClassname(){

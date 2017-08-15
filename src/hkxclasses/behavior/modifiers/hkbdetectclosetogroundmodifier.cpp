@@ -23,7 +23,7 @@ hkbDetectCloseToGroundModifier::hkbDetectCloseToGroundModifier(HkxFile *parent, 
     setType(HKB_DETECT_CLOSE_TO_GROUND_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbDetectCloseToGroundModifier"+QString::number(refCount);
+    name = "DetectCloseToGroundModifier"+QString::number(refCount);
 }
 
 QString hkbDetectCloseToGroundModifier::getClassname(){

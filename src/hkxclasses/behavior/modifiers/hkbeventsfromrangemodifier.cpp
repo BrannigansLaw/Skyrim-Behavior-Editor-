@@ -21,7 +21,7 @@ hkbEventsFromRangeModifier::hkbEventsFromRangeModifier(HkxFile *parent, long ref
     setType(HKB_EVENTS_FROM_RANGE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbEventsFromRangeModifier"+QString::number(refCount);
+    name = "EventsFromRangeModifier"+QString::number(refCount);
 }
 
 QString hkbEventsFromRangeModifier::getClassname(){

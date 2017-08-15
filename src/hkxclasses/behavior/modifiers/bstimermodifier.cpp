@@ -19,7 +19,7 @@ BSTimerModifier::BSTimerModifier(HkxFile *parent, long ref)
     setType(BS_TIMER_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSTimerModifier"+QString::number(refCount);
+    name = "TimerModifier"+QString::number(refCount);
 }
 
 QString BSTimerModifier::getClassname(){

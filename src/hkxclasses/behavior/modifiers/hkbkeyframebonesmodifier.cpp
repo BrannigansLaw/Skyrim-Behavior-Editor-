@@ -18,7 +18,7 @@ hkbKeyframeBonesModifier::hkbKeyframeBonesModifier(HkxFile *parent, long ref)
     setType(HKB_KEY_FRAME_BONES_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbKeyframeBonesModifier"+QString::number(refCount);
+    name = "KeyframeBonesModifier"+QString::number(refCount);
 }
 
 QString hkbKeyframeBonesModifier::getClassname(){

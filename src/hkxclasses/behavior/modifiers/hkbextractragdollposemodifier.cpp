@@ -22,7 +22,7 @@ hkbExtractRagdollPoseModifier::hkbExtractRagdollPoseModifier(HkxFile *parent, lo
     setType(HKB_EXTRACT_RAGDOLL_POSE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbExtractRagdollPoseModifier"+QString::number(refCount);
+    name = "ExtractRagdollPoseModifier"+QString::number(refCount);
 }
 
 QString hkbExtractRagdollPoseModifier::getClassname(){

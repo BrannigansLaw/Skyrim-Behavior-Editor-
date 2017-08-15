@@ -19,7 +19,7 @@ hkbHandIkControlsModifier::hkbHandIkControlsModifier(HkxFile *parent, long ref)
     setType(HKB_HAND_IK_CONTROLS_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbHandIkControlsModifier"+QString::number(refCount);
+    name = "HandIkControlsModifier"+QString::number(refCount);
 }
 
 QString hkbHandIkControlsModifier::getClassname(){

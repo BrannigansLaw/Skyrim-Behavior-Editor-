@@ -28,7 +28,7 @@ hkbPoweredRagdollControlsModifier::hkbPoweredRagdollControlsModifier(HkxFile *pa
     setType(HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbPoweredRagdollControlsModifier"+QString::number(refCount);
+    name = "PoweredRagdollControlsModifier"+QString::number(refCount);
 }
 
 QString hkbPoweredRagdollControlsModifier::getClassname(){

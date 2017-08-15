@@ -22,7 +22,7 @@ BSInterpValueModifier::BSInterpValueModifier(HkxFile *parent, long ref)
     setType(BS_INTERP_VALUE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSInterpValueModifier"+QString::number(refCount);
+    name = "InterpValueModifier"+QString::number(refCount);
 }
 
 QString BSInterpValueModifier::getClassname(){

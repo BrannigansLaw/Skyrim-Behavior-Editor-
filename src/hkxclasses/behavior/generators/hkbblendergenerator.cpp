@@ -24,7 +24,7 @@ hkbBlenderGenerator::hkbBlenderGenerator(HkxFile *parent, long ref)
     setType(HKB_BLENDER_GENERATOR, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbBlenderGenerator"+QString::number(refCount);
+    name = "BlenderGenerator"+QString::number(refCount);
 }
 
 QString hkbBlenderGenerator::getClassname(){

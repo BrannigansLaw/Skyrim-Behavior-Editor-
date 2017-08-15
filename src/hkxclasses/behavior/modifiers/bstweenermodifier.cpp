@@ -22,7 +22,7 @@ BSTweenerModifier::BSTweenerModifier(HkxFile *parent, long ref)
     setType(HKB_TWIST_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSTweenerModifier"+QString::number(refCount);
+    name = "TweenerModifier"+QString::number(refCount);
 }
 
 QString BSTweenerModifier::getClassname(){

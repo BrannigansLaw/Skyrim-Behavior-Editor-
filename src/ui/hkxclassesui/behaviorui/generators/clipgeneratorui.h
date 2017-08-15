@@ -18,13 +18,14 @@ class SpinBox;
 class hkbVariableBindingSet;
 class ClipTriggerUI;
 class QGroupBox;
+class MainWindow;
 
 class ClipGeneratorUI: public QStackedWidget
 {
     Q_OBJECT
     friend class HkDataUI;
 public:
-    ClipGeneratorUI();
+    ClipGeneratorUI(MainWindow *mainui);
     virtual ~ClipGeneratorUI(){}
     void loadData(HkxObject *data);
 signals:
@@ -73,6 +74,7 @@ private:
         CHILD_WIDGET = 1
     };
     static QStringList headerLabels;
+    MainWindow *mainUI;
     hkbClipGenerator *bsData;
     QGridLayout *topLyt;
     TableWidget *table;

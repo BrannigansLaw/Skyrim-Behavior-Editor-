@@ -18,7 +18,7 @@ BSEventOnDeactivateModifier::BSEventOnDeactivateModifier(HkxFile *parent, long r
     setType(BS_EVENT_ON_DEACTIVATE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSEventOnDeactivateModifier"+QString::number(refCount);
+    name = "EventOnDeactivateModifier"+QString::number(refCount);
 }
 
 QString BSEventOnDeactivateModifier::getClassname(){

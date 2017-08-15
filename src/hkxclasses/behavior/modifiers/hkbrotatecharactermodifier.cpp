@@ -20,7 +20,7 @@ hkbRotateCharacterModifier::hkbRotateCharacterModifier(HkxFile *parent, long ref
     setType(HKB_ROTATE_CHARACTER_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbRotateCharacterModifier"+QString::number(refCount);
+    name = "RotateCharacterModifier"+QString::number(refCount);
 }
 
 QString hkbRotateCharacterModifier::getClassname(){

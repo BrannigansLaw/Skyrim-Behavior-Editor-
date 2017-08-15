@@ -22,7 +22,7 @@ BSCyclicBlendTransitionGenerator::BSCyclicBlendTransitionGenerator(HkxFile *pare
     setType(BS_CYCLIC_BLEND_TRANSITION_GENERATOR, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSCyclicBlendTransitionGenerator"+QString::number(refCount);
+    name = "CyclicBlendTransitionGenerator"+QString::number(refCount);
 }
 
 QString BSCyclicBlendTransitionGenerator::getClassname(){

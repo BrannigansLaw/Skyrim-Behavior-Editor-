@@ -16,7 +16,7 @@ hkbModifierGenerator::hkbModifierGenerator(HkxFile *parent, long ref)
     setType(HKB_MODIFIER_GENERATOR, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbModifierGenerator"+QString::number(refCount);
+    name = "ModifierGenerator"+QString::number(refCount);
 }
 
 QString hkbModifierGenerator::getClassname(){

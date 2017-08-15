@@ -19,7 +19,7 @@ hkbMirrorModifier::hkbMirrorModifier(HkxFile *parent, long ref)
     setType(HKB_MIRROR_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbMirrorModifier"+QString::number(refCount);
+    name = "MirrorModifier"+QString::number(refCount);
 }
 
 QString hkbMirrorModifier::getClassname(){

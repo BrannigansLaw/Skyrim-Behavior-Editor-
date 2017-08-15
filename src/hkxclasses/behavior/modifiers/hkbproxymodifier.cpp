@@ -40,7 +40,7 @@ hkbProxyModifier::hkbProxyModifier(HkxFile *parent, long ref)
     setType(HKB_PROXY_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbProxyModifier"+QString::number(refCount);
+    name = "ProxyModifier"+QString::number(refCount);
 }
 
 QString hkbProxyModifier::getClassname(){

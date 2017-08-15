@@ -164,8 +164,9 @@ QStringList HkDataUI::variableTypes = {
     "hkQuaternion"
 };
 
-HkDataUI::HkDataUI(const QString &title)
-    : behaviorView(NULL),
+HkDataUI::HkDataUI(MainWindow *mainui, const QString &title)
+    : mainUI(mainui),
+      behaviorView(NULL),
       verLyt(new QVBoxLayout),
       stack(new QStackedLayout),
       loadedData(NULL),

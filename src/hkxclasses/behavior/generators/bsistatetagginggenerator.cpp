@@ -19,7 +19,7 @@ BSiStateTaggingGenerator::BSiStateTaggingGenerator(HkxFile *parent, long ref)
     setType(BS_I_STATE_TAGGING_GENERATOR, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSiStateTaggingGenerator"+QString::number(refCount);
+    name = "iStateTaggingGenerator"+QString::number(refCount);
 }
 
 QString BSiStateTaggingGenerator::getClassname(){

@@ -18,7 +18,7 @@ BSBoneSwitchGenerator::BSBoneSwitchGenerator(HkxFile *parent, long ref)
     setType(BS_BONE_SWITCH_GENERATOR, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSBoneSwitchGenerator"+QString::number(refCount);
+    name = "BoneSwitchGenerator"+QString::number(refCount);
 }
 
 QString BSBoneSwitchGenerator::getClassname(){

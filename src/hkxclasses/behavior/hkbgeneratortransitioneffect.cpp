@@ -24,7 +24,7 @@ hkbGeneratorTransitionEffect::hkbGeneratorTransitionEffect(HkxFile *parent, long
     setType(HKB_GENERATOR_TRANSITION_EFFECT, TYPE_OTHER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbGeneratorTransitionEffect"+QString::number(refCount);
+    name = "GeneratorTransitionEffect"+QString::number(refCount);
 }
 
 QString hkbGeneratorTransitionEffect::getClassname(){

@@ -18,7 +18,7 @@ BSRagdollContactListenerModifier::BSRagdollContactListenerModifier(HkxFile *pare
     setType(BS_RAGDOLL_CONTACT_LISTENER_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSRagdollContactListenerModifier"+QString::number(refCount);
+    name = "RagdollContactListenerModifier"+QString::number(refCount);
 }
 
 QString BSRagdollContactListenerModifier::getClassname(){

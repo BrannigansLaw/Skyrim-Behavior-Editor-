@@ -33,7 +33,7 @@ hkbStateMachine::hkbStateMachine(HkxFile *parent, long ref)
     setType(HKB_STATE_MACHINE, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbStateMachine"+QString::number(refCount);
+    name = "StateMachine"+QString::number(refCount);
 }
 
 QString hkbStateMachine::getClassname(){

@@ -21,7 +21,7 @@ hkbDelayedModifier::hkbDelayedModifier(HkxFile *parent, long ref)
     setType(HKB_DELAYED_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbDelayedModifier"+QString::number(refCount);
+    name = "DelayedModifier"+QString::number(refCount);
 }
 
 QString hkbDelayedModifier::getClassname(){

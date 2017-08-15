@@ -31,7 +31,7 @@ hkbRigidBodyRagdollControlsModifier::hkbRigidBodyRagdollControlsModifier(HkxFile
     setType(HKB_RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbRigidBodyRagdollControlsModifier"+QString::number(refCount);
+    name = "RigidBodyRagdollControlsModifier"+QString::number(refCount);
 }
 
 QString hkbRigidBodyRagdollControlsModifier::getClassname(){

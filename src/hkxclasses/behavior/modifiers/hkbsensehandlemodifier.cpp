@@ -30,7 +30,7 @@ hkbSenseHandleModifier::hkbSenseHandleModifier(HkxFile *parent, long ref)
     setType(HKB_SENSE_HANDLE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbSenseHandleModifier"+QString::number(refCount);
+    name = "SenseHandleModifier"+QString::number(refCount);
 }
 
 QString hkbSenseHandleModifier::getClassname(){

@@ -19,7 +19,7 @@ BSComputeAddBoneAnimModifier::BSComputeAddBoneAnimModifier(HkxFile *parent, long
     setType(BS_COMPUTE_ADD_BONE_ANIM_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSComputeAddBoneAnimModifier"+QString::number(refCount);
+    name = "ComputeAddBoneAnimModifier"+QString::number(refCount);
 }
 
 QString BSComputeAddBoneAnimModifier::getClassname(){

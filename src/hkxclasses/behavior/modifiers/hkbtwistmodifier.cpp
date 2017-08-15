@@ -27,7 +27,7 @@ hkbTwistModifier::hkbTwistModifier(HkxFile *parent, long ref)
     setType(HKB_TWIST_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbTwistModifier"+QString::number(refCount);
+    name = "TwistModifier"+QString::number(refCount);
 }
 
 QString hkbTwistModifier::getClassname(){

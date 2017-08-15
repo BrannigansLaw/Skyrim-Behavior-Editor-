@@ -53,6 +53,7 @@ public:
     void removeModifierData();
     void removeOtherData();
     bool refocus();
+    QString getBehaviorFilename() const;
 signals:
     void addedGenerator(const QString & name, const QString & type);
     void addedModifier(const QString & name, const QString & type);

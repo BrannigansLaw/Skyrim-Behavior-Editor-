@@ -19,7 +19,7 @@ BSPassByTargetTriggerModifier::BSPassByTargetTriggerModifier(HkxFile *parent, lo
     setType(BS_PASS_BY_TARGET_TRIGGER_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSPassByTargetTriggerModifier"+QString::number(refCount);
+    name = "PassByTargetTriggerModifier"+QString::number(refCount);
 }
 
 QString BSPassByTargetTriggerModifier::getClassname(){

@@ -22,7 +22,7 @@ BSDecomposeVectorModifier::BSDecomposeVectorModifier(HkxFile *parent, long ref)
     setType(BS_DECOMPOSE_VECTOR_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSDecomposeVectorModifier"+QString::number(refCount);
+    name = "DecomposeVectorModifier"+QString::number(refCount);
 }
 
 QString BSDecomposeVectorModifier::getClassname(){

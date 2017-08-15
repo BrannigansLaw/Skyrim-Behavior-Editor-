@@ -51,8 +51,9 @@ QStringList ClipGeneratorUI::headerLabels = {
     "Value"
 };
 
-ClipGeneratorUI::ClipGeneratorUI()
-    : bsData(NULL),
+ClipGeneratorUI::ClipGeneratorUI(MainWindow *mainui)
+    : mainUI(mainui),
+      bsData(NULL),
       triggerUI(new ClipTriggerUI),
       groupBox(new QGroupBox),
       topLyt(new QGridLayout),

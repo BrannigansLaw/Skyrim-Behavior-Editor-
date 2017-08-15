@@ -24,7 +24,7 @@ BSEventOnFalseToTrueModifier::BSEventOnFalseToTrueModifier(HkxFile *parent, long
     setType(BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSEventOnFalseToTrueModifier"+QString::number(refCount);
+    name = "EventOnFalseToTrueModifier"+QString::number(refCount);
 }
 
 QString BSEventOnFalseToTrueModifier::getClassname(){

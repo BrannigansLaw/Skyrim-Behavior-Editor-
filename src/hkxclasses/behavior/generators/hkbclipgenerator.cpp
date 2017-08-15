@@ -26,7 +26,7 @@ hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, const QString &ani
     setType(HKB_CLIP_GENERATOR, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbClipGenerator"+QString::number(refCount);
+    name = "ClipGenerator"+QString::number(refCount);
 }
 
 QString hkbClipGenerator::getClassname(){

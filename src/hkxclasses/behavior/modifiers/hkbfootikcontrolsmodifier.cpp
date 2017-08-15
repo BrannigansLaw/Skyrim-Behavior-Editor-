@@ -18,7 +18,7 @@ hkbFootIkControlsModifier::hkbFootIkControlsModifier(HkxFile *parent, long ref)
     setType(HKB_FOOT_IK_CONTROLS_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbFootIkControlsModifier"+QString::number(refCount);
+    name = "FootIkControlsModifier"+QString::number(refCount);
 }
 
 QString hkbFootIkControlsModifier::getClassname(){

@@ -21,7 +21,7 @@ hkbBehaviorGraph::hkbBehaviorGraph(HkxFile *parent, long ref)
     setType(HKB_BEHAVIOR_GRAPH, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbBehaviorGraph"+QString::number(refCount);
+    name = "BehaviorGraph"+QString::number(refCount);
 }
 
 QString hkbBehaviorGraph::getClassname(){

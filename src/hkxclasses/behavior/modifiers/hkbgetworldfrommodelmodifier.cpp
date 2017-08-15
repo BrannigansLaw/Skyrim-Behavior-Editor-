@@ -18,7 +18,7 @@ hkbGetWorldFromModelModifier::hkbGetWorldFromModelModifier(HkxFile *parent, long
     setType(HKB_GET_WORLD_FROM_MODEL_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbGetWorldFromModelModifier"+QString::number(refCount);
+    name = "GetWorldFromModelModifier"+QString::number(refCount);
 }
 
 QString hkbGetWorldFromModelModifier::getClassname(){

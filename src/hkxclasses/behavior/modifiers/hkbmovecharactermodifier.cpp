@@ -18,7 +18,7 @@ hkbMoveCharacterModifier::hkbMoveCharacterModifier(HkxFile *parent, long ref)
     setType(HKB_MOVE_CHARACTER_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbMoveCharacterModifier"+QString::number(refCount);
+    name = "MoveCharacterModifier"+QString::number(refCount);
 }
 
 QString hkbMoveCharacterModifier::getClassname(){

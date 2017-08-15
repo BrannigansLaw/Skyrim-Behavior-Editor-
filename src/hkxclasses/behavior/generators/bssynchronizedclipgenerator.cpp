@@ -23,7 +23,7 @@ BSSynchronizedClipGenerator::BSSynchronizedClipGenerator(HkxFile *parent, long r
     setType(BS_SYNCHRONIZED_CLIP_GENERATOR, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSSynchronizedClipGenerator"+QString::number(refCount);
+    name = "SynchronizedClipGenerator"+QString::number(refCount);
 }
 
 QString BSSynchronizedClipGenerator::getClassname(){

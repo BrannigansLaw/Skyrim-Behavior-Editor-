@@ -19,7 +19,7 @@ BSIStateManagerModifier::BSIStateManagerModifier(HkxFile *parent, long ref)
     setType(BS_I_STATE_MANAGER_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSIStateManagerModifier"+QString::number(refCount);
+    name = "IStateManagerModifier"+QString::number(refCount);
 }
 
 QString BSIStateManagerModifier::getClassname(){

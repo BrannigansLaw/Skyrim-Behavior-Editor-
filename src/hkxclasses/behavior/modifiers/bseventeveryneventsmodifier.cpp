@@ -21,7 +21,7 @@ BSEventEveryNEventsModifier::BSEventEveryNEventsModifier(HkxFile *parent, long r
     setType(BS_EVENT_EVERY_N_EVENTS_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSEventEveryNEventsModifier"+QString::number(refCount);
+    name = "EventEveryNEventsModifier"+QString::number(refCount);
 }
 
 QString BSEventEveryNEventsModifier::getClassname(){

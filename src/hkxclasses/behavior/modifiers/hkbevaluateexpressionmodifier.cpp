@@ -19,7 +19,7 @@ hkbEvaluateExpressionModifier::hkbEvaluateExpressionModifier(HkxFile *parent, lo
     setType(HKB_EVALUATE_EXPRESSION_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbEvaluateExpressionModifier"+QString::number(refCount);
+    name = "EvaluateExpressionModifier"+QString::number(refCount);
 }
 
 QString hkbEvaluateExpressionModifier::getClassname(){

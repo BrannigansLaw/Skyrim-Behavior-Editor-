@@ -38,7 +38,7 @@ hkbPoseMatchingGenerator::hkbPoseMatchingGenerator(HkxFile *parent, long ref)
     setType(HKB_POSE_MATCHING_GENERATOR, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbPoseMatchingGenerator"+QString::number(refCount);
+    name = "PoseMatchingGenerator"+QString::number(refCount);
 }
 
 QString hkbPoseMatchingGenerator::getClassname(){

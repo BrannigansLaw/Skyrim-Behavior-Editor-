@@ -19,7 +19,7 @@ BSOffsetAnimationGenerator::BSOffsetAnimationGenerator(HkxFile *parent, long ref
     setType(BS_OFFSET_ANIMATION_GENERATOR, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "BSOffsetAnimationGenerator"+QString::number(refCount);
+    name = "OffsetAnimationGenerator"+QString::number(refCount);
 }
 
 QString BSOffsetAnimationGenerator::getClassname(){

@@ -3,10 +3,12 @@
 
 #include <QColor>
 #include <QPushButton>
+#include "src/animData/skyrimanimdata.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    //SkyrimAnimData *data = new SkyrimAnimData();
     MainWindow w;
     //w.setStyleSheet("QWidget {background: blue;font-weight: bold; color: red}QComboBox {background: yellow}");
     w.setWindowTitle("Skyrim Behavior Tool");

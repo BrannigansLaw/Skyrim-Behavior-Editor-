@@ -24,7 +24,7 @@ hkbEvaluateHandleModifier::hkbEvaluateHandleModifier(HkxFile *parent, long ref)
     setType(HKB_EVALUATE_HANDLE_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbEvaluateHandleModifier"+QString::number(refCount);
+    name = "EvaluateHandleModifier"+QString::number(refCount);
 }
 
 QString hkbEvaluateHandleModifier::getClassname(){

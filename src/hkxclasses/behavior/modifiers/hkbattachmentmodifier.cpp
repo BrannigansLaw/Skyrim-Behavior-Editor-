@@ -19,7 +19,7 @@ hkbAttachmentModifier::hkbAttachmentModifier(HkxFile *parent, long ref)
     setType(HKB_ATTACHMENT_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbAttachmentModifier"+QString::number(refCount);
+    name = "AttachmentModifier"+QString::number(refCount);
 }
 
 QString hkbAttachmentModifier::getClassname(){

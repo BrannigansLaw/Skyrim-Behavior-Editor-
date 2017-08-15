@@ -21,7 +21,7 @@ hkbCombineTransformsModifier::hkbCombineTransformsModifier(HkxFile *parent, long
     setType(HKB_COMBINE_TRANSFORMS_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbCombineTransformsModifier"+QString::number(refCount);
+    name = "CombineTransformsModifier"+QString::number(refCount);
 }
 
 QString hkbCombineTransformsModifier::getClassname(){

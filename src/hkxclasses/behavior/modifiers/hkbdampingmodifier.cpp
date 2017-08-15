@@ -27,7 +27,7 @@ hkbDampingModifier::hkbDampingModifier(HkxFile *parent, long ref)
     setType(HKB_DAMPING_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbDampingModifier"+QString::number(refCount);
+    name = "DampingModifier"+QString::number(refCount);
 }
 
 QString hkbDampingModifier::getClassname(){

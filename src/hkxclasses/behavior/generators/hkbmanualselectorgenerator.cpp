@@ -18,7 +18,7 @@ hkbManualSelectorGenerator::hkbManualSelectorGenerator(HkxFile *parent, long ref
     setType(HKB_MANUAL_SELECTOR_GENERATOR, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbManualSelectorGenerator"+QString::number(refCount);
+    name = "ManualSelectorGenerator"+QString::number(refCount);
 }
 
 QString hkbManualSelectorGenerator::getClassname(){

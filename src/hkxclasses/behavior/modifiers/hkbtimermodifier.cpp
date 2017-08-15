@@ -19,7 +19,7 @@ hkbTimerModifier::hkbTimerModifier(HkxFile *parent, long ref)
     setType(HKB_TIMER_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
-    name = "hkbTimerModifier"+QString::number(refCount);
+    name = "TimerModifier"+QString::number(refCount);
 }
 
 QString hkbTimerModifier::getClassname(){
