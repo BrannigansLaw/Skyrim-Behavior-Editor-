@@ -4,6 +4,7 @@
 #include "src/filetypes/hkxfile.h"
 
 class CharacterFile;
+class BehaviorFile;
 
 class ProjectFile: public HkxFile
 {
@@ -19,6 +20,7 @@ public:
     //QString getRootObjectReferenceString();
     QString getCharacterFilePathAt(int index) const;
     void setCharacterFile(CharacterFile *file);
+    bool isClipGenNameTaken(const QString & name) const;
 protected:
     bool parse();
     bool link();
@@ -27,6 +29,7 @@ private:
     HkxSharedPtr * findProjectStringData(long ref);
 private:
     CharacterFile *character;
+    QList <BehaviorFile *> behaviorFiles;
     HkxSharedPtr stringData;
     HkxSharedPtr projectData;
     long largestRef;

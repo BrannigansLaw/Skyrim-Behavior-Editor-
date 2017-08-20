@@ -95,7 +95,7 @@ class HkDataUI: public QGroupBox
 {
     Q_OBJECT
 public:
-    HkDataUI(MainWindow *mainui, const QString & title);
+    HkDataUI(/*MainWindow *mainui, */const QString & title);
     virtual ~HkDataUI(){}
     BehaviorGraphView * loadBehaviorView(BehaviorGraphView *view);
     void setEventsVariablesAnimationsUI(EventsUI *events, BehaviorVariablesUI *variables, AnimationsUI *animations);
@@ -188,7 +188,7 @@ private:
     static QStringList generatorTypes;
     static QStringList modifierTypes;
     static QStringList variableTypes;
-    MainWindow *mainUI;
+    //MainWindow *mainUI;
     EventsUI *eventsUI;
     BehaviorVariablesUI *variablesUI;
     AnimationsUI *animationsUI;

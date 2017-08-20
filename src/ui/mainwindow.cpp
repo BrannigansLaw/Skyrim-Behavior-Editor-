@@ -136,9 +136,9 @@ MainWindow::MainWindow()
 }
 
 MainWindow::~MainWindow(){
-    for (int i = 0; i < behaviorFiles.size(); i++){
-        delete behaviorFiles.at(i);
-    }
+    /*for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
+        delete projectFile->behaviorFiles.at(i);
+    }*/
     delete characterFile;
     delete skeletonFile;
     delete projectFile;
@@ -170,8 +170,8 @@ void MainWindow::changedTabs(int index){
     //ProgressDialog dialog("Changing viewed behavior...", "", 0, 100, this);
     index--;
     if (projectFile){
-        if (!behaviorFiles.isEmpty()){
-            if (index < behaviorFiles.size() && index < behaviorGraphs.size()){
+        if (!projectFile->behaviorFiles.isEmpty()){
+            if (index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
                 objectDataWid->changeCurrentDataWidget(NULL);
                 if (index == -1){
                     variablesWid->hide();
@@ -185,9 +185,9 @@ void MainWindow::changedTabs(int index){
                 }else if (index >= 0){
                     objectDataWid->loadBehaviorView(behaviorGraphs.at(index));
                     variablesWid->clear();
-                    variablesWid->loadData(behaviorFiles.at(index)->getBehaviorGraphData());
+                    variablesWid->loadData(projectFile->behaviorFiles.at(index)->getBehaviorGraphData());
                     eventsWid->clear();
-                    eventsWid->loadData(behaviorFiles.at(index)->getBehaviorGraphData());
+                    eventsWid->loadData(projectFile->behaviorFiles.at(index)->getBehaviorGraphData());
                     topLyt->removeWidget(behaviorGraphViewGB);
                     topLyt->addWidget(behaviorGraphViewGB, 1, 0, 9, 6);
                     topLyt->addWidget(objectDataSA, 1, 6, 6, 4);
@@ -211,7 +211,7 @@ void MainWindow::changedTabs(int index){
 void MainWindow::expandBranches(){
     if (projectFile){
         int index = tabs->currentIndex() - 1;
-        if (index >= 0 && index < behaviorFiles.size() && index < behaviorGraphs.size()){
+        if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
             behaviorGraphs.at(index)->expandAllBranches();
         }else{
             CRITICAL_ERROR_MESSAGE(QString("MainWindow::expandBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!"));
@@ -224,7 +224,7 @@ void MainWindow::expandBranches(){
 void MainWindow::collapseBranches(){
     if (projectFile){
         int index = tabs->currentIndex() - 1;
-        if (index >= 0 && index < behaviorFiles.size() && index < behaviorGraphs.size()){
+        if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
             behaviorGraphs.at(index)->contractAllBranches();
             behaviorGraphs.at(index)->selectRoot();
         }else{
@@ -239,7 +239,7 @@ void MainWindow::refocus(){
     if (projectFile){
         int index = tabs->currentIndex() - 1;
         if (index != -1){
-            if (index >= 0 && index < behaviorFiles.size() && index < behaviorGraphs.size()){
+            if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
                 if (!behaviorGraphs.at(index)->refocus()){
                     WARNING_MESSAGE(QString("MainWindow::refocus(): No behavior graph item is currently selected!"));
                 }
@@ -261,33 +261,33 @@ void MainWindow::save(){
 void MainWindow::saveFile(int index){
     if (projectFile){
         QString backupPath;
-        if (index >= 0 && index < behaviorFiles.size() && index < behaviorGraphs.size()){
-            if (behaviorFiles.at(index)->getIsChanged()){
-                ProgressDialog dialog("Saving behavior: "+behaviorFiles.at(index)->fileName()+"...", "", 0, 100, this);
+        if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
+            if (projectFile->behaviorFiles.at(index)->getIsChanged()){
+                ProgressDialog dialog("Saving behavior: "+projectFile->behaviorFiles.at(index)->fileName()+"...", "", 0, 100, this);
                 backupPath = QDir::currentPath()+"/Backup";
                 QDir dir(backupPath);
                 if (!dir.exists()) {
                     dir.mkpath(backupPath);
                 }
                 dialog.setProgress("Creating backup file...", 10);
-                QString filename = backupPath+"\\"+behaviorFiles.at(index)->fileName().section("/",-1,-1);
+                QString filename = backupPath+"\\"+projectFile->behaviorFiles.at(index)->fileName().section("/",-1,-1);
                 QFile backup(filename);
                 if (backup.exists()){
                     if (!backup.remove()){
                         WARNING_MESSAGE(QString("Failed to remove to old backup file "+backupPath.section("/",-1,-1)+"!"));
                     }
                 }
-                if (!behaviorFiles.at(index)->copy(behaviorFiles.at(index)->fileName(), filename)){
+                if (!projectFile->behaviorFiles.at(index)->copy(projectFile->behaviorFiles.at(index)->fileName(), filename)){
                     WARNING_MESSAGE(QString("Backup failed!"));
                 }else{
-                    if (!behaviorFiles.at(index)->remove()){
+                    if (!projectFile->behaviorFiles.at(index)->remove()){
                         WARNING_MESSAGE(QString("Failed to remove to old file "+backupPath.section("/",-1,-1)+"!"));
                     }
                     dialog.setProgress("Backup finished...", 20);
                 }
                 dialog.setProgress("Writing to file...", 30);
-                behaviorFiles.at(index)->write();
-                behaviorFiles.at(index)->toggleChanged(false);
+                projectFile->behaviorFiles.at(index)->write();
+                projectFile->behaviorFiles.at(index)->toggleChanged(false);
                 dialog.setProgress("Behavior file saved!!!", dialog.maximum());
             }
         }else{
@@ -318,9 +318,9 @@ void MainWindow::saveProject(){
                     skeletonFile->toggleChanged(false);
                 }*/
                 dialog.setProgress("Saving all unsaved behavior files...", 30);
-                for (int i = 0; i < behaviorFiles.size(); i++){
-                    if (behaviorFiles.at(i) && i < behaviorGraphs.size() && behaviorGraphs.at(i)){
-                        if (behaviorFiles.at(i)->getIsChanged()){
+                for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
+                    if (projectFile->behaviorFiles.at(i) && i < behaviorGraphs.size() && behaviorGraphs.at(i)){
+                        if (projectFile->behaviorFiles.at(i)->getIsChanged()){
                             saveFile(i);
                         }
                     }else{
@@ -363,14 +363,14 @@ void MainWindow::packAndExportProjectToSkyrimDirectory(){
 void MainWindow::packAndExportFileToSkyrimDirectory(){
     if (projectFile){
         int index = tabs->currentIndex() - 1;
-        if (characterFile && index >= 0 && index < behaviorFiles.size()){
+        if (characterFile && index >= 0 && index < projectFile->behaviorFiles.size()){
             QTime t;
             t.start();
             writeToLog("\n-------------------------\nExporting the current file to the Skyrim game directory...");
             //ProgressDialog dialog("Exporting the current file to the Skyrim game directory...", "", 0, 100, this);
             QString path = skyrimDirectory+"/data/meshes/actors";
             QString projectFolder = path+"/"+lastFileSelectedPath.section("/", -1, -1);
-            QString filename = behaviorFiles.at(index)->fileName().section("/", -1, -1);
+            QString filename = projectFile->behaviorFiles.at(index)->fileName().section("/", -1, -1);
             QString temppath = projectFolder+"/"+characterFile->getBehaviorDirectoryName()+"/"+filename;
             if (hkxcmd(lastFileSelectedPath+"/"+characterFile->getBehaviorDirectoryName()+"/"+filename, temppath) != HKXCMD_SUCCESS){
                 //dialog.setProgress("Behavior file export failed!", dialog.maximum());
@@ -395,20 +395,20 @@ void MainWindow::exit(){
 void MainWindow::closeTab(int index){
     objectDataWid->unloadDataWidget();
     if (projectFile){
-        if (index == 0 && (behaviorFiles.isEmpty() || (!behaviorFiles.at(index)->getIsChanged() || closeAllDialogue() != QMessageBox::Cancel))){
+        if (index == 0 && (projectFile->behaviorFiles.isEmpty() || (!projectFile->behaviorFiles.at(index)->getIsChanged() || closeAllDialogue() != QMessageBox::Cancel))){
             closeAll();
         }else{
             index--;
-            if (index >= 0 && index < behaviorGraphs.size() && (!behaviorFiles.at(index)->getIsChanged() || closeFileDialogue() != QMessageBox::Cancel)){
-                if (index < behaviorFiles.size()){
+            if (index >= 0 && index < behaviorGraphs.size() && (!projectFile->behaviorFiles.at(index)->getIsChanged() || closeFileDialogue() != QMessageBox::Cancel)){
+                if (index < projectFile->behaviorFiles.size()){
                     if (behaviorGraphs.at(index)){
                         delete behaviorGraphs.at(index);
                     }
                     behaviorGraphs.removeAt(index);
-                    /*if (behaviorFiles.at(index)){
-                        delete behaviorFiles.at(index);
+                    /*if (projectFile->behaviorFiles.at(index)){
+                        delete projectFile->behaviorFiles.at(index);
                     }
-                    behaviorFiles.removeAt(index);*/
+                    projectFile->behaviorFiles.removeAt(index);*/
                 }
             }else{
                 CRITICAL_ERROR_MESSAGE(QString("MainWindow::closeTab(): The tab index is out of sync with the behavior files or behavior graphs!"));
@@ -458,21 +458,21 @@ void MainWindow::addNewBehavior(bool initData){
         if (characterFile){
             QString filename = generateUniqueBehaviorName();
             if (filename != ""){
-                behaviorFiles.append(new BehaviorFile(this, characterFile, filename));
+                projectFile->behaviorFiles.append(new BehaviorFile(this, projectFile, characterFile, filename));
                 if (initData){
-                    behaviorFiles.last()->generateDefaultCharacterData();
+                    projectFile->behaviorFiles.last()->generateDefaultCharacterData();
                 }else{
-                    behaviorFiles.last()->generateNewBehavior();
+                    projectFile->behaviorFiles.last()->generateNewBehavior();
                 }
                 dialog.setProgress("Drawing behavior graph...", 50);
-                behaviorGraphs.append(new BehaviorGraphView(objectDataWid, behaviorFiles.last()));
+                behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.last()));
                 tabs->addTab(behaviorGraphs.last(), filename.section("/", -1, -1));
-                if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(behaviorFiles.last()->getBehaviorGraph()))){
+                if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.last()->getBehaviorGraph()))){
                     CRITICAL_ERROR_MESSAGE(QString("MainWindow::addNewBehavior(): The behavior graph was drawn incorrectly!"));
                 }
                 tabs->setCurrentIndex(tabs->count() - 1);
                 dialog.setProgress("Writing to file...", 50);
-                behaviorFiles.last()->toggleChanged(true);
+                projectFile->behaviorFiles.last()->toggleChanged(true);
                 saveFile(tabs->count() - 2);
                 dialog.setProgress("Behavior file creation sucessful!!", dialog.maximum());
                 return;
@@ -575,7 +575,7 @@ bool MainWindow::closeAll(){
     if (projectFile){
         bool unsavedChanges = false;
         for (int i = 0; i < behaviorGraphs.size(); i++){
-            if (behaviorFiles.at(i)->getIsChanged()){
+            if (projectFile->behaviorFiles.at(i)->getIsChanged()){
                 unsavedChanges = true;
             }
         }
@@ -592,12 +592,12 @@ bool MainWindow::closeAll(){
                 }
             }
             behaviorGraphs.clear();
-            for (int j = 0; j < behaviorFiles.size(); j++){
-                if (behaviorFiles.at(j)){
-                    delete behaviorFiles.at(j);
+            for (int j = 0; j < projectFile->behaviorFiles.size(); j++){
+                if (projectFile->behaviorFiles.at(j)){
+                    delete projectFile->behaviorFiles.at(j);
                 }
             }
-            behaviorFiles.clear();
+            projectFile->behaviorFiles.clear();
             if (projectFile){
                 delete projectFile;
                 projectFile = NULL;
@@ -688,8 +688,8 @@ void MainWindow::openUnpackedProject(){
 bool MainWindow::openBehavior(const QString & filename){
     if (filename != ""){
         if (projectFile){
-            for (int i = 0; i < behaviorFiles.size(); i++){
-                if (behaviorFiles.at(i)->fileName() == filename){
+            for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
+                if (projectFile->behaviorFiles.at(i)->fileName() == filename){
                     WARNING_MESSAGE(QString("MainWindow::openBehavior(): The selected behavior file is already open!"));
                     return true;
                 }
@@ -697,17 +697,17 @@ bool MainWindow::openBehavior(const QString & filename){
             ProgressDialog dialog("Opening "+filename, "", 0, 100, this);
             objectDataWid->changeCurrentDataWidget(NULL);
             dialog.setProgress("Beginning XML parse...", 5);
-            behaviorFiles.append(new BehaviorFile(this, characterFile, filename));
-            if (!behaviorFiles.last()->parse()){
-                delete behaviorFiles.last();
-                behaviorFiles.removeLast();
+            projectFile->behaviorFiles.append(new BehaviorFile(this, projectFile, characterFile, filename));
+            if (!projectFile->behaviorFiles.last()->parse()){
+                delete projectFile->behaviorFiles.last();
+                projectFile->behaviorFiles.removeLast();
                 return false;
             }
             dialog.setProgress("Behavior file parsed and objects linked successfully!!!", dialog.maximum());
-            /*behaviorGraphs.append(new BehaviorGraphView(objectDataWid, behaviorFiles.last()));
+            /*behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.last()));
             tabs->addTab(behaviorGraphs.last(), filename.section("/", -1, -1));
             dialog.setProgress("Drawing Behavior Graph...", 60);
-            if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(behaviorFiles.last()->getBehaviorGraph()))){
+            if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.last()->getBehaviorGraph()))){
                 CRITICAL_ERROR_MESSAGE(QString("MainWindow::drawBehaviorGraph(): The behavior graph was drawn incorrectly!"));
             }
             tabs->setCurrentIndex(tabs->count() - 1);
@@ -727,8 +727,8 @@ void MainWindow::openBehaviorFile(const QModelIndex & index){
     int ind = -1;
     //QTime t;
     //t.start();
-    for (int i = 0; i < behaviorFiles.size(); i++){
-        if (fileName == behaviorFiles.at(i)->fileName().section("/", -1, -1)){
+    for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
+        if (fileName == projectFile->behaviorFiles.at(i)->fileName().section("/", -1, -1)){
             ind = i;
             for (int j = 0; j < behaviorGraphs.size(); j++){
                 if (fileName == behaviorGraphs.at(i)->getBehaviorFilename().section("/", -1, -1)){
@@ -741,9 +741,9 @@ void MainWindow::openBehaviorFile(const QModelIndex & index){
         CRITICAL_ERROR_MESSAGE(QString("MainWindow::openBehaviorFile(): Invalid behavior file index!"));
         return;
     }
-    behaviorGraphs.append(new BehaviorGraphView(objectDataWid, behaviorFiles.at(ind)));
+    behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.at(ind)));
     tabs->addTab(behaviorGraphs.at(ind), fileName.section("/", -1, -1));
-    if (!behaviorGraphs.at(ind)->drawGraph(static_cast<DataIconManager *>(behaviorFiles.at(ind)->getBehaviorGraph()))){
+    if (!behaviorGraphs.at(ind)->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.at(ind)->getBehaviorGraph()))){
         CRITICAL_ERROR_MESSAGE(QString("MainWindow::openBehaviorFile(): The behavior graph was drawn incorrectly!"));
     }
     tabs->setCurrentIndex(tabs->count() - 1);

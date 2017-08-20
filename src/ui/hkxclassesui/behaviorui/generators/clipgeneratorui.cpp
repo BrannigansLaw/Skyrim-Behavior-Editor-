@@ -51,9 +51,8 @@ QStringList ClipGeneratorUI::headerLabels = {
     "Value"
 };
 
-ClipGeneratorUI::ClipGeneratorUI(MainWindow *mainui)
-    : mainUI(mainui),
-      bsData(NULL),
+ClipGeneratorUI::ClipGeneratorUI()
+    : bsData(NULL),
       triggerUI(new ClipTriggerUI),
       groupBox(new QGroupBox),
       topLyt(new QGridLayout),
@@ -464,13 +463,20 @@ void ClipGeneratorUI::returnToWidget(){
 void ClipGeneratorUI::setName(){
     if (bsData){
         if (bsData->name != name->text()){
-            bsData->name = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-            bsData->getParentFile()->toggleChanged(true);
+            if (static_cast<BehaviorFile *>(bsData->getParentFile())->isClipGenNameAvailable(name->text())){
+                bsData->name = name->text();
+                static_cast<DataIconManager*>((bsData))->updateIconNames();
+                emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
+                bsData->getParentFile()->toggleChanged(true);
+            }else{
+                disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
+                name->setText(bsData->name);
+                connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
+                WARNING_MESSAGE(QString("ClipGeneratorUI::setName(): This clip generator name is already is use elsewhere in the project!!"))
+            }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ClipGeneratorUI::setName(): The data is NULL!!"))
+        CRITICAL_ERROR_MESSAGE(QString("ClipGeneratorUI::setName(): The data is NULL!!"));
     }
 }
 

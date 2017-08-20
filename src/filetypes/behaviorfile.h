@@ -6,6 +6,7 @@
 class hkbBehaviorGraph;
 class CharacterFile;
 class hkbModifier;
+class ProjectFile;
 
 class BehaviorFile: public HkxFile
 {
@@ -15,7 +16,7 @@ class BehaviorFile: public HkxFile
     friend class MainWindow;
     friend class HkDataUI;
 public:
-    BehaviorFile(MainWindow *window, CharacterFile *characterData, const QString & name);
+    BehaviorFile(MainWindow *window, ProjectFile *projectfile, CharacterFile *characterData, const QString & name);
     virtual ~BehaviorFile();
     HkxSharedPtr * findHkxObject(long ref);
     HkxSharedPtr * findGenerator(long ref);
@@ -58,6 +59,8 @@ public:
     QStringList getAnimationNames() const;
     QStringList getLocalFrameNames() const;
     QStringList getAllBehaviorFileNames() const;
+    bool isClipGenNameTaken(const QString & name) const;
+    bool isClipGenNameAvailable(const QString & name) const;
 protected:
     bool parse();
     bool link();
@@ -71,6 +74,7 @@ private:
     void write();
     void removeBindings(int varIndex);
 private:
+    ProjectFile *project;
     CharacterFile *character;
     HkxSharedPtr behaviorGraph;
     HkxSharedPtr stringData;

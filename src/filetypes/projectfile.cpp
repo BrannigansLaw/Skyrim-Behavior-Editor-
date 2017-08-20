@@ -1,4 +1,5 @@
 #include "projectfile.h"
+#include "behaviorfile.h"
 
 #include "src/xml/hkxxmlreader.h"
 #include "src/xml/hkxxmlwriter.h"
@@ -16,6 +17,15 @@ ProjectFile::ProjectFile(MainWindow *window, const QString & name)
 
 void ProjectFile::setCharacterFile(CharacterFile *file){
     character = file;
+}
+
+bool ProjectFile::isClipGenNameTaken(const QString &name) const{
+    for (int i = 0; i < behaviorFiles.size(); i++){
+        if (behaviorFiles.at(i)->isClipGenNameTaken(name)){
+            return true;
+        }
+    }
+    return false;
 }
 
 QString ProjectFile::getCharacterFilePathAt(int index) const{

@@ -8,10 +8,10 @@ class HkCRC
 {
 public:
     HkCRC();
+    QByteArray compute(QByteArray input);
 private:
     int reflectByte(int c);
     void reflect(int * crc, int bitnum, int startLSB);
-    QByteArray compute(QByteArray input);
 private:
     int crc_order;
     QByteArray crc_poly;

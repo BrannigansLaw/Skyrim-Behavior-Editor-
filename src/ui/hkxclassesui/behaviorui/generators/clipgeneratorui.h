@@ -25,7 +25,7 @@ class ClipGeneratorUI: public QStackedWidget
     Q_OBJECT
     friend class HkDataUI;
 public:
-    ClipGeneratorUI(MainWindow *mainui);
+    ClipGeneratorUI();
     virtual ~ClipGeneratorUI(){}
     void loadData(HkxObject *data);
 signals:
@@ -74,7 +74,6 @@ private:
         CHILD_WIDGET = 1
     };
     static QStringList headerLabels;
-    MainWindow *mainUI;
     hkbClipGenerator *bsData;
     QGridLayout *topLyt;
     TableWidget *table;

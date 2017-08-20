@@ -77,7 +77,7 @@ private:
     ProjectFile *projectFile;
     CharacterFile *characterFile;
     SkeletonFile *skeletonFile;
-    QList <BehaviorFile *> behaviorFiles;
+    //QList <BehaviorFile *> behaviorFiles;
     QList <BehaviorGraphView *> behaviorGraphs;
     ProjectUI *projectUI;
     QGroupBox *behaviorGraphViewGB;

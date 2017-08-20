@@ -1,6 +1,7 @@
 #include "behaviorfile.h"
 #include "characterfile.h"
 #include "skeletonfile.h"
+#include "projectfile.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/xml/hkxxmlwriter.h"
 #include "src/ui/mainwindow.h"
@@ -106,8 +107,9 @@
  *
  */
 
-BehaviorFile::BehaviorFile(MainWindow *window, CharacterFile *characterData, const QString & name)
+BehaviorFile::BehaviorFile(MainWindow *window, ProjectFile *projectfile, CharacterFile *characterData, const QString & name)
     : HkxFile(window, name),
+      project(projectfile),
       character(characterData),
       largestRef(0)
 {
@@ -387,6 +389,22 @@ QStringList BehaviorFile::getAllBehaviorFileNames() const{
         }
     }
     return list;
+}
+
+bool BehaviorFile::isClipGenNameTaken(const QString & name) const{
+    for (int i = 0; i < generators.size(); i++){
+        if (generators.at(i).data()->getSignature() == HKB_CLIP_GENERATOR && name == static_cast<hkbClipGenerator *>(generators.at(i).data())->getName()){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool BehaviorFile::isClipGenNameAvailable(const QString &name) const{
+    if (project){
+        return !project->isClipGenNameTaken(name);
+    }
+    return false;
 }
 
 HkxObject * BehaviorFile::getRootStateMachine() const{
