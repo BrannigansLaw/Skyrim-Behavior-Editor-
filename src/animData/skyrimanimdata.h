@@ -14,6 +14,13 @@ class SkyrimAnimData
 public:
     SkyrimAnimData();
     bool parse(QFile * file);
+    //bool extract(const QString & projectname);
+    bool write(const QString & filename);
+    int getProjectIndex(const QString & projectname) const;
+    bool appendClipGenerator(const QString &projectname, const AnimData & animdata);
+    bool removeClipGenerator(const QString & projectname, const QString & clipname);
+    bool appendAnimation(const QString & projectname, const SkyrimAnimData::AnimMotionData &motiondata);
+    bool removeAnimation(const QString & projectname, int animationindex);
 private:
     struct Trigger{
         Trigger(qreal t = 0, const QString & trigname = "")
@@ -112,17 +119,17 @@ private:
         }
 
         bool read(QFile * file);
-        bool write(const QString & projectname) const;
-        bool appendAnimationData(const AnimData & animdata, const AnimMotionData & motiondata);
-        bool removeAnimationData(const QString & clipname);
+        bool write(QFile &file, QTextStream &output) const;
+        bool appendClipGenerator(const AnimData & animdata);
+        bool removeClipGenerator(const QString & clipname);
+        bool appendAnimation(const SkyrimAnimData::AnimMotionData &motiondata);
+        bool removeAnimation(int animationindex);
         uint animationDataLines;
         uint animationMotionDataLines;
         QStringList projectFiles;
         QVector <AnimData> animationData;
         QVector <AnimMotionData> animationMotionData;
     };
-private:
-    bool extract(const QString & projectname);
 private:
     QStringList projectNames;
     QVector <ProjectAnimData> animData;

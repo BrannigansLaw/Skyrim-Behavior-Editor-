@@ -4,10 +4,7 @@
 
 SkyrimAnimSetData::SkyrimAnimSetData()
 {
-    QFile file("C:/Users/Wayne/Desktop/Test Behavior/meshes/animationsetdatasinglefile.txt");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-    parse(&file);
+    //
 }
 
 bool SkyrimAnimSetData::parse(QFile *file){
@@ -50,20 +47,26 @@ bool SkyrimAnimSetData::parse(QFile *file){
             return false;
         }
     }
-    if (!extractProject("DefaultMaleData\\DefaultMale.txt")){
-        return false;
-    }
     return true;
 }
 
-bool SkyrimAnimSetData::addAnimationToCache(const QString &projectname, const QStringList &events, const QVector<SkyrimAnimSetData::AnimationInfo> &animations, const QVector<SkyrimAnimSetData::BehaviorVariable> &vars, const QVector<SkyrimAnimSetData::ClipInfo> &clips){
+bool SkyrimAnimSetData::addAnimationToCache(const QString &projectname, const QString & event, const QVector<SkyrimAnimSetData::AnimationInfo> &animations, const QVector<SkyrimAnimSetData::BehaviorVariable> &vars, const QVector<SkyrimAnimSetData::ClipInfo> &clips){
+    int count = 0;
     int index = projectNames.indexOf(projectname);
     if (index < 0 || index >= projects.size()){
         return false;
     }
     for (int i = 0; i < projects.at(index).animSetData.size(); i++){
-        projects.at(index).animSetData.at(i).addAnimationToCache(events, animations, vars, clips);
+        if (projects.at(index).animSetData.at(i).cacheEvents.contains(event)){
+            count++;
+            if (!projects[index].animSetData[i].addAnimationToCache(event, animations, vars, clips)){
+                return false;
+            }
+        }
     }
+    /*if (count == 0){
+        createNewCacheBlock(event, animations, vars, clips);
+    }*/
     return true;
 }
 
@@ -73,7 +76,7 @@ bool SkyrimAnimSetData::removeAnimationFromCache(const QString & projectname, co
         return false;
     }
     for (int i = 0; i < projects.at(index).animSetData.size(); i++){
-        projects.at(index).animSetData.at(i).removeAnimationFromCache(animationname, variablename, clipname);
+        projects[index].animSetData[i].removeAnimationFromCache(animationname, variablename, clipname);
     }
     return true;
 }
@@ -87,19 +90,6 @@ bool SkyrimAnimSetData::extractProject(const QString &projectname){
     }
     return false;
 }
-
-/*bool SkyrimAnimSetData::extractSubProject(const QString &projectname, const QString &subprojectname){
-    int index = 0;
-    for (; index < projectNames.size(); index++){
-        if (projectNames.at(index) == projectname){
-            for (int j = 0; j < projects.at(index).animSetData.size(); j++){
-                QFile subProject("");
-                return projects.at(index).animSetData.at(j).write();
-            }
-        }
-    }
-    return false;
-}*/
 
 bool SkyrimAnimSetData::ProjectAnimSetData::read(QFile *file){
     if (!file || !file->isOpen()){
@@ -138,12 +128,8 @@ bool SkyrimAnimSetData::ProjectAnimSetData::read(QFile *file){
     return true;
 }
 
-bool SkyrimAnimSetData::ProjectAnimSetData::write(const QString &projectname) const{
-    //QString project = projectname;
-    //project.replace("\\", "/");
-    //DEBUG
-    QFile file(/*"C:/Users/Desktop/Wayne/"+project*/ "File.txt");
-    //
+bool SkyrimAnimSetData::ProjectAnimSetData::write(const QString &projectfilename) const{
+    QFile file(projectfilename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
         return false;
     }
@@ -263,13 +249,69 @@ bool SkyrimAnimSetData::AnimSetData::write(QFile *file, QTextStream & out) const
     return true;
 }
 
-bool SkyrimAnimSetData::AnimSetData::addAnimationToCache(const QStringList &events, const QVector<SkyrimAnimSetData::AnimationInfo> &animations, const QVector<SkyrimAnimSetData::BehaviorVariable> &vars, const QVector <ClipInfo> & clips){
-    //
+bool SkyrimAnimSetData::AnimSetData::addAnimationToCache(const QString & event, const QVector<SkyrimAnimSetData::AnimationInfo> &anims, const QVector<SkyrimAnimSetData::BehaviorVariable> &vars, const QVector <ClipInfo> & clips){
+    bool exists;
+    if (!cacheEvents.contains(event)){
+        cacheEvents.append(event);
+    }
+    for (int i = 0; i < anims.size(); i++){
+        exists = false;
+        for (int j = 0; j < animations.size(); j++){
+            if (animations.at(j) == anims.at(i)){
+                exists = true;
+            }
+        }
+        if (!exists){
+            animations.append(anims.at(i));
+        }
+    }
+    for (int i = 0; i < vars.size(); i++){
+        exists = false;
+        for (int j = 0; j < behaviorVariables.size(); j++){
+            if (behaviorVariables.at(j) == vars.at(i)){
+                exists = true;
+            }
+        }
+        if (!exists){
+            behaviorVariables.append(vars.at(i));
+        }
+    }
+    for (int i = 0; i < clips.size(); i++){
+        exists = false;
+        for (int j = 0; j < clipGenerators.size(); j++){
+            if (clipGenerators.at(j) == clips.at(i)){
+                exists = true;
+            }
+        }
+        if (!exists){
+            clipGenerators.append(clips.at(i));
+        }
+    }
+    return true;
 }
 
 
-bool SkyrimAnimSetData::AnimSetData::removeAnimationFromCache(const QString &animationname, const QString &variablename, const QString &clipname){
-    //
+void SkyrimAnimSetData::AnimSetData::removeAnimationFromCache(const QString &animationname, const QString &clipname,  const QString &variablename){
+    if (animationname != ""){
+        QString animationhash = QString(HkCRC().compute(animationname.toLocal8Bit().toLower()));
+        for (int i = animations.size() - 1; i >= 0; i--){
+            if (animations.at(i).crcAnimationName == animationhash){
+                animations.removeAt(i);
+            }
+        }
+    }
+    if (variablename != ""){
+        for (int i = behaviorVariables.size() - 1; i >= 0; i--){
+            if (behaviorVariables.at(i).name == variablename){
+                behaviorVariables.removeAt(i);
+            }
+        }
+    }
+    if (clipname != ""){
+        for (int i = clipGenerators.size() - 1; i >= 0; i--){
+            clipGenerators[i].clipGenerators.removeAll(clipname);
+        }
+    }
 }
 
 bool SkyrimAnimSetData::BehaviorVariable::read(QFile *file){

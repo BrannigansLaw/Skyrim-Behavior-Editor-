@@ -368,8 +368,20 @@ public:
         return QSize(800, 100);
     }*/
 
+    void setVector4(){
+        spinBoxW->setVisible(true);
+    }
+
+    void setVector3(){
+        spinBoxW->setVisible(false);
+    }
+
     hkQuadVariable value() const{
         return hkQuadVariable(spinBoxX->value(), spinBoxY->value(), spinBoxZ->value(), spinBoxW->value());
+    }
+
+    hkVector3 valueAsVector3() const{
+        return hkVector3(spinBoxX->value(), spinBoxY->value(), spinBoxZ->value());
     }
 
     void setValue(const hkQuadVariable & value){
@@ -377,6 +389,12 @@ public:
         spinBoxY->setValue(value.y);
         spinBoxZ->setValue(value.z);
         spinBoxW->setValue(value.w);
+    }
+
+    void setValue(const hkVector3 & value){
+        spinBoxX->setValue(value.x);
+        spinBoxY->setValue(value.y);
+        spinBoxZ->setValue(value.z);
     }
 
     virtual ~QuadVariableWidget(){}

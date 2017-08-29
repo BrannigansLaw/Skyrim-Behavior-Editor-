@@ -25,6 +25,7 @@ public:
     bool getIsChanged() const;
     void toggleChanged(bool wasEdited);
 protected:
+    MainWindow *getUi() const;
     HkxSharedPtr & getRootObject();
     virtual bool parse();
     virtual bool link();

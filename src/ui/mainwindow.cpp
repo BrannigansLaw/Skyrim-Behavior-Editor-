@@ -498,6 +498,10 @@ void MainWindow::openProject(QString & filepath){
     objectDataWid->changeCurrentDataWidget(NULL);
     int time = t.elapsed();
     projectFile = new ProjectFile(this, filepath);
+    if (!projectFile->readAnimationData()){
+        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The project animation data file could not be parsed!!!"));
+        return;
+    }
     ProgressDialog dialog("Opening project..."+projectFile->fileName().section("/", -1, -1), "", 0, 100, this);
     if (!projectFile->parse()){
         CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The project file "+filepath+" could not be parsed!!!\nYou have tried to open non-project file or the project file is corrupted!"));

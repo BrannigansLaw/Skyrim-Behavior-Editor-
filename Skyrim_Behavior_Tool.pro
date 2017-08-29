@@ -432,7 +432,8 @@ SOURCES += \
     src/main.cpp \
     src/animSetData/skyrimanimsetdata.cpp \
     src/animData/skyrimanimdata.cpp \
-    src/animSetData/hkcrc.cpp
+    src/animSetData/hkcrc.cpp \
+    src/ui/skyrimanimationdataui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -841,4 +842,5 @@ HEADERS  += \
     src/utility.h \
     src/animSetData/skyrimanimsetdata.h \
     src/animData/skyrimanimdata.h \
-    src/animSetData/hkcrc.h
+    src/animSetData/hkcrc.h \
+    src/ui/skyrimanimationdataui.h

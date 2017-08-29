@@ -1,6 +1,8 @@
 #include "projectfile.h"
 #include "behaviorfile.h"
 
+//#include "src/animData/skyrimanimdata.h"
+//#include "src/animSetData/skyrimanimsetdata.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/xml/hkxxmlwriter.h"
 #include "src/ui/mainwindow.h"
@@ -10,8 +12,10 @@
 
 ProjectFile::ProjectFile(MainWindow *window, const QString & name)
     : HkxFile(window, name),
-      largestRef(0)
+      largestRef(0),
+      projectIndex(-1)
 {
+    projectName = QString(fileName().section("/", -1, -1)).remove(".hkx");
     getReader().setFile(this);
 }
 
@@ -27,6 +31,28 @@ bool ProjectFile::isClipGenNameTaken(const QString &name) const{
     }
     return false;
 }
+
+bool ProjectFile::readAnimationData(){
+    projectIndex = skyrimAnimData.getProjectIndex(fileName().section("/", -1, -1));
+    QFile animfile("C:/Users/Wayne/Desktop/Test Behavior/meshes/animationdatasinglefile.txt" /*QDir::currentPath()+"/animationdatasinglefile.txt"*/);
+    if (!animData.parse(&animfile)){
+        return false;
+    }
+    QFile animsetfile("C:/Users/Wayne/Desktop/Test Behavior/meshes/animationsetdatasinglefile.txt" /*QDir::currentPath()+"/animationsetdatasinglefile.txt"*/);
+    if (!animSetData.parse(&animsetfile)){
+        return false;
+    }
+    return true;
+}
+
+bool ProjectFile::removeClipGenFromAnimData(const QString &name){
+    return skyrimAnimData.removeClipGenerator(projectName+".txt", name);
+}
+
+bool ProjectFile::removeAnimationFromAnimData(const QString &name){
+    return skyrimAnimData.removeAnimation(projectName+".txt", name);
+}
+
 
 QString ProjectFile::getCharacterFilePathAt(int index) const{
     if (!stringData.data()){

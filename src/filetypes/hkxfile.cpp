@@ -67,6 +67,10 @@ HkxXMLWriter & HkxFile::getWriter(){
     return writer;
 }
 
+MainWindow *HkxFile::getUi() const{
+    return ui;
+}
+
 void HkxFile::writeToLog(const QString & message, bool isError){
     if (ui){
         ui->writeToLog(message, isError);

@@ -12,21 +12,27 @@
 class SkyrimAnimSetData
 {
 public:
-    SkyrimAnimSetData();
-    bool parse(QFile * file);
-    bool addAnimationToCache(const QString & projectname, const QStringList & events, const QVector <AnimationInfo> & animations, const QVector <BehaviorVariable> & vars = QVector <BehaviorVariable> (), const QVector <ClipInfo> & clips = QVector <ClipInfo> (ClipInfo));
-    bool removeAnimationFromCache(const QString & projectname, const QString & animationname, const QString & variablename = "", const QString & clipname = "");
-private:
     struct AnimationInfo{
         AnimationInfo(const QString & path = "", const QString & name = "", bool compute = false){
             if (compute){
                 HkCRC crcGen;
-                crcPath = crcGen.compute(path.toLocal8Bit());
-                crcAnimationName = crcGen.compute(name.toLocal8Bit());
+                crcPath = crcGen.compute(path.toLower().toLocal8Bit());
+                crcAnimationName = crcGen.compute(name.toLower().toLocal8Bit());
             }else{
                 crcPath = path;
                 crcAnimationName = name;
             }
+        }
+
+        AnimationInfo(const AnimationInfo & other){
+            *this = other;
+        }
+
+        bool operator ==(const AnimationInfo & other) const{
+            if (crcPath != other.crcPath || crcAnimationName != other.crcAnimationName){
+                return false;
+            }
+            return true;
         }
 
         AnimationInfo & operator =(const AnimationInfo & other){
@@ -57,6 +63,17 @@ private:
             return *this;
         }
 
+        bool operator ==(const ClipInfo & other) const{
+            if (eventName != other.eventName || unknown != other.unknown || clipGenerators != other.clipGenerators){
+                return false;
+            }
+            return true;
+        }
+
+        ClipInfo(const ClipInfo & other){
+            *this = other;
+        }
+
         bool read(QFile * file);
         bool write(QFile * file, QTextStream & out) const;
 
@@ -79,6 +96,17 @@ private:
             return *this;
         }
 
+        bool operator ==(const BehaviorVariable & other) const{
+            if (name != other.name || value1 != other.value1 || value2 != other.value2){
+                return false;
+            }
+            return true;
+        }
+
+        BehaviorVariable(const BehaviorVariable & other){
+            *this = other;
+        }
+
         bool read(QFile * file);
         bool write(QFile * file, QTextStream & out) const;
 
@@ -97,8 +125,8 @@ private:
 
         bool read(QFile * file);
         bool write(QFile *file, QTextStream &out) const;
-        bool addAnimationToCache(const QStringList & events, const QVector <AnimationInfo> & animations, const QVector <BehaviorVariable> & vars = QVector <BehaviorVariable> (), const QVector <ClipInfo> & clips = QVector <ClipInfo> (ClipInfo));
-        bool removeAnimationFromCache(const QString & animationname, const QString & variablename = "", const QString & clipname = "");
+        bool addAnimationToCache(const QString & event, const QVector <AnimationInfo> & anims, const QVector <BehaviorVariable> & vars = QVector <BehaviorVariable> (), const QVector <ClipInfo> & clips = QVector <ClipInfo> ());
+        void removeAnimationFromCache(const QString & animationname, const QString & clipname = "", const QString & variablename = "");
 
         QStringList cacheEvents;
         QVector <BehaviorVariable> behaviorVariables;
@@ -114,15 +142,18 @@ private:
         }
 
         bool read(QFile * file);
-        bool write(const QString & projectname) const;
+        bool write(const QString & projectfilename) const;
 
         QStringList fileNames;
         QVector <AnimSetData> animSetData;
     };
 
-private:
+public:
+    SkyrimAnimSetData();
+    bool parse(QFile * file);
+    bool addAnimationToCache(const QString & projectname, const QString & event, const QVector <AnimationInfo> & animations, const QVector <BehaviorVariable> & vars = QVector <BehaviorVariable> (), const QVector <ClipInfo> & clips = QVector <ClipInfo> ());
+    bool removeAnimationFromCache(const QString & projectname, const QString & animationname, const QString & variablename = "", const QString & clipname = "");
     bool extractProject(const QString & projectname);
-    //bool extractSubProject(const QString & projectname, const QString & subprojectname);
 private:
     QStringList projectNames;
     QVector <ProjectAnimSetData> projects;

@@ -4,10 +4,7 @@
 
 SkyrimAnimData::SkyrimAnimData()
 {
-    QFile file("C:/Users/Wayne/Desktop/Test Behavior/meshes/animationdatasinglefile.txt");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-    parse(&file);
+    //
 }
 
 bool SkyrimAnimData::parse(QFile *file){
@@ -18,62 +15,117 @@ bool SkyrimAnimData::parse(QFile *file){
     bool ok = false;
     uint size = 0;
     //Get project names...
-    while (!file->atEnd()){
-        line = file->readLine();
-        line.chop(1);
-        size = line.toUInt(&ok);
-        if (ok){
-            for (uint i = 0; i < size; i++){
-                if (!file->atEnd()){
-                    line = file->readLine();
-                    line.chop(1);
-                    if (line.contains(".txt")){
-                        projectNames.append(line);
+    if (file->fileName().contains("animationdatasinglefile.txt")){
+        if (!file->atEnd()){
+            line = file->readLine();
+            line.chop(1);
+            size = line.toUInt(&ok);
+            if (ok){
+                for (uint i = 0; i < size; i++){
+                    if (!file->atEnd()){
+                        line = file->readLine();
+                        line.chop(1);
+                        if (line.contains(".txt")){
+                            projectNames.append(line);
+                        }else{
+                            CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): Corrupted project filename does not have 'txt' extension!"));
+                            return false;
+                        }
                     }else{
-                        CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): Corrupted project filename does not have 'txt' extension!"));
+                        CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): Unexpected EOF!"));
                         return false;
                     }
-                }else{
-                    CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): Unexpected EOF!"));
-                    return false;
                 }
-            }
-            for (uint i = 0; i < size; i++){
-                animData.append(ProjectAnimData());
-                if (!animData.last().read(file)){
-                    CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): ProjectAnimData read failed!"));
-                    return false;
-                }
+            }else{
+                CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): Corrupted length of current block!"));
+                return false;
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): Corrupted length of current block!"));
+            CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): Unexpected EOF!"));
             return false;
         }
     }
-    if (!extract("DefaultMale.txt")){
-        return false;
+    for (uint i = 0; i < size; i++){
+        animData.append(ProjectAnimData());
+        if (!animData.last().read(file)){
+            CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): ProjectAnimData read failed!"));
+            return false;
+        }
     }
     return true;
 }
 
-bool SkyrimAnimData::extract(const QString & projectname){
+/*bool SkyrimAnimData::extract(const QString & projectname){
     int index = 0;
     for (; index < projectNames.size(); index++){
-        if (projectNames.at(index) == projectname){
+        if (!QString::compare(projectNames.at(index), projectname.section("/", -1, -1), Qt::CaseInsensitive)){
             return animData.at(index).write(projectname);
         }
     }
     return false;
-}
+}*/
 
-bool SkyrimAnimData::ProjectAnimData::write(const QString & projectname) const{
-    //DEBUG
-    QFile file(/*"C:/Users/Desktop/Wayne/"+*/projectname);
-    //
+bool SkyrimAnimData::write(const QString &filename){
+    QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
         return false;
     }
     QTextStream out(&file);
+    out << QString::number(projectNames.size()) << "\n";
+    for (int i = 0; i < projectNames.size(); i++){
+        out << projectNames.at(i) << "\n";
+    }
+    for (int i = 0; i < animData.size(); i++){
+        out << animData.at(i).write(file, out) << "\n";
+    }
+    return true;
+}
+
+int SkyrimAnimData::getProjectIndex(const QString &projectname) const{
+    for (int i = 0; i < projectNames.size(); i++){
+        if (projectNames.at(i) == projectname){
+            return i;
+        }
+    }
+    return -1;
+}
+
+bool SkyrimAnimData::appendClipGenerator(const QString & projectname, const SkyrimAnimData::AnimData &animdata){
+    int index = getProjectIndex(projectname);
+    if (index < 0 || index >= animData.size()){
+        return false;
+    }
+    return animData.at(index).appendClipGenerator(clipname);
+}
+
+bool SkyrimAnimData::removeClipGenerator(const QString &projectname, const QString &name){
+    int index = getProjectIndex(projectname);
+    if (index < 0 || index >= animData.size()){
+        return false;
+    }
+    return animData.at(index).removeClipGenerator(clipname);
+}
+
+bool SkyrimAnimData::appendAnimation(const QString &projectname, const SkyrimAnimData::AnimMotionData &motiondata){
+    int index = getProjectIndex(projectname);
+    if (index < 0 || index >= animData.size()){
+        return false;
+    }
+    return animData.at(index).appendAnimation(motiondata);
+}
+
+bool SkyrimAnimData::removeAnimation(const QString &projectname, int animationindex){
+    int index = getProjectIndex(projectname);
+    if (index < 0 || index >= animData.size()){
+        return false;
+    }
+    return animData.at(index).removeAnimation(animationindex);
+}
+
+bool SkyrimAnimData::ProjectAnimData::write(QFile & file, QTextStream & out) const{
+    if (out.status() != QTextStream::Ok || !file.isOpen()){
+        return false;
+    }
     out << QString::number(animationDataLines) << "\n";
     out << "1" << "\n";
     out << QString::number(projectFiles.size()) << "\n";
@@ -97,8 +149,7 @@ bool SkyrimAnimData::ProjectAnimData::write(const QString & projectname) const{
     return true;
 }
 
-bool SkyrimAnimData::ProjectAnimData::appendAnimationData(const SkyrimAnimData::AnimData &animdata, const SkyrimAnimData::AnimMotionData &motiondata){
-    bool appendmotion = true;
+bool SkyrimAnimData::ProjectAnimData::appendClipGenerator(const SkyrimAnimData::AnimData &animdata){
     for (int i = 0; i < animationData.size(); i++){
         if (animationData.at(i).clipGeneratorName == animdata.clipGeneratorName){
             return false;
@@ -106,37 +157,36 @@ bool SkyrimAnimData::ProjectAnimData::appendAnimationData(const SkyrimAnimData::
     }
     animationData.append(animdata);
     animationDataLines = animationDataLines + animdata.lineCount();
-    for (int i = 0; i < animationMotionData.size(); i++){
-        if (animationMotionData.at(i).animationIndex == motiondata.animationIndex){
-            appendmotion = false;
-        }
-    }
-    if (appendmotion){
-        animationMotionData.append(motiondata);
-        animationMotionDataLines = animationMotionDataLines + motiondata.lineCount();
-    }
     return true;
 }
 
-bool SkyrimAnimData::ProjectAnimData::removeAnimationData(const QString &clipname){
-    uint index = 0;
+bool SkyrimAnimData::ProjectAnimData::removeClipGenerator(const QString &clipname){
     for (int i = 0; i < animationData.size(); i++){
         if (animationData.at(i).clipGeneratorName == clipname){
-            index = animationData.at(i).animationIndex;
-            for (int j = 0; j < animationData.size(); j++){
-                if (animationData.at(j).animationIndex == index && j != index){
-                    //animationMotionData.removeAt(i); may not work...
-                    for (int k = 0; k < animationMotionData.size(); k++){
-                        if (animationMotionData.at(k).animationIndex == index){
-                            animationMotionDataLines = animationMotionDataLines - animationMotionData.at(k).lineCount();
-                            animationMotionData.removeAt(k);
-                            break;
-                        }
-                    }
-                }
-            }
             animationDataLines = animationDataLines - animationData.at(i).lineCount();
             animationData.removeAt(i);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool SkyrimAnimData::ProjectAnimData::appendAnimation(const SkyrimAnimData::AnimMotionData &motiondata){
+    for (int i = 0; i < animationMotionData.size(); i++){
+        if (animationMotionData.at(i).animationIndex == motiondata.animationIndex){
+            return false;
+        }
+    }
+    animationMotionData.append(motiondata);
+    animationMotionDataLines = animationMotionDataLines + motiondata.lineCount();
+    return true;
+}
+
+bool SkyrimAnimData::ProjectAnimData::removeAnimation(int animationindex){
+    for (int i = 0; i < animationMotionData.size(); i++){
+        if (animationMotionData.at(i).animationIndex == animationindex){
+            animationMotionDataLines = animationMotionDataLines - animationMotionData.at(i).lineCount();
+            animationMotionData.removeAt(i);
             return true;
         }
     }
