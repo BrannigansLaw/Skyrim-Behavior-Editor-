@@ -1,5 +1,6 @@
 #include "projectfile.h"
 #include "behaviorfile.h"
+#include "characterfile.h"
 
 //#include "src/animData/skyrimanimdata.h"
 //#include "src/animSetData/skyrimanimsetdata.h"
@@ -32,16 +33,35 @@ bool ProjectFile::isClipGenNameTaken(const QString &name) const{
     return false;
 }
 
-bool ProjectFile::readAnimationData(){
+bool ProjectFile::readAnimationData(const QString & filename){
     projectIndex = skyrimAnimData.getProjectIndex(fileName().section("/", -1, -1));
-    QFile animfile("C:/Users/Wayne/Desktop/Test Behavior/meshes/animationdatasinglefile.txt" /*QDir::currentPath()+"/animationdatasinglefile.txt"*/);
-    if (!animData.parse(&animfile)){
+    QFile *animfile = new QFile(filename);
+    if (!animfile->exists()){
+        delete animfile;
+        animfile = new QFile(QDir::currentPath()+"/animationdatasinglefile.txt");
+        if (!animfile->exists()){
+            CRITICAL_ERROR_MESSAGE(QString("animationdatasinglefile.txt is missing from the application directory!"));
+        }
+    }
+    if (!skyrimAnimData.parse(animfile)){
+        delete animfile;
         return false;
     }
-    QFile animsetfile("C:/Users/Wayne/Desktop/Test Behavior/meshes/animationsetdatasinglefile.txt" /*QDir::currentPath()+"/animationsetdatasinglefile.txt"*/);
-    if (!animSetData.parse(&animsetfile)){
+    QFile *animsetfile = new QFile(QString(filename).replace("animationdatasinglefile.txt", "animationsetdatasinglefile.txt"));
+    if (!animsetfile->exists()){
+        delete animsetfile;
+        animsetfile = new QFile(QDir::currentPath()+"/animationsetdatasinglefile.txt");
+        if (!animsetfile->exists()){
+            CRITICAL_ERROR_MESSAGE(QString("animationsetdatasinglefile.txt is missing from the application directory!"));
+        }
+    }
+    if (!skyrimAnimSetData.parse(animsetfile)){
+        delete animfile;
+        delete animsetfile;
         return false;
     }
+    delete animfile;
+    delete animsetfile;
     return true;
 }
 
@@ -50,7 +70,7 @@ bool ProjectFile::removeClipGenFromAnimData(const QString &name){
 }
 
 bool ProjectFile::removeAnimationFromAnimData(const QString &name){
-    return skyrimAnimData.removeAnimation(projectName+".txt", name);
+    return skyrimAnimData.removeAnimation(projectName+".txt", character->getAnimationNames().indexOf(name));    //Unsafe...
 }
 
 

@@ -1,8 +1,11 @@
 #include "animationsui.h"
+#include "src/ui/skyrimanimationdataui.h"
 
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 #include "src/hkxclasses/behavior/hkbcharacterstringdata.h"
 #include "src/ui/genericdatawidgets.h"
+#include "src/animData/skyrimanimdata.h"
+#include "src/animData/projectanimdata.h"
 
 #include <QPushButton>
 #include <QMessageBox>
@@ -21,44 +24,35 @@ QStringList AnimationsUI::headerLabels = {
 AnimationsUI::AnimationsUI(const QString &title)
     : dataUI(NULL),
       verLyt(new QVBoxLayout),
+      animData(NULL),
       loadedData(NULL),
       table(new TableWidget),
-      addObjectPB(new QPushButton("Add Animation")),
       buttonLyt(new QHBoxLayout),
-      animationName(new LineEdit),
-      animationNameWidget(new TableWidget),
+      addObjectPB(new QPushButton("Add Animation")),
       stackLyt(new QStackedLayout),
-      returnPB(new QPushButton("Return To Parent"))
+      animationUI(new SkyrimAnimationDataUI())
 {
     setTitle(title);
     stackLyt->addWidget(table);
-    stackLyt->addWidget(animationNameWidget);
+    stackLyt->addWidget(animationUI);
     stackLyt->setCurrentIndex(TABLE_WIDGET);
-    animationNameWidget->setRowCount(1);
-    animationNameWidget->setColumnCount(2);
-    animationNameWidget->setCellWidget(0, 0, animationName);
-    //animationNameWidget->setCellWidget(0, 1, flag);
-    animationNameWidget->setCellWidget(0, 1, returnPB);
     buttonLyt->addWidget(addObjectPB, 1);
     //buttonLyt->addSpacing(2);
     //buttonLyt->addWidget(removeObjectPB, 1);
     table->setColumnCount(2);
     table->setHorizontalHeaderLabels(headerLabels);
-    verLyt->addLayout(buttonLyt, 1);
-    verLyt->addLayout(stackLyt, 10);
+    verLyt->addLayout(stackLyt);
     setLayout(verLyt);
     //connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeAnimation()));
     connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addAnimation()));
-    connect(animationName, SIGNAL(editingFinished()), this, SLOT(renameSelectedAnimation()));
+    //connect(animationName, SIGNAL(editingFinished()), this, SLOT(renameSelectedAnimation()));
     connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewAnimation(int,int)));
-    connect(returnPB, SIGNAL(released()), this, SLOT(returnToTable()));
+    connect(animationUI, SIGNAL(returnToParent()), this, SLOT(returnToTable()));
 }
 
 void AnimationsUI::viewAnimation(int row, int column){
-    if (column == 1 && loadedData && loadedData->animationNames.size() > row){
-        disconnect(animationName, 0, this, 0);
-        animationName->setText(loadedData->animationNames.at(row));
-        connect(animationName, SIGNAL(editingFinished()), this, SLOT(renameSelectedAnimation()));
+    if (column == 1 && animData && loadedData && loadedData->animationNames.size() > row && row >= 0 && row < animData->animationMotionData.size()){
+        animationUI->loadData(&animData->animationMotionData[row]);
         stackLyt->setCurrentIndex(ANIMATION_WIDGET);
     }
 }
@@ -68,16 +62,17 @@ void AnimationsUI::returnToTable(){
 }
 
 void AnimationsUI::renameSelectedAnimation(){
-    QString newName = animationName->text();
+    /*QString newName = animationName->text();
     table->item(table->currentRow(), 0)->setText(newName);
     loadedData->animationNames[table->currentRow()] = newName;
     loadedData->getParentFile()->toggleChanged(true);
-    emit animationNameChanged(newName, table->currentRow());
+    emit animationNameChanged(newName, table->currentRow());*/
 }
 
-void AnimationsUI::loadData(HkxObject *data){
+void AnimationsUI::loadData(HkxObject *data, ProjectAnimData *animdata){
     if (data && data->getSignature() == HKB_CHARACTER_STRING_DATA){
         loadedData = static_cast<hkbCharacterStringData *>(data);
+        animData = animdata;
         int row;
         for (int i = 0; i < loadedData->animationNames.size(); i++){
             row = table->rowCount();

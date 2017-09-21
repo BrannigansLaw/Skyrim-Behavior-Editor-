@@ -6,12 +6,7 @@
 
 #include "src/utility.h"
 #include "src/animData/skyrimanimdata.h"
-#include "src/ui/genericdatawidgets.h"
 
-class HkxObject;
-class BehaviorGraphView;
-class RotationUI;
-class hkbStateMachineStateInfo;
 class QGridLayout;
 class TableWidget;
 class SpinBox;
@@ -20,27 +15,9 @@ class ComboBox;
 class QPushButton;
 class DoubleSpinBox;
 class CheckBox;
-class EventUI;
 class QGroupBox;
-class QuadVariableWidget;
-
-class TranslationUI: public QWidget{
-    Q_OBJECT
-    TranslationUI()
-        : lyt(new QVBoxLayout), returnPB(new QPushButton), translation(new QuadVariableWidget), time(new DoubleSpinBox)
-    {
-        lyt->addWidget(returnPB);
-        lyt->addWidget(time);
-        lyt->addWidget(translation);
-        time->setPrefix("Time: ");
-        translation->setVector3();
-        setLayout(lyt);
-    }
-    QVBoxLayout *lyt;
-    QPushButton *returnPB;
-    QuadVariableWidget *translation;
-    DoubleSpinBox *time;
-};
+class AnimationRotationUI;
+class AnimationTranslationUI;
 
 class SkyrimAnimationDataUI: public QStackedWidget
 {
@@ -48,8 +25,11 @@ class SkyrimAnimationDataUI: public QStackedWidget
 public:
     SkyrimAnimationDataUI();
     virtual ~SkyrimAnimationDataUI(){}
-    void loadData(SkyrimAnimData::AnimMotionData & data);
+    void loadData(SkyrimAnimationMotionData * data);
+signals:
+    void returnToParent();
 private slots:
+    void setName();
     void setDuration();
     void viewSelectedChild(int row, int column);
     void returnToWidget();
@@ -63,21 +43,21 @@ private:
     void loadDynamicTableRows();
     void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2);
 private:
-    enum ACTIVE_WIDGET {
+    enum ACTIVE_WIDGET{
         MAIN_WIDGET = 0,
         TRANSLATION_WIDGET = 1,
         ROTATION_WIDGET = 2
     };
     static QStringList headerLabels;
     int rotationsButtonRow;
-    SkyrimAnimData::AnimMotionData &bsData;
-    //int animationIndex;
+    SkyrimAnimationMotionData *bsData;
     QGroupBox *groupBox;
-    TranslationUI *translationUI;
-    RotationUI *rotationUI;
+    AnimationTranslationUI *translationUI;
+    AnimationRotationUI *rotationUI;
     QGridLayout *topLyt;
     TableWidget *table;
     QPushButton *returnPB;
+    LineEdit *name;
     DoubleSpinBox *duration;
 };
 

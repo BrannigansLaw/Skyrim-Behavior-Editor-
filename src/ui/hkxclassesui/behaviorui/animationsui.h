@@ -2,6 +2,7 @@
 #define ANIMATIONSUI_H
 
 #include <QGroupBox>
+//#include "src/animData/skyrimanimdata.h"
 
 class HkDataUI;
 class QVBoxLayout;
@@ -11,9 +12,10 @@ class QPushButton;
 class QSignalMapper;
 class hkbCharacterStringData;
 class HkxObject;
-class LineEdit;
+class SkyrimAnimationDataUI;
 class CheckBox;
 class QStackedLayout;
+class ProjectAnimData;
 
 class AnimationsUI: public QGroupBox
 {
@@ -22,7 +24,7 @@ public:
     AnimationsUI(const QString & title);
     virtual ~AnimationsUI(){}
     void setHkDataUI(HkDataUI *ui);
-    void loadData(HkxObject *data);
+    void loadData(HkxObject *data, ProjectAnimData *animdata);
     void clear();
 private slots:
     void addAnimation();
@@ -45,14 +47,13 @@ private:
     static QStringList headerLabels;
     HkDataUI *dataUI;
     QVBoxLayout *verLyt;
+    ProjectAnimData *animData;
     hkbCharacterStringData *loadedData;
     TableWidget *table;
     QPushButton *addObjectPB;
-    //QPushButton *removeObjectPB;
     QHBoxLayout *buttonLyt;
-    LineEdit *animationName;
-    TableWidget *animationNameWidget;
+    //QPushButton *removeObjectPB;
     QStackedLayout *stackLyt;
-    QPushButton *returnPB;
+    SkyrimAnimationDataUI *animationUI;
 };
 #endif // ANIMATIONSUI_H

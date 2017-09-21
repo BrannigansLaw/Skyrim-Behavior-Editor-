@@ -50,6 +50,27 @@ bool SkyrimAnimSetData::parse(QFile *file){
     return true;
 }
 
+bool SkyrimAnimSetData::write(const QString &filename){
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+        return false;
+    }
+    QTextStream out(&file);
+    out << QString::number(projectNames.size()) << "\n";
+    for (int i = 0; i < projectNames.size(); i++){
+        out << projectNames.at(i) << "\n";
+    }
+    for (int i = 0; i < projects.size(); i++){
+        for (int k = 0; k < projects.at(i).fileNames.size(); k++){
+            out << projects.at(i).fileNames.at(k) << "\n";
+        }
+        for (int j = 0; j < projects.at(i).animSetData.size(); j++){
+            out << projects.at(i).animSetData.at(j).write(&file, out) << "\n";
+        }
+    }
+    return true;
+}
+
 bool SkyrimAnimSetData::addAnimationToCache(const QString &projectname, const QString & event, const QVector<SkyrimAnimSetData::AnimationInfo> &animations, const QVector<SkyrimAnimSetData::BehaviorVariable> &vars, const QVector<SkyrimAnimSetData::ClipInfo> &clips){
     int count = 0;
     int index = projectNames.indexOf(projectname);

@@ -5,12 +5,14 @@
 #include <QLabel>
 #include <QComboBox>
 #include <limits.h>
+#include <math.h>
 
 #include <QSpinBox>
 #include <QLineEdit>
 #include <QGroupBox>
 
 #include "src/utility.h"
+#include "src/animData/skyrimanimdata.h"
 #include "src/filetypes/behaviorfile.h"
 
 #include <QTableWidget>

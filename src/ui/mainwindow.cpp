@@ -306,6 +306,22 @@ void MainWindow::saveProject(){
             projectFile->toggleChanged(false);
         }
         dialog.setProgress(projectFile->fileName()+" saved...", 10);
+        QFile animData(lastFileSelectedPath+"/animationdatasinglefile.txt");
+        if (animData.exists()){
+            if (!animData.remove()){
+                WARNING_MESSAGE(QString("Failed to remove to old animData file!"));
+            }
+        }
+        if (!projectFile->skyrimAnimData.write(lastFileSelectedPath+"/animationdatasinglefile.txt")){
+            WARNING_MESSAGE(QString("Failed to write animationdatasinglefile.txt!"));
+        }
+        QFile animSetData(lastFileSelectedPath+"/animationsetdatasinglefile.txt");
+        if (animSetData.exists()){
+            if (!animSetData.remove()){
+                WARNING_MESSAGE(QString("Failed to remove to old animSetData file!"));
+            }
+        }
+        projectFile->skyrimAnimSetData.write(lastFileSelectedPath+"/animationsetdatasinglefile.txt");
         if (characterFile){
             if (characterFile->getIsChanged()){
                 characterFile->write();
@@ -319,7 +335,7 @@ void MainWindow::saveProject(){
                 }*/
                 dialog.setProgress("Saving all unsaved behavior files...", 30);
                 for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
-                    if (projectFile->behaviorFiles.at(i) && i < behaviorGraphs.size() && behaviorGraphs.at(i)){
+                    if (projectFile->behaviorFiles.at(i)/* && i < behaviorGraphs.size() && behaviorGraphs.at(i)*/){
                         if (projectFile->behaviorFiles.at(i)->getIsChanged()){
                             saveFile(i);
                         }
@@ -496,22 +512,6 @@ void MainWindow::openProject(QString & filepath){
     QTime t;
     t.start();
     objectDataWid->changeCurrentDataWidget(NULL);
-    int time = t.elapsed();
-    projectFile = new ProjectFile(this, filepath);
-    if (!projectFile->readAnimationData()){
-        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The project animation data file could not be parsed!!!"));
-        return;
-    }
-    ProgressDialog dialog("Opening project..."+projectFile->fileName().section("/", -1, -1), "", 0, 100, this);
-    if (!projectFile->parse()){
-        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The project file "+filepath+" could not be parsed!!!\nYou have tried to open non-project file or the project file is corrupted!"));
-        delete projectFile;
-        projectFile = NULL;
-        return;
-    }
-    writeToLog("\n-------------------------\nTime taken to open file \""+filepath+
-                               "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
-    dialog.setProgress("Loading character data...", 10);
     int index = filepath.lastIndexOf("\\", -1);
     if (index > -1){
         lastFileSelectedPath = filepath.remove(index, filepath.size() - index);
@@ -523,6 +523,22 @@ void MainWindow::openProject(QString & filepath){
             lastFileSelectedPath = filepath;
         }
     }
+    int time = t.elapsed();
+    projectFile = new ProjectFile(this, lastFileSelected);
+    if (!projectFile->readAnimationData(lastFileSelectedPath+"/animationdatasinglefile.txt")){
+        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The project animation data file could not be parsed!!!"));
+        return;
+    }
+    ProgressDialog dialog("Opening project..."+projectFile->fileName().section("/", -1, -1), "", 0, 100, this);
+    if (!projectFile->parse()){
+        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The project file "+lastFileSelected+" could not be parsed!!!\nYou have tried to open non-project file or the project file is corrupted!"));
+        delete projectFile;
+        projectFile = NULL;
+        return;
+    }
+    writeToLog("\n-------------------------\nTime taken to open file \""+filepath+
+                               "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
+    dialog.setProgress("Loading character data...", 10);
     projectUI->setFilePath(lastFileSelectedPath);
     time = t.elapsed();
     characterFile = new CharacterFile(this, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));

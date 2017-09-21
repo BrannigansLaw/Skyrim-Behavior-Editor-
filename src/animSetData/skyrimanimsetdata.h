@@ -25,7 +25,8 @@ public:
         }
 
         AnimationInfo(const AnimationInfo & other){
-            *this = other;
+            crcPath = other.crcPath;
+            crcAnimationName = other.crcAnimationName;
         }
 
         bool operator ==(const AnimationInfo & other) const{
@@ -33,12 +34,6 @@ public:
                 return false;
             }
             return true;
-        }
-
-        AnimationInfo & operator =(const AnimationInfo & other){
-            crcPath = other.crcPath;
-            crcAnimationName = other.crcAnimationName;
-            return *this;
         }
 
         bool read(QFile * file);
@@ -56,13 +51,6 @@ public:
             //
         }
 
-        ClipInfo & operator =(const ClipInfo & other){
-            eventName = other.eventName;
-            unknown = other.unknown;
-            clipGenerators = other.clipGenerators;
-            return *this;
-        }
-
         bool operator ==(const ClipInfo & other) const{
             if (eventName != other.eventName || unknown != other.unknown || clipGenerators != other.clipGenerators){
                 return false;
@@ -71,7 +59,9 @@ public:
         }
 
         ClipInfo(const ClipInfo & other){
-            *this = other;
+            eventName = other.eventName;
+            unknown = other.unknown;
+            clipGenerators = other.clipGenerators;
         }
 
         bool read(QFile * file);
@@ -89,11 +79,10 @@ public:
             //
         }
 
-        BehaviorVariable & operator =(const BehaviorVariable & other){
+        BehaviorVariable(const BehaviorVariable & other){
             name = other.name;
             value1 = other.value1;
             value2 = other.value2;
-            return *this;
         }
 
         bool operator ==(const BehaviorVariable & other) const{
@@ -101,10 +90,6 @@ public:
                 return false;
             }
             return true;
-        }
-
-        BehaviorVariable(const BehaviorVariable & other){
-            *this = other;
         }
 
         bool read(QFile * file);
@@ -151,6 +136,7 @@ public:
 public:
     SkyrimAnimSetData();
     bool parse(QFile * file);
+    bool write(const QString & filename);
     bool addAnimationToCache(const QString & projectname, const QString & event, const QVector <AnimationInfo> & animations, const QVector <BehaviorVariable> & vars = QVector <BehaviorVariable> (), const QVector <ClipInfo> & clips = QVector <ClipInfo> ());
     bool removeAnimationFromCache(const QString & projectname, const QString & animationname, const QString & variablename = "", const QString & clipname = "");
     bool extractProject(const QString & projectname);

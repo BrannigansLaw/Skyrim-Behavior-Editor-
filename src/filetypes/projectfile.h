@@ -23,7 +23,7 @@ public:
     QString getCharacterFilePathAt(int index) const;
     void setCharacterFile(CharacterFile *file);
     bool isClipGenNameTaken(const QString & name) const;
-    bool readAnimationData();
+    bool readAnimationData(const QString &filename);
     bool removeClipGenFromAnimData(const QString & name);
     bool removeAnimationFromAnimData(const QString & name);
 protected:
