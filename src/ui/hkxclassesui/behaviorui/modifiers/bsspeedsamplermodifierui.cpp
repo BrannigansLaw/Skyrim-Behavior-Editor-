@@ -105,7 +105,7 @@ void BSSpeedSamplerModifierUI::connectToTables(GenericTableWidget *variables, Ge
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("BSSpeedSamplerModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -136,10 +136,10 @@ void BSSpeedSamplerModifierUI::loadData(HkxObject *data){
                 table->item(SPEED_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("BSSpeedSamplerModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("BSSpeedSamplerModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -153,7 +153,7 @@ void BSSpeedSamplerModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::setName(): The data is NULL!!"));
+        (qFatal("BSSpeedSamplerModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -162,7 +162,7 @@ void BSSpeedSamplerModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("BSSpeedSamplerModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -173,7 +173,7 @@ void BSSpeedSamplerModifierUI::setState(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::setstate(): The data is NULL!!"));
+        (qFatal("BSSpeedSamplerModifierUI::setstate(): The data is NULL!!"));
     }
 }
 
@@ -184,7 +184,7 @@ void BSSpeedSamplerModifierUI::setDirection(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::setdirection(): The data is NULL!!"));
+        (qFatal("BSSpeedSamplerModifierUI::setdirection(): The data is NULL!!"));
     }
 }
 
@@ -195,7 +195,7 @@ void BSSpeedSamplerModifierUI::setGoalSpeed(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::setgoalSpeed(): The data is NULL!!"));
+        (qFatal("BSSpeedSamplerModifierUI::setgoalSpeed(): The data is NULL!!"));
     }
 }
 
@@ -206,7 +206,7 @@ void BSSpeedSamplerModifierUI::setSpeedOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::setspeedOut(): The data is NULL!!"));
+        (qFatal("BSSpeedSamplerModifierUI::setspeedOut(): The data is NULL!!"));
     }
 }
 
@@ -250,7 +250,7 @@ void BSSpeedSamplerModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSSpeedSamplerModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -270,7 +270,7 @@ void BSSpeedSamplerModifierUI::selectTableToView(bool viewisProperty, const QStr
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("BSSpeedSamplerModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -301,7 +301,7 @@ void BSSpeedSamplerModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSSpeedSamplerModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -319,20 +319,20 @@ bool BSSpeedSamplerModifierUI::setBinding(int index, int row, const QString &var
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSSpeedSamplerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSSpeedSamplerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("BSSpeedSamplerModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -377,7 +377,7 @@ void BSSpeedSamplerModifierUI::setBindingVariable(int index, const QString &name
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("BSSpeedSamplerModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -399,9 +399,9 @@ void BSSpeedSamplerModifierUI::loadBinding(int row, int colunm, hkbVariableBindi
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("BSSpeedSamplerModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSSpeedSamplerModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("BSSpeedSamplerModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

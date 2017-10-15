@@ -158,10 +158,10 @@ void BSCyclicBlendTransitionGeneratorUI::loadData(HkxObject *data){
                 table->item(TRANSITION_DURATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)))
+            (qFatal(QString("BSCyclicBlendTransitionGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::loadData(): Attempting to load a null pointer!!"))
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::loadData(): Attempting to load a null pointer!!"));
     }
     connectSignals();
 }
@@ -175,7 +175,7 @@ void BSCyclicBlendTransitionGeneratorUI::setName(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::setName(): The data is NULL!!"))
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -186,7 +186,7 @@ void BSCyclicBlendTransitionGeneratorUI::setBlendParameter(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setBlendParameter(): The data is NULL!!"))
+        (qFatal("BSOffsetAnimationGeneratorUI::setBlendParameter(): The data is NULL!!"));
     }
 }
 
@@ -197,7 +197,7 @@ void BSCyclicBlendTransitionGeneratorUI::setTransitionDuration(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setTransitionDuration(): The data is NULL!!"))
+        (qFatal("BSOffsetAnimationGeneratorUI::setTransitionDuration(): The data is NULL!!"));
     }
 }
 
@@ -206,7 +206,7 @@ void BSCyclicBlendTransitionGeneratorUI::setBlendCurve(int index){
         bsData->eBlendCurve = bsData->BlendCurve.at(index);
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::setBlendCurve(): The data is NULL!!"));
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::setBlendCurve(): The data is NULL!!"));
     }
 }
 
@@ -215,7 +215,7 @@ void BSCyclicBlendTransitionGeneratorUI::viewEventToFreezeBlendValue(){
         eventUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), &bsData->eventToFreezeBlendValue);
         setCurrentIndex(EVENT_WIDGET);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::viewEventToFreezeBlendValue(): The data is NULL!!"));
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::viewEventToFreezeBlendValue(): The data is NULL!!"));
     }
 }
 
@@ -228,7 +228,7 @@ void BSCyclicBlendTransitionGeneratorUI::toggleEventToFreezeBlendValue(bool enab
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::toggleEventToFreezeBlendValue(): The data is NULL!!"));
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::toggleEventToFreezeBlendValue(): The data is NULL!!"));
     }
 }
 
@@ -237,7 +237,7 @@ void BSCyclicBlendTransitionGeneratorUI::viewEventToCrossBlend(){
         eventUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), &bsData->eventToCrossBlend);
         setCurrentIndex(EVENT_WIDGET);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::viewEventToCrossBlend(): The data is NULL!!"));
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::viewEventToCrossBlend(): The data is NULL!!"));
     }
 }
 
@@ -250,7 +250,7 @@ void BSCyclicBlendTransitionGeneratorUI::toggleEventToCrossBlend(bool enable){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::toggleEventToCrossBlend(): The data is NULL!!"));
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::toggleEventToCrossBlend(): The data is NULL!!"));
     }
 }
 
@@ -270,7 +270,7 @@ void BSCyclicBlendTransitionGeneratorUI::selectTableToView(bool viewproperties, 
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("BSOffsetAnimationGeneratorUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -298,7 +298,7 @@ void BSCyclicBlendTransitionGeneratorUI::viewSelectedChild(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::viewSelectedChild(): The data is NULL!!"))
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::viewSelectedChild(): The data is NULL!!"));
     }
 }
 
@@ -311,20 +311,20 @@ void BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(int index, const QS
             indexOfGenerator = bsData->getIndexOfObj(static_cast<DataIconManager*>(bsData->pBlenderGenerator.data()));
             if (ptr){
                 if (name != ptr->getName()){
-                    CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"));
+                    (qFatal("The name of the selected object does not match it's name in the object selection table!!!"));
                     return;
                 }else if (ptr->getSignature() != HKB_BLENDER_GENERATOR){
-                    WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nInvalid object type selected! You must select a blender generator for the 'pBlenderGenerator' data field!!!"));
+                    (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nInvalid object type selected! You must select a blender generator for the 'pBlenderGenerator' data field!!!"));
                     return;
                 }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->pBlenderGenerator.data()), ptr, false)){
-                    WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+                    (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
                     return;
                 }
             }else{
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->pBlenderGenerator.data())), indexOfGenerator);
                 }else{
-                    CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(): The selected icon is NULL!!"));
+                    (qFatal("BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(): The selected icon is NULL!!"));
                     return;
                 }
             }
@@ -332,10 +332,10 @@ void BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(int index, const QS
             table->item(BLENDER_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(): The 'behaviorView' pointer is NULL!!"))
+            (qFatal("BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(): The 'behaviorView' pointer is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -357,10 +357,10 @@ void BSCyclicBlendTransitionGeneratorUI::loadBinding(int row, int colunm, hkbVar
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("BSCyclicBlendTransitionGeneratorUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::loadBinding(): The data is NULL!!"));
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::loadBinding(): The data is NULL!!"));
     }
 }
 
@@ -384,10 +384,10 @@ bool BSCyclicBlendTransitionGeneratorUI::setBinding(int index, int row, const QS
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!"))
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::setBinding(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::setBinding(): The 'bsData' pointer is NULL!!"));
         return false;
     }
     return true;
@@ -415,7 +415,7 @@ void BSCyclicBlendTransitionGeneratorUI::setBindingVariable(int index, const QSt
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::setBindingVariable(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::setBindingVariable(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -438,7 +438,7 @@ void BSCyclicBlendTransitionGeneratorUI::connectToTables(GenericTableWidget *gen
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::connectToTables(): One or more arguments are NULL!!"));
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -448,7 +448,7 @@ void BSCyclicBlendTransitionGeneratorUI::eventRenamed(const QString & name, int 
             eventUI->eventRenamed(name, index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::eventRenamed(): The data is NULL!!"));
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::eventRenamed(): The data is NULL!!"));
     }
 }
 
@@ -456,7 +456,7 @@ void BSCyclicBlendTransitionGeneratorUI::variableRenamed(const QString & name, i
     int bindIndex = -1;
     hkbVariableBindingSet *bind = NULL;
     if (name == ""){
-        WARNING_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::variableRenamed(): The new variable name is the empty string!!"))
+        (qWarning("BSCyclicBlendTransitionGeneratorUI::variableRenamed(): The new variable name is the empty string!!"));
     }
     if (bsData){
         index--;
@@ -472,13 +472,13 @@ void BSCyclicBlendTransitionGeneratorUI::variableRenamed(const QString & name, i
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::variableRenamed(): The data is NULL!!"))
+        (qFatal("BSCyclicBlendTransitionGeneratorUI::variableRenamed(): The data is NULL!!"));
     }
 }
 
 void BSCyclicBlendTransitionGeneratorUI::generatorRenamed(const QString &name, int index){
     if (name == ""){
-        WARNING_MESSAGE(QString("BSCyclicBlendTransitionGeneratorUI::generatorRenamed(): The new variable name is the empty string!!"))
+        (qWarning("BSCyclicBlendTransitionGeneratorUI::generatorRenamed(): The new variable name is the empty string!!"));
     }
     index--;
     if (index == static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pBlenderGenerator)){

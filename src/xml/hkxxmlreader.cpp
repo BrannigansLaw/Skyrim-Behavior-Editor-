@@ -18,19 +18,20 @@ HkxXmlReader::HkxXmlReader(HkxFile *file)
 }
 
 bool HkxXmlReader::parse(){
-    std::mutex mu;
-    mu.lock();
+    //std::mutex mu;
+    //mu.lock();
     lineNumber = 0;
     if (!hkxXmlFile->open(QIODevice::ReadOnly)){
         isEOF = true;
-        hkxXmlFile->writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" failed to open!", true);
+        //hkxXmlFile->writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" failed to open!", true);
         return false;
     }
     isEOF = false;
     QByteArray line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGTH);
     lineNumber++;
     if (line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\n" && line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\r\n"){
-        hkxXmlFile->writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" is not in the correct XML format!", true);
+        //hkxXmlFile->writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" is not in the correct XML format!", true);
+        //mu.unlock();
         return false;
     }
     HkxXmlParseLine result = NoError;
@@ -38,17 +39,17 @@ bool HkxXmlReader::parse(){
         //hkxXmlFile->//setProgressData("Parsing XML line number "+QString::number(lineNumber), 20);
         result = readNextLine();
         if (result != NoError && result != EmptyLine && result != EmptyLineEndFile){
-            hkxXmlFile->writeToLog("HkxXmlReader: parse() failed because readNextLine() failed!", true);
+            //hkxXmlFile->writeToLog("HkxXmlReader: parse() failed because readNextLine() failed!", true);
+            //mu.unlock();
             return false;
         }
     }
     if (!indexOfElemTags.isEmpty()){
-        hkxXmlFile->writeToLog("HkxXmlReader: parse() failed because there are orphaned element tags!!!", true);
+        //hkxXmlFile->writeToLog("HkxXmlReader: parse() failed because there are orphaned element tags!!!", true);
         return false;
     }
     //hkxXmlFile->//setProgressData("XML parsed successfully!", 40);
-
-    mu.unlock();
+    //mu.unlock();
     return true;
 }
 
@@ -242,13 +243,16 @@ int HkxXmlReader::skipComment(const QByteArray & line, int index){
 
 HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
     QByteArray line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGTH);
+    if (line == "\t\t\t\t<hkcstring> iState_NPCSneaking</hkcstring>\n"){
+        int o = 0;
+    }
     lineNumber++;
     if (line.isEmpty()){
         isEOF = true;
         return EmptyLineEndFile;
     }else if (line.size() == 1){
         if (line.at(0) != '\n'){
-            hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because an orphaned character was found on line "+QString::number(lineNumber)+"!", true);
+            //hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because an orphaned character was found on line "+QString::number(lineNumber)+"!", true);
             return OrphanedCharacter;
         }else{
             return EmptyLine;
@@ -265,12 +269,6 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                     i = readElementTag(line, i + 1, isIsolatedEndElemTag, true);
                 }else if (line.at(i) == '!'){
                     i = skipComment(line, i + 1);
-                }else if (line.at(i) == ' '){
-                    //isValueSplitOnMultipleLines = false;
-                    i++;
-                    if (i < line.size()){
-                        i = readAttribute(line, i);
-                    }
                 }else{
                     isIsolatedEndElemTag = false;
                     i = readElementTag(line, i, isIsolatedEndElemTag, false);
@@ -285,6 +283,17 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
             return NoError;
         }else if (line.at(i) == '>'){
             i = readValue(line, i + 1, false);
+        }else if (line.at(i) == ' '){
+            //isValueSplitOnMultipleLines = false;
+            int temp = i - 1;
+            if (temp >= 0 && line.at(temp) == '>'){
+                i = readValue(line, i + 1, false);
+            }else{
+                i++;
+                if (i < line.size()){
+                    i = readAttribute(line, i);
+                }
+            }
         }else{
             i = readValue(line, i, isValueSplitOnMultipleLines);
         }

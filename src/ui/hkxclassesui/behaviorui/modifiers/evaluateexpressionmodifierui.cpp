@@ -100,7 +100,7 @@ void EvaluateExpressionModifierUI::addExpression(){
         bsData->getParentFile()->toggleChanged(true);
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::addExpression(): The data is NULL!!"));
+        (qFatal("EvaluateExpressionModifierUI::addExpression(): The data is NULL!!"));
     }
 }
 
@@ -112,17 +112,17 @@ void EvaluateExpressionModifierUI::removeExpression(int index){
             if (index < exps->expressionsData.size() && index >= 0){
                 exps->removeExpression(index);
             }else{
-                WARNING_MESSAGE(QString("EvaluateExpressionModifierUI::removeExpression(): Invalid row index selected!!"));
+                (qWarning("EvaluateExpressionModifierUI::removeExpression(): Invalid row index selected!!"));
                 return;
             }
             bsData->getParentFile()->toggleChanged(true);
             loadDynamicTableRows();
         }else{
-            WARNING_MESSAGE(QString("EvaluateExpressionModifierUI::removeExpression(): Event data is NULL!!"));
+            (qWarning("EvaluateExpressionModifierUI::removeExpression(): Event data is NULL!!"));
             return;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::removeExpression(): The data is NULL!!"));
+        (qFatal("EvaluateExpressionModifierUI::removeExpression(): The data is NULL!!"));
     }
 }
 
@@ -143,10 +143,10 @@ void EvaluateExpressionModifierUI::loadData(HkxObject *data){
             }
             loadDynamicTableRows();
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)))
+            (qFatal(QString("EvaluateExpressionModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::loadData(): Attempting to load a null pointer!!"))
+        (qFatal("EvaluateExpressionModifierUI::loadData(): Attempting to load a null pointer!!"));
     }
     connectSignals();
 }
@@ -165,7 +165,7 @@ void EvaluateExpressionModifierUI::loadDynamicTableRows(){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::loadDynamicTableRows(): The data is NULL!!"));
+        (qFatal("EvaluateExpressionModifierUI::loadDynamicTableRows(): The data is NULL!!"));
     }
     //table->setSortingEnabled(true);
 }
@@ -207,20 +207,20 @@ bool EvaluateExpressionModifierUI::setBinding(int index, int row, const QString 
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("EvaluateExpressionModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -241,7 +241,7 @@ void EvaluateExpressionModifierUI::setBindingVariable(int index, const QString &
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::setBindingVariable(): The data is NULL!!"))
+        (qFatal("EvaluateExpressionModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -259,7 +259,7 @@ void EvaluateExpressionModifierUI::setName(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::setName(): The data is NULL!!"))
+        (qFatal("EvaluateExpressionModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -268,7 +268,7 @@ void EvaluateExpressionModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("EvaluateExpressionModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -301,11 +301,11 @@ void EvaluateExpressionModifierUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::viewSelectedChild(): Invalid index of child to view!!"))
+                (qFatal("EvaluateExpressionModifierUI::viewSelectedChild(): Invalid index of child to view!!"));
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::viewSelectedChild(): The data is NULL!!"))
+        (qFatal("EvaluateExpressionModifierUI::viewSelectedChild(): The data is NULL!!"));
     }
 }
 
@@ -318,7 +318,7 @@ void EvaluateExpressionModifierUI::variableTableElementSelected(int index, const
         expressionUI->setAssignmentVariableIndex(index, name);
         break;
     default:
-        WARNING_MESSAGE(QString("EvaluateExpressionModifierUI::variableTableElementSelected(): An unwanted element selected event was recieved!!"));;
+        (qWarning("EvaluateExpressionModifierUI::variableTableElementSelected(): An unwanted element selected event was recieved!!"));
     }
 }
 
@@ -334,7 +334,7 @@ void EvaluateExpressionModifierUI::connectToTables(GenericTableWidget *variables
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("EvaluateExpressionModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -356,10 +356,10 @@ void EvaluateExpressionModifierUI::loadBinding(int row, int colunm, hkbVariableB
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("EvaluateExpressionModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("EvaluateExpressionModifierUI::loadBinding(): The data is NULL!!"));
     }
 }
 
@@ -379,7 +379,7 @@ void EvaluateExpressionModifierUI::selectTableToView(bool viewproperties, const 
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("EvaluateExpressionModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -387,7 +387,7 @@ void EvaluateExpressionModifierUI::eventRenamed(const QString & name, int index)
     if (bsData){
         expressionUI->eventRenamed(name, index);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::eventRenamed(): The data is NULL!!"));
+        (qFatal("EvaluateExpressionModifierUI::eventRenamed(): The data is NULL!!"));
     }
 }
 
@@ -395,7 +395,7 @@ void EvaluateExpressionModifierUI::variableRenamed(const QString & name, int ind
     int bindIndex = -1;
     hkbVariableBindingSet *bind = NULL;
     if (name == ""){
-        WARNING_MESSAGE(QString("EvaluateExpressionModifierUI::variableRenamed(): The new variable name is the empty string!!"))
+        (qWarning("EvaluateExpressionModifierUI::variableRenamed(): The new variable name is the empty string!!"));
     }
     if (bsData){
         index--;
@@ -411,7 +411,7 @@ void EvaluateExpressionModifierUI::variableRenamed(const QString & name, int ind
             expressionUI->variableRenamed(name, index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::variableRenamed(): The data is NULL!!"))
+        (qFatal("EvaluateExpressionModifierUI::variableRenamed(): The data is NULL!!"));
     }
 }
 

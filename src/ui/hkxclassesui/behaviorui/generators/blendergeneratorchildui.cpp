@@ -128,10 +128,10 @@ void BlenderGeneratorChildUI::loadData(HkxObject *data, int childindex){
                 table->item(WORLD_FROM_MODEL_WEIGHT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)));
+            (qFatal(QString("BlenderGeneratorChildUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::loadData(): The data passed to the UI is NULL!!!"));
+        (qFatal("BlenderGeneratorChildUI::loadData(): The data passed to the UI is NULL!!!"));
     }
     connectSignals();
 }
@@ -154,10 +154,10 @@ void BlenderGeneratorChildUI::loadBinding(int row, int colunm, hkbVariableBindin
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("BlenderGeneratorChildUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::loadBinding(): The data is NULL!!"));
+        (qFatal("BlenderGeneratorChildUI::loadBinding(): The data is NULL!!"));
     }
 }
 
@@ -170,20 +170,20 @@ void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
             ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
             if (ptr){
                 if (name != ptr->getName()){
-                    CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"));
+                    (qFatal("The name of the selected object does not match it's name in the object selection table!!!"));
                     return;
                 }else if (!gen){
-                    CRITICAL_ERROR_MESSAGE(QString("The currently loaded 'hkbBlenderGeneratorChild' has no parent 'hkbBlenderGenerator' or 'hkbPoseMatchingGenerator'!!!"));
+                    (qFatal("The currently loaded 'hkbBlenderGeneratorChild' has no parent 'hkbBlenderGenerator' or 'hkbPoseMatchingGenerator'!!!"));
                     return;
                 }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generator.data()), ptr, false)){
-                    WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+                    (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
                     return;
                 }
             }else{
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->generator.data())), childIndex);
                 }else{
-                    CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setGenerator(): The selected icon is NULL!!"));;
+                    (qFatal("BlenderGeneratorChildUI::setGenerator(): The selected icon is NULL!!"));
                     return;
                 }
             }
@@ -192,10 +192,10 @@ void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
             bsData->getParentFile()->toggleChanged(true);
             emit returnToParent(true);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setGenerator(): The 'behaviorView' pointer is NULL!!"))
+            (qFatal("BlenderGeneratorChildUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setGenerator(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BlenderGeneratorChildUI::setGenerator(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -219,10 +219,10 @@ bool BlenderGeneratorChildUI::setBinding(int index, int row, const QString & var
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!"))
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setBinding(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BlenderGeneratorChildUI::setBinding(): The 'bsData' pointer is NULL!!"));
         return false;
     }
     return true;
@@ -256,7 +256,7 @@ void BlenderGeneratorChildUI::setBindingVariable(int index, const QString & name
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setBindingVariable(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BlenderGeneratorChildUI::setBindingVariable(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -267,7 +267,7 @@ void BlenderGeneratorChildUI::setWeight(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setWeight(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BlenderGeneratorChildUI::setWeight(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -278,7 +278,7 @@ void BlenderGeneratorChildUI::setWorldFromModelWeight(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::setWorldFromModelWeight(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BlenderGeneratorChildUI::setWorldFromModelWeight(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -287,7 +287,7 @@ void BlenderGeneratorChildUI::viewBoneWeights(){
         boneWeightArrayUI->loadData(bsData->boneWeights.data());
         setCurrentIndex(BONE_WEIGHT_ARRAY_WIDGET);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::viewBoneWeights(): The data is NULL!!"));
+        (qFatal("BlenderGeneratorChildUI::viewBoneWeights(): The data is NULL!!"));
     }
 }
 
@@ -300,7 +300,7 @@ void BlenderGeneratorChildUI::toggleBoneWeights(bool enable){
             bsData->boneWeights = HkxSharedPtr(new hkbBoneWeightArray(bsData->getParentFile(), -1, static_cast<BehaviorFile *>(bsData->getParentFile())->getNumberOfBones()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::toggleBoneWeights(): The data is NULL!!"));
+        (qFatal("BlenderGeneratorChildUI::toggleBoneWeights(): The data is NULL!!"));
     }
 }
 
@@ -320,7 +320,7 @@ void BlenderGeneratorChildUI::selectTableToView(bool viewproperties, const QStri
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("BlenderGeneratorChildUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -352,7 +352,7 @@ void BlenderGeneratorChildUI::viewSelected(int row, int column){
             emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BlenderGeneratorChildUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -379,7 +379,7 @@ void BlenderGeneratorChildUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BlenderGeneratorChildUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -390,7 +390,7 @@ void BlenderGeneratorChildUI::generatorRenamed(const QString &name, int index){
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::generatorRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BlenderGeneratorChildUI::generatorRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 

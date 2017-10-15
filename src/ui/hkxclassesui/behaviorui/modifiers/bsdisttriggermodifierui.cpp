@@ -113,7 +113,7 @@ void BSDistTriggerModifierUI::connectToTables(GenericTableWidget *variables, Gen
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("BSDistTriggerModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -153,10 +153,10 @@ void BSDistTriggerModifierUI::loadData(HkxObject *data){
                 table->item(DISTANCE_TRIGGER_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("BSDistTriggerModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("BSDistTriggerModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -170,7 +170,7 @@ void BSDistTriggerModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::setName(): The data is NULL!!"));
+        (qFatal("BSDistTriggerModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -179,7 +179,7 @@ void BSDistTriggerModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("BSDistTriggerModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -190,7 +190,7 @@ void BSDistTriggerModifierUI::setTargetPosition(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::settargetPosition(): The data is NULL!!"));
+        (qFatal("BSDistTriggerModifierUI::settargetPosition(): The data is NULL!!"));
     }
 }
 
@@ -201,7 +201,7 @@ void BSDistTriggerModifierUI::setDistance(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::setdistance(): The data is NULL!!"));
+        (qFatal("BSDistTriggerModifierUI::setdistance(): The data is NULL!!"));
     }
 }
 
@@ -212,7 +212,7 @@ void BSDistTriggerModifierUI::setDistanceTrigger(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::setdistanceTrigger(): The data is NULL!!"));
+        (qFatal("BSDistTriggerModifierUI::setdistanceTrigger(): The data is NULL!!"));
     }
 }
 
@@ -225,7 +225,7 @@ void BSDistTriggerModifierUI::setTriggerEventId(int index, const QString & name)
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::setTriggerEventId(): The data is NULL!!"));
+        (qFatal("BSDistTriggerModifierUI::setTriggerEventId(): The data is NULL!!"));
     }
 }
 
@@ -246,7 +246,7 @@ void BSDistTriggerModifierUI::setTriggerEventPayload(){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::setTriggerEventPayload(): The data is NULL!!"));
+        (qFatal("BSDistTriggerModifierUI::setTriggerEventPayload(): The data is NULL!!"));
     }
 }
 
@@ -286,7 +286,7 @@ void BSDistTriggerModifierUI::viewSelected(int row, int column){
             emit viewEvents(bsData->triggerEvent.id + 1);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSDistTriggerModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -306,7 +306,7 @@ void BSDistTriggerModifierUI::selectTableToView(bool viewisProperty, const QStri
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("BSDistTriggerModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -317,7 +317,7 @@ void BSDistTriggerModifierUI::eventRenamed(const QString & name, int index){
             table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::eventRenamed(): The data is NULL!!"));
+        (qFatal("BSDistTriggerModifierUI::eventRenamed(): The data is NULL!!"));
     }
 }
 
@@ -344,7 +344,7 @@ void BSDistTriggerModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSDistTriggerModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -362,20 +362,20 @@ bool BSDistTriggerModifierUI::setBinding(int index, int row, const QString &vari
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSDistTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSDistTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("BSDistTriggerModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -414,7 +414,7 @@ void BSDistTriggerModifierUI::setBindingVariable(int index, const QString &name)
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("BSDistTriggerModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -436,10 +436,10 @@ void BSDistTriggerModifierUI::loadBinding(int row, int colunm, hkbVariableBindin
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("BSDistTriggerModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDistTriggerModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("BSDistTriggerModifierUI::loadBinding(): The data is NULL!!"));
     }
 }
 

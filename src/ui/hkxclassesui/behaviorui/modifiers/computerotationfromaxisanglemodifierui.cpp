@@ -96,7 +96,7 @@ void ComputeRotationFromAxisAngleModifierUI::connectToTables(GenericTableWidget 
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("ComputeRotationFromAxisAngleModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -124,10 +124,10 @@ void ComputeRotationFromAxisAngleModifierUI::loadData(HkxObject *data){
                 table->item(ANGLE_DEGREES_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("ComputeRotationFromAxisAngleModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("ComputeRotationFromAxisAngleModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -141,7 +141,7 @@ void ComputeRotationFromAxisAngleModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::setName(): The data is NULL!!"));
+        (qFatal("ComputeRotationFromAxisAngleModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -150,7 +150,7 @@ void ComputeRotationFromAxisAngleModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("ComputeRotationFromAxisAngleModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -161,7 +161,7 @@ void ComputeRotationFromAxisAngleModifierUI::setRotationOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::setRotationOut(): The data is NULL!!"));
+        (qFatal("ComputeRotationFromAxisAngleModifierUI::setRotationOut(): The data is NULL!!"));
     }
 }
 
@@ -172,7 +172,7 @@ void ComputeRotationFromAxisAngleModifierUI::setAxis(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::setaxis(): The data is NULL!!"));
+        (qFatal("ComputeRotationFromAxisAngleModifierUI::setaxis(): The data is NULL!!"));
     }
 }
 
@@ -183,7 +183,7 @@ void ComputeRotationFromAxisAngleModifierUI::setAngleDegrees(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::setangleDegrees(): The data is NULL!!"));
+        (qFatal("ComputeRotationFromAxisAngleModifierUI::setangleDegrees(): The data is NULL!!"));
     }
 }
 
@@ -221,7 +221,7 @@ void ComputeRotationFromAxisAngleModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("ComputeRotationFromAxisAngleModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -241,7 +241,7 @@ void ComputeRotationFromAxisAngleModifierUI::selectTableToView(bool viewisProper
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("ComputeRotationFromAxisAngleModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -268,7 +268,7 @@ void ComputeRotationFromAxisAngleModifierUI::variableRenamed(const QString & nam
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("ComputeRotationFromAxisAngleModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -286,20 +286,20 @@ bool ComputeRotationFromAxisAngleModifierUI::setBinding(int index, int row, cons
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("ComputeRotationFromAxisAngleModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("ComputeRotationFromAxisAngleModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("ComputeRotationFromAxisAngleModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -338,7 +338,7 @@ void ComputeRotationFromAxisAngleModifierUI::setBindingVariable(int index, const
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("ComputeRotationFromAxisAngleModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -360,9 +360,9 @@ void ComputeRotationFromAxisAngleModifierUI::loadBinding(int row, int colunm, hk
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("ComputeRotationFromAxisAngleModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeRotationFromAxisAngleModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("ComputeRotationFromAxisAngleModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

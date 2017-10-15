@@ -114,7 +114,7 @@ void BSPassByTargetTriggerModifierUI::connectToTables(GenericTableWidget *variab
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("BSPassByTargetTriggerModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -154,10 +154,10 @@ void BSPassByTargetTriggerModifierUI::loadData(HkxObject *data){
                 table->item(MOVEMENT_DIRECTION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("BSPassByTargetTriggerModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("BSPassByTargetTriggerModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -171,7 +171,7 @@ void BSPassByTargetTriggerModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::setName(): The data is NULL!!"));
+        (qFatal("BSPassByTargetTriggerModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -180,7 +180,7 @@ void BSPassByTargetTriggerModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("BSPassByTargetTriggerModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -191,7 +191,7 @@ void BSPassByTargetTriggerModifierUI::setTargetPosition(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::settargetPosition(): The data is NULL!!"));
+        (qFatal("BSPassByTargetTriggerModifierUI::settargetPosition(): The data is NULL!!"));
     }
 }
 
@@ -202,7 +202,7 @@ void BSPassByTargetTriggerModifierUI::setRadius(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::setradius(): The data is NULL!!"));
+        (qFatal("BSPassByTargetTriggerModifierUI::setradius(): The data is NULL!!"));
     }
 }
 
@@ -213,7 +213,7 @@ void BSPassByTargetTriggerModifierUI::setMovementDirection(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::setmovementDirection(): The data is NULL!!"));
+        (qFatal("BSPassByTargetTriggerModifierUI::setmovementDirection(): The data is NULL!!"));
     }
 }
 
@@ -226,7 +226,7 @@ void BSPassByTargetTriggerModifierUI::setTriggerEventId(int index, const QString
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::settriggerEventId(): The data is NULL!!"));
+        (qFatal("BSPassByTargetTriggerModifierUI::settriggerEventId(): The data is NULL!!"));
     }
 }
 
@@ -247,7 +247,7 @@ void BSPassByTargetTriggerModifierUI::setTriggerEventPayload(){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::settriggerEventPayload(): The data is NULL!!"));
+        (qFatal("BSPassByTargetTriggerModifierUI::settriggerEventPayload(): The data is NULL!!"));
     }
 }
 
@@ -287,7 +287,7 @@ void BSPassByTargetTriggerModifierUI::viewSelected(int row, int column){
             emit viewEvents(bsData->triggerEvent.id + 1);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSPassByTargetTriggerModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -307,7 +307,7 @@ void BSPassByTargetTriggerModifierUI::selectTableToView(bool viewisProperty, con
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("BSPassByTargetTriggerModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -318,7 +318,7 @@ void BSPassByTargetTriggerModifierUI::eventRenamed(const QString & name, int ind
             table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::eventRenamed(): The data is NULL!!"));
+        (qFatal("BSPassByTargetTriggerModifierUI::eventRenamed(): The data is NULL!!"));
     }
 }
 
@@ -345,7 +345,7 @@ void BSPassByTargetTriggerModifierUI::variableRenamed(const QString & name, int 
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSPassByTargetTriggerModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -363,20 +363,20 @@ bool BSPassByTargetTriggerModifierUI::setBinding(int index, int row, const QStri
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSPassByTargetTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSPassByTargetTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("BSPassByTargetTriggerModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -415,7 +415,7 @@ void BSPassByTargetTriggerModifierUI::setBindingVariable(int index, const QStrin
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("BSPassByTargetTriggerModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -437,10 +437,10 @@ void BSPassByTargetTriggerModifierUI::loadBinding(int row, int colunm, hkbVariab
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("BSPassByTargetTriggerModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSPassByTargetTriggerModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("BSPassByTargetTriggerModifierUI::loadBinding(): The data is NULL!!"));
     }
 }
 

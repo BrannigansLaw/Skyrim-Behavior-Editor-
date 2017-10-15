@@ -310,7 +310,7 @@ void PoseMatchingGeneratorUI::loadTableValue(int row, const QString &value){
             table->item(row, VALUE_COLUMN)->setText("NONE");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadTableValue(): There is no table item here!!"));
+        (qFatal("StateMachineUI::loadTableValue(): There is no table item here!!"));
     }
 }
 
@@ -431,13 +431,13 @@ void PoseMatchingGeneratorUI::loadData(HkxObject *data){
                 }
                 loadDynamicTableRows();
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags))
+                (qFatal(QString("PoseMatchingGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data()));
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)))
+            (qFatal(QString("PoseMatchingGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::loadData(): Attempting to load a null pointer!!"))
+        (qFatal("PoseMatchingGeneratorUI::loadData(): Attempting to load a null pointer!!"));
     }
     connectSignals();
 }
@@ -455,11 +455,11 @@ void PoseMatchingGeneratorUI::loadDynamicTableRows(){
             if (child){
                 setRowItems(i, "Child "+QString::number(j), child->getClassname(), "Remove", "Edit", "Double click to remove this child", "Double click to edit this child");
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::loadData(): Null child found!!!"));
+                (qFatal("PoseMatchingGeneratorUI::loadData(): Null child found!!!"));
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::loadDynamicTableRows(): The data is NULL!!"));
+        (qFatal("PoseMatchingGeneratorUI::loadDynamicTableRows(): The data is NULL!!"));
     }
     //table->setSortingEnabled(true);
 }
@@ -501,20 +501,20 @@ bool PoseMatchingGeneratorUI::setBinding(int index, int row, const QString & var
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("PoseMatchingGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("PoseMatchingGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setBinding(): The data is NULL!!"));
+        (qFatal("PoseMatchingGeneratorUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -619,7 +619,7 @@ void PoseMatchingGeneratorUI::setBindingVariable(int index, const QString & name
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setBindingVariable(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -632,7 +632,7 @@ void PoseMatchingGeneratorUI::setName(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setName(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -643,7 +643,7 @@ void PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(): The data is NULL!!"));
     }
 }
 
@@ -654,7 +654,7 @@ void PoseMatchingGeneratorUI::setBlendParameter(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setBlendParameter(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setBlendParameter(): The data is NULL!!"));
     }
 }
 
@@ -665,7 +665,7 @@ void PoseMatchingGeneratorUI::setMinCyclicBlendParameter(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setMinCyclicBlendParameter(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setMinCyclicBlendParameter(): The data is NULL!!"));
     }
 }
 
@@ -676,7 +676,7 @@ void PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(): The data is NULL!!"));
     }
 }
 
@@ -687,7 +687,7 @@ void PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(): The data is NULL!!"));
     }
 }
 
@@ -703,10 +703,10 @@ void PoseMatchingGeneratorUI::setFlagSync(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagSync(): The flags string is invalid!!!\nString: "+bsData->flags))
+            (qFatal(QString("PoseMatchingGeneratorUI::setFlagSync(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagSync(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setFlagSync(): The data is NULL!!"));
     }
 }
 
@@ -722,10 +722,10 @@ void PoseMatchingGeneratorUI::setFlagSmoothGeneratorWeights(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagSmoothGeneratorWeights(): The flags string is invalid!!!\nString: "+bsData->flags))
+            (qFatal(QString("PoseMatchingGeneratorUI::setFlagSmoothGeneratorWeights(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagSmoothGeneratorWeights(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setFlagSmoothGeneratorWeights(): The data is NULL!!"));
     }
 }
 
@@ -741,10 +741,10 @@ void PoseMatchingGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The flags string is invalid!!!\nString: "+bsData->flags))
+            (qFatal(QString("PoseMatchingGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The data is NULL!!"));
     }
 }
 
@@ -760,10 +760,10 @@ void PoseMatchingGeneratorUI::setFlagParametricBlend(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagParametricBlend(): The flags string is invalid!!!\nString: "+bsData->flags))
+            (qFatal(QString("PoseMatchingGeneratorUI::setFlagParametricBlend(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagParametricBlend(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setFlagParametricBlend(): The data is NULL!!"));
     }
 }
 
@@ -779,10 +779,10 @@ void PoseMatchingGeneratorUI::setFlagIsParametricBlendCyclic(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagIsParametricBlendCyclic(): The flags string is invalid!!!\nString: "+bsData->flags))
+            (qFatal(QString("PoseMatchingGeneratorUI::setFlagIsParametricBlendCyclic(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagIsParametricBlendCyclic(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setFlagIsParametricBlendCyclic(): The data is NULL!!"));
     }
 }
 
@@ -798,10 +798,10 @@ void PoseMatchingGeneratorUI::setFlagForceDensePose(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagForceDensePose(): The flags string is invalid!!!\nString: "+bsData->flags))
+            (qFatal(QString("PoseMatchingGeneratorUI::setFlagForceDensePose(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagForceDensePose(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setFlagForceDensePose(): The data is NULL!!"));
     }
 }
 
@@ -810,7 +810,7 @@ void PoseMatchingGeneratorUI::setSubtractLastChild(){
         bsData->subtractLastChild = subtractLastChild->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setSubtractLastChild(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setSubtractLastChild(): The data is NULL!!"));
     }
 }
 
@@ -821,7 +821,7 @@ void PoseMatchingGeneratorUI::setWorldFromModelRotation(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setWorldFromModelRotation(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setWorldFromModelRotation(): The data is NULL!!"));
     }
 }
 
@@ -832,7 +832,7 @@ void PoseMatchingGeneratorUI::setBlendSpeed(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setBlendSpeed(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setBlendSpeed(): The data is NULL!!"));
     }
 }
 
@@ -843,7 +843,7 @@ void PoseMatchingGeneratorUI::setMinSpeedToSwitch(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setMinSpeedToSwitch(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setMinSpeedToSwitch(): The data is NULL!!"));
     }
 }
 
@@ -854,7 +854,7 @@ void PoseMatchingGeneratorUI::setMinSwitchTimeNoError(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setMinSwitchTimeNoError(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setMinSwitchTimeNoError(): The data is NULL!!"));
     }
 }
 
@@ -865,7 +865,7 @@ void PoseMatchingGeneratorUI::setMinSwitchTimeFullError(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setMinSwitchTimeFullError(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::setMinSwitchTimeFullError(): The data is NULL!!"));
     }
 }
 
@@ -875,7 +875,7 @@ void PoseMatchingGeneratorUI::setStartPlayingEventId(int index, const QString &n
         table->item(START_PLAYING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setStartPlayingEventId(): The data is NULL!!"));
+        (qFatal("PoseMatchingGeneratorUI::setStartPlayingEventId(): The data is NULL!!"));
     }
 }
 
@@ -885,7 +885,7 @@ void PoseMatchingGeneratorUI::setStartMatchingEventId(int index, const QString &
         table->item(START_MATCHING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setStartMatchingEventId(): The data is NULL!!"));
+        (qFatal("PoseMatchingGeneratorUI::setStartMatchingEventId(): The data is NULL!!"));
     }
 }
 
@@ -894,7 +894,7 @@ void PoseMatchingGeneratorUI::setRootBoneIndex(int index){
         bsData->rootBoneIndex = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setRootBoneIndex(): The data is NULL!!"));
+        (qFatal("PoseMatchingGeneratorUI::setRootBoneIndex(): The data is NULL!!"));
     }
 }
 
@@ -903,7 +903,7 @@ void PoseMatchingGeneratorUI::setOtherBoneIndex(int index){
         bsData->otherBoneIndex = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setOtherBoneIndex(): The data is NULL!!"));
+        (qFatal("PoseMatchingGeneratorUI::setOtherBoneIndex(): The data is NULL!!"));
     }
 }
 
@@ -912,7 +912,7 @@ void PoseMatchingGeneratorUI::setAnotherBoneIndex(int index){
         bsData->anotherBoneIndex = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setAnotherBoneIndex(): The data is NULL!!"));
+        (qFatal("PoseMatchingGeneratorUI::setAnotherBoneIndex(): The data is NULL!!"));
     }
 }
 
@@ -921,7 +921,7 @@ void PoseMatchingGeneratorUI::setPelvisIndex(int index){
         bsData->pelvisIndex = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setPelvisIndex(): The data is NULL!!"));
+        (qFatal("PoseMatchingGeneratorUI::setPelvisIndex(): The data is NULL!!"));
     }
 }
 
@@ -930,7 +930,7 @@ void PoseMatchingGeneratorUI::setMode(int index){
         bsData->mode = bsData->Mode.at(index);
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setMode(): The data is NULL!!"));
+        (qFatal("PoseMatchingGeneratorUI::setMode(): The data is NULL!!"));
     }
 }
 
@@ -943,14 +943,14 @@ void PoseMatchingGeneratorUI::swapGeneratorIndices(int index1, int index2){
             if (behaviorView->getSelectedItem()){
                 behaviorView->getSelectedItem()->reorderChildren();
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::swapGeneratorIndices(): No item selected!!"));
+                (qFatal("PoseMatchingGeneratorUI::swapGeneratorIndices(): No item selected!!"));
             }
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("PoseMatchingGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!"));
+            (qWarning("PoseMatchingGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::swapGeneratorIndices(): The data is NULL!!"));
+        (qFatal("PoseMatchingGeneratorUI::swapGeneratorIndices(): The data is NULL!!"));
     }
 }
 
@@ -999,12 +999,12 @@ void PoseMatchingGeneratorUI::addChildWithGenerator(){
             behaviorView->appendBGSGamebryoSequenceGenerator();
             break;
         default:
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::addChild(): Invalid typeEnum!!"))
+            (qFatal("PoseMatchingGeneratorUI::addChild(): Invalid typeEnum!!"));
             return;
         }
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::addChild(): The data or behavior graph pointer is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::addChild(): The data or behavior graph pointer is NULL!!"));
     }
 }
 
@@ -1016,11 +1016,11 @@ void PoseMatchingGeneratorUI::removeChild(int index){
             behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->generator.data()), index);//Reorderchildren?
             behaviorView->removeObjects();
         }else{
-            WARNING_MESSAGE(QString("PoseMatchingGeneratorUI::removeChild(): Invalid index of child to remove!!"));
+            (qWarning("PoseMatchingGeneratorUI::removeChild(): Invalid index of child to remove!!"));
         }
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::removeChild(): The data or behavior graph pointer is NULL!!"));
+        (qFatal("PoseMatchingGeneratorUI::removeChild(): The data or behavior graph pointer is NULL!!"));
     }
 }
 
@@ -1143,11 +1143,11 @@ void PoseMatchingGeneratorUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::viewSelectedChild(): Invalid index of child to view!!"))
+                (qFatal("PoseMatchingGeneratorUI::viewSelectedChild(): Invalid index of child to view!!"));
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::viewSelectedChild(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::viewSelectedChild(): The data is NULL!!"));
     }
 }
 
@@ -1167,7 +1167,7 @@ void PoseMatchingGeneratorUI::eventRenamed(const QString & name, int index){
             table->item(START_MATCHING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::eventRenamed(): The data is NULL!!"));
+        (qFatal("PoseMatchingGeneratorUI::eventRenamed(): The data is NULL!!"));
     }
 }
 
@@ -1182,12 +1182,12 @@ void PoseMatchingGeneratorUI::eventTableElementSelected(int index, const QString
             setStartMatchingEventId(index, name);
             break;
         default:
-            WARNING_MESSAGE(QString("PoseMatchingGeneratorUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));
+            (qWarning("PoseMatchingGeneratorUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));
             return;
         }
         break;
     default:
-        WARNING_MESSAGE(QString("PoseMatchingGeneratorUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));;
+        (qWarning("PoseMatchingGeneratorUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));
     }
 }
 
@@ -1200,7 +1200,7 @@ void PoseMatchingGeneratorUI::variableTableElementSelected(int index, const QStr
         childUI->setBindingVariable(index, name);
         break;
     default:
-        WARNING_MESSAGE(QString("PoseMatchingGeneratorUI::variableTableElementSelected(): An unwanted element selected event was recieved!!"));;
+        (qWarning("PoseMatchingGeneratorUI::variableTableElementSelected(): An unwanted element selected event was recieved!!"));
     }
 }
 
@@ -1210,7 +1210,7 @@ void PoseMatchingGeneratorUI::generatorTableElementSelected(int index, const QSt
         childUI->setGenerator(index, name);
         break;
     default:
-        WARNING_MESSAGE(QString("PoseMatchingGeneratorUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!"));;
+        (qWarning("PoseMatchingGeneratorUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!"));
     }
 }
 
@@ -1229,7 +1229,7 @@ void PoseMatchingGeneratorUI::connectToTables(GenericTableWidget *generators, Ge
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -1251,10 +1251,10 @@ void PoseMatchingGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindin
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("PoseMatchingGeneratorUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::loadBinding(): The data is NULL!!"));
+        (qFatal("PoseMatchingGeneratorUI::loadBinding(): The data is NULL!!"));
     }
 }
 
@@ -1274,7 +1274,7 @@ void PoseMatchingGeneratorUI::selectTableToView(bool viewproperties, const QStri
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("PoseMatchingGeneratorUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -1282,7 +1282,7 @@ void PoseMatchingGeneratorUI::variableRenamed(const QString & name, int index){
     int bindIndex = -1;
     hkbVariableBindingSet *bind = NULL;
     if (name == ""){
-        WARNING_MESSAGE(QString("PoseMatchingGeneratorUI::variableRenamed(): The new variable name is the empty string!!"))
+        (qWarning("PoseMatchingGeneratorUI::variableRenamed(): The new variable name is the empty string!!"));
     }
     if (bsData){
         index--;
@@ -1352,13 +1352,13 @@ void PoseMatchingGeneratorUI::variableRenamed(const QString & name, int index){
         }
         childUI->variableRenamed(name, index);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::variableRenamed(): The data is NULL!!"))
+        (qFatal("PoseMatchingGeneratorUI::variableRenamed(): The data is NULL!!"));
     }
 }
 
 void PoseMatchingGeneratorUI::generatorRenamed(const QString &name, int index){
     if (name == ""){
-        WARNING_MESSAGE(QString("PoseMatchingGeneratorUI::generatorRenamed(): The new variable name is the empty string!!"))
+        (qWarning("PoseMatchingGeneratorUI::generatorRenamed(): The new variable name is the empty string!!"));
     }
     if (currentIndex() == CHILD_WIDGET){
         childUI->generatorRenamed(name, index);

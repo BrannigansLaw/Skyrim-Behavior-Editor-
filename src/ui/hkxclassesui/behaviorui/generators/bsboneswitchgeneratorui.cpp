@@ -126,10 +126,10 @@ void BSBoneSwitchGeneratorUI::loadData(HkxObject *data){
             }
             loadDynamicTableRows();
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)))
+            (qFatal(QString("BSBoneSwitchGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::loadData(): Attempting to load a null pointer!!"))
+        (qFatal("BSBoneSwitchGeneratorUI::loadData(): Attempting to load a null pointer!!"));
     }
     connectSignals();
 }
@@ -147,11 +147,11 @@ void BSBoneSwitchGeneratorUI::loadDynamicTableRows(){
             if (child){
                 setRowItems(i, "Bone Data "+QString::number(j), child->getClassname(), "Remove", "Edit", "Double click to remove this bone data", "Double click to edit this bone data");
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::loadData(): Null bone data found!!!"));
+                (qFatal("BSBoneSwitchGeneratorUI::loadData(): Null bone data found!!!"));
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::loadDynamicTableRows(): The data is NULL!!"));
+        (qFatal("BSBoneSwitchGeneratorUI::loadDynamicTableRows(): The data is NULL!!"));
     }
     //table->setSortingEnabled(true);
 }
@@ -188,7 +188,7 @@ void BSBoneSwitchGeneratorUI::setName(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::setName(): The data is NULL!!"))
+        (qFatal("BSBoneSwitchGeneratorUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -201,14 +201,14 @@ void BSBoneSwitchGeneratorUI::swapGeneratorIndices(int index1, int index2){
             if (behaviorView->getSelectedItem()){
                 behaviorView->getSelectedItem()->reorderChildren();
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::swapGeneratorIndices(): No item selected!!"));
+                (qFatal("BSBoneSwitchGeneratorUI::swapGeneratorIndices(): No item selected!!"));
             }
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("BSBoneSwitchGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!"))
+            (qWarning("BSBoneSwitchGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::swapGeneratorIndices(): The data is NULL!!"))
+        (qFatal("BSBoneSwitchGeneratorUI::swapGeneratorIndices(): The data is NULL!!"));
     }
 }
 
@@ -257,12 +257,12 @@ void BSBoneSwitchGeneratorUI::addChildWithGenerator(){
             behaviorView->appendBGSGamebryoSequenceGenerator();
             break;
         default:
-            CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::addChild(): Invalid typeEnum!!"))
+            (qFatal("BSBoneSwitchGeneratorUI::addChild(): Invalid typeEnum!!"));
             return;
         }
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::addChild(): The data or behavior graph pointer is NULL!!"))
+        (qFatal("BSBoneSwitchGeneratorUI::addChild(): The data or behavior graph pointer is NULL!!"));
     }
 }
 
@@ -274,11 +274,11 @@ void BSBoneSwitchGeneratorUI::removeChild(int index){
             behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->pGenerator.data()), index);//Reorderchildren?
             behaviorView->removeObjects();
         }else{
-            WARNING_MESSAGE(QString("BSBoneSwitchGeneratorUI::removeChild(): Invalid index of child to remove!!"));
+            (qWarning("BSBoneSwitchGeneratorUI::removeChild(): Invalid index of child to remove!!"));
         }
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::removeChild(): The data or behavior graph pointer is NULL!!"));
+        (qFatal("BSBoneSwitchGeneratorUI::removeChild(): The data or behavior graph pointer is NULL!!"));
     }
 }
 
@@ -301,11 +301,11 @@ void BSBoneSwitchGeneratorUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::viewSelectedChild(): Invalid index of bone data to view!!"))
+                (qFatal("BSBoneSwitchGeneratorUI::viewSelectedChild(): Invalid index of bone data to view!!"));
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::viewSelectedChild(): The data is NULL!!"))
+        (qFatal("BSBoneSwitchGeneratorUI::viewSelectedChild(): The data is NULL!!"));
     }
 }
 
@@ -319,17 +319,17 @@ void BSBoneSwitchGeneratorUI::setDefaultGenerator(int index, const QString & nam
                 indexOfGenerator = bsData->getIndexOfObj(static_cast<DataIconManager*>(bsData->pDefaultGenerator.data()));
                 if (ptr){
                     if (name != ptr->getName()){
-                        CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"));
+                        (qFatal("The name of the selected object does not match it's name in the object selection table!!!"));
                         return;
                     }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->pDefaultGenerator.data()), ptr, false)){
-                        WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+                        (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
                         return;
                     }
                 }else{
                     if (behaviorView->getSelectedItem()){
                         behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->pDefaultGenerator.data())), indexOfGenerator);
                     }else{
-                        CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::setDefaultGenerator(): The selected icon is NULL!!"));
+                        (qFatal("BSBoneSwitchGeneratorUI::setDefaultGenerator(): The selected icon is NULL!!"));
                         return;
                     }
                 }
@@ -337,13 +337,13 @@ void BSBoneSwitchGeneratorUI::setDefaultGenerator(int index, const QString & nam
                 table->item(DEFAULT_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
                 bsData->getParentFile()->toggleChanged(true);
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::setDefaultGenerator(): The 'behaviorView' pointer is NULL!!"))
+                (qFatal("BSBoneSwitchGeneratorUI::setDefaultGenerator(): The 'behaviorView' pointer is NULL!!"));
             }
         }else{
             childUI->setGenerator(index, name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::setDefaultGenerator(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSBoneSwitchGeneratorUI::setDefaultGenerator(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -360,7 +360,7 @@ void BSBoneSwitchGeneratorUI::variableTableElementSelected(int index, const QStr
         childUI->setBindingVariable(index, name);
         break;
     default:
-        WARNING_MESSAGE(QString("BSBoneSwitchGeneratorUI::variableTableElementSelected(): An unwanted element selected event was recieved!!"));;
+        (qWarning("BSBoneSwitchGeneratorUI::variableTableElementSelected(): An unwanted element selected event was recieved!!"));
     }
 }
 
@@ -373,7 +373,7 @@ void BSBoneSwitchGeneratorUI::generatorTableElementSelected(int index, const QSt
         childUI->setGenerator(index, name);
         break;
     default:
-        WARNING_MESSAGE(QString("BSBoneSwitchGeneratorUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!"));;
+        (qWarning("BSBoneSwitchGeneratorUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!"));
     }
 }
 
@@ -389,25 +389,25 @@ void BSBoneSwitchGeneratorUI::connectToTables(GenericTableWidget *generators, Ge
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("BSBoneSwitchGeneratorUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
 void BSBoneSwitchGeneratorUI::variableRenamed(const QString & name, int index){
     if (name == ""){
-        WARNING_MESSAGE(QString("BSBoneSwitchGeneratorUI::variableRenamed(): The new variable name is the empty string!!"))
+        (qWarning("BSBoneSwitchGeneratorUI::variableRenamed(): The new variable name is the empty string!!"));
     }
     if (bsData){
         index--;
         childUI->variableRenamed(name, index);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorUI::variableRenamed(): The data is NULL!!"))
+        (qFatal("BSBoneSwitchGeneratorUI::variableRenamed(): The data is NULL!!"));
     }
 }
 
 void BSBoneSwitchGeneratorUI::generatorRenamed(const QString &name, int index){
     if (name == ""){
-        WARNING_MESSAGE(QString("BSBoneSwitchGeneratorUI::generatorRenamed(): The new variable name is the empty string!!"))
+        (qWarning("BSBoneSwitchGeneratorUI::generatorRenamed(): The new variable name is the empty string!!"));
     }
     index--;
     if (index == static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pDefaultGenerator)){

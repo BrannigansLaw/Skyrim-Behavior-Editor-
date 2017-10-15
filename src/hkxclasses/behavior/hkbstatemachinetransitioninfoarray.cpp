@@ -68,12 +68,12 @@ void hkbStateMachineTransitionInfoArray::removeTransitionToState(uint stateId){
 
 QString hkbStateMachineTransitionInfoArray::getTransitionNameAt(int index){
     if (index > -1 && index < transitions.size()){
-        if (parent.data()){
+        if (parent){
             hkbStateMachine *stateMachine;
-            if (parent.data()->getSignature() == HKB_STATE_MACHINE){
-                stateMachine = static_cast<hkbStateMachine *>(parent.data());
-            }else if (parent.data()->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
-                stateMachine = static_cast<hkbStateMachineStateInfo *>(parent.data())->getParentStateMachine();
+            if (parent->getSignature() == HKB_STATE_MACHINE){
+                stateMachine = static_cast<hkbStateMachine *>(parent);
+            }else if (parent->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
+                stateMachine = static_cast<hkbStateMachineStateInfo *>(parent)->getParentStateMachine();
             }
             if (stateMachine){
                 if (transitions.at(index).flags.contains("FLAG_TO_NESTED_STATE_ID_IS_VALID")){

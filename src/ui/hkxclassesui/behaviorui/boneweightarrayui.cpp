@@ -61,7 +61,7 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
                     boneNames = static_cast<CharacterFile *>(file)->getRigBoneNames();
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("BoneWeightArrayUI::loadData(): Parent file type is unrecognized!!!"))
+                (qFatal("BoneWeightArrayUI::loadData(): Parent file type is unrecognized!!!"));
             }
         }
         for (int i = 0; i < bsData->boneWeights.size() && i < boneNames.size(); i++){
@@ -88,7 +88,7 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
             bones->setRowHidden(j, true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BoneWeightArrayUI::loadData(): The data passed to the UI is NULL!!!"))
+        (qFatal("BoneWeightArrayUI::loadData(): The data passed to the UI is NULL!!!"));
     }
     blockSignals(false);
 }
@@ -105,7 +105,7 @@ void BoneWeightArrayUI::setBoneWeight(){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BoneWeightArrayUI::setBoneWeight(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BoneWeightArrayUI::setBoneWeight(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -115,6 +115,6 @@ void BoneWeightArrayUI::loadBoneWeight(int row, int){
             selectedBone->setValue(bsData->boneWeights.at(row));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("loadBoneWeight::setBoneWeight(): The 'bsData' pointer is NULL!!"))
+        (qFatal("loadBoneWeight::setBoneWeight(): The 'bsData' pointer is NULL!!"));
     }
 }

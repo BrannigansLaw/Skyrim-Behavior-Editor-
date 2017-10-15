@@ -130,7 +130,7 @@ void HandIkDriverInfoHandUI::loadData(hkbHandIkDriverInfoHand *data, hkbHandIkDr
         enforceEndRotation->setChecked(bsData->enforceEndRotation);
         localFrameName->setText(bsData->localFrameName);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandIkDriverInfoHandUI::loadData(): The data or parent object is NULL!!"))
+        (qFatal("HandIkDriverInfoHandUI::loadData(): The data or parent object is NULL!!"));
     }
 }
 

@@ -136,7 +136,7 @@ void TransformVectorModifierUI::connectToTables(GenericTableWidget *variables, G
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("TransformVectorModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -179,10 +179,10 @@ void TransformVectorModifierUI::loadData(HkxObject *data){
                 table->item(COMPUTE_ON_MODIFY_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("TransformVectorModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -196,7 +196,7 @@ void TransformVectorModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setName(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -205,7 +205,7 @@ void TransformVectorModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -216,7 +216,7 @@ void TransformVectorModifierUI::setRotation(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setrotation(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::setrotation(): The data is NULL!!"));
     }
 }
 
@@ -227,7 +227,7 @@ void TransformVectorModifierUI::setTranslation(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::settranslation(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::settranslation(): The data is NULL!!"));
     }
 }
 
@@ -238,7 +238,7 @@ void TransformVectorModifierUI::setVectorIn(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setvectorIn(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::setvectorIn(): The data is NULL!!"));
     }
 }
 
@@ -249,7 +249,7 @@ void TransformVectorModifierUI::setVectorOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setvectorOut(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::setvectorOut(): The data is NULL!!"));
     }
 }
 
@@ -258,7 +258,7 @@ void TransformVectorModifierUI::setRotateOnly(){
         bsData->rotateOnly = rotateOnly->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setrotateOnly(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::setrotateOnly(): The data is NULL!!"));
     }
 }
 
@@ -267,7 +267,7 @@ void TransformVectorModifierUI::setInverse(){
         bsData->inverse = inverse->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setinverse(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::setinverse(): The data is NULL!!"));
     }
 }
 
@@ -276,7 +276,7 @@ void TransformVectorModifierUI::setComputeOnActivate(){
         bsData->computeOnActivate = computeOnActivate->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setcomputeOnActivate(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::setcomputeOnActivate(): The data is NULL!!"));
     }
 }
 
@@ -285,7 +285,7 @@ void TransformVectorModifierUI::setComputeOnModify(){
         bsData->computeOnModify = computeOnModify->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setcomputeOnModify(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::setcomputeOnModify(): The data is NULL!!"));
     }
 }
 
@@ -353,7 +353,7 @@ void TransformVectorModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("TransformVectorModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -373,7 +373,7 @@ void TransformVectorModifierUI::selectTableToView(bool viewisProperty, const QSt
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -420,7 +420,7 @@ void TransformVectorModifierUI::variableRenamed(const QString & name, int index)
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("TransformVectorModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -438,20 +438,20 @@ bool TransformVectorModifierUI::setBinding(int index, int row, const QString &va
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("TransformVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("TransformVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -520,7 +520,7 @@ void TransformVectorModifierUI::setBindingVariable(int index, const QString &nam
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -542,9 +542,9 @@ void TransformVectorModifierUI::loadBinding(int row, int colunm, hkbVariableBind
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("TransformVectorModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TransformVectorModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("TransformVectorModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

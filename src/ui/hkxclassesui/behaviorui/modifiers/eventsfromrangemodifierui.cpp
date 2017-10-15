@@ -118,7 +118,7 @@ void EventsFromRangeModifierUI::addRange(){
         bsData->getParentFile()->toggleChanged(true);
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::addExpression(): The data is NULL!!"));
+        (qFatal("EventsFromRangeModifierUI::addExpression(): The data is NULL!!"));
     }
 }
 
@@ -130,17 +130,17 @@ void EventsFromRangeModifierUI::removeRange(int index){
             if (index < exps->eventData.size() && index >= 0){
                 exps->removeEventData(index);
             }else{
-                WARNING_MESSAGE(QString("EventsFromRangeModifierUI::removeRange(): Invalid row index selected!!"));
+                (qWarning("EventsFromRangeModifierUI::removeRange(): Invalid row index selected!!"));
                 return;
             }
             bsData->getParentFile()->toggleChanged(true);
             loadDynamicTableRows();
         }else{
-            WARNING_MESSAGE(QString("EventsFromRangeModifierUI::removeRange(): Event data is NULL!!"));
+            (qWarning("EventsFromRangeModifierUI::removeRange(): Event data is NULL!!"));
             return;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::removeRange(): The data is NULL!!"));
+        (qFatal("EventsFromRangeModifierUI::removeRange(): The data is NULL!!"));
     }
 }
 
@@ -167,10 +167,10 @@ void EventsFromRangeModifierUI::loadData(HkxObject *data){
             }
             loadDynamicTableRows();
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)))
+            (qFatal(QString("EventsFromRangeModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::loadData(): Attempting to load a null pointer!!"))
+        (qFatal("EventsFromRangeModifierUI::loadData(): Attempting to load a null pointer!!"));
     }
     connectSignals();
 }
@@ -191,7 +191,7 @@ void EventsFromRangeModifierUI::loadDynamicTableRows(){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::loadDynamicTableRows(): The data is NULL!!"));
+        (qFatal("EventsFromRangeModifierUI::loadDynamicTableRows(): The data is NULL!!"));
     }
     //table->setSortingEnabled(true);
 }
@@ -233,20 +233,20 @@ bool EventsFromRangeModifierUI::setBinding(int index, int row, const QString & v
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("EventsFromRangeModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("EventsFromRangeModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("EventsFromRangeModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -279,7 +279,7 @@ void EventsFromRangeModifierUI::setBindingVariable(int index, const QString & na
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::setBindingVariable(): The data is NULL!!"))
+        (qFatal("EventsFromRangeModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -297,7 +297,7 @@ void EventsFromRangeModifierUI::setName(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::setName(): The data is NULL!!"))
+        (qFatal("EventsFromRangeModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -306,7 +306,7 @@ void EventsFromRangeModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("EventsFromRangeModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -317,7 +317,7 @@ void EventsFromRangeModifierUI::setInputValue(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::setInputValue(): The data is NULL!!"));
+        (qFatal("EventsFromRangeModifierUI::setInputValue(): The data is NULL!!"));
     }
 }
 
@@ -328,7 +328,7 @@ void EventsFromRangeModifierUI::setLowerBound(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::setLowerBound(): The data is NULL!!"));
+        (qFatal("EventsFromRangeModifierUI::setLowerBound(): The data is NULL!!"));
     }
 }
 
@@ -374,11 +374,11 @@ void EventsFromRangeModifierUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::viewSelectedChild(): Invalid index of child to view!!"))
+                (qFatal("EventsFromRangeModifierUI::viewSelectedChild(): Invalid index of child to view!!"));
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::viewSelectedChild(): The data is NULL!!"))
+        (qFatal("EventsFromRangeModifierUI::viewSelectedChild(): The data is NULL!!"));
     }
 }
 
@@ -391,7 +391,7 @@ void EventsFromRangeModifierUI::variableTableElementSelected(int index, const QS
         rangeUI->setAssignmentVariableIndex(index, name);
         break;*/
     default:
-        WARNING_MESSAGE(QString("EventsFromRangeModifierUI::variableTableElementSelected(): An unwanted element selected event was recieved!!"));;
+        (qWarning("EventsFromRangeModifierUI::variableTableElementSelected(): An unwanted element selected event was recieved!!"));
     }
 }
 
@@ -407,7 +407,7 @@ void EventsFromRangeModifierUI::connectToTables(GenericTableWidget *variables, G
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("EventsFromRangeModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -429,10 +429,10 @@ void EventsFromRangeModifierUI::loadBinding(int row, int colunm, hkbVariableBind
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("EventsFromRangeModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("EventsFromRangeModifierUI::loadBinding(): The data is NULL!!"));
     }
 }
 
@@ -452,7 +452,7 @@ void EventsFromRangeModifierUI::selectTableToView(bool viewproperties, const QSt
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("EventsFromRangeModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -460,7 +460,7 @@ void EventsFromRangeModifierUI::eventRenamed(const QString & name, int index){
     if (bsData){
         rangeUI->eventRenamed(name, index);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::eventRenamed(): The data is NULL!!"));
+        (qFatal("EventsFromRangeModifierUI::eventRenamed(): The data is NULL!!"));
     }
 }
 
@@ -468,7 +468,7 @@ void EventsFromRangeModifierUI::variableRenamed(const QString & name, int index)
     int bindIndex = -1;
     hkbVariableBindingSet *bind = NULL;
     if (name == ""){
-        WARNING_MESSAGE(QString("EventsFromRangeModifierUI::variableRenamed(): The new variable name is the empty string!!"))
+        (qWarning("EventsFromRangeModifierUI::variableRenamed(): The new variable name is the empty string!!"));
     }
     if (bsData){
         index--;
@@ -492,7 +492,7 @@ void EventsFromRangeModifierUI::variableRenamed(const QString & name, int index)
             //rangeUI->variableRenamed(name, index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::variableRenamed(): The data is NULL!!"))
+        (qFatal("EventsFromRangeModifierUI::variableRenamed(): The data is NULL!!"));
     }
 }
 

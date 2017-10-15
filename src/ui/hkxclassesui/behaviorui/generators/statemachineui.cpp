@@ -269,7 +269,7 @@ void StateMachineUI::loadData(HkxObject *data){
         selfTransitionMode->setCurrentIndex(bsData->SelfTransitionMode.indexOf(bsData->selfTransitionMode));
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadData(): The data is NULL or an incorrect type!!"));
+        (qFatal("StateMachineUI::loadData(): The data is NULL or an incorrect type!!"));
     }
     connectSignals();
 }
@@ -296,7 +296,7 @@ void StateMachineUI::loadDynamicTableRows(){
             if (state){
                 setRowItems(i, state->getName()+" ->ID: "+QString::number(state->stateId), state->getClassname(), "Remove", "Edit", "Double click to remove this state", "Double click to edit this state");
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadData(): Null state found!!!"));
+                (qFatal("StateMachineUI::loadData(): Null state found!!!"));
             }
         }
         hkbStateMachineTransitionInfoArray *trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->wildcardTransitions.data());
@@ -309,7 +309,7 @@ void StateMachineUI::loadDynamicTableRows(){
             table->setRowCount(transitionsButtonRow + 1);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadDynamicTableRows(): The data is NULL!!"));
+        (qFatal("StateMachineUI::loadDynamicTableRows(): The data is NULL!!"));
     }
     //table->setSortingEnabled(true);
 }
@@ -346,7 +346,7 @@ void StateMachineUI::setName(){
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setName(): The data is NULL!!"));
+        (qFatal("StateMachineUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -356,7 +356,7 @@ void StateMachineUI::setReturnToPreviousStateEventId(int index, const QString & 
         table->item(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setReturnToPreviousStateEventId(): The data is NULL!!"));
+        (qFatal("StateMachineUI::setReturnToPreviousStateEventId(): The data is NULL!!"));
     }
 }
 
@@ -365,7 +365,7 @@ void StateMachineUI::setStartStateId(int index){
         bsData->startStateId = static_cast<hkbStateMachineStateInfo *>(bsData->states.at(index).data())->stateId;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setStartStateId(): The data is NULL!!"));
+        (qFatal("StateMachineUI::setStartStateId(): The data is NULL!!"));
     }
 }
 
@@ -375,7 +375,7 @@ void StateMachineUI::setRandomTransitionEventId(int index, const QString & name)
         table->item(RANDOM_TRANSITION_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setRandomTransitionEventId(): The data is NULL!!"));
+        (qFatal("StateMachineUI::setRandomTransitionEventId(): The data is NULL!!"));
     }
 }
 
@@ -385,7 +385,7 @@ void StateMachineUI::setTransitionToNextHigherStateEventId(int index, const QStr
         table->item(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setTransitionToNextHigherStateEventId(): The data is NULL!!"));
+        (qFatal("StateMachineUI::setTransitionToNextHigherStateEventId(): The data is NULL!!"));
     }
 }
 
@@ -395,7 +395,7 @@ void StateMachineUI::setTransitionToNextLowerStateEventId(int index, const QStri
         table->item(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setTransitionToNextLowerStateEventId(): The data is NULL!!"));
+        (qFatal("StateMachineUI::setTransitionToNextLowerStateEventId(): The data is NULL!!"));
     }
 }
 
@@ -404,7 +404,7 @@ void StateMachineUI::setSyncVariableIndex(int index){
         bsData->syncVariableIndex = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setSyncVariableIndex(): The data is NULL!!"));
+        (qFatal("StateMachineUI::setSyncVariableIndex(): The data is NULL!!"));
     }
 }
 
@@ -413,7 +413,7 @@ void StateMachineUI::setWrapAroundStateId(bool checked){
         bsData->wrapAroundStateId = checked;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setWrapAroundStateId(): The data is NULL!!"));
+        (qFatal("StateMachineUI::setWrapAroundStateId(): The data is NULL!!"));
     }
 }
 
@@ -424,7 +424,7 @@ void StateMachineUI::setMaxSimultaneousTransitions(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setMaxSimultaneousTransitions(): The data is NULL!!"));
+        (qFatal("StateMachineUI::setMaxSimultaneousTransitions(): The data is NULL!!"));
     }
 }
 
@@ -433,7 +433,7 @@ void StateMachineUI::setStartStateMode(int index){
         bsData->startStateMode = bsData->StartStateMode.at(index);
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setStartStateMode(): The data is NULL!!"));
+        (qFatal("StateMachineUI::setStartStateMode(): The data is NULL!!"));
     }
 }
 
@@ -442,7 +442,7 @@ void StateMachineUI::setSelfTransitionMode(int index){
         bsData->selfTransitionMode = bsData->SelfTransitionMode.at(index);
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setSelfTransitionMode(): The data is NULL!!"));
+        (qFatal("StateMachineUI::setSelfTransitionMode(): The data is NULL!!"));
     }
 }
 
@@ -455,14 +455,14 @@ void StateMachineUI::swapGeneratorIndices(int index1, int index2){
             if (behaviorView->getSelectedItem()){
                 behaviorView->getSelectedItem()->reorderChildren();
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::swapGeneratorIndices(): No item selected!!"));
+                (qFatal("StateMachineUI::swapGeneratorIndices(): No item selected!!"));
             }
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("StateMachineUI::swapGeneratorIndices(): Cannot swap these rows!!"))
+            (qWarning("StateMachineUI::swapGeneratorIndices(): Cannot swap these rows!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::swapGeneratorIndices(): The data is NULL!!"))
+        (qFatal("StateMachineUI::swapGeneratorIndices(): The data is NULL!!"));
     }
 }
 
@@ -471,7 +471,7 @@ void StateMachineUI::setStateIDForRow(int index, int newID, const QString &state
     if (table->item(row, NAME_COLUMN)){
         table->item(row, NAME_COLUMN)->setText(statename+" ->ID: "+QString::number(newID));
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setStateIDForRow(): Unwanted state id change event heard!!"));
+        (qFatal("StateMachineUI::setStateIDForRow(): Unwanted state id change event heard!!"));
     }
 }
 
@@ -489,20 +489,20 @@ bool StateMachineUI::setBinding(int index, int row, const QString & variableName
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("StateMachineUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("StateMachineUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setBinding(): The data is NULL!!"));
+        (qFatal("StateMachineUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -535,7 +535,7 @@ void StateMachineUI::setBindingVariable(int index, const QString & name){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("StateMachineUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -544,7 +544,7 @@ void StateMachineUI::viewEventToSendWhenStateOrTransitionChanges(){
         eventUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), &bsData->eventToSendWhenStateOrTransitionChanges);
         setCurrentIndex(EVENT_PAYLOAD_WIDGET);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::viewEventToSendWhenStateOrTransitionChanges(): The data is NULL!!"));
+        (qFatal("StateMachineUI::viewEventToSendWhenStateOrTransitionChanges(): The data is NULL!!"));
     }
 }
 
@@ -556,7 +556,7 @@ void StateMachineUI::toggleEventToSendWhenStateOrTransitionChanges(bool enable){
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::toggleEventToSendWhenStateOrTransitionChanges(): The data is NULL!!"));
+        (qFatal("StateMachineUI::toggleEventToSendWhenStateOrTransitionChanges(): The data is NULL!!"));
     }
 }
 
@@ -565,10 +565,10 @@ void StateMachineUI::stateRenamed(const QString &name, int stateIndex){
         if (table->item(INITIAL_ADD_TRANSITION_ROW + stateIndex, NAME_COLUMN)){
             table->item(INITIAL_ADD_TRANSITION_ROW + stateIndex, NAME_COLUMN)->setText(name);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::stateRenamed(): Invalid row selected!!"));
+            (qFatal("StateMachineUI::stateRenamed(): Invalid row selected!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::stateRenamed(): The data is NULL!!"));
+        (qFatal("StateMachineUI::stateRenamed(): The data is NULL!!"));
     }
 }
 
@@ -577,10 +577,10 @@ void StateMachineUI::transitionRenamed(const QString &name, int index){
         if (table->item(transitionsButtonRow + index + 1, NAME_COLUMN)){
             table->item(transitionsButtonRow + index + 1, NAME_COLUMN)->setText(name);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::transitionRenamed(): Invalid row selected!!"));
+            (qFatal("StateMachineUI::transitionRenamed(): Invalid row selected!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::transitionRenamed(): The data is NULL!!"));
+        (qFatal("StateMachineUI::transitionRenamed(): The data is NULL!!"));
     }
 }
 
@@ -600,7 +600,7 @@ void StateMachineUI::selectTableToView(bool viewproperties, const QString & path
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("StateMachineUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -674,7 +674,7 @@ void StateMachineUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::viewSelectedChild(): Invalid index of child to view!!"));
+                (qFatal("StateMachineUI::viewSelectedChild(): Invalid index of child to view!!"));
             }
         }else if (row > transitionsButtonRow && row < table->rowCount()){
             result = row - BASE_NUMBER_OF_ROWS - bsData->getNumberOfStates();
@@ -689,11 +689,11 @@ void StateMachineUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::viewSelectedChild(): Invalid index of child to view!!"));
+                (qFatal("StateMachineUI::viewSelectedChild(): Invalid index of child to view!!"));
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::viewSelectedChild(): The data is NULL!!"));
+        (qFatal("StateMachineUI::viewSelectedChild(): The data is NULL!!"));
     }
 }
 
@@ -715,7 +715,7 @@ void StateMachineUI::eventTableElementSelected(int index, const QString &name){
             setTransitionToNextLowerStateEventId(index, name);
             break;
         default:
-            WARNING_MESSAGE(QString("StateMachineUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));
+            (qWarning("StateMachineUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));
             return;
         }
         break;
@@ -729,7 +729,7 @@ void StateMachineUI::eventTableElementSelected(int index, const QString &name){
         transitionUI->eventTableElementSelected(index, name);
         break;
     default:
-        WARNING_MESSAGE(QString("StateMachineUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));;
+        (qWarning("StateMachineUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));
     }
 }
 
@@ -745,7 +745,7 @@ void StateMachineUI::variableTableElementSelected(int index, const QString &name
         transitionUI->variableTableElementSelected(index, name);
         break;
     default:
-        WARNING_MESSAGE(QString("StateMachineUI::variableTableElementSelected(): An unwanted element selected event was recieved!!"));;
+        (qWarning("StateMachineUI::variableTableElementSelected(): An unwanted element selected event was recieved!!"));
     }
 }
 
@@ -755,7 +755,7 @@ void StateMachineUI::generatorTableElementSelected(int index, const QString &nam
         stateUI->setGenerator(index, name);
         break;
     default:
-        WARNING_MESSAGE(QString("StateMachineUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!"));;
+        (qWarning("StateMachineUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!"));
     }
 }
 
@@ -765,7 +765,7 @@ void StateMachineUI::generatorRenamed(const QString &name, int index){
         stateUI->generatorRenamed(name, index);
         break;
     default:
-        WARNING_MESSAGE(QString("StateMachineUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!"));;
+        (qWarning("StateMachineUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!"));
     }
 }
 
@@ -814,12 +814,12 @@ void StateMachineUI::addStateWithGenerator(){
             behaviorView->appendBGSGamebryoSequenceGenerator();
             break;
         default:
-            CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::addNewStateWithGenerator(): Invalid typeEnum!!"));
+            (qFatal("StateMachineUI::addNewStateWithGenerator(): Invalid typeEnum!!"));
             return;
         }
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::addNewStateWithGenerator(): The data or behavior graph pointer is NULL!!"));
+        (qFatal("StateMachineUI::addNewStateWithGenerator(): The data or behavior graph pointer is NULL!!"));
     }
 }
 
@@ -832,7 +832,7 @@ void StateMachineUI::removeState(int index){
             behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->generator.data()), index);//Reorderchildren?
             behaviorView->removeObjects();
         }else{
-            WARNING_MESSAGE(QString("StateMachineUI::removeState(): Invalid index of child to remove!!"));
+            (qWarning("StateMachineUI::removeState(): Invalid index of child to remove!!"));
         }
         disconnect(startStateId, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateId(int)));
         currentindex = startStateId->currentIndex();
@@ -843,7 +843,7 @@ void StateMachineUI::removeState(int index){
         connect(startStateId, SIGNAL(currentIndexChanged(int)), this, SLOT(setStartStateId(int)), Qt::UniqueConnection);
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::removeState(): The data or behavior graph pointer is NULL!!"));
+        (qFatal("StateMachineUI::removeState(): The data or behavior graph pointer is NULL!!"));
     }
 }
 
@@ -855,16 +855,16 @@ void StateMachineUI::removeTransition(int index){
             if (index < trans->getNumTransitions() && index >= 0){
                 trans->removeTransition(index);
             }else{
-                WARNING_MESSAGE(QString("StateMachineUI::removeTransition(): Invalid row index selected!!"));
+                (qWarning("StateMachineUI::removeTransition(): Invalid row index selected!!"));
                 return;
             }
         }else{
-            WARNING_MESSAGE(QString("StateMachineUI::removeTransition(): Transition data is NULL!!"));
+            (qWarning("StateMachineUI::removeTransition(): Transition data is NULL!!"));
             return;
         }
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::removeTransition(): The data is NULL!!"));
+        (qFatal("StateMachineUI::removeTransition(): The data is NULL!!"));
     }
 }
 
@@ -879,7 +879,7 @@ void StateMachineUI::addTransition(){
         trans->addTransition();
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::addTransition(): The data is NULL!!"));
+        (qFatal("StateMachineUI::addTransition(): The data is NULL!!"));
     }
 }
 
@@ -909,7 +909,7 @@ void StateMachineUI::connectToTables(GenericTableWidget *generators, GenericTabl
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::connectToTables(): One or more arguments are NULL!!"));
+        (qFatal("StateMachineUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -917,7 +917,7 @@ void StateMachineUI::variableRenamed(const QString & name, int index){
     int bindIndex = -1;
     hkbVariableBindingSet *bind = NULL;
     if (name == ""){
-        WARNING_MESSAGE(QString("StateMachineUI::variableRenamed(): The new variable name is the empty string!!"))
+        (qWarning("StateMachineUI::variableRenamed(): The new variable name is the empty string!!"));
     }
     if (bsData){
         index--;
@@ -937,7 +937,7 @@ void StateMachineUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::variableRenamed(): The data is NULL!!"));
+        (qFatal("StateMachineUI::variableRenamed(): The data is NULL!!"));
     }
 }
 
@@ -960,7 +960,7 @@ void StateMachineUI::eventRenamed(const QString & name, int index){
             eventUI->eventRenamed(name, index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::eventRenamed(): The data is NULL!!"));
+        (qFatal("StateMachineUI::eventRenamed(): The data is NULL!!"));
     }
 }
 
@@ -982,10 +982,10 @@ void StateMachineUI::loadBinding(int row, int colunm, hkbVariableBindingSet *var
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("StateMachineUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadBinding(): The data is NULL!!"));
+        (qFatal("StateMachineUI::loadBinding(): The data is NULL!!"));
     }
 }
 
@@ -997,7 +997,7 @@ void StateMachineUI::loadTableValue(int row, const QString &value){
             table->item(row, VALUE_COLUMN)->setText("NONE");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("StateMachineUI::loadTableValue(): There is no table item here!!"));
+        (qFatal("StateMachineUI::loadTableValue(): There is no table item here!!"));
     }
 }
 

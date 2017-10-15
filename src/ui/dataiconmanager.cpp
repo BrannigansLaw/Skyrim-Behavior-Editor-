@@ -18,7 +18,7 @@ bool DataIconManager::hasIcons() const{
             return true;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DataIconManager::hasIcons(): 'icons' is empty!!!"))
+        (qFatal("DataIconManager::hasIcons(): 'icons' is empty!!!"));
         getParentFile()->writeToLog("DataIconManager::hasIcons(): 'icons' is empty!!!");
     }
     return false;
@@ -78,7 +78,7 @@ TreeGraphicsItem * DataIconManager::reconnectToNext(){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DataIconManager::reconnectToNext(): 'icons' is empty!!!"))
+        (qFatal("DataIconManager::reconnectToNext(): 'icons' is empty!!!"));
         getParentFile()->writeToLog("DataIconManager::reconnectToNext(): 'icons' is empty!!!");
     }
     return NULL;
@@ -104,7 +104,7 @@ void DataIconManager::removeIcon(TreeGraphicsItem *icon){
     if (!icons.isEmpty()){
         icons.removeAll(icon);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DataIconManager::removeIcon(): 'icons' is empty!!!"))
+        (qFatal("DataIconManager::removeIcon(): 'icons' is empty!!!"));
         getParentFile()->writeToLog("DataIconManager::removeIcon(): 'icons' is empty!!!");
     }
 }

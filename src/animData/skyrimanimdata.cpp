@@ -29,27 +29,27 @@ bool SkyrimAnimData::parse(QFile *file){
                         if (line.contains(".txt")){
                             projectNames.append(line);
                         }else{
-                            CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): Corrupted project filename does not have 'txt' extension!"));
+                            (qFatal("SkyrimAnimData::parse(): Corrupted project filename does not have 'txt' extension!"));
                             return false;
                         }
                     }else{
-                        CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): Unexpected EOF!"));
+                        (qFatal("SkyrimAnimData::parse(): Unexpected EOF!"));
                         return false;
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): Corrupted length of current block!"));
+                (qFatal("SkyrimAnimData::parse(): Corrupted length of current block!"));
                 return false;
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): Unexpected EOF!"));
+            (qFatal("SkyrimAnimData::parse(): Unexpected EOF!"));
             return false;
         }
     }
     for (uint i = 0; i < size; i++){
         animData.append(new ProjectAnimData());
         if (!animData.last()->read(file)){
-            CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): ProjectAnimData read failed!"));
+            (qFatal("SkyrimAnimData::parse(): ProjectAnimData read failed!"));
             return false;
         }
     }

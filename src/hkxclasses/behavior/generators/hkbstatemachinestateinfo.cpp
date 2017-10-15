@@ -37,25 +37,24 @@ QString hkbStateMachineStateInfo::getName() const{
 }
 
 hkbStateMachine * hkbStateMachineStateInfo::getParentStateMachine() const{
-    if (parentSM.data() && parentSM.data()->getSignature() == HKB_STATE_MACHINE){
-        return reinterpret_cast<hkbStateMachine *>(parentSM.data());
+    if (parentSM && parentSM->getSignature() == HKB_STATE_MACHINE){
+        return parentSM;
     }
     return NULL;
 }
 
 bool hkbStateMachineStateInfo::setStateId(ushort id){
-    hkbStateMachine *parent = static_cast<hkbStateMachine *>(parentSM.data());
     hkbStateMachineStateInfo *state = NULL;
     hkbStateMachineTransitionInfoArray *trans = NULL;
-    if (parent){
-        for (int i = 0; i < parent->states.size(); i++){
-            state = static_cast<hkbStateMachineStateInfo *>(parent->states.at(i).data());
+    if (parentSM){
+        for (int i = 0; i < parentSM->states.size(); i++){
+            state = static_cast<hkbStateMachineStateInfo *>(parentSM->states.at(i).data());
             if (state && state->stateId == id){
                 return false;
             }
         }
-        for (int i = 0; i < parent->states.size(); i++){
-            state = static_cast<hkbStateMachineStateInfo *>(parent->states.at(i).data());
+        for (int i = 0; i < parentSM->states.size(); i++){
+            state = static_cast<hkbStateMachineStateInfo *>(parentSM->states.at(i).data());
             trans = static_cast<hkbStateMachineTransitionInfoArray *>(state->transitions.data());
             if (trans){
                 for (int j = 0; j < trans->transitions.size(); j++){
@@ -65,7 +64,7 @@ bool hkbStateMachineStateInfo::setStateId(ushort id){
                 }
             }
         }
-        trans = static_cast<hkbStateMachineTransitionInfoArray *>(parent->wildcardTransitions.data());
+        trans = static_cast<hkbStateMachineTransitionInfoArray *>(parentSM->wildcardTransitions.data());
         if (trans){
             for (int i = 0; i < trans->transitions.size(); i++){
                 if (trans->transitions.at(i).toStateId == stateId){
@@ -226,7 +225,7 @@ bool hkbStateMachineStateInfo::link(){
             setDataValidity(false);
         }
         transitions = *ptr;
-        static_cast<hkbStateMachineTransitionInfoArray *>(transitions.data())->parent = this;
+        static_cast<hkbStateMachineTransitionInfoArray *>(transitions.data())->parent = parentSM;
     }
     ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(generator.getReference());
     if (!ptr){
@@ -244,7 +243,7 @@ bool hkbStateMachineStateInfo::link(){
 
 void hkbStateMachineStateInfo::unlink(){
     HkDynamicObject::unlink();
-    parentSM = HkxSharedPtr();
+    parentSM = NULL;
     enterNotifyEvents = HkxSharedPtr();
     exitNotifyEvents = HkxSharedPtr();
     transitions = HkxSharedPtr();

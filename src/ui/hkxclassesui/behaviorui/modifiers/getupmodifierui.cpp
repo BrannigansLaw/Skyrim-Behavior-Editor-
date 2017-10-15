@@ -120,7 +120,7 @@ void GetUpModifierUI::connectToTables(GenericTableWidget *variables, GenericTabl
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("GetUpModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -171,10 +171,10 @@ void GetUpModifierUI::loadData(HkxObject *data){
                 table->item(ANOTHER_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("GetUpModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("GetUpModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -188,7 +188,7 @@ void GetUpModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::setName(): The data is NULL!!"));
+        (qFatal("GetUpModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -197,7 +197,7 @@ void GetUpModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("GetUpModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -208,7 +208,7 @@ void GetUpModifierUI::setGroundNormal(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::setgroundNormal(): The data is NULL!!"));
+        (qFatal("GetUpModifierUI::setgroundNormal(): The data is NULL!!"));
     }
 }
 
@@ -219,7 +219,7 @@ void GetUpModifierUI::setDuration(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::setduration(): The data is NULL!!"));
+        (qFatal("GetUpModifierUI::setduration(): The data is NULL!!"));
     }
 }
 
@@ -230,7 +230,7 @@ void GetUpModifierUI::setAlignWithGroundDuration(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::setalignWithGroundDuration(): The data is NULL!!"));
+        (qFatal("GetUpModifierUI::setalignWithGroundDuration(): The data is NULL!!"));
     }
 }
 
@@ -239,7 +239,7 @@ void GetUpModifierUI::setRootBoneIndex(int index){
         bsData->rootBoneIndex = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::setrootBoneIndex(): The data is NULL!!"));
+        (qFatal("GetUpModifierUI::setrootBoneIndex(): The data is NULL!!"));
     }
 }
 
@@ -248,7 +248,7 @@ void GetUpModifierUI::setOtherBoneIndex(int index){
         bsData->otherBoneIndex = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::setotherBoneIndex(): The data is NULL!!"));
+        (qFatal("GetUpModifierUI::setotherBoneIndex(): The data is NULL!!"));
     }
 }
 
@@ -257,7 +257,7 @@ void GetUpModifierUI::setAnotherBoneIndex(int index){
         bsData->anotherBoneIndex = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::setanotherBoneIndex(): The data is NULL!!"));
+        (qFatal("GetUpModifierUI::setanotherBoneIndex(): The data is NULL!!"));
     }
 }
 
@@ -313,7 +313,7 @@ void GetUpModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("GetUpModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -333,7 +333,7 @@ void GetUpModifierUI::selectTableToView(bool viewisProperty, const QString & pat
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("GetUpModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -372,7 +372,7 @@ void GetUpModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("GetUpModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -390,20 +390,20 @@ bool GetUpModifierUI::setBinding(int index, int row, const QString &variableName
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("GetUpModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("GetUpModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("GetUpModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -460,7 +460,7 @@ void GetUpModifierUI::setBindingVariable(int index, const QString &name){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("GetUpModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -482,9 +482,9 @@ void GetUpModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *va
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("GetUpModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetUpModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("GetUpModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

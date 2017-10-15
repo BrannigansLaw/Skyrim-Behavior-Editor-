@@ -205,7 +205,7 @@ void FootIkControlsModifierUI::addLeg(){
         bsData->getParentFile()->toggleChanged(true);
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::addRange(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::addRange(): The data is NULL!!"));
     }
 }
 
@@ -215,17 +215,17 @@ void FootIkControlsModifierUI::removeLeg(int index){
             if (index < bsData->legs.size() && index >= 0){
                 bsData->legs.removeAt(index);
             }else{
-                WARNING_MESSAGE(QString("FootIkControlsModifierUI::removeExpression(): Invalid row index selected!!"));
+                (qWarning("FootIkControlsModifierUI::removeExpression(): Invalid row index selected!!"));
                 return;
             }
             bsData->getParentFile()->toggleChanged(true);
             loadDynamicTableRows();
         }else{
-            WARNING_MESSAGE(QString("FootIkControlsModifierUI::removeExpression(): Ranges is empty!!"));
+            (qWarning("FootIkControlsModifierUI::removeExpression(): Ranges is empty!!"));
             return;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::removeExpression(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::removeExpression(): The data is NULL!!"));
     }
 }
 
@@ -288,10 +288,10 @@ void FootIkControlsModifierUI::loadData(HkxObject *data){
             }
             loadDynamicTableRows();
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)))
+            (qFatal(QString("FootIkControlsModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::loadData(): Attempting to load a null pointer!!"))
+        (qFatal("FootIkControlsModifierUI::loadData(): Attempting to load a null pointer!!"));
     }
     connectSignals();
 }
@@ -307,7 +307,7 @@ void FootIkControlsModifierUI::loadDynamicTableRows(){
             setRowItems(i, "Leg "+QString::number(j), "hkLeg", "Remove", "Edit", "Double click to remove this Leg", "Double click to edit this Leg");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::loadDynamicTableRows(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::loadDynamicTableRows(): The data is NULL!!"));
     }
     //table->setSortingEnabled(true);
 }
@@ -349,20 +349,20 @@ bool FootIkControlsModifierUI::setBinding(int index, int row, const QString & va
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("FootIkControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("FootIkControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -467,7 +467,7 @@ void FootIkControlsModifierUI::setBindingVariable(int index, const QString & nam
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setBindingVariable(): The data is NULL!!"))
+        (qFatal("FootIkControlsModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -485,7 +485,7 @@ void FootIkControlsModifierUI::setName(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setName(): The data is NULL!!"))
+        (qFatal("FootIkControlsModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -494,7 +494,7 @@ void FootIkControlsModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -505,7 +505,7 @@ void FootIkControlsModifierUI::setonOffGain(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setonOffGain(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::setonOffGain(): The data is NULL!!"));
     }
 }
 
@@ -516,7 +516,7 @@ void FootIkControlsModifierUI::setfootPlantedGain(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setfootPlantedGain(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::setfootPlantedGain(): The data is NULL!!"));
     }
 }
 
@@ -527,7 +527,7 @@ void FootIkControlsModifierUI::setfootRaisedGain(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setfootRaisedGain(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::setfootRaisedGain(): The data is NULL!!"));
     }
 }
 
@@ -538,7 +538,7 @@ void FootIkControlsModifierUI::setfootUnlockGain(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setfootUnlockGain(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::setfootUnlockGain(): The data is NULL!!"));
     }
 }
 
@@ -549,7 +549,7 @@ void FootIkControlsModifierUI::setgroundAscendingGain(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setgroundAscendingGain(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::setgroundAscendingGain(): The data is NULL!!"));
     }
 }
 
@@ -560,7 +560,7 @@ void FootIkControlsModifierUI::setgroundDescendingGain(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setgroundDescendingGain(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::setgroundDescendingGain(): The data is NULL!!"));
     }
 }
 
@@ -571,7 +571,7 @@ void FootIkControlsModifierUI::setworldFromModelFeedbackGain(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setworldFromModelFeedbackGain(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::setworldFromModelFeedbackGain(): The data is NULL!!"));
     }
 }
 
@@ -582,7 +582,7 @@ void FootIkControlsModifierUI::seterrorUpDownBias(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::seterrorUpDownBias(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::seterrorUpDownBias(): The data is NULL!!"));
     }
 }
 
@@ -593,7 +593,7 @@ void FootIkControlsModifierUI::setalignWorldFromModelGain(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setalignWorldFromModelGain(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::setalignWorldFromModelGain(): The data is NULL!!"));
     }
 }
 
@@ -604,7 +604,7 @@ void FootIkControlsModifierUI::sethipOrientationGain(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::sethipOrientationGain(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::sethipOrientationGain(): The data is NULL!!"));
     }
 }
 
@@ -615,7 +615,7 @@ void FootIkControlsModifierUI::setmaxKneeAngleDifference(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setmaxKneeAngleDifference(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::setmaxKneeAngleDifference(): The data is NULL!!"));
     }
 }
 
@@ -626,7 +626,7 @@ void FootIkControlsModifierUI::setankleOrientationGain(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setankleOrientationGain(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::setankleOrientationGain(): The data is NULL!!"));
     }
 }
 
@@ -637,7 +637,7 @@ void FootIkControlsModifierUI::seterrorOutTranslation(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::seterrorOutTranslation(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::seterrorOutTranslation(): The data is NULL!!"));
     }
 }
 
@@ -648,7 +648,7 @@ void FootIkControlsModifierUI::setalignWithGroundRotation(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::setalignWithGroundRotation(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::setalignWithGroundRotation(): The data is NULL!!"));
     }
 }
 
@@ -765,11 +765,11 @@ void FootIkControlsModifierUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::viewSelectedChild(): Invalid index of range to view!!"))
+                (qFatal("FootIkControlsModifierUI::viewSelectedChild(): Invalid index of range to view!!"));
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::viewSelectedChild(): The data is NULL!!"))
+        (qFatal("FootIkControlsModifierUI::viewSelectedChild(): The data is NULL!!"));
     }
 }
 
@@ -782,7 +782,7 @@ void FootIkControlsModifierUI::variableTableElementSelected(int index, const QSt
         legUI->setBindingVariable(index, name);
         break;
     default:
-        WARNING_MESSAGE(QString("FootIkControlsModifierUI::variableTableElementSelected(): An unwanted element selected event was recieved!!"));;
+        (qWarning("FootIkControlsModifierUI::variableTableElementSelected(): An unwanted element selected event was recieved!!"));
     }
 }
 
@@ -798,7 +798,7 @@ void FootIkControlsModifierUI::connectToTables(GenericTableWidget *variables, Ge
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("FootIkControlsModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -820,10 +820,10 @@ void FootIkControlsModifierUI::loadBinding(int row, int colunm, hkbVariableBindi
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("FootIkControlsModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::loadBinding(): The data is NULL!!"));
     }
 }
 
@@ -843,7 +843,7 @@ void FootIkControlsModifierUI::selectTableToView(bool viewproperties, const QStr
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("FootIkControlsModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -851,7 +851,7 @@ void FootIkControlsModifierUI::variableRenamed(const QString & name, int index){
     int bindIndex = -1;
     hkbVariableBindingSet *bind = NULL;
     if (name == ""){
-        WARNING_MESSAGE(QString("FootIkControlsModifierUI::variableRenamed(): The new variable name is the empty string!!"))
+        (qWarning("FootIkControlsModifierUI::variableRenamed(): The new variable name is the empty string!!"));
     }
     if (bsData){
         index--;
@@ -923,7 +923,7 @@ void FootIkControlsModifierUI::variableRenamed(const QString & name, int index){
             legUI->variableRenamed(name, index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::variableRenamed(): The data is NULL!!"))
+        (qFatal("FootIkControlsModifierUI::variableRenamed(): The data is NULL!!"));
     }
 }
 

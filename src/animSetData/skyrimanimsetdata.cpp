@@ -27,23 +27,23 @@ bool SkyrimAnimSetData::parse(QFile *file){
                     if (line.contains(".txt")){
                         projectNames.append(line);
                     }else{
-                        CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimSetData::parse(): Corrupted project filename does not have 'txt' extension!"));
+                        (qFatal("SkyrimAnimSetData::parse(): Corrupted project filename does not have 'txt' extension!"));
                         return false;
                     }
                 }else{
-                    CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimSetData::parse(): Unexpected EOF!"));
+                    (qFatal("SkyrimAnimSetData::parse(): Unexpected EOF!"));
                     return false;
                 }
             }
             for (int i = 0; i < projectNames.size(); i++){
                 projects.append(AnimCacheProjectData());
                 if (!projects.last().read(file)){
-                    CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimSetData::parse(): ProjectAnimSetData read failed!"));
+                    (qFatal("SkyrimAnimSetData::parse(): ProjectAnimSetData read failed!"));
                     return false;
                 }
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimSetData::parse(): Corrupted length of current block!"));
+            (qFatal("SkyrimAnimSetData::parse(): Corrupted length of current block!"));
             return false;
         }
     }

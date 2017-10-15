@@ -45,12 +45,12 @@ bool ProjectFile::readAnimationData(const QString & filename){
         delete animfile;
         animfile = new QFile(QDir::currentPath()+"/animationdatasinglefile.txt");
         if (!animfile->exists()){
-            CRITICAL_ERROR_MESSAGE(QString("animationdatasinglefile.txt is missing from the application directory!"));
+            (qFatal("animationdatasinglefile.txt is missing from the application directory!"));
         }
     }
     if (!skyrimAnimData->parse(animfile)){
         delete animfile;
-        CRITICAL_ERROR_MESSAGE(QString("ProjectFile::readAnimationData(): The project animation data file could not be parsed!!!"));
+        (qFatal("ProjectFile::readAnimationData(): The project animation data file could not be parsed!!!"));
         return false;
     }
     delete animfile;
@@ -67,12 +67,12 @@ bool ProjectFile::readAnimationSetData(const QString & filename){
         delete animsetfile;
         animsetfile = new QFile(QDir::currentPath()+"/animationsetdatasinglefile.txt");
         if (!animsetfile->exists()){
-            CRITICAL_ERROR_MESSAGE(QString("animationsetdatasinglefile.txt is missing from the application directory!"));
+            (qFatal("animationsetdatasinglefile.txt is missing from the application directory!"));
         }
     }
     if (!skyrimAnimSetData.parse(animsetfile)){
         delete animsetfile;
-        CRITICAL_ERROR_MESSAGE(QString("ProjectFile::readAnimationSetData(): The project animation set data file could not be parsed!!!"));
+        (qFatal("ProjectFile::readAnimationSetData(): The project animation set data file could not be parsed!!!"));
         return false;
     }
     delete animsetfile;

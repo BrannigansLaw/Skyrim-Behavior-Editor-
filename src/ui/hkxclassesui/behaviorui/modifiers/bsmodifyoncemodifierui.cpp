@@ -88,7 +88,7 @@ void BSModifyOnceModifierUI::connectToTables(GenericTableWidget *modifiers, Gene
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("BSModifyOnceModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -109,10 +109,10 @@ void BSModifyOnceModifierUI::loadData(HkxObject *data){
                 table->item(ON_DEACTIVATE_MODIFIER_ROW, VALUE_COLUMN)->setText("NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)));
+            (qFatal(QString("BSModifyOnceModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::loadData(): The data passed to the UI is NULL!!!"));
+        (qFatal("BSModifyOnceModifierUI::loadData(): The data passed to the UI is NULL!!!"));
     }
     connectSignals();
 }
@@ -126,7 +126,7 @@ void BSModifyOnceModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::setName(): The data is NULL!!"));
+        (qFatal("BSModifyOnceModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -148,17 +148,17 @@ void BSModifyOnceModifierUI::setModifier(int index, const QString &name){
             indexOfModifier = bsData->getIndexOfObj(mod);
             if (ptr){
                 if (name != ptr->getName()){
-                    CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"));
+                    (qFatal("The name of the selected object does not match it's name in the object selection table!!!"));
                     return;
                 }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), mod, ptr, false)){
-                    WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+                    (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
                     return;
                 }
             }else{
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(mod), indexOfModifier);
                 }else{
-                    CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::setGenerator(): The selected icon is NULL!!"));
+                    (qFatal("BSModifyOnceModifierUI::setGenerator(): The selected icon is NULL!!"));
                     return;
                 }
             }
@@ -166,10 +166,10 @@ void BSModifyOnceModifierUI::setModifier(int index, const QString &name){
             table->item(row, VALUE_COLUMN)->setText(name);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::setGenerator(): The 'behaviorView' pointer is NULL!!"))
+            (qFatal("BSModifyOnceModifierUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::setGenerator(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSModifyOnceModifierUI::setGenerator(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -189,7 +189,7 @@ void BSModifyOnceModifierUI::selectTableToView(bool viewproperties, const QStrin
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("BSModifyOnceModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -209,7 +209,7 @@ void BSModifyOnceModifierUI::setBindingVariable(int index, const QString & name)
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::setBindingVariable(): The data is NULL!!"))
+        (qFatal("BSModifyOnceModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -227,20 +227,20 @@ bool BSModifyOnceModifierUI::setBinding(int index, int row, const QString & vari
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSModifyOnceModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSModifyOnceModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("BSModifyOnceModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -263,10 +263,10 @@ void BSModifyOnceModifierUI::loadBinding(int row, int colunm, hkbVariableBinding
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("BSModifyOnceModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("BSModifyOnceModifierUI::loadBinding(): The data is NULL!!"));
     }
 }
 
@@ -280,7 +280,7 @@ void BSModifyOnceModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSModifyOnceModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -295,7 +295,7 @@ void BSModifyOnceModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSModifyOnceModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -309,7 +309,7 @@ void BSModifyOnceModifierUI::modifierRenamed(const QString & name, int index){
             table->item(ON_DEACTIVATE_MODIFIER_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSModifyOnceModifierUI::modifierRenamed(): The 'bsData' pointer is NULL!!"));
+        (qFatal("BSModifyOnceModifierUI::modifierRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 

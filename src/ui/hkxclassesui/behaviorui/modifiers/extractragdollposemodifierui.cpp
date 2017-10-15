@@ -103,7 +103,7 @@ void ExtractRagdollPoseModifierUI::connectToTables(GenericTableWidget *variables
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("ExtractRagdollPoseModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -147,10 +147,10 @@ void ExtractRagdollPoseModifierUI::loadData(HkxObject *data){
                 table->item(ENABLE_COMPUTE_WORLD_FROM_MODEL_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("ExtractRagdollPoseModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("ExtractRagdollPoseModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -164,7 +164,7 @@ void ExtractRagdollPoseModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::setName(): The data is NULL!!"));
+        (qFatal("ExtractRagdollPoseModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -173,7 +173,7 @@ void ExtractRagdollPoseModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("ExtractRagdollPoseModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -182,7 +182,7 @@ void ExtractRagdollPoseModifierUI::setPoseMatchingBone0(int index){
         bsData->poseMatchingBone0 = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::setposeMatchingBone0(): The data is NULL!!"));
+        (qFatal("ExtractRagdollPoseModifierUI::setposeMatchingBone0(): The data is NULL!!"));
     }
 }
 
@@ -191,7 +191,7 @@ void ExtractRagdollPoseModifierUI::setPoseMatchingBone1(int index){
         bsData->poseMatchingBone1 = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::setposeMatchingBone1(): The data is NULL!!"));
+        (qFatal("ExtractRagdollPoseModifierUI::setposeMatchingBone1(): The data is NULL!!"));
     }
 }
 
@@ -200,7 +200,7 @@ void ExtractRagdollPoseModifierUI::setPoseMatchingBone2(int index){
         bsData->poseMatchingBone2 = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::setposeMatchingBone2(): The data is NULL!!"));
+        (qFatal("ExtractRagdollPoseModifierUI::setposeMatchingBone2(): The data is NULL!!"));
     }
 }
 
@@ -209,7 +209,7 @@ void ExtractRagdollPoseModifierUI::setEnableComputeWorldFromModel(){
         bsData->enableComputeWorldFromModel = enableComputeWorldFromModel->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::setenableComputeWorldFromModel(): The data is NULL!!"));
+        (qFatal("ExtractRagdollPoseModifierUI::setenableComputeWorldFromModel(): The data is NULL!!"));
     }
 }
 
@@ -253,7 +253,7 @@ void ExtractRagdollPoseModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("ExtractRagdollPoseModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -273,7 +273,7 @@ void ExtractRagdollPoseModifierUI::selectTableToView(bool viewisProperty, const 
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("ExtractRagdollPoseModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -304,7 +304,7 @@ void ExtractRagdollPoseModifierUI::variableRenamed(const QString & name, int ind
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("ExtractRagdollPoseModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -322,20 +322,20 @@ bool ExtractRagdollPoseModifierUI::setBinding(int index, int row, const QString 
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("ExtractRagdollPoseModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("ExtractRagdollPoseModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("ExtractRagdollPoseModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -380,7 +380,7 @@ void ExtractRagdollPoseModifierUI::setBindingVariable(int index, const QString &
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("ExtractRagdollPoseModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -402,9 +402,9 @@ void ExtractRagdollPoseModifierUI::loadBinding(int row, int colunm, hkbVariableB
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("ExtractRagdollPoseModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ExtractRagdollPoseModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("ExtractRagdollPoseModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

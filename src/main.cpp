@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
             }
         }
     }
-    CRITICAL_ERROR_MESSAGE(QString(QString::number(linecount)))*/
+    (qFatal(QString::number(linecount)))*/
 
     return a.exec();
 }

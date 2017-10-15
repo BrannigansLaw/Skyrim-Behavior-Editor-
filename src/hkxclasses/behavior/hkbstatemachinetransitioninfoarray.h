@@ -59,7 +59,7 @@ private:
     static uint refCount;
     static QString classname;
     QList <HkTransition> transitions;
-    HkxSharedPtr parent;
+    HkxObject *parent;
 };
 
 #endif // HKBSTATEMACHINETRANSITIONINFOARRAY_H

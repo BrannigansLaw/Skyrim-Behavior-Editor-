@@ -96,7 +96,7 @@ void RotateCharacterModifierUI::connectToTables(GenericTableWidget *variables, G
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("RotateCharacterModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -124,10 +124,10 @@ void RotateCharacterModifierUI::loadData(HkxObject *data){
                 table->item(AXIS_OF_ROTATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("RotateCharacterModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("RotateCharacterModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -141,7 +141,7 @@ void RotateCharacterModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::setName(): The data is NULL!!"));
+        (qFatal("RotateCharacterModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -150,7 +150,7 @@ void RotateCharacterModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("RotateCharacterModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -161,7 +161,7 @@ void RotateCharacterModifierUI::setDegreesPerSecond(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::setDegreesPerSecond(): The data is NULL!!"));
+        (qFatal("RotateCharacterModifierUI::setDegreesPerSecond(): The data is NULL!!"));
     }
 }
 
@@ -172,7 +172,7 @@ void RotateCharacterModifierUI::setSpeedMultiplier(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::setSpeedMultiplier(): The data is NULL!!"));
+        (qFatal("RotateCharacterModifierUI::setSpeedMultiplier(): The data is NULL!!"));
     }
 }
 
@@ -183,7 +183,7 @@ void RotateCharacterModifierUI::setAxisOfRotation(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::setAxisOfRotation(): The data is NULL!!"));
+        (qFatal("RotateCharacterModifierUI::setAxisOfRotation(): The data is NULL!!"));
     }
 }
 
@@ -221,7 +221,7 @@ void RotateCharacterModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("RotateCharacterModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -241,7 +241,7 @@ void RotateCharacterModifierUI::selectTableToView(bool viewisProperty, const QSt
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("RotateCharacterModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -268,7 +268,7 @@ void RotateCharacterModifierUI::variableRenamed(const QString & name, int index)
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("RotateCharacterModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -286,20 +286,20 @@ bool RotateCharacterModifierUI::setBinding(int index, int row, const QString &va
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("RotateCharacterModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("RotateCharacterModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("RotateCharacterModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -338,7 +338,7 @@ void RotateCharacterModifierUI::setBindingVariable(int index, const QString &nam
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("RotateCharacterModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -360,9 +360,9 @@ void RotateCharacterModifierUI::loadBinding(int row, int colunm, hkbVariableBind
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("RotateCharacterModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("RotateCharacterModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("RotateCharacterModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

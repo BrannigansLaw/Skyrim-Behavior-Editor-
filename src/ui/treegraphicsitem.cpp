@@ -265,7 +265,7 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
             children[i]->setParentItem(NULL);
         }
         if (children.removeAll(this) != 1){
-            CRITICAL_ERROR_MESSAGE(QString("TreeGraphicsItem::setParent(): Error!!!"))
+            (qFatal("TreeGraphicsItem::setParent(): Error!!!"));
         }
         for (int i = 0; i < children.size(); i++){
             children[i]->setParentItem(oldParent);
@@ -296,7 +296,7 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
         }
         reposition();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("TreeGraphicsItem::setParent(): Error!!!"))
+        (qFatal("TreeGraphicsItem::setParent(): Error!!!"));
     }
     return (TreeGraphicsItem *)oldParent;
 }

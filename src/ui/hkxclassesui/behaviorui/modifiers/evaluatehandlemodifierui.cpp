@@ -125,7 +125,7 @@ void EvaluateHandleModifierUI::connectToTables(GenericTableWidget *variables, Ge
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("EvaluateHandleModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -165,10 +165,10 @@ void EvaluateHandleModifierUI::loadData(HkxObject *data){
                 table->item(HANDLE_CHANGE_SPEED_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("EvaluateHandleModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("EvaluateHandleModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -182,7 +182,7 @@ void EvaluateHandleModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::setName(): The data is NULL!!"));
+        (qFatal("EvaluateHandleModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -191,7 +191,7 @@ void EvaluateHandleModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("EvaluateHandleModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -202,7 +202,7 @@ void EvaluateHandleModifierUI::setHandlePositionOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::setHandlePositionOut(): The data is NULL!!"));
+        (qFatal("EvaluateHandleModifierUI::setHandlePositionOut(): The data is NULL!!"));
     }
 }
 
@@ -213,7 +213,7 @@ void EvaluateHandleModifierUI::setHandleRotationOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::setHandleRotationOut(): The data is NULL!!"));
+        (qFatal("EvaluateHandleModifierUI::setHandleRotationOut(): The data is NULL!!"));
     }
 }
 
@@ -222,7 +222,7 @@ void EvaluateHandleModifierUI::setIsValidOut(){
         bsData->isValidOut = isValidOut->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::setIsValidOut(): The data is NULL!!"));
+        (qFatal("EvaluateHandleModifierUI::setIsValidOut(): The data is NULL!!"));
     }
 }
 
@@ -233,7 +233,7 @@ void EvaluateHandleModifierUI::setExtrapolationTimeStep(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::setExtrapolationTimeStep(): The data is NULL!!"));
+        (qFatal("EvaluateHandleModifierUI::setExtrapolationTimeStep(): The data is NULL!!"));
     }
 }
 
@@ -244,7 +244,7 @@ void EvaluateHandleModifierUI::setHandleChangeSpeed(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::setHandleChangeSpeed(): The data is NULL!!"));
+        (qFatal("EvaluateHandleModifierUI::setHandleChangeSpeed(): The data is NULL!!"));
     }
 }
 
@@ -253,7 +253,7 @@ void EvaluateHandleModifierUI::setHandleChangeMode(int index){
         bsData->handleChangeMode = bsData->HandleChangeMode.at(index);
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::setHandleChangeMode(): The data is NULL!!"));
+        (qFatal("EvaluateHandleModifierUI::setHandleChangeMode(): The data is NULL!!"));
     }
 }
 
@@ -309,7 +309,7 @@ void EvaluateHandleModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("EvaluateHandleModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -329,7 +329,7 @@ void EvaluateHandleModifierUI::selectTableToView(bool viewisProperty, const QStr
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("EvaluateHandleModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -368,7 +368,7 @@ void EvaluateHandleModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("EvaluateHandleModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -386,20 +386,20 @@ bool EvaluateHandleModifierUI::setBinding(int index, int row, const QString &var
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("EvaluateHandleModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("EvaluateHandleModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("EvaluateHandleModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -456,7 +456,7 @@ void EvaluateHandleModifierUI::setBindingVariable(int index, const QString &name
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("EvaluateHandleModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -478,10 +478,10 @@ void EvaluateHandleModifierUI::loadBinding(int row, int colunm, hkbVariableBindi
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("EvaluateHandleModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EvaluateHandleModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("EvaluateHandleModifierUI::loadBinding(): The data is NULL!!"));
     }
 }
 

@@ -103,7 +103,7 @@ void BehaviorGraphIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     if (itemData->hasChildren()){
         painter->drawRect(button);
         if (itemData->icons.isEmpty()){
-            CRITICAL_ERROR_MESSAGE(QString("BehaviorGraphIcon::paint(): Icon data has no icons!!!"));
+            (qFatal("BehaviorGraphIcon::paint(): Icon data has no icons!!!"));
         }else if (itemData->icons.first() == this){
             if (!childItems().isEmpty()){
                 painter->drawLine(horiz);

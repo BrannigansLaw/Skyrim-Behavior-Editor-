@@ -189,7 +189,7 @@ void DetectCloseToGroundModifierUI::connectToTables(GenericTableWidget *variable
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("DetectCloseToGroundModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -217,7 +217,7 @@ void DetectCloseToGroundModifierUI::loadData(HkxObject *data){
             closeToGroundHeight->setValue(bsData->closeToGroundHeight);
             raycastDistanceDown->setValue(bsData->raycastDistanceDown);
             if (bsData->collisionFilterInfo + 1 >= collisionFilterInfo->count() || bsData->collisionFilterInfo + 1 < 0){
-                CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::loadData(): Invalid collisionFilterInfo!!!"));
+                (qFatal("DetectCloseToGroundModifierUI::loadData(): Invalid collisionFilterInfo!!!"));
                 return;
             }
             collisionFilterInfo->setCurrentIndex(bsData->collisionFilterInfo + 1);
@@ -248,10 +248,10 @@ void DetectCloseToGroundModifierUI::loadData(HkxObject *data){
                 table->item(ANIM_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("DetectCloseToGroundModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -265,7 +265,7 @@ void DetectCloseToGroundModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::setName(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -274,7 +274,7 @@ void DetectCloseToGroundModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -287,7 +287,7 @@ void DetectCloseToGroundModifierUI::setCloseToGroundEventId(int index, const QSt
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::setcloseToGroundEventId(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::setcloseToGroundEventId(): The data is NULL!!"));
     }
 }
 
@@ -308,7 +308,7 @@ void DetectCloseToGroundModifierUI::setCloseToGroundEventPayload(){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::setcloseToGroundEventPayload(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::setcloseToGroundEventPayload(): The data is NULL!!"));
     }
 }
 
@@ -319,7 +319,7 @@ void DetectCloseToGroundModifierUI::setCloseToGroundHeight(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::setcloseToGroundHeight(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::setcloseToGroundHeight(): The data is NULL!!"));
     }
 }
 
@@ -330,7 +330,7 @@ void DetectCloseToGroundModifierUI::setRaycastDistanceDown(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::setdistance(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::setdistance(): The data is NULL!!"));
     }
 }
 
@@ -339,7 +339,7 @@ void DetectCloseToGroundModifierUI::setCollisionFilterInfo(int index){
         bsData->collisionFilterInfo = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::setcollisionFilterInfo(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::setcollisionFilterInfo(): The data is NULL!!"));
     }
 }
 
@@ -351,7 +351,7 @@ void DetectCloseToGroundModifierUI::setBoneIndex(int index){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::setBoneIndex(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::setBoneIndex(): The data is NULL!!"));
     }
 }
 
@@ -363,7 +363,7 @@ void DetectCloseToGroundModifierUI::setAnimBoneIndex(int index){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::setAnimBoneIndex(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::setAnimBoneIndex(): The data is NULL!!"));
     }
 }
 
@@ -415,7 +415,7 @@ void DetectCloseToGroundModifierUI::viewSelected(int row, int column){
             emit viewEvents(bsData->closeToGroundEvent.id + 1);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("DetectCloseToGroundModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -435,7 +435,7 @@ void DetectCloseToGroundModifierUI::selectTableToView(bool viewisProperty, const
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -446,7 +446,7 @@ void DetectCloseToGroundModifierUI::eventRenamed(const QString & name, int index
             table->item(CLOSE_TO_GROUND_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::eventRenamed(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::eventRenamed(): The data is NULL!!"));
     }
 }
 
@@ -481,7 +481,7 @@ void DetectCloseToGroundModifierUI::variableRenamed(const QString & name, int in
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("DetectCloseToGroundModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -499,20 +499,20 @@ bool DetectCloseToGroundModifierUI::setBinding(int index, int row, const QString
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("DetectCloseToGroundModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("DetectCloseToGroundModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -563,7 +563,7 @@ void DetectCloseToGroundModifierUI::setBindingVariable(int index, const QString 
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -585,10 +585,10 @@ void DetectCloseToGroundModifierUI::loadBinding(int row, int colunm, hkbVariable
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("DetectCloseToGroundModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("DetectCloseToGroundModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("DetectCloseToGroundModifierUI::loadBinding(): The data is NULL!!"));
     }
 }
 

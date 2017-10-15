@@ -217,7 +217,7 @@ void LookAtModifierUI::connectToTables(GenericTableWidget *variables, GenericTab
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("LookAtModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -299,10 +299,10 @@ void LookAtModifierUI::loadData(HkxObject *data){
                 table->item(IS_TARGET_INSIDE_LIMIT_CONE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("LookAtModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -316,7 +316,7 @@ void LookAtModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setName(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -325,7 +325,7 @@ void LookAtModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -336,7 +336,7 @@ void LookAtModifierUI::setTargetWS(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::settargetWS(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::settargetWS(): The data is NULL!!"));
     }
 }
 
@@ -347,7 +347,7 @@ void LookAtModifierUI::setHeadForwardLS(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setheadForwardLS(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setheadForwardLS(): The data is NULL!!"));
     }
 }
 
@@ -358,7 +358,7 @@ void LookAtModifierUI::setNeckForwardLS(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setneckForwardLS(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setneckForwardLS(): The data is NULL!!"));
     }
 }
 
@@ -369,7 +369,7 @@ void LookAtModifierUI::setNeckRightLS(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setneckRightLS(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setneckRightLS(): The data is NULL!!"));
     }
 }
 
@@ -380,7 +380,7 @@ void LookAtModifierUI::setEyePositionHS(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::seteyePositionHS(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::seteyePositionHS(): The data is NULL!!"));
     }
 }
 
@@ -391,7 +391,7 @@ void LookAtModifierUI::setNewTargetGain(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setnewTargetGain(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setnewTargetGain(): The data is NULL!!"));
     }
 }
 
@@ -402,7 +402,7 @@ void LookAtModifierUI::setOnGain(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setonGain(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setonGain(): The data is NULL!!"));
     }
 }
 
@@ -413,7 +413,7 @@ void LookAtModifierUI::setOffGain(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setoffGain(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setoffGain(): The data is NULL!!"));
     }
 }
 
@@ -424,7 +424,7 @@ void LookAtModifierUI::setLimitAngleDegrees(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setLimitAngleDegrees(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setLimitAngleDegrees(): The data is NULL!!"));
     }
 }
 
@@ -435,7 +435,7 @@ void LookAtModifierUI::setLimitAngleLeft(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setlimitAngleLeft(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setlimitAngleLeft(): The data is NULL!!"));
     }
 }
 
@@ -446,7 +446,7 @@ void LookAtModifierUI::setLimitAngleRight(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setlimitAngleRight(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setlimitAngleRight(): The data is NULL!!"));
     }
 }
 
@@ -457,7 +457,7 @@ void LookAtModifierUI::setLimitAngleUp(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setlimitAngleUp(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setlimitAngleUp(): The data is NULL!!"));
     }
 }
 
@@ -468,7 +468,7 @@ void LookAtModifierUI::setLimitAngleDown(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setlimitAngleDown(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setlimitAngleDown(): The data is NULL!!"));
     }
 }
 
@@ -477,7 +477,7 @@ void LookAtModifierUI::setHeadIndex(int index){
         bsData->headIndex = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setheadIndex(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setheadIndex(): The data is NULL!!"));
     }
 }
 
@@ -486,7 +486,7 @@ void LookAtModifierUI::setNeckIndex(int index){
         bsData->neckIndex = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setneckIndex(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setneckIndex(): The data is NULL!!"));
     }
 }
 
@@ -495,7 +495,7 @@ void LookAtModifierUI::setIsOn(){
         bsData->isOn = isOn->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setisOn(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setisOn(): The data is NULL!!"));
     }
 }
 
@@ -504,7 +504,7 @@ void LookAtModifierUI::setIndividualLimitsOn(){
         bsData->individualLimitsOn = individualLimitsOn->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setindividualLimitsOn(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setindividualLimitsOn(): The data is NULL!!"));
     }
 }
 
@@ -513,7 +513,7 @@ void LookAtModifierUI::setIsTargetInsideLimitCone(){
         bsData->isTargetInsideLimitCone = isTargetInsideLimitCone->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setisTargetInsideLimitCone(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setisTargetInsideLimitCone(): The data is NULL!!"));
     }
 }
 
@@ -641,7 +641,7 @@ void LookAtModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("LookAtModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -661,7 +661,7 @@ void LookAtModifierUI::selectTableToView(bool viewisProperty, const QString & pa
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -748,7 +748,7 @@ void LookAtModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("LookAtModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -766,20 +766,20 @@ bool LookAtModifierUI::setBinding(int index, int row, const QString &variableNam
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("LookAtModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("LookAtModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -908,7 +908,7 @@ void LookAtModifierUI::setBindingVariable(int index, const QString &name){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -930,9 +930,9 @@ void LookAtModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *v
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("LookAtModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("LookAtModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("LookAtModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

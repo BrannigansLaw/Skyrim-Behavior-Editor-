@@ -5,6 +5,7 @@
 #include <QString>
 //#include <QStringBuilder>
 #include <QMessageBox>
+#include <QDebug>
 
 #define MAX_HKXXML_LINE_LENGTH 512
 

@@ -88,7 +88,7 @@ void GetWorldFromModelModifierUI::connectToTables(GenericTableWidget *variables,
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("GetWorldFromModelModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -113,10 +113,10 @@ void GetWorldFromModelModifierUI::loadData(HkxObject *data){
                 table->item(ROTATION_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("GetWorldFromModelModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("GetWorldFromModelModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -130,7 +130,7 @@ void GetWorldFromModelModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setName(): The data is NULL!!"));
+        (qFatal("GetWorldFromModelModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -139,7 +139,7 @@ void GetWorldFromModelModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("GetWorldFromModelModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -150,7 +150,7 @@ void GetWorldFromModelModifierUI::setTranslationOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::settranslationOut(): The data is NULL!!"));
+        (qFatal("GetWorldFromModelModifierUI::settranslationOut(): The data is NULL!!"));
     }
 }
 
@@ -161,7 +161,7 @@ void GetWorldFromModelModifierUI::setRotationOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setrotationOut(): The data is NULL!!"));
+        (qFatal("GetWorldFromModelModifierUI::setrotationOut(): The data is NULL!!"));
     }
 }
 
@@ -193,7 +193,7 @@ void GetWorldFromModelModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("GetWorldFromModelModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -213,7 +213,7 @@ void GetWorldFromModelModifierUI::selectTableToView(bool viewisProperty, const Q
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("GetWorldFromModelModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -236,7 +236,7 @@ void GetWorldFromModelModifierUI::variableRenamed(const QString & name, int inde
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("GetWorldFromModelModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -254,20 +254,20 @@ bool GetWorldFromModelModifierUI::setBinding(int index, int row, const QString &
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("GetWorldFromModelModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("GetWorldFromModelModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("GetWorldFromModelModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -300,7 +300,7 @@ void GetWorldFromModelModifierUI::setBindingVariable(int index, const QString &n
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("GetWorldFromModelModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -322,9 +322,9 @@ void GetWorldFromModelModifierUI::loadBinding(int row, int colunm, hkbVariableBi
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("GetWorldFromModelModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("GetWorldFromModelModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("GetWorldFromModelModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

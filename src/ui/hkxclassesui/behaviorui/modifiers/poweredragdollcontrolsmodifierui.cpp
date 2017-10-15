@@ -181,7 +181,7 @@ void PoweredRagdollControlsModifierUI::connectToTables(GenericTableWidget *varia
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(boneIndexUI, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("PoweredRagdollControlsModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -258,10 +258,10 @@ void PoweredRagdollControlsModifierUI::loadData(HkxObject *data){
                 table->item(BONE_WEIGHTS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("PoweredRagdollControlsModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -275,7 +275,7 @@ void PoweredRagdollControlsModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setName(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -284,7 +284,7 @@ void PoweredRagdollControlsModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -295,7 +295,7 @@ void PoweredRagdollControlsModifierUI::setMaxForce(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setmaxForce(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::setmaxForce(): The data is NULL!!"));
     }
 }
 
@@ -306,7 +306,7 @@ void PoweredRagdollControlsModifierUI::setTau(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::settau(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::settau(): The data is NULL!!"));
     }
 }
 
@@ -317,7 +317,7 @@ void PoweredRagdollControlsModifierUI::setDamping(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setdamping(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::setdamping(): The data is NULL!!"));
     }
 }
 
@@ -328,7 +328,7 @@ void PoweredRagdollControlsModifierUI::setProportionalRecoveryVelocity(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setproportionalRecoveryVelocity(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::setproportionalRecoveryVelocity(): The data is NULL!!"));
     }
 }
 
@@ -339,7 +339,7 @@ void PoweredRagdollControlsModifierUI::setConstantRecoveryVelocity(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setconstantRecoveryVelocity(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::setconstantRecoveryVelocity(): The data is NULL!!"));
     }
 }
 
@@ -348,7 +348,7 @@ void PoweredRagdollControlsModifierUI::setPoseMatchingBone0(int index){
         bsData->poseMatchingBone0 = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setPoseMatchingBone0(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::setPoseMatchingBone0(): The data is NULL!!"));
     }
 }
 
@@ -357,7 +357,7 @@ void PoweredRagdollControlsModifierUI::setPoseMatchingBone1(int index){
         bsData->poseMatchingBone1 = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setPoseMatchingBone1(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::setPoseMatchingBone1(): The data is NULL!!"));
     }
 }
 
@@ -366,7 +366,7 @@ void PoweredRagdollControlsModifierUI::setPoseMatchingBone2(int index){
         bsData->poseMatchingBone2 = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setPoseMatchingBone2(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::setPoseMatchingBone2(): The data is NULL!!"));
     }
 }
 
@@ -375,7 +375,7 @@ void PoweredRagdollControlsModifierUI::setMode(int index){
         bsData->mode = bsData->Mode.at(index);
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setMode(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::setMode(): The data is NULL!!"));
     }
 }
 
@@ -392,7 +392,7 @@ void PoweredRagdollControlsModifierUI::toggleBones(bool enable){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::toggleBones(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::toggleBones(): The data is NULL!!"));
     }
 }
 
@@ -401,7 +401,7 @@ void PoweredRagdollControlsModifierUI::viewBones(){
         boneIndexUI->loadData(bsData->bones.data());
         setCurrentIndex(BONE_INDEX_WIDGET);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::viewBones(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::viewBones(): The data is NULL!!"));
     }
 }
 
@@ -416,7 +416,7 @@ void PoweredRagdollControlsModifierUI::toggleBoneWeights(bool enable){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::toggleBoneWeights(): The data is NULL!!"));
+        (qFatal("BlenderGeneratorChildUI::toggleBoneWeights(): The data is NULL!!"));
     }
 }
 
@@ -425,7 +425,7 @@ void PoweredRagdollControlsModifierUI::viewBoneWeights(){
         boneWeightsUI->loadData(bsData->boneWeights.data());
         setCurrentIndex(BONE_WEIGHT_WIDGET);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::viewBoneWeights(): The data is NULL!!"));
+        (qFatal("BlenderGeneratorChildUI::viewBoneWeights(): The data is NULL!!"));
     }
 }
 
@@ -499,7 +499,7 @@ void PoweredRagdollControlsModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("PoweredRagdollControlsModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -519,7 +519,7 @@ void PoweredRagdollControlsModifierUI::selectTableToView(bool viewisProperty, co
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -570,7 +570,7 @@ void PoweredRagdollControlsModifierUI::variableRenamed(const QString & name, int
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("PoweredRagdollControlsModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -588,20 +588,20 @@ bool PoweredRagdollControlsModifierUI::setBinding(int index, int row, const QStr
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("PoweredRagdollControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("PoweredRagdollControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -676,7 +676,7 @@ void PoweredRagdollControlsModifierUI::setBindingVariable(int index, const QStri
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -702,9 +702,9 @@ void PoweredRagdollControlsModifierUI::loadBinding(int row, int colunm, hkbVaria
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("PoweredRagdollControlsModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("PoweredRagdollControlsModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("PoweredRagdollControlsModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

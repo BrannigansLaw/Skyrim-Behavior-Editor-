@@ -227,7 +227,7 @@ void HandUI::loadData(BehaviorFile *parentFile, hkbHandIkControlsModifier::hkHan
             table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::loadData(): Behavior file, bind or event data is null!!!"));
+        (qFatal("HandUI::loadData(): Behavior file, bind or event data is null!!!"));
     }
     connectSignals();
 }
@@ -250,10 +250,10 @@ void HandUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, co
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("HandUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("HandUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::loadBinding(): The data is NULL!!"));
+        (qFatal("HandUI::loadBinding(): The data is NULL!!"));
     }
 }
 
@@ -271,20 +271,20 @@ bool HandUI::setBinding(int index, int row, const QString & variableName, const 
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             file->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::setBinding(): The data is NULL!!"));
+        (qFatal("HandUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -371,7 +371,7 @@ void HandUI::setBindingVariable(int index, const QString & name){
         }
         file->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::setBindingVariable(): The data is NULL!!"))
+        (qFatal("HandUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -382,7 +382,7 @@ void HandUI::setTargetPosition(){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::settargetPosition(): Behavior file or event data is null!!!"));
+        (qFatal("HandUI::settargetPosition(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -393,7 +393,7 @@ void HandUI::setTargetRotation(){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::settargetRotation(): Behavior file or event data is null!!!"));
+        (qFatal("HandUI::settargetRotation(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -404,7 +404,7 @@ void HandUI::setTargetNormal(){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::settargetNormal(): Behavior file or event data is null!!!"));
+        (qFatal("HandUI::settargetNormal(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -415,7 +415,7 @@ void HandUI::setTransformOnFraction(){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::settransformOnFraction(): Behavior file or event data is null!!!"));
+        (qFatal("HandUI::settransformOnFraction(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -426,7 +426,7 @@ void HandUI::setNormalOnFraction(){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::setnormalOnFraction(): Behavior file or event data is null!!!"));
+        (qFatal("HandUI::setnormalOnFraction(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -437,7 +437,7 @@ void HandUI::setFadeInDuration(){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::setFadeInDuration(): Behavior file or event data is null!!!"));
+        (qFatal("HandUI::setFadeInDuration(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -448,7 +448,7 @@ void HandUI::setFadeOutDuration(){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::setFadeOutDuration(): Behavior file or event data is null!!!"));
+        (qFatal("HandUI::setFadeOutDuration(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -459,7 +459,7 @@ void HandUI::setExtrapolationTimeStep(){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::setExtrapolationTimeStep(): Behavior file or event data is null!!!"));
+        (qFatal("HandUI::setExtrapolationTimeStep(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -470,7 +470,7 @@ void HandUI::setHandleChangeSpeed(){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::setHandleChangeSpeed(): Behavior file or event data is null!!!"));
+        (qFatal("HandUI::setHandleChangeSpeed(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -479,7 +479,7 @@ void HandUI::setHandleChangeMode(const QString &mode){
         bsData->controlData.handleChangeMode = mode;
         file->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::setHandleChangeSpeed(): Behavior file or event data is null!!!"));
+        (qFatal("HandUI::setHandleChangeSpeed(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -490,7 +490,7 @@ void HandUI::setFixUp(){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::setFixUp(): Behavior file or event data is null!!!"));
+        (qFatal("HandUI::setFixUp(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -499,7 +499,7 @@ void HandUI::setHandIndex(int index){
         bsData->handIndex = index - 1;
         file->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::setindex(): Behavior file or event data is null!!!"));
+        (qFatal("HandUI::setindex(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -508,7 +508,7 @@ void HandUI::setEnable(){
         bsData->enable = enable->isChecked();
         file->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::setEnable(): Behavior file or event data is null!!!"));
+        (qFatal("HandUI::setEnable(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -592,7 +592,7 @@ void HandUI::viewSelectedChild(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::viewSelectedChild(): The data is NULL!!"))
+        (qFatal("HandUI::viewSelectedChild(): The data is NULL!!"));
     }
 }
 
@@ -612,7 +612,7 @@ void HandUI::selectTableToView(bool viewproperties, const QString & path){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("HandUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -620,7 +620,7 @@ void HandUI::variableRenamed(const QString & name, int index){
     int bindIndex = -1;
     hkbVariableBindingSet *bind = NULL;
     if (name == ""){
-        WARNING_MESSAGE(QString("HandUI::variableRenamed(): The new variable name is the empty string!!"))
+        (qWarning("HandUI::variableRenamed(): The new variable name is the empty string!!"));
     }
     if (bsData){
         //index--;
@@ -676,6 +676,6 @@ void HandUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("HandUI::variableRenamed(): The data is NULL!!"))
+        (qFatal("HandUI::variableRenamed(): The data is NULL!!"));
     }
 }

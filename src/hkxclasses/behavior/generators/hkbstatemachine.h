@@ -9,6 +9,7 @@ class hkbStateMachine: public hkbGenerator
     friend class StateMachineUI;
     friend class StateUI;
     friend class hkbStateMachineStateInfo;
+    friend class BehaviorFile;
 public:
     hkbStateMachine(HkxFile *parent, long ref = 0);
     virtual ~hkbStateMachine();

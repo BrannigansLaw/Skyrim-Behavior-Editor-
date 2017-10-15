@@ -376,7 +376,7 @@ void BehaviorFile::generateDefaultCharacterData(){
         data->addEvent("2_KillActor");
         data->addEvent("MRh_SpellFire_Event");
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BehaviorFile::generateDefaultCharacterData(): The behavior graph data failed to construct!"));
+        (qFatal("BehaviorFile::generateDefaultCharacterData(): The behavior graph data failed to construct!"));
     }
 }
 
@@ -973,7 +973,7 @@ void BehaviorFile::write(){
         getWriter().setFile(this);
         getWriter().writeToXMLFile();
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BehaviorFile::write(): The root object is NULL!!"));
+        (qFatal("BehaviorFile::write(): The root object is NULL!!"));
     }
 }
 

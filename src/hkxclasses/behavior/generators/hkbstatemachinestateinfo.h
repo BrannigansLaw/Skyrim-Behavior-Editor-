@@ -28,7 +28,7 @@ private:
     hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&);
     hkbStateMachineStateInfo(const hkbStateMachineStateInfo &);
 private:
-    HkxSharedPtr parentSM;
+    hkbStateMachine *parentSM;
     static uint refCount;
     static QString classname;
     HkxSharedPtr enterNotifyEvents;

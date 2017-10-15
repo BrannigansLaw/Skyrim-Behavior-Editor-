@@ -55,7 +55,7 @@ void EventUI::loadData(BehaviorFile *parentFile, hkEventPayload * event){
         text = file->getEventNameAt(event->id);
         if (text == ""){
             if (event->id != -1){
-                WARNING_MESSAGE(QString("EventUI::loadData(): Invalid event id!!!"));
+                (qWarning("EventUI::loadData(): Invalid event id!!!"));
             }
             text = "NONE";
         }
@@ -66,7 +66,7 @@ void EventUI::loadData(BehaviorFile *parentFile, hkEventPayload * event){
             eventPayload->setText("");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventUI::loadData(): Behavior file or event data is null!!!"));
+        (qFatal("EventUI::loadData(): Behavior file or event data is null!!!"));
     }
     connectSignals();
 }
@@ -85,7 +85,7 @@ void EventUI::setEvent(int index, const QString & name){
         selectEvent->setText(name);
         file->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventUI::setEvent(): Behavior file or event data is null!!!"));
+        (qFatal("EventUI::setEvent(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -106,7 +106,7 @@ void EventUI::setEventPayload(){
         }
         file->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventUI::setEventPayload(): Behavior file or event data is null!!!"));
+        (qFatal("EventUI::setEventPayload(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -114,7 +114,7 @@ void EventUI::emitViewEvent(){
     if (eventData){
         emit viewEvents(eventData->id + 1);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventUI::emitViewEvent(): Event data is null!!!"));
+        (qFatal("EventUI::emitViewEvent(): Event data is null!!!"));
     }
 }
 
@@ -124,6 +124,6 @@ void EventUI::eventRenamed(const QString & name, int index){
             selectEvent->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("EventUI::eventRenamed(): The data is NULL!!"))
+        (qFatal("EventUI::eventRenamed(): The data is NULL!!"));
     }
 }

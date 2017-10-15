@@ -109,7 +109,7 @@ void BSOffsetAnimationGeneratorUI::connectToTables(GenericTableWidget *generator
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("BSOffsetAnimationGeneratorUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -122,7 +122,7 @@ void BSOffsetAnimationGeneratorUI::setName(){
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setName(): The data is NULL!!"))
+        (qFatal("BSOffsetAnimationGeneratorUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -133,7 +133,7 @@ void BSOffsetAnimationGeneratorUI::setFOffsetVariable(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setFOffsetVariable(): The data is NULL!!"))
+        (qFatal("BSOffsetAnimationGeneratorUI::setFOffsetVariable(): The data is NULL!!"));
     }
 }
 
@@ -144,7 +144,7 @@ void BSOffsetAnimationGeneratorUI::setFOffsetRangeStart(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setFOffsetRangeStart(): The data is NULL!!"))
+        (qFatal("BSOffsetAnimationGeneratorUI::setFOffsetRangeStart(): The data is NULL!!"));
     }
 }
 
@@ -155,7 +155,7 @@ void BSOffsetAnimationGeneratorUI::setFOffsetRangeEnd(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setFOffsetRangeEnd(): The data is NULL!!"))
+        (qFatal("BSOffsetAnimationGeneratorUI::setFOffsetRangeEnd(): The data is NULL!!"));
     }
 }
 
@@ -173,20 +173,20 @@ bool BSOffsetAnimationGeneratorUI::setBinding(int index, int row, const QString 
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSOffsetAnimationGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSOffsetAnimationGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setBinding(): The data is NULL!!"));
+        (qFatal("BSOffsetAnimationGeneratorUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -219,7 +219,7 @@ void BSOffsetAnimationGeneratorUI::setBindingVariable(int index, const QString &
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setBindingVariable(): The data is NULL!!"))
+        (qFatal("BSOffsetAnimationGeneratorUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -241,10 +241,10 @@ void BSOffsetAnimationGeneratorUI::loadBinding(int row, int colunm, hkbVariableB
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("BSOffsetAnimationGeneratorUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::loadBinding(): The data is NULL!!"));
+        (qFatal("BSOffsetAnimationGeneratorUI::loadBinding(): The data is NULL!!"));
     }
 }
 
@@ -278,10 +278,10 @@ void BSOffsetAnimationGeneratorUI::loadData(HkxObject *data){
                 table->item(FOFFSET_RANGE_END_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)));
+            (qFatal(QString("BSOffsetAnimationGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::loadData(): The data passed to the UI is NULL!!!"));
+        (qFatal("BSOffsetAnimationGeneratorUI::loadData(): The data passed to the UI is NULL!!!"));
     }
     connectSignals();
 }
@@ -304,20 +304,20 @@ void BSOffsetAnimationGeneratorUI::setGenerator(int index, const QString & name)
             indexOfGenerator = bsData->getIndexOfObj(gen);
             if (ptr){
                 if (name != ptr->getName()){
-                    CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"));
+                    (qFatal("The name of the selected object does not match it's name in the object selection table!!!"));
                     return;
                 }else if (row == POFFSET_CLIP_GENERATOR_ROW && ptr->getSignature() != HKB_CLIP_GENERATOR){
-                    WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nInvalid object type selected! You must select a clip generator for the 'pOffsetClipGenerator' data field!!!"));
+                    (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nInvalid object type selected! You must select a clip generator for the 'pOffsetClipGenerator' data field!!!"));
                     return;
                 }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), gen, ptr, false)){
-                    WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+                    (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
                     return;
                 }
             }else{
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(gen), indexOfGenerator);
                 }else{
-                    CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setGenerator(): The selected icon is NULL!!"));
+                    (qFatal("BSOffsetAnimationGeneratorUI::setGenerator(): The selected icon is NULL!!"));
                     return;
                 }
             }
@@ -325,10 +325,10 @@ void BSOffsetAnimationGeneratorUI::setGenerator(int index, const QString & name)
             table->item(row, VALUE_COLUMN)->setText(name);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setGenerator(): The 'behaviorView' pointer is NULL!!"))
+            (qFatal("BSOffsetAnimationGeneratorUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::setGenerator(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSOffsetAnimationGeneratorUI::setGenerator(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -364,7 +364,7 @@ void BSOffsetAnimationGeneratorUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSOffsetAnimationGeneratorUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -384,7 +384,7 @@ void BSOffsetAnimationGeneratorUI::selectTableToView(bool viewproperties, const 
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("BSOffsetAnimationGeneratorUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -407,7 +407,7 @@ void BSOffsetAnimationGeneratorUI::variableRenamed(const QString & name, int ind
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSOffsetAnimationGeneratorUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -421,7 +421,7 @@ void BSOffsetAnimationGeneratorUI::generatorRenamed(const QString & name, int in
             table->item(POFFSET_CLIP_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSOffsetAnimationGeneratorUI::generatorRenamed(): The 'bsData' pointer is NULL!!"));
+        (qFatal("BSOffsetAnimationGeneratorUI::generatorRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 

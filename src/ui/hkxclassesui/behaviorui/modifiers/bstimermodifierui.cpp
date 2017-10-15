@@ -105,7 +105,7 @@ void BSTimerModifierUI::connectToTables(GenericTableWidget *variables, GenericTa
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("BSTimerModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -142,10 +142,10 @@ void BSTimerModifierUI::loadData(HkxObject *data){
                 table->item(RESET_ALARM_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("BSTimerModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("BSTimerModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -159,7 +159,7 @@ void BSTimerModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::setName(): The data is NULL!!"));
+        (qFatal("BSTimerModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -168,7 +168,7 @@ void BSTimerModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("BSTimerModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -179,7 +179,7 @@ void BSTimerModifierUI::setAlarmTimeSeconds(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::setalarmTimeSeconds(): The data is NULL!!"));
+        (qFatal("BSTimerModifierUI::setalarmTimeSeconds(): The data is NULL!!"));
     }
 }
 
@@ -192,7 +192,7 @@ void BSTimerModifierUI::setAlarmEventId(int index, const QString & name){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::setAlarmEventId(): The data is NULL!!"));
+        (qFatal("BSTimerModifierUI::setAlarmEventId(): The data is NULL!!"));
     }
 }
 
@@ -213,7 +213,7 @@ void BSTimerModifierUI::setAlarmEventPayload(){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::setalarmEventPayload(): The data is NULL!!"));
+        (qFatal("BSTimerModifierUI::setalarmEventPayload(): The data is NULL!!"));
     }
 }
 
@@ -222,7 +222,7 @@ void BSTimerModifierUI::setResetAlarm(){
         bsData->resetAlarm = resetAlarm->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::setResetAlarm(): The data is NULL!!"));
+        (qFatal("BSTimerModifierUI::setResetAlarm(): The data is NULL!!"));
     }
 }
 
@@ -256,7 +256,7 @@ void BSTimerModifierUI::viewSelected(int row, int column){
             emit viewEvents(bsData->alarmEvent.id + 1);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSTimerModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -276,7 +276,7 @@ void BSTimerModifierUI::selectTableToView(bool viewisProperty, const QString & p
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("BSTimerModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -287,7 +287,7 @@ void BSTimerModifierUI::eventRenamed(const QString & name, int index){
             table->item(ALARM_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::eventRenamed(): The data is NULL!!"));
+        (qFatal("BSTimerModifierUI::eventRenamed(): The data is NULL!!"));
     }
 }
 
@@ -310,7 +310,7 @@ void BSTimerModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSTimerModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -328,20 +328,20 @@ bool BSTimerModifierUI::setBinding(int index, int row, const QString &variableNa
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSTimerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSTimerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("BSTimerModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -374,7 +374,7 @@ void BSTimerModifierUI::setBindingVariable(int index, const QString &name){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("BSTimerModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -396,10 +396,10 @@ void BSTimerModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("BSTimerModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTimerModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("BSTimerModifierUI::loadBinding(): The data is NULL!!"));
     }
 }
 

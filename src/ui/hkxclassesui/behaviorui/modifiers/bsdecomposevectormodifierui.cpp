@@ -112,7 +112,7 @@ void BSDecomposeVectorModifierUI::connectToTables(GenericTableWidget *variables,
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("BSDecomposeVectorModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -146,10 +146,10 @@ void BSDecomposeVectorModifierUI::loadData(HkxObject *data){
                 table->item(W_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("BSDecomposeVectorModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("BSDecomposeVectorModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -163,7 +163,7 @@ void BSDecomposeVectorModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::setName(): The data is NULL!!"));
+        (qFatal("BSDecomposeVectorModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -172,7 +172,7 @@ void BSDecomposeVectorModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("BSDecomposeVectorModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -183,7 +183,7 @@ void BSDecomposeVectorModifierUI::setVector(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::setVector(): The data is NULL!!"));
+        (qFatal("BSDecomposeVectorModifierUI::setVector(): The data is NULL!!"));
     }
 }
 
@@ -194,7 +194,7 @@ void BSDecomposeVectorModifierUI::setX(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::setX(): The data is NULL!!"));
+        (qFatal("BSDecomposeVectorModifierUI::setX(): The data is NULL!!"));
     }
 }
 
@@ -205,7 +205,7 @@ void BSDecomposeVectorModifierUI::setY(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::setY(): The data is NULL!!"));
+        (qFatal("BSDecomposeVectorModifierUI::setY(): The data is NULL!!"));
     }
 }
 
@@ -216,7 +216,7 @@ void BSDecomposeVectorModifierUI::setZ(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::setZ(): The data is NULL!!"));
+        (qFatal("BSDecomposeVectorModifierUI::setZ(): The data is NULL!!"));
     }
 }
 
@@ -227,7 +227,7 @@ void BSDecomposeVectorModifierUI::setW(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::setW(): The data is NULL!!"));
+        (qFatal("BSDecomposeVectorModifierUI::setW(): The data is NULL!!"));
     }
 }
 
@@ -277,7 +277,7 @@ void BSDecomposeVectorModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSDecomposeVectorModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -297,7 +297,7 @@ void BSDecomposeVectorModifierUI::selectTableToView(bool viewisProperty, const Q
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("BSDecomposeVectorModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -332,7 +332,7 @@ void BSDecomposeVectorModifierUI::variableRenamed(const QString & name, int inde
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSDecomposeVectorModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -350,20 +350,20 @@ bool BSDecomposeVectorModifierUI::setBinding(int index, int row, const QString &
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSDecomposeVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSDecomposeVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("BSDecomposeVectorModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -414,7 +414,7 @@ void BSDecomposeVectorModifierUI::setBindingVariable(int index, const QString &n
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("BSDecomposeVectorModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -436,9 +436,9 @@ void BSDecomposeVectorModifierUI::loadBinding(int row, int colunm, hkbVariableBi
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("BSDecomposeVectorModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSDecomposeVectorModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("BSDecomposeVectorModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

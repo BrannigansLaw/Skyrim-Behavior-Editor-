@@ -85,10 +85,10 @@ void BGSGamebryoSequenceGeneratorUI::loadData(HkxObject *data){
             eBlendModeFunction->setCurrentIndex(bsData->BlendModeFunction.indexOf(bsData->eBlendModeFunction));
             fPercent->setValue(bsData->fPercent);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BGSGamebryoSequenceGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)));
+            (qFatal(QString("BGSGamebryoSequenceGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BGSGamebryoSequenceGeneratorUI::loadData(): The data passed to the UI is NULL!!!"));
+        (qFatal("BGSGamebryoSequenceGeneratorUI::loadData(): The data passed to the UI is NULL!!!"));
     }
     connectSignals();
 }
@@ -102,7 +102,7 @@ void BGSGamebryoSequenceGeneratorUI::setName(){
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BGSGamebryoSequenceGeneratorUI::setName(): The data is NULL!!"));
+        (qFatal("BGSGamebryoSequenceGeneratorUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -113,7 +113,7 @@ void BGSGamebryoSequenceGeneratorUI::setSequence(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BGSGamebryoSequenceGeneratorUI::setSequence(): The data is NULL!!"));
+        (qFatal("BGSGamebryoSequenceGeneratorUI::setSequence(): The data is NULL!!"));
     }
 }
 
@@ -122,7 +122,7 @@ void BGSGamebryoSequenceGeneratorUI::setBlendModeFunction(int index){
         bsData->eBlendModeFunction = bsData->BlendModeFunction.at(index);
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BGSGamebryoSequenceGeneratorUI::setBlendModeFunction(): The data is NULL!!"));
+        (qFatal("BGSGamebryoSequenceGeneratorUI::setBlendModeFunction(): The data is NULL!!"));
     }
 }
 
@@ -133,7 +133,7 @@ void BGSGamebryoSequenceGeneratorUI::setPercent(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BGSGamebryoSequenceGeneratorUI::setPercent(): The data is NULL!!"));
+        (qFatal("BGSGamebryoSequenceGeneratorUI::setPercent(): The data is NULL!!"));
     }
 }
 

@@ -144,7 +144,7 @@ void CombineTransformsModifierUI::connectToTables(GenericTableWidget *variables,
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("CombineTransformsModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -190,10 +190,10 @@ void CombineTransformsModifierUI::loadData(HkxObject *data){
                 table->item(INVERT_RESULT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("CombineTransformsModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -207,7 +207,7 @@ void CombineTransformsModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setName(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -216,7 +216,7 @@ void CombineTransformsModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -227,7 +227,7 @@ void CombineTransformsModifierUI::setTranslationOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setTranslationOut(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::setTranslationOut(): The data is NULL!!"));
     }
 }
 
@@ -238,7 +238,7 @@ void CombineTransformsModifierUI::setRotationOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setRotationOut(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::setRotationOut(): The data is NULL!!"));
     }
 }
 
@@ -249,7 +249,7 @@ void CombineTransformsModifierUI::setLeftTranslation(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setLeftTranslation(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::setLeftTranslation(): The data is NULL!!"));
     }
 }
 
@@ -260,7 +260,7 @@ void CombineTransformsModifierUI::setLeftRotation(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setLeftRotation(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::setLeftRotation(): The data is NULL!!"));
     }
 }
 
@@ -271,7 +271,7 @@ void CombineTransformsModifierUI::setRightTranslation(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setRightTranslation(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::setRightTranslation(): The data is NULL!!"));
     }
 }
 
@@ -282,7 +282,7 @@ void CombineTransformsModifierUI::setRightRotation(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setRightRotation(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::setRightRotation(): The data is NULL!!"));
     }
 }
 
@@ -291,7 +291,7 @@ void CombineTransformsModifierUI::setInvertLeftTransform(){
         bsData->invertLeftTransform = invertLeftTransform->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setInvertLeftTransform(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::setInvertLeftTransform(): The data is NULL!!"));
     }
 }
 
@@ -300,7 +300,7 @@ void CombineTransformsModifierUI::setInvertRightTransform(){
         bsData->invertRightTransform = invertRightTransform->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setInvertRightTransform(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::setInvertRightTransform(): The data is NULL!!"));
     }
 }
 
@@ -309,7 +309,7 @@ void CombineTransformsModifierUI::setInvertResult(){
         bsData->invertResult = invertResult->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setInvertResult(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::setInvertResult(): The data is NULL!!"));
     }
 }
 
@@ -383,7 +383,7 @@ void CombineTransformsModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("CombineTransformsModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -403,7 +403,7 @@ void CombineTransformsModifierUI::selectTableToView(bool viewisProperty, const Q
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -454,7 +454,7 @@ void CombineTransformsModifierUI::variableRenamed(const QString & name, int inde
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("CombineTransformsModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -472,20 +472,20 @@ bool CombineTransformsModifierUI::setBinding(int index, int row, const QString &
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("CombineTransformsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("CombineTransformsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -560,7 +560,7 @@ void CombineTransformsModifierUI::setBindingVariable(int index, const QString &n
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -582,9 +582,9 @@ void CombineTransformsModifierUI::loadBinding(int row, int colunm, hkbVariableBi
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("CombineTransformsModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("CombineTransformsModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("CombineTransformsModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

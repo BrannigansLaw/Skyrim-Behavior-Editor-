@@ -72,15 +72,15 @@ void BehaviorReferenceGeneratorUI::loadData(HkxObject *data){
             bsData->behaviorName.replace("\\", "/");    //Do this once on object read?
             int index = behaviorName->findText(bsData->behaviorName, Qt::MatchFixedString);
             if (index < 0){
-                WARNING_MESSAGE(QString("BehaviorReferenceGeneratorUI::loadData(): The data has an invalid behavior name!!!"));
+                (qWarning("BehaviorReferenceGeneratorUI::loadData(): The data has an invalid behavior name!!!"));
             }else{
                 behaviorName->setCurrentIndex(index);
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BehaviorReferenceGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)));
+            (qFatal(QString("BehaviorReferenceGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BehaviorReferenceGeneratorUI::loadData(): The data passed to the UI is NULL!!!"));
+        (qFatal("BehaviorReferenceGeneratorUI::loadData(): The data passed to the UI is NULL!!!"));
     }
     connectSignals();
 }
@@ -94,14 +94,14 @@ void BehaviorReferenceGeneratorUI::setName(){
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BehaviorReferenceGeneratorUI::setName(): The data is NULL!!"));
+        (qFatal("BehaviorReferenceGeneratorUI::setName(): The data is NULL!!"));
     }
 }
 
 void BehaviorReferenceGeneratorUI::setBehaviorName(const QString & text){
     if (bsData){
         if (bsData->getParentFile()->fileName().contains(text)){
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch!!!"));
             disconnectSignals();
             behaviorName->setCurrentIndex(behaviorName->findText(bsData->behaviorName, Qt::MatchFixedString));
             connectSignals();
@@ -110,13 +110,13 @@ void BehaviorReferenceGeneratorUI::setBehaviorName(const QString & text){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BehaviorReferenceGeneratorUI::setBehaviorName(): The data is NULL!!"));
+        (qFatal("BehaviorReferenceGeneratorUI::setBehaviorName(): The data is NULL!!"));
     }
 }
 
 void BehaviorReferenceGeneratorUI::behaviorRenamed(const QString &name, int index){
     if (name == ""){
-        WARNING_MESSAGE(QString("BehaviorReferenceGeneratorUI::behaviorRenamed(): The new variable name is the empty string!!"))
+        (qWarning("BehaviorReferenceGeneratorUI::behaviorRenamed(): The new variable name is the empty string!!"));
     }
     //index--;
     if (index == behaviorName->currentIndex()){

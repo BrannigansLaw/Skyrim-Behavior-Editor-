@@ -86,7 +86,7 @@ void AnimationTranslationUI::loadData(SkyrimAnimationTranslation *trans, qreal m
         y->setValue(bsData->y);
         z->setValue(bsData->z);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("AnimationTranslationUI::loadData(): Data is null!!!"));
+        (qFatal("AnimationTranslationUI::loadData(): Data is null!!!"));
     }
     connectSignals();
 }
@@ -98,7 +98,7 @@ void AnimationTranslationUI::setLocalTime(){
             //file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("AnimationTranslationUI::setlocalTime(): Data is null!!!"));
+        (qFatal("AnimationTranslationUI::setlocalTime(): Data is null!!!"));
     }
 }
 
@@ -109,7 +109,7 @@ void AnimationTranslationUI::setX(){
             //file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("AnimationTranslationUI::setx(): Data is null!!!"));
+        (qFatal("AnimationTranslationUI::setx(): Data is null!!!"));
     }
 }
 
@@ -120,7 +120,7 @@ void AnimationTranslationUI::setY(){
             //file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("AnimationTranslationUI::sety(): Data is null!!!"));
+        (qFatal("AnimationTranslationUI::sety(): Data is null!!!"));
     }
 }
 
@@ -131,6 +131,6 @@ void AnimationTranslationUI::setZ(){
             //file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("AnimationTranslationUI::setz(): Data is null!!!"));
+        (qFatal("AnimationTranslationUI::setz(): Data is null!!!"));
     }
 }

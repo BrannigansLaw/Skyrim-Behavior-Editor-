@@ -80,7 +80,7 @@ void MirrorModifierUI::connectToTables(GenericTableWidget *variables, GenericTab
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("MirrorModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -102,10 +102,10 @@ void MirrorModifierUI::loadData(HkxObject *data){
                 table->item(IS_ADDITIVE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("MirrorModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("MirrorModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -119,7 +119,7 @@ void MirrorModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::setName(): The data is NULL!!"));
+        (qFatal("MirrorModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -128,7 +128,7 @@ void MirrorModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("MirrorModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -137,7 +137,7 @@ void MirrorModifierUI::setIsAdditive(){
         bsData->isAdditive = isAdditive->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::setIsAdditive(): The data is NULL!!"));
+        (qFatal("MirrorModifierUI::setIsAdditive(): The data is NULL!!"));
     }
 }
 
@@ -163,7 +163,7 @@ void MirrorModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("MirrorModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -183,7 +183,7 @@ void MirrorModifierUI::selectTableToView(bool viewisProperty, const QString & pa
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("MirrorModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -202,7 +202,7 @@ void MirrorModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("MirrorModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -220,20 +220,20 @@ bool MirrorModifierUI::setBinding(int index, int row, const QString &variableNam
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("MirrorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("MirrorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("MirrorModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -260,7 +260,7 @@ void MirrorModifierUI::setBindingVariable(int index, const QString &name){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("MirrorModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -282,9 +282,9 @@ void MirrorModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *v
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("MirrorModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("MirrorModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("MirrorModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

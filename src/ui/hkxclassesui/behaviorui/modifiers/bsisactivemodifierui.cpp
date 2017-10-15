@@ -152,7 +152,7 @@ void BSIsActiveModifierUI::connectToTables(GenericTableWidget *variables, Generi
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("BSIsActiveModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -201,10 +201,10 @@ void BSIsActiveModifierUI::loadData(HkxObject *data){
                 table->item(INVERT_ACTIVE_4_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("BSIsActiveModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -218,7 +218,7 @@ void BSIsActiveModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setName(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -227,7 +227,7 @@ void BSIsActiveModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -236,7 +236,7 @@ void BSIsActiveModifierUI::setIsActive0(){
         bsData->bIsActive0 = bIsActive0->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setIsActive0(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::setIsActive0(): The data is NULL!!"));
     }
 }
 
@@ -245,7 +245,7 @@ void BSIsActiveModifierUI::setInvertActive0(){
         bsData->bInvertActive0 = bInvertActive0->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setInvertActive0(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::setInvertActive0(): The data is NULL!!"));
     }
 }
 
@@ -254,7 +254,7 @@ void BSIsActiveModifierUI::setIsActive1(){
         bsData->bIsActive1 = bIsActive1->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setIsActive1(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::setIsActive1(): The data is NULL!!"));
     }
 }
 
@@ -263,7 +263,7 @@ void BSIsActiveModifierUI::setInvertActive1(){
         bsData->bInvertActive1 = bInvertActive1->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setInvertActive1(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::setInvertActive1(): The data is NULL!!"));
     }
 }
 
@@ -272,7 +272,7 @@ void BSIsActiveModifierUI::setIsActive2(){
         bsData->bIsActive2 = bIsActive2->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setIsActive2(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::setIsActive2(): The data is NULL!!"));
     }
 }
 
@@ -281,7 +281,7 @@ void BSIsActiveModifierUI::setInvertActive2(){
         bsData->bInvertActive2 = bInvertActive2->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setInvertActive2(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::setInvertActive2(): The data is NULL!!"));
     }
 }
 
@@ -290,7 +290,7 @@ void BSIsActiveModifierUI::setIsActive3(){
         bsData->bIsActive3 = bIsActive3->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setIsActive3(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::setIsActive3(): The data is NULL!!"));
     }
 }
 
@@ -299,7 +299,7 @@ void BSIsActiveModifierUI::setInvertActive3(){
         bsData->bInvertActive3 = bInvertActive3->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setInvertActive3(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::setInvertActive3(): The data is NULL!!"));
     }
 }
 
@@ -308,7 +308,7 @@ void BSIsActiveModifierUI::setIsActive4(){
         bsData->bIsActive4 = bIsActive4->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setIsActive4(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::setIsActive4(): The data is NULL!!"));
     }
 }
 
@@ -317,7 +317,7 @@ void BSIsActiveModifierUI::setInvertActive4(){
         bsData->bInvertActive4 = bInvertActive4->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setInvertActive4(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::setInvertActive4(): The data is NULL!!"));
     }
 }
 
@@ -397,7 +397,7 @@ void BSIsActiveModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSIsActiveModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -417,7 +417,7 @@ void BSIsActiveModifierUI::selectTableToView(bool viewisProperty, const QString 
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -472,7 +472,7 @@ void BSIsActiveModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSIsActiveModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -490,20 +490,20 @@ bool BSIsActiveModifierUI::setBinding(int index, int row, const QString &variabl
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSIsActiveModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSIsActiveModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -584,7 +584,7 @@ void BSIsActiveModifierUI::setBindingVariable(int index, const QString &name){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -606,9 +606,9 @@ void BSIsActiveModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSe
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("BSIsActiveModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSIsActiveModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("BSIsActiveModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

@@ -80,7 +80,7 @@ void ModifierGeneratorUI::connectToTables(GenericTableWidget *modifiers, Generic
         connect(this, SIGNAL(viewGenerators(int)), generators, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewModifiers(int)), modifiers, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ModifierGeneratorUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("ModifierGeneratorUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -101,10 +101,10 @@ void ModifierGeneratorUI::loadData(HkxObject *data){
                 table->item(GENERATOR_ROW, VALUE_COLUMN)->setText("NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("ModifierGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)));
+            (qFatal(QString("ModifierGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ModifierGeneratorUI::loadData(): The data passed to the UI is NULL!!!"));
+        (qFatal("ModifierGeneratorUI::loadData(): The data passed to the UI is NULL!!!"));
     }
     connectSignals();
 }
@@ -118,7 +118,7 @@ void ModifierGeneratorUI::setName(){
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ModifierGeneratorUI::setName(): The data is NULL!!"));
+        (qFatal("ModifierGeneratorUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -131,17 +131,17 @@ void ModifierGeneratorUI::setModifier(int index, const QString &name){
             indexOfModifier = bsData->getIndexOfObj(static_cast<DataIconManager*>(bsData->modifier.data()));
             if (ptr){
                 if (name != ptr->getName()){
-                    CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"));
+                    (qFatal("The name of the selected object does not match it's name in the object selection table!!!"));
                     return;
                 }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->modifier.data()), ptr, false)){
-                    WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+                    (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
                     return;
                 }
             }else{
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->modifier.data())), indexOfModifier);
                 }else{
-                    CRITICAL_ERROR_MESSAGE(QString("ModifierGeneratorUI::setModifier(): The selected icon is NULL!!"));
+                    (qFatal("ModifierGeneratorUI::setModifier(): The selected icon is NULL!!"));
                     return;
                 }
             }
@@ -149,10 +149,10 @@ void ModifierGeneratorUI::setModifier(int index, const QString &name){
             table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(name);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("ModifierGeneratorUI::setModifier(): The 'behaviorView' pointer is NULL!!"))
+            (qFatal("ModifierGeneratorUI::setModifier(): The 'behaviorView' pointer is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ModifierGeneratorUI::setModifier(): The 'bsData' pointer is NULL!!"))
+        (qFatal("ModifierGeneratorUI::setModifier(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -165,17 +165,17 @@ void ModifierGeneratorUI::setGenerator(int index, const QString & name){
             indexOfGenerator = bsData->getIndexOfObj(static_cast<DataIconManager*>(bsData->generator.data()));
             if (ptr){
                 if (name != ptr->getName()){
-                    CRITICAL_ERROR_MESSAGE(QString("The name of the selected object does not match it's name in the object selection table!!!"));
+                    (qFatal("The name of the selected object does not match it's name in the object selection table!!!"));
                     return;
                 }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generator.data()), ptr, false)){
-                    WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+                    (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
                     return;
                 }
             }else{
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->generator.data())), indexOfGenerator);
                 }else{
-                    CRITICAL_ERROR_MESSAGE(QString("ModifierGeneratorUI::setGenerator(): The selected icon is NULL!!"));
+                    (qFatal("ModifierGeneratorUI::setGenerator(): The selected icon is NULL!!"));
                     return;
                 }
             }
@@ -183,10 +183,10 @@ void ModifierGeneratorUI::setGenerator(int index, const QString & name){
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("ModifierGeneratorUI::setGenerator(): The 'behaviorView' pointer is NULL!!"))
+            (qFatal("ModifierGeneratorUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ModifierGeneratorUI::setGenerator(): The 'bsData' pointer is NULL!!"))
+        (qFatal("ModifierGeneratorUI::setGenerator(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -200,7 +200,7 @@ void ModifierGeneratorUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ModifierGeneratorUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("ModifierGeneratorUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -211,7 +211,7 @@ void ModifierGeneratorUI::modifierRenamed(const QString & name, int index){
             table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ModifierGeneratorUI::modifierRenamed(): The 'bsData' pointer is NULL!!"));
+        (qFatal("ModifierGeneratorUI::modifierRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -222,7 +222,7 @@ void ModifierGeneratorUI::generatorRenamed(const QString & name, int index){
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ModifierGeneratorUI::generatorRenamed(): The 'bsData' pointer is NULL!!"));
+        (qFatal("ModifierGeneratorUI::generatorRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 

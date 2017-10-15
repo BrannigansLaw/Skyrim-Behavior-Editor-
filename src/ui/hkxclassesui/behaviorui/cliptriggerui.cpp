@@ -102,7 +102,7 @@ void ClipTriggerUI::loadData(BehaviorFile *parentFile, hkbClipTriggerArray::HkTr
         text = file->getEventNameAt(trigger->event.id);
         if (text == ""){
             if (trigger->event.id != -1){
-                WARNING_MESSAGE(QString("ClipTriggerUI::loadData(): Invalid event id!!!"));
+                (qWarning("ClipTriggerUI::loadData(): Invalid event id!!!"));
             }
             text = "NONE";
         }
@@ -122,7 +122,7 @@ void ClipTriggerUI::loadData(BehaviorFile *parentFile, hkbClipTriggerArray::HkTr
         acyclic->setChecked(bsData->acyclic);
         isAnnotation->setChecked(bsData->isAnnotation);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ClipTriggerUI::loadData(): Behavior file or event data is null!!!"));
+        (qFatal("ClipTriggerUI::loadData(): Behavior file or event data is null!!!"));
     }
     connectSignals();
 }
@@ -144,7 +144,7 @@ void ClipTriggerUI::setEventId(int index, const QString & name){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ClipTriggerUI::setEventId(): Behavior file or event data is null!!!"));
+        (qFatal("ClipTriggerUI::setEventId(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -169,7 +169,7 @@ void ClipTriggerUI::setEventPayload(){
         }
         file->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ClipTriggerUI::setEventPayload(): Behavior file or event data is null!!!"));
+        (qFatal("ClipTriggerUI::setEventPayload(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -180,7 +180,7 @@ void ClipTriggerUI::setLocalTime(){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ClipTriggerUI::setLocalTime(): Behavior file or event data is null!!!"));
+        (qFatal("ClipTriggerUI::setLocalTime(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -191,7 +191,7 @@ void ClipTriggerUI::setRelativeToEndOfClip(){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ClipTriggerUI::setRelativeToEndOfClip(): Behavior file or event data is null!!!"));
+        (qFatal("ClipTriggerUI::setRelativeToEndOfClip(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -202,7 +202,7 @@ void ClipTriggerUI::setAcyclic(){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ClipTriggerUI::setAcyclic(): Behavior file or event data is null!!!"));
+        (qFatal("ClipTriggerUI::setAcyclic(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -213,7 +213,7 @@ void ClipTriggerUI::setIsAnnotation(){
             file->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ClipTriggerUI::setIsAnnotation(): Behavior file or event data is null!!!"));
+        (qFatal("ClipTriggerUI::setIsAnnotation(): Behavior file or event data is null!!!"));
     }
 }
 
@@ -223,7 +223,7 @@ void ClipTriggerUI::viewSelectedChild(int row, int column){
             emit viewEvents(bsData->event.id + 1);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ClipTriggerUI::viewSelectedChild(): The data is NULL!!"))
+        (qFatal("ClipTriggerUI::viewSelectedChild(): The data is NULL!!"));
     }
 }
 
@@ -233,6 +233,6 @@ void ClipTriggerUI::eventRenamed(const QString & name, int index){
             table->item(EVENT_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ClipTriggerUI::eventRenamed(): The data is NULL!!"))
+        (qFatal("ClipTriggerUI::eventRenamed(): The data is NULL!!"));
     }
 }

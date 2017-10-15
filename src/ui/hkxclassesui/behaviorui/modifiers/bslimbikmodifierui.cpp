@@ -119,7 +119,7 @@ void BSLimbIKModifierUI::connectToTables(GenericTableWidget *variables, GenericT
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("BSLimbIKModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -166,10 +166,10 @@ void BSLimbIKModifierUI::loadData(HkxObject *data){
                 table->item(CAST_OFFSET_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("BSLimbIKModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("BSLimbIKModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -183,7 +183,7 @@ void BSLimbIKModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setName(): The data is NULL!!"));
+        (qFatal("BSLimbIKModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -192,7 +192,7 @@ void BSLimbIKModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("BSLimbIKModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -203,7 +203,7 @@ void BSLimbIKModifierUI::setLimitAngleDegrees(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setLimitAngleDegrees(): The data is NULL!!"));
+        (qFatal("BSLimbIKModifierUI::setLimitAngleDegrees(): The data is NULL!!"));
     }
 }
 
@@ -212,7 +212,7 @@ void BSLimbIKModifierUI::setStartBoneIndex(int index){
         bsData->startBoneIndex = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setStartBoneIndex(): The data is NULL!!"));
+        (qFatal("BSLimbIKModifierUI::setStartBoneIndex(): The data is NULL!!"));
     }
 }
 
@@ -221,7 +221,7 @@ void BSLimbIKModifierUI::setEndBoneIndex(int index){
         bsData->endBoneIndex = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setEndBoneIndex(): The data is NULL!!"));
+        (qFatal("BSLimbIKModifierUI::setEndBoneIndex(): The data is NULL!!"));
     }
 }
 
@@ -232,7 +232,7 @@ void BSLimbIKModifierUI::setGain(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setGain(): The data is NULL!!"));
+        (qFatal("BSLimbIKModifierUI::setGain(): The data is NULL!!"));
     }
 }
 
@@ -243,7 +243,7 @@ void BSLimbIKModifierUI::setBoneRadius(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setBoneRadius(): The data is NULL!!"));
+        (qFatal("BSLimbIKModifierUI::setBoneRadius(): The data is NULL!!"));
     }
 }
 
@@ -254,7 +254,7 @@ void BSLimbIKModifierUI::setCastOffset(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setCastOffset(): The data is NULL!!"));
+        (qFatal("BSLimbIKModifierUI::setCastOffset(): The data is NULL!!"));
     }
 }
 
@@ -310,7 +310,7 @@ void BSLimbIKModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSLimbIKModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -330,7 +330,7 @@ void BSLimbIKModifierUI::selectTableToView(bool viewisProperty, const QString & 
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("BSLimbIKModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -369,7 +369,7 @@ void BSLimbIKModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSLimbIKModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -387,20 +387,20 @@ bool BSLimbIKModifierUI::setBinding(int index, int row, const QString &variableN
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSLimbIKModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSLimbIKModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("BSLimbIKModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -457,7 +457,7 @@ void BSLimbIKModifierUI::setBindingVariable(int index, const QString &name){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("BSLimbIKModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -479,9 +479,9 @@ void BSLimbIKModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet 
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("BSLimbIKModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSLimbIKModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("BSLimbIKModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

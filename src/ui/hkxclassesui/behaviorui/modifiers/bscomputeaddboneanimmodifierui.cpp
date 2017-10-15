@@ -104,7 +104,7 @@ void BSComputeAddBoneAnimModifierUI::connectToTables(GenericTableWidget *variabl
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("BSComputeAddBoneAnimModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -141,10 +141,10 @@ void BSComputeAddBoneAnimModifierUI::loadData(HkxObject *data){
                 table->item(SCALE_LS_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("BSComputeAddBoneAnimModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("BSComputeAddBoneAnimModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -158,7 +158,7 @@ void BSComputeAddBoneAnimModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::setName(): The data is NULL!!"));
+        (qFatal("BSComputeAddBoneAnimModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -167,7 +167,7 @@ void BSComputeAddBoneAnimModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("BSComputeAddBoneAnimModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -176,7 +176,7 @@ void BSComputeAddBoneAnimModifierUI::setBoneIndex(int index){
         bsData->boneIndex = index - 1;
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::setboneIndex(): The data is NULL!!"));
+        (qFatal("BSComputeAddBoneAnimModifierUI::setboneIndex(): The data is NULL!!"));
     }
 }
 
@@ -187,7 +187,7 @@ void BSComputeAddBoneAnimModifierUI::setTranslationLSOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::settranslationLSOut(): The data is NULL!!"));
+        (qFatal("BSComputeAddBoneAnimModifierUI::settranslationLSOut(): The data is NULL!!"));
     }
 }
 
@@ -198,7 +198,7 @@ void BSComputeAddBoneAnimModifierUI::setRotationLSOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::setrotationLSOut(): The data is NULL!!"));
+        (qFatal("BSComputeAddBoneAnimModifierUI::setrotationLSOut(): The data is NULL!!"));
     }
 }
 
@@ -209,7 +209,7 @@ void BSComputeAddBoneAnimModifierUI::setScaleLSOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::setscaleLSOut(): The data is NULL!!"));
+        (qFatal("BSComputeAddBoneAnimModifierUI::setscaleLSOut(): The data is NULL!!"));
     }
 }
 
@@ -253,7 +253,7 @@ void BSComputeAddBoneAnimModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSComputeAddBoneAnimModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -273,7 +273,7 @@ void BSComputeAddBoneAnimModifierUI::selectTableToView(bool viewisProperty, cons
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("BSComputeAddBoneAnimModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -304,7 +304,7 @@ void BSComputeAddBoneAnimModifierUI::variableRenamed(const QString & name, int i
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSComputeAddBoneAnimModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -322,20 +322,20 @@ bool BSComputeAddBoneAnimModifierUI::setBinding(int index, int row, const QStrin
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSComputeAddBoneAnimModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSComputeAddBoneAnimModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("BSComputeAddBoneAnimModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -380,7 +380,7 @@ void BSComputeAddBoneAnimModifierUI::setBindingVariable(int index, const QString
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("BSComputeAddBoneAnimModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -402,9 +402,9 @@ void BSComputeAddBoneAnimModifierUI::loadBinding(int row, int colunm, hkbVariabl
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("BSComputeAddBoneAnimModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSComputeAddBoneAnimModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("BSComputeAddBoneAnimModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

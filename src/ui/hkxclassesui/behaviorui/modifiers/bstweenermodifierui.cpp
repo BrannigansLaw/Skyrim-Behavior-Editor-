@@ -120,7 +120,7 @@ void BSTweenerModifierUI::connectToTables(GenericTableWidget *variables, Generic
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("BSTweenerModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -157,10 +157,10 @@ void BSTweenerModifierUI::loadData(HkxObject *data){
                 table->item(TARGET_ROTATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("BSTweenerModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("BSTweenerModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -174,7 +174,7 @@ void BSTweenerModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::setName(): The data is NULL!!"));
+        (qFatal("BSTweenerModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -183,7 +183,7 @@ void BSTweenerModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("BSTweenerModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -192,7 +192,7 @@ void BSTweenerModifierUI::setTweenPosition(){
         bsData->tweenPosition = tweenPosition->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::settweenPosition(): The data is NULL!!"));
+        (qFatal("BSTweenerModifierUI::settweenPosition(): The data is NULL!!"));
     }
 }
 
@@ -201,7 +201,7 @@ void BSTweenerModifierUI::setTweenRotation(){
         bsData->tweenRotation = tweenRotation->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::settweenRotation(): The data is NULL!!"));
+        (qFatal("BSTweenerModifierUI::settweenRotation(): The data is NULL!!"));
     }
 }
 
@@ -210,7 +210,7 @@ void BSTweenerModifierUI::setUseTweenDuration(){
         bsData->useTweenDuration = useTweenDuration->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::setuseTweenDuration(): The data is NULL!!"));
+        (qFatal("BSTweenerModifierUI::setuseTweenDuration(): The data is NULL!!"));
     }
 }
 
@@ -221,7 +221,7 @@ void BSTweenerModifierUI::setTweenDuration(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::settweenDuration(): The data is NULL!!"));
+        (qFatal("BSTweenerModifierUI::settweenDuration(): The data is NULL!!"));
     }
 }
 
@@ -232,7 +232,7 @@ void BSTweenerModifierUI::setTargetPosition(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::settargetPosition(): The data is NULL!!"));
+        (qFatal("BSTweenerModifierUI::settargetPosition(): The data is NULL!!"));
     }
 }
 
@@ -243,7 +243,7 @@ void BSTweenerModifierUI::setTargetRotation(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::settargetRotation(): The data is NULL!!"));
+        (qFatal("BSTweenerModifierUI::settargetRotation(): The data is NULL!!"));
     }
 }
 
@@ -299,7 +299,7 @@ void BSTweenerModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSTweenerModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -319,7 +319,7 @@ void BSTweenerModifierUI::selectTableToView(bool viewisProperty, const QString &
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("BSTweenerModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -358,7 +358,7 @@ void BSTweenerModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSTweenerModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -376,20 +376,20 @@ bool BSTweenerModifierUI::setBinding(int index, int row, const QString &variable
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSTweenerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSTweenerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("BSTweenerModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -446,7 +446,7 @@ void BSTweenerModifierUI::setBindingVariable(int index, const QString &name){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("BSTweenerModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -468,9 +468,9 @@ void BSTweenerModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("BSTweenerModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSTweenerModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("BSTweenerModifierUI::loadBinding(): The data is NULL!!"));
     }
 }

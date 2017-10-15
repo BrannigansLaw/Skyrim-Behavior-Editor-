@@ -126,7 +126,7 @@ void BSEventEveryNEventsModifierUI::connectToTables(GenericTableWidget *variable
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("BSEventEveryNEventsModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -177,10 +177,10 @@ void BSEventEveryNEventsModifierUI::loadData(HkxObject *data){
                 table->item(RANDOMIZE_NUMBER_OF_EVENTS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("BSEventEveryNEventsModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -194,7 +194,7 @@ void BSEventEveryNEventsModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::setName(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -203,7 +203,7 @@ void BSEventEveryNEventsModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -216,7 +216,7 @@ void BSEventEveryNEventsModifierUI::setEventToCheckForId(int index, const QStrin
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::seteventToCheckForId(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::seteventToCheckForId(): The data is NULL!!"));
     }
 }
 
@@ -237,7 +237,7 @@ void BSEventEveryNEventsModifierUI::setEventToCheckForPayload(){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::seteventToCheckForPayload(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::seteventToCheckForPayload(): The data is NULL!!"));
     }
 }
 
@@ -250,7 +250,7 @@ void BSEventEveryNEventsModifierUI::setEventToSendId(int index, const QString &n
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::setEventToSendId(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::setEventToSendId(): The data is NULL!!"));
     }
 }
 
@@ -271,7 +271,7 @@ void BSEventEveryNEventsModifierUI::setEventToSendPayload(){
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::setEventToSendPayload(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::setEventToSendPayload(): The data is NULL!!"));
     }
 }
 
@@ -282,7 +282,7 @@ void BSEventEveryNEventsModifierUI::setNumberOfEventsBeforeSend(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::setnumberOfEventsBeforeSend(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::setnumberOfEventsBeforeSend(): The data is NULL!!"));
     }
 }
 
@@ -293,7 +293,7 @@ void BSEventEveryNEventsModifierUI::setMinimumNumberOfEventsBeforeSend(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::setminimumNumberOfEventsBeforeSend(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::setminimumNumberOfEventsBeforeSend(): The data is NULL!!"));
     }
 }
 
@@ -302,7 +302,7 @@ void BSEventEveryNEventsModifierUI::setRandomizeNumberOfEvents(){
         bsData->randomizeNumberOfEvents = randomizeNumberOfEvents->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::setrandomizeNumberOfEvents(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::setrandomizeNumberOfEvents(): The data is NULL!!"));
     }
 }
 
@@ -316,7 +316,7 @@ void BSEventEveryNEventsModifierUI::eventTableElementSelected(int index, const Q
         setEventToSendId(index, name);
         break;
     default:
-        WARNING_MESSAGE(QString("BSEventEveryNEventsModifierUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));
+        (qWarning("BSEventEveryNEventsModifierUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));
         return;
     }
 }
@@ -359,7 +359,7 @@ void BSEventEveryNEventsModifierUI::viewSelected(int row, int column){
             emit viewEvents(bsData->eventToSend.id + 1);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSEventEveryNEventsModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -379,7 +379,7 @@ void BSEventEveryNEventsModifierUI::selectTableToView(bool viewisProperty, const
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -393,7 +393,7 @@ void BSEventEveryNEventsModifierUI::eventRenamed(const QString & name, int index
             table->item(EVENT_TO_SEND_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::eventRenamed(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::eventRenamed(): The data is NULL!!"));
     }
 }
 
@@ -420,7 +420,7 @@ void BSEventEveryNEventsModifierUI::variableRenamed(const QString & name, int in
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("BSEventEveryNEventsModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -438,20 +438,20 @@ bool BSEventEveryNEventsModifierUI::setBinding(int index, int row, const QString
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSEventEveryNEventsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("BSEventEveryNEventsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -490,7 +490,7 @@ void BSEventEveryNEventsModifierUI::setBindingVariable(int index, const QString 
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -512,10 +512,10 @@ void BSEventEveryNEventsModifierUI::loadBinding(int row, int colunm, hkbVariable
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("BSEventEveryNEventsModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BSEventEveryNEventsModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("BSEventEveryNEventsModifierUI::loadBinding(): The data is NULL!!"));
     }
 }
 

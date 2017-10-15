@@ -160,7 +160,7 @@ void ComputeDirectionModifierUI::connectToTables(GenericTableWidget *variables, 
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::connectToTables(): One or more arguments are NULL!!"))
+        (qFatal("ComputeDirectionModifierUI::connectToTables(): One or more arguments are NULL!!"));
     }
 }
 
@@ -212,10 +212,10 @@ void ComputeDirectionModifierUI::loadData(HkxObject *data){
                 table->item(COMPUTED_OUTPUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::loadData(): The data is an incorrect type!!"));
+            (qFatal("ComputeDirectionModifierUI::loadData(): The data is an incorrect type!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::loadData(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::loadData(): The data is NULL!!"));
     }
     connectSignals();
 }
@@ -229,7 +229,7 @@ void ComputeDirectionModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setName(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setName(): The data is NULL!!"));
     }
 }
 
@@ -238,7 +238,7 @@ void ComputeDirectionModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setEnable(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setEnable(): The data is NULL!!"));
     }
 }
 
@@ -249,7 +249,7 @@ void ComputeDirectionModifierUI::setPointIn(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setPointIn(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setPointIn(): The data is NULL!!"));
     }
 }
 
@@ -260,7 +260,7 @@ void ComputeDirectionModifierUI::setPointOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setPointOut(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setPointOut(): The data is NULL!!"));
     }
 }
 
@@ -271,7 +271,7 @@ void ComputeDirectionModifierUI::setGroundAngleOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setGroundAngleOut(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setGroundAngleOut(): The data is NULL!!"));
     }
 }
 
@@ -282,7 +282,7 @@ void ComputeDirectionModifierUI::setUpAngleOut(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setUpAngleOut(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setUpAngleOut(): The data is NULL!!"));
     }
 }
 
@@ -293,7 +293,7 @@ void ComputeDirectionModifierUI::setVerticalOffset(){
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setVerticalOffset(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setVerticalOffset(): The data is NULL!!"));
     }
 }
 
@@ -302,7 +302,7 @@ void ComputeDirectionModifierUI::setReverseGroundAngle(){
         bsData->reverseGroundAngle = reverseGroundAngle->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setReverseGroundAngle(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setReverseGroundAngle(): The data is NULL!!"));
     }
 }
 
@@ -311,7 +311,7 @@ void ComputeDirectionModifierUI::setReverseUpAngle(){
         bsData->reverseUpAngle = reverseUpAngle->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setReverseUpAngle(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setReverseUpAngle(): The data is NULL!!"));
     }
 }
 
@@ -320,7 +320,7 @@ void ComputeDirectionModifierUI::setProjectPoint(){
         bsData->projectPoint = projectPoint->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setProjectPoint(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setProjectPoint(): The data is NULL!!"));
     }
 }
 
@@ -329,7 +329,7 @@ void ComputeDirectionModifierUI::setNormalizePoint(){
         bsData->normalizePoint = normalizePoint->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setNormalizePoint(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setNormalizePoint(): The data is NULL!!"));
     }
 }
 
@@ -338,7 +338,7 @@ void ComputeDirectionModifierUI::setComputeOnlyOnce(){
         bsData->computeOnlyOnce = computeOnlyOnce->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setComputeOnlyOnce(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setComputeOnlyOnce(): The data is NULL!!"));
     }
 }
 
@@ -347,7 +347,7 @@ void ComputeDirectionModifierUI::setComputedOutput(){
         bsData->computedOutput = computedOutput->isChecked();
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setComputedOutput(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setComputedOutput(): The data is NULL!!"));
     }
 }
 
@@ -433,7 +433,7 @@ void ComputeDirectionModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"))
+        (qFatal("ComputeDirectionModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -453,7 +453,7 @@ void ComputeDirectionModifierUI::selectTableToView(bool viewisProperty, const QS
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::selectTableToView(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::selectTableToView(): The data is NULL!!"));
     }
 }
 
@@ -512,7 +512,7 @@ void ComputeDirectionModifierUI::variableRenamed(const QString & name, int index
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"))
+        (qFatal("ComputeDirectionModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
     }
 }
 
@@ -530,20 +530,20 @@ bool ComputeDirectionModifierUI::setBinding(int index, int row, const QString &v
             }
             if (isProperty){
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("ComputeDirectionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }else{
                 if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                    (qFatal("ComputeDirectionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->toggleChanged(true);
         }else{
-            WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setBinding(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setBinding(): The data is NULL!!"));
     }
     return true;
 }
@@ -630,7 +630,7 @@ void ComputeDirectionModifierUI::setBindingVariable(int index, const QString &na
         }
         bsData->getParentFile()->toggleChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::setBindingVariable(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::setBindingVariable(): The data is NULL!!"));
     }
 }
 
@@ -652,9 +652,9 @@ void ComputeDirectionModifierUI::loadBinding(int row, int colunm, hkbVariableBin
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            (qFatal("ComputeDirectionModifierUI::loadBinding(): The variable binding set is NULL!!"));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("ComputeDirectionModifierUI::loadBinding(): The data is NULL!!"));
+        (qFatal("ComputeDirectionModifierUI::loadBinding(): The data is NULL!!"));
     }
 }
