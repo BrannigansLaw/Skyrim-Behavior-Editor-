@@ -215,7 +215,7 @@ void SkyrimAnimationDataUI::viewSelectedChild(int row, int column){
             result = row - ADD_TRANSLATION_ROW - 1;
             if (bsData->translations.size() > result && result >= 0){
                 if (column == VALUE_COLUMN){
-                    translationUI->loadData(&(bsData->translations[result]), bsData->duration);
+                    translationUI->loadData(&bsData->translations[result], bsData->duration);
                     setCurrentIndex(TRANSLATION_WIDGET);
                 }else if (column == BINDING_COLUMN){
                     if (MainWindow::yesNoDialogue("Are you sure you want to remove the enter translation \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
@@ -229,7 +229,7 @@ void SkyrimAnimationDataUI::viewSelectedChild(int row, int column){
             result = row - BASE_NUMBER_OF_ROWS - bsData->translations.size();
             if (result < bsData->rotations.size() && result >= 0){
                 if (column == VALUE_COLUMN){
-                    rotationUI->loadData(&(bsData->rotations[result]), bsData->duration);
+                    rotationUI->loadData(&bsData->rotations[result], bsData->duration);
                     setCurrentIndex(ROTATION_WIDGET);
                 }else if (column == BINDING_COLUMN){
                     if (MainWindow::yesNoDialogue("Are you sure you want to remove the rotation \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){

@@ -441,7 +441,12 @@ SOURCES += \
     src/animData/skyrimcliptrigger.cpp \
     src/animData/skyrimanimationtranslation.cpp \
     src/animData/skyrimanimationrotation.cpp \
-    src/animData/skyrimanimationmotiondata.cpp
+    src/animData/skyrimanimationmotiondata.cpp \
+    src/animSetData/animcacheanimationinfo.cpp \
+    src/animSetData/animcacheclipinfo.cpp \
+    src/animSetData/animcachevariable.cpp \
+    src/animSetData/animcacheanimsetdata.cpp \
+    src/animSetData/animcacheprojectdata.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -859,4 +864,9 @@ HEADERS  += \
     src/animData/skyrimcliptrigger.h \
     src/animData/skyrimanimationtranslation.h \
     src/animData/skyrimanimationrotation.h \
-    src/animData/skyrimanimationmotiondata.h
+    src/animData/skyrimanimationmotiondata.h \
+    src/animSetData/animcacheanimationinfo.h \
+    src/animSetData/animcacheclipinfo.h \
+    src/animSetData/animcachevariable.h \
+    src/animSetData/animcacheanimsetdata.h \
+    src/animSetData/animcacheprojectdata.h

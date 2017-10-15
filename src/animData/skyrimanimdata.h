@@ -18,13 +18,13 @@ public:
     //bool extract(const QString & projectname);
     bool write(const QString & filename);
     int getProjectIndex(const QString & projectname) const;
-    bool appendClipGenerator(const QString &projectname, const SkyrimClipGeneratoData & animdata);
+    bool appendClipGenerator(const QString &projectname, SkyrimClipGeneratoData *animdata);
     bool removeClipGenerator(const QString & projectname, const QString & clipname);
-    bool appendAnimation(const QString & projectname, const SkyrimAnimationMotionData &motiondata);
+    bool appendAnimation(const QString & projectname, SkyrimAnimationMotionData *motiondata);
     bool removeAnimation(const QString & projectname, int animationindex);
 private:
     QStringList projectNames;
-    QVector <ProjectAnimData> animData;
+    QVector <ProjectAnimData *> animData;
 };
 
 #endif // SKYRIMANIMDATA_H

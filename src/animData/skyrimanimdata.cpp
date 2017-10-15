@@ -47,8 +47,8 @@ bool SkyrimAnimData::parse(QFile *file){
         }
     }
     for (uint i = 0; i < size; i++){
-        animData.append(ProjectAnimData());
-        if (!animData.last().read(file)){
+        animData.append(new ProjectAnimData());
+        if (!animData.last()->read(file)){
             CRITICAL_ERROR_MESSAGE(QString("SkyrimAnimData::parse(): ProjectAnimData read failed!"));
             return false;
         }
@@ -77,7 +77,7 @@ bool SkyrimAnimData::write(const QString &filename){
         out << projectNames.at(i) << "\n";
     }
     for (int i = 0; i < animData.size(); i++){
-        if (!animData.at(i).write(file, out)){
+        if (!animData.at(i)->write(file, out)){
             return false;
         }
     }
@@ -95,12 +95,12 @@ int SkyrimAnimData::getProjectIndex(const QString &projectname) const{
     return -1;
 }
 
-bool SkyrimAnimData::appendClipGenerator(const QString & projectname, const SkyrimClipGeneratoData &animdata){
+bool SkyrimAnimData::appendClipGenerator(const QString & projectname, SkyrimClipGeneratoData * animdata){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         return false;
     }
-    return animData[index].appendClipGenerator(animdata);
+    return animData.at(index)->appendClipGenerator(animdata);
 }
 
 bool SkyrimAnimData::removeClipGenerator(const QString &projectname, const QString &name){
@@ -108,15 +108,15 @@ bool SkyrimAnimData::removeClipGenerator(const QString &projectname, const QStri
     if (index < 0 || index >= animData.size()){
         return false;
     }
-    return animData[index].removeClipGenerator(name);
+    return animData.at(index)->removeClipGenerator(name);
 }
 
-bool SkyrimAnimData::appendAnimation(const QString &projectname, const SkyrimAnimationMotionData &motiondata){
+bool SkyrimAnimData::appendAnimation(const QString &projectname, SkyrimAnimationMotionData * motiondata){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         return false;
     }
-    return animData[index].appendAnimation(motiondata);
+    return animData.at(index)->appendAnimation(motiondata);
 }
 
 bool SkyrimAnimData::removeAnimation(const QString &projectname, int animationindex){
@@ -124,5 +124,5 @@ bool SkyrimAnimData::removeAnimation(const QString &projectname, int animationin
     if (index < 0 || index >= animData.size()){
         return false;
     }
-    return animData[index].removeAnimation(animationindex);
+    return animData.at(index)->removeAnimation(animationindex);
 }

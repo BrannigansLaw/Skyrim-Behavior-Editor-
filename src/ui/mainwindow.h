@@ -100,6 +100,7 @@ private slots:
     void save();
     void saveProject();
     void packAndExportProjectToSkyrimDirectory();
+    void exportAnimationData() const;
     void packAndExportFileToSkyrimDirectory();
     //void saveAs();
     void exit();

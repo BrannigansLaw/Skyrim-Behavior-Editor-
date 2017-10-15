@@ -66,8 +66,8 @@ bool ProjectAnimData::read(QFile *file){
         if (count > 0){
             //Read animation data...
             for (;lineCount < blocksize;){
-                animationData.append(SkyrimClipGeneratoData(this));
-                if (!animationData.last().read(file, lineCount)){
+                animationData.append(new SkyrimClipGeneratoData(this));
+                if (!animationData.last()->read(file, lineCount)){
                     return false;
                 }
             }
@@ -82,8 +82,8 @@ bool ProjectAnimData::read(QFile *file){
             lineCount = 0;
             //Get animation motion data...
             for (;lineCount < blocksize;){
-                animationMotionData.append(SkyrimAnimationMotionData(this));
-                if (!animationMotionData.last().read(file, lineCount)){
+                animationMotionData.append(new SkyrimAnimationMotionData(this));
+                if (!animationMotionData.last()->read(file, lineCount)){
                     return false;
                 }
             }
@@ -107,34 +107,34 @@ bool ProjectAnimData::write(QFile & file, QTextStream & out) const{
         out << "1" << "\n";
     }
     for (int i = 0; i < animationData.size(); i++){
-        if (!animationData.at(i).write(&file, out)){
+        if (!animationData.at(i)->write(&file, out)){
             return false;
         }
     }
     out << QString::number(animationMotionDataLines) << "\n";
     for (int i = 0; i < animationMotionData.size(); i++){
-        if (!animationMotionData.at(i).write(&file, out)){
+        if (!animationMotionData.at(i)->write(&file, out)){
             return false;
         }
     }
     return true;
 }
 
-bool ProjectAnimData::appendClipGenerator(const SkyrimClipGeneratoData &animData){
+bool ProjectAnimData::appendClipGenerator(SkyrimClipGeneratoData * animData){
     for (int i = 0; i < animationData.size(); i++){
-        if (animationData.at(i).clipGeneratorName == animData.clipGeneratorName){
+        if (animationData.at(i)->clipGeneratorName == animData->clipGeneratorName){
             return false;
         }
     }
     animationData.append(animData);
-    animationDataLines = animationDataLines + animData.lineCount();
+    animationDataLines = animationDataLines + animData->lineCount();
     return true;
 }
 
 bool ProjectAnimData::removeClipGenerator(const QString &clipname){
     for (int i = 0; i < animationData.size(); i++){
-        if (animationData.at(i).clipGeneratorName == clipname){
-            animationDataLines = animationDataLines - animationData.at(i).lineCount();
+        if (animationData.at(i)->clipGeneratorName == clipname){
+            animationDataLines = animationDataLines - animationData.at(i)->lineCount();
             animationData.removeAt(i);
             return true;
         }
@@ -142,24 +142,33 @@ bool ProjectAnimData::removeClipGenerator(const QString &clipname){
     return false;
 }
 
-bool ProjectAnimData::appendAnimation(const SkyrimAnimationMotionData &motiondata){
+bool ProjectAnimData::appendAnimation(SkyrimAnimationMotionData * motiondata){
     for (int i = 0; i < animationMotionData.size(); i++){
-        if (animationMotionData.at(i).animationIndex == motiondata.animationIndex){
+        if (animationMotionData.at(i)->animationIndex == motiondata->animationIndex){
             return false;
         }
     }
     animationMotionData.append(motiondata);
-    animationMotionDataLines = animationMotionDataLines + motiondata.lineCount();
+    animationMotionDataLines = animationMotionDataLines + motiondata->lineCount();
     return true;
 }
 
 bool ProjectAnimData::removeAnimation(int animationindex){
     for (int i = 0; i < animationMotionData.size(); i++){
-        if (animationMotionData.at(i).animationIndex == animationindex){
-            animationMotionDataLines = animationMotionDataLines - animationMotionData.at(i).lineCount();
+        if (animationMotionData.at(i)->animationIndex == animationindex){
+            animationMotionDataLines = animationMotionDataLines - animationMotionData.at(i)->lineCount();
             animationMotionData.removeAt(i);
             return true;
         }
     }
     return false;
+}
+
+SkyrimAnimationMotionData *ProjectAnimData::findMotionData(int animationindex){
+    for (int i = 0; i < animationMotionData.size(); i++){
+        if (animationMotionData.at(i)->animationIndex == animationindex){
+            return animationMotionData.at(i);
+        }
+    }
+    return NULL;
 }

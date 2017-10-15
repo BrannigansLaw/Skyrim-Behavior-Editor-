@@ -11,7 +11,6 @@ class SkyrimClipGeneratoData
 {
     friend class ProjectAnimData;
 public:
-    SkyrimClipGeneratoData();
     SkyrimClipGeneratoData(ProjectAnimData *par, uint ind = 0, qreal speed = 0, qreal startcrop = 0, qreal endcrop = 0, const QVector <SkyrimClipTrigger> & trigs = QVector <SkyrimClipTrigger>());
     SkyrimClipGeneratoData(const SkyrimClipGeneratoData & other);
     bool read(QFile * file, uint & lineCount);

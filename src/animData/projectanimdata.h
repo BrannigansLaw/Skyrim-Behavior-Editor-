@@ -12,16 +12,17 @@ public:
     ProjectAnimData();
     bool read(QFile * file);
     bool write(QFile &file, QTextStream &output) const;
-    bool appendClipGenerator(const SkyrimClipGeneratoData & animData);
+    bool appendClipGenerator(SkyrimClipGeneratoData *animData);
     bool removeClipGenerator(const QString & clipname);
-    bool appendAnimation(const SkyrimAnimationMotionData &motiondata);
+    bool appendAnimation(SkyrimAnimationMotionData *motiondata);
     bool removeAnimation(int animationindex);
+    SkyrimAnimationMotionData * findMotionData(int animationindex);
 private:
     uint animationDataLines;
     uint animationMotionDataLines;
     QStringList projectFiles;
-    QVector <SkyrimClipGeneratoData> animationData;
-    QVector <SkyrimAnimationMotionData> animationMotionData;
+    QVector <SkyrimClipGeneratoData *> animationData;
+    QVector <SkyrimAnimationMotionData *> animationMotionData;
     bool chopLine(QFile *file, QByteArray &line, uint &linecount);
 };
 

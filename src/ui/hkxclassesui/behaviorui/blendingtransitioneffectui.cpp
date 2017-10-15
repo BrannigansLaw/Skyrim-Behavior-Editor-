@@ -326,8 +326,8 @@ void BlendingTransitionEffectUI::toggleSyncFlag(){
                 bsData->flags.append("|FLAG_SYNC");
             }
         }else{
-            if (bsData->flags == ""){
-                bsData->flags.remove("FLAG_SYNC");
+            if (bsData->flags == "FLAG_SYNC"){
+                bsData->flags = "0";
             }else{
                 bsData->flags.remove("|FLAG_SYNC");
             }
@@ -347,8 +347,8 @@ void BlendingTransitionEffectUI::toggleIgnoreFromWorldFromModelFlag(){
                 bsData->flags.append("|FLAG_IGNORE_FROM_WORLD_FROM_MODEL");
             }
         }else{
-            if (bsData->flags == ""){
-                bsData->flags.remove("FLAG_IGNORE_FROM_WORLD_FROM_MODEL");
+            if (bsData->flags == "FLAG_IGNORE_FROM_WORLD_FROM_MODEL"){
+                bsData->flags = "0";
             }else{
                 bsData->flags.remove("|FLAG_IGNORE_FROM_WORLD_FROM_MODEL");
             }
@@ -368,8 +368,8 @@ void BlendingTransitionEffectUI::toggleIgnoreToWorldFromModelFlag(){
                 bsData->flags.append("|FLAG_IGNORE_TO_WORLD_FROM_MODEL");
             }
         }else{
-            if (bsData->flags == ""){
-                bsData->flags.remove("FLAG_IGNORE_TO_WORLD_FROM_MODEL");
+            if (bsData->flags == "FLAG_IGNORE_TO_WORLD_FROM_MODEL"){
+                bsData->flags = "0";
             }else{
                 bsData->flags.remove("|FLAG_IGNORE_TO_WORLD_FROM_MODEL");
             }

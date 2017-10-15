@@ -516,8 +516,8 @@ void TransitionsUI::toggleGlobalWildcardFlag(){
                 bsData->flags.append("|FLAG_IS_GLOBAL_WILDCARD");
             }
         }else{
-            if (bsData->flags == ""){
-                bsData->flags.remove("FLAG_IS_GLOBAL_WILDCARD");
+            if (bsData->flags == "FLAG_IS_GLOBAL_WILDCARD"){
+                bsData->flags = "0";
             }else{
                 bsData->flags.remove("|FLAG_IS_GLOBAL_WILDCARD");
             }
@@ -538,8 +538,8 @@ void TransitionsUI::toggleUseNestedStateFlag(){
             }
             toNestedStateId->setDisabled(false);
         }else{
-            if (bsData->flags == ""){
-                bsData->flags.remove("FLAG_TO_NESTED_STATE_ID_IS_VALID");
+            if (bsData->flags == "FLAG_TO_NESTED_STATE_ID_IS_VALID"){
+                bsData->flags = "0";
             }else{
                 bsData->flags.remove("|FLAG_TO_NESTED_STATE_ID_IS_VALID");
             }
@@ -560,8 +560,8 @@ void TransitionsUI::toggleDisallowRandomTransitionFlag(){
                 bsData->flags.append("|FLAG_DISALLOW_RANDOM_TRANSITION");
             }
         }else{
-            if (bsData->flags == ""){
-                bsData->flags.remove("FLAG_DISALLOW_RANDOM_TRANSITION");
+            if (bsData->flags == "FLAG_DISALLOW_RANDOM_TRANSITION"){
+                bsData->flags = "0";
             }else{
                 bsData->flags.remove("|FLAG_DISALLOW_RANDOM_TRANSITION");
             }
@@ -581,8 +581,8 @@ void TransitionsUI::toggleDisallowReturnToStateFlag(){
                 bsData->flags.append("|FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE");
             }
         }else{
-            if (bsData->flags == ""){
-                bsData->flags.remove("FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE");
+            if (bsData->flags == "FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE"){
+                bsData->flags = "0";
             }else{
                 bsData->flags.remove("|FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE");
             }
@@ -602,8 +602,8 @@ void TransitionsUI::toggleAbutEndStateFlag(){
                 bsData->flags.append("|FLAG_ABUT_AT_END_OF_FROM_GENERATOR");
             }
         }else{
-            if (bsData->flags == ""){
-                bsData->flags.remove("FLAG_ABUT_AT_END_OF_FROM_GENERATOR");
+            if (bsData->flags == "FLAG_ABUT_AT_END_OF_FROM_GENERATOR"){
+                bsData->flags = "0";
             }else{
                 bsData->flags.remove("|FLAG_ABUT_AT_END_OF_FROM_GENERATOR");
             }

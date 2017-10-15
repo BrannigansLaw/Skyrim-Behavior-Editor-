@@ -14,9 +14,8 @@ class SkyrimAnimationMotionData
     friend class SkyrimAnimationDataUI;
     friend class ProjectAnimData;
 public:
-    SkyrimAnimationMotionData();
     SkyrimAnimationMotionData(ProjectAnimData *par, uint ind = 0, qreal dur = 0, const QVector <SkyrimAnimationTranslation> & trans = QVector <SkyrimAnimationTranslation>(), const QVector <SkyrimAnimationRotation> & rots = QVector <SkyrimAnimationRotation>());
-    SkyrimAnimationMotionData(const SkyrimAnimationMotionData & other);
+    //SkyrimAnimationMotionData(const SkyrimAnimationMotionData & other);
     bool read(QFile * file, uint &lineCount);
     bool write(QFile * file, QTextStream & out) const;
     uint lineCount() const;

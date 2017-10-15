@@ -1,6 +1,8 @@
 #include "hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 
+#include <mutex>
+
 #define AVERAGE_ELEMENT_TAG_LENGTH 9
 #define AVERAGE_ATTRIBUTE_LENGTH 5
 #define AVERAGE_ATTRIBUTE_VALUE_LENGTH 14
@@ -16,6 +18,8 @@ HkxXmlReader::HkxXmlReader(HkxFile *file)
 }
 
 bool HkxXmlReader::parse(){
+    std::mutex mu;
+    mu.lock();
     lineNumber = 0;
     if (!hkxXmlFile->open(QIODevice::ReadOnly)){
         isEOF = true;
@@ -43,6 +47,8 @@ bool HkxXmlReader::parse(){
         return false;
     }
     //hkxXmlFile->//setProgressData("XML parsed successfully!", 40);
+
+    mu.unlock();
     return true;
 }
 
@@ -259,6 +265,12 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                     i = readElementTag(line, i + 1, isIsolatedEndElemTag, true);
                 }else if (line.at(i) == '!'){
                     i = skipComment(line, i + 1);
+                }else if (line.at(i) == ' '){
+                    //isValueSplitOnMultipleLines = false;
+                    i++;
+                    if (i < line.size()){
+                        i = readAttribute(line, i);
+                    }
                 }else{
                     isIsolatedEndElemTag = false;
                     i = readElementTag(line, i, isIsolatedEndElemTag, false);
@@ -266,12 +278,6 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
                 if (i < 0){
                     return UnknownError;
                 }
-            }
-        }else if (line.at(i) == ' '){
-            isValueSplitOnMultipleLines = false;
-            i++;
-            if (i < line.size()){
-                i = readAttribute(line, i);
             }
         }else if (line.at(i) == '\t'){
             //continue...

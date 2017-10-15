@@ -10,11 +10,13 @@
 #include "src/hkxclasses/behavior/hkbprojectdata.h"
 #include "src/hkxclasses/behavior/hkbprojectstringdata.h"
 #include "src/hkxclasses/hkrootlevelcontainer.h"
+#include <mutex>
 
 ProjectFile::ProjectFile(MainWindow *window, const QString & name)
     : HkxFile(window, name),
       largestRef(0),
-      projectIndex(-1)
+      projectIndex(-1),
+      skyrimAnimData(new SkyrimAnimData)
 {
     projectName = QString(fileName().section("/", -1, -1)).remove(".hkx");
     getReader().setFile(this);
@@ -34,7 +36,10 @@ bool ProjectFile::isClipGenNameTaken(const QString &name) const{
 }
 
 bool ProjectFile::readAnimationData(const QString & filename){
-    projectIndex = skyrimAnimData.getProjectIndex(fileName().section("/", -1, -1));
+    std::mutex mu;
+    mu.lock();
+    projectIndex = skyrimAnimData->getProjectIndex(fileName().section("/", -1, -1));
+    mu.unlock();
     QFile *animfile = new QFile(filename);
     if (!animfile->exists()){
         delete animfile;
@@ -43,10 +48,20 @@ bool ProjectFile::readAnimationData(const QString & filename){
             CRITICAL_ERROR_MESSAGE(QString("animationdatasinglefile.txt is missing from the application directory!"));
         }
     }
-    if (!skyrimAnimData.parse(animfile)){
+    if (!skyrimAnimData->parse(animfile)){
         delete animfile;
+        CRITICAL_ERROR_MESSAGE(QString("ProjectFile::readAnimationData(): The project animation data file could not be parsed!!!"));
         return false;
     }
+    delete animfile;
+    return true;
+}
+
+bool ProjectFile::readAnimationSetData(const QString & filename){
+    std::mutex mu;
+    mu.lock();
+    projectIndex = skyrimAnimData->getProjectIndex(fileName().section("/", -1, -1));
+    mu.unlock();
     QFile *animsetfile = new QFile(QString(filename).replace("animationdatasinglefile.txt", "animationsetdatasinglefile.txt"));
     if (!animsetfile->exists()){
         delete animsetfile;
@@ -56,21 +71,20 @@ bool ProjectFile::readAnimationData(const QString & filename){
         }
     }
     if (!skyrimAnimSetData.parse(animsetfile)){
-        delete animfile;
         delete animsetfile;
+        CRITICAL_ERROR_MESSAGE(QString("ProjectFile::readAnimationSetData(): The project animation set data file could not be parsed!!!"));
         return false;
     }
-    delete animfile;
     delete animsetfile;
     return true;
 }
 
 bool ProjectFile::removeClipGenFromAnimData(const QString &name){
-    return skyrimAnimData.removeClipGenerator(projectName+".txt", name);
+    return skyrimAnimData->removeClipGenerator(projectName+".txt", name);
 }
 
 bool ProjectFile::removeAnimationFromAnimData(const QString &name){
-    return skyrimAnimData.removeAnimation(projectName+".txt", character->getAnimationNames().indexOf(name));    //Unsafe...
+    return skyrimAnimData->removeAnimation(projectName+".txt", character->getAnimationNames().indexOf(name));    //Unsafe...
 }
 
 

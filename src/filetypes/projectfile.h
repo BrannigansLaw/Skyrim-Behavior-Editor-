@@ -24,6 +24,7 @@ public:
     void setCharacterFile(CharacterFile *file);
     bool isClipGenNameTaken(const QString & name) const;
     bool readAnimationData(const QString &filename);
+    bool readAnimationSetData(const QString & filename);
     bool removeClipGenFromAnimData(const QString & name);
     bool removeAnimationFromAnimData(const QString & name);
 protected:
@@ -38,7 +39,7 @@ private:
     HkxSharedPtr stringData;
     HkxSharedPtr projectData;
     long largestRef;
-    SkyrimAnimData skyrimAnimData;
+    SkyrimAnimData *skyrimAnimData;
     SkyrimAnimSetData skyrimAnimSetData;
     int projectIndex;
     QString projectName;

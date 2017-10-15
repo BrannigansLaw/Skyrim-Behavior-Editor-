@@ -52,7 +52,7 @@ AnimationsUI::AnimationsUI(const QString &title)
 
 void AnimationsUI::viewAnimation(int row, int column){
     if (column == 1 && animData && loadedData && loadedData->animationNames.size() > row && row >= 0 && row < animData->animationMotionData.size()){
-        animationUI->loadData(&animData->animationMotionData[row]);
+        animationUI->loadData(animData->findMotionData(row));
         stackLyt->setCurrentIndex(ANIMATION_WIDGET);
     }
 }

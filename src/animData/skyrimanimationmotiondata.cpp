@@ -19,18 +19,13 @@ SkyrimAnimationMotionData::SkyrimAnimationMotionData(ProjectAnimData *par, uint 
     //
 }
 
-SkyrimAnimationMotionData::SkyrimAnimationMotionData(const SkyrimAnimationMotionData & other){
+/*SkyrimAnimationMotionData::SkyrimAnimationMotionData(const SkyrimAnimationMotionData & other){
     parent = other.parent;
     animationIndex = other.animationIndex;
     duration = other.duration;
     translations = other.translations;
     rotations = other.rotations;
-}
-
-SkyrimAnimationMotionData::SkyrimAnimationMotionData()
-{
-    //
-}
+}*/
 
 bool SkyrimAnimationMotionData::read(QFile *file, uint &lineCount){
     if (!file || !file->isOpen()){
