@@ -61,12 +61,7 @@ bool SkyrimAnimSetData::write(const QString &filename){
         out << projectNames.at(i) << "\n";
     }
     for (int i = 0; i < projects.size(); i++){
-        for (int k = 0; k < projects.at(i).fileNames.size(); k++){
-            out << projects.at(i).fileNames.at(k) << "\n";
-        }
-        for (int j = 0; j < projects.at(i).animSetData.size(); j++){
-            out << projects.at(i).write(&file, out) << "\n";
-        }
+        projects.at(i).write(&file, out);
     }
     return true;
 }
