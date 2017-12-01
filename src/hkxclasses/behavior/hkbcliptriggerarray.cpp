@@ -31,6 +31,12 @@ void hkbClipTriggerArray::setTriggerId(int index, int id){
     }
 }
 
+void hkbClipTriggerArray::setLocalTime(int index, qreal time){
+    if (triggers.size() > index){
+        triggers[index].localTime = time;
+    }
+}
+
 void hkbClipTriggerArray::removeTrigger(int index){
     if (triggers.size() > index){
         triggers.removeAt(index);

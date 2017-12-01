@@ -101,7 +101,11 @@ void ProjectUI::loadData(){
     if (project && project->character && project->character->skeleton && !project->character->skeleton->skeletons.isEmpty()){
         setTitle(project->fileName());
         characterProperties->loadData(project->character->getCharacterData());
-        animations->loadData(project->character->stringData.data(), project->skyrimAnimData->animData.at(project->skyrimAnimData->getProjectIndex(project->fileName().section("/", -1, -1))));//UNSAFE....
+        int index = project->skyrimAnimData->getProjectIndex(project->fileName().section("/", -1, -1));
+        if (index == -1){
+            (qFatal("ProjectUI::loadData(): getProjectIndex failed!"));
+        }
+        animations->loadData(project->character->stringData.data(), project->skyrimAnimData->animData.at(index));//UNSAFE....
         skeleton->loadData(project->character->skeleton->skeletons.first().data());
         if (project->character->footIkDriverInfo.data()){
             footIK->loadData(project->character->footIkDriverInfo.data());

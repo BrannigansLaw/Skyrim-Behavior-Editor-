@@ -103,7 +103,7 @@ bool hkbGetHandleOnBoneModifier::write(HkxXMLWriter *writer){
             refString = "null";
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("handleOut"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("localFrameName"), localFrameName);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("localFrameName"), localFrameName, true);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("ragdollBoneIndex"), QString::number(ragdollBoneIndex));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("animationBoneIndex"), QString::number(animationBoneIndex));
         writer->writeLine(writer->object, false);

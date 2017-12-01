@@ -13,8 +13,8 @@ bool SkyrimClipGeneratoData::chopLine(QFile * file, QByteArray & line, uint & li
     return false;
 }
 
-SkyrimClipGeneratoData::SkyrimClipGeneratoData(ProjectAnimData *par, uint ind, qreal speed, qreal startcrop, qreal endcrop, const QVector <SkyrimClipTrigger> & trigs)
-    : parent(par), animationIndex(ind), playbackSpeed(speed), cropStartTime(startcrop), cropEndTime(endcrop), triggers(trigs)
+SkyrimClipGeneratoData::SkyrimClipGeneratoData(ProjectAnimData *par, const QString & name, uint ind, qreal speed, qreal startcrop, qreal endcrop, const QVector <SkyrimClipTrigger> & trigs)
+    : parent(par), clipGeneratorName(name), animationIndex(ind), playbackSpeed(speed), cropStartTime(startcrop), cropEndTime(endcrop), triggers(trigs)
 {
     //
 }

@@ -464,7 +464,7 @@ void ClipGeneratorUI::setName(){
     if (bsData){
         if (bsData->name != name->text()){
             if (static_cast<BehaviorFile *>(bsData->getParentFile())->isClipGenNameAvailable(name->text())){
-                bsData->name = name->text();
+                bsData->setName(name->text(), bsData->name);
                 static_cast<DataIconManager*>((bsData))->updateIconNames();
                 emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
                 bsData->getParentFile()->toggleChanged(true);
@@ -480,10 +480,10 @@ void ClipGeneratorUI::setName(){
     }
 }
 
-void ClipGeneratorUI::setAnimationName(int, const QString &name){
+void ClipGeneratorUI::setAnimationName(int index, const QString &name){
     if (bsData){
         if (bsData->animationName != name){
-            bsData->animationName = name;
+            bsData->setAnimationName(index, name);
             table->item(ANIMATION_NAME_ROW, VALUE_COLUMN)->setText(name);
             bsData->getParentFile()->toggleChanged(true);
         }
@@ -495,7 +495,7 @@ void ClipGeneratorUI::setAnimationName(int, const QString &name){
 void ClipGeneratorUI::setCropStartAmountLocalTime(){
     if (bsData){
         if (bsData->cropStartAmountLocalTime != cropStartAmountLocalTime->value()){
-            bsData->cropStartAmountLocalTime = cropStartAmountLocalTime->value();
+            bsData->setCropStartAmountLocalTime(cropStartAmountLocalTime->value());
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
@@ -506,7 +506,7 @@ void ClipGeneratorUI::setCropStartAmountLocalTime(){
 void ClipGeneratorUI::setCropEndAmountLocalTime(){
     if (bsData){
         if (bsData->cropEndAmountLocalTime != cropEndAmountLocalTime->value()){
-            bsData->cropEndAmountLocalTime = cropEndAmountLocalTime->value();
+            bsData->setCropEndAmountLocalTime(cropEndAmountLocalTime->value());
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
@@ -528,7 +528,7 @@ void ClipGeneratorUI::setStartTime(){
 void ClipGeneratorUI::setPlaybackSpeed(){
     if (bsData){
         if (bsData->playbackSpeed != playbackSpeed->value()){
-            bsData->playbackSpeed = playbackSpeed->value();
+            bsData->setPlaybackSpeed(playbackSpeed->value());
             bsData->getParentFile()->toggleChanged(true);
         }
     }else{
@@ -756,7 +756,7 @@ void ClipGeneratorUI::viewSelectedChild(int row, int column){
             result = row - BASE_NUMBER_OF_ROWS;
             if (bsData->getNumberOfTriggers() > result && result >= 0){
                 if (column == VALUE_COLUMN){
-                    triggerUI->loadData((BehaviorFile *)(bsData->triggers.data()->getParentFile()), &static_cast<hkbClipTriggerArray *>(bsData->triggers.data())->triggers[result]);
+                    triggerUI->loadData((BehaviorFile *)(bsData->triggers.data()->getParentFile()), bsData, result, &static_cast<hkbClipTriggerArray *>(bsData->triggers.data())->triggers[result]);
                     setCurrentIndex(CHILD_WIDGET);
                 }else if (column == BINDING_COLUMN){
                     if (MainWindow::yesNoDialogue("Are you sure you want to remove the trigger \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){

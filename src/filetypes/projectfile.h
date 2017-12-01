@@ -27,9 +27,18 @@ public:
     bool readAnimationSetData(const QString & filename);
     bool removeClipGenFromAnimData(const QString & name);
     bool removeAnimationFromAnimData(const QString & name);
+    bool appendClipGeneratorAnimData(const QString & name);
+    void setLocalTimeForClipGenAnimData(const QString &clipname, int triggerindex, qreal time);
+    void setEventNameForClipGenAnimData(const QString &clipname, int triggerindex, const QString &eventname);
+    void setClipNameAnimData(const QString &oldclipname, const QString &newclipname);
+    void setAnimationIndexForClipGen(int index, const QString &clipGenName);
+    void setPlaybackSpeedAnimData(const QString & clipGenName, qreal speed);
+    void setCropStartAmountLocalTimeAnimData(const QString & clipGenName, qreal time);
+    void setCropEndAmountLocalTimeAnimData(const QString & clipGenName, qreal time);
 protected:
     bool parse();
     bool link();
+    //SkyrimAnimData *getAnimData() const;
 private:
     HkxSharedPtr * findProjectData(long ref);
     HkxSharedPtr * findProjectStringData(long ref);

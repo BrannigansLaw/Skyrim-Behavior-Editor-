@@ -37,6 +37,7 @@ private:
     };
     void addTrigger(const HkTrigger & trigger = HkTrigger());
     void setTriggerId(int index, int id);
+    void setLocalTime(int index, qreal time);
     void removeTrigger(int index);
 private:
     static uint refCount;

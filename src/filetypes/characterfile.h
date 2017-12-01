@@ -27,6 +27,7 @@ public:
     QString getRagdollName() const;
     QStringList getRagdollBoneNames() const;
     QStringList getAnimationNames() const;
+    QString getAnimationNameAt(int index) const;
     QString getCharacterPropertyNameAt(int index) const;
     int getCharacterPropertyIndex(const QString & name) const;
     QStringList getCharacterPropertyNames() const;

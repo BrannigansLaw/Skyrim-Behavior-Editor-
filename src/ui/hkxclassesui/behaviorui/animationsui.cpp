@@ -104,6 +104,7 @@ void AnimationsUI::clear(){
 void AnimationsUI::addAnimation(){
     if (loadedData){
         loadedData->addAnimation();
+        //animData->appendAnimation(new SkyrimAnimationMotionData(animData, ));
         int row = table->rowCount();
         table->setRowCount(row + 1);
         table->setItem(row, 0, new QTableWidgetItem(loadedData->animationNames.last()));

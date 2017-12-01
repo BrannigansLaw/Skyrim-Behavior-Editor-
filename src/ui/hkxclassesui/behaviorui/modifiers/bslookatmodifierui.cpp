@@ -691,7 +691,9 @@ void BSLookAtModifierUI::viewSelectedChild(int row, int column){
     bool properties = false;
     if (bsData){
         if (row < ADD_BONE_ROW && row >= 0){
-            if (column == BINDING_COLUMN){
+            if (column == VALUE_COLUMN && row == TARGET_OUT_OF_LIMIT_EVENT_ID_ROW){
+                emit viewEvents(bsData->id + 1);
+            }else if (column == BINDING_COLUMN){
                 switch (row){
                 case ENABLE_ROW:
                     if (table->item(ENABLE_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){

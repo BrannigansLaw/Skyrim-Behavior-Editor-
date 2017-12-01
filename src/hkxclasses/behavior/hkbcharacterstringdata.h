@@ -25,7 +25,8 @@ public:
     bool write(HkxXMLWriter *writer);
     QStringList getAnimationNames() const;
     QString getCharacterPropertyNameAt(int index) const;
-    void addAnimation();
+    void addAnimation(const QString &name = "");
+    QString getAnimationNameAt(int index) const;
 private:
     hkbCharacterStringData& operator=(const hkbCharacterStringData&);
     hkbCharacterStringData(const hkbCharacterStringData &);

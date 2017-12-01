@@ -9,14 +9,14 @@ QString hkbClipGenerator::classname = "hkbClipGenerator";
 
 QStringList hkbClipGenerator::PlaybackMode = {"MODE_SINGLE_PLAY", "MODE_LOOPING", "MODE_USER_CONTROLLED", "MODE_PING_PONG", "MODE_COUNT"};
 
-hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, const QString &animationname)
+hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, bool addToAnimData, const QString &animationname)
     : hkbGenerator(parent, ref),
       userData(0),
       animationName(animationname),
       cropStartAmountLocalTime(0),
       cropEndAmountLocalTime(0),
       startTime(0),
-      playbackSpeed(0),
+      playbackSpeed(1),
       enforcedDuration(0),
       userControlledTimeFraction(0),
       animationBindingIndex(-1),
@@ -24,9 +24,19 @@ hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, const QString &ani
       flags("0")
 {
     setType(HKB_CLIP_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);
+    BehaviorFile *par = static_cast<BehaviorFile *>(getParentFile());
+    if (!getParentFile()){
+        (qFatal("hkbClipGenerator(): Parent file is NULL!"));
+    }
+    par->addObjectToFile(this, ref);
     refCount++;
     name = "ClipGenerator"+QString::number(refCount);
+    if (animationname == ""){
+        animationName = par->getAnimationNameAt(0);
+    }
+    if (addToAnimData && !par->addClipGenToAnimationData(name)){
+        (qFatal("hkbClipGenerator::hkbClipGenerator(): The clip generator could not be added to the animation data!"));
+    }
 }
 
 QString hkbClipGenerator::getClassname(){
@@ -168,10 +178,32 @@ int hkbClipGenerator::getNumberOfTriggers() const{
     return 0;
 }
 
+void hkbClipGenerator::setName(const QString &oldclipname, const QString &newclipname){
+    static_cast<BehaviorFile *>(getParentFile())->setClipNameAnimData(oldclipname, newclipname);    //Unsafe...
+    name = newclipname;
+}
+
+void hkbClipGenerator::setAnimationName(int index, const QString &animationname){
+    animationName = animationname;
+    static_cast<BehaviorFile *>(getParentFile())->setAnimationIndexAnimData(index, name);    //Unsafe...
+}
+
+void hkbClipGenerator::setPlaybackSpeed(qreal speed){
+    playbackSpeed = speed;
+    static_cast<BehaviorFile *>(getParentFile())->setPlaybackSpeedAnimData(name, speed);    //Unsafe...
+}
+
+void hkbClipGenerator::setCropStartAmountLocalTime(qreal time){
+    cropStartAmountLocalTime = time;
+    static_cast<BehaviorFile *>(getParentFile())->setCropStartAmountLocalTimeAnimData(name, time);    //Unsafe...
+}
+
+void hkbClipGenerator::setCropEndAmountLocalTime(qreal time){
+    cropEndAmountLocalTime = time;
+    static_cast<BehaviorFile *>(getParentFile())->setCropEndAmountLocalTimeAnimData(name, time);    //Unsafe...
+}
+
 bool hkbClipGenerator::link(){
-    if (!getParentFile()){
-        return false;
-    }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
@@ -209,5 +241,6 @@ bool hkbClipGenerator::evaulateDataValidity(){
 }
 
 hkbClipGenerator::~hkbClipGenerator(){
+    static_cast<BehaviorFile *>(getParentFile())->removeClipGenFromAnimData(name);
     refCount--;
 }

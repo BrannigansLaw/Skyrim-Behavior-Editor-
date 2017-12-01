@@ -17,6 +17,13 @@ public:
     bool appendAnimation(SkyrimAnimationMotionData *motiondata);
     bool removeAnimation(int animationindex);
     SkyrimAnimationMotionData * findMotionData(int animationindex);
+    void setLocalTimeForClipGenAnimData(const QString &clipname, int triggerindex, qreal time);
+    void setEventNameForClipGenAnimData(const QString &clipname, int triggerindex, const QString &eventname);
+    void setClipNameAnimData(const QString &oldclipname, const QString &newclipname);
+    void setAnimationIndexForClipGen(const QString &clipGenName, int index);
+    void setPlaybackSpeedForClipGen(const QString & clipGenName, qreal speed);
+    void setCropStartAmountLocalTimeForClipGen(const QString & clipGenName, qreal time);
+    void setCropEndAmountLocalTimeForClipGen(const QString & clipGenName, qreal time);
 private:
     uint animationDataLines;
     uint animationMotionDataLines;

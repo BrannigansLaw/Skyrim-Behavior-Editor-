@@ -33,28 +33,39 @@ QString hkbCharacterStringData::getCharacterPropertyNameAt(int index) const{
     return "";
 }
 
-void hkbCharacterStringData::addAnimation(){
-    QString name = "NEW-ANIMATION-";
-    int num = 0;
-    int index;
-    for (int i = 0; i < animationNames.size(); i++){
-        if (animationNames.at(i) == name){
-            index = name.indexOf('_');
-            if (index > -1){
-                name.remove(name.indexOf('_'), name.size());
-            }
-            name.append("_"+QString::number(num));
-            num++;
-            if (num > 1){
-                if (num > 10){
-                    name = name+"_FUCKING RENAME YOUR ANIMATIONS PROPERLY!";
-                    break;
+void hkbCharacterStringData::addAnimation(const QString & name){
+    if (name == ""){
+        QString newname = "NEW-ANIMATION-";
+        int num = 0;
+        int index;
+        for (int i = 0; i < animationNames.size(); i++){
+            if (animationNames.at(i) == newname){
+                index = newname.indexOf('_');
+                if (index > -1){
+                    newname.remove(newname.indexOf('_'), newname.size());
                 }
-                i = 0;
+                newname.append("_"+QString::number(num));
+                num++;
+                if (num > 1){
+                    if (num > 10){
+                        newname = newname+"_FUCKING RENAME YOUR ANIMATIONS PROPERLY!";
+                        break;
+                    }
+                    i = 0;
+                }
             }
         }
+        animationNames.append(newname);
+    }else{
+        animationNames.append(name);
     }
-    animationNames.append(name);
+}
+
+QString hkbCharacterStringData::getAnimationNameAt(int index) const{
+    if (animationNames.size() > index && index >= 0){
+        return animationNames.at(index);
+    }
+    return "";
 }
 
 bool hkbCharacterStringData::readData(const HkxXmlReader &reader, long index){

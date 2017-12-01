@@ -132,6 +132,7 @@ bool hkbDetectCloseToGroundModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("collisionFilterInfo"), QString::number(collisionFilterInfo));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("boneIndex"), QString::number(boneIndex));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("animBoneIndex"), QString::number(animBoneIndex));
+        writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){

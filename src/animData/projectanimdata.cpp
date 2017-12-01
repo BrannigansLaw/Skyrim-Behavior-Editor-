@@ -66,7 +66,7 @@ bool ProjectAnimData::read(QFile *file){
         if (count > 0){
             //Read animation data...
             for (;lineCount < blocksize;){
-                animationData.append(new SkyrimClipGeneratoData(this));
+                animationData.append(new SkyrimClipGeneratoData(this, ""));
                 if (!animationData.last()->read(file, lineCount)){
                     return false;
                 }
@@ -171,4 +171,74 @@ SkyrimAnimationMotionData *ProjectAnimData::findMotionData(int animationindex){
         }
     }
     return NULL;
+}
+
+void ProjectAnimData::setLocalTimeForClipGenAnimData(const QString &clipname, int triggerindex, qreal time){
+    for (int i = 0; i < animationData.size(); i++){
+        if (animationData.at(i)->clipGeneratorName == clipname && triggerindex >= 0 && triggerindex < animationData.at(i)->triggers.size()){
+            animationData.at(i)->triggers.at(triggerindex).time = time;
+            return;
+        }
+    }
+    (qFatal("ProjectAnimData::setLocalTimeForClipGenAnimData(): Failed to set data!"));
+}
+
+void ProjectAnimData::setEventNameForClipGenAnimData(const QString &clipname, int triggerindex, const QString &eventname){
+    for (int i = 0; i < animationData.size(); i++){
+        if (animationData.at(i)->clipGeneratorName == clipname && triggerindex >= 0 && triggerindex < animationData.at(i)->triggers.size()){
+            animationData.at(i)->triggers.at(triggerindex).name = eventname;
+            return;
+        }
+    }
+    (qFatal("ProjectAnimData::setEventNameForClipGenAnimData(): Failed to set data!"));
+}
+
+void ProjectAnimData::setClipNameAnimData(const QString &oldclipname, const QString &newclipname){
+    for (int i = 0; i < animationData.size(); i++){
+        if (animationData.at(i)->clipGeneratorName == oldclipname){
+            animationData.at(i)->clipGeneratorName = newclipname;
+            return;
+        }
+    }
+    (qFatal("ProjectAnimData::setClipNameAnimData(): Failed to set data!"));
+}
+
+void ProjectAnimData::setAnimationIndexForClipGen(const QString &clipGenName, int index){
+    for (int i = 0; i < animationData.size(); i++){
+        if (animationData.at(i)->clipGeneratorName == clipGenName){
+            animationData.at(i)->animationIndex = index;
+            return;
+        }
+    }
+    (qFatal("ProjectAnimData::setAnimationIndexForClipGen(): Failed to set data!"));
+}
+
+void ProjectAnimData::setPlaybackSpeedForClipGen(const QString &clipGenName, qreal speed){
+    for (int i = 0; i < animationData.size(); i++){
+        if (animationData.at(i)->clipGeneratorName == clipGenName){
+            animationData.at(i)->playbackSpeed = speed;
+            return;
+        }
+    }
+    (qFatal("ProjectAnimData::setPlaybackSpeedForClipGen(): Failed to set data!"));
+}
+
+void ProjectAnimData::setCropStartAmountLocalTimeForClipGen(const QString &clipGenName, qreal time){
+    for (int i = 0; i < animationData.size(); i++){
+        if (animationData.at(i)->clipGeneratorName == clipGenName){
+            animationData.at(i)->cropStartTime = time;
+            return;
+        }
+    }
+    (qFatal("ProjectAnimData::setCropStartAmountLocalTimeForClipGen(): Failed to set data!"));
+}
+
+void ProjectAnimData::setCropEndAmountLocalTimeForClipGen(const QString &clipGenName, qreal time){
+    for (int i = 0; i < animationData.size(); i++){
+        if (animationData.at(i)->clipGeneratorName == clipGenName){
+            animationData.at(i)->cropEndTime = time;
+            return;
+        }
+    }
+    (qFatal("ProjectAnimData::setCropEndAmountLocalTimeForClipGen(): Failed to set data!"));
 }

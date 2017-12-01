@@ -13,7 +13,9 @@ QString hkbEventDrivenModifier::classname = "hkbEventDrivenModifier";
 hkbEventDrivenModifier::hkbEventDrivenModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
       userData(1),
-      enable(true)
+      enable(true),
+      activateEventId(-1),
+      deactivateEventId(-1)
 {
     setType(HKB_EVENT_DRIVEN_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);

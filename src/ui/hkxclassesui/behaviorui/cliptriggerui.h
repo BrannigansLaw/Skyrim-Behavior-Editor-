@@ -13,6 +13,7 @@ class BehaviorFile;
 class DoubleSpinBox;
 class CheckBox;
 class TableWidget;
+class hkbClipGenerator;
 
 class ClipTriggerUI: public QGroupBox
 {
@@ -20,7 +21,7 @@ class ClipTriggerUI: public QGroupBox
     friend class ClipGeneratorUI;
 public:
     ClipTriggerUI();
-    void loadData(BehaviorFile *parentFile, hkbClipTriggerArray::HkTrigger *trigger);
+    void loadData(BehaviorFile *parentFile, hkbClipGenerator *parent, int index, hkbClipTriggerArray::HkTrigger *trigger);
     //QSize sizeHint() const Q_DECL_OVERRIDE;
     //QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 signals:
@@ -41,6 +42,8 @@ private:
 private:
     static QStringList headerLabels;
     BehaviorFile *file;
+    hkbClipGenerator *parentClipGen;
+    int indexOfTrigger;
     hkbClipTriggerArray::HkTrigger *bsData;
     QGridLayout *topLyt;
     QPushButton *returnPB;

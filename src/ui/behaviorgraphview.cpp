@@ -537,7 +537,7 @@ void BehaviorGraphView::appendBoneSwitchGenerator(){
 }
 
 void BehaviorGraphView::appendClipGenerator(){
-    append(new hkbClipGenerator(behavior));
+    append(new hkbClipGenerator(behavior, 0, true));
 }
 
 void BehaviorGraphView::appendBehaviorReferenceGenerator(){

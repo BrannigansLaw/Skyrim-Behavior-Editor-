@@ -7,6 +7,7 @@ class hkbBehaviorGraph;
 class CharacterFile;
 class hkbModifier;
 class ProjectFile;
+class SkyrimClipGeneratoData;
 
 class BehaviorFile: public HkxFile
 {
@@ -57,10 +58,20 @@ public:
     QString getEventNameAt(int index) const;
     QString getCharacterPropertyNameAt(int index, bool fromBehaviorFile) const;
     QStringList getAnimationNames() const;
+    QString getAnimationNameAt(int index) const;
     QStringList getLocalFrameNames() const;
     QStringList getAllBehaviorFileNames() const;
+    void setLocalTimeForClipGenAnimData(const QString &clipname, int triggerindex, qreal time);
+    void setEventNameForClipGenAnimData(const QString &clipname, int triggerindex, int eventid);
     bool isClipGenNameTaken(const QString & name) const;
     bool isClipGenNameAvailable(const QString & name) const;
+    bool addClipGenToAnimationData(const QString & name);
+    bool removeClipGenFromAnimData(const QString & name);
+    void setClipNameAnimData(const QString &oldclipname, const QString &newclipname);
+    void setAnimationIndexAnimData(int index, const QString &clipGenName);
+    void setPlaybackSpeedAnimData(const QString & clipGenName, qreal speed);
+    void setCropStartAmountLocalTimeAnimData(const QString & clipGenName, qreal time);
+    void setCropEndAmountLocalTimeAnimData(const QString & clipGenName, qreal time);
 protected:
     bool parse();
     bool link();

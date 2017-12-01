@@ -114,6 +114,12 @@ BehaviorFile::BehaviorFile(MainWindow *window, ProjectFile *projectfile, Charact
       largestRef(0)
 {
     getReader().setFile(this);
+    if (!project){
+        (qFatal("BehaviorFile::BehaviorFile(): The project pointer is NULL!"));
+    }
+    if (!character){
+        (qFatal("BehaviorFile::BehaviorFile(): The character pointer is NULL!"));
+    }
 }
 
 void BehaviorFile::generateNewBehavior(){
@@ -391,8 +397,16 @@ QStringList BehaviorFile::getAllBehaviorFileNames() const{
     return list;
 }
 
+void BehaviorFile::setLocalTimeForClipGenAnimData(const QString &clipname, int triggerindex, qreal time){
+    project->setLocalTimeForClipGenAnimData(clipname, triggerindex, time);
+}
+
+void BehaviorFile::setEventNameForClipGenAnimData(const QString &clipname, int triggerindex, int eventid){
+    project->setEventNameForClipGenAnimData(clipname, triggerindex, getEventNameAt(eventid));
+}
+
 bool BehaviorFile::isClipGenNameTaken(const QString & name) const{
-    for (int i = 0; i < generators.size(); i++){
+    for (int i = 0; i < generators.size() - 1; i++){
         if (generators.at(i).data()->getSignature() == HKB_CLIP_GENERATOR && name == static_cast<hkbClipGenerator *>(generators.at(i).data())->getName()){
             return true;
         }
@@ -407,6 +421,37 @@ bool BehaviorFile::isClipGenNameAvailable(const QString &name) const{
     return false;
 }
 
+bool BehaviorFile::addClipGenToAnimationData(const QString &name){
+    if (!isClipGenNameAvailable(name)){
+        return false;
+    }
+    return project->appendClipGeneratorAnimData(name);
+}
+
+bool BehaviorFile::removeClipGenFromAnimData(const QString &name){
+    return project->removeClipGenFromAnimData(name);
+}
+
+void BehaviorFile::setClipNameAnimData(const QString &oldclipname, const QString &newclipname){
+    project->setClipNameAnimData(oldclipname, newclipname);
+}
+
+void BehaviorFile::setAnimationIndexAnimData(int index, const QString &clipGenName){
+    project->setAnimationIndexForClipGen(index, clipGenName);
+}
+
+void BehaviorFile::setPlaybackSpeedAnimData(const QString &clipGenName, qreal speed){
+    project->setPlaybackSpeedAnimData(clipGenName, speed);
+}
+
+void BehaviorFile::setCropStartAmountLocalTimeAnimData(const QString &clipGenName, qreal time){
+    project->setCropStartAmountLocalTimeAnimData(clipGenName, time);
+}
+
+void BehaviorFile::setCropEndAmountLocalTimeAnimData(const QString &clipGenName, qreal time){
+    project->setCropEndAmountLocalTimeAnimData(clipGenName, time);
+}
+
 HkxObject * BehaviorFile::getRootStateMachine() const{
     return static_cast<hkbBehaviorGraph *>(behaviorGraph.data())->rootGenerator.data();
 }
@@ -416,24 +461,15 @@ hkbBehaviorGraph * BehaviorFile::getBehaviorGraph() const{
 }
 
 QStringList BehaviorFile::getRigBoneNames() const{
-    if (character){
-        return character->getRigBoneNames();
-    }
-    return QStringList();
+    return character->getRigBoneNames();
 }
 
 int BehaviorFile::getNumberOfBones(bool ragdoll) const{
-    if (character){
-        return character->getNumberOfBones(ragdoll);
-    }
-    return -1;
+    return character->getNumberOfBones(ragdoll);
 }
 
 QStringList BehaviorFile::getRagdollBoneNames() const{
-    if (character){
-        return character->getRagdollBoneNames();
-    }
-    return QStringList();
+    return character->getRagdollBoneNames();
 }
 
 /*TreeGraphicsItem * BehaviorFile::getRootIcon() const{
@@ -1049,18 +1085,17 @@ QString BehaviorFile::getCharacterPropertyNameAt(int index, bool fromBehaviorFil
             return static_cast<hkbBehaviorGraphData *>(graphData.data())->getCharacterPropertyNameAt(index);
         }
     }else{
-        if (character){
-            return character->getCharacterPropertyNameAt(index);
-        }
+        return character->getCharacterPropertyNameAt(index);
     }
     return "";
 }
 
 QStringList BehaviorFile::getAnimationNames() const{
-    if (character){
-        return character->getAnimationNames();
-    }
-    return QStringList();
+    return character->getAnimationNames();
+}
+
+QString BehaviorFile::getAnimationNameAt(int index) const{
+    return character->getAnimationNameAt(index);
 }
 
 QStringList BehaviorFile::getLocalFrameNames() const{

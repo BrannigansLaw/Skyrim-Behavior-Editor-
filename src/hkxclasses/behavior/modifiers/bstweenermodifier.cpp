@@ -19,7 +19,7 @@ BSTweenerModifier::BSTweenerModifier(HkxFile *parent, long ref)
       useTweenDuration(true),
       tweenDuration(0)
 {
-    setType(HKB_TWIST_MODIFIER, TYPE_MODIFIER);
+    setType(BS_TWEENER_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
     name = "TweenerModifier"+QString::number(refCount);

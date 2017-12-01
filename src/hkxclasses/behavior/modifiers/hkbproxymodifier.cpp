@@ -35,7 +35,9 @@ hkbProxyModifier::hkbProxyModifier(HkxFile *parent, long ref)
       ignoreIncomingTranslation(true),
       includeDownwardMomentum(true),
       followWorldFromModel(true),
-      isTouchingGround(true)
+      isTouchingGround(true),
+      phantomType(PhantomType.first()),
+      linearVelocityMode(LinearVelocityMode.first())
 {
     setType(HKB_PROXY_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);

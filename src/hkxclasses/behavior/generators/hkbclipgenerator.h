@@ -8,7 +8,7 @@ class hkbClipGenerator: public hkbGenerator
     friend class BehaviorGraphView;
     friend class ClipGeneratorUI;
 public:
-    hkbClipGenerator(HkxFile *parent, long ref = 0, const QString & animationname = "/");
+    hkbClipGenerator(HkxFile *parent, long ref = 0, bool addToAnimData = false, const QString & animationname = "/...");
     virtual ~hkbClipGenerator();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
@@ -31,6 +31,11 @@ public:
     };
     Q_DECLARE_FLAGS(ClipFlags, ClipFlag)
 private:
+    void setName(const QString & oldclipname, const QString & newclipname);
+    void setAnimationName(int index, const QString & animationname);
+    void setPlaybackSpeed(qreal speed);
+    void setCropStartAmountLocalTime(qreal time);
+    void setCropEndAmountLocalTime(qreal time);
     hkbClipGenerator& operator=(const hkbClipGenerator&);
     hkbClipGenerator(const hkbClipGenerator &);
 private:

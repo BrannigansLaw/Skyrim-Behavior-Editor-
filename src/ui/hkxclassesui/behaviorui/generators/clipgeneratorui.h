@@ -36,7 +36,7 @@ signals:
     void generatorNameChanged(const QString & newName, int index);
 private slots:
     void setName();
-    void setAnimationName(int, const QString & name);
+    void setAnimationName(int index, const QString & name);
     void setCropStartAmountLocalTime();
     void setCropEndAmountLocalTime();
     void setStartTime();

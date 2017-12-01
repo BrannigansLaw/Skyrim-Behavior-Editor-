@@ -36,10 +36,6 @@ bool ProjectFile::isClipGenNameTaken(const QString &name) const{
 }
 
 bool ProjectFile::readAnimationData(const QString & filename){
-    std::mutex mu;
-    mu.lock();
-    projectIndex = skyrimAnimData->getProjectIndex(fileName().section("/", -1, -1));
-    mu.unlock();
     QFile *animfile = new QFile(filename);
     if (!animfile->exists()){
         delete animfile;
@@ -54,14 +50,14 @@ bool ProjectFile::readAnimationData(const QString & filename){
         return false;
     }
     delete animfile;
-    return true;
-}
-
-bool ProjectFile::readAnimationSetData(const QString & filename){
     std::mutex mu;
     mu.lock();
     projectIndex = skyrimAnimData->getProjectIndex(fileName().section("/", -1, -1));
     mu.unlock();
+    return true;
+}
+
+bool ProjectFile::readAnimationSetData(const QString & filename){
     QFile *animsetfile = new QFile(QString(filename).replace("animationdatasinglefile.txt", "animationsetdatasinglefile.txt"));
     if (!animsetfile->exists()){
         delete animsetfile;
@@ -76,6 +72,10 @@ bool ProjectFile::readAnimationSetData(const QString & filename){
         return false;
     }
     delete animsetfile;
+    std::mutex mu;
+    mu.lock();
+    projectIndex = skyrimAnimData->getProjectIndex(fileName().section("/", -1, -1));
+    mu.unlock();
     return true;
 }
 
@@ -203,6 +203,44 @@ bool ProjectFile::link(){
     return true;
 }
 
+bool ProjectFile::appendClipGeneratorAnimData(const QString &name){
+    if (name == ""){
+        return false;
+    }
+    return skyrimAnimData->appendClipGenerator(projectName, new SkyrimClipGeneratoData(skyrimAnimData->getProjectAnimData(projectName), name));
+}
+
+void ProjectFile::setLocalTimeForClipGenAnimData(const QString &clipname, int triggerindex, qreal time){
+    skyrimAnimData->setLocalTimeForClipGenAnimData(projectName, clipname, triggerindex, time);
+}
+
+void ProjectFile::setEventNameForClipGenAnimData(const QString &clipname, int triggerindex, const QString &eventname){
+    skyrimAnimData->setEventNameForClipGenAnimData(projectName, clipname, triggerindex, eventname);
+}
+
+void ProjectFile::setClipNameAnimData(const QString &oldclipname, const QString &newclipname){
+    skyrimAnimData->setClipNameAnimData(projectName, oldclipname, newclipname);
+}
+
+void ProjectFile::setAnimationIndexForClipGen(int index, const QString &clipGenName){
+    skyrimAnimData->setAnimationIndexForClipGen(projectName, clipGenName, index);
+}
+
+void ProjectFile::setPlaybackSpeedAnimData(const QString &clipGenName, qreal speed){
+    skyrimAnimData->setPlaybackSpeedAnimData(projectName, clipGenName, speed);
+}
+
+void ProjectFile::setCropStartAmountLocalTimeAnimData(const QString &clipGenName, qreal time){
+    skyrimAnimData->setCropStartAmountLocalTimeAnimData(projectName, clipGenName, time);
+}
+
+void ProjectFile::setCropEndAmountLocalTimeAnimData(const QString &clipGenName, qreal time){
+    skyrimAnimData->setCropEndAmountLocalTimeAnimData(projectName, clipGenName, time);
+}
+
+/*SkyrimAnimData *ProjectFile::getAnimData() const{
+    return skyrimAnimData;
+}*/
 
 void ProjectFile::write(){
     ulong ref = 1;

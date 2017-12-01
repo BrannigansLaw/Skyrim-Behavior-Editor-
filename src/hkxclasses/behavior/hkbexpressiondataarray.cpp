@@ -102,7 +102,7 @@ bool hkbExpressionDataArray::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < expressionsData.size(); i++){
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("expression"), expressionsData.at(i).expression);
+            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("expression"), expressionsData.at(i).expression, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("assignmentVariableIndex"), QString::number(expressionsData.at(i).assignmentVariableIndex));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("assignmentEventIndex"), QString::number(expressionsData.at(i).assignmentEventIndex));
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("eventMode"), expressionsData.at(i).eventMode);

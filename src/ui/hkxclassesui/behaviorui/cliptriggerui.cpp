@@ -3,6 +3,7 @@
 #include "src/utility.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbstringeventpayload.h"
+#include "src/hkxclasses/behavior/generators/hkbclipgenerator.h"
 #include "src/hkxclasses/hkxobject.h"
 #include "src/ui/genericdatawidgets.h"
 
@@ -33,6 +34,7 @@ QStringList ClipTriggerUI::headerLabels = {
 ClipTriggerUI::ClipTriggerUI()
     : file(NULL),
       bsData(NULL),
+      indexOfTrigger(-1),
       topLyt(new QGridLayout),
       returnPB(new QPushButton("Return")),
       table(new TableWidget),
@@ -93,11 +95,13 @@ void ClipTriggerUI::disconnectSignals(){
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
 }
 
-void ClipTriggerUI::loadData(BehaviorFile *parentFile, hkbClipTriggerArray::HkTrigger *trigger){
+void ClipTriggerUI::loadData(BehaviorFile *parentFile, hkbClipGenerator *parent, int index, hkbClipTriggerArray::HkTrigger *trigger){
     disconnectSignals();
     QString text;
-    if (parentFile && trigger){
+    if (parentFile && parent && trigger){
         file = parentFile;
+        parentClipGen = parent;
+        indexOfTrigger = index;
         bsData = trigger;
         text = file->getEventNameAt(trigger->event.id);
         if (text == ""){
@@ -122,7 +126,7 @@ void ClipTriggerUI::loadData(BehaviorFile *parentFile, hkbClipTriggerArray::HkTr
         acyclic->setChecked(bsData->acyclic);
         isAnnotation->setChecked(bsData->isAnnotation);
     }else{
-        (qFatal("ClipTriggerUI::loadData(): Behavior file or event data is null!!!"));
+        (qFatal("ClipTriggerUI::loadData(): Behavior file, parent clip generator or event data is null!!!"));
     }
     connectSignals();
 }
@@ -140,6 +144,7 @@ void ClipTriggerUI::setEventId(int index, const QString & name){
         index--;
         if (bsData->event.id != index){
             bsData->event.id = index;
+            file->setEventNameForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, index);
             table->item(EVENT_ROW, VALUE_COLUMN)->setText(name);
             file->toggleChanged(true);
         }
@@ -177,6 +182,7 @@ void ClipTriggerUI::setLocalTime(){
     if (bsData && file){
         if (bsData->localTime != localTime->value()){
             bsData->localTime = localTime->value();
+            file->setLocalTimeForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, localTime->value());
             file->toggleChanged(true);
         }
     }else{

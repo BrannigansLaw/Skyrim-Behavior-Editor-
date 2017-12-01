@@ -634,14 +634,14 @@ void MainWindow::openProject(QString & filepath){
         behavior = it.next();
         if (behavior.contains(".hkx")){
             behaviornames.append(behavior);
-            /*if (!openBehavior(behavior)){
-                (qFatal(QString("MainWindow::openProject(): The behavior file "+behavior+" could not be read!!!").toLocal8Bit().data()));
-            }*/
-
-            //DEBUG!!!
-            if (behavior.contains("master") && !openBehavior(behavior)){
+            if (!openBehavior(behavior)){
                 (qFatal(QString("MainWindow::openProject(): The behavior file "+behavior+" could not be read!!!").toLocal8Bit().data()));
             }
+
+            //DEBUG!!!
+            /*if (behavior.contains("master") && !openBehavior(behavior)){
+                (qFatal(QString("MainWindow::openProject(): The behavior file "+behavior+" could not be read!!!").toLocal8Bit().data()));
+            }*/
             //DEBUG!!!
         }
     }
@@ -830,14 +830,17 @@ void MainWindow::openBehaviorFile(const QModelIndex & index){
     //QTime t;
     //t.start();
     for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
-        if (fileName == projectFile->behaviorFiles.at(i)->fileName().section("/", -1, -1)){
+        if (!fileName.compare(projectFile->behaviorFiles.at(i)->fileName().section("/", -1, -1), Qt::CaseInsensitive)){
             ind = i;
             for (int j = 0; j < behaviorGraphs.size(); j++){
-                if (fileName == behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1)){
+                if (!fileName.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive)){
                     return;
                 }
             }
         }
+    }
+    if (ind == -1){
+        (qFatal("MainWindow::openBehaviorFile(): The selected behavior file was not found!"));
     }
     behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.at(ind)));
     tabs->addTab(behaviorGraphs.last(), fileName.section("/", -1, -1));

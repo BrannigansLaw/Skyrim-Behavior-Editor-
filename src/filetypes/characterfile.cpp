@@ -103,6 +103,13 @@ QStringList CharacterFile::getAnimationNames() const{
     return QStringList();
 }
 
+QString CharacterFile::getAnimationNameAt(int index) const{
+    if (stringData.data() && stringData->getSignature() == HKB_CHARACTER_STRING_DATA){
+        return static_cast<hkbCharacterStringData *>(stringData.data())->getAnimationNameAt(index);
+    }
+    return QString();
+}
+
 QString CharacterFile::getCharacterPropertyNameAt(int index) const{
     return static_cast<hkbCharacterStringData *>(stringData.data())->getCharacterPropertyNameAt(index);
 }

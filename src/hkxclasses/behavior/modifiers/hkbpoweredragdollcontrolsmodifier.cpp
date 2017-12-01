@@ -23,7 +23,8 @@ hkbPoweredRagdollControlsModifier::hkbPoweredRagdollControlsModifier(HkxFile *pa
       constantRecoveryVelocity(0),
       poseMatchingBone0(-1),
       poseMatchingBone1(-1),
-      poseMatchingBone2(-1)
+      poseMatchingBone2(-1),
+      mode(Mode.first())
 {
     setType(HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER, TYPE_MODIFIER);
     getParentFile()->addObjectToFile(this, ref);

@@ -243,9 +243,6 @@ int HkxXmlReader::skipComment(const QByteArray & line, int index){
 
 HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
     QByteArray line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGTH);
-    if (line == "\t\t\t\t<hkcstring> iState_NPCSneaking</hkcstring>\n"){
-        int o = 0;
-    }
     lineNumber++;
     if (line.isEmpty()){
         isEOF = true;
