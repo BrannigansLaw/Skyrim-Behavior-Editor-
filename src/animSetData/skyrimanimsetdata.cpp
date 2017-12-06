@@ -66,16 +66,16 @@ bool SkyrimAnimSetData::write(const QString &filename){
     return true;
 }
 
-bool SkyrimAnimSetData::addAnimationToCache(const QString &projectname, const QString & event, const QVector<AnimCacheAnimationInfo> &animations, const QVector<AnimCacheVariable> &vars, const QVector<AnimCacheClipInfo> &clips){
+bool SkyrimAnimSetData::addAnimationToCache(const QString &projectname, const QString & eventname, const QVector<AnimCacheAnimationInfo> &animations, const QVector<AnimCacheVariable> &vars, const QVector<AnimCacheClipInfo> &clips){
     int count = 0;
     int index = projectNames.indexOf(projectname);
     if (index < 0 || index >= projects.size()){
         return false;
     }
     for (int i = 0; i < projects.at(index).animSetData.size(); i++){
-        if (projects.at(index).animSetData.at(i).cacheEvents.contains(event)){
+        if (projects.at(index).animSetData.at(i).cacheEvents.contains(eventname)){
             count++;
-            if (!projects[index].animSetData[i].addAnimationToCache(event, animations, vars, clips)){
+            if (!projects[index].animSetData[i].addAnimationToCache(eventname, animations, vars, clips)){
                 return false;
             }
         }

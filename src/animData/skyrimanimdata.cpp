@@ -197,3 +197,19 @@ void SkyrimAnimData::setCropEndAmountLocalTimeAnimData(const QString &projectnam
     animData.at(index)->setCropEndAmountLocalTimeForClipGen(clipGenName, time);
 }
 
+void SkyrimAnimData::appendClipTriggerToAnimData(const QString &projectname, const QString &clipGenName, const QString & eventname){
+    int index = getProjectIndex(projectname);
+    if (index < 0 || index >= animData.size()){
+        (qFatal("SkyrimAnimData::appendClipTriggerToAnimData(): Project was not found!"));
+    }
+    animData.at(index)->appendClipTriggerToAnimData(clipGenName, eventname);
+}
+
+void SkyrimAnimData::removeClipTriggerToAnimDataAt(const QString &projectname, const QString &clipGenName, int index){
+    int indexi = getProjectIndex(projectname);
+    if (indexi < 0 || indexi >= animData.size()){
+        (qFatal("SkyrimAnimData::removeClipTriggerToAnimDataAt(): Project was not found!"));
+    }
+    animData.at(indexi)->removeClipTriggerToAnimDataAt(clipGenName, index);
+}
+

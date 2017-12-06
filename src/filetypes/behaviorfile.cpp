@@ -452,6 +452,14 @@ void BehaviorFile::setCropEndAmountLocalTimeAnimData(const QString &clipGenName,
     project->setCropEndAmountLocalTimeAnimData(clipGenName, time);
 }
 
+void BehaviorFile::appendClipTriggerToAnimData(const QString &clipGenName){
+    project->appendClipTriggerToAnimData(clipGenName, getEventNameAt(0));
+}
+
+void BehaviorFile::removeClipTriggerToAnimDataAt(const QString &clipGenName, int index){
+    project->removeClipTriggerToAnimDataAt(clipGenName, index);
+}
+
 HkxObject * BehaviorFile::getRootStateMachine() const{
     return static_cast<hkbBehaviorGraph *>(behaviorGraph.data())->rootGenerator.data();
 }

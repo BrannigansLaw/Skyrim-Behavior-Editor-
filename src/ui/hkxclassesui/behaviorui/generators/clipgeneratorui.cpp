@@ -211,6 +211,7 @@ void ClipGeneratorUI::addTrigger(){
         }
         triggers->addTrigger();
         triggers->triggers.last().event.id = 0;
+        static_cast<BehaviorFile *>(bsData->getParentFile())->appendClipTriggerToAnimData(bsData->name);
         bsData->getParentFile()->toggleChanged(true);
         loadDynamicTableRows();
     }else{
@@ -225,6 +226,7 @@ void ClipGeneratorUI::removeTrigger(int index){
         if (triggers){
             if (index < triggers->triggers.size() && index >= 0){
                 triggers->removeTrigger(index);
+                static_cast<BehaviorFile *>(bsData->getParentFile())->removeClipTriggerToAnimDataAt(bsData->name, index);
             }else{
                 (qWarning("ClipGeneratorUI::removeTrigger(): Invalid row index selected!!"));
                 return;
@@ -464,7 +466,7 @@ void ClipGeneratorUI::setName(){
     if (bsData){
         if (bsData->name != name->text()){
             if (static_cast<BehaviorFile *>(bsData->getParentFile())->isClipGenNameAvailable(name->text())){
-                bsData->setName(name->text(), bsData->name);
+                bsData->setName(bsData->name, name->text());
                 static_cast<DataIconManager*>((bsData))->updateIconNames();
                 emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
                 bsData->getParentFile()->toggleChanged(true);

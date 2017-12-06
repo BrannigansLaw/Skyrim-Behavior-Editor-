@@ -18,8 +18,6 @@ HkxXmlReader::HkxXmlReader(HkxFile *file)
 }
 
 bool HkxXmlReader::parse(){
-    //std::mutex mu;
-    //mu.lock();
     lineNumber = 0;
     if (!hkxXmlFile->open(QIODevice::ReadOnly)){
         isEOF = true;
@@ -31,7 +29,6 @@ bool HkxXmlReader::parse(){
     lineNumber++;
     if (line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\n" && line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\r\n"){
         //hkxXmlFile->writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" is not in the correct XML format!", true);
-        //mu.unlock();
         return false;
     }
     HkxXmlParseLine result = NoError;
@@ -40,7 +37,6 @@ bool HkxXmlReader::parse(){
         result = readNextLine();
         if (result != NoError && result != EmptyLine && result != EmptyLineEndFile){
             //hkxXmlFile->writeToLog("HkxXmlReader: parse() failed because readNextLine() failed!", true);
-            //mu.unlock();
             return false;
         }
     }
@@ -49,7 +45,6 @@ bool HkxXmlReader::parse(){
         return false;
     }
     //hkxXmlFile->//setProgressData("XML parsed successfully!", 40);
-    //mu.unlock();
     return true;
 }
 

@@ -6,6 +6,7 @@
 class SkyrimClipTrigger
 {
     friend class SkyrimClipGeneratoData;
+    friend class ProjectAnimData;
 public:
     SkyrimClipTrigger(qreal t = 0, const QString & trigname = "");
 private:

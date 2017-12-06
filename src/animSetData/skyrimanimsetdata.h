@@ -15,7 +15,7 @@ public:
     SkyrimAnimSetData();
     bool parse(QFile * file);
     bool write(const QString & filename);
-    bool addAnimationToCache(const QString & projectname, const QString & event, const QVector <AnimCacheAnimationInfo> & animations, const QVector <AnimCacheVariable> & vars = QVector <AnimCacheVariable> (), const QVector <AnimCacheClipInfo> & clips = QVector <AnimCacheClipInfo> ());
+    bool addAnimationToCache(const QString & projectname, const QString & eventname, const QVector <AnimCacheAnimationInfo> & animations, const QVector <AnimCacheVariable> & vars = QVector <AnimCacheVariable> (), const QVector <AnimCacheClipInfo> & clips = QVector <AnimCacheClipInfo> ());
     bool removeAnimationFromCache(const QString & projectname, const QString & animationname, const QString & variablename = "", const QString & clipname = "");
     //bool extractProject(const QString & projectname);
 private:

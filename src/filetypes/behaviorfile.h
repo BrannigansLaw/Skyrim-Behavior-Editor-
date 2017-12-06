@@ -72,6 +72,8 @@ public:
     void setPlaybackSpeedAnimData(const QString & clipGenName, qreal speed);
     void setCropStartAmountLocalTimeAnimData(const QString & clipGenName, qreal time);
     void setCropEndAmountLocalTimeAnimData(const QString & clipGenName, qreal time);
+    void appendClipTriggerToAnimData(const QString & clipGenName);
+    void removeClipTriggerToAnimDataAt(const QString & clipGenName, int index);
 protected:
     bool parse();
     bool link();

@@ -50,10 +50,7 @@ bool ProjectFile::readAnimationData(const QString & filename){
         return false;
     }
     delete animfile;
-    std::mutex mu;
-    mu.lock();
     projectIndex = skyrimAnimData->getProjectIndex(fileName().section("/", -1, -1));
-    mu.unlock();
     return true;
 }
 
@@ -72,10 +69,10 @@ bool ProjectFile::readAnimationSetData(const QString & filename){
         return false;
     }
     delete animsetfile;
-    std::mutex mu;
+    /*std::mutex mu;
     mu.lock();
     projectIndex = skyrimAnimData->getProjectIndex(fileName().section("/", -1, -1));
-    mu.unlock();
+    mu.unlock();*/
     return true;
 }
 
@@ -236,6 +233,14 @@ void ProjectFile::setCropStartAmountLocalTimeAnimData(const QString &clipGenName
 
 void ProjectFile::setCropEndAmountLocalTimeAnimData(const QString &clipGenName, qreal time){
     skyrimAnimData->setCropEndAmountLocalTimeAnimData(projectName, clipGenName, time);
+}
+
+void ProjectFile::appendClipTriggerToAnimData(const QString &clipGenName, const QString &eventname){
+    skyrimAnimData->appendClipTriggerToAnimData(projectName, clipGenName, eventname);
+}
+
+void ProjectFile::removeClipTriggerToAnimDataAt(const QString &clipGenName, int index){
+    skyrimAnimData->removeClipTriggerToAnimDataAt(projectName, clipGenName, index);
 }
 
 /*SkyrimAnimData *ProjectFile::getAnimData() const{

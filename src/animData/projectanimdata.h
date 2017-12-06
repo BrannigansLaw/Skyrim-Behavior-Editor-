@@ -24,6 +24,8 @@ public:
     void setPlaybackSpeedForClipGen(const QString & clipGenName, qreal speed);
     void setCropStartAmountLocalTimeForClipGen(const QString & clipGenName, qreal time);
     void setCropEndAmountLocalTimeForClipGen(const QString & clipGenName, qreal time);
+    void appendClipTriggerToAnimData(const QString & clipGenName, const QString & eventname);
+    void removeClipTriggerToAnimDataAt(const QString & clipGenName, int index);
 private:
     uint animationDataLines;
     uint animationMotionDataLines;

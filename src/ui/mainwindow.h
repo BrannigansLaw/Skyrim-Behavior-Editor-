@@ -114,7 +114,7 @@ private:
     QString generateUniqueBehaviorName();
     void openProject(QString &filepath);
     void saveFile(int index);
-    bool openBehavior(const QString & filename);
+    bool openBehavior(const QString & filename, bool checkisopen = true);
     bool exitProgram();
     bool findSkyrimDirectory();
     MainWindow::HKXCMD_RETURN hkxcmd(const QString &filepath, const QString &outputDirectory, const QString &flags = "-f SAVE_CONCISE");

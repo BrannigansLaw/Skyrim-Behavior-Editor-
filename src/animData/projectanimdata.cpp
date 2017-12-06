@@ -176,7 +176,7 @@ SkyrimAnimationMotionData *ProjectAnimData::findMotionData(int animationindex){
 void ProjectAnimData::setLocalTimeForClipGenAnimData(const QString &clipname, int triggerindex, qreal time){
     for (int i = 0; i < animationData.size(); i++){
         if (animationData.at(i)->clipGeneratorName == clipname && triggerindex >= 0 && triggerindex < animationData.at(i)->triggers.size()){
-            animationData.at(i)->triggers.at(triggerindex).time = time;
+            animationData.at(i)->triggers[triggerindex].time = time;
             return;
         }
     }
@@ -186,7 +186,7 @@ void ProjectAnimData::setLocalTimeForClipGenAnimData(const QString &clipname, in
 void ProjectAnimData::setEventNameForClipGenAnimData(const QString &clipname, int triggerindex, const QString &eventname){
     for (int i = 0; i < animationData.size(); i++){
         if (animationData.at(i)->clipGeneratorName == clipname && triggerindex >= 0 && triggerindex < animationData.at(i)->triggers.size()){
-            animationData.at(i)->triggers.at(triggerindex).name = eventname;
+            animationData.at(i)->triggers[triggerindex].name = eventname;
             return;
         }
     }
@@ -241,4 +241,24 @@ void ProjectAnimData::setCropEndAmountLocalTimeForClipGen(const QString &clipGen
         }
     }
     (qFatal("ProjectAnimData::setCropEndAmountLocalTimeForClipGen(): Failed to set data!"));
+}
+
+void ProjectAnimData::appendClipTriggerToAnimData(const QString &clipGenName, const QString & eventname){
+    for (int i = 0; i < animationData.size(); i++){
+        if (animationData.at(i)->clipGeneratorName == clipGenName){
+            animationData.at(i)->addTrigger(SkyrimClipTrigger(0, eventname));
+            return;
+        }
+    }
+    (qFatal("ProjectAnimData::appendClipTriggerToAnimData(): Failed to set data!"));
+}
+
+void ProjectAnimData::removeClipTriggerToAnimDataAt(const QString &clipGenName, int index){
+    for (int i = 0; i < animationData.size(); i++){
+        if (animationData.at(i)->clipGeneratorName == clipGenName){
+            animationData.at(i)->removeTrigger(index);
+            return;
+        }
+    }
+    (qFatal("ProjectAnimData::removeClipTriggerToAnimDataAt(): Failed to set data!"));
 }

@@ -30,6 +30,8 @@ public:
     void setPlaybackSpeedAnimData(const QString & projectname, const QString & clipGenName, qreal speed);
     void setCropStartAmountLocalTimeAnimData(const QString & projectname, const QString & clipGenName, qreal time);
     void setCropEndAmountLocalTimeAnimData(const QString & projectname, const QString & clipGenName, qreal time);
+    void appendClipTriggerToAnimData(const QString & projectname, const QString & clipGenName, const QString &eventname);
+    void removeClipTriggerToAnimDataAt(const QString & projectname, const QString & clipGenName, int index);
 private:
     QStringList projectNames;
     QVector <ProjectAnimData *> animData;
