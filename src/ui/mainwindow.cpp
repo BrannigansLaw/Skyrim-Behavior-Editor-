@@ -462,16 +462,8 @@ void MainWindow::closeTab(int index){
         }else{
             index--;
             if (index >= 0 && index < behaviorGraphs.size() && (!projectFile->behaviorFiles.at(index)->getIsChanged() || closeFileDialogue() != QMessageBox::Cancel)){
-                if (index < projectFile->behaviorFiles.size()){
-                    if (behaviorGraphs.at(index)){
-                        delete behaviorGraphs.at(index);
-                    }
-                    behaviorGraphs.removeAt(index);
-                    /*if (projectFile->behaviorFiles.at(index)){
-                        delete projectFile->behaviorFiles.at(index);
-                    }
-                    projectFile->behaviorFiles.removeAt(index);*/
-                }
+                tabs->removeTab(index + 1);
+                //behaviorGraphs.move(index, behaviorGraphs.size() - 1);
             }else{
                 (qFatal("MainWindow::closeTab(): The tab index is out of sync with the behavior files or behavior graphs!"));
             }
@@ -534,8 +526,9 @@ void MainWindow::addNewBehavior(bool initData){
                 }
                 tabs->setCurrentIndex(tabs->count() - 1);
                 dialog.setProgress("Writing to file...", 50);
-                projectFile->behaviorFiles.last()->toggleChanged(true);
-                saveFile(tabs->count() - 2);
+                //???
+                //projectFile->behaviorFiles.last()->toggleChanged(true);
+                //saveFile(tabs->count() - 2);
                 dialog.setProgress("Behavior file creation sucessful!!", dialog.maximum());
                 return;
             }else{
@@ -636,11 +629,46 @@ void MainWindow::openProject(QString & filepath){
             behaviornames.append(behavior);
         }
     }
+    //Read files...
     for (int i = 0; i < behaviornames.size();){
         for (uint j = 0; j < std::thread::hardware_concurrency(); j++){
             if (threads.size() < std::thread::hardware_concurrency()){
                 if (i < behaviornames.size()){
                     threads.push_back(std::thread(&MainWindow::openBehavior, this, behaviornames.at(i), false));
+                    i++;
+                }else{
+                    break;
+                }
+            }else{
+                for (int k = 0; k < threads.size(); k++){
+                    if (threads.at(k).joinable()){
+                        threads.at(k).join();
+                    }else{
+                        (qFatal(QString("MainWindow::openProject(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data()));
+                    }
+                }
+                threads.clear();
+            }
+        }
+    }
+    for (int k = 0; k < threads.size(); k++){
+        if (threads.at(k).joinable()){
+            threads.at(k).join();
+        }else{
+            (qFatal(QString("MainWindow::openProject(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data()));
+        }
+    }
+    threads.clear();
+    //Draw graphs...
+    for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
+        behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.at(i)));
+        //tabs->addTab(behaviorGraphs.last(), QString(behaviornames.at(i)).section("/", -1, -1));
+    }
+    for (int i = 0; i < behaviornames.size();){
+        for (uint j = 0; j < std::thread::hardware_concurrency(); j++){
+            if (threads.size() < std::thread::hardware_concurrency()){
+                if (i < behaviornames.size()){
+                    threads.push_back(std::thread(&TreeGraphicsView::drawGraph, behaviorGraphs[i], static_cast<DataIconManager *>(projectFile->behaviorFiles.at(i)->getBehaviorGraph()), false));
                     i++;
                 }else{
                     break;
@@ -795,11 +823,10 @@ bool MainWindow::openBehavior(const QString & filename, bool checkisopen){
                         return true;
                     }
                 }
+            }else{
+                objectDataWid->changeCurrentDataWidget(NULL);
             }
             std::mutex mu;
-            mu.lock();
-            objectDataWid->changeCurrentDataWidget(NULL);
-            mu.unlock();
             BehaviorFile *ptr = new BehaviorFile(this, projectFile, characterFile, filename);
             mu.lock();
             projectFile->behaviorFiles.append(ptr);
@@ -824,34 +851,14 @@ bool MainWindow::openBehavior(const QString & filename, bool checkisopen){
 
 void MainWindow::openBehaviorFile(const QModelIndex & index){
     QString fileName = index.data().toString();
-    int ind = -1;
-    //QTime t;
-    //t.start();
-    for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
-        if (!fileName.compare(projectFile->behaviorFiles.at(i)->fileName().section("/", -1, -1), Qt::CaseInsensitive)){
-            ind = i;
-            for (int j = 0; j < behaviorGraphs.size(); j++){
-                if (!fileName.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive)){
-                    return;
-                }
-            }
+    for (int j = 0; j < behaviorGraphs.size(); j++){
+        if (fileName.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive) == 0){
+            tabs->addTab(behaviorGraphs.at(j), fileName.section("/", -1, -1));
+            tabs->setCurrentIndex(tabs->count() - 1);
+            return;
         }
     }
-    if (ind == -1){
-        (qFatal("MainWindow::openBehaviorFile(): The selected behavior file was not found!"));
-    }
-    behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.at(ind)));
-    tabs->addTab(behaviorGraphs.last(), fileName.section("/", -1, -1));
-    if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.at(ind)->getBehaviorGraph()))){
-        (qFatal("MainWindow::openBehaviorFile(): The behavior graph was drawn incorrectly!"));
-    }
-    tabs->setCurrentIndex(tabs->count() - 1);
-    /*if (openBehavior(lastFileSelectedPath+"/"+projectFile->character->getBehaviorDirectoryName()+"/"+fileName)){
-        writeToLog("\n-------------------------\nTime taken to open behavior \""+fileName+
-                              "\" is approximately "+QString::number(t.elapsed())+" milliseconds\n-------------------------\n");
-    }else{
-        (qWarning("MainWindow::openBehaviorFile(): The behavior file "+fileName+" failded to open!"));
-    }*/
+    (qFatal("MainWindow::openBehaviorFile(): The selected behavior file was not found!"));
 }
 
 void MainWindow::readSettings(){
