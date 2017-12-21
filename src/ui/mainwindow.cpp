@@ -171,26 +171,26 @@ QMessageBox::StandardButton MainWindow::closeFileDialogue(){
 
 void MainWindow::changedTabs(int index){
     //ProgressDialog dialog("Changing viewed behavior...", "", 0, 100, this);
-    index--;
     if (projectFile){
         if (!projectFile->behaviorFiles.isEmpty()){
-            if (index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
-                objectDataWid->changeCurrentDataWidget(NULL);
-                if (index == -1){
-                    variablesWid->hide();
-                    eventsWid->hide();
-                    objectDataSA->hide();
-                    topLyt->removeWidget(objectDataSA);
-                    topLyt->removeWidget(eventsWid);
-                    topLyt->removeWidget(variablesWid);
-                    topLyt->removeWidget(behaviorGraphViewGB);
-                    topLyt->addWidget(behaviorGraphViewGB, 1, 0, 9, 10);
-                }else if (index >= 0){
-                    objectDataWid->loadBehaviorView(behaviorGraphs.at(index));
+            if (index <= 0){
+                variablesWid->hide();
+                eventsWid->hide();
+                objectDataSA->hide();
+                topLyt->removeWidget(objectDataSA);
+                topLyt->removeWidget(eventsWid);
+                topLyt->removeWidget(variablesWid);
+                topLyt->removeWidget(behaviorGraphViewGB);
+                topLyt->addWidget(behaviorGraphViewGB, 1, 0, 9, 10);
+            }else{
+                int graphindex = getBehaviorGraphIndex(tabs->tabText(index));
+                if (graphindex < projectFile->behaviorFiles.size() && graphindex < behaviorGraphs.size()){
+                    objectDataWid->changeCurrentDataWidget(NULL);
+                    objectDataWid->loadBehaviorView(behaviorGraphs.at(graphindex));
                     variablesWid->clear();
-                    variablesWid->loadData(projectFile->behaviorFiles.at(index)->getBehaviorGraphData());
+                    variablesWid->loadData(projectFile->behaviorFiles.at(graphindex)->getBehaviorGraphData());
                     eventsWid->clear();
-                    eventsWid->loadData(projectFile->behaviorFiles.at(index)->getBehaviorGraphData());
+                    eventsWid->loadData(projectFile->behaviorFiles.at(graphindex)->getBehaviorGraphData());
                     topLyt->removeWidget(behaviorGraphViewGB);
                     topLyt->addWidget(behaviorGraphViewGB, 1, 0, 9, 6);
                     topLyt->addWidget(objectDataSA, 1, 6, 6, 4);
@@ -199,9 +199,9 @@ void MainWindow::changedTabs(int index){
                     variablesWid->show();
                     eventsWid->show();
                     objectDataSA->show();
+                }else{
+                    (qFatal("MainWindow::changedTabs(): The tab index is out of sync with the behavior files or behavior graphs!"));
                 }
-            }else{
-                (qFatal("MainWindow::changedTabs(): The tab index is out of sync with the behavior files or behavior graphs!"));
             }
         }
     }else{
@@ -258,7 +258,7 @@ void MainWindow::refocus(){
 }
 
 void MainWindow::save(){
-    saveFile(tabs->currentIndex() - 1);
+    saveFile(getBehaviorGraphIndex(tabs->tabText(tabs->currentIndex())));
 }
 
 void MainWindow::saveFile(int index){
@@ -629,6 +629,7 @@ void MainWindow::openProject(QString & filepath){
             behaviornames.append(behavior);
         }
     }
+    //This also reads files that may not belong to the current project! See dog!!
     //Read files...
     for (int i = 0; i < behaviornames.size();){
         for (uint j = 0; j < std::thread::hardware_concurrency(); j++){
@@ -667,7 +668,7 @@ void MainWindow::openProject(QString & filepath){
     for (int i = 0; i < behaviornames.size();){
         for (uint j = 0; j < std::thread::hardware_concurrency(); j++){
             if (threads.size() < std::thread::hardware_concurrency()){
-                if (i < behaviornames.size()){
+                if (i < behaviornames.size() && i < behaviorGraphs.size()){
                     threads.push_back(std::thread(&TreeGraphicsView::drawGraph, behaviorGraphs[i], static_cast<DataIconManager *>(projectFile->behaviorFiles.at(i)->getBehaviorGraph()), false));
                     i++;
                 }else{
@@ -853,12 +854,25 @@ void MainWindow::openBehaviorFile(const QModelIndex & index){
     QString fileName = index.data().toString();
     for (int j = 0; j < behaviorGraphs.size(); j++){
         if (fileName.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive) == 0){
+            objectDataWid->loadBehaviorView(behaviorGraphs.at(j));
             tabs->addTab(behaviorGraphs.at(j), fileName.section("/", -1, -1));
             tabs->setCurrentIndex(tabs->count() - 1);
             return;
         }
     }
     (qFatal("MainWindow::openBehaviorFile(): The selected behavior file was not found!"));
+}
+
+int MainWindow::getBehaviorGraphIndex(const QString & filename) const{
+    for (int j = 0; j < behaviorGraphs.size(); j++){
+        if (filename.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive) == 0){
+            if (j >= projectFile->behaviorFiles.size() || filename.compare(projectFile->behaviorFiles.at(j)->fileName().section("/", -1, -1), Qt::CaseInsensitive) != 0){
+                (qFatal("MainWindow::getBehaviorGraphIndex(): The index is invalid!"));
+            }
+            return j;
+        }
+    }
+    return -1;
 }
 
 void MainWindow::readSettings(){

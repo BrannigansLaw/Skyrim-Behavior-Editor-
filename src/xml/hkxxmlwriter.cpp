@@ -20,7 +20,9 @@ HkxXMLWriter::HkxXMLWriter(BehaviorFile *file)
       clas("class"),
       signature("signature"),
       numelements("numelements"),
-      nestLevel(0)
+      nestLevel(0),
+      newfile(NULL),
+      stream(NULL)
 {
     //
 }
@@ -34,37 +36,43 @@ void HkxXMLWriter::setFile(HkxFile *file){
 }
 
 bool HkxXMLWriter::writeToXMLFile(){
-    bool isGood = false;
+    bool result = true;
     if (hkxXmlFile){
-        newfile.setFileName(hkxXmlFile->fileName()/*.insert(hkxXmlFile->fileName().indexOf('.'), "_out")*/);
-        if (!newfile.open(QIODevice::WriteOnly | QIODevice::Text)){
+        nestLevel = 0;
+        newfile = new QFile(hkxXmlFile->fileName());
+        stream = new QTextStream(newfile);
+        if (!newfile->open(QIODevice::WriteOnly | QIODevice::Text)){
             hkxXmlFile->writeToLog("HkxXMLWriter: writeToXMLFile()!\nUnable to open a new file!!!", true);
-            return false;
+            result = false;
+        }else{
+            writeHeader(version, encoding);
+            QStringList list1 = {"classversion", "contentsversion", "toplevelobject"};
+            QStringList list2 = {classversion, contentsversion, hkxXmlFile->getRootObjectReferenceString()};
+            writeLine(filetype, list1, list2, "");
+            writeLine("\n");
+            writeLine(section, QStringList(name), QStringList("__data__"), "");
+            writeLine("\n");
+            if (!hkxXmlFile->getRootObject().data()->write(this)){
+                result = false;
+            }
+            writeLine(section, false);
+            writeLine("\n");
+            writeLine(filetype, false);
         }
-        stream.setDevice(&newfile);
-        writeHeader(version, encoding);
-        //writeLine("\n");
-        QStringList list1 = {"classversion", "contentsversion", "toplevelobject"};
-        QStringList list2 = {classversion, contentsversion, hkxXmlFile->getRootObjectReferenceString()};
-        writeLine(filetype, list1, list2, "");
-        writeLine("\n");
-        writeLine(section, QStringList(name), QStringList("__data__"), "");
-        writeLine("\n");
-        if (hkxXmlFile->getRootObject().data()->write(this)){
-            isGood = true;
-        }
-        //writeLine("\n");
-        writeLine(section, false);
-        writeLine("\n");
-        writeLine(filetype, false);
-        newfile.close();
-        return isGood;
+    }else{
+        hkxXmlFile->writeToLog("HkxXMLWriter: writeToXMLFile()!\nUnable to open a new file!!!", true);
+        result = false;
     }
-    return isGood;
+    newfile->close();
+    delete newfile;
+    newfile = NULL;
+    delete stream;
+    stream = NULL;
+    return result;
 }
 
 void HkxXMLWriter::writeHeader(const QString & version, const QString & encoding){
-    stream << "<?xml version=\""+version+"\" encoding=\""+encoding+"\"?>\n";
+    *stream << "<?xml version=\""+version+"\" encoding=\""+encoding+"\"?>\n";
 }
 
 bool HkxXMLWriter::writeLine(const QString & tag, const QStringList & attribs, const QStringList & attribValues, const QString & value, bool nullValueAllowed){
@@ -77,24 +85,24 @@ bool HkxXMLWriter::writeLine(const QString & tag, const QStringList & attribs, c
         text.append("\t");
     }
     text = text+"<"+tag;
-    stream << text;
+    *stream << text;
     for (int j = 0; j < attribs.size(); j++){
-        stream << " "+attribs.at(j)+"=\""+attribValues.at(j)+"\"";
+        *stream << " "+attribs.at(j)+"=\""+attribValues.at(j)+"\"";
     }
     if (value == ""){
         bool ok;
         if (attribValues.last().toInt(&ok) == 0 && attribValues.size() == 2 && ok){
-            stream << "></"+tag+">\n";
+            *stream << "></"+tag+">\n";
         }else{
             if (nullValueAllowed){
-                stream << "></"+tag+">\n";
+                *stream << "></"+tag+">\n";
             }else{
                 nestLevel++;
-                stream << ">\n";
+                *stream << ">\n";
             }
         }
     }else{
-        stream << ">"+value+"</"+tag+">\n";
+        *stream << ">"+value+"</"+tag+">\n";
     }
     return true;
 }
@@ -110,7 +118,7 @@ bool HkxXMLWriter::writeLine(const QString & tag, bool opening){
             text.append("\t");
         }
         nestLevel++;
-        stream << text+"<"+tag+">\n";
+        *stream << text+"<"+tag+">\n";
     }else{
         if (nestLevel > 0){
             nestLevel--;
@@ -118,14 +126,14 @@ bool HkxXMLWriter::writeLine(const QString & tag, bool opening){
         for (uint i = 0; i < nestLevel; i++){
             text.append("\t");
         }
-        stream << text+"</"+tag+">\n";
+        *stream << text+"</"+tag+">\n";
     }
     return true;
 }
 
 bool HkxXMLWriter::writeLine(const QString & value){
     if (value == "\n"){
-        stream << "\n";
+        *stream << "\n";
     }else{
         QString text;
         for (uint i = 0; i < nestLevel; i++){
@@ -133,10 +141,10 @@ bool HkxXMLWriter::writeLine(const QString & value){
         }
         QStringList list = value.split('\n', QString::SkipEmptyParts);
         if (list.isEmpty()){
-            stream << text+value+"\n";
+            *stream << text+value+"\n";
         }else{
             for (int i = 0; i < list.size(); i++){
-                stream << text+list.at(i)+"\n";
+                *stream << text+list.at(i)+"\n";
             }
         }
     }

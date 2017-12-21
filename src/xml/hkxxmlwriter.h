@@ -39,8 +39,8 @@ public:
     const QString numelements;
 private:
     HkxFile *hkxXmlFile;
-    QFile newfile;
-    QTextStream stream;
+    QFile *newfile;
+    QTextStream *stream;
     ulong nestLevel;
 };
 

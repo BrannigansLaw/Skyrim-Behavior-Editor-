@@ -1015,7 +1015,9 @@ void BehaviorFile::write(){
             }
         }
         getWriter().setFile(this);
-        getWriter().writeToXMLFile();
+        if (!getWriter().writeToXMLFile()){
+            (qFatal("BehaviorFile::write(): writeToXMLFile() failed!!"));
+        }
     }else{
         (qFatal("BehaviorFile::write(): The root object is NULL!!"));
     }

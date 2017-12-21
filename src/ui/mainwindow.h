@@ -119,6 +119,7 @@ private:
     bool findSkyrimDirectory();
     MainWindow::HKXCMD_RETURN hkxcmd(const QString &filepath, const QString &outputDirectory, const QString &flags = "-f SAVE_CONCISE");
     //void drawIcons();
+    int getBehaviorGraphIndex(const QString & filename) const;
     void readSettings();
     void writeSettings();
     QMessageBox::StandardButton closeAllDialogue();
