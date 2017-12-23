@@ -1,19 +1,19 @@
 #include "animcachevariable.h"
 
 AnimCacheVariable::AnimCacheVariable(const QString & name, uint val1, uint val2)
-    : name(name), value1(val1), value2(val2)
+    : name(name), minValue(val1), maxValue(val2)
 {
     //
 }
 
 AnimCacheVariable::AnimCacheVariable(const AnimCacheVariable & other){
     name = other.name;
-    value1 = other.value1;
-    value2 = other.value2;
+    minValue = other.minValue;
+    maxValue = other.maxValue;
 }
 
 bool AnimCacheVariable::operator ==(const AnimCacheVariable & other) const{
-    if (name != other.name || value1 != other.value1 || value2 != other.value2){
+    if (name != other.name || minValue != other.minValue || maxValue != other.maxValue){
         return false;
     }
     return true;
@@ -36,7 +36,7 @@ bool AnimCacheVariable::read(QFile *file){
     }
     line = file->readLine();
     line.chop(1);
-    value1 = line.toUInt(&ok);
+    minValue = line.toUInt(&ok);
     if (!ok){
         return false;
     }
@@ -45,7 +45,7 @@ bool AnimCacheVariable::read(QFile *file){
     }
     line = file->readLine();
     line.chop(1);
-    value2 = line.toUInt(&ok);
+    maxValue = line.toUInt(&ok);
     if (!ok){
         return false;
     }
@@ -57,7 +57,7 @@ bool AnimCacheVariable::write(QFile *file, QTextStream &out) const{
         return false;
     }
     out << name << "\n";
-    out << QString::number(value1) << "\n";
-    out << QString::number(value2) << "\n";
+    out << QString::number(minValue) << "\n";
+    out << QString::number(maxValue) << "\n";
     return true;
 }

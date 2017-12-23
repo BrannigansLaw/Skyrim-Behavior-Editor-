@@ -13,8 +13,8 @@ public:
     bool write(QFile * file, QTextStream & out) const;
 private:
     QString name;
-    uint value1;
-    uint value2;
+    uint minValue;
+    uint maxValue;
 };
 
 #endif // ANIMCACHEVARIABLE_H

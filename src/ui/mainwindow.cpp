@@ -60,9 +60,11 @@ MainWindow::MainWindow()
     //setStyleSheet("QComboBox {background: yellow};QWidget {background: darkGray}");
     projectUI->setDisabled(true);
 
-    //Change this for release!!!
+#ifdef MY_DEBUG
     hkxcmdPath = "c:/users/wayne/desktop/hkxcmd.exe";
-    //hkxcmdPath = QDir::currentPath()+"/hkxcmd.exe";
+#else
+    hkxcmdPath = QDir::currentPath()+"/hkxcmd.exe";
+#endif
 
     openPackedProjectA->setStatusTip("Open a hkx project file!");
     //openPackedProjectA->setShortcut(QKeySequence::Open);
@@ -423,15 +425,14 @@ void MainWindow::exportAnimationData() const{
 
 void MainWindow::packAndExportFileToSkyrimDirectory(){
     if (projectFile){
-        int index = tabs->currentIndex() - 1;
-        if (characterFile && index >= 0 && index < projectFile->behaviorFiles.size()){
+        if (characterFile){
             QTime t;
             t.start();
             writeToLog("\n-------------------------\nExporting the current file to the Skyrim game directory...");
             //ProgressDialog dialog("Exporting the current file to the Skyrim game directory...", "", 0, 100, this);
             QString path = skyrimDirectory+"/data/meshes/actors";
             QString projectFolder = path+"/"+lastFileSelectedPath.section("/", -1, -1);
-            QString filename = projectFile->behaviorFiles.at(index)->fileName().section("/", -1, -1);
+            QString filename = tabs->tabText(tabs->currentIndex());
             QString temppath = projectFolder+"/"+characterFile->getBehaviorDirectoryName()+"/"+filename;
             if (hkxcmd(lastFileSelectedPath+"/"+characterFile->getBehaviorDirectoryName()+"/"+filename, temppath) != HKXCMD_SUCCESS){
                 //dialog.setProgress("Behavior file export failed!", dialog.maximum());
