@@ -102,7 +102,6 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
             for (int j = 0; j < numtrans; j++){
                 transitions.append(HkTransition());
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-                    QString test = reader.getNthAttributeValueAt(index, 0);
                     if (reader.getNthAttributeValueAt(index, 0) == "triggerInterval"){
                         intervalType = TRIGGER;
                     }else if (reader.getNthAttributeValueAt(index, 0) == "initiateInterval"){

@@ -60,7 +60,7 @@ bool HkxXMLWriter::writeToXMLFile(){
             writeLine(filetype, false);
         }
     }else{
-        hkxXmlFile->writeToLog("HkxXMLWriter: writeToXMLFile()!\nUnable to open a new file!!!", true);
+        //hkxXmlFile->writeToLog("HkxXMLWriter: writeToXMLFile()!\nUnable to open a new file!!!", true);
         result = false;
     }
     newfile->close();

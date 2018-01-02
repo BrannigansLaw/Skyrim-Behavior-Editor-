@@ -19,13 +19,6 @@ TEMPLATE = app
 # add the desired -O3 if not present
 #QMAKE_CXXFLAGS_DEBUG *= -O3
 
-debug {
-  DEFINES += MY_DEBUG
-}
-
-release {
-  DEFINES += MY_RELEASE
-}
 
 VERSION = 0.90
 QMAKE_TARGET_COMPANY = WK Inc.

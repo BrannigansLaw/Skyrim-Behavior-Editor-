@@ -86,7 +86,7 @@ bool hkbProjectData::link(){
     }else{
         writeToLog(getClassname()+": link()!\nParent file type is invalid!!!", true);
     }
-    if (!ptr){
+    if (!ptr->data()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'stringData' data field!\n");
         setDataValidity(false);
     }else if ((*ptr)->getSignature() != HKB_PROJECT_STRING_DATA){
@@ -96,7 +96,7 @@ bool hkbProjectData::link(){
     }else{
         stringData = *ptr;
     }
-    ptr = &file->stringData;
+    //ptr = &file->stringData;
     return true;
 }
 

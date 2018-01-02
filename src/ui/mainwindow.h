@@ -9,6 +9,10 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
 //class FileSelectWindow;
 class QVBoxLayout;
 class QMenuBar;
@@ -90,6 +94,8 @@ private:
     QVBoxLayout *logGBLyt;
     QString lastFileSelected;
     QString lastFileSelectedPath;
+    std::mutex mutex;
+    std::condition_variable conditionVar;
 private slots:
     void openPackedProject();
     void openUnpackedProject();
@@ -114,7 +120,7 @@ private:
     QString generateUniqueBehaviorName();
     void openProject(QString &filepath);
     void saveFile(int index);
-    bool openBehavior(const QString & filename, bool checkisopen = true);
+    bool openBehavior(const QString & filename, int &taskCount, bool checkisopen = true);
     bool exitProgram();
     bool findSkyrimDirectory();
     MainWindow::HKXCMD_RETURN hkxcmd(const QString &filepath, const QString &outputDirectory, const QString &flags = "-f SAVE_CONCISE");

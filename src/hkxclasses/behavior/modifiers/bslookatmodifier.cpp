@@ -85,27 +85,27 @@ bool BSLookAtModifier::readData(const HkxXmlReader &reader, long index){
                         if (!ok){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'index' data field!\nObject Reference: "+ref);
                         }
-                    }else if (text == "fwdAxisLS"){
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "fwdAxisLS"){
                         bones.last().fwdAxisLS = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'fwdAxisLS' data field!\nObject Reference: "+ref);
                         }
-                    }else if (text == "limitAngleDegrees"){
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "limitAngleDegrees"){
                         bones.last().limitAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'limitAngleDegrees' data field!\nObject Reference: "+ref);
                         }
-                    }else if (text == "onGain"){
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "onGain"){
                         bones.last().onGain = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'onGain' data field!\nObject Reference: "+ref);
                         }
-                    }else if (text == "offGain"){
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "offGain"){
                         bones.last().offGain = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'offGain' data field!\nObject Reference: "+ref);
                         }
-                    }else if (text == "enabled"){
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "enabled"){
                         bones.last().enabled = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'enabled' data field!\nObject Reference: "+ref);
@@ -116,6 +116,7 @@ bool BSLookAtModifier::readData(const HkxXmlReader &reader, long index){
                     index++;
                 }
             }
+            index--;
         }else if (text == "eyeBones"){
             int numbones = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
@@ -129,27 +130,27 @@ bool BSLookAtModifier::readData(const HkxXmlReader &reader, long index){
                         if (!ok){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'index' data field!\nObject Reference: "+ref);
                         }
-                    }else if (text == "fwdAxisLS"){
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "fwdAxisLS"){
                         eyeBones.last().fwdAxisLS = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'fwdAxisLS' data field!\nObject Reference: "+ref);
                         }
-                    }else if (text == "limitAngleDegrees"){
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "limitAngleDegrees"){
                         eyeBones.last().limitAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'limitAngleDegrees' data field!\nObject Reference: "+ref);
                         }
-                    }else if (text == "onGain"){
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "onGain"){
                         eyeBones.last().onGain = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'onGain' data field!\nObject Reference: "+ref);
                         }
-                    }else if (text == "offGain"){
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "offGain"){
                         eyeBones.last().offGain = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'offGain' data field!\nObject Reference: "+ref);
                         }
-                    }else if (text == "enabled"){
+                    }else if (reader.getNthAttributeValueAt(index, 0) == "enabled"){
                         eyeBones.last().enabled = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'enabled' data field!\nObject Reference: "+ref);
@@ -159,6 +160,9 @@ bool BSLookAtModifier::readData(const HkxXmlReader &reader, long index){
                     }
                     index++;
                 }
+            }
+            if (numbones > 0){
+                index--;
             }
         }else if (text == "limitAngleDegrees"){
             limitAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);

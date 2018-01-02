@@ -967,8 +967,8 @@ bool BehaviorFile::link(){
 }
 
 void BehaviorFile::write(){
-    ulong ref = 1;
     if (getRootObject().data()){
+        ulong ref = getRootObject().data()->reference;
         getRootObject().data()->setIsWritten(false);
         stringData.data()->setIsWritten(false);
         variableValues.data()->setIsWritten(false);

@@ -18,9 +18,6 @@
 
 #include <QtWidgets>
 
-#include <thread>
-#include <mutex>
-
 #define MAX_REFERENCED_BEHAVIOR_FILES 30
 #define CONFIRM_CLOSE_PROJECT_WITHOUT_SAVING "WARNING: There are unsaved changes to the project, character or behavior files currently open!\nAre you sure you want to close them without saving?"
 #define CONFIRM_CLOSE_FILE_WITHOUT_SAVING "WARNING: There are unsaved changes to the behavior file currently open!\nAre you sure you want to close it without saving?"
@@ -60,11 +57,9 @@ MainWindow::MainWindow()
     //setStyleSheet("QComboBox {background: yellow};QWidget {background: darkGray}");
     projectUI->setDisabled(true);
 
-#ifdef MY_DEBUG
+    //hkxcmdPath = QDir::currentPath()+"/hkxcmd.exe";
+
     hkxcmdPath = "c:/users/wayne/desktop/hkxcmd.exe";
-#else
-    hkxcmdPath = QDir::currentPath()+"/hkxcmd.exe";
-#endif
 
     openPackedProjectA->setStatusTip("Open a hkx project file!");
     //openPackedProjectA->setShortcut(QKeySequence::Open);
@@ -620,7 +615,7 @@ void MainWindow::openProject(QString & filepath){
     writeToLog("\n-------------------------\nTime taken to open file \""+lastFileSelectedPath+"/"+characterFile->getRigName()+
                                "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
     projectUI->setDisabled(false);
-    std::vector <std::thread> threads;
+    //Start opening behavior files...
     QDirIterator it(lastFileSelectedPath+"/"+characterFile->getBehaviorDirectoryName());
     QString behavior;
     QStringList behaviornames;
@@ -631,40 +626,30 @@ void MainWindow::openProject(QString & filepath){
         }
     }
     //This also reads files that may not belong to the current project! See dog!!
+    std::vector <std::thread> threads;
+    std::unique_lock<std::mutex> locker(mutex);
+    int taskCount = behaviornames.size();
+    int previousCount = taskCount;
+    int behaviorIndex = 0;
     //Read files...
-    for (int i = 0; i < behaviornames.size();){
-        for (uint j = 0; j < std::thread::hardware_concurrency(); j++){
-            if (threads.size() < std::thread::hardware_concurrency()){
-                if (i < behaviornames.size()){
-                    threads.push_back(std::thread(&MainWindow::openBehavior, this, behaviornames.at(i), false));
-                    i++;
-                }else{
-                    break;
-                }
-            }else{
-                for (int k = 0; k < threads.size(); k++){
-                    if (threads.at(k).joinable()){
-                        threads.at(k).join();
-                    }else{
-                        (qFatal(QString("MainWindow::openProject(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data()));
-                    }
-                }
-                threads.clear();
+    for (uint i = 0; i < std::thread::hardware_concurrency(), behaviorIndex < behaviornames.size(); i++, behaviorIndex++){
+        threads.push_back(std::thread(&MainWindow::openBehavior, this, behaviornames.at(behaviorIndex), std::ref(taskCount), false));
+        threads.back().detach();
+    }
+    while (taskCount > 0){
+        if (taskCount < previousCount){
+            previousCount = taskCount;
+            if (behaviorIndex < behaviornames.size()){
+                threads.push_back(std::thread(&MainWindow::openBehavior, this, behaviornames.at(behaviorIndex), std::ref(taskCount), false));
+                threads.back().detach();
+                behaviorIndex++;
             }
         }
-    }
-    for (int k = 0; k < threads.size(); k++){
-        if (threads.at(k).joinable()){
-            threads.at(k).join();
-        }else{
-            (qFatal(QString("MainWindow::openProject(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data()));
-        }
+        conditionVar.wait(locker);
     }
     threads.clear();
-    //Draw graphs...
     for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
         behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.at(i)));
-        //tabs->addTab(behaviorGraphs.last(), QString(behaviornames.at(i)).section("/", -1, -1));
     }
     for (int i = 0; i < behaviornames.size();){
         for (uint j = 0; j < std::thread::hardware_concurrency(); j++){
@@ -699,6 +684,53 @@ void MainWindow::openProject(QString & filepath){
                               "\" is approximately "+QString::number(t.elapsed())+" milliseconds\n-------------------------\n");
     dialog.setProgress("Project loaded sucessfully!!!", dialog.maximum());
     //changedTabs(0);
+}
+
+bool MainWindow::openBehavior(const QString & filename, int & taskCount, bool checkisopen){
+    bool result = false;
+    std::unique_lock<std::mutex> lock(mutex, std::defer_lock);
+    if (filename != ""){
+        if (projectFile){
+            if (checkisopen){
+                for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
+                    if (projectFile->behaviorFiles.at(i)->fileName() == filename){
+                        (qWarning("MainWindow::openBehavior(): The selected behavior file is already open!"));
+                        lock.lock();
+                        taskCount--;
+                        lock.unlock();
+                        conditionVar.notify_one();
+                        return true;
+                    }
+                }
+            }else{
+                //lock.lock();
+                objectDataWid->changeCurrentDataWidget(NULL);
+                //lock.unlock();
+            }
+            BehaviorFile *ptr = new BehaviorFile(this, projectFile, characterFile, filename);
+            lock.lock();
+            projectFile->behaviorFiles.append(ptr);
+            ptr = projectFile->behaviorFiles.last();
+            lock.unlock();
+            if (!ptr->parse()){
+                lock.lock();
+                delete projectFile->behaviorFiles.last();
+                projectFile->behaviorFiles.removeLast();
+                lock.unlock();
+            }else{
+                result = true;
+            }
+        }else{
+            (qFatal("MainWindow::openBehavior(): No project is opened!"));
+        }
+    }else{
+        (qFatal("MainWindow::openBehavior(): Filename is empty!"));
+    }
+    lock.lock();
+    taskCount--;
+    lock.unlock();
+    conditionVar.notify_one();
+    return result;
 }
 
 bool MainWindow::closeAll(){
@@ -813,42 +845,6 @@ void MainWindow::openUnpackedProject(){
         return;
     }
     openProject(filename);
-}
-
-bool MainWindow::openBehavior(const QString & filename, bool checkisopen){
-    if (filename != ""){
-        if (projectFile){
-            if (checkisopen){
-                for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
-                    if (projectFile->behaviorFiles.at(i)->fileName() == filename){
-                        (qWarning("MainWindow::openBehavior(): The selected behavior file is already open!"));
-                        return true;
-                    }
-                }
-            }else{
-                objectDataWid->changeCurrentDataWidget(NULL);
-            }
-            std::mutex mu;
-            BehaviorFile *ptr = new BehaviorFile(this, projectFile, characterFile, filename);
-            mu.lock();
-            projectFile->behaviorFiles.append(ptr);
-            ptr = projectFile->behaviorFiles.last();
-            mu.unlock();
-            if (!ptr->parse()){
-                mu.lock();
-                delete projectFile->behaviorFiles.last();
-                projectFile->behaviorFiles.removeLast();
-                mu.unlock();
-                return false;
-            }
-            return true;
-        }else{
-            (qFatal("MainWindow::openBehavior(): No project is opened!"));
-        }
-    }else{
-        (qFatal("MainWindow::openBehavior(): Filename is empty!"));
-    }
-    return false;
 }
 
 void MainWindow::openBehaviorFile(const QModelIndex & index){
