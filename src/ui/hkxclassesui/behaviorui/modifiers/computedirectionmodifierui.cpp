@@ -225,7 +225,7 @@ void ComputeDirectionModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -236,7 +236,7 @@ void ComputeDirectionModifierUI::setName(){
 void ComputeDirectionModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ComputeDirectionModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -246,7 +246,7 @@ void ComputeDirectionModifierUI::setPointIn(){
     if (bsData){
         if (bsData->pointIn != pointIn->value()){
             bsData->pointIn = pointIn->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ComputeDirectionModifierUI::setPointIn(): The data is NULL!!"));
@@ -257,7 +257,7 @@ void ComputeDirectionModifierUI::setPointOut(){
     if (bsData){
         if (bsData->pointOut != pointOut->value()){
             bsData->pointOut = pointOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ComputeDirectionModifierUI::setPointOut(): The data is NULL!!"));
@@ -268,7 +268,7 @@ void ComputeDirectionModifierUI::setGroundAngleOut(){
     if (bsData){
         if (bsData->groundAngleOut != groundAngleOut->value()){
             bsData->groundAngleOut = groundAngleOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ComputeDirectionModifierUI::setGroundAngleOut(): The data is NULL!!"));
@@ -279,7 +279,7 @@ void ComputeDirectionModifierUI::setUpAngleOut(){
     if (bsData){
         if (bsData->upAngleOut != upAngleOut->value()){
             bsData->upAngleOut = upAngleOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ComputeDirectionModifierUI::setUpAngleOut(): The data is NULL!!"));
@@ -290,7 +290,7 @@ void ComputeDirectionModifierUI::setVerticalOffset(){
     if (bsData){
         if (bsData->verticalOffset != verticalOffset->value()){
             bsData->verticalOffset = verticalOffset->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ComputeDirectionModifierUI::setVerticalOffset(): The data is NULL!!"));
@@ -300,7 +300,7 @@ void ComputeDirectionModifierUI::setVerticalOffset(){
 void ComputeDirectionModifierUI::setReverseGroundAngle(){
     if (bsData){
         bsData->reverseGroundAngle = reverseGroundAngle->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ComputeDirectionModifierUI::setReverseGroundAngle(): The data is NULL!!"));
     }
@@ -309,7 +309,7 @@ void ComputeDirectionModifierUI::setReverseGroundAngle(){
 void ComputeDirectionModifierUI::setReverseUpAngle(){
     if (bsData){
         bsData->reverseUpAngle = reverseUpAngle->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ComputeDirectionModifierUI::setReverseUpAngle(): The data is NULL!!"));
     }
@@ -318,7 +318,7 @@ void ComputeDirectionModifierUI::setReverseUpAngle(){
 void ComputeDirectionModifierUI::setProjectPoint(){
     if (bsData){
         bsData->projectPoint = projectPoint->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ComputeDirectionModifierUI::setProjectPoint(): The data is NULL!!"));
     }
@@ -327,7 +327,7 @@ void ComputeDirectionModifierUI::setProjectPoint(){
 void ComputeDirectionModifierUI::setNormalizePoint(){
     if (bsData){
         bsData->normalizePoint = normalizePoint->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ComputeDirectionModifierUI::setNormalizePoint(): The data is NULL!!"));
     }
@@ -336,7 +336,7 @@ void ComputeDirectionModifierUI::setNormalizePoint(){
 void ComputeDirectionModifierUI::setComputeOnlyOnce(){
     if (bsData){
         bsData->computeOnlyOnce = computeOnlyOnce->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ComputeDirectionModifierUI::setComputeOnlyOnce(): The data is NULL!!"));
     }
@@ -345,7 +345,7 @@ void ComputeDirectionModifierUI::setComputeOnlyOnce(){
 void ComputeDirectionModifierUI::setComputedOutput(){
     if (bsData){
         bsData->computedOutput = computedOutput->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ComputeDirectionModifierUI::setComputedOutput(): The data is NULL!!"));
     }
@@ -538,7 +538,7 @@ bool ComputeDirectionModifierUI::setBinding(int index, int row, const QString &v
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -628,7 +628,7 @@ void ComputeDirectionModifierUI::setBindingVariable(int index, const QString &na
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ComputeDirectionModifierUI::setBindingVariable(): The data is NULL!!"));
     }

@@ -218,7 +218,7 @@ bool ManualSelectorGeneratorUI::setBinding(int index, int row, const QString & v
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -248,7 +248,7 @@ void ManualSelectorGeneratorUI::setBindingVariable(int index, const QString & na
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ManualSelectorGeneratorUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -348,7 +348,7 @@ void ManualSelectorGeneratorUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
@@ -360,7 +360,7 @@ void ManualSelectorGeneratorUI::setSelectedGeneratorIndex(){
     if (bsData){
         if (bsData->selectedGeneratorIndex != selectedGeneratorIndex->value()){
             bsData->selectedGeneratorIndex = selectedGeneratorIndex->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ManualSelectorGeneratorUI::setSelectedGeneratorIndex(): The data is NULL!!"));
@@ -371,7 +371,7 @@ void ManualSelectorGeneratorUI::setCurrentGeneratorIndex(){
     if (bsData){
         if (bsData->currentGeneratorIndex != currentGeneratorIndex->value()){
             bsData->currentGeneratorIndex = currentGeneratorIndex->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ManualSelectorGeneratorUI::setCurrentGeneratorIndex(): The data is NULL!!"));
@@ -441,7 +441,7 @@ void ManualSelectorGeneratorUI::swapGeneratorIndices(int index1, int index2){
             }else if (bsData->currentGeneratorIndex == index2){
                 bsData->currentGeneratorIndex = index1;
             }
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("ManualSelectorGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!"));
         }
@@ -475,7 +475,7 @@ void ManualSelectorGeneratorUI::setGenerator(int index, const QString &name){
                 }
                 behaviorView->removeGeneratorData();
                 table->item(table->currentRow(), NAME_COLUMN)->setText(name);
-                bsData->getParentFile()->toggleChanged(true);
+                bsData->getParentFile()->setIsChanged(true);
                 loadDynamicTableRows();
             }else{
                 (qFatal("ManualSelectorGeneratorUI::setGenerator(): Invalid generator index selected!!"));

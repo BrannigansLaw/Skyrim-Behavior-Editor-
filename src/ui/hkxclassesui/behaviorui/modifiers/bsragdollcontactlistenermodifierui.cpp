@@ -163,7 +163,7 @@ void BSRagdollContactListenerModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -174,7 +174,7 @@ void BSRagdollContactListenerModifierUI::setName(){
 void BSRagdollContactListenerModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSRagdollContactListenerModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -186,7 +186,7 @@ void BSRagdollContactListenerModifierUI::setContactEventId(int index, const QStr
         if (bsData->contactEvent.id != index){
             bsData->contactEvent.id = index;
             table->item(CONTACT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSRagdollContactListenerModifierUI::setcontactEventId(): The data is NULL!!"));
@@ -208,7 +208,7 @@ void BSRagdollContactListenerModifierUI::setContactEventPayload(){
         }else{
             bsData->contactEvent.payload = HkxSharedPtr();
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSRagdollContactListenerModifierUI::setcontactEventPayload(): The data is NULL!!"));
     }
@@ -225,7 +225,7 @@ void BSRagdollContactListenerModifierUI::toggleBones(bool enable){
             bsData->bones = HkxSharedPtr(indices);
             bones->setText("Click to Edit");
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSRagdollContactListenerModifierUI::toggleBones(): The data is NULL!!"));
     }
@@ -330,7 +330,7 @@ bool BSRagdollContactListenerModifierUI::setBinding(int index, int row, const QS
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -354,7 +354,7 @@ void BSRagdollContactListenerModifierUI::setBindingVariable(int index, const QSt
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSRagdollContactListenerModifierUI::setBindingVariable(): The data is NULL!!"));
     }

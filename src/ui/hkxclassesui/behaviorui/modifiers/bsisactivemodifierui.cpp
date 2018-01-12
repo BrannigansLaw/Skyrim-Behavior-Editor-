@@ -214,7 +214,7 @@ void BSIsActiveModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -225,7 +225,7 @@ void BSIsActiveModifierUI::setName(){
 void BSIsActiveModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSIsActiveModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -234,7 +234,7 @@ void BSIsActiveModifierUI::setEnable(){
 void BSIsActiveModifierUI::setIsActive0(){
     if (bsData){
         bsData->bIsActive0 = bIsActive0->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSIsActiveModifierUI::setIsActive0(): The data is NULL!!"));
     }
@@ -243,7 +243,7 @@ void BSIsActiveModifierUI::setIsActive0(){
 void BSIsActiveModifierUI::setInvertActive0(){
     if (bsData){
         bsData->bInvertActive0 = bInvertActive0->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSIsActiveModifierUI::setInvertActive0(): The data is NULL!!"));
     }
@@ -252,7 +252,7 @@ void BSIsActiveModifierUI::setInvertActive0(){
 void BSIsActiveModifierUI::setIsActive1(){
     if (bsData){
         bsData->bIsActive1 = bIsActive1->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSIsActiveModifierUI::setIsActive1(): The data is NULL!!"));
     }
@@ -261,7 +261,7 @@ void BSIsActiveModifierUI::setIsActive1(){
 void BSIsActiveModifierUI::setInvertActive1(){
     if (bsData){
         bsData->bInvertActive1 = bInvertActive1->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSIsActiveModifierUI::setInvertActive1(): The data is NULL!!"));
     }
@@ -270,7 +270,7 @@ void BSIsActiveModifierUI::setInvertActive1(){
 void BSIsActiveModifierUI::setIsActive2(){
     if (bsData){
         bsData->bIsActive2 = bIsActive2->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSIsActiveModifierUI::setIsActive2(): The data is NULL!!"));
     }
@@ -279,7 +279,7 @@ void BSIsActiveModifierUI::setIsActive2(){
 void BSIsActiveModifierUI::setInvertActive2(){
     if (bsData){
         bsData->bInvertActive2 = bInvertActive2->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSIsActiveModifierUI::setInvertActive2(): The data is NULL!!"));
     }
@@ -288,7 +288,7 @@ void BSIsActiveModifierUI::setInvertActive2(){
 void BSIsActiveModifierUI::setIsActive3(){
     if (bsData){
         bsData->bIsActive3 = bIsActive3->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSIsActiveModifierUI::setIsActive3(): The data is NULL!!"));
     }
@@ -297,7 +297,7 @@ void BSIsActiveModifierUI::setIsActive3(){
 void BSIsActiveModifierUI::setInvertActive3(){
     if (bsData){
         bsData->bInvertActive3 = bInvertActive3->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSIsActiveModifierUI::setInvertActive3(): The data is NULL!!"));
     }
@@ -306,7 +306,7 @@ void BSIsActiveModifierUI::setInvertActive3(){
 void BSIsActiveModifierUI::setIsActive4(){
     if (bsData){
         bsData->bIsActive4 = bIsActive4->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSIsActiveModifierUI::setIsActive4(): The data is NULL!!"));
     }
@@ -315,7 +315,7 @@ void BSIsActiveModifierUI::setIsActive4(){
 void BSIsActiveModifierUI::setInvertActive4(){
     if (bsData){
         bsData->bInvertActive4 = bInvertActive4->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSIsActiveModifierUI::setInvertActive4(): The data is NULL!!"));
     }
@@ -498,7 +498,7 @@ bool BSIsActiveModifierUI::setBinding(int index, int row, const QString &variabl
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -582,7 +582,7 @@ void BSIsActiveModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSIsActiveModifierUI::setBindingVariable(): The data is NULL!!"));
     }

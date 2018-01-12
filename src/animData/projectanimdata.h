@@ -5,12 +5,15 @@
 #include "skyrimanimationmotiondata.h"
 
 class ProjectAnimData{
+    friend class ProjectFile;
     friend class AnimationsUI;
     friend class SkyrimClipGeneratoData;
     friend class SkyrimAnimationMotionData;
+    friend class SkyrimAnimData;
 public:
     ProjectAnimData();
     bool read(QFile * file);
+    bool readMotionOnly(QFile *file);
     bool write(QFile &file, QTextStream &output) const;
     bool appendClipGenerator(SkyrimClipGeneratoData *animData);
     bool removeClipGenerator(const QString & clipname);

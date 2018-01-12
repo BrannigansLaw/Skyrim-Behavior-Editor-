@@ -149,7 +149,7 @@ void BSSpeedSamplerModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -160,7 +160,7 @@ void BSSpeedSamplerModifierUI::setName(){
 void BSSpeedSamplerModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSSpeedSamplerModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -170,7 +170,7 @@ void BSSpeedSamplerModifierUI::setState(){
     if (bsData){
         if (bsData->state != state->value()){
             bsData->state = state->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSSpeedSamplerModifierUI::setstate(): The data is NULL!!"));
@@ -181,7 +181,7 @@ void BSSpeedSamplerModifierUI::setDirection(){
     if (bsData){
         if (bsData->direction != direction->value()){
             bsData->direction = direction->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSSpeedSamplerModifierUI::setdirection(): The data is NULL!!"));
@@ -192,7 +192,7 @@ void BSSpeedSamplerModifierUI::setGoalSpeed(){
     if (bsData){
         if (bsData->goalSpeed != goalSpeed->value()){
             bsData->goalSpeed = goalSpeed->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSSpeedSamplerModifierUI::setgoalSpeed(): The data is NULL!!"));
@@ -203,7 +203,7 @@ void BSSpeedSamplerModifierUI::setSpeedOut(){
     if (bsData){
         if (bsData->speedOut != speedOut->value()){
             bsData->speedOut = speedOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSSpeedSamplerModifierUI::setspeedOut(): The data is NULL!!"));
@@ -327,7 +327,7 @@ bool BSSpeedSamplerModifierUI::setBinding(int index, int row, const QString &var
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -375,7 +375,7 @@ void BSSpeedSamplerModifierUI::setBindingVariable(int index, const QString &name
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSSpeedSamplerModifierUI::setBindingVariable(): The data is NULL!!"));
     }

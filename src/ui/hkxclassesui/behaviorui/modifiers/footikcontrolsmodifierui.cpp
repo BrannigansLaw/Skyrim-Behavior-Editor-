@@ -202,7 +202,7 @@ void FootIkControlsModifierUI::disconnectSignals(){
 void FootIkControlsModifierUI::addLeg(){
     if (bsData){
         bsData->legs.append(hkbFootIkControlsModifier::hkLeg());
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
         (qFatal("FootIkControlsModifierUI::addRange(): The data is NULL!!"));
@@ -218,7 +218,7 @@ void FootIkControlsModifierUI::removeLeg(int index){
                 (qWarning("FootIkControlsModifierUI::removeExpression(): Invalid row index selected!!"));
                 return;
             }
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             loadDynamicTableRows();
         }else{
             (qWarning("FootIkControlsModifierUI::removeExpression(): Ranges is empty!!"));
@@ -357,7 +357,7 @@ bool FootIkControlsModifierUI::setBinding(int index, int row, const QString & va
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -465,7 +465,7 @@ void FootIkControlsModifierUI::setBindingVariable(int index, const QString & nam
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("FootIkControlsModifierUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -482,7 +482,7 @@ void FootIkControlsModifierUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit modifierNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::setName(): The data is NULL!!"));
@@ -492,7 +492,7 @@ void FootIkControlsModifierUI::setName(){
 void FootIkControlsModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("FootIkControlsModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -502,7 +502,7 @@ void FootIkControlsModifierUI::setonOffGain(){
     if (bsData){
         if (bsData->gains.onOffGain != onOffGain->value()){
             bsData->gains.onOffGain = onOffGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::setonOffGain(): The data is NULL!!"));
@@ -513,7 +513,7 @@ void FootIkControlsModifierUI::setfootPlantedGain(){
     if (bsData){
         if (bsData->gains.footPlantedGain != footPlantedGain->value()){
             bsData->gains.footPlantedGain = footPlantedGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::setfootPlantedGain(): The data is NULL!!"));
@@ -524,7 +524,7 @@ void FootIkControlsModifierUI::setfootRaisedGain(){
     if (bsData){
         if (bsData->gains.footRaisedGain != footRaisedGain->value()){
             bsData->gains.footRaisedGain = footRaisedGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::setfootRaisedGain(): The data is NULL!!"));
@@ -535,7 +535,7 @@ void FootIkControlsModifierUI::setfootUnlockGain(){
     if (bsData){
         if (bsData->gains.footUnlockGain != footUnlockGain->value()){
             bsData->gains.footUnlockGain = footUnlockGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::setfootUnlockGain(): The data is NULL!!"));
@@ -546,7 +546,7 @@ void FootIkControlsModifierUI::setgroundAscendingGain(){
     if (bsData){
         if (bsData->gains.groundAscendingGain != groundAscendingGain->value()){
             bsData->gains.groundAscendingGain = groundAscendingGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::setgroundAscendingGain(): The data is NULL!!"));
@@ -557,7 +557,7 @@ void FootIkControlsModifierUI::setgroundDescendingGain(){
     if (bsData){
         if (bsData->gains.groundDescendingGain != groundDescendingGain->value()){
             bsData->gains.groundDescendingGain = groundDescendingGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::setgroundDescendingGain(): The data is NULL!!"));
@@ -568,7 +568,7 @@ void FootIkControlsModifierUI::setworldFromModelFeedbackGain(){
     if (bsData){
         if (bsData->gains.worldFromModelFeedbackGain != worldFromModelFeedbackGain->value()){
             bsData->gains.worldFromModelFeedbackGain = worldFromModelFeedbackGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::setworldFromModelFeedbackGain(): The data is NULL!!"));
@@ -579,7 +579,7 @@ void FootIkControlsModifierUI::seterrorUpDownBias(){
     if (bsData){
         if (bsData->gains.errorUpDownBias != errorUpDownBias->value()){
             bsData->gains.errorUpDownBias = errorUpDownBias->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::seterrorUpDownBias(): The data is NULL!!"));
@@ -590,7 +590,7 @@ void FootIkControlsModifierUI::setalignWorldFromModelGain(){
     if (bsData){
         if (bsData->gains.alignWorldFromModelGain != alignWorldFromModelGain->value()){
             bsData->gains.alignWorldFromModelGain = alignWorldFromModelGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::setalignWorldFromModelGain(): The data is NULL!!"));
@@ -601,7 +601,7 @@ void FootIkControlsModifierUI::sethipOrientationGain(){
     if (bsData){
         if (bsData->gains.hipOrientationGain != hipOrientationGain->value()){
             bsData->gains.hipOrientationGain = hipOrientationGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::sethipOrientationGain(): The data is NULL!!"));
@@ -612,7 +612,7 @@ void FootIkControlsModifierUI::setmaxKneeAngleDifference(){
     if (bsData){
         if (bsData->gains.maxKneeAngleDifference != maxKneeAngleDifference->value()){
             bsData->gains.maxKneeAngleDifference = maxKneeAngleDifference->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::setmaxKneeAngleDifference(): The data is NULL!!"));
@@ -623,7 +623,7 @@ void FootIkControlsModifierUI::setankleOrientationGain(){
     if (bsData){
         if (bsData->gains.ankleOrientationGain != ankleOrientationGain->value()){
             bsData->gains.ankleOrientationGain = ankleOrientationGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::setankleOrientationGain(): The data is NULL!!"));
@@ -634,7 +634,7 @@ void FootIkControlsModifierUI::seterrorOutTranslation(){
     if (bsData){
         if (bsData->errorOutTranslation != errorOutTranslation->value()){
             bsData->errorOutTranslation = errorOutTranslation->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::seterrorOutTranslation(): The data is NULL!!"));
@@ -645,7 +645,7 @@ void FootIkControlsModifierUI::setalignWithGroundRotation(){
     if (bsData){
         if (bsData->alignWithGroundRotation != alignWithGroundRotation->value()){
             bsData->alignWithGroundRotation = alignWithGroundRotation->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("FootIkControlsModifierUI::setalignWithGroundRotation(): The data is NULL!!"));

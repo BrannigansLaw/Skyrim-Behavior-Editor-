@@ -43,6 +43,7 @@ public:
     QByteArray getElementValueAt(int index) const;
     QByteArray getNthAttributeNameAt(int index, int nth) const;
     QByteArray getNthAttributeValueAt(int index, int nth) const;
+    QByteArray findFirstValueWithAttributeValue(const QString & attributevalue) const;
     HkxXmlParseLine readNextLine();
     void clear();
 private:

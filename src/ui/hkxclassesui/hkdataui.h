@@ -100,6 +100,8 @@ public:
     BehaviorGraphView * loadBehaviorView(BehaviorGraphView *view);
     void setEventsVariablesAnimationsUI(EventsUI *events, BehaviorVariablesUI *variables, AnimationsUI *animations);
     void unloadDataWidget();
+signals:
+    void newAnimationAdded(const QString & name);
 public slots:
     void changeCurrentDataWidget(TreeGraphicsItem *icon);
     void modifierAdded(const QString & name, const QString & type);
@@ -113,7 +115,7 @@ public slots:
     void eventRemoved(int index);
     void animationNameChanged(const QString & newName, int index);
     void animationAdded(const QString & name);
-    void animationRemoved(int index);
+    //void animationRemoved(int index);
     void variableNameChanged(const QString & newName, int index);
     void variableAdded(const QString & name, const QString & type);
     void variableRemoved(int index);

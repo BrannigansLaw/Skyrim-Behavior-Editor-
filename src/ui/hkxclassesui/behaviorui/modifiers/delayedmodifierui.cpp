@@ -156,7 +156,7 @@ void DelayedModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }
@@ -165,7 +165,7 @@ void DelayedModifierUI::setName(){
 void DelayedModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("DelayedModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -175,7 +175,7 @@ void DelayedModifierUI::setDelaySeconds(){
     if (bsData){
         if (bsData->delaySeconds != delaySeconds->value()){
             bsData->delaySeconds = delaySeconds->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("DelayedModifierUI::setDelaySeconds(): The data is NULL!!"));
@@ -186,7 +186,7 @@ void DelayedModifierUI::setDurationSeconds(){
     if (bsData){
         if (bsData->durationSeconds != durationSeconds->value()){
             bsData->durationSeconds = durationSeconds->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("DelayedModifierUI::setDurationSeconds(): The data is NULL!!"));
@@ -197,7 +197,7 @@ void DelayedModifierUI::setSecondsElapsed(){
     if (bsData){
         if (bsData->secondsElapsed != secondsElapsed->value()){
             bsData->secondsElapsed = secondsElapsed->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("DelayedModifierUI::setSecondsElapsed(): The data is NULL!!"));
@@ -229,7 +229,7 @@ void DelayedModifierUI::setModifier(int index, const QString & name){
             }
             behaviorView->removeModifierData();
             table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qFatal("DelayedModifierUI::setModifier(): The 'behaviorView' pointer is NULL!!"));
         }
@@ -285,7 +285,7 @@ bool DelayedModifierUI::setBinding(int index, int row, const QString & variableN
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -328,7 +328,7 @@ void DelayedModifierUI::setBindingVariable(int index, const QString & name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("DelayedModifierUI::setBindingVariable(): The 'bsData' pointer is NULL!!"));
     }

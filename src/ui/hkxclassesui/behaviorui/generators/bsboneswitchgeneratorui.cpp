@@ -185,7 +185,7 @@ void BSBoneSwitchGeneratorUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSBoneSwitchGeneratorUI::setName(): The data is NULL!!"));
@@ -203,7 +203,7 @@ void BSBoneSwitchGeneratorUI::swapGeneratorIndices(int index1, int index2){
             }else{
                 (qFatal("BSBoneSwitchGeneratorUI::swapGeneratorIndices(): No item selected!!"));
             }
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("BSBoneSwitchGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!"));
         }
@@ -335,7 +335,7 @@ void BSBoneSwitchGeneratorUI::setDefaultGenerator(int index, const QString & nam
                 }
                 behaviorView->removeGeneratorData();
                 table->item(DEFAULT_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-                bsData->getParentFile()->toggleChanged(true);
+                bsData->getParentFile()->setIsChanged(true);
             }else{
                 (qFatal("BSBoneSwitchGeneratorUI::setDefaultGenerator(): The 'behaviorView' pointer is NULL!!"));
             }

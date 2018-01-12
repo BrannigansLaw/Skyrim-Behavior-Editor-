@@ -14,7 +14,7 @@ class SkyrimAnimData
     friend class ProjectUI;
 public:
     SkyrimAnimData();
-    bool parse(QFile * file);
+    bool parse(QFile * file, const QString &projectToIgnore = "");
     //bool extract(const QString & projectname);
     bool write(const QString & filename);
     int getProjectIndex(const QString & projectname) const;

@@ -24,7 +24,7 @@ bool HkxFile::getIsChanged() const{
     return changed;
 }
 
-void HkxFile::toggleChanged(bool wasEdited){
+void HkxFile::setIsChanged(bool wasEdited){
     changed = wasEdited;
 }
 

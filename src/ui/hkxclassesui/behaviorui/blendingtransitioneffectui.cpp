@@ -203,7 +203,7 @@ void BlendingTransitionEffectUI::setName(){
     if (bsData){
         if (bsData->name != name->text()){
             bsData->name = name->text();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit transitionEffectRenamed(bsData->name);
         }
     }else{
@@ -257,7 +257,7 @@ void BlendingTransitionEffectUI::setBindingVariable(int index, const QString &na
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BlendingTransitionEffectUI::setBindingVariable(): The 'bsData' pointer is NULL!!"));
     }
@@ -266,7 +266,7 @@ void BlendingTransitionEffectUI::setBindingVariable(int index, const QString &na
 void BlendingTransitionEffectUI::setSelfTransitionMode(int index){
     if (bsData){
         bsData->selfTransitionMode = bsData->SelfTransitionMode.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BlendingTransitionEffectUI::setSelfTransitionMode(): The data is NULL!!"));
     }
@@ -275,7 +275,7 @@ void BlendingTransitionEffectUI::setSelfTransitionMode(int index){
 void BlendingTransitionEffectUI::setEventMode(int index){
     if (bsData){
         bsData->eventMode = bsData->EventMode.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BlendingTransitionEffectUI::setEventMode(): The data is NULL!!"));
     }
@@ -284,7 +284,7 @@ void BlendingTransitionEffectUI::setEventMode(int index){
 void BlendingTransitionEffectUI::setDuration(){
     if (bsData){
         bsData->duration = duration->value();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BlendingTransitionEffectUI::setDuration(): The data is NULL!!"));
     }
@@ -293,7 +293,7 @@ void BlendingTransitionEffectUI::setDuration(){
 void BlendingTransitionEffectUI::setToGeneratorStartTimeFraction(){
     if (bsData){
         bsData->toGeneratorStartTimeFraction = toGeneratorStartTimeFraction->value();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BlendingTransitionEffectUI::setToGeneratorStartTimeFraction(): The data is NULL!!"));
     }
@@ -302,7 +302,7 @@ void BlendingTransitionEffectUI::setToGeneratorStartTimeFraction(){
 void BlendingTransitionEffectUI::setEndMode(int index){
     if (bsData){
         bsData->endMode = bsData->EndMode.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BlendingTransitionEffectUI::setEndMode(): The data is NULL!!"));
     }
@@ -311,7 +311,7 @@ void BlendingTransitionEffectUI::setEndMode(int index){
 void BlendingTransitionEffectUI::setBlendCurve(int index){
     if (bsData){
         bsData->blendCurve = bsData->BlendCurve.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BlendingTransitionEffectUI::setBlendCurve(): The data is NULL!!"));
     }
@@ -332,7 +332,7 @@ void BlendingTransitionEffectUI::toggleSyncFlag(){
                 bsData->flags.remove("|FLAG_SYNC");
             }
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BlendingTransitionEffectUI::setFlagSync(): The data is NULL!!"));
     }
@@ -353,7 +353,7 @@ void BlendingTransitionEffectUI::toggleIgnoreFromWorldFromModelFlag(){
                 bsData->flags.remove("|FLAG_IGNORE_FROM_WORLD_FROM_MODEL");
             }
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BlendingTransitionEffectUI::setFlagIgnoreFromWorldFromModel(): The data is NULL!!"));
     }
@@ -374,7 +374,7 @@ void BlendingTransitionEffectUI::toggleIgnoreToWorldFromModelFlag(){
                 bsData->flags.remove("|FLAG_IGNORE_TO_WORLD_FROM_MODEL");
             }
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BlendingTransitionEffectUI::setFlagIgnoreToWorldFromModel(): The data is NULL!!"));
     }
@@ -463,7 +463,7 @@ bool BlendingTransitionEffectUI::setBinding(int index, int row, const QString & 
                 varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }

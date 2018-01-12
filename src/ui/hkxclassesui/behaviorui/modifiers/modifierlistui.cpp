@@ -245,7 +245,7 @@ bool ModifierListUI::setBinding(int index, int row, const QString & variableName
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -269,7 +269,7 @@ void ModifierListUI::setBindingVariable(int index, const QString & name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ModifierListUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -365,7 +365,7 @@ void ModifierListUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -376,7 +376,7 @@ void ModifierListUI::setName(){
 void ModifierListUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ModifierListUI::setEnable(): The data is NULL!!"));
     }
@@ -425,7 +425,7 @@ void ModifierListUI::swapGeneratorIndices(int index1, int index2){
         if (bsData->modifiers.size() > index1 && bsData->modifiers.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
             bsData->modifiers.swap(index1, index2);
             behaviorView->getSelectedItem()->reorderChildren();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("ModifierListUI::swapGeneratorIndices(): Cannot swap these rows!!"));
         }
@@ -459,7 +459,7 @@ void ModifierListUI::setModifier(int index, const QString &name){
                 }
                 behaviorView->removeModifierData();
                 table->item(table->currentRow(), NAME_COLUMN)->setText(name);
-                bsData->getParentFile()->toggleChanged(true);
+                bsData->getParentFile()->setIsChanged(true);
                 loadDynamicTableRows();
             }else{
                 (qFatal("ModifierListUI::setModifier(): Invalid modifier index selected!!"));

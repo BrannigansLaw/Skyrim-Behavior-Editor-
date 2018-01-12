@@ -83,7 +83,7 @@ void EventUI::setEvent(int index, const QString & name){
     if (eventData && file){
         eventData->id = index - 1;
         selectEvent->setText(name);
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("EventUI::setEvent(): Behavior file or event data is null!!!"));
     }
@@ -104,7 +104,7 @@ void EventUI::setEventPayload(){
         }else{
             eventData->payload = HkxSharedPtr();
         }
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("EventUI::setEventPayload(): Behavior file or event data is null!!!"));
     }

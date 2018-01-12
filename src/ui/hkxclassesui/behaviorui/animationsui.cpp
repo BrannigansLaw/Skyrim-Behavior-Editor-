@@ -6,6 +6,7 @@
 #include "src/ui/genericdatawidgets.h"
 #include "src/animData/skyrimanimdata.h"
 #include "src/animData/projectanimdata.h"
+#include "src/filetypes/characterfile.h"
 
 #include <QPushButton>
 #include <QMessageBox>
@@ -15,6 +16,7 @@
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QCoreApplication>
+#include <QFileDialog>
 
 QStringList AnimationsUI::headerLabels = {
     "Name",
@@ -29,6 +31,7 @@ AnimationsUI::AnimationsUI(const QString &title)
       table(new TableWidget),
       buttonLyt(new QHBoxLayout),
       addObjectPB(new QPushButton("Add Animation")),
+      removeObjectPB(new QPushButton("Remove Animation")),
       stackLyt(new QStackedLayout),
       animationUI(new SkyrimAnimationDataUI())
 {
@@ -37,13 +40,14 @@ AnimationsUI::AnimationsUI(const QString &title)
     stackLyt->addWidget(animationUI);
     stackLyt->setCurrentIndex(TABLE_WIDGET);
     buttonLyt->addWidget(addObjectPB, 1);
-    //buttonLyt->addSpacing(2);
-    //buttonLyt->addWidget(removeObjectPB, 1);
+    buttonLyt->addSpacing(2);
+    buttonLyt->addWidget(removeObjectPB, 1);
     table->setColumnCount(2);
     table->setHorizontalHeaderLabels(headerLabels);
+    verLyt->addLayout(buttonLyt);
     verLyt->addLayout(stackLyt);
     setLayout(verLyt);
-    //connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeAnimation()));
+    connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeAnimation()));
     connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addAnimation()));
     //connect(animationName, SIGNAL(editingFinished()), this, SLOT(renameSelectedAnimation()));
     connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewAnimation(int,int)));
@@ -103,23 +107,30 @@ void AnimationsUI::clear(){
 
 void AnimationsUI::addAnimation(){
     if (loadedData){
-        loadedData->addAnimation();
-        //animData->appendAnimation(new SkyrimAnimationMotionData(animData, ));
-        int row = table->rowCount();
-        table->setRowCount(row + 1);
-        table->setItem(row, 0, new QTableWidgetItem(loadedData->animationNames.last()));
-        table->setItem(row, 1, new QTableWidgetItem("Click To Edit"));
-        if (stackLyt->currentIndex() == ANIMATION_WIDGET){
-            stackLyt->setCurrentIndex(TABLE_WIDGET);
+        QString filename = QFileDialog::getOpenFileName(this, tr("Open hkx animation file..."), loadedData->getParentFile()->fileName(), tr("hkx Files (*.hkx)"));
+        if (filename != "" && (filename.contains(loadedData->getParentFile()->fileName().section("/", 0, -3)+"/"+"animations", Qt::CaseInsensitive) || filename.contains("SharedKillMoves", Qt::CaseInsensitive)) && loadedData->getAnimationIndex(filename) == -1){
+            loadedData->addAnimation(filename.section("/", -2, -1));
+            animData->appendAnimation(new SkyrimAnimationMotionData(animData, loadedData->animationNames.size() - 1));  //Need to set duration later...
+            int row = table->rowCount();
+            table->setRowCount(row + 1);
+            table->setItem(row, 0, new QTableWidgetItem(loadedData->animationNames.last()));
+            table->setItem(row, 1, new QTableWidgetItem("Click To Edit"));
+            if (stackLyt->currentIndex() == ANIMATION_WIDGET){
+                stackLyt->setCurrentIndex(TABLE_WIDGET);
+            }
+            table->setCurrentCell(row, 0);
+            emit animationAdded(loadedData->animationNames.last());
+            emit openAnimationFile(filename);
         }
-        table->setCurrentCell(row, 0);
-        emit animationAdded(loadedData->animationNames.last());
     }
 }
 
 void AnimationsUI::removeAnimation(){
-    if (loadedData){
+    if (loadedData && !static_cast<CharacterFile *>(loadedData->getParentFile())->isAnimationUsed(table->item(table->currentRow(), table->currentColumn())->text())){
         int index = table->currentRow();
+        if (!animData->removeAnimation(index)){
+            (qFatal("AnimationsUI::removeAnimation(): Failed!"));
+        }
         loadedData->animationNames.removeAt(index);
         if (index < table->rowCount()){
             table->removeRow(index);
@@ -127,8 +138,10 @@ void AnimationsUI::removeAnimation(){
         if (stackLyt->currentIndex() == ANIMATION_WIDGET){
             stackLyt->setCurrentIndex(TABLE_WIDGET);
         }
-        loadedData->getParentFile()->toggleChanged(true);
-        emit animationRemoved(index);
+        loadedData->getParentFile()->setIsChanged(true);
+        //emit animationRemoved(index);
+    }else{
+        WARNING_MESSAGE(QString("Animation is in use! Check the text log for information on where the animation is used..."))
     }
 }
 

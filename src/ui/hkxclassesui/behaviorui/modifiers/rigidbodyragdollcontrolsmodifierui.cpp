@@ -276,7 +276,7 @@ void RigidBodyRagdollControlsModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -287,7 +287,7 @@ void RigidBodyRagdollControlsModifierUI::setName(){
 void RigidBodyRagdollControlsModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -297,7 +297,7 @@ void RigidBodyRagdollControlsModifierUI::setHierarchyGain(){
     if (bsData){
         if (bsData->hierarchyGain != hierarchyGain->value()){
             bsData->hierarchyGain = hierarchyGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::sethierarchyGain(): The data is NULL!!"));
@@ -308,7 +308,7 @@ void RigidBodyRagdollControlsModifierUI::setVelocityDamping(){
     if (bsData){
         if (bsData->velocityDamping != velocityDamping->value()){
             bsData->velocityDamping = velocityDamping->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::setvelocityDamping(): The data is NULL!!"));
@@ -319,7 +319,7 @@ void RigidBodyRagdollControlsModifierUI::setAccelerationGain(){
     if (bsData){
         if (bsData->accelerationGain != accelerationGain->value()){
             bsData->accelerationGain = accelerationGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::setaccelerationGain(): The data is NULL!!"));
@@ -330,7 +330,7 @@ void RigidBodyRagdollControlsModifierUI::setVelocityGain(){
     if (bsData){
         if (bsData->velocityGain != velocityGain->value()){
             bsData->velocityGain = velocityGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::setvelocityGain(): The data is NULL!!"));
@@ -341,7 +341,7 @@ void RigidBodyRagdollControlsModifierUI::setPositionGain(){
     if (bsData){
         if (bsData->positionGain != positionGain->value()){
             bsData->positionGain = positionGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::setpositionGain(): The data is NULL!!"));
@@ -352,7 +352,7 @@ void RigidBodyRagdollControlsModifierUI::setPositionMaxLinearVelocity(){
     if (bsData){
         if (bsData->positionMaxLinearVelocity != positionMaxLinearVelocity->value()){
             bsData->positionMaxLinearVelocity = positionMaxLinearVelocity->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::setpositionMaxLinearVelocity(): The data is NULL!!"));
@@ -363,7 +363,7 @@ void RigidBodyRagdollControlsModifierUI::setPositionMaxAngularVelocity(){
     if (bsData){
         if (bsData->positionMaxAngularVelocity != positionMaxAngularVelocity->value()){
             bsData->positionMaxAngularVelocity = positionMaxAngularVelocity->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::setpositionMaxAngularVelocity(): The data is NULL!!"));
@@ -374,7 +374,7 @@ void RigidBodyRagdollControlsModifierUI::setSnapGain(){
     if (bsData){
         if (bsData->snapGain != snapGain->value()){
             bsData->snapGain = snapGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::setsnapGain(): The data is NULL!!"));
@@ -385,7 +385,7 @@ void RigidBodyRagdollControlsModifierUI::setSnapMaxLinearVelocity(){
     if (bsData){
         if (bsData->snapMaxLinearVelocity != snapMaxLinearVelocity->value()){
             bsData->snapMaxLinearVelocity = snapMaxLinearVelocity->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::setsnapMaxLinearVelocity(): The data is NULL!!"));
@@ -396,7 +396,7 @@ void RigidBodyRagdollControlsModifierUI::setSnapMaxAngularVelocity(){
     if (bsData){
         if (bsData->snapMaxAngularVelocity != snapMaxAngularVelocity->value()){
             bsData->snapMaxAngularVelocity = snapMaxAngularVelocity->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::setsnapMaxAngularVelocity(): The data is NULL!!"));
@@ -407,7 +407,7 @@ void RigidBodyRagdollControlsModifierUI::setSnapMaxLinearDistance(){
     if (bsData){
         if (bsData->snapMaxLinearDistance != snapMaxLinearDistance->value()){
             bsData->snapMaxLinearDistance = snapMaxLinearDistance->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::setsnapMaxLinearDistance(): The data is NULL!!"));
@@ -418,7 +418,7 @@ void RigidBodyRagdollControlsModifierUI::setSnapMaxAngularDistance(){
     if (bsData){
         if (bsData->snapMaxAngularDistance != snapMaxAngularDistance->value()){
             bsData->snapMaxAngularDistance = snapMaxAngularDistance->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::setsnapMaxAngularDistance(): The data is NULL!!"));
@@ -429,7 +429,7 @@ void RigidBodyRagdollControlsModifierUI::setDurationToBlend(){
     if (bsData){
         if (bsData->durationToBlend != durationToBlend->value()){
             bsData->durationToBlend = durationToBlend->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::setdurationToBlend(): The data is NULL!!"));
@@ -447,7 +447,7 @@ void RigidBodyRagdollControlsModifierUI::toggleBones(bool enable){
             bsData->bones = HkxSharedPtr(indices);
             bones->setText("Click to Edit");
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::toggleBones(): The data is NULL!!"));
     }
@@ -669,7 +669,7 @@ bool RigidBodyRagdollControlsModifierUI::setBinding(int index, int row, const QS
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -771,7 +771,7 @@ void RigidBodyRagdollControlsModifierUI::setBindingVariable(int index, const QSt
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("RigidBodyRagdollControlsModifierUI::setBindingVariable(): The data is NULL!!"));
     }

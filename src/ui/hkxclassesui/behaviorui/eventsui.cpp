@@ -81,14 +81,14 @@ void EventsUI::returnToTable(){
 
 void EventsUI::setBoolVariableValue(){
     loadedData->setEventFlagAt(table->currentRow(), flag->isChecked());
-    loadedData->getParentFile()->toggleChanged(true);
+    loadedData->getParentFile()->setIsChanged(true);
 }
 
 void EventsUI::renameSelectedEvent(){
     QString newName = eventName->text();
     table->item(table->currentRow(), 0)->setText(newName);
     loadedData->setEventNameAt(table->currentRow(), newName);
-    loadedData->getParentFile()->toggleChanged(true);
+    loadedData->getParentFile()->setIsChanged(true);
     emit eventNameChanged(newName, table->currentRow());
 }
 
@@ -152,7 +152,7 @@ void EventsUI::removeEvent(){
         if (stackLyt->currentIndex() == EVENT_WIDGET){
             stackLyt->setCurrentIndex(TABLE_WIDGET);
         }
-        loadedData->getParentFile()->toggleChanged(true);
+        loadedData->getParentFile()->setIsChanged(true);
         emit eventRemoved(index);
     }
 }

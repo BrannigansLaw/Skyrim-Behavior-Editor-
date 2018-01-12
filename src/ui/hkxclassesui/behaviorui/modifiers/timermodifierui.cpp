@@ -144,7 +144,7 @@ void TimerModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -155,7 +155,7 @@ void TimerModifierUI::setName(){
 void TimerModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TimerModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -165,7 +165,7 @@ void TimerModifierUI::setAlarmTimeSeconds(){
     if (bsData){
         if (bsData->alarmTimeSeconds != alarmTimeSeconds->value()){
             bsData->alarmTimeSeconds = alarmTimeSeconds->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("TimerModifierUI::setalarmTimeSeconds(): The data is NULL!!"));
@@ -178,7 +178,7 @@ void TimerModifierUI::setAlarmEventId(int index, const QString & name){
         if (bsData->alarmEvent.id != index){
             bsData->alarmEvent.id = index;
             table->item(ALARM_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("TimerModifierUI::setAlarmEventId(): The data is NULL!!"));
@@ -200,7 +200,7 @@ void TimerModifierUI::setAlarmEventPayload(){
         }else{
             bsData->alarmEvent.payload = HkxSharedPtr();
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TimerModifierUI::setalarmEventPayload(): The data is NULL!!"));
     }
@@ -306,7 +306,7 @@ bool TimerModifierUI::setBinding(int index, int row, const QString &variableName
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -336,7 +336,7 @@ void TimerModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TimerModifierUI::setBindingVariable(): The data is NULL!!"));
     }

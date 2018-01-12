@@ -2,14 +2,16 @@
 #include "behaviorfile.h"
 #include "characterfile.h"
 
-//#include "src/animData/skyrimanimdata.h"
-//#include "src/animSetData/skyrimanimsetdata.h"
+#include "src/animData/skyrimanimationmotiondata.h"
+#include "src/animData/skyrimanimdata.h"
+#include "src/animSetData/skyrimanimsetdata.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/xml/hkxxmlwriter.h"
 #include "src/ui/mainwindow.h"
 #include "src/hkxclasses/behavior/hkbprojectdata.h"
 #include "src/hkxclasses/behavior/hkbprojectstringdata.h"
 #include "src/hkxclasses/hkrootlevelcontainer.h"
+#include "src/hkxclasses/behavior/generators/hkbclipgenerator.h"
 #include <mutex>
 
 ProjectFile::ProjectFile(MainWindow *window, const QString & name)
@@ -19,6 +21,7 @@ ProjectFile::ProjectFile(MainWindow *window, const QString & name)
       skyrimAnimData(new SkyrimAnimData)
 {
     projectName = QString(fileName().section("/", -1, -1)).remove(".hkx");
+    projectPath = "meshes/actors/"+projectName+"/animations";
     getReader().setFile(this);
 }
 
@@ -37,6 +40,7 @@ bool ProjectFile::isClipGenNameTaken(const QString &name) const{
 
 bool ProjectFile::readAnimationData(const QString & filename){
     QFile *animfile = new QFile(filename);
+    QString projectname = fileName().section("/", -1, -1);
     if (!animfile->exists()){
         delete animfile;
         animfile = new QFile(QDir::currentPath()+"/animationdatasinglefile.txt");
@@ -44,13 +48,13 @@ bool ProjectFile::readAnimationData(const QString & filename){
             (qFatal("animationdatasinglefile.txt is missing from the application directory!"));
         }
     }
-    if (!skyrimAnimData->parse(animfile)){
+    if (!skyrimAnimData->parse(animfile, projectname)){
         delete animfile;
         (qFatal("ProjectFile::readAnimationData(): The project animation data file could not be parsed!!!"));
         return false;
     }
     delete animfile;
-    projectIndex = skyrimAnimData->getProjectIndex(fileName().section("/", -1, -1));
+    projectIndex = skyrimAnimData->getProjectIndex(projectname);
     return true;
 }
 
@@ -69,10 +73,6 @@ bool ProjectFile::readAnimationSetData(const QString & filename){
         return false;
     }
     delete animsetfile;
-    /*std::mutex mu;
-    mu.lock();
-    projectIndex = skyrimAnimData->getProjectIndex(fileName().section("/", -1, -1));
-    mu.unlock();*/
     return true;
 }
 
@@ -198,6 +198,58 @@ bool ProjectFile::link(){
         return false;
     }
     return true;
+}
+
+void ProjectFile::setAnimationIndexDuration(int indexofanimationlist, int animationindex, qreal duration){
+    ProjectAnimData *project = skyrimAnimData->getProjectAnimData(projectName);
+    if (project){
+        if (indexofanimationlist == -1){
+            project->animationMotionData.last()->animationIndex = animationindex;
+            project->animationMotionData.last()->duration = duration;
+        }else if (indexofanimationlist < project->animationMotionData.size()){
+            project->animationMotionData.at(indexofanimationlist)->animationIndex = animationindex;
+            project->animationMotionData.at(indexofanimationlist)->duration = duration;
+        }
+    }else{
+        (qFatal("ProjectFile::setAnimationIndexDuration(): skyrimAnimData->getProjectAnimData Failed!"));
+    }
+}
+
+void ProjectFile::generateAnimDataForProject(){
+    HkxObject *generator;
+    for (int i = 0; i < behaviorFiles.size(); i++){
+        for (int j = 0; j < behaviorFiles.at(i)->generators.size(); j++){
+            generator = behaviorFiles.at(i)->generators.at(j).data();
+            if (generator->getSignature() == HKB_CLIP_GENERATOR){
+                if (!skyrimAnimData->appendClipGenerator(projectName, new SkyrimClipGeneratoData(static_cast<hkbClipGenerator *>(generator)->getClipGeneratorAnimData(skyrimAnimData->getProjectAnimData(projectName), getAnimationIndex(static_cast<hkbClipGenerator *>(generator)->animationName))))){
+                    (qFatal("ProjectFile::generateAnimDataForProject(): skyrimAnimData->appendClipGenerator Failed!"));
+                }
+            }
+        }
+    }
+}
+
+int ProjectFile::getAnimationIndex(const QString & name) const{
+    if (character){
+        return character->getAnimationIndex(name);
+    }
+    return -1;
+}
+
+bool ProjectFile::isAnimationUsed(const QString &animationname){
+    HkxObject *generator;
+    for (int i = 0; i < behaviorFiles.size(); i++){
+        for (int j = 0; j < behaviorFiles.at(i)->generators.size(); j++){
+            generator = behaviorFiles.at(i)->generators.at(j).data();
+            if (generator->getSignature() == HKB_CLIP_GENERATOR){
+                if (!QString::compare(animationname, static_cast<hkbClipGenerator *>(generator)->getAnimationName(), Qt::CaseInsensitive)){
+                    writeToLog("ProjectFile: isAnimationUsed()!\nAnimation is used in the Clip Generator \""+static_cast<hkbClipGenerator *>(generator)->getName()+"\" in behavior: "+behaviorFiles.at(i)->fileName().section("/",-1,-1));
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 bool ProjectFile::appendClipGeneratorAnimData(const QString &name){

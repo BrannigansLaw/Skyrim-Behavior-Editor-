@@ -88,7 +88,7 @@ void HandIkControlsModifierUI::disconnectSignals(){
 void HandIkControlsModifierUI::addHand(){
     if (bsData){
         bsData->hands.append(hkbHandIkControlsModifier::hkHand());
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
         (qFatal("HandIkControlsModifierUI::addHand(): The data is NULL!!"));
@@ -104,7 +104,7 @@ void HandIkControlsModifierUI::removeHand(int index){
                 (qWarning("HandIkControlsModifierUI::removeHand(): Invalid row index selected!!"));
                 return;
             }
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             loadDynamicTableRows();
         }else{
             (qWarning("HandIkControlsModifierUI::removeHand(): Ranges is empty!!"));
@@ -201,7 +201,7 @@ bool HandIkControlsModifierUI::setBinding(int index, int row, const QString & va
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -225,7 +225,7 @@ void HandIkControlsModifierUI::setBindingVariable(int index, const QString & nam
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("HandIkControlsModifierUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -242,7 +242,7 @@ void HandIkControlsModifierUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit modifierNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("HandIkControlsModifierUI::setName(): The data is NULL!!"));
@@ -252,7 +252,7 @@ void HandIkControlsModifierUI::setName(){
 void HandIkControlsModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("HandIkControlsModifierUI::setEnable(): The data is NULL!!"));
     }

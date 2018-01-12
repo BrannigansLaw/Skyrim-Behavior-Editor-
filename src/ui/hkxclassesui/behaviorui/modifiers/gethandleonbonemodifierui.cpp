@@ -165,7 +165,7 @@ void GetHandleOnBoneModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -176,7 +176,7 @@ void GetHandleOnBoneModifierUI::setName(){
 void GetHandleOnBoneModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("GetHandleOnBoneModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -185,7 +185,7 @@ void GetHandleOnBoneModifierUI::setEnable(){
 void GetHandleOnBoneModifierUI::setLocalFrameName(const QString & name){
     if (bsData){
         bsData->localFrameName = name;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("GetHandleOnBoneModifierUI::setLocalFrameName(): The data is NULL!!"));
     }
@@ -194,7 +194,7 @@ void GetHandleOnBoneModifierUI::setLocalFrameName(const QString & name){
 void GetHandleOnBoneModifierUI::setRagdollBoneIndex(int index){
     if (bsData){
         bsData->ragdollBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("GetHandleOnBoneModifierUI::setRagdollBoneIndex(): The data is NULL!!"));
     }
@@ -203,7 +203,7 @@ void GetHandleOnBoneModifierUI::setRagdollBoneIndex(int index){
 void GetHandleOnBoneModifierUI::setAnimationBoneIndex(int index){
     if (bsData){
         bsData->animationBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("GetHandleOnBoneModifierUI::setAnimationBoneIndex(): The data is NULL!!"));
     }
@@ -316,7 +316,7 @@ bool GetHandleOnBoneModifierUI::setBinding(int index, int row, const QString &va
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -358,7 +358,7 @@ void GetHandleOnBoneModifierUI::setBindingVariable(int index, const QString &nam
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("GetHandleOnBoneModifierUI::setBindingVariable(): The data is NULL!!"));
     }

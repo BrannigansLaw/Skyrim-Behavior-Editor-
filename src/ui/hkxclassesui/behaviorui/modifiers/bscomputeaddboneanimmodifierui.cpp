@@ -154,7 +154,7 @@ void BSComputeAddBoneAnimModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -165,7 +165,7 @@ void BSComputeAddBoneAnimModifierUI::setName(){
 void BSComputeAddBoneAnimModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSComputeAddBoneAnimModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -174,7 +174,7 @@ void BSComputeAddBoneAnimModifierUI::setEnable(){
 void BSComputeAddBoneAnimModifierUI::setBoneIndex(int index){
     if (bsData){
         bsData->boneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSComputeAddBoneAnimModifierUI::setboneIndex(): The data is NULL!!"));
     }
@@ -184,7 +184,7 @@ void BSComputeAddBoneAnimModifierUI::setTranslationLSOut(){
     if (bsData){
         if (bsData->translationLSOut != translationLSOut->value()){
             bsData->translationLSOut = translationLSOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSComputeAddBoneAnimModifierUI::settranslationLSOut(): The data is NULL!!"));
@@ -195,7 +195,7 @@ void BSComputeAddBoneAnimModifierUI::setRotationLSOut(){
     if (bsData){
         if (bsData->rotationLSOut != rotationLSOut->value()){
             bsData->rotationLSOut = rotationLSOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSComputeAddBoneAnimModifierUI::setrotationLSOut(): The data is NULL!!"));
@@ -206,7 +206,7 @@ void BSComputeAddBoneAnimModifierUI::setScaleLSOut(){
     if (bsData){
         if (bsData->scaleLSOut != scaleLSOut->value()){
             bsData->scaleLSOut = scaleLSOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSComputeAddBoneAnimModifierUI::setscaleLSOut(): The data is NULL!!"));
@@ -330,7 +330,7 @@ bool BSComputeAddBoneAnimModifierUI::setBinding(int index, int row, const QStrin
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -378,7 +378,7 @@ void BSComputeAddBoneAnimModifierUI::setBindingVariable(int index, const QString
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSComputeAddBoneAnimModifierUI::setBindingVariable(): The data is NULL!!"));
     }

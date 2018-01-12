@@ -179,7 +179,7 @@ void BSLimbIKModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -190,7 +190,7 @@ void BSLimbIKModifierUI::setName(){
 void BSLimbIKModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSLimbIKModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -200,7 +200,7 @@ void BSLimbIKModifierUI::setLimitAngleDegrees(){
     if (bsData){
         if (bsData->limitAngleDegrees != limitAngleDegrees->value()){
             bsData->limitAngleDegrees = limitAngleDegrees->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSLimbIKModifierUI::setLimitAngleDegrees(): The data is NULL!!"));
@@ -210,7 +210,7 @@ void BSLimbIKModifierUI::setLimitAngleDegrees(){
 void BSLimbIKModifierUI::setStartBoneIndex(int index){
     if (bsData){
         bsData->startBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSLimbIKModifierUI::setStartBoneIndex(): The data is NULL!!"));
     }
@@ -219,7 +219,7 @@ void BSLimbIKModifierUI::setStartBoneIndex(int index){
 void BSLimbIKModifierUI::setEndBoneIndex(int index){
     if (bsData){
         bsData->endBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSLimbIKModifierUI::setEndBoneIndex(): The data is NULL!!"));
     }
@@ -229,7 +229,7 @@ void BSLimbIKModifierUI::setGain(){
     if (bsData){
         if (bsData->gain != gain->value()){
             bsData->gain = gain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSLimbIKModifierUI::setGain(): The data is NULL!!"));
@@ -240,7 +240,7 @@ void BSLimbIKModifierUI::setBoneRadius(){
     if (bsData){
         if (bsData->boneRadius != boneRadius->value()){
             bsData->boneRadius = boneRadius->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSLimbIKModifierUI::setBoneRadius(): The data is NULL!!"));
@@ -251,7 +251,7 @@ void BSLimbIKModifierUI::setCastOffset(){
     if (bsData){
         if (bsData->castOffset != castOffset->value()){
             bsData->castOffset = castOffset->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSLimbIKModifierUI::setCastOffset(): The data is NULL!!"));
@@ -395,7 +395,7 @@ bool BSLimbIKModifierUI::setBinding(int index, int row, const QString &variableN
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -455,7 +455,7 @@ void BSLimbIKModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSLimbIKModifierUI::setBindingVariable(): The data is NULL!!"));
     }

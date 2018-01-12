@@ -33,9 +33,10 @@ private slots:
     void viewAnimation(int row, int column);
     void returnToTable();
 signals:
+    void openAnimationFile(const QString & filename);
     void animationNameChanged(const QString & newName, int index);
     void animationAdded(const QString & name);
-    void animationRemoved(int index);
+    //void animationRemoved(int index);
 private:
     AnimationsUI& operator=(const AnimationsUI&);
     AnimationsUI(const AnimationsUI &);
@@ -52,7 +53,7 @@ private:
     TableWidget *table;
     QPushButton *addObjectPB;
     QHBoxLayout *buttonLyt;
-    //QPushButton *removeObjectPB;
+    QPushButton *removeObjectPB;
     QStackedLayout *stackLyt;
     SkyrimAnimationDataUI *animationUI;
 };

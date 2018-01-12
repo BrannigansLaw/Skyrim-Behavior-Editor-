@@ -98,7 +98,7 @@ void BGSGamebryoSequenceGeneratorUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
@@ -110,7 +110,7 @@ void BGSGamebryoSequenceGeneratorUI::setSequence(){
     if (bsData){
         if (bsData->pSequence != pSequence->text()){
             bsData->pSequence = pSequence->text();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BGSGamebryoSequenceGeneratorUI::setSequence(): The data is NULL!!"));
@@ -120,7 +120,7 @@ void BGSGamebryoSequenceGeneratorUI::setSequence(){
 void BGSGamebryoSequenceGeneratorUI::setBlendModeFunction(int index){
     if (bsData){
         bsData->eBlendModeFunction = bsData->BlendModeFunction.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BGSGamebryoSequenceGeneratorUI::setBlendModeFunction(): The data is NULL!!"));
     }
@@ -130,7 +130,7 @@ void BGSGamebryoSequenceGeneratorUI::setPercent(){
     if (bsData){
         if (bsData->fPercent != fPercent->value()){
             bsData->fPercent = fPercent->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BGSGamebryoSequenceGeneratorUI::setPercent(): The data is NULL!!"));

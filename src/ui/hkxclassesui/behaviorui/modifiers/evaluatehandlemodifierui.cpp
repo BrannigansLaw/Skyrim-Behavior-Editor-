@@ -178,7 +178,7 @@ void EvaluateHandleModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -189,7 +189,7 @@ void EvaluateHandleModifierUI::setName(){
 void EvaluateHandleModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("EvaluateHandleModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -199,7 +199,7 @@ void EvaluateHandleModifierUI::setHandlePositionOut(){
     if (bsData){
         if (bsData->handlePositionOut != handlePositionOut->value()){
             bsData->handlePositionOut = handlePositionOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("EvaluateHandleModifierUI::setHandlePositionOut(): The data is NULL!!"));
@@ -210,7 +210,7 @@ void EvaluateHandleModifierUI::setHandleRotationOut(){
     if (bsData){
         if (bsData->handleRotationOut != handleRotationOut->value()){
             bsData->handleRotationOut = handleRotationOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("EvaluateHandleModifierUI::setHandleRotationOut(): The data is NULL!!"));
@@ -220,7 +220,7 @@ void EvaluateHandleModifierUI::setHandleRotationOut(){
 void EvaluateHandleModifierUI::setIsValidOut(){
     if (bsData){
         bsData->isValidOut = isValidOut->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("EvaluateHandleModifierUI::setIsValidOut(): The data is NULL!!"));
     }
@@ -230,7 +230,7 @@ void EvaluateHandleModifierUI::setExtrapolationTimeStep(){
     if (bsData){
         if (bsData->extrapolationTimeStep != extrapolationTimeStep->value()){
             bsData->extrapolationTimeStep = extrapolationTimeStep->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("EvaluateHandleModifierUI::setExtrapolationTimeStep(): The data is NULL!!"));
@@ -241,7 +241,7 @@ void EvaluateHandleModifierUI::setHandleChangeSpeed(){
     if (bsData){
         if (bsData->handleChangeSpeed != handleChangeSpeed->value()){
             bsData->handleChangeSpeed = handleChangeSpeed->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("EvaluateHandleModifierUI::setHandleChangeSpeed(): The data is NULL!!"));
@@ -251,7 +251,7 @@ void EvaluateHandleModifierUI::setHandleChangeSpeed(){
 void EvaluateHandleModifierUI::setHandleChangeMode(int index){
     if (bsData){
         bsData->handleChangeMode = bsData->HandleChangeMode.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("EvaluateHandleModifierUI::setHandleChangeMode(): The data is NULL!!"));
     }
@@ -394,7 +394,7 @@ bool EvaluateHandleModifierUI::setBinding(int index, int row, const QString &var
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -454,7 +454,7 @@ void EvaluateHandleModifierUI::setBindingVariable(int index, const QString &name
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("EvaluateHandleModifierUI::setBindingVariable(): The data is NULL!!"));
     }

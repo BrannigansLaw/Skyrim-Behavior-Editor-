@@ -118,7 +118,7 @@ void BSOffsetAnimationGeneratorUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
@@ -130,7 +130,7 @@ void BSOffsetAnimationGeneratorUI::setFOffsetVariable(){
     if (bsData){
         if (bsData->fOffsetVariable != fOffsetVariable->value()){
             bsData->fOffsetVariable = fOffsetVariable->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSOffsetAnimationGeneratorUI::setFOffsetVariable(): The data is NULL!!"));
@@ -141,7 +141,7 @@ void BSOffsetAnimationGeneratorUI::setFOffsetRangeStart(){
     if (bsData){
         if (bsData->fOffsetRangeStart != fOffsetRangeStart->value()){
             bsData->fOffsetRangeStart = fOffsetRangeStart->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSOffsetAnimationGeneratorUI::setFOffsetRangeStart(): The data is NULL!!"));
@@ -152,7 +152,7 @@ void BSOffsetAnimationGeneratorUI::setFOffsetRangeEnd(){
     if (bsData){
         if (bsData->fOffsetRangeEnd != fOffsetRangeEnd->value()){
             bsData->fOffsetRangeEnd = fOffsetRangeEnd->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSOffsetAnimationGeneratorUI::setFOffsetRangeEnd(): The data is NULL!!"));
@@ -181,7 +181,7 @@ bool BSOffsetAnimationGeneratorUI::setBinding(int index, int row, const QString 
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -217,7 +217,7 @@ void BSOffsetAnimationGeneratorUI::setBindingVariable(int index, const QString &
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSOffsetAnimationGeneratorUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -323,7 +323,7 @@ void BSOffsetAnimationGeneratorUI::setGenerator(int index, const QString & name)
             }
             behaviorView->removeGeneratorData();
             table->item(row, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qFatal("BSOffsetAnimationGeneratorUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));
         }

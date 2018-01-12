@@ -122,7 +122,7 @@ void BSModifyOnceModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
@@ -164,7 +164,7 @@ void BSModifyOnceModifierUI::setModifier(int index, const QString &name){
             }
             behaviorView->removeModifierData();
             table->item(row, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qFatal("BSModifyOnceModifierUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));
         }
@@ -207,7 +207,7 @@ void BSModifyOnceModifierUI::setBindingVariable(int index, const QString & name)
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSModifyOnceModifierUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -235,7 +235,7 @@ bool BSModifyOnceModifierUI::setBinding(int index, int row, const QString & vari
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }

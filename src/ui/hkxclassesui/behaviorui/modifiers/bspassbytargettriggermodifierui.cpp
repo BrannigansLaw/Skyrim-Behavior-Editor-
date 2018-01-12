@@ -167,7 +167,7 @@ void BSPassByTargetTriggerModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -178,7 +178,7 @@ void BSPassByTargetTriggerModifierUI::setName(){
 void BSPassByTargetTriggerModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSPassByTargetTriggerModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -188,7 +188,7 @@ void BSPassByTargetTriggerModifierUI::setTargetPosition(){
     if (bsData){
         if (bsData->targetPosition != targetPosition->value()){
             bsData->targetPosition = targetPosition->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSPassByTargetTriggerModifierUI::settargetPosition(): The data is NULL!!"));
@@ -199,7 +199,7 @@ void BSPassByTargetTriggerModifierUI::setRadius(){
     if (bsData){
         if (bsData->radius != radius->value()){
             bsData->radius = radius->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSPassByTargetTriggerModifierUI::setradius(): The data is NULL!!"));
@@ -210,7 +210,7 @@ void BSPassByTargetTriggerModifierUI::setMovementDirection(){
     if (bsData){
         if (bsData->movementDirection != movementDirection->value()){
             bsData->movementDirection = movementDirection->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSPassByTargetTriggerModifierUI::setmovementDirection(): The data is NULL!!"));
@@ -223,7 +223,7 @@ void BSPassByTargetTriggerModifierUI::setTriggerEventId(int index, const QString
         if (bsData->triggerEvent.id != index){
             bsData->triggerEvent.id = index;
             table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSPassByTargetTriggerModifierUI::settriggerEventId(): The data is NULL!!"));
@@ -245,7 +245,7 @@ void BSPassByTargetTriggerModifierUI::setTriggerEventPayload(){
         }else{
             bsData->triggerEvent.payload = HkxSharedPtr();
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSPassByTargetTriggerModifierUI::settriggerEventPayload(): The data is NULL!!"));
     }
@@ -371,7 +371,7 @@ bool BSPassByTargetTriggerModifierUI::setBinding(int index, int row, const QStri
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -413,7 +413,7 @@ void BSPassByTargetTriggerModifierUI::setBindingVariable(int index, const QStrin
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSPassByTargetTriggerModifierUI::setBindingVariable(): The data is NULL!!"));
     }

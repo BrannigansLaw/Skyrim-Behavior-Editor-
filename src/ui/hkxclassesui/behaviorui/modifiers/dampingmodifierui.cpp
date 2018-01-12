@@ -247,7 +247,7 @@ void DampingModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -258,7 +258,7 @@ void DampingModifierUI::setName(){
 void DampingModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("DampingModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -268,7 +268,7 @@ void DampingModifierUI::setKP(){
     if (bsData){
         if (bsData->kP != kP->value()){
             bsData->kP = kP->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("DampingModifierUI::setkP(): The data is NULL!!"));
@@ -279,7 +279,7 @@ void DampingModifierUI::setKI(){
     if (bsData){
         if (bsData->kI != kI->value()){
             bsData->kI = kI->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("DampingModifierUI::setkI(): The data is NULL!!"));
@@ -290,7 +290,7 @@ void DampingModifierUI::setKD(){
     if (bsData){
         if (bsData->kD != kD->value()){
             bsData->kD = kD->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("DampingModifierUI::setkD(): The data is NULL!!"));
@@ -300,7 +300,7 @@ void DampingModifierUI::setKD(){
 void DampingModifierUI::setEnableScalarDamping(){
     if (bsData){
         bsData->enableScalarDamping = enableScalarDamping->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("DampingModifierUI::setenableScalarDamping(): The data is NULL!!"));
     }
@@ -309,7 +309,7 @@ void DampingModifierUI::setEnableScalarDamping(){
 void DampingModifierUI::setEnableVectorDamping(){
     if (bsData){
         bsData->enableVectorDamping = enableVectorDamping->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("DampingModifierUI::setenableVectorDamping(): The data is NULL!!"));
     }
@@ -319,7 +319,7 @@ void DampingModifierUI::setRawValue(){
     if (bsData){
         if (bsData->rawValue != rawValue->value()){
             bsData->rawValue = rawValue->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("DampingModifierUI::setrawValue(): The data is NULL!!"));
@@ -330,7 +330,7 @@ void DampingModifierUI::setDampedValue(){
     if (bsData){
         if (bsData->dampedValue != dampedValue->value()){
             bsData->dampedValue = dampedValue->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("DampingModifierUI::setdampedValue(): The data is NULL!!"));
@@ -341,7 +341,7 @@ void DampingModifierUI::setRawVector(){
     if (bsData){
         if (bsData->rawVector != rawVector->value()){
             bsData->rawVector = rawVector->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("DampingModifierUI::setrawVector(): The data is NULL!!"));
@@ -352,7 +352,7 @@ void DampingModifierUI::setDampedVector(){
     if (bsData){
         if (bsData->dampedVector != dampedVector->value()){
             bsData->dampedVector = dampedVector->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("DampingModifierUI::setdampedVector(): The data is NULL!!"));
@@ -363,7 +363,7 @@ void DampingModifierUI::setVecErrorSum(){
     if (bsData){
         if (bsData->vecErrorSum != vecErrorSum->value()){
             bsData->vecErrorSum = vecErrorSum->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("DampingModifierUI::setvecErrorSum(): The data is NULL!!"));
@@ -374,7 +374,7 @@ void DampingModifierUI::setVecPreviousError(){
     if (bsData){
         if (bsData->vecPreviousError != vecPreviousError->value()){
             bsData->vecPreviousError = vecPreviousError->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("DampingModifierUI::setvecPreviousError(): The data is NULL!!"));
@@ -385,7 +385,7 @@ void DampingModifierUI::setErrorSum(){
     if (bsData){
         if (bsData->errorSum != errorSum->value()){
             bsData->errorSum = errorSum->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("DampingModifierUI::seterrorSum(): The data is NULL!!"));
@@ -396,7 +396,7 @@ void DampingModifierUI::setPreviousError(){
     if (bsData){
         if (bsData->previousError != previousError->value()){
             bsData->previousError = previousError->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("DampingModifierUI::setpreviousError(): The data is NULL!!"));
@@ -610,7 +610,7 @@ bool DampingModifierUI::setBinding(int index, int row, const QString &variableNa
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -712,7 +712,7 @@ void DampingModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("DampingModifierUI::setBindingVariable(): The data is NULL!!"));
     }

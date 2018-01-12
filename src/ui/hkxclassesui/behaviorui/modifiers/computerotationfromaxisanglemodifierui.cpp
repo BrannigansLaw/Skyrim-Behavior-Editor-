@@ -137,7 +137,7 @@ void ComputeRotationFromAxisAngleModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -148,7 +148,7 @@ void ComputeRotationFromAxisAngleModifierUI::setName(){
 void ComputeRotationFromAxisAngleModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ComputeRotationFromAxisAngleModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -158,7 +158,7 @@ void ComputeRotationFromAxisAngleModifierUI::setRotationOut(){
     if (bsData){
         if (bsData->rotationOut != rotationOut->value()){
             bsData->rotationOut = rotationOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ComputeRotationFromAxisAngleModifierUI::setRotationOut(): The data is NULL!!"));
@@ -169,7 +169,7 @@ void ComputeRotationFromAxisAngleModifierUI::setAxis(){
     if (bsData){
         if (bsData->axis != axis->value()){
             bsData->axis = axis->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ComputeRotationFromAxisAngleModifierUI::setaxis(): The data is NULL!!"));
@@ -180,7 +180,7 @@ void ComputeRotationFromAxisAngleModifierUI::setAngleDegrees(){
     if (bsData){
         if (bsData->angleDegrees != angleDegrees->value()){
             bsData->angleDegrees = angleDegrees->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ComputeRotationFromAxisAngleModifierUI::setangleDegrees(): The data is NULL!!"));
@@ -294,7 +294,7 @@ bool ComputeRotationFromAxisAngleModifierUI::setBinding(int index, int row, cons
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -336,7 +336,7 @@ void ComputeRotationFromAxisAngleModifierUI::setBindingVariable(int index, const
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ComputeRotationFromAxisAngleModifierUI::setBindingVariable(): The data is NULL!!"));
     }

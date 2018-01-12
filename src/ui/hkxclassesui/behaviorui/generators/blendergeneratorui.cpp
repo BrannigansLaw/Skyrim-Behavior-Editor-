@@ -354,7 +354,7 @@ bool BlenderGeneratorUI::setBinding(int index, int row, const QString & variable
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -408,7 +408,7 @@ void BlenderGeneratorUI::setBindingVariable(int index, const QString & name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BlenderGeneratorUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -420,7 +420,7 @@ void BlenderGeneratorUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BlenderGeneratorUI::setName(): The data is NULL!!"));
@@ -431,7 +431,7 @@ void BlenderGeneratorUI::setReferencePoseWeightThreshold(){
     if (bsData){
         if (bsData->referencePoseWeightThreshold != referencePoseWeightThreshold->value()){
             bsData->referencePoseWeightThreshold = referencePoseWeightThreshold->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BlenderGeneratorUI::setReferencePoseWeightThreshold(): The data is NULL!!"));
@@ -442,7 +442,7 @@ void BlenderGeneratorUI::setBlendParameter(){
     if (bsData){
         if (bsData->blendParameter != blendParameter->value()){
             bsData->blendParameter = blendParameter->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BlenderGeneratorUI::setBlendParameter(): The data is NULL!!"));
@@ -453,7 +453,7 @@ void BlenderGeneratorUI::setMinCyclicBlendParameter(){
     if (bsData){
         if (bsData->minCyclicBlendParameter != minCyclicBlendParameter->value()){
             bsData->minCyclicBlendParameter = minCyclicBlendParameter->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BlenderGeneratorUI::setMinCyclicBlendParameter(): The data is NULL!!"));
@@ -464,7 +464,7 @@ void BlenderGeneratorUI::setMaxCyclicBlendParameter(){
     if (bsData){
         if (bsData->maxCyclicBlendParameter != maxCyclicBlendParameter->value()){
             bsData->maxCyclicBlendParameter = maxCyclicBlendParameter->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BlenderGeneratorUI::setMaxCyclicBlendParameter(): The data is NULL!!"));
@@ -475,7 +475,7 @@ void BlenderGeneratorUI::setIndexOfSyncMasterChild(){
     if (bsData){
         if (bsData->indexOfSyncMasterChild != indexOfSyncMasterChild->value()){
             bsData->indexOfSyncMasterChild = indexOfSyncMasterChild->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BlenderGeneratorUI::setIndexOfSyncMasterChild(): The data is NULL!!"));
@@ -599,7 +599,7 @@ void BlenderGeneratorUI::setFlagForceDensePose(){
 void BlenderGeneratorUI::setSubtractLastChild(){
     if (bsData){
         bsData->subtractLastChild = subtractLastChild->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BlenderGeneratorUI::setSubtractLastChild(): The data is NULL!!"));
     }
@@ -616,7 +616,7 @@ void BlenderGeneratorUI::swapGeneratorIndices(int index1, int index2){
             }else{
                 (qFatal("BlenderGeneratorUI::swapGeneratorIndices(): No item selected!!"));
             }
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("BlenderGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!"));
         }

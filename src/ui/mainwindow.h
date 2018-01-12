@@ -100,6 +100,7 @@ private slots:
     void openPackedProject();
     void openUnpackedProject();
     void openBehaviorFile(const QModelIndex & index);
+    void openAnimationFile(const QString &animationname);
     void expandBranches();
     void collapseBranches();
     void refocus();

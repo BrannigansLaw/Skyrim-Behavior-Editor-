@@ -249,7 +249,7 @@ void BSEventOnFalseToTrueModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -260,7 +260,7 @@ void BSEventOnFalseToTrueModifierUI::setName(){
 void BSEventOnFalseToTrueModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventOnFalseToTrueModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -269,7 +269,7 @@ void BSEventOnFalseToTrueModifierUI::setEnable(){
 void BSEventOnFalseToTrueModifierUI::setEnableEvent1(){
     if (bsData){
         bsData->bEnableEvent1 = bEnableEvent1->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventOnFalseToTrueModifierUI::setbEnableEvent1(): The data is NULL!!"));
     }
@@ -278,7 +278,7 @@ void BSEventOnFalseToTrueModifierUI::setEnableEvent1(){
 void BSEventOnFalseToTrueModifierUI::setVariableToTest1(){
     if (bsData){
         bsData->bVariableToTest1 = bVariableToTest1->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventOnFalseToTrueModifierUI::setbVariableToTest1(): The data is NULL!!"));
     }
@@ -290,7 +290,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend1Id(int index, const QString 
         if (bsData->eventToSend1.id != index){
             bsData->eventToSend1.id = index;
             table->item(EVENT_TO_SEND_1_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSEventOnFalseToTrueModifierUI::seteventToSend1Id(): The data is NULL!!"));
@@ -312,7 +312,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend1Payload(){
         }else{
             bsData->eventToSend1.payload = HkxSharedPtr();
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventOnFalseToTrueModifierUI::seteventToSend1Payload(): The data is NULL!!"));
     }
@@ -321,7 +321,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend1Payload(){
 void BSEventOnFalseToTrueModifierUI::setEnableEvent2(){
     if (bsData){
         bsData->bEnableEvent2 = bEnableEvent2->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventOnFalseToTrueModifierUI::setbEnableEvent2(): The data is NULL!!"));
     }
@@ -330,7 +330,7 @@ void BSEventOnFalseToTrueModifierUI::setEnableEvent2(){
 void BSEventOnFalseToTrueModifierUI::setVariableToTest2(){
     if (bsData){
         bsData->bVariableToTest2 = bVariableToTest2->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventOnFalseToTrueModifierUI::setbVariableToTest2(): The data is NULL!!"));
     }
@@ -342,7 +342,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend2Id(int index, const QString 
         if (bsData->eventToSend2.id != index){
             bsData->eventToSend2.id = index;
             table->item(EVENT_TO_SEND_2_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSEventOnFalseToTrueModifierUI::seteventToSend2Id(): The data is NULL!!"));
@@ -364,7 +364,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend2Payload(){
         }else{
             bsData->eventToSend2.payload = HkxSharedPtr();
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventOnFalseToTrueModifierUI::setEventToSend2Payload(): The data is NULL!!"));
     }
@@ -373,7 +373,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend2Payload(){
 void BSEventOnFalseToTrueModifierUI::setEnableEvent3(){
     if (bsData){
         bsData->bEnableEvent3 = bEnableEvent3->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventOnFalseToTrueModifierUI::setbEnableEvent3(): The data is NULL!!"));
     }
@@ -382,7 +382,7 @@ void BSEventOnFalseToTrueModifierUI::setEnableEvent3(){
 void BSEventOnFalseToTrueModifierUI::setVariableToTest3(){
     if (bsData){
         bsData->bVariableToTest3 = bVariableToTest3->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventOnFalseToTrueModifierUI::setbVariableToTest3(): The data is NULL!!"));
     }
@@ -394,7 +394,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend3Id(int index, const QString 
         if (bsData->eventToSend3.id != index){
             bsData->eventToSend3.id = index;
             table->item(EVENT_TO_SEND_3_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSEventOnFalseToTrueModifierUI::seteventToSend3Id(): The data is NULL!!"));
@@ -416,7 +416,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend3Payload(){
         }else{
             bsData->eventToSend3.payload = HkxSharedPtr();
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventOnFalseToTrueModifierUI::setEventToSend3Payload(): The data is NULL!!"));
     }
@@ -600,7 +600,7 @@ bool BSEventOnFalseToTrueModifierUI::setBinding(int index, int row, const QStrin
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -660,7 +660,7 @@ void BSEventOnFalseToTrueModifierUI::setBindingVariable(int index, const QString
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventOnFalseToTrueModifierUI::setBindingVariable(): The data is NULL!!"));
     }

@@ -146,7 +146,7 @@ void ClipTriggerUI::setEventId(int index, const QString & name){
             bsData->event.id = index;
             file->setEventNameForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, index);
             table->item(EVENT_ROW, VALUE_COLUMN)->setText(name);
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("ClipTriggerUI::setEventId(): Behavior file or event data is null!!!"));
@@ -172,7 +172,7 @@ void ClipTriggerUI::setEventPayload(){
         }else{
             bsData->event.payload = HkxSharedPtr();
         }
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("ClipTriggerUI::setEventPayload(): Behavior file or event data is null!!!"));
     }
@@ -183,7 +183,7 @@ void ClipTriggerUI::setLocalTime(){
         if (bsData->localTime != localTime->value()){
             bsData->localTime = localTime->value();
             file->setLocalTimeForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, localTime->value());
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("ClipTriggerUI::setLocalTime(): Behavior file or event data is null!!!"));
@@ -194,7 +194,7 @@ void ClipTriggerUI::setRelativeToEndOfClip(){
     if (bsData && file){
         if (bsData->relativeToEndOfClip != relativeToEndOfClip->isChecked()){
             bsData->relativeToEndOfClip = relativeToEndOfClip->isChecked();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("ClipTriggerUI::setRelativeToEndOfClip(): Behavior file or event data is null!!!"));
@@ -205,7 +205,7 @@ void ClipTriggerUI::setAcyclic(){
     if (bsData && file){
         if (bsData->acyclic != acyclic->isChecked()){
             bsData->acyclic = acyclic->isChecked();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("ClipTriggerUI::setAcyclic(): Behavior file or event data is null!!!"));
@@ -216,7 +216,7 @@ void ClipTriggerUI::setIsAnnotation(){
     if (bsData && file){
         if (bsData->isAnnotation != isAnnotation->isChecked()){
             bsData->isAnnotation = isAnnotation->isChecked();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("ClipTriggerUI::setIsAnnotation(): Behavior file or event data is null!!!"));

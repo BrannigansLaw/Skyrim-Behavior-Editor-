@@ -11,6 +11,7 @@ class QFile;
 
 class SkyrimAnimationMotionData
 {
+    friend class ProjectFile;
     friend class SkyrimAnimationDataUI;
     friend class ProjectAnimData;
 public:

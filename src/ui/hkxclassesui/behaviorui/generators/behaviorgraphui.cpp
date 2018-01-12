@@ -82,7 +82,7 @@ void BehaviorGraphUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();//Make sure name is valid...
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BehaviorGraphUI::setName(): The data is NULL!!"));
@@ -92,7 +92,7 @@ void BehaviorGraphUI::setName(){
 void BehaviorGraphUI::setVariableMode(int index){
     if (bsData){
         bsData->variableMode = bsData->VariableMode.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BehaviorGraphUI::setVariableMode(): The data is NULL!!"));
     }
@@ -139,7 +139,7 @@ void BehaviorGraphUI::setRootGenerator(int index, const QString &name){
             }
             behaviorView->removeGeneratorData();
             table->item(ROOT_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qFatal("BehaviorGraphUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));
         }

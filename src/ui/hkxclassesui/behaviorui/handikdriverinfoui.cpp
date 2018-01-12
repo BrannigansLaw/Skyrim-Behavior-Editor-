@@ -84,7 +84,7 @@ void HandIkDriverInfoUI::loadData(HkxObject *data){
 void HandIkDriverInfoUI::setFadeInOutCurve(int index){
     if (bsData){
         bsData->fadeInOutCurve = fadeInOutCurve->itemText(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }
 }
 
@@ -104,7 +104,7 @@ void HandIkDriverInfoUI::addHand(){
             table->item(result, 0)->setText("Hand "+QString::number(bsData->hands.size() - 1));
             table->item(result, 1)->setText("hkbHandIkDriverInfoHand");
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }
 }
 

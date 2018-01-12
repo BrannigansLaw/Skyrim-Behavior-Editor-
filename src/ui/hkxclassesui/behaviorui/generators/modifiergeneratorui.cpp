@@ -114,7 +114,7 @@ void ModifierGeneratorUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
@@ -147,7 +147,7 @@ void ModifierGeneratorUI::setModifier(int index, const QString &name){
             }
             behaviorView->removeModifierData();
             table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qFatal("ModifierGeneratorUI::setModifier(): The 'behaviorView' pointer is NULL!!"));
         }
@@ -181,7 +181,7 @@ void ModifierGeneratorUI::setGenerator(int index, const QString & name){
             }
             behaviorView->removeGeneratorData();
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qFatal("ModifierGeneratorUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));
         }

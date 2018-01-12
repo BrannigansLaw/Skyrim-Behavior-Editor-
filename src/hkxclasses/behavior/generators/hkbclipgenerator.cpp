@@ -178,6 +178,21 @@ int hkbClipGenerator::getNumberOfTriggers() const{
     return 0;
 }
 
+QString hkbClipGenerator::getAnimationName() const{
+    return animationName;
+}
+
+SkyrimClipGeneratoData hkbClipGenerator::getClipGeneratorAnimData(ProjectAnimData *parent, uint animationIndex) const{
+    QVector <SkyrimClipTrigger> animTrigs;
+    hkbClipTriggerArray *trigs = static_cast<hkbClipTriggerArray *>(triggers.data());
+    if (trigs){
+        for (int i = 0; i < trigs->triggers.size(); i++){
+            animTrigs.append(SkyrimClipTrigger(trigs->triggers.at(i).localTime, static_cast<BehaviorFile *>(getParentFile())->getAnimationNameAt(trigs->triggers.at(i).event.id)));
+        }
+    }
+    return SkyrimClipGeneratoData(parent, name, animationIndex, playbackSpeed, cropStartAmountLocalTime, cropEndAmountLocalTime, animTrigs);
+}
+
 void hkbClipGenerator::setName(const QString &oldclipname, const QString &newclipname){
     static_cast<BehaviorFile *>(getParentFile())->setClipNameAnimData(oldclipname, newclipname);    //Unsafe...
     name = newclipname;

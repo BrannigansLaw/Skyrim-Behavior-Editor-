@@ -266,7 +266,7 @@ void SenseHandleModifierUI::disconnectSignals(){
 void SenseHandleModifierUI::addRange(){
     if (bsData){
         bsData->ranges.append(hkbSenseHandleModifier::hkRanges());
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
         (qFatal("SenseHandleModifierUI::addRange(): The data is NULL!!"));
@@ -282,7 +282,7 @@ void SenseHandleModifierUI::removeRange(int index){
                 (qWarning("SenseHandleModifierUI::removeExpression(): Invalid row index selected!!"));
                 return;
             }
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             loadDynamicTableRows();
         }else{
             (qWarning("SenseHandleModifierUI::removeExpression(): Ranges is empty!!"));
@@ -459,7 +459,7 @@ bool SenseHandleModifierUI::setBinding(int index, int row, const QString & varia
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -555,7 +555,7 @@ void SenseHandleModifierUI::setBindingVariable(int index, const QString & name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("SenseHandleModifierUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -572,7 +572,7 @@ void SenseHandleModifierUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit modifierNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("SenseHandleModifierUI::setName(): The data is NULL!!"));
@@ -582,7 +582,7 @@ void SenseHandleModifierUI::setName(){
 void SenseHandleModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("SenseHandleModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -592,7 +592,7 @@ void SenseHandleModifierUI::setSensorLocalOffset(){
     if (bsData){
         if (bsData->sensorLocalOffset != sensorLocalOffset->value()){
             bsData->sensorLocalOffset = sensorLocalOffset->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("SenseHandleModifierUI::setSensorLocalOffset(): The data is NULL!!"));
@@ -603,7 +603,7 @@ void SenseHandleModifierUI::setMinDistance(){
     if (bsData){
         if (bsData->minDistance != minDistance->value()){
             bsData->minDistance = minDistance->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("SenseHandleModifierUI::setMinDistance(): The data is NULL!!"));
@@ -614,7 +614,7 @@ void SenseHandleModifierUI::setMaxDistance(){
     if (bsData){
         if (bsData->maxDistance != maxDistance->value()){
             bsData->maxDistance = maxDistance->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("SenseHandleModifierUI::setMaxDistance(): The data is NULL!!"));
@@ -625,7 +625,7 @@ void SenseHandleModifierUI::setDistanceOut(){
     if (bsData){
         if (bsData->distanceOut != distanceOut->value()){
             bsData->distanceOut = distanceOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("SenseHandleModifierUI::setDistanceOut(): The data is NULL!!"));
@@ -635,7 +635,7 @@ void SenseHandleModifierUI::setDistanceOut(){
 void SenseHandleModifierUI::setLocalFrameName(const QString & text){
     if (bsData){
         bsData->localFrameName = text;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("SenseHandleModifierUI::setLocalFrameName(): The data is NULL!!"));
     }
@@ -644,7 +644,7 @@ void SenseHandleModifierUI::setLocalFrameName(const QString & text){
 void SenseHandleModifierUI::setSensorLocalFrameName(const QString & text){
     if (bsData){
         bsData->sensorLocalFrameName = text;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("SenseHandleModifierUI::setSensorLocalFrameName(): The data is NULL!!"));
     }
@@ -653,7 +653,7 @@ void SenseHandleModifierUI::setSensorLocalFrameName(const QString & text){
 void SenseHandleModifierUI::setCollisionFilterInfo(int index){
     if (bsData){
         bsData->collisionFilterInfo = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("SenseHandleModifierUI::setCollisionFilterInfo(): The data is NULL!!"));
     }
@@ -665,7 +665,7 @@ void SenseHandleModifierUI::setSensorRagdollBoneIndex(int index){
         if (bsData->sensorRagdollBoneIndex > -1){   //sensorRagdollBoneIndex and sensorAnimationBoneIndex cannot simultaneously have nonnegative values!!!
             setSensorAnimationBoneIndex(-1);
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("SenseHandleModifierUI::setSensorRagdollBoneIndex(): The data is NULL!!"));
     }
@@ -677,7 +677,7 @@ void SenseHandleModifierUI::setSensorAnimationBoneIndex(int index){
         if (bsData->sensorAnimationBoneIndex > -1){   //sensorRagdollBoneIndex and sensorAnimationBoneIndex cannot simultaneously have nonnegative values!!!
             setSensorRagdollBoneIndex(-1);
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("SenseHandleModifierUI::setSensorAnimationBoneIndex(): The data is NULL!!"));
     }
@@ -686,7 +686,7 @@ void SenseHandleModifierUI::setSensorAnimationBoneIndex(int index){
 void SenseHandleModifierUI::setSensingMode(int index){
     if (bsData){
         bsData->sensingMode = bsData->SensingMode.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("SenseHandleModifierUI::setSensingMode(): The data is NULL!!"));
     }
@@ -695,7 +695,7 @@ void SenseHandleModifierUI::setSensingMode(int index){
 void SenseHandleModifierUI::setExtrapolateSensorPosition(){
     if (bsData){
         bsData->extrapolateSensorPosition = extrapolateSensorPosition->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("SenseHandleModifierUI::setExtrapolateSensorPosition(): The data is NULL!!"));
     }
@@ -704,7 +704,7 @@ void SenseHandleModifierUI::setExtrapolateSensorPosition(){
 void SenseHandleModifierUI::setKeepFirstSensedHandle(){
     if (bsData){
         bsData->keepFirstSensedHandle = keepFirstSensedHandle->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("SenseHandleModifierUI::setKeepFirstSensedHandle(): The data is NULL!!"));
     }
@@ -713,7 +713,7 @@ void SenseHandleModifierUI::setKeepFirstSensedHandle(){
 void SenseHandleModifierUI::setFoundHandleOut(){
     if (bsData){
         bsData->foundHandleOut = foundHandleOut->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("SenseHandleModifierUI::setFoundHandleOut(): The data is NULL!!"));
     }

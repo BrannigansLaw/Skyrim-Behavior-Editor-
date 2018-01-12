@@ -280,7 +280,7 @@ void StateUI::setName(){
     if (bsData){
         if (bsData->name != name->text()){
             bsData->name = name->text();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit stateNameChanged(name->text(), stateIndex);
         }
     }else{
@@ -292,7 +292,7 @@ void StateUI::setStateId(){
     if (bsData){
         if (bsData->setStateId(stateId->value())){
             emit stateIdChanged(stateIndex, bsData->stateId, bsData->name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("StateUI::setStateId(): Another state has the selected state ID!!! The state ID for this state was not changed!!!"));
             disconnect(stateId, SIGNAL(editingFinished()), this, SLOT(setStateId()));
@@ -308,7 +308,7 @@ void StateUI::setProbability(){
     if (bsData){
         if (bsData->probability != probability->value()){
             bsData->probability = probability->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("StateUI::setProbability(): The data is NULL!!"));
@@ -318,7 +318,7 @@ void StateUI::setProbability(){
 void StateUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("StateUI::setEnable(): The data is NULL!!"));
     }
@@ -550,7 +550,7 @@ void StateUI::setGenerator(int index, const QString & name){
             }
             behaviorView->removeGeneratorData();
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit returnToParent(true);
         }else{
             (qFatal("StateUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));

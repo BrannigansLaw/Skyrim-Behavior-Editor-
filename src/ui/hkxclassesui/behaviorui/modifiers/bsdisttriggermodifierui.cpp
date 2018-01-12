@@ -166,7 +166,7 @@ void BSDistTriggerModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -177,7 +177,7 @@ void BSDistTriggerModifierUI::setName(){
 void BSDistTriggerModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSDistTriggerModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -187,7 +187,7 @@ void BSDistTriggerModifierUI::setTargetPosition(){
     if (bsData){
         if (bsData->targetPosition != targetPosition->value()){
             bsData->targetPosition = targetPosition->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDistTriggerModifierUI::settargetPosition(): The data is NULL!!"));
@@ -198,7 +198,7 @@ void BSDistTriggerModifierUI::setDistance(){
     if (bsData){
         if (bsData->distance != distance->value()){
             bsData->distance = distance->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDistTriggerModifierUI::setdistance(): The data is NULL!!"));
@@ -209,7 +209,7 @@ void BSDistTriggerModifierUI::setDistanceTrigger(){
     if (bsData){
         if (bsData->distanceTrigger != distanceTrigger->value()){
             bsData->distanceTrigger = distanceTrigger->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDistTriggerModifierUI::setdistanceTrigger(): The data is NULL!!"));
@@ -222,7 +222,7 @@ void BSDistTriggerModifierUI::setTriggerEventId(int index, const QString & name)
         if (bsData->triggerEvent.id != index){
             bsData->triggerEvent.id = index;
             table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDistTriggerModifierUI::setTriggerEventId(): The data is NULL!!"));
@@ -244,7 +244,7 @@ void BSDistTriggerModifierUI::setTriggerEventPayload(){
         }else{
             bsData->triggerEvent.payload = HkxSharedPtr();
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSDistTriggerModifierUI::setTriggerEventPayload(): The data is NULL!!"));
     }
@@ -370,7 +370,7 @@ bool BSDistTriggerModifierUI::setBinding(int index, int row, const QString &vari
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -412,7 +412,7 @@ void BSDistTriggerModifierUI::setBindingVariable(int index, const QString &name)
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSDistTriggerModifierUI::setBindingVariable(): The data is NULL!!"));
     }

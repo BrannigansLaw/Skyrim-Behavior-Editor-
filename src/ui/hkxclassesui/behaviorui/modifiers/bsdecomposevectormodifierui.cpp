@@ -159,7 +159,7 @@ void BSDecomposeVectorModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -170,7 +170,7 @@ void BSDecomposeVectorModifierUI::setName(){
 void BSDecomposeVectorModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSDecomposeVectorModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -180,7 +180,7 @@ void BSDecomposeVectorModifierUI::setVector(){
     if (bsData){
         if (bsData->vector != vector->value()){
             bsData->vector = vector->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDecomposeVectorModifierUI::setVector(): The data is NULL!!"));
@@ -191,7 +191,7 @@ void BSDecomposeVectorModifierUI::setX(){
     if (bsData){
         if (bsData->x != x->value()){
             bsData->x = x->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDecomposeVectorModifierUI::setX(): The data is NULL!!"));
@@ -202,7 +202,7 @@ void BSDecomposeVectorModifierUI::setY(){
     if (bsData){
         if (bsData->y != y->value()){
             bsData->y = y->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDecomposeVectorModifierUI::setY(): The data is NULL!!"));
@@ -213,7 +213,7 @@ void BSDecomposeVectorModifierUI::setZ(){
     if (bsData){
         if (bsData->z != z->value()){
             bsData->z = z->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDecomposeVectorModifierUI::setZ(): The data is NULL!!"));
@@ -224,7 +224,7 @@ void BSDecomposeVectorModifierUI::setW(){
     if (bsData){
         if (bsData->w != w->value()){
             bsData->w = w->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDecomposeVectorModifierUI::setW(): The data is NULL!!"));
@@ -358,7 +358,7 @@ bool BSDecomposeVectorModifierUI::setBinding(int index, int row, const QString &
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -412,7 +412,7 @@ void BSDecomposeVectorModifierUI::setBindingVariable(int index, const QString &n
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSDecomposeVectorModifierUI::setBindingVariable(): The data is NULL!!"));
     }

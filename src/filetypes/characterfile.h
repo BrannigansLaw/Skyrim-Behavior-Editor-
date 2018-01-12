@@ -5,6 +5,7 @@
 
 class SkeletonFile;
 class hkbCharacterData;
+class ProjectFile;
 
 class CharacterFile: public HkxFile
 {
@@ -15,7 +16,7 @@ class CharacterFile: public HkxFile
     friend class hkRootLevelContainer;
     friend class BehaviorFile;
 public:
-    CharacterFile(MainWindow *window, const QString & name);
+    CharacterFile(MainWindow *window, ProjectFile *projectfile, const QString & name);
     virtual ~CharacterFile();
     bool addObjectToFile(HkxObject *obj, long ref = -1);
     QString getRootObjectReferenceString();
@@ -33,6 +34,9 @@ public:
     QStringList getCharacterPropertyNames() const;
     QStringList getCharacterPropertyTypenames() const;
     hkVariableType getCharacterPropertyTypeAt(int index) const;
+    int getAnimationIndex(const QString & name) const;
+    int getNumberOfAnimations() const;
+    bool isAnimationUsed(const QString & animationname) const;
 protected:
     bool parse();
     bool link();
@@ -47,6 +51,7 @@ private:
     void disableFootIK();
     void disableHandIK();
 private:
+    ProjectFile *project;
     SkeletonFile *skeleton;
     HkxSharedPtr characterData;
     HkxSharedPtr characterPropertyValues;

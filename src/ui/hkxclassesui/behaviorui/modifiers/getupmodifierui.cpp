@@ -184,7 +184,7 @@ void GetUpModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -195,7 +195,7 @@ void GetUpModifierUI::setName(){
 void GetUpModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("GetUpModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -205,7 +205,7 @@ void GetUpModifierUI::setGroundNormal(){
     if (bsData){
         if (bsData->groundNormal != groundNormal->value()){
             bsData->groundNormal = groundNormal->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("GetUpModifierUI::setgroundNormal(): The data is NULL!!"));
@@ -216,7 +216,7 @@ void GetUpModifierUI::setDuration(){
     if (bsData){
         if (bsData->duration != duration->value()){
             bsData->duration = duration->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("GetUpModifierUI::setduration(): The data is NULL!!"));
@@ -227,7 +227,7 @@ void GetUpModifierUI::setAlignWithGroundDuration(){
     if (bsData){
         if (bsData->alignWithGroundDuration != alignWithGroundDuration->value()){
             bsData->alignWithGroundDuration = alignWithGroundDuration->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("GetUpModifierUI::setalignWithGroundDuration(): The data is NULL!!"));
@@ -237,7 +237,7 @@ void GetUpModifierUI::setAlignWithGroundDuration(){
 void GetUpModifierUI::setRootBoneIndex(int index){
     if (bsData){
         bsData->rootBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("GetUpModifierUI::setrootBoneIndex(): The data is NULL!!"));
     }
@@ -246,7 +246,7 @@ void GetUpModifierUI::setRootBoneIndex(int index){
 void GetUpModifierUI::setOtherBoneIndex(int index){
     if (bsData){
         bsData->otherBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("GetUpModifierUI::setotherBoneIndex(): The data is NULL!!"));
     }
@@ -255,7 +255,7 @@ void GetUpModifierUI::setOtherBoneIndex(int index){
 void GetUpModifierUI::setAnotherBoneIndex(int index){
     if (bsData){
         bsData->anotherBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("GetUpModifierUI::setanotherBoneIndex(): The data is NULL!!"));
     }
@@ -398,7 +398,7 @@ bool GetUpModifierUI::setBinding(int index, int row, const QString &variableName
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -458,7 +458,7 @@ void GetUpModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("GetUpModifierUI::setBindingVariable(): The data is NULL!!"));
     }

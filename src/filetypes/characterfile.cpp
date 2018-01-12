@@ -1,5 +1,6 @@
 #include "characterfile.h"
 #include "skeletonfile.h"
+#include "projectfile.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/xml/hkxxmlwriter.h"
 #include "src/ui/mainwindow.h"
@@ -12,8 +13,9 @@
 #include "src/hkxclasses/behavior/hkbmirroredskeletoninfo.h"
 #include "src/hkxclasses/hkrootlevelcontainer.h"
 
-CharacterFile::CharacterFile(MainWindow *window, const QString & name)
+CharacterFile::CharacterFile(MainWindow *window, ProjectFile *projectfile, const QString & name)
     : HkxFile(window, name),
+      project(projectfile),
       skeleton(NULL),
       largestRef(0)
 {
@@ -131,6 +133,24 @@ QStringList CharacterFile::getCharacterPropertyTypenames() const{
 
 hkVariableType CharacterFile::getCharacterPropertyTypeAt(int index) const{
     return static_cast<hkbCharacterData *>(characterData.data())->getCharacterPropertyTypeAt(index);
+}
+
+int CharacterFile::getAnimationIndex(const QString &name) const{
+    if (stringData.data() && stringData->getSignature() == HKB_CHARACTER_STRING_DATA){
+        return static_cast<hkbCharacterStringData *>(stringData.data())->getAnimationIndex(name);
+    }
+    return -1;
+}
+
+int CharacterFile::getNumberOfAnimations() const{
+    if (stringData.data() && stringData->getSignature() == HKB_CHARACTER_STRING_DATA){
+        return static_cast<hkbCharacterStringData *>(stringData.data())->animationNames.size();
+    }
+    return -1;
+}
+
+bool CharacterFile::isAnimationUsed(const QString &animationname) const{
+    return project->isAnimationUsed(animationname);
 }
 
 void CharacterFile::setSkeletonFile(SkeletonFile *skel){
@@ -287,7 +307,7 @@ void CharacterFile::addFootIK(){
         }else{
             static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo = footIkDriverInfo;
         }
-        toggleChanged(true);
+        setIsChanged(true);
     }
 }
 
@@ -301,21 +321,21 @@ void CharacterFile::addHandIK(){
         }else{
             static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo = handIkDriverInfo;
         }
-        toggleChanged(true);
+        setIsChanged(true);
     }
 }
 
 void CharacterFile::disableFootIK(){
     if (characterData.data() && !static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo.data()){
         static_cast<hkbCharacterData *>(characterData.data())->footIkDriverInfo = HkxSharedPtr();
-        toggleChanged(true);
+        setIsChanged(true);
     }
 }
 
 void CharacterFile::disableHandIK(){
     if (characterData.data() && !static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo.data()){
         static_cast<hkbCharacterData *>(characterData.data())->handIkDriverInfo = HkxSharedPtr();
-        toggleChanged(true);
+        setIsChanged(true);
     }
 }
 

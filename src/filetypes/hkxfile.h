@@ -23,7 +23,7 @@ public:
     virtual bool addObjectToFile(HkxObject *obj, long ref) = 0;
     QString getRootObjectReferenceString();
     bool getIsChanged() const;
-    void toggleChanged(bool wasEdited);
+    void setIsChanged(bool wasEdited);
 protected:
     MainWindow *getUi() const;
     HkxSharedPtr & getRootObject();

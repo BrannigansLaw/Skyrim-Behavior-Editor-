@@ -294,7 +294,7 @@ void TransitionsUI::setTriggerIntervalEnterEventId(int index, const QString &nam
                 bsData->flags.append("|FLAG_USE_TRIGGER_INTERVAL");
             }
         }
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::setTriggerIntervalEnterEventId(): The data is NULL!!"));
     }
@@ -311,7 +311,7 @@ void TransitionsUI::setTriggerIntervalExitEventId(int index, const QString &name
                 bsData->flags.append("|FLAG_USE_TRIGGER_INTERVAL");
             }
         }
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::setTriggerIntervalExitEventId(): The data is NULL!!"));
     }
@@ -320,7 +320,7 @@ void TransitionsUI::setTriggerIntervalExitEventId(int index, const QString &name
 void TransitionsUI::setTriggerIntervalEnterTime(){
     if (bsData){
         bsData->triggerInterval.enterTime = enterTimeTI->value();
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::setTriggerIntervalEnterTime(): The data is NULL!!"));
     }
@@ -329,7 +329,7 @@ void TransitionsUI::setTriggerIntervalEnterTime(){
 void TransitionsUI::setTriggerIntervalExitTime(){
     if (bsData){
         bsData->triggerInterval.exitTime = exitTimeTI->value();
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::setTriggerIntervalExitTime(): The data is NULL!!"));
     }
@@ -346,7 +346,7 @@ void TransitionsUI::setInitiateIntervalEnterEventId(int index, const QString &na
                 bsData->flags.append("|FLAG_USE_INITIATE_INTERVAL");
             }
         }
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::setInitiateIntervalEnterEventId(): The data is NULL!!"));
     }
@@ -363,7 +363,7 @@ void TransitionsUI::setInitiateIntervalExitEventId(int index, const QString &nam
                 bsData->flags.append("|FLAG_USE_INITIATE_INTERVAL");
             }
         }
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::setInitiateIntervalExitEventId(): The data is NULL!!"));
     }
@@ -372,7 +372,7 @@ void TransitionsUI::setInitiateIntervalExitEventId(int index, const QString &nam
 void TransitionsUI::setInitiateIntervalEnterTime(){
     if (bsData){
         bsData->initiateInterval.enterTime = enterTimeII->value();
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::setInitiateIntervalEnterTime(): The data is NULL!!"));
     }
@@ -381,7 +381,7 @@ void TransitionsUI::setInitiateIntervalEnterTime(){
 void TransitionsUI::setInitiateIntervalExitTime(){
     if (bsData){
         bsData->initiateInterval.exitTime = exitTimeII->value();
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::setInitiateIntervalExitTime(): The data is NULL!!"));
     }
@@ -428,7 +428,7 @@ void TransitionsUI::setCondition(){
                 bsData->flags.append("|FLAG_DISABLE_CONDITION");
             }
         }
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::setCondition(): The data or parent object is NULL!!"));
     }
@@ -442,7 +442,7 @@ void TransitionsUI::setEventId(int index, const QString &name){
         }else{
             (qFatal("TransitionsUI::setEventId(): The event name is NULL!!"));
         }
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::setEventId(): The data is NULL!!"));
     }
@@ -465,7 +465,7 @@ void TransitionsUI::setToStateId(const QString &name){
         }else{
             (qFatal("TransitionsUI::setToStateId(): The event name is NULL!!"));
         }
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::setToStateId(): The data or parent object is NULL!!"));
     }
@@ -478,7 +478,7 @@ void TransitionsUI::setFromNestedStateId(const QString &name){
         }else{
             (qFatal("TransitionsUI::setFromNestedStateId(): The event name is NULL!!"));
         }
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::setFromNestedStateId(): The data or parent object is NULL!!"));
     }
@@ -492,7 +492,7 @@ void TransitionsUI::setToNestedStateId(const QString &name){
         }else{
             (qFatal("TransitionsUI::setToNestedStateId(): The event name is NULL!!"));
         }
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::setToNestedStateId(): The data or parent object is NULL!!"));
     }
@@ -501,7 +501,7 @@ void TransitionsUI::setToNestedStateId(const QString &name){
 void TransitionsUI::setPriority(){
     if (bsData){
         bsData->priority = priority->value();
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::setPriority(): The data is NULL!!"));
     }
@@ -522,7 +522,7 @@ void TransitionsUI::toggleGlobalWildcardFlag(){
                 bsData->flags.remove("|FLAG_IS_GLOBAL_WILDCARD");
             }
         }
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::toggleGlobalWildcardFlag(): The data is NULL!!"));
     }
@@ -545,7 +545,7 @@ void TransitionsUI::toggleUseNestedStateFlag(){
             }
             toNestedStateId->setDisabled(true);
         }
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::toggleUseNestedStateFlag(): The data is NULL!!"));
     }
@@ -566,7 +566,7 @@ void TransitionsUI::toggleDisallowRandomTransitionFlag(){
                 bsData->flags.remove("|FLAG_DISALLOW_RANDOM_TRANSITION");
             }
         }
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::toggleDisallowRandomTransitionFlag(): The data is NULL!!"));
     }
@@ -587,7 +587,7 @@ void TransitionsUI::toggleDisallowReturnToStateFlag(){
                 bsData->flags.remove("|FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE");
             }
         }
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::toggleDisallowReturnToStateFlag(): The data is NULL!!"));
     }
@@ -608,7 +608,7 @@ void TransitionsUI::toggleAbutEndStateFlag(){
                 bsData->flags.remove("|FLAG_ABUT_AT_END_OF_FROM_GENERATOR");
             }
         }
-        parentObj->getParentFile()->toggleChanged(true);
+        parentObj->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TransitionsUI::toggleAbutEndStateFlag(): The data is NULL!!"));
     }

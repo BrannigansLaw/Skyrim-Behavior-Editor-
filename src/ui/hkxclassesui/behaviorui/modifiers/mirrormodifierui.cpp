@@ -115,7 +115,7 @@ void MirrorModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -126,7 +126,7 @@ void MirrorModifierUI::setName(){
 void MirrorModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("MirrorModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -135,7 +135,7 @@ void MirrorModifierUI::setEnable(){
 void MirrorModifierUI::setIsAdditive(){
     if (bsData){
         bsData->isAdditive = isAdditive->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("MirrorModifierUI::setIsAdditive(): The data is NULL!!"));
     }
@@ -228,7 +228,7 @@ bool MirrorModifierUI::setBinding(int index, int row, const QString &variableNam
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -258,7 +258,7 @@ void MirrorModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("MirrorModifierUI::setBindingVariable(): The data is NULL!!"));
     }

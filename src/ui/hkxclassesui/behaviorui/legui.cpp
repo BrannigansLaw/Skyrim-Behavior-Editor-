@@ -198,7 +198,7 @@ bool LegUI::setBinding(int index, int row, const QString & variableName, const Q
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -240,7 +240,7 @@ void LegUI::setBindingVariable(int index, const QString & name){
         default:
             return;
         }
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("LegUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -252,7 +252,7 @@ void LegUI::setEventId(int index, const QString & name){
         if (bsData->id != index){
             bsData->id = index;
             table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("LegUI::setEvent(): Behavior file or event data is null!!!"));
@@ -278,7 +278,7 @@ void LegUI::setEventPayload(){
         }else{
             bsData->payload = HkxSharedPtr();
         }
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("LegUI::setEventPayload(): Behavior file or event data is null!!!"));
     }
@@ -288,7 +288,7 @@ void LegUI::setGroundPosition(){
     if (bsData && file){
         if (bsData->groundPosition != groundPosition->value()){
             bsData->groundPosition = groundPosition->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("LegUI::setGroundPosition(): Behavior file or event data is null!!!"));
@@ -299,7 +299,7 @@ void LegUI::setVerticalError(){
     if (bsData && file){
         if (bsData->verticalError != verticalError->value()){
             bsData->verticalError = verticalError->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("LegUI::setverticalError(): Behavior file or event data is null!!!"));
@@ -310,7 +310,7 @@ void LegUI::setHitSomething(){
     if (bsData && file){
         if (bsData->hitSomething != hitSomething->isChecked()){
             bsData->hitSomething = hitSomething->isChecked();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("LegUI::sethitSomething(): Behavior file or event data is null!!!"));
@@ -321,7 +321,7 @@ void LegUI::setIsPlantedMS(){
     if (bsData && file){
         if (bsData->isPlantedMS != isPlantedMS->isChecked()){
             bsData->isPlantedMS = isPlantedMS->isChecked();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("LegUI::setIsPlantedMS(): Behavior file or event data is null!!!"));

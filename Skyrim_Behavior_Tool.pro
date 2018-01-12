@@ -447,7 +447,9 @@ SOURCES += \
     src/animSetData/animcacheclipinfo.cpp \
     src/animSetData/animcachevariable.cpp \
     src/animSetData/animcacheanimsetdata.cpp \
-    src/animSetData/animcacheprojectdata.cpp
+    src/animSetData/animcacheprojectdata.cpp \
+    src/filetypes/animationfile.cpp \
+    src/ui/hkxclassesui/animationcacheui.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -870,4 +872,6 @@ HEADERS  += \
     src/animSetData/animcacheclipinfo.h \
     src/animSetData/animcachevariable.h \
     src/animSetData/animcacheanimsetdata.h \
-    src/animSetData/animcacheprojectdata.h
+    src/animSetData/animcacheprojectdata.h \
+    src/filetypes/animationfile.h \
+    src/ui/hkxclassesui/animationcacheui.h

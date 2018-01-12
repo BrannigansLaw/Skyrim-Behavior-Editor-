@@ -172,7 +172,7 @@ void BSCyclicBlendTransitionGeneratorUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSCyclicBlendTransitionGeneratorUI::setName(): The data is NULL!!"));
@@ -183,7 +183,7 @@ void BSCyclicBlendTransitionGeneratorUI::setBlendParameter(){
     if (bsData){
         if (bsData->fBlendParameter != fBlendParameter->value()){
             bsData->fBlendParameter = fBlendParameter->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSOffsetAnimationGeneratorUI::setBlendParameter(): The data is NULL!!"));
@@ -194,7 +194,7 @@ void BSCyclicBlendTransitionGeneratorUI::setTransitionDuration(){
     if (bsData){
         if (bsData->fTransitionDuration != fTransitionDuration->value()){
             bsData->fTransitionDuration = fTransitionDuration->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSOffsetAnimationGeneratorUI::setTransitionDuration(): The data is NULL!!"));
@@ -204,7 +204,7 @@ void BSCyclicBlendTransitionGeneratorUI::setTransitionDuration(){
 void BSCyclicBlendTransitionGeneratorUI::setBlendCurve(int index){
     if (bsData){
         bsData->eBlendCurve = bsData->BlendCurve.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSCyclicBlendTransitionGeneratorUI::setBlendCurve(): The data is NULL!!"));
     }
@@ -225,7 +225,7 @@ void BSCyclicBlendTransitionGeneratorUI::toggleEventToFreezeBlendValue(bool enab
             bsData->eventToFreezeBlendValue.id = -1;
             bsData->eventToFreezeBlendValue.payload = HkxSharedPtr();
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSCyclicBlendTransitionGeneratorUI::toggleEventToFreezeBlendValue(): The data is NULL!!"));
@@ -247,7 +247,7 @@ void BSCyclicBlendTransitionGeneratorUI::toggleEventToCrossBlend(bool enable){
             bsData->eventToCrossBlend.id = -1;
             bsData->eventToCrossBlend.payload = HkxSharedPtr();
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSCyclicBlendTransitionGeneratorUI::toggleEventToCrossBlend(): The data is NULL!!"));
@@ -330,7 +330,7 @@ void BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(int index, const QS
             }
             behaviorView->removeGeneratorData();
             table->item(BLENDER_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qFatal("BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(): The 'behaviorView' pointer is NULL!!"));
         }
@@ -382,7 +382,7 @@ bool BSCyclicBlendTransitionGeneratorUI::setBinding(int index, int row, const QS
                 varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -413,7 +413,7 @@ void BSCyclicBlendTransitionGeneratorUI::setBindingVariable(int index, const QSt
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSCyclicBlendTransitionGeneratorUI::setBindingVariable(): The 'bsData' pointer is NULL!!"));
     }

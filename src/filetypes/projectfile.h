@@ -10,6 +10,7 @@ class BehaviorFile;
 
 class ProjectFile: public HkxFile
 {
+    friend class CacheWidget;
     friend class MainWindow;
     friend class ProjectUI;
     friend class hkbProjectData;
@@ -37,10 +38,15 @@ public:
     void setCropEndAmountLocalTimeAnimData(const QString & clipGenName, qreal time);
     void appendClipTriggerToAnimData(const QString & clipGenName, const QString & eventname);
     void removeClipTriggerToAnimDataAt(const QString & clipGenName, int index);
+    int getAnimationIndex(const QString & name) const;
+    bool isAnimationUsed(const QString & animationname);
 protected:
     bool parse();
     bool link();
     //SkyrimAnimData *getAnimData() const;
+private:
+    void setAnimationIndexDuration(int indexofanimationlist, int animationindex, qreal duration);
+    void generateAnimDataForProject();
 private:
     HkxSharedPtr * findProjectData(long ref);
     HkxSharedPtr * findProjectStringData(long ref);
@@ -54,6 +60,7 @@ private:
     SkyrimAnimSetData skyrimAnimSetData;
     int projectIndex;
     QString projectName;
+    QString projectPath;
 };
 
 #endif // PROJECTFILE_H

@@ -181,7 +181,7 @@ void ComputeRotationToTargetModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -192,7 +192,7 @@ void ComputeRotationToTargetModifierUI::setName(){
 void ComputeRotationToTargetModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ComputeRotationToTargetModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -202,7 +202,7 @@ void ComputeRotationToTargetModifierUI::setRotationOut(){
     if (bsData){
         if (bsData->rotationOut != rotationOut->value()){
             bsData->rotationOut = rotationOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ComputeRotationToTargetModifierUI::setrotationOut(): The data is NULL!!"));
@@ -213,7 +213,7 @@ void ComputeRotationToTargetModifierUI::setTargetPosition(){
     if (bsData){
         if (bsData->targetPosition != targetPosition->value()){
             bsData->targetPosition = targetPosition->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ComputeRotationToTargetModifierUI::settargetPosition(): The data is NULL!!"));
@@ -224,7 +224,7 @@ void ComputeRotationToTargetModifierUI::setCurrentPosition(){
     if (bsData){
         if (bsData->currentPosition != currentPosition->value()){
             bsData->currentPosition = currentPosition->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ComputeRotationToTargetModifierUI::setcurrentPosition(): The data is NULL!!"));
@@ -235,7 +235,7 @@ void ComputeRotationToTargetModifierUI::setCurrentRotation(){
     if (bsData){
         if (bsData->currentRotation != currentRotation->value()){
             bsData->currentRotation = currentRotation->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ComputeRotationToTargetModifierUI::setcurrentRotation(): The data is NULL!!"));
@@ -246,7 +246,7 @@ void ComputeRotationToTargetModifierUI::setLocalAxisOfRotation(){
     if (bsData){
         if (bsData->localAxisOfRotation != localAxisOfRotation->value()){
             bsData->localAxisOfRotation = localAxisOfRotation->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ComputeRotationToTargetModifierUI::setlocalAxisOfRotation(): The data is NULL!!"));
@@ -257,7 +257,7 @@ void ComputeRotationToTargetModifierUI::setLocalFacingDirection(){
     if (bsData){
         if (bsData->localFacingDirection != localFacingDirection->value()){
             bsData->localFacingDirection = localFacingDirection->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("ComputeRotationToTargetModifierUI::setlocalFacingDirection(): The data is NULL!!"));
@@ -267,7 +267,7 @@ void ComputeRotationToTargetModifierUI::setLocalFacingDirection(){
 void ComputeRotationToTargetModifierUI::setResultIsDelta(){
     if (bsData){
         bsData->resultIsDelta = resultIsDelta->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ComputeRotationToTargetModifierUI::setresultIsDelta(): The data is NULL!!"));
     }
@@ -420,7 +420,7 @@ bool ComputeRotationToTargetModifierUI::setBinding(int index, int row, const QSt
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -486,7 +486,7 @@ void ComputeRotationToTargetModifierUI::setBindingVariable(int index, const QStr
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ComputeRotationToTargetModifierUI::setBindingVariable(): The data is NULL!!"));
     }

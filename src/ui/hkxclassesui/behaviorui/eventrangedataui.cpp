@@ -215,7 +215,7 @@ void EventRangeDataUI::setEventId(int index, const QString & name){
         if (bsData->event.id != index){
             bsData->event.id = index;
             table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("EventRangeDataUI::setEvent(): Behavior file or event data is null!!!"));
@@ -241,7 +241,7 @@ void EventRangeDataUI::setEventPayload(){
         }else{
             bsData->event.payload = HkxSharedPtr();
         }
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("EventRangeDataUI::setEventPayload(): Behavior file or event data is null!!!"));
     }
@@ -251,7 +251,7 @@ void EventRangeDataUI::setUpperBound(){
     if (bsData && file){
         if (bsData->upperBound != upperBound->value()){
             bsData->upperBound = upperBound->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("EventRangeDataUI::setupperBound(): Behavior file or event data is null!!!"));
@@ -261,7 +261,7 @@ void EventRangeDataUI::setUpperBound(){
 void EventRangeDataUI::setEventMode(int index){
     if (bsData){
         bsData->eventMode = bsData->EventRangeMode.at(index);
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("EventRangeDataUI::setEventMode(): The data is NULL!!"));
     }

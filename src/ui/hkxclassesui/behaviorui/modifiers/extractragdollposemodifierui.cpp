@@ -160,7 +160,7 @@ void ExtractRagdollPoseModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -171,7 +171,7 @@ void ExtractRagdollPoseModifierUI::setName(){
 void ExtractRagdollPoseModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ExtractRagdollPoseModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -180,7 +180,7 @@ void ExtractRagdollPoseModifierUI::setEnable(){
 void ExtractRagdollPoseModifierUI::setPoseMatchingBone0(int index){
     if (bsData){
         bsData->poseMatchingBone0 = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ExtractRagdollPoseModifierUI::setposeMatchingBone0(): The data is NULL!!"));
     }
@@ -189,7 +189,7 @@ void ExtractRagdollPoseModifierUI::setPoseMatchingBone0(int index){
 void ExtractRagdollPoseModifierUI::setPoseMatchingBone1(int index){
     if (bsData){
         bsData->poseMatchingBone1 = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ExtractRagdollPoseModifierUI::setposeMatchingBone1(): The data is NULL!!"));
     }
@@ -198,7 +198,7 @@ void ExtractRagdollPoseModifierUI::setPoseMatchingBone1(int index){
 void ExtractRagdollPoseModifierUI::setPoseMatchingBone2(int index){
     if (bsData){
         bsData->poseMatchingBone2 = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ExtractRagdollPoseModifierUI::setposeMatchingBone2(): The data is NULL!!"));
     }
@@ -207,7 +207,7 @@ void ExtractRagdollPoseModifierUI::setPoseMatchingBone2(int index){
 void ExtractRagdollPoseModifierUI::setEnableComputeWorldFromModel(){
     if (bsData){
         bsData->enableComputeWorldFromModel = enableComputeWorldFromModel->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ExtractRagdollPoseModifierUI::setenableComputeWorldFromModel(): The data is NULL!!"));
     }
@@ -330,7 +330,7 @@ bool ExtractRagdollPoseModifierUI::setBinding(int index, int row, const QString 
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -378,7 +378,7 @@ void ExtractRagdollPoseModifierUI::setBindingVariable(int index, const QString &
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("ExtractRagdollPoseModifierUI::setBindingVariable(): The data is NULL!!"));
     }

@@ -8,6 +8,7 @@
 #include "animcacheclipinfo.h"
 
 class AnimCacheAnimSetData{
+    friend class CacheWidget;
     friend class AnimCacheProjectData;
     friend class SkyrimAnimSetData;
 public:

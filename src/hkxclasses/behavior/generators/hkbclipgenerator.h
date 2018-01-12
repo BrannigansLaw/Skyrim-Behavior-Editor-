@@ -2,11 +2,13 @@
 #define HKBCLIPGENERATOR_H
 
 #include "hkbgenerator.h"
+#include "src/animData/skyrimclipgeneratodata.h"
 
 class hkbClipGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
     friend class ClipGeneratorUI;
+    friend class ProjectFile;
 public:
     hkbClipGenerator(HkxFile *parent, long ref = 0, bool addToAnimData = false, const QString & animationname = "");
     virtual ~hkbClipGenerator();
@@ -19,6 +21,7 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfTriggers() const;
+    QString getAnimationName() const;
     enum ClipFlag{
         FLAG_NONE = 0,
         FLAG_CONTINUE_MOTION_AT_END = 1,
@@ -30,6 +33,7 @@ public:
         INVALID_FLAG = 128
     };
     Q_DECLARE_FLAGS(ClipFlags, ClipFlag)
+    SkyrimClipGeneratoData getClipGeneratorAnimData(ProjectAnimData *parent, uint animationIndex) const;
 private:
     void setName(const QString & oldclipname, const QString & newclipname);
     void setAnimationName(int index, const QString & animationname);

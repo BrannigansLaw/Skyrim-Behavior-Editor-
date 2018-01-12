@@ -192,7 +192,7 @@ void TwistModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -203,7 +203,7 @@ void TwistModifierUI::setName(){
 void TwistModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TwistModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -213,7 +213,7 @@ void TwistModifierUI::setAxisOfRotation(){
     if (bsData){
         if (bsData->axisOfRotation != axisOfRotation->value()){
             bsData->axisOfRotation = axisOfRotation->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("TwistModifierUI::setaxisOfRotation(): The data is NULL!!"));
@@ -223,7 +223,7 @@ void TwistModifierUI::setAxisOfRotation(){
 void TwistModifierUI::setStartBoneIndex(int index){
     if (bsData){
         bsData->startBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TwistModifierUI::setStartBoneIndex(): The data is NULL!!"));
     }
@@ -232,7 +232,7 @@ void TwistModifierUI::setStartBoneIndex(int index){
 void TwistModifierUI::setEndBoneIndex(int index){
     if (bsData){
         bsData->endBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TwistModifierUI::setEndBoneIndex(): The data is NULL!!"));
     }
@@ -242,7 +242,7 @@ void TwistModifierUI::setTwistAngle(){
     if (bsData){
         if (bsData->twistAngle != twistAngle->value()){
             bsData->twistAngle = twistAngle->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("TwistModifierUI::settwistAngle(): The data is NULL!!"));
@@ -252,7 +252,7 @@ void TwistModifierUI::setTwistAngle(){
 void TwistModifierUI::setSetAngleMethod(int index){
     if (bsData){
         bsData->setAngleMethod = bsData->SetAngleMethod.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TwistModifierUI::setSetAngleMethod(): The data is NULL!!"));
     }
@@ -261,7 +261,7 @@ void TwistModifierUI::setSetAngleMethod(int index){
 void TwistModifierUI::setRotationAxisCoordinates(int index){
     if (bsData){
         bsData->rotationAxisCoordinates = bsData->RotationAxisCoordinates.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TwistModifierUI::setRotationAxisCoordinates(): The data is NULL!!"));
     }
@@ -270,7 +270,7 @@ void TwistModifierUI::setRotationAxisCoordinates(int index){
 void TwistModifierUI::setIsAdditive(){
     if (bsData){
         bsData->isAdditive = isAdditive->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TwistModifierUI::setIsAdditive(): The data is NULL!!"));
     }
@@ -403,7 +403,7 @@ bool TwistModifierUI::setBinding(int index, int row, const QString &variableName
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -457,7 +457,7 @@ void TwistModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("TwistModifierUI::setBindingVariable(): The data is NULL!!"));
     }

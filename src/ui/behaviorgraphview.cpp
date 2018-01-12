@@ -439,7 +439,7 @@ void BehaviorGraphView::removeObjects(){
     removeGeneratorData();//Inefficient...
     removeModifierData();
     behavior->removeOtherData();
-    behavior->toggleChanged(true);
+    behavior->setIsChanged(true);
 }
 
 template <typename T>
@@ -486,7 +486,7 @@ void BehaviorGraphView::append(T *obj){
             ((HkxObject *)((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData)->evaulateDataValidity();
         }
         selectedItemData->evaulateDataValidity();
-        behavior->toggleChanged(true);
+        behavior->setIsChanged(true);
         getSelectedItem()->reposition();
         treeScene->selectIcon(newIcon, false);
         emit addedGenerator(obj->getName(), obj->getClassname());
@@ -755,9 +755,9 @@ void BehaviorGraphView::appendHandIKControlsModifier(){
 template <typename T>
 void BehaviorGraphView::wrap(T *obj){
     if (getSelectedItem() && ((TreeGraphicsItem *)getSelectedItem()->parentItem()) && ((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData){
-        behavior->toggleChanged(true);
+        behavior->setIsChanged(true);
         TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), static_cast<DataIconManager*>((obj)), -1, true);
-        behavior->toggleChanged(true);
+        behavior->setIsChanged(true);
         getSelectedItem()->reposition();
         treeScene->selectIcon(newIcon, false);
         emit addedGenerator(obj->getName(), obj->getClassname());

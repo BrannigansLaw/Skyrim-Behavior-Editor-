@@ -271,7 +271,7 @@ void PoweredRagdollControlsModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -282,7 +282,7 @@ void PoweredRagdollControlsModifierUI::setName(){
 void PoweredRagdollControlsModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoweredRagdollControlsModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -292,7 +292,7 @@ void PoweredRagdollControlsModifierUI::setMaxForce(){
     if (bsData){
         if (bsData->maxForce != maxForce->value()){
             bsData->maxForce = maxForce->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoweredRagdollControlsModifierUI::setmaxForce(): The data is NULL!!"));
@@ -303,7 +303,7 @@ void PoweredRagdollControlsModifierUI::setTau(){
     if (bsData){
         if (bsData->tau != tau->value()){
             bsData->tau = tau->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoweredRagdollControlsModifierUI::settau(): The data is NULL!!"));
@@ -314,7 +314,7 @@ void PoweredRagdollControlsModifierUI::setDamping(){
     if (bsData){
         if (bsData->damping != damping->value()){
             bsData->damping = damping->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoweredRagdollControlsModifierUI::setdamping(): The data is NULL!!"));
@@ -325,7 +325,7 @@ void PoweredRagdollControlsModifierUI::setProportionalRecoveryVelocity(){
     if (bsData){
         if (bsData->proportionalRecoveryVelocity != proportionalRecoveryVelocity->value()){
             bsData->proportionalRecoveryVelocity = proportionalRecoveryVelocity->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoweredRagdollControlsModifierUI::setproportionalRecoveryVelocity(): The data is NULL!!"));
@@ -336,7 +336,7 @@ void PoweredRagdollControlsModifierUI::setConstantRecoveryVelocity(){
     if (bsData){
         if (bsData->constantRecoveryVelocity != constantRecoveryVelocity->value()){
             bsData->constantRecoveryVelocity = constantRecoveryVelocity->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoweredRagdollControlsModifierUI::setconstantRecoveryVelocity(): The data is NULL!!"));
@@ -346,7 +346,7 @@ void PoweredRagdollControlsModifierUI::setConstantRecoveryVelocity(){
 void PoweredRagdollControlsModifierUI::setPoseMatchingBone0(int index){
     if (bsData){
         bsData->poseMatchingBone0 = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoweredRagdollControlsModifierUI::setPoseMatchingBone0(): The data is NULL!!"));
     }
@@ -355,7 +355,7 @@ void PoweredRagdollControlsModifierUI::setPoseMatchingBone0(int index){
 void PoweredRagdollControlsModifierUI::setPoseMatchingBone1(int index){
     if (bsData){
         bsData->poseMatchingBone1 = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoweredRagdollControlsModifierUI::setPoseMatchingBone1(): The data is NULL!!"));
     }
@@ -364,7 +364,7 @@ void PoweredRagdollControlsModifierUI::setPoseMatchingBone1(int index){
 void PoweredRagdollControlsModifierUI::setPoseMatchingBone2(int index){
     if (bsData){
         bsData->poseMatchingBone2 = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoweredRagdollControlsModifierUI::setPoseMatchingBone2(): The data is NULL!!"));
     }
@@ -373,7 +373,7 @@ void PoweredRagdollControlsModifierUI::setPoseMatchingBone2(int index){
 void PoweredRagdollControlsModifierUI::setMode(int index){
     if (bsData){
         bsData->mode = bsData->Mode.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoweredRagdollControlsModifierUI::setMode(): The data is NULL!!"));
     }
@@ -390,7 +390,7 @@ void PoweredRagdollControlsModifierUI::toggleBones(bool enable){
             bsData->bones = HkxSharedPtr(indices);
             //bones->setText(indices->getName());
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoweredRagdollControlsModifierUI::toggleBones(): The data is NULL!!"));
     }
@@ -414,7 +414,7 @@ void PoweredRagdollControlsModifierUI::toggleBoneWeights(bool enable){
             bsData->boneWeights = HkxSharedPtr(new hkbBoneWeightArray(bsData->getParentFile(), -1, static_cast<BehaviorFile *>(bsData->getParentFile())->getNumberOfBones()));
             boneWeights->setText("Click to Edit");
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BlenderGeneratorChildUI::toggleBoneWeights(): The data is NULL!!"));
     }
@@ -596,7 +596,7 @@ bool PoweredRagdollControlsModifierUI::setBinding(int index, int row, const QStr
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -674,7 +674,7 @@ void PoweredRagdollControlsModifierUI::setBindingVariable(int index, const QStri
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoweredRagdollControlsModifierUI::setBindingVariable(): The data is NULL!!"));
     }

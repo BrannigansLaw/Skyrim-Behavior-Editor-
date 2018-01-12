@@ -126,7 +126,7 @@ void GetWorldFromModelModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -137,7 +137,7 @@ void GetWorldFromModelModifierUI::setName(){
 void GetWorldFromModelModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("GetWorldFromModelModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -147,7 +147,7 @@ void GetWorldFromModelModifierUI::setTranslationOut(){
     if (bsData){
         if (bsData->translationOut != translationOut->value()){
             bsData->translationOut = translationOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("GetWorldFromModelModifierUI::settranslationOut(): The data is NULL!!"));
@@ -158,7 +158,7 @@ void GetWorldFromModelModifierUI::setRotationOut(){
     if (bsData){
         if (bsData->rotationOut != rotationOut->value()){
             bsData->rotationOut = rotationOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("GetWorldFromModelModifierUI::setrotationOut(): The data is NULL!!"));
@@ -262,7 +262,7 @@ bool GetWorldFromModelModifierUI::setBinding(int index, int row, const QString &
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -298,7 +298,7 @@ void GetWorldFromModelModifierUI::setBindingVariable(int index, const QString &n
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("GetWorldFromModelModifierUI::setBindingVariable(): The data is NULL!!"));
     }

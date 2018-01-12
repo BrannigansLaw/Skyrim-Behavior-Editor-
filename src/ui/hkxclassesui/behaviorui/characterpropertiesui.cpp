@@ -145,7 +145,7 @@ void CharacterPropertiesUI::setVariableValue(int type){
     }*/else if (type == 3){
         loadedData->setQuadVariableValueAt(index, quadWidget->value());
     }
-    loadedData->getParentFile()->toggleChanged(true);
+    loadedData->getParentFile()->setIsChanged(true);
 }
 
 void CharacterPropertiesUI::renameSelectedVariable(int type){
@@ -163,7 +163,7 @@ void CharacterPropertiesUI::renameSelectedVariable(int type){
     }
     table->item(table->currentRow(), 0)->setText(newName);
     loadedData->setVariableNameAt(table->currentRow(), newName);
-    loadedData->getParentFile()->toggleChanged(true);
+    loadedData->getParentFile()->setIsChanged(true);
     emit variableNameChanged(newName, table->currentRow());
 }
 
@@ -353,7 +353,7 @@ void CharacterPropertiesUI::addVariable(){
     default:
         return;
     }
-    loadedData->getParentFile()->toggleChanged(true);
+    loadedData->getParentFile()->setIsChanged(true);
     emit variableAdded(vars->characterPropertyNames.last());
 }
 
@@ -366,7 +366,7 @@ void CharacterPropertiesUI::removeVariable(){
     if (stackLyt->currentIndex() == VARIABLE_WIDGET){
         stackLyt->setCurrentIndex(TABLE_WIDGET);
     }
-    loadedData->getParentFile()->toggleChanged(true);
+    loadedData->getParentFile()->setIsChanged(true);
     emit variableRemoved(index);
 }
 

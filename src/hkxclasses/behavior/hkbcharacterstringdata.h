@@ -27,6 +27,7 @@ public:
     QString getCharacterPropertyNameAt(int index) const;
     void addAnimation(const QString &name = "");
     QString getAnimationNameAt(int index) const;
+    int getAnimationIndex(const QString & name) const;
 private:
     hkbCharacterStringData& operator=(const hkbCharacterStringData&);
     hkbCharacterStringData(const hkbCharacterStringData &);

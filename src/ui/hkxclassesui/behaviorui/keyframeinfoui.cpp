@@ -170,7 +170,7 @@ bool KeyframeInfoUI::setBinding(int index, int row, const QString & variableName
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -212,7 +212,7 @@ void KeyframeInfoUI::setBindingVariable(int index, const QString & name){
         default:
             return;
         }
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("KeyframeInfoUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -222,7 +222,7 @@ void KeyframeInfoUI::setKeyframedPosition(){
     if (bsData && file){
         if (bsData->keyframedPosition != keyframedPosition->value()){
             bsData->keyframedPosition = keyframedPosition->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("KeyframeInfoUI::setkeyframedPosition(): Behavior file or event data is null!!!"));
@@ -233,7 +233,7 @@ void KeyframeInfoUI::setKeyframedRotation(){
     if (bsData && file){
         if (bsData->keyframedRotation != keyframedRotation->value()){
             bsData->keyframedRotation = keyframedRotation->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("KeyframeInfoUI::setkeyframedRotation(): Behavior file or event data is null!!!"));
@@ -243,7 +243,7 @@ void KeyframeInfoUI::setKeyframedRotation(){
 void KeyframeInfoUI::setBoneIndex(int index){
     if (bsData && file){
         bsData->boneIndex = index - 1;
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("KeyframeInfoUI::setboneIndex(): Behavior file or event data is null!!!"));
     }
@@ -253,7 +253,7 @@ void KeyframeInfoUI::setIsValid(){
     if (bsData && file){
         if (bsData->isValid != isValid->isChecked()){
             bsData->isValid = isValid->isChecked();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("KeyframeInfoUI::setIsAnnotation(): Behavior file or event data is null!!!"));

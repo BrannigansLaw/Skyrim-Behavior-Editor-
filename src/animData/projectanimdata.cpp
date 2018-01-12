@@ -93,6 +93,36 @@ bool ProjectAnimData::read(QFile *file){
     return false;
 }
 
+bool ProjectAnimData::readMotionOnly(QFile *file){
+    if (!file || !file->isOpen()){
+        return false;
+    }
+    QByteArray line;
+    bool ok = false;
+    uint lineCount = 0;
+    if (!chopLine(file, line, lineCount)){
+        return false;
+    }
+    uint blocksize = line.toUInt(&ok);
+    if (!ok){
+        return false;
+    }
+    animationMotionDataLines = blocksize;
+    //Read individual projects...
+    while (!file->atEnd()){
+        lineCount = 0;
+        //Get animation motion data...
+        for (;lineCount < blocksize;){
+            animationMotionData.append(new SkyrimAnimationMotionData(this));
+            if (!animationMotionData.last()->read(file, lineCount)){
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
 bool ProjectAnimData::write(QFile & file, QTextStream & out) const{
     if (out.status() != QTextStream::Ok || !file.isOpen()){
         return false;

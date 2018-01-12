@@ -4,6 +4,8 @@
 #include <QtCore>
 
 class AnimCacheClipInfo{
+    friend class CacheWidget;
+    friend class CacheClipWidget;
     friend class AnimCacheAnimSetData;
 public:
     AnimCacheClipInfo(const QString & eventname = "", const QStringList & clipgens = QStringList(), uint unk = 0);

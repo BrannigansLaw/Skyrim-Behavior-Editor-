@@ -159,7 +159,7 @@ void EventDrivenModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }
@@ -168,7 +168,7 @@ void EventDrivenModifierUI::setName(){
 void EventDrivenModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("EventDrivenModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -178,7 +178,7 @@ void EventDrivenModifierUI::setActivateEventId(int index, const QString & name){
     if (bsData){
         bsData->activateEventId = index - 1;
         table->item(ACTIVATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("EventDrivenModifierUI::setActivateEventId(): The data is NULL!!"));
     }
@@ -188,7 +188,7 @@ void EventDrivenModifierUI::setDeactivateEventId(int index, const QString & name
     if (bsData){
         bsData->deactivateEventId = index - 1;
         table->item(DEACTIVATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("EventDrivenModifierUI::setDeactivateEventId(): The data is NULL!!"));
     }
@@ -197,7 +197,7 @@ void EventDrivenModifierUI::setDeactivateEventId(int index, const QString & name
 void EventDrivenModifierUI::setActiveByDefault(){
     if (bsData){
         bsData->activeByDefault = activeByDefault->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("EventDrivenModifierUI::setActiveByDefault(): The data is NULL!!"));
     }
@@ -242,7 +242,7 @@ void EventDrivenModifierUI::setModifier(int index, const QString & name){
             }
             behaviorView->removeModifierData();
             table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qFatal("EventDrivenModifierUI::setModifier(): The 'behaviorView' pointer is NULL!!"));
         }
@@ -298,7 +298,7 @@ bool EventDrivenModifierUI::setBinding(int index, int row, const QString & varia
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -329,7 +329,7 @@ void EventDrivenModifierUI::setBindingVariable(int index, const QString & name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("EventDrivenModifierUI::setBindingVariable(): The 'bsData' pointer is NULL!!"));
     }

@@ -509,7 +509,7 @@ bool PoseMatchingGeneratorUI::setBinding(int index, int row, const QString & var
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -617,7 +617,7 @@ void PoseMatchingGeneratorUI::setBindingVariable(int index, const QString & name
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoseMatchingGeneratorUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -629,7 +629,7 @@ void PoseMatchingGeneratorUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoseMatchingGeneratorUI::setName(): The data is NULL!!"));
@@ -640,7 +640,7 @@ void PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(){
     if (bsData){
         if (bsData->referencePoseWeightThreshold != referencePoseWeightThreshold->value()){
             bsData->referencePoseWeightThreshold = referencePoseWeightThreshold->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(): The data is NULL!!"));
@@ -651,7 +651,7 @@ void PoseMatchingGeneratorUI::setBlendParameter(){
     if (bsData){
         if (bsData->blendParameter != blendParameter->value()){
             bsData->blendParameter = blendParameter->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoseMatchingGeneratorUI::setBlendParameter(): The data is NULL!!"));
@@ -662,7 +662,7 @@ void PoseMatchingGeneratorUI::setMinCyclicBlendParameter(){
     if (bsData){
         if (bsData->minCyclicBlendParameter != minCyclicBlendParameter->value()){
             bsData->minCyclicBlendParameter = minCyclicBlendParameter->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoseMatchingGeneratorUI::setMinCyclicBlendParameter(): The data is NULL!!"));
@@ -673,7 +673,7 @@ void PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(){
     if (bsData){
         if (bsData->maxCyclicBlendParameter != maxCyclicBlendParameter->value()){
             bsData->maxCyclicBlendParameter = maxCyclicBlendParameter->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(): The data is NULL!!"));
@@ -684,7 +684,7 @@ void PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(){
     if (bsData){
         if (bsData->indexOfSyncMasterChild != indexOfSyncMasterChild->value()){
             bsData->indexOfSyncMasterChild = indexOfSyncMasterChild->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(): The data is NULL!!"));
@@ -808,7 +808,7 @@ void PoseMatchingGeneratorUI::setFlagForceDensePose(){
 void PoseMatchingGeneratorUI::setSubtractLastChild(){
     if (bsData){
         bsData->subtractLastChild = subtractLastChild->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoseMatchingGeneratorUI::setSubtractLastChild(): The data is NULL!!"));
     }
@@ -818,7 +818,7 @@ void PoseMatchingGeneratorUI::setWorldFromModelRotation(){
     if (bsData){
         if (bsData->worldFromModelRotation != worldFromModelRotation->value()){
             bsData->worldFromModelRotation = worldFromModelRotation->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoseMatchingGeneratorUI::setWorldFromModelRotation(): The data is NULL!!"));
@@ -829,7 +829,7 @@ void PoseMatchingGeneratorUI::setBlendSpeed(){
     if (bsData){
         if (bsData->blendSpeed != blendSpeed->value()){
             bsData->blendSpeed = blendSpeed->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoseMatchingGeneratorUI::setBlendSpeed(): The data is NULL!!"));
@@ -840,7 +840,7 @@ void PoseMatchingGeneratorUI::setMinSpeedToSwitch(){
     if (bsData){
         if (bsData->minSpeedToSwitch != minSpeedToSwitch->value()){
             bsData->minSpeedToSwitch = minSpeedToSwitch->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoseMatchingGeneratorUI::setMinSpeedToSwitch(): The data is NULL!!"));
@@ -851,7 +851,7 @@ void PoseMatchingGeneratorUI::setMinSwitchTimeNoError(){
     if (bsData){
         if (bsData->minSwitchTimeNoError != minSwitchTimeNoError->value()){
             bsData->minSwitchTimeNoError = minSwitchTimeNoError->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoseMatchingGeneratorUI::setMinSwitchTimeNoError(): The data is NULL!!"));
@@ -862,7 +862,7 @@ void PoseMatchingGeneratorUI::setMinSwitchTimeFullError(){
     if (bsData){
         if (bsData->minSwitchTimeFullError != minSwitchTimeFullError->value()){
             bsData->minSwitchTimeFullError = minSwitchTimeFullError->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("PoseMatchingGeneratorUI::setMinSwitchTimeFullError(): The data is NULL!!"));
@@ -873,7 +873,7 @@ void PoseMatchingGeneratorUI::setStartPlayingEventId(int index, const QString &n
     if (bsData){
         bsData->startPlayingEventId = index - 1;
         table->item(START_PLAYING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoseMatchingGeneratorUI::setStartPlayingEventId(): The data is NULL!!"));
     }
@@ -883,7 +883,7 @@ void PoseMatchingGeneratorUI::setStartMatchingEventId(int index, const QString &
     if (bsData){
         bsData->startMatchingEventId = index - 1;
         table->item(START_MATCHING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoseMatchingGeneratorUI::setStartMatchingEventId(): The data is NULL!!"));
     }
@@ -892,7 +892,7 @@ void PoseMatchingGeneratorUI::setStartMatchingEventId(int index, const QString &
 void PoseMatchingGeneratorUI::setRootBoneIndex(int index){
     if (bsData){
         bsData->rootBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoseMatchingGeneratorUI::setRootBoneIndex(): The data is NULL!!"));
     }
@@ -901,7 +901,7 @@ void PoseMatchingGeneratorUI::setRootBoneIndex(int index){
 void PoseMatchingGeneratorUI::setOtherBoneIndex(int index){
     if (bsData){
         bsData->otherBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoseMatchingGeneratorUI::setOtherBoneIndex(): The data is NULL!!"));
     }
@@ -910,7 +910,7 @@ void PoseMatchingGeneratorUI::setOtherBoneIndex(int index){
 void PoseMatchingGeneratorUI::setAnotherBoneIndex(int index){
     if (bsData){
         bsData->anotherBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoseMatchingGeneratorUI::setAnotherBoneIndex(): The data is NULL!!"));
     }
@@ -919,7 +919,7 @@ void PoseMatchingGeneratorUI::setAnotherBoneIndex(int index){
 void PoseMatchingGeneratorUI::setPelvisIndex(int index){
     if (bsData){
         bsData->pelvisIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoseMatchingGeneratorUI::setPelvisIndex(): The data is NULL!!"));
     }
@@ -928,7 +928,7 @@ void PoseMatchingGeneratorUI::setPelvisIndex(int index){
 void PoseMatchingGeneratorUI::setMode(int index){
     if (bsData){
         bsData->mode = bsData->Mode.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("PoseMatchingGeneratorUI::setMode(): The data is NULL!!"));
     }
@@ -945,7 +945,7 @@ void PoseMatchingGeneratorUI::swapGeneratorIndices(int index1, int index2){
             }else{
                 (qFatal("PoseMatchingGeneratorUI::swapGeneratorIndices(): No item selected!!"));
             }
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("PoseMatchingGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!"));
         }

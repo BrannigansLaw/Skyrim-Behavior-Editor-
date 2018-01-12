@@ -137,7 +137,7 @@ void RotateCharacterModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -148,7 +148,7 @@ void RotateCharacterModifierUI::setName(){
 void RotateCharacterModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("RotateCharacterModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -158,7 +158,7 @@ void RotateCharacterModifierUI::setDegreesPerSecond(){
     if (bsData){
         if (bsData->degreesPerSecond != degreesPerSecond->value()){
             bsData->degreesPerSecond = degreesPerSecond->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RotateCharacterModifierUI::setDegreesPerSecond(): The data is NULL!!"));
@@ -169,7 +169,7 @@ void RotateCharacterModifierUI::setSpeedMultiplier(){
     if (bsData){
         if (bsData->speedMultiplier != speedMultiplier->value()){
             bsData->speedMultiplier = speedMultiplier->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RotateCharacterModifierUI::setSpeedMultiplier(): The data is NULL!!"));
@@ -180,7 +180,7 @@ void RotateCharacterModifierUI::setAxisOfRotation(){
     if (bsData){
         if (bsData->axisOfRotation != axisOfRotation->value()){
             bsData->axisOfRotation = axisOfRotation->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("RotateCharacterModifierUI::setAxisOfRotation(): The data is NULL!!"));
@@ -294,7 +294,7 @@ bool RotateCharacterModifierUI::setBinding(int index, int row, const QString &va
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -336,7 +336,7 @@ void RotateCharacterModifierUI::setBindingVariable(int index, const QString &nam
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("RotateCharacterModifierUI::setBindingVariable(): The data is NULL!!"));
     }

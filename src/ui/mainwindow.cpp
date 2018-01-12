@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "src/filetypes/animationfile.h"
 #include "src/filetypes/projectfile.h"
 #include "src/filetypes/characterfile.h"
 #include "src/filetypes/skeletonfile.h"
@@ -15,6 +16,7 @@
 #include "src/ui/treegraphicsitem.h"
 #include "src/hkxclasses/behavior/generators/hkbbehaviorgraph.h"
 #include "src/ui/genericdatawidgets.h"
+#include "src/ui/hkxclassesui/behaviorui/animationsui.h"
 
 #include <QtWidgets>
 
@@ -133,6 +135,7 @@ MainWindow::MainWindow()
     connect(tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)), Qt::UniqueConnection);
     connect(projectUI, SIGNAL(openFile(QModelIndex)), this, SLOT(openBehaviorFile(QModelIndex)), Qt::UniqueConnection);
     connect(projectUI, SIGNAL(addBehavior(bool)), this, SLOT(addNewBehavior(bool)), Qt::UniqueConnection);
+    connect(projectUI, SIGNAL(openAnimation(QString)), this, SLOT(openAnimationFile(QString)), Qt::UniqueConnection);
 }
 
 MainWindow::~MainWindow(){
@@ -287,7 +290,7 @@ void MainWindow::saveFile(int index){
                 }
                 dialog.setProgress("Writing to file...", 30);
                 projectFile->behaviorFiles.at(index)->write();
-                projectFile->behaviorFiles.at(index)->toggleChanged(false);
+                projectFile->behaviorFiles.at(index)->setIsChanged(false);
                 dialog.setProgress("Behavior file saved!!!", dialog.maximum());
             }
         }else{
@@ -303,7 +306,7 @@ void MainWindow::saveProject(){
         ProgressDialog dialog("Saving project "+projectFile->fileName().section("/", -1, -1)+"...", "", 0, 100, this);
         if (projectFile->getIsChanged()){
             projectFile->write();
-            projectFile->toggleChanged(false);
+            projectFile->setIsChanged(false);
         }
         dialog.setProgress(projectFile->fileName()+" saved...", 10);
         QFile animData(lastFileSelectedPath+"/animationdatasinglefile.txt");
@@ -325,7 +328,7 @@ void MainWindow::saveProject(){
         if (characterFile){
             if (characterFile->getIsChanged()){
                 characterFile->write();
-                characterFile->toggleChanged(false);
+                characterFile->setIsChanged(false);
             }
             dialog.setProgress(characterFile->fileName().section("/", -1, -1)+" saved...", 20);
             if (skeletonFile){
@@ -581,7 +584,7 @@ void MainWindow::openProject(QString & filepath){
     dialog.setProgress("Loading character data...", 10);
     projectUI->setFilePath(lastFileSelectedPath);
     time = t.elapsed();
-    characterFile = new CharacterFile(this, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));
+    characterFile = new CharacterFile(this, projectFile, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));
     if (!characterFile->parse()){
         (qFatal(QString("MainWindow::openProject(): The character file "+projectFile->getCharacterFilePathAt(0)+" could not be parsed!!!").toLocal8Bit().data()));
         delete projectFile;
@@ -680,6 +683,7 @@ void MainWindow::openProject(QString & filepath){
         }
     }
     threads.clear();
+    projectFile->generateAnimDataForProject();
     writeToLog("\n-------------------------\nTime taken to open project \""+filepath+
                               "\" is approximately "+QString::number(t.elapsed())+" milliseconds\n-------------------------\n");
     dialog.setProgress("Project loaded sucessfully!!!", dialog.maximum());
@@ -858,6 +862,20 @@ void MainWindow::openBehaviorFile(const QModelIndex & index){
         }
     }
     (qFatal("MainWindow::openBehaviorFile(): The selected behavior file was not found!"));
+}
+
+void MainWindow::openAnimationFile(const QString &animationname){
+    if (hkxcmd(animationname, animationname, "-v:xml") != HKXCMD_SUCCESS){
+        (qWarning("Failed to convert the animation file!"));
+        return;
+    }
+    AnimationFile *ptr = new AnimationFile(this, QString(animationname).replace(".hkx", "-out.hkx"));
+    if (!ptr->parse()){
+        (qFatal("MainWindow::openAnimationFile(): The selected animation file was not opened!"));
+    }
+    projectFile->setAnimationIndexDuration(-1, characterFile->getNumberOfAnimations() - 1, ptr->getDuration());
+    ptr->remove();
+    delete ptr;
 }
 
 int MainWindow::getBehaviorGraphIndex(const QString & filename) const{

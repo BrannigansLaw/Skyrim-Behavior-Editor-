@@ -115,7 +115,7 @@ void EventsFromRangeModifierUI::addRange(){
             bsData->eventRanges = HkxSharedPtr(exps);
         }
         exps->addEventData();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
         (qFatal("EventsFromRangeModifierUI::addExpression(): The data is NULL!!"));
@@ -133,7 +133,7 @@ void EventsFromRangeModifierUI::removeRange(int index){
                 (qWarning("EventsFromRangeModifierUI::removeRange(): Invalid row index selected!!"));
                 return;
             }
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             loadDynamicTableRows();
         }else{
             (qWarning("EventsFromRangeModifierUI::removeRange(): Event data is NULL!!"));
@@ -241,7 +241,7 @@ bool EventsFromRangeModifierUI::setBinding(int index, int row, const QString & v
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -277,7 +277,7 @@ void EventsFromRangeModifierUI::setBindingVariable(int index, const QString & na
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("EventsFromRangeModifierUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -294,7 +294,7 @@ void EventsFromRangeModifierUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit modifierNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("EventsFromRangeModifierUI::setName(): The data is NULL!!"));
@@ -304,7 +304,7 @@ void EventsFromRangeModifierUI::setName(){
 void EventsFromRangeModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("EventsFromRangeModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -314,7 +314,7 @@ void EventsFromRangeModifierUI::setInputValue(){
     if (bsData){
         if (bsData->inputValue != inputValue->value()){
             bsData->inputValue = inputValue->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("EventsFromRangeModifierUI::setInputValue(): The data is NULL!!"));
@@ -325,7 +325,7 @@ void EventsFromRangeModifierUI::setLowerBound(){
     if (bsData){
         if (bsData->lowerBound != lowerBound->value()){
             bsData->lowerBound = lowerBound->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("EventsFromRangeModifierUI::setLowerBound(): The data is NULL!!"));

@@ -134,7 +134,7 @@ void BSEventOnDeactivateModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -145,7 +145,7 @@ void BSEventOnDeactivateModifierUI::setName(){
 void BSEventOnDeactivateModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventOnDeactivateModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -157,7 +157,7 @@ void BSEventOnDeactivateModifierUI::setEventId(int index, const QString & name){
         if (bsData->event.id != index){
             bsData->event.id = index;
             table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSEventOnDeactivateModifierUI::seteventId(): The data is NULL!!"));
@@ -179,7 +179,7 @@ void BSEventOnDeactivateModifierUI::setEventPayload(){
         }else{
             bsData->event.payload = HkxSharedPtr();
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventOnDeactivateModifierUI::seteventPayload(): The data is NULL!!"));
     }
@@ -275,7 +275,7 @@ bool BSEventOnDeactivateModifierUI::setBinding(int index, int row, const QString
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -299,7 +299,7 @@ void BSEventOnDeactivateModifierUI::setBindingVariable(int index, const QString 
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventOnDeactivateModifierUI::setBindingVariable(): The data is NULL!!"));
     }

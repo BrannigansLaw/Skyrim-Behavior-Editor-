@@ -189,7 +189,7 @@ void BSSynchronizedClipGeneratorUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSSynchronizedClipGeneratorUI::setName(): The data is NULL!!"));
@@ -200,7 +200,7 @@ void BSSynchronizedClipGeneratorUI::setSyncAnimPrefix(){
     if (bsData){
         if (bsData->syncAnimPrefix != syncAnimPrefix->text()){
             bsData->syncAnimPrefix = syncAnimPrefix->text();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSSynchronizedClipGeneratorUI::setSyncAnimPrefix(): The data is NULL!!"));
@@ -211,7 +211,7 @@ void BSSynchronizedClipGeneratorUI::setSyncClipIgnoreMarkPlacement(){
     if (bsData){
         if (bsData->bSyncClipIgnoreMarkPlacement != bSyncClipIgnoreMarkPlacement->isChecked()){
             bsData->bSyncClipIgnoreMarkPlacement = bSyncClipIgnoreMarkPlacement->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSOffsetAnimationGeneratorUI::setSyncClipIgnoreMarkPlacement(): The data is NULL!!"));
@@ -222,7 +222,7 @@ void BSSynchronizedClipGeneratorUI::setGetToMarkTime(){
     if (bsData){
         if (bsData->fGetToMarkTime != fGetToMarkTime->value()){
             bsData->fGetToMarkTime = fGetToMarkTime->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSOffsetAnimationGeneratorUI::setGetToMarkTime(): The data is NULL!!"));
@@ -233,7 +233,7 @@ void BSSynchronizedClipGeneratorUI::setMarkErrorThreshold(){
     if (bsData){
         if (bsData->fMarkErrorThreshold != fMarkErrorThreshold->value()){
             bsData->fMarkErrorThreshold = fMarkErrorThreshold->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSOffsetAnimationGeneratorUI::setMarkErrorThreshold(): The data is NULL!!"));
@@ -244,7 +244,7 @@ void BSSynchronizedClipGeneratorUI::setLeadCharacter(){
     if (bsData){
         if (bsData->bLeadCharacter != bLeadCharacter->isChecked()){
             bsData->bLeadCharacter = bLeadCharacter->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSOffsetAnimationGeneratorUI::setLeadCharacter(): The data is NULL!!"));
@@ -255,7 +255,7 @@ void BSSynchronizedClipGeneratorUI::setReorientSupportChar(){
     if (bsData){
         if (bsData->bReorientSupportChar != bReorientSupportChar->isChecked()){
             bsData->bReorientSupportChar = bReorientSupportChar->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSOffsetAnimationGeneratorUI::setReorientSupportChar(): The data is NULL!!"));
@@ -266,7 +266,7 @@ void BSSynchronizedClipGeneratorUI::setApplyMotionFromRoot(){
     if (bsData){
         if (bsData->bApplyMotionFromRoot != bApplyMotionFromRoot->isChecked()){
             bsData->bApplyMotionFromRoot = bApplyMotionFromRoot->isChecked();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSOffsetAnimationGeneratorUI::setApplyMotionFromRoot(): The data is NULL!!"));
@@ -277,7 +277,7 @@ void BSSynchronizedClipGeneratorUI::setAnimationBindingIndex(){
     if (bsData){
         if (bsData->sAnimationBindingIndex != sAnimationBindingIndex->value()){
             bsData->sAnimationBindingIndex = sAnimationBindingIndex->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSOffsetAnimationGeneratorUI::setAnimationBindingIndex(): The data is NULL!!"));
@@ -390,7 +390,7 @@ void BSSynchronizedClipGeneratorUI::setClipGenerator(int index, const QString & 
             }
             behaviorView->removeGeneratorData();
             table->item(CLIP_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qFatal("BSSynchronizedClipGeneratorUI::setClipGenerator(): The 'behaviorView' pointer is NULL!!"));
         }
@@ -442,7 +442,7 @@ bool BSSynchronizedClipGeneratorUI::setBinding(int index, int row, const QString
                 varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -503,7 +503,7 @@ void BSSynchronizedClipGeneratorUI::setBindingVariable(int index, const QString 
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSSynchronizedClipGeneratorUI::setBindingVariable(): The 'bsData' pointer is NULL!!"));
     }

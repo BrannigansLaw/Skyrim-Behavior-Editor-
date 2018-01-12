@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
             }
         }
     }
-    (qFatal(QString::number(linecount)))*/
+    WARNING_MESSAGE(QString::number(linecount));*/
 
     return a.exec();
 }

@@ -167,7 +167,7 @@ void BSBoneSwitchGeneratorBoneDataUI::setGenerator(int index, const QString & na
             }
             behaviorView->removeGeneratorData();
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit returnToParent(true);
         }else{
             (qFatal("BSBoneSwitchGeneratorBoneDataUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));
@@ -195,7 +195,7 @@ bool BSBoneSwitchGeneratorBoneDataUI::setBinding(int index, int row, const QStri
                 varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -220,7 +220,7 @@ void BSBoneSwitchGeneratorBoneDataUI::setBindingVariable(int index, const QStrin
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSBoneSwitchGeneratorBoneDataUI::setBindingVariable(): The 'bsData' pointer is NULL!!"));
     }

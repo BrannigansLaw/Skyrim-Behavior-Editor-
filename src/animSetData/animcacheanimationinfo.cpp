@@ -61,3 +61,14 @@ bool AnimCacheAnimationInfo::write(QFile *file, QTextStream &out) const{
     out << "7891816" << "\n";
     return true;
 }
+
+void AnimCacheAnimationInfo::setAnimationData(const QString &path, const QString &name, bool compute){
+    if (compute){
+        HkCRC crcGen;
+        crcPath = crcGen.compute(path.toLower().toLocal8Bit());
+        crcAnimationName = crcGen.compute(name.toLower().toLocal8Bit());
+    }else{
+        crcPath = path;
+        crcAnimationName = name;
+    }
+}

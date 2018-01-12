@@ -155,7 +155,7 @@ void BSTimerModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -166,7 +166,7 @@ void BSTimerModifierUI::setName(){
 void BSTimerModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSTimerModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -176,7 +176,7 @@ void BSTimerModifierUI::setAlarmTimeSeconds(){
     if (bsData){
         if (bsData->alarmTimeSeconds != alarmTimeSeconds->value()){
             bsData->alarmTimeSeconds = alarmTimeSeconds->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSTimerModifierUI::setalarmTimeSeconds(): The data is NULL!!"));
@@ -189,7 +189,7 @@ void BSTimerModifierUI::setAlarmEventId(int index, const QString & name){
         if (bsData->alarmEvent.id != index){
             bsData->alarmEvent.id = index;
             table->item(ALARM_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSTimerModifierUI::setAlarmEventId(): The data is NULL!!"));
@@ -211,7 +211,7 @@ void BSTimerModifierUI::setAlarmEventPayload(){
         }else{
             bsData->alarmEvent.payload = HkxSharedPtr();
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSTimerModifierUI::setalarmEventPayload(): The data is NULL!!"));
     }
@@ -220,7 +220,7 @@ void BSTimerModifierUI::setAlarmEventPayload(){
 void BSTimerModifierUI::setResetAlarm(){
     if (bsData){
         bsData->resetAlarm = resetAlarm->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSTimerModifierUI::setResetAlarm(): The data is NULL!!"));
     }
@@ -336,7 +336,7 @@ bool BSTimerModifierUI::setBinding(int index, int row, const QString &variableNa
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -372,7 +372,7 @@ void BSTimerModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSTimerModifierUI::setBindingVariable(): The data is NULL!!"));
     }

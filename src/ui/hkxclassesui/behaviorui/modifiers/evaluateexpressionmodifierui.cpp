@@ -97,7 +97,7 @@ void EvaluateExpressionModifierUI::addExpression(){
             bsData->expressions = HkxSharedPtr(exps);
         }
         exps->addExpression();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
         (qFatal("EvaluateExpressionModifierUI::addExpression(): The data is NULL!!"));
@@ -115,7 +115,7 @@ void EvaluateExpressionModifierUI::removeExpression(int index){
                 (qWarning("EvaluateExpressionModifierUI::removeExpression(): Invalid row index selected!!"));
                 return;
             }
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             loadDynamicTableRows();
         }else{
             (qWarning("EvaluateExpressionModifierUI::removeExpression(): Event data is NULL!!"));
@@ -215,7 +215,7 @@ bool EvaluateExpressionModifierUI::setBinding(int index, int row, const QString 
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -239,7 +239,7 @@ void EvaluateExpressionModifierUI::setBindingVariable(int index, const QString &
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("EvaluateExpressionModifierUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -256,7 +256,7 @@ void EvaluateExpressionModifierUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit modifierNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("EvaluateExpressionModifierUI::setName(): The data is NULL!!"));
@@ -266,7 +266,7 @@ void EvaluateExpressionModifierUI::setName(){
 void EvaluateExpressionModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("EvaluateExpressionModifierUI::setEnable(): The data is NULL!!"));
     }

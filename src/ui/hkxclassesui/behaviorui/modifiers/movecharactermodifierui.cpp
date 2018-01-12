@@ -115,7 +115,7 @@ void MoveCharacterModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -126,7 +126,7 @@ void MoveCharacterModifierUI::setName(){
 void MoveCharacterModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("MoveCharacterModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -136,7 +136,7 @@ void MoveCharacterModifierUI::setOffsetPerSecondMS(){
     if (bsData){
         if (bsData->offsetPerSecondMS != offsetPerSecondMS->value()){
             bsData->offsetPerSecondMS = offsetPerSecondMS->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("MoveCharacterModifierUI::setOffsetPerSecondMS(): The data is NULL!!"));
@@ -230,7 +230,7 @@ bool MoveCharacterModifierUI::setBinding(int index, int row, const QString &vari
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -260,7 +260,7 @@ void MoveCharacterModifierUI::setBindingVariable(int index, const QString &name)
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("MoveCharacterModifierUI::setBindingVariable(): The data is NULL!!"));
     }

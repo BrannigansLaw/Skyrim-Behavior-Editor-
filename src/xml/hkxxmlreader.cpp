@@ -339,6 +339,19 @@ QByteArray HkxXmlReader::getNthAttributeValueAt(int index, int nth) const{
     }
 }
 
+QByteArray HkxXmlReader::findFirstValueWithAttributeValue(const QString &attributevalue) const{
+    for (int i = 0; i < elementList.size(); i++){
+        if (!elementList.at(i).attributeList.isEmpty()){
+            for (int j = 0; j < elementList.at(i).attributeList.size(); j++){
+                if (elementList.at(i).attributeList.at(j).value == attributevalue){
+                    return elementList.at(i).value;
+                }
+            }
+        }
+    }
+    return "";
+}
+
 void HkxXmlReader::setFile(HkxFile *file){
     hkxXmlFile = file;
 }

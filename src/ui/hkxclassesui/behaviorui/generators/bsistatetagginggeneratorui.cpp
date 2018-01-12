@@ -133,7 +133,7 @@ void BSiStateTaggingGeneratorUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }
@@ -143,7 +143,7 @@ void BSiStateTaggingGeneratorUI::setIStateToSetAs(){
     if (bsData){
         if (bsData->iStateToSetAs != iStateToSetAs->value()){
             bsData->iStateToSetAs = iStateToSetAs->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSiStateTaggingGeneratorUI::setIStateToSetAs(): The 'bsData' pointer is NULL!!"));
@@ -154,7 +154,7 @@ void BSiStateTaggingGeneratorUI::setIPriority(){
     if (bsData){
         if (bsData->iPriority != iPriority->value()){
             bsData->iPriority = iPriority->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSiStateTaggingGeneratorUI::setIPriority(): The 'bsData' pointer is NULL!!"));
@@ -186,7 +186,7 @@ void BSiStateTaggingGeneratorUI::setDefaultGenerator(int index, const QString & 
             }
             behaviorView->removeGeneratorData();
             table->item(P_DEFAULT_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qFatal("BSiStateTaggingGeneratorUI::setDefaultGenerator(): The 'behaviorView' pointer is NULL!!"));
         }
@@ -242,7 +242,7 @@ bool BSiStateTaggingGeneratorUI::setBinding(int index, int row, const QString & 
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -273,7 +273,7 @@ void BSiStateTaggingGeneratorUI::setBindingVariable(int index, const QString & n
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSiStateTaggingGeneratorUI::setBindingVariable(): The 'bsData' pointer is NULL!!"));
     }

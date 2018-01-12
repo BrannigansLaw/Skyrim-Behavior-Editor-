@@ -16,6 +16,7 @@ class BehaviorFile: public HkxFile
     friend class hkbBehaviorGraph;
     friend class MainWindow;
     friend class HkDataUI;
+    friend class ProjectFile;
 public:
     BehaviorFile(MainWindow *window, ProjectFile *projectfile, CharacterFile *characterData, const QString & name);
     virtual ~BehaviorFile();

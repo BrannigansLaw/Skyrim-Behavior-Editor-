@@ -190,7 +190,7 @@ void BSEventEveryNEventsModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -201,7 +201,7 @@ void BSEventEveryNEventsModifierUI::setName(){
 void BSEventEveryNEventsModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventEveryNEventsModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -213,7 +213,7 @@ void BSEventEveryNEventsModifierUI::setEventToCheckForId(int index, const QStrin
         if (bsData->eventToCheckFor.id != index){
             bsData->eventToCheckFor.id = index;
             table->item(EVENT_TO_CHECK_FOR_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSEventEveryNEventsModifierUI::seteventToCheckForId(): The data is NULL!!"));
@@ -235,7 +235,7 @@ void BSEventEveryNEventsModifierUI::setEventToCheckForPayload(){
         }else{
             bsData->eventToCheckFor.payload = HkxSharedPtr();
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventEveryNEventsModifierUI::seteventToCheckForPayload(): The data is NULL!!"));
     }
@@ -247,7 +247,7 @@ void BSEventEveryNEventsModifierUI::setEventToSendId(int index, const QString &n
         if (bsData->eventToSend.id != index){
             bsData->eventToSend.id = index;
             table->item(EVENT_TO_SEND_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSEventEveryNEventsModifierUI::setEventToSendId(): The data is NULL!!"));
@@ -269,7 +269,7 @@ void BSEventEveryNEventsModifierUI::setEventToSendPayload(){
         }else{
             bsData->eventToSend.payload = HkxSharedPtr();
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventEveryNEventsModifierUI::setEventToSendPayload(): The data is NULL!!"));
     }
@@ -279,7 +279,7 @@ void BSEventEveryNEventsModifierUI::setNumberOfEventsBeforeSend(){
     if (bsData){
         if (bsData->numberOfEventsBeforeSend != numberOfEventsBeforeSend->value()){
             bsData->numberOfEventsBeforeSend = numberOfEventsBeforeSend->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSEventEveryNEventsModifierUI::setnumberOfEventsBeforeSend(): The data is NULL!!"));
@@ -290,7 +290,7 @@ void BSEventEveryNEventsModifierUI::setMinimumNumberOfEventsBeforeSend(){
     if (bsData){
         if (bsData->minimumNumberOfEventsBeforeSend != minimumNumberOfEventsBeforeSend->value()){
             bsData->minimumNumberOfEventsBeforeSend = minimumNumberOfEventsBeforeSend->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSEventEveryNEventsModifierUI::setminimumNumberOfEventsBeforeSend(): The data is NULL!!"));
@@ -300,7 +300,7 @@ void BSEventEveryNEventsModifierUI::setMinimumNumberOfEventsBeforeSend(){
 void BSEventEveryNEventsModifierUI::setRandomizeNumberOfEvents(){
     if (bsData){
         bsData->randomizeNumberOfEvents = randomizeNumberOfEvents->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventEveryNEventsModifierUI::setrandomizeNumberOfEvents(): The data is NULL!!"));
     }
@@ -446,7 +446,7 @@ bool BSEventEveryNEventsModifierUI::setBinding(int index, int row, const QString
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -488,7 +488,7 @@ void BSEventEveryNEventsModifierUI::setBindingVariable(int index, const QString 
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSEventEveryNEventsModifierUI::setBindingVariable(): The data is NULL!!"));
     }

@@ -279,7 +279,7 @@ bool HandUI::setBinding(int index, int row, const QString & variableName, const 
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -369,7 +369,7 @@ void HandUI::setBindingVariable(int index, const QString & name){
         default:
             return;
         }
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("HandUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -379,7 +379,7 @@ void HandUI::setTargetPosition(){
     if (bsData && file){
         if (bsData->controlData.targetPosition != targetPosition->value()){
             bsData->controlData.targetPosition = targetPosition->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("HandUI::settargetPosition(): Behavior file or event data is null!!!"));
@@ -390,7 +390,7 @@ void HandUI::setTargetRotation(){
     if (bsData && file){
         if (bsData->controlData.targetRotation != targetRotation->value()){
             bsData->controlData.targetRotation = targetRotation->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("HandUI::settargetRotation(): Behavior file or event data is null!!!"));
@@ -401,7 +401,7 @@ void HandUI::setTargetNormal(){
     if (bsData && file){
         if (bsData->controlData.targetNormal != targetNormal->value()){
             bsData->controlData.targetNormal = targetNormal->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("HandUI::settargetNormal(): Behavior file or event data is null!!!"));
@@ -412,7 +412,7 @@ void HandUI::setTransformOnFraction(){
     if (bsData && file){
         if (bsData->controlData.transformOnFraction != transformOnFraction->value()){
             bsData->controlData.transformOnFraction = transformOnFraction->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("HandUI::settransformOnFraction(): Behavior file or event data is null!!!"));
@@ -423,7 +423,7 @@ void HandUI::setNormalOnFraction(){
     if (bsData && file){
         if (bsData->controlData.normalOnFraction != normalOnFraction->value()){
             bsData->controlData.normalOnFraction = normalOnFraction->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("HandUI::setnormalOnFraction(): Behavior file or event data is null!!!"));
@@ -434,7 +434,7 @@ void HandUI::setFadeInDuration(){
     if (bsData && file){
         if (bsData->controlData.fadeInDuration != fadeInDuration->value()){
             bsData->controlData.fadeInDuration = fadeInDuration->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("HandUI::setFadeInDuration(): Behavior file or event data is null!!!"));
@@ -445,7 +445,7 @@ void HandUI::setFadeOutDuration(){
     if (bsData && file){
         if (bsData->controlData.fadeOutDuration != fadeOutDuration->value()){
             bsData->controlData.fadeOutDuration = fadeOutDuration->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("HandUI::setFadeOutDuration(): Behavior file or event data is null!!!"));
@@ -456,7 +456,7 @@ void HandUI::setExtrapolationTimeStep(){
     if (bsData && file){
         if (bsData->controlData.extrapolationTimeStep != extrapolationTimeStep->value()){
             bsData->controlData.extrapolationTimeStep = extrapolationTimeStep->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("HandUI::setExtrapolationTimeStep(): Behavior file or event data is null!!!"));
@@ -467,7 +467,7 @@ void HandUI::setHandleChangeSpeed(){
     if (bsData && file){
         if (bsData->controlData.handleChangeSpeed != handleChangeSpeed->value()){
             bsData->controlData.handleChangeSpeed = handleChangeSpeed->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("HandUI::setHandleChangeSpeed(): Behavior file or event data is null!!!"));
@@ -477,7 +477,7 @@ void HandUI::setHandleChangeSpeed(){
 void HandUI::setHandleChangeMode(const QString &mode){
     if (bsData && file){
         bsData->controlData.handleChangeMode = mode;
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("HandUI::setHandleChangeSpeed(): Behavior file or event data is null!!!"));
     }
@@ -487,7 +487,7 @@ void HandUI::setFixUp(){
     if (bsData && file){
         if (bsData->controlData.fixUp != fixUp->isChecked()){
             bsData->controlData.fixUp = fixUp->isChecked();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("HandUI::setFixUp(): Behavior file or event data is null!!!"));
@@ -497,7 +497,7 @@ void HandUI::setFixUp(){
 void HandUI::setHandIndex(int index){
     if (bsData && file){
         bsData->handIndex = index - 1;
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("HandUI::setindex(): Behavior file or event data is null!!!"));
     }
@@ -506,7 +506,7 @@ void HandUI::setHandIndex(int index){
 void HandUI::setEnable(){
     if (bsData && file){
         bsData->enable = enable->isChecked();
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("HandUI::setEnable(): Behavior file or event data is null!!!"));
     }

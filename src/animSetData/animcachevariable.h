@@ -4,7 +4,9 @@
 #include <QtCore>
 
 class AnimCacheVariable{
+    friend class CacheWidget;
     friend class AnimCacheAnimSetData;
+    friend class CacheVariableWidget;
 public:
     AnimCacheVariable(const QString & name = "", uint val1 = 0, uint val2 = 0);
     AnimCacheVariable(const AnimCacheVariable & other);

@@ -197,7 +197,7 @@ bool BSBoneUI::setBinding(int index, int row, const QString & variableName, cons
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -251,7 +251,7 @@ void BSBoneUI::setBindingVariable(int index, const QString & name){
         default:
             return;
         }
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("BSBoneUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -260,7 +260,7 @@ void BSBoneUI::setBindingVariable(int index, const QString & name){
 void BSBoneUI::setIndex(int index){
     if (bsData && file){
         bsData->index = index - 1;
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("BSBoneUI::setindex(): Behavior file or event data is null!!!"));
     }
@@ -270,7 +270,7 @@ void BSBoneUI::setFwdAxisLS(){
     if (bsData && file){
         if (bsData->fwdAxisLS != fwdAxisLS->value()){
             bsData->fwdAxisLS = fwdAxisLS->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("BSBoneUI::setfwdAxisLS(): Behavior file or event data is null!!!"));
@@ -281,7 +281,7 @@ void BSBoneUI::setLimitAngleDegrees(){
     if (bsData && file){
         if (bsData->limitAngleDegrees != limitAngleDegrees->value()){
             bsData->limitAngleDegrees = limitAngleDegrees->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("BSBoneUI::setLimitAngleDegrees(): Behavior file or event data is null!!!"));
@@ -292,7 +292,7 @@ void BSBoneUI::setOnGain(){
     if (bsData && file){
         if (bsData->onGain != onGain->value()){
             bsData->onGain = onGain->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("BSBoneUI::setOnGain(): Behavior file or event data is null!!!"));
@@ -303,7 +303,7 @@ void BSBoneUI::setOffGain(){
     if (bsData && file){
         if (bsData->offGain != offGain->value()){
             bsData->offGain = offGain->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("BSBoneUI::setOffGain(): Behavior file or event data is null!!!"));
@@ -314,7 +314,7 @@ void BSBoneUI::setEnabled(){
     if (bsData && file){
         if (bsData->enabled != enabled->isChecked()){
             bsData->enabled = enabled->isChecked();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("BSBoneUI::setEnabled(): Behavior file or event data is null!!!"));

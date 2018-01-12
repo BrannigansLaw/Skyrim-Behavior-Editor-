@@ -61,6 +61,7 @@ ProjectUI::ProjectUI(ProjectFile *file)
     connect(enableFootIKCB, SIGNAL(clicked(bool)), this, SLOT(toggleFootIK(bool)), Qt::UniqueConnection);
     connect(enableHandIKCB, SIGNAL(clicked(bool)), this, SLOT(toggleHandIK(bool)), Qt::UniqueConnection);
     connect(addBehaviorFile, SIGNAL(released()), this, SLOT(addNewBehaviorFile()), Qt::UniqueConnection);
+    connect(animations, SIGNAL(openAnimationFile(QString)), this, SIGNAL(openAnimation(QString)), Qt::UniqueConnection);
 }
 
 ProjectUI::~ProjectUI()

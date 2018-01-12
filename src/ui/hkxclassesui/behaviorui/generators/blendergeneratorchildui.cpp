@@ -189,7 +189,7 @@ void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
             }
             behaviorView->removeGeneratorData();
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit returnToParent(true);
         }else{
             (qFatal("BlenderGeneratorChildUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));
@@ -217,7 +217,7 @@ bool BlenderGeneratorChildUI::setBinding(int index, int row, const QString & var
                 varBind->addBinding(path, variableName, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -254,7 +254,7 @@ void BlenderGeneratorChildUI::setBindingVariable(int index, const QString & name
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BlenderGeneratorChildUI::setBindingVariable(): The 'bsData' pointer is NULL!!"));
     }
@@ -264,7 +264,7 @@ void BlenderGeneratorChildUI::setWeight(){
     if (bsData){
         if (bsData->weight != weight->value()){
             bsData->weight = weight->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BlenderGeneratorChildUI::setWeight(): The 'bsData' pointer is NULL!!"));
@@ -275,7 +275,7 @@ void BlenderGeneratorChildUI::setWorldFromModelWeight(){
     if (bsData){
         if (bsData->worldFromModelWeight != worldFromModelWeight->value()){
             bsData->worldFromModelWeight = worldFromModelWeight->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BlenderGeneratorChildUI::setWorldFromModelWeight(): The 'bsData' pointer is NULL!!"));

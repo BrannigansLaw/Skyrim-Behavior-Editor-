@@ -170,7 +170,7 @@ void BSTweenerModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -181,7 +181,7 @@ void BSTweenerModifierUI::setName(){
 void BSTweenerModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSTweenerModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -190,7 +190,7 @@ void BSTweenerModifierUI::setEnable(){
 void BSTweenerModifierUI::setTweenPosition(){
     if (bsData){
         bsData->tweenPosition = tweenPosition->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSTweenerModifierUI::settweenPosition(): The data is NULL!!"));
     }
@@ -199,7 +199,7 @@ void BSTweenerModifierUI::setTweenPosition(){
 void BSTweenerModifierUI::setTweenRotation(){
     if (bsData){
         bsData->tweenRotation = tweenRotation->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSTweenerModifierUI::settweenRotation(): The data is NULL!!"));
     }
@@ -208,7 +208,7 @@ void BSTweenerModifierUI::setTweenRotation(){
 void BSTweenerModifierUI::setUseTweenDuration(){
     if (bsData){
         bsData->useTweenDuration = useTweenDuration->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSTweenerModifierUI::setuseTweenDuration(): The data is NULL!!"));
     }
@@ -218,7 +218,7 @@ void BSTweenerModifierUI::setTweenDuration(){
     if (bsData){
         if (bsData->tweenDuration != tweenDuration->value()){
             bsData->tweenDuration = tweenDuration->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSTweenerModifierUI::settweenDuration(): The data is NULL!!"));
@@ -229,7 +229,7 @@ void BSTweenerModifierUI::setTargetPosition(){
     if (bsData){
         if (bsData->targetPosition != targetPosition->value()){
             bsData->targetPosition = targetPosition->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSTweenerModifierUI::settargetPosition(): The data is NULL!!"));
@@ -240,7 +240,7 @@ void BSTweenerModifierUI::setTargetRotation(){
     if (bsData){
         if (bsData->targetRotation != targetRotation->value()){
             bsData->targetRotation = targetRotation->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSTweenerModifierUI::settargetRotation(): The data is NULL!!"));
@@ -384,7 +384,7 @@ bool BSTweenerModifierUI::setBinding(int index, int row, const QString &variable
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -444,7 +444,7 @@ void BSTweenerModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSTweenerModifierUI::setBindingVariable(): The data is NULL!!"));
     }

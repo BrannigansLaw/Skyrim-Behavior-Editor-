@@ -90,7 +90,7 @@ void BehaviorReferenceGeneratorUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
@@ -107,7 +107,7 @@ void BehaviorReferenceGeneratorUI::setBehaviorName(const QString & text){
             connectSignals();
         }else{
             bsData->behaviorName = text;
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BehaviorReferenceGeneratorUI::setBehaviorName(): The data is NULL!!"));

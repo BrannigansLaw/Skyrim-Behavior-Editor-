@@ -148,7 +148,7 @@ void BSInterpValueModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -159,7 +159,7 @@ void BSInterpValueModifierUI::setName(){
 void BSInterpValueModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSInterpValueModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -169,7 +169,7 @@ void BSInterpValueModifierUI::setSource(){
     if (bsData){
         if (bsData->source != source->value()){
             bsData->source = source->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSInterpValueModifierUI::setSource(): The data is NULL!!"));
@@ -180,7 +180,7 @@ void BSInterpValueModifierUI::setTarget(){
     if (bsData){
         if (bsData->target != target->value()){
             bsData->target = target->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSInterpValueModifierUI::setTarget(): The data is NULL!!"));
@@ -191,7 +191,7 @@ void BSInterpValueModifierUI::setResult(){
     if (bsData){
         if (bsData->result != result->value()){
             bsData->result = result->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSInterpValueModifierUI::setResult(): The data is NULL!!"));
@@ -202,7 +202,7 @@ void BSInterpValueModifierUI::setGain(){
     if (bsData){
         if (bsData->gain != gain->value()){
             bsData->gain = gain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSInterpValueModifierUI::setGain(): The data is NULL!!"));
@@ -326,7 +326,7 @@ bool BSInterpValueModifierUI::setBinding(int index, int row, const QString &vari
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -374,7 +374,7 @@ void BSInterpValueModifierUI::setBindingVariable(int index, const QString &name)
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSInterpValueModifierUI::setBindingVariable(): The data is NULL!!"));
     }

@@ -104,7 +104,7 @@ void KeyframeBonesModifierUI::disconnectSignals(){
 void KeyframeBonesModifierUI::addKeyframeInfo(){
     if (bsData){
         bsData->keyframeInfo.append(hkbKeyframeBonesModifier::hkKeyframeInfo());
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
         (qFatal("KeyframeBonesModifierUI::addKeyframeInfo(): The data is NULL!!"));
@@ -120,7 +120,7 @@ void KeyframeBonesModifierUI::removeKeyframeInfo(int index){
                 (qWarning("KeyframeBonesModifierUI::removeKeyframeInfo(): Invalid row index selected!!"));
                 return;
             }
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             loadDynamicTableRows();
         }else{
             (qWarning("KeyframeBonesModifierUI::removeKeyframeInfo(): Ranges is empty!!"));
@@ -224,7 +224,7 @@ bool KeyframeBonesModifierUI::setBinding(int index, int row, const QString & var
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -248,7 +248,7 @@ void KeyframeBonesModifierUI::setBindingVariable(int index, const QString & name
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("KeyframeBonesModifierUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -265,7 +265,7 @@ void KeyframeBonesModifierUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit modifierNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("KeyframeBonesModifierUI::setName(): The data is NULL!!"));
@@ -275,7 +275,7 @@ void KeyframeBonesModifierUI::setName(){
 void KeyframeBonesModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("KeyframeBonesModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -292,7 +292,7 @@ void KeyframeBonesModifierUI::toggleKeyframedBonesList(bool enable){
             bsData->keyframedBonesList = HkxSharedPtr(indices);
             //bones->setText(indices->getName());
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("KeyframeBonesModifierUI::toggleKeyframedBonesList(): The data is NULL!!"));
     }

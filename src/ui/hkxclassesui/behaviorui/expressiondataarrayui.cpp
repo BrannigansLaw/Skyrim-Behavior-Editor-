@@ -112,7 +112,7 @@ void ExpressionDataArrayUI::setExpression(){
     if (bsData && file){
         if (bsData->expression != expression->text()){
             bsData->expression = expression->text();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("ExpressionDataArrayUI::setExpression(): Behavior file or event data is null!!!"));
@@ -122,7 +122,7 @@ void ExpressionDataArrayUI::setExpression(){
 void ExpressionDataArrayUI::setEventMode(int index){
     if (bsData){
         bsData->eventMode = EventModeUI.at(index);
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("ExpressionDataArrayUI::setEventMode(): The data is NULL!!"));
     }
@@ -134,7 +134,7 @@ void ExpressionDataArrayUI::setAssignmentVariableIndex(int index, const QString 
         if (bsData->assignmentVariableIndex != index){
             bsData->assignmentVariableIndex = index;
             table->item(ASSIGNMENT_VARIABLE_INDEX_ROW, VALUE_COLUMN)->setText(name);
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("ExpressionDataArrayUI::setAssignmentVariableIndex(): Behavior file or event data is null!!!"));
@@ -147,7 +147,7 @@ void ExpressionDataArrayUI::setAssignmentEventIndex(int index, const QString & n
         if (bsData->assignmentEventIndex != index){
             bsData->assignmentEventIndex = index;
             table->item(ASSIGNMENT_EVENT_INDEX_ROW, VALUE_COLUMN)->setText(name);
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("ExpressionDataArrayUI::setAssignmentVariableIndex(): Behavior file or event data is null!!!"));

@@ -342,7 +342,7 @@ void StateMachineUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
@@ -354,7 +354,7 @@ void StateMachineUI::setReturnToPreviousStateEventId(int index, const QString & 
     if (bsData){
         bsData->returnToPreviousStateEventId = index - 1;
         table->item(RETURN_TO_PREVIOUS_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("StateMachineUI::setReturnToPreviousStateEventId(): The data is NULL!!"));
     }
@@ -363,7 +363,7 @@ void StateMachineUI::setReturnToPreviousStateEventId(int index, const QString & 
 void StateMachineUI::setStartStateId(int index){
     if (bsData && index < bsData->states.size()&& index > -1){
         bsData->startStateId = static_cast<hkbStateMachineStateInfo *>(bsData->states.at(index).data())->stateId;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("StateMachineUI::setStartStateId(): The data is NULL!!"));
     }
@@ -373,7 +373,7 @@ void StateMachineUI::setRandomTransitionEventId(int index, const QString & name)
     if (bsData){
         bsData->randomTransitionEventId = index - 1;
         table->item(RANDOM_TRANSITION_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("StateMachineUI::setRandomTransitionEventId(): The data is NULL!!"));
     }
@@ -383,7 +383,7 @@ void StateMachineUI::setTransitionToNextHigherStateEventId(int index, const QStr
     if (bsData){
         bsData->transitionToNextHigherStateEventId = index - 1;
         table->item(TRANSITION_TO_NEXT_HIGHER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("StateMachineUI::setTransitionToNextHigherStateEventId(): The data is NULL!!"));
     }
@@ -393,7 +393,7 @@ void StateMachineUI::setTransitionToNextLowerStateEventId(int index, const QStri
     if (bsData){
         bsData->transitionToNextLowerStateEventId = index - 1;
         table->item(TRANSITION_TO_NEXT_LOWER_STATE_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("StateMachineUI::setTransitionToNextLowerStateEventId(): The data is NULL!!"));
     }
@@ -402,7 +402,7 @@ void StateMachineUI::setTransitionToNextLowerStateEventId(int index, const QStri
 void StateMachineUI::setSyncVariableIndex(int index){
     if (bsData){
         bsData->syncVariableIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("StateMachineUI::setSyncVariableIndex(): The data is NULL!!"));
     }
@@ -411,7 +411,7 @@ void StateMachineUI::setSyncVariableIndex(int index){
 void StateMachineUI::setWrapAroundStateId(bool checked){
     if (bsData){
         bsData->wrapAroundStateId = checked;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("StateMachineUI::setWrapAroundStateId(): The data is NULL!!"));
     }
@@ -421,7 +421,7 @@ void StateMachineUI::setMaxSimultaneousTransitions(){
     if (bsData){
         if (bsData->maxSimultaneousTransitions != maxSimultaneousTransitions->value()){
             bsData->maxSimultaneousTransitions = maxSimultaneousTransitions->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("StateMachineUI::setMaxSimultaneousTransitions(): The data is NULL!!"));
@@ -431,7 +431,7 @@ void StateMachineUI::setMaxSimultaneousTransitions(){
 void StateMachineUI::setStartStateMode(int index){
     if (bsData){
         bsData->startStateMode = bsData->StartStateMode.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("StateMachineUI::setStartStateMode(): The data is NULL!!"));
     }
@@ -440,7 +440,7 @@ void StateMachineUI::setStartStateMode(int index){
 void StateMachineUI::setSelfTransitionMode(int index){
     if (bsData){
         bsData->selfTransitionMode = bsData->SelfTransitionMode.at(index);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("StateMachineUI::setSelfTransitionMode(): The data is NULL!!"));
     }
@@ -457,7 +457,7 @@ void StateMachineUI::swapGeneratorIndices(int index1, int index2){
             }else{
                 (qFatal("StateMachineUI::swapGeneratorIndices(): No item selected!!"));
             }
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("StateMachineUI::swapGeneratorIndices(): Cannot swap these rows!!"));
         }
@@ -497,7 +497,7 @@ bool StateMachineUI::setBinding(int index, int row, const QString & variableName
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -533,7 +533,7 @@ void StateMachineUI::setBindingVariable(int index, const QString & name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("StateMachineUI::setBindingVariable(): The data is NULL!!"));
     }

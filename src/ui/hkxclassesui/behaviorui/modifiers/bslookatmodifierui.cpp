@@ -355,7 +355,7 @@ void BSLookAtModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
@@ -366,7 +366,7 @@ void BSLookAtModifierUI::setName(){
 void BSLookAtModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSLookAtModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -375,7 +375,7 @@ void BSLookAtModifierUI::setEnable(){
 void BSLookAtModifierUI::setLookAtTarget(){
     if (bsData){
         bsData->lookAtTarget = lookAtTarget->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSLookAtModifierUI::setLookAtTarget(): The data is NULL!!"));
     }
@@ -385,7 +385,7 @@ void BSLookAtModifierUI::setLimitAngleDegrees(){
     if (bsData){
         if (bsData->limitAngleDegrees != limitAngleDegrees->value()){
             bsData->limitAngleDegrees = limitAngleDegrees->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSLookAtModifierUI::setLimitAngleDegrees(): The data is NULL!!"));
@@ -396,7 +396,7 @@ void BSLookAtModifierUI::setLimitAngleThresholdDegrees(){
     if (bsData){
         if (bsData->limitAngleThresholdDegrees != limitAngleThresholdDegrees->value()){
             bsData->limitAngleThresholdDegrees = limitAngleThresholdDegrees->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSLookAtModifierUI::setLimitAngleThresholdDegrees(): The data is NULL!!"));
@@ -406,7 +406,7 @@ void BSLookAtModifierUI::setLimitAngleThresholdDegrees(){
 void BSLookAtModifierUI::setContinueLookOutsideOfLimit(){
     if (bsData){
         bsData->continueLookOutsideOfLimit = continueLookOutsideOfLimit->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSLookAtModifierUI::setContinueLookOutsideOfLimit(): The data is NULL!!"));
     }
@@ -416,7 +416,7 @@ void BSLookAtModifierUI::setOnGain(){
     if (bsData){
         if (bsData->onGain != onGain->value()){
             bsData->onGain = onGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSLookAtModifierUI::setOnGain(): The data is NULL!!"));
@@ -427,7 +427,7 @@ void BSLookAtModifierUI::setOffGain(){
     if (bsData){
         if (bsData->offGain != offGain->value()){
             bsData->offGain = offGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSLookAtModifierUI::setOffGain(): The data is NULL!!"));
@@ -437,7 +437,7 @@ void BSLookAtModifierUI::setOffGain(){
 void BSLookAtModifierUI::setUseBoneGains(){
     if (bsData){
         bsData->useBoneGains = useBoneGains->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSLookAtModifierUI::setUseBoneGains(): The data is NULL!!"));
     }
@@ -447,7 +447,7 @@ void BSLookAtModifierUI::setTargetLocation(){
     if (bsData){
         if (bsData->targetLocation != targetLocation->value()){
             bsData->targetLocation = targetLocation->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSLookAtModifierUI::setTargetLocation(): The data is NULL!!"));
@@ -457,7 +457,7 @@ void BSLookAtModifierUI::setTargetLocation(){
 void BSLookAtModifierUI::setTargetOutsideLimits(){
     if (bsData){
         bsData->targetOutsideLimits = targetOutsideLimits->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSLookAtModifierUI::setTargetOutsideLimits(): The data is NULL!!"));
     }
@@ -467,7 +467,7 @@ void BSLookAtModifierUI::setTargetOutOfLimitEventId(int index, const QString &na
     if (bsData){
         bsData->id = index - 1;
         table->item(TARGET_OUT_OF_LIMIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("StateMachineUI::setTargetOutOfLimitEventId(): The data is NULL!!"));
     }
@@ -488,7 +488,7 @@ void BSLookAtModifierUI::setTargetOutOfLimitEventPayload(){
         }else{
             bsData->payload = HkxSharedPtr();
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSLookAtModifierUI::setTargetOutOfLimitEventPayload(): The data is NULL!!"));
     }
@@ -497,7 +497,7 @@ void BSLookAtModifierUI::setTargetOutOfLimitEventPayload(){
 void BSLookAtModifierUI::setLookAtCamera(){
     if (bsData){
         bsData->lookAtCamera = lookAtCamera->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSLookAtModifierUI::setLookAtCamera(): The data is NULL!!"));
     }
@@ -507,7 +507,7 @@ void BSLookAtModifierUI::setLookAtCameraX(){
     if (bsData){
         if (bsData->lookAtCameraX != lookAtCameraX->value()){
             bsData->lookAtCameraX = lookAtCameraX->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSLookAtModifierUI::setLookAtCameraX(): The data is NULL!!"));
@@ -518,7 +518,7 @@ void BSLookAtModifierUI::setLookAtCameraY(){
     if (bsData){
         if (bsData->lookAtCameraY != lookAtCameraY->value()){
             bsData->lookAtCameraY = lookAtCameraY->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSLookAtModifierUI::setLookAtCameraY(): The data is NULL!!"));
@@ -529,7 +529,7 @@ void BSLookAtModifierUI::setLookAtCameraZ(){
     if (bsData){
         if (bsData->lookAtCameraZ != lookAtCameraZ->value()){
             bsData->lookAtCameraZ = lookAtCameraZ->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSLookAtModifierUI::setLookAtCameraZ(): The data is NULL!!"));
@@ -558,7 +558,7 @@ bool BSLookAtModifierUI::setBinding(int index, int row, const QString & variable
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -660,7 +660,7 @@ void BSLookAtModifierUI::setBindingVariable(int index, const QString & name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSLookAtModifierUI::setBindingVariable(): The data is NULL!!"));
     }

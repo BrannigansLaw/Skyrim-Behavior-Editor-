@@ -187,7 +187,7 @@ bool RangesUI::setBinding(int index, int row, const QString & variableName, cons
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -223,7 +223,7 @@ void RangesUI::setBindingVariable(int index, const QString & name){
         default:
             return;
         }
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("RangesUI::setBindingVariable(): The data is NULL!!"));
     }
@@ -243,7 +243,7 @@ void RangesUI::setEventId(int index, const QString & name){
         if (bsData->event.id != index){
             bsData->event.id = index;
             table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("RangesUI::setEvent(): Behavior file or event data is null!!!"));
@@ -269,7 +269,7 @@ void RangesUI::setEventPayload(){
         }else{
             bsData->event.payload = HkxSharedPtr();
         }
-        file->toggleChanged(true);
+        file->setIsChanged(true);
     }else{
         (qFatal("RangesUI::setEventPayload(): Behavior file or event data is null!!!"));
     }
@@ -279,7 +279,7 @@ void RangesUI::setMinDistance(){
     if (bsData && file){
         if (bsData->minDistance != minDistance->value()){
             bsData->minDistance = minDistance->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("RangesUI::setMinDistance(): Behavior file or event data is null!!!"));
@@ -290,7 +290,7 @@ void RangesUI::setMaxDistance(){
     if (bsData && file){
         if (bsData->maxDistance != maxDistance->value()){
             bsData->maxDistance = maxDistance->value();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("RangesUI::setMaxDistance(): Behavior file or event data is null!!!"));
@@ -301,7 +301,7 @@ void RangesUI::setIgnoreHandle(){
     if (bsData && file){
         if (bsData->ignoreHandle != ignoreHandle->isChecked()){
             bsData->ignoreHandle = ignoreHandle->isChecked();
-            file->toggleChanged(true);
+            file->setIsChanged(true);
         }
     }else{
         (qFatal("RangesUI::setIsAnnotation(): Behavior file or event data is null!!!"));

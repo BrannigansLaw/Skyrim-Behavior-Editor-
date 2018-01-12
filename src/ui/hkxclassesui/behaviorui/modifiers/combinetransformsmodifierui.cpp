@@ -203,7 +203,7 @@ void CombineTransformsModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -214,7 +214,7 @@ void CombineTransformsModifierUI::setName(){
 void CombineTransformsModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("CombineTransformsModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -224,7 +224,7 @@ void CombineTransformsModifierUI::setTranslationOut(){
     if (bsData){
         if (bsData->translationOut != translationOut->value()){
             bsData->translationOut = translationOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("CombineTransformsModifierUI::setTranslationOut(): The data is NULL!!"));
@@ -235,7 +235,7 @@ void CombineTransformsModifierUI::setRotationOut(){
     if (bsData){
         if (bsData->rotationOut != rotationOut->value()){
             bsData->rotationOut = rotationOut->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("CombineTransformsModifierUI::setRotationOut(): The data is NULL!!"));
@@ -246,7 +246,7 @@ void CombineTransformsModifierUI::setLeftTranslation(){
     if (bsData){
         if (bsData->leftTranslation != leftTranslation->value()){
             bsData->leftTranslation = leftTranslation->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("CombineTransformsModifierUI::setLeftTranslation(): The data is NULL!!"));
@@ -257,7 +257,7 @@ void CombineTransformsModifierUI::setLeftRotation(){
     if (bsData){
         if (bsData->leftRotation != leftRotation->value()){
             bsData->leftRotation = leftRotation->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("CombineTransformsModifierUI::setLeftRotation(): The data is NULL!!"));
@@ -268,7 +268,7 @@ void CombineTransformsModifierUI::setRightTranslation(){
     if (bsData){
         if (bsData->rightTranslation != rightTranslation->value()){
             bsData->rightTranslation = rightTranslation->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("CombineTransformsModifierUI::setRightTranslation(): The data is NULL!!"));
@@ -279,7 +279,7 @@ void CombineTransformsModifierUI::setRightRotation(){
     if (bsData){
         if (bsData->rightRotation != rightRotation->value()){
             bsData->rightRotation = rightRotation->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("CombineTransformsModifierUI::setRightRotation(): The data is NULL!!"));
@@ -289,7 +289,7 @@ void CombineTransformsModifierUI::setRightRotation(){
 void CombineTransformsModifierUI::setInvertLeftTransform(){
     if (bsData){
         bsData->invertLeftTransform = invertLeftTransform->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("CombineTransformsModifierUI::setInvertLeftTransform(): The data is NULL!!"));
     }
@@ -298,7 +298,7 @@ void CombineTransformsModifierUI::setInvertLeftTransform(){
 void CombineTransformsModifierUI::setInvertRightTransform(){
     if (bsData){
         bsData->invertRightTransform = invertRightTransform->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("CombineTransformsModifierUI::setInvertRightTransform(): The data is NULL!!"));
     }
@@ -307,7 +307,7 @@ void CombineTransformsModifierUI::setInvertRightTransform(){
 void CombineTransformsModifierUI::setInvertResult(){
     if (bsData){
         bsData->invertResult = invertResult->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("CombineTransformsModifierUI::setInvertResult(): The data is NULL!!"));
     }
@@ -480,7 +480,7 @@ bool CombineTransformsModifierUI::setBinding(int index, int row, const QString &
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -558,7 +558,7 @@ void CombineTransformsModifierUI::setBindingVariable(int index, const QString &n
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("CombineTransformsModifierUI::setBindingVariable(): The data is NULL!!"));
     }

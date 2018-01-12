@@ -77,7 +77,6 @@
 #include "src/ui/hkxclassesui/behaviorui/modifiers/bstweenermodifierui.h"
 #include "src/ui/hkxclassesui/behaviorui/generators/bgsgamebryosequencegeneratorui.h"
 #include "src/ui/hkxclassesui/behaviorui/modifiers/eventsfromrangemodifierui.h"
-
 #include "src/ui/hkxclassesui/behaviorui/expressiondataarrayui.h"
 
 #include <QPushButton>
@@ -375,7 +374,7 @@ HkDataUI::HkDataUI(const QString &title)
 
     connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
     connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
-    connect(animationsUI, SIGNAL(animationRemoved(int)), this, SLOT(animationRemoved(int)), Qt::UniqueConnection);
+    //connect(animationsUI, SIGNAL(animationRemoved(int)), this, SLOT(animationRemoved(int)), Qt::UniqueConnection);
 
     connect(behaviorView, SIGNAL(iconSelected(TreeGraphicsItem*)), this, SLOT(changeCurrentDataWidget(TreeGraphicsItem*)), Qt::UniqueConnection);
 }
@@ -394,7 +393,7 @@ void HkDataUI::setEventsVariablesAnimationsUI(EventsUI *events, BehaviorVariable
     connect(variablesUI, SIGNAL(variableRemoved(int)), this, SLOT(variableRemoved(int)), Qt::UniqueConnection);
     connect(variablesUI, SIGNAL(variableNameChanged(QString,int)), this, SLOT(variableNameChanged(QString,int)), Qt::UniqueConnection);
     connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
-    connect(animationsUI, SIGNAL(animationRemoved(int)), this, SLOT(animationRemoved(int)), Qt::UniqueConnection);
+    //connect(animationsUI, SIGNAL(animationRemoved(int)), this, SLOT(animationRemoved(int)), Qt::UniqueConnection);
     connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
 }
 
@@ -693,15 +692,15 @@ void HkDataUI::animationAdded(const QString &name){
     animationsTable->addItem(name, "hkStringPtr");
 }
 
-void HkDataUI::animationRemoved(int index){
+/*void HkDataUI::animationRemoved(int index){
     index++;
     eventsTable->removeItem(index);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::CLIP_GENERATOR:
-        clipGenUI->animationRenamed("/", index);
+        clipGenUI->animationRenamed("/", index);    //Cannot happen!
         break;
     }
-}
+}*/
 
 void HkDataUI::variableNameChanged(const QString & newName, int index){
     index++;

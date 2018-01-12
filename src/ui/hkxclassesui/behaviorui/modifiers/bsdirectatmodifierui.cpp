@@ -327,7 +327,7 @@ void BSDirectAtModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -338,7 +338,7 @@ void BSDirectAtModifierUI::setName(){
 void BSDirectAtModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSDirectAtModifierUI::setEnable(): The data is NULL!!"));
     }
@@ -347,7 +347,7 @@ void BSDirectAtModifierUI::setEnable(){
 void BSDirectAtModifierUI::setDirectAtTarget(){
     if (bsData){
         bsData->directAtTarget = directAtTarget->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSDirectAtModifierUI::setDirectAtTarget(): The data is NULL!!"));
     }
@@ -356,7 +356,7 @@ void BSDirectAtModifierUI::setDirectAtTarget(){
 void BSDirectAtModifierUI::setSourceBoneIndex(int index){
     if (bsData){
         bsData->sourceBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSDirectAtModifierUI::setSourceBoneIndex(): The data is NULL!!"));
     }
@@ -365,7 +365,7 @@ void BSDirectAtModifierUI::setSourceBoneIndex(int index){
 void BSDirectAtModifierUI::setStartBoneIndex(int index){
     if (bsData){
         bsData->startBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSDirectAtModifierUI::setStartBoneIndex(): The data is NULL!!"));
     }
@@ -374,7 +374,7 @@ void BSDirectAtModifierUI::setStartBoneIndex(int index){
 void BSDirectAtModifierUI::setEndBoneIndex(int index){
     if (bsData){
         bsData->endBoneIndex = index - 1;
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSDirectAtModifierUI::setEndBoneIndex(): The data is NULL!!"));
     }
@@ -384,7 +384,7 @@ void BSDirectAtModifierUI::setLimitHeadingDegrees(){
     if (bsData){
         if (bsData->limitHeadingDegrees != limitHeadingDegrees->value()){
             bsData->limitHeadingDegrees = limitHeadingDegrees->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDirectAtModifierUI::setLimitHeadingDegrees(): The data is NULL!!"));
@@ -395,7 +395,7 @@ void BSDirectAtModifierUI::setLimitPitchDegrees(){
     if (bsData){
         if (bsData->limitPitchDegrees != limitPitchDegrees->value()){
             bsData->limitPitchDegrees = limitPitchDegrees->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDirectAtModifierUI::setLimitPitchDegrees(): The data is NULL!!"));
@@ -406,7 +406,7 @@ void BSDirectAtModifierUI::setOffsetHeadingDegrees(){
     if (bsData){
         if (bsData->offsetHeadingDegrees != offsetHeadingDegrees->value()){
             bsData->offsetHeadingDegrees = offsetHeadingDegrees->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDirectAtModifierUI::setOffsetHeadingDegrees(): The data is NULL!!"));
@@ -417,7 +417,7 @@ void BSDirectAtModifierUI::setOffsetPitchDegrees(){
     if (bsData){
         if (bsData->offsetPitchDegrees != offsetPitchDegrees->value()){
             bsData->offsetPitchDegrees = offsetPitchDegrees->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDirectAtModifierUI::setOffsetPitchDegrees(): The data is NULL!!"));
@@ -428,7 +428,7 @@ void BSDirectAtModifierUI::setOnGain(){
     if (bsData){
         if (bsData->onGain != onGain->value()){
             bsData->onGain = onGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDirectAtModifierUI::setOnGain(): The data is NULL!!"));
@@ -439,7 +439,7 @@ void BSDirectAtModifierUI::setOffGain(){
     if (bsData){
         if (bsData->offGain != offGain->value()){
             bsData->offGain = offGain->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDirectAtModifierUI::setOffGain(): The data is NULL!!"));
@@ -450,7 +450,7 @@ void BSDirectAtModifierUI::setTargetLocation(){
     if (bsData){
         if (bsData->targetLocation != targetLocation->value()){
             bsData->targetLocation = targetLocation->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDirectAtModifierUI::setTargetLocation(): The data is NULL!!"));
@@ -461,7 +461,7 @@ void BSDirectAtModifierUI::setUserInfo(){
     if (bsData){
         if (bsData->userInfo != userInfo->value()){
             bsData->userInfo = userInfo->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDirectAtModifierUI::setUserInfo(): The data is NULL!!"));
@@ -471,7 +471,7 @@ void BSDirectAtModifierUI::setUserInfo(){
 void BSDirectAtModifierUI::setDirectAtCamera(){
     if (bsData){
         bsData->directAtCamera = directAtCamera->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSDirectAtModifierUI::setDirectAtCamera(): The data is NULL!!"));
     }
@@ -481,7 +481,7 @@ void BSDirectAtModifierUI::setDirectAtCameraX(){
     if (bsData){
         if (bsData->directAtCameraX != directAtCameraX->value()){
             bsData->directAtCameraX = directAtCameraX->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDirectAtModifierUI::setDirectAtCameraX(): The data is NULL!!"));
@@ -492,7 +492,7 @@ void BSDirectAtModifierUI::setDirectAtCameraY(){
     if (bsData){
         if (bsData->directAtCameraY != directAtCameraY->value()){
             bsData->directAtCameraY = directAtCameraY->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDirectAtModifierUI::setDirectAtCameraY(): The data is NULL!!"));
@@ -503,7 +503,7 @@ void BSDirectAtModifierUI::setDirectAtCameraZ(){
     if (bsData){
         if (bsData->directAtCameraZ != directAtCameraZ->value()){
             bsData->directAtCameraZ = directAtCameraZ->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDirectAtModifierUI::setDirectAtCameraZ(): The data is NULL!!"));
@@ -513,7 +513,7 @@ void BSDirectAtModifierUI::setDirectAtCameraZ(){
 void BSDirectAtModifierUI::setActive(){
     if (bsData){
         bsData->active = active->isChecked();
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSDirectAtModifierUI::setActive(): The data is NULL!!"));
     }
@@ -523,7 +523,7 @@ void BSDirectAtModifierUI::setCurrentHeadingOffset(){
     if (bsData){
         if (bsData->currentHeadingOffset != currentHeadingOffset->value()){
             bsData->currentHeadingOffset = currentHeadingOffset->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDirectAtModifierUI::setCurrentHeadingOffset(): The data is NULL!!"));
@@ -533,7 +533,7 @@ void BSDirectAtModifierUI::setCurrentPitchOffset(){
     if (bsData){
         if (bsData->currentPitchOffset != currentPitchOffset->value()){
             bsData->currentPitchOffset = currentPitchOffset->value();
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         (qFatal("BSDirectAtModifierUI::setCurrentPitchOffset(): The data is NULL!!"));
@@ -806,7 +806,7 @@ bool BSDirectAtModifierUI::setBinding(int index, int row, const QString &variabl
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->toggleChanged(true);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
         }
@@ -944,7 +944,7 @@ void BSDirectAtModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->toggleChanged(true);
+        bsData->getParentFile()->setIsChanged(true);
     }else{
         (qFatal("BSDirectAtModifierUI::setBindingVariable(): The data is NULL!!"));
     }
