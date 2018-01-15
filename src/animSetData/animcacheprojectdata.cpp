@@ -1,6 +1,7 @@
 #include "animcacheprojectdata.h"
+#include <QStringList>
 
-AnimCacheProjectData::AnimCacheProjectData(const QStringList & files, const QVector <AnimCacheAnimSetData> & animdata)
+AnimCacheProjectData::AnimCacheProjectData(const QStringList & files, const QVector<AnimCacheAnimSetData *> &animdata)
     : fileNames(files), animSetData(animdata)
 {
     //
@@ -35,8 +36,8 @@ bool AnimCacheProjectData::read(QFile *file){
     }
     //Read individual project's animsetdata...
     for (uint i = 0; i < numFiles; i++){
-        animSetData.append(AnimCacheAnimSetData());
-        if (!animSetData.last().read(file)){
+        animSetData.append(new AnimCacheAnimSetData());
+        if (!animSetData.last()->read(file)){
             return false;
         }
     }
@@ -52,7 +53,7 @@ bool AnimCacheProjectData::write(QFile *file, QTextStream & out) const{
         out << fileNames.at(i) << "\n";
     }
     for (int i = 0; i < animSetData.size(); i++){
-        if (!animSetData.at(i).write(file, out)){
+        if (!animSetData.at(i)->write(file, out)){
             return false;
         }
     }

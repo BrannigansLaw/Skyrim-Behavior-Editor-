@@ -678,15 +678,15 @@ void HkDataUI::eventRemoved(int index){
     }
 }
 
-void HkDataUI::animationNameChanged(const QString &newName, int index){
+/*void HkDataUI::animationNameChanged(const QString &newName, int index){
     index++;
     animationsTable->renameItem(index, newName);
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::CLIP_GENERATOR:
-        clipGenUI->animationRenamed(newName, index);
+        //clipGenUI->animationRenamed(newName, index);
         break;
     }
-}
+}*/
 
 void HkDataUI::animationAdded(const QString &name){
     animationsTable->addItem(name, "hkStringPtr");

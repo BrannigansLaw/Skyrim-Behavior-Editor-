@@ -18,9 +18,10 @@ public:
     bool addAnimationToCache(const QString & projectname, const QString & eventname, const QVector <AnimCacheAnimationInfo> & animations, const QVector <AnimCacheVariable> & vars = QVector <AnimCacheVariable> (), const QVector <AnimCacheClipInfo> & clips = QVector <AnimCacheClipInfo> ());
     bool removeAnimationFromCache(const QString & projectname, const QString & animationname, const QString & variablename = "", const QString & clipname = "");
     //bool extractProject(const QString & projectname);
+    AnimCacheProjectData *getProjectCacheData(const QString &name);
 private:
     QStringList projectNames;
-    QVector <AnimCacheProjectData> projects;
+    QVector <AnimCacheProjectData *> projects;
 };
 
 #endif // SKYRIMANIMSETDATA_H

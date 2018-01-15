@@ -5,6 +5,7 @@
 #include "src/animData/skyrimanimationmotiondata.h"
 #include "src/animData/skyrimanimdata.h"
 #include "src/animSetData/skyrimanimsetdata.h"
+#include "src/animSetData/hkcrc.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/xml/hkxxmlwriter.h"
 #include "src/ui/mainwindow.h"
@@ -18,10 +19,12 @@ ProjectFile::ProjectFile(MainWindow *window, const QString & name)
     : HkxFile(window, name),
       largestRef(0),
       projectIndex(-1),
-      skyrimAnimData(new SkyrimAnimData)
+      skyrimAnimData(new SkyrimAnimData),
+      skyrimAnimSetData(new SkyrimAnimSetData)
 {
-    projectName = QString(fileName().section("/", -1, -1)).remove(".hkx");
-    projectPath = "meshes/actors/"+projectName+"/animations";
+    projectName = fileName().section("/", -1, -1).remove(".hkx");
+    projectFolderName = fileName().section("/", -2, -2);
+    projectAnimationsPath = "meshes/actors/"+projectFolderName+"/animations";
     getReader().setFile(this);
 }
 
@@ -67,7 +70,7 @@ bool ProjectFile::readAnimationSetData(const QString & filename){
             (qFatal("animationsetdatasinglefile.txt is missing from the application directory!"));
         }
     }
-    if (!skyrimAnimSetData.parse(animsetfile)){
+    if (!skyrimAnimSetData->parse(animsetfile)){
         delete animsetfile;
         (qFatal("ProjectFile::readAnimationSetData(): The project animation set data file could not be parsed!!!"));
         return false;
@@ -200,6 +203,10 @@ bool ProjectFile::link(){
     return true;
 }
 
+AnimCacheProjectData *ProjectFile::getProjectCacheData() const{
+    return skyrimAnimSetData->getProjectCacheData(projectName);
+}
+
 void ProjectFile::setAnimationIndexDuration(int indexofanimationlist, int animationindex, qreal duration){
     ProjectAnimData *project = skyrimAnimData->getProjectAnimData(projectName);
     if (project){
@@ -229,6 +236,24 @@ void ProjectFile::generateAnimDataForProject(){
     }
 }
 
+void ProjectFile::loadEncryptedAnimationNames(){
+    HkCRC encryptor;
+    QStringList list = getAnimationNames();
+    for (int i = 0; i < list.size(); i++){
+        encryptedAnimationNames.append(QString(encryptor.compute(list.at(i).section("\\", -1, -1).toLower().replace(".hkx", "").toLocal8Bit())));
+    }
+}
+
+void ProjectFile::addEncryptedAnimationName(const QString &unencryptedname){
+    encryptedAnimationNames.append(HkCRC().compute(unencryptedname.section("\\", -1, -1).toLower().replace(".hkx", "").toLocal8Bit()));
+}
+
+void ProjectFile::removeEncryptedAnimationName(int index){
+    if (index > -1 && index < encryptedAnimationNames.size()){
+        encryptedAnimationNames.removeAt(index);
+    }
+}
+
 int ProjectFile::getAnimationIndex(const QString & name) const{
     if (character){
         return character->getAnimationIndex(name);
@@ -250,6 +275,35 @@ bool ProjectFile::isAnimationUsed(const QString &animationname){
         }
     }
     return false;
+}
+
+QStringList ProjectFile::getAnimationNames() const{
+    if (character){
+        return character->getAnimationNames();
+    }
+    return QStringList();
+}
+
+QString ProjectFile::findAnimationNameFromEncryptedData(const QString &encryptedname) const{
+    bool ok;
+    ulong value1;
+    ulong value2 = encryptedname.toULong(&ok, 10);
+    if (!ok){
+        (qFatal("ProjectFile::findAnimationNameFromEncryptedData(): encryptedname.toULong(&ok, 10) Failed!"));
+    }
+    for (int i = 0; i < encryptedAnimationNames.size(); i++){
+        value1 = encryptedAnimationNames.at(i).toULong(&ok, 16);
+        if (!ok){
+            (qFatal("ProjectFile::findAnimationNameFromEncryptedData(): encryptedAnimationNames.at(i).toULong(&ok, 16) Failed!"));
+        }
+        if (value1 == value2){
+            if (!character){
+                (qFatal("ProjectFile::findAnimationNameFromEncryptedData(): character is NULL!"));
+            }
+            return character->getAnimationNameAt(i).toLower().section("\\", -1, -1).replace(".hkx", "");
+        }
+    }
+    return "";
 }
 
 bool ProjectFile::appendClipGeneratorAnimData(const QString &name){

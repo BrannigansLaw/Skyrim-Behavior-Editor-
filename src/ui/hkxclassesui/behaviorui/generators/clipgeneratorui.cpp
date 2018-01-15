@@ -846,13 +846,13 @@ void ClipGeneratorUI::eventRenamed(const QString & name, int index){
     }
 }
 
-void ClipGeneratorUI::animationRenamed(const QString &name, int index){
+/*void ClipGeneratorUI::animationRenamed(const QString &name, int index){
     if (bsData){
         //if ()
     }else{
         (qFatal("ClipGeneratorUI::animationRenamed(): The data is NULL!!"));
     }
-}
+}*/
 
 void ClipGeneratorUI::variableRenamed(const QString & name, int index){
     int bindIndex = -1;

@@ -139,7 +139,7 @@ void AnimationsUI::removeAnimation(){
             stackLyt->setCurrentIndex(TABLE_WIDGET);
         }
         loadedData->getParentFile()->setIsChanged(true);
-        //emit animationRemoved(index);
+        emit animationRemoved(index);
     }else{
         WARNING_MESSAGE(QString("Animation is in use! Check the text log for information on where the animation is used..."))
     }

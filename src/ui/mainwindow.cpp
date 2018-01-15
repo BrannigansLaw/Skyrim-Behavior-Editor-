@@ -17,6 +17,7 @@
 #include "src/hkxclasses/behavior/generators/hkbbehaviorgraph.h"
 #include "src/ui/genericdatawidgets.h"
 #include "src/ui/hkxclassesui/behaviorui/animationsui.h"
+#include "src/ui/hkxclassesui/animationcacheui.h"
 
 #include <QtWidgets>
 
@@ -40,7 +41,11 @@ MainWindow::MainWindow()
       viewM(new QMenu("View", this)),
       expandA(new QAction("Expand All", this)),
       collapseA(new QAction("Collapse All", this)),
+      viewAnimationCacheA(new QAction("View Animation Cache", this)),
       refocusA(new QAction("Refocus On Selected Item", this)),
+      settingsM(new QMenu("Settings", this)),
+      setPathToGameFolderA(new QAction("Set Path To Game Directory", this)),
+      setGameModeA(new QAction("Set Game Mode", this)),
       tabs(new QTabWidget),
       projectFile(NULL),
       characterFile(NULL),
@@ -54,7 +59,10 @@ MainWindow::MainWindow()
       objectDataWid(new HkDataUI("Object Data")),
       logGB(new QGroupBox("Debug Log")),
       logGBLyt(new QVBoxLayout(this)),
-      lastFileSelected("C:/")
+      lastFileSelected("C:/"),
+      animationCacheUI(nullptr),
+      gameFolderLE(new QLineEdit)
+      //animationCacheSA(new QScrollArea)
 {
     //setStyleSheet("QComboBox {background: yellow};QWidget {background: darkGray}");
     projectUI->setDisabled(true);
@@ -62,6 +70,12 @@ MainWindow::MainWindow()
     //hkxcmdPath = QDir::currentPath()+"/hkxcmd.exe";
 
     hkxcmdPath = "c:/users/wayne/desktop/hkxcmd.exe";
+
+    animationCacheUI = new AnimationCacheUI();
+    animationCacheUI->setWindowTitle("Project Animation Cache Data!");
+    animationCacheUI->setVisible(false);
+    gameFolderLE->setWindowTitle("Set the path to the game directory!");
+    gameFolderLE->setVisible(false);
 
     openPackedProjectA->setStatusTip("Open a hkx project file!");
     //openPackedProjectA->setShortcut(QKeySequence::Open);
@@ -90,9 +104,13 @@ MainWindow::MainWindow()
     //collapseA->setShortcut(QKeySequence::ZoomOut);
     refocusA->setStatusTip("Centers the behavior view on the selected item!");
     //refocusA->setShortcut(QKeySequence::Back);
+    setGameModeA->setCheckable(true);
+    settingsM->addAction(setPathToGameFolderA);
+    settingsM->addAction(setGameModeA);
     viewM->addAction(expandA);
     viewM->addAction(collapseA);
     viewM->addAction(refocusA);
+    viewM->addAction(viewAnimationCacheA);
     topMB->setMaximumHeight(50);
     topMB->addMenu(fileM);
     topMB->addMenu(viewM);
@@ -114,6 +132,9 @@ MainWindow::MainWindow()
     readSettings();
     setLayout(topLyt);
     objectDataSA->setWidget(objectDataWid);
+    //animationCacheSA->setWidget(animationCacheUI);
+    //animationCacheSA->setVisible(false);
+    //animationCacheSA->setWindowFlags();
     //objectDataSA->setStyleSheet("QScrollArea {background-color:cyan}");
     //variablesWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
     //eventsWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
@@ -129,6 +150,7 @@ MainWindow::MainWindow()
     connect(saveProjectA, SIGNAL(triggered(bool)), this, SLOT(saveProject()), Qt::UniqueConnection);
     connect(expandA, SIGNAL(triggered(bool)), this, SLOT(expandBranches()), Qt::UniqueConnection);
     connect(collapseA, SIGNAL(triggered(bool)), this, SLOT(collapseBranches()), Qt::UniqueConnection);
+    connect(viewAnimationCacheA, SIGNAL(triggered(bool)), this, SLOT(viewAnimationCache()), Qt::UniqueConnection);
     connect(refocusA, SIGNAL(triggered(bool)), this, SLOT(refocus()), Qt::UniqueConnection);
     connect(exitA, SIGNAL(triggered(bool)), this, SLOT(exit()), Qt::UniqueConnection);
     connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(changedTabs(int)), Qt::UniqueConnection);
@@ -136,6 +158,10 @@ MainWindow::MainWindow()
     connect(projectUI, SIGNAL(openFile(QModelIndex)), this, SLOT(openBehaviorFile(QModelIndex)), Qt::UniqueConnection);
     connect(projectUI, SIGNAL(addBehavior(bool)), this, SLOT(addNewBehavior(bool)), Qt::UniqueConnection);
     connect(projectUI, SIGNAL(openAnimation(QString)), this, SLOT(openAnimationFile(QString)), Qt::UniqueConnection);
+    connect(projectUI, SIGNAL(animationRemoved(int)), this, SLOT(removeAnimation(int)), Qt::UniqueConnection);
+    connect(setGameModeA, SIGNAL(changed()), this, SLOT(setGameMode()), Qt::UniqueConnection);
+    connect(setPathToGameFolderA, SIGNAL(toggled(bool)), this, SLOT(viewPathToGameDirectory()), Qt::UniqueConnection);
+    connect(gameFolderLE, SIGNAL(textChanged(QString)), this, SLOT(setPathToGameDirectory(QString)), Qt::UniqueConnection);
 }
 
 MainWindow::~MainWindow(){
@@ -257,8 +283,33 @@ void MainWindow::refocus(){
     }
 }
 
+void MainWindow::setGameMode(){
+    //
+    //
+    //
+    //
+}
+
+void MainWindow::viewPathToGameDirectory(){
+    gameFolderLE->setVisible(true);
+}
+
+void MainWindow::setPathToGameDirectory(const QString &newpath){
+    skyrimDirectory = newpath;
+}
+
 void MainWindow::save(){
     saveFile(getBehaviorGraphIndex(tabs->tabText(tabs->currentIndex())));
+}
+
+void MainWindow::viewAnimationCache(){
+    if (projectFile){
+        animationCacheUI->loadData(projectFile);
+        animationCacheUI->setVisible(true);
+        //animationCacheSA->setVisible(true);
+    }else{
+        (qWarning("MainWindow::viewAnimationCache(): No project opened!"));
+    }
 }
 
 void MainWindow::saveFile(int index){
@@ -324,7 +375,7 @@ void MainWindow::saveProject(){
                 (qWarning("Failed to remove to old animSetData file!"));
             }
         }
-        projectFile->skyrimAnimSetData.write(lastFileSelectedPath+"/animationsetdatasinglefile.txt");
+        projectFile->skyrimAnimSetData->write(lastFileSelectedPath+"/animationsetdatasinglefile.txt");
         if (characterFile){
             if (characterFile->getIsChanged()){
                 characterFile->write();
@@ -595,6 +646,7 @@ void MainWindow::openProject(QString & filepath){
     }
     dialog.setProgress("Character data loaded sucessfully!!!", 40);
     projectFile->setCharacterFile(characterFile);
+    projectFile->loadEncryptedAnimationNames();
     writeToLog("\n-------------------------\nTime taken to open file \""+lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0)+
                                "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
     time = t.elapsed();
@@ -874,8 +926,13 @@ void MainWindow::openAnimationFile(const QString &animationname){
         (qFatal("MainWindow::openAnimationFile(): The selected animation file was not opened!"));
     }
     projectFile->setAnimationIndexDuration(-1, characterFile->getNumberOfAnimations() - 1, ptr->getDuration());
+    projectFile->addEncryptedAnimationName(animationname);
     ptr->remove();
     delete ptr;
+}
+
+void MainWindow::removeAnimation(int index){
+    projectFile->removeEncryptedAnimationName(index);
 }
 
 int MainWindow::getBehaviorGraphIndex(const QString & filename) const{
@@ -913,28 +970,30 @@ bool MainWindow::findSkyrimDirectory(){
     QString driveName;
     QString path;
     QDir dir;
+    bool value = false;
     for (int i = 0; i < drives.size(); i++){
         driveName = drives.at(i).absolutePath();
         dir.setPath(driveName);
         path = driveName+"Program Files/Steam/steamapps/common/Skyrim";
         if (dir.exists(path)){
             skyrimDirectory = path;
-            return true;
+            value = true;
         }else{
             path = driveName+"Steam/steamapps/common/Skyrim";
             if (dir.exists(path)){
                 skyrimDirectory = path;
-                return true;
+                value = true;
             }else{
                 path = driveName+"Steam Games/steamapps/common/Skyrim";
                 if (dir.exists(path)){
                     skyrimDirectory = path;
-                    return true;
+                    value = true;
                 }
             }
         }
     }
-    return false;
+    gameFolderLE->setText(skyrimDirectory);
+    return value;
 }
 
 MainWindow::HKXCMD_RETURN MainWindow::hkxcmd(const QString &filepath, const QString &outputDirectory, const QString &flags){

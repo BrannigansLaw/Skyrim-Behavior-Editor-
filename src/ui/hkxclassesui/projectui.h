@@ -30,6 +30,7 @@ signals:
     void openFile(const QModelIndex & index);
     void addBehavior(bool initData);
     void openAnimation(const QString & filename);
+    void animationRemoved(int index);
 protected:
 private slots:
     void toggleFootIK(bool toggle);

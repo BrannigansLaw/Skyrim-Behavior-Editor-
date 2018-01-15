@@ -8,7 +8,7 @@ class HkCRC
 {
 public:
     HkCRC();
-    QByteArray compute(QByteArray input);
+    QByteArray compute(const QByteArray &input);
 private:
     int reflectByte(int c);
     void reflect(int * crc, int bitnum, int startLSB);

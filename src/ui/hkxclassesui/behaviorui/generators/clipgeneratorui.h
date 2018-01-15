@@ -61,7 +61,7 @@ private:
     void addTrigger();
     void removeTrigger(int index);
     void eventRenamed(const QString & name, int index);
-    void animationRenamed(const QString & name, int index);
+    //void animationRenamed(const QString & name, int index);
     void loadDynamicTableRows();
     void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events, GenericTableWidget *animations);
     void variableRenamed(const QString & name, int index);

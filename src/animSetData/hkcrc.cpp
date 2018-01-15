@@ -36,7 +36,7 @@ void HkCRC::reflect(int * crc, int bitnum, int startLSB){
     }
 }
 
-QByteArray HkCRC::compute(QByteArray input){
+QByteArray HkCRC::compute(const QByteArray & input){
     // computes crc value
     int i,j,k,bit,datalen,len,flag,counter,c,order,ch,actchar;
     QByteArray data,output;

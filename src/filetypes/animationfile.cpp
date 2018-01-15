@@ -26,4 +26,5 @@ bool AnimationFile::parse(){
     if (!ok){
         (qFatal("AnimationFile::parse(): The animation duration was not found!"));
     }
+    return ok;
 }

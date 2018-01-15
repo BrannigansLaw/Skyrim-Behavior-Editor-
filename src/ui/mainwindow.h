@@ -32,6 +32,7 @@ class CharacterFile;
 class ProjectFile;
 class SkeletonFile;
 class ProjectUI;
+class AnimationCacheUI;
 
 class PlainTextEdit: public QPlainTextEdit
 {
@@ -77,6 +78,10 @@ private:
     QAction *expandA;
     QAction *collapseA;
     QAction *refocusA;
+    QAction *viewAnimationCacheA;
+    QMenu *settingsM;
+    QAction *setPathToGameFolderA;
+    QAction *setGameModeA;
     QTabWidget *tabs;
     ProjectFile *projectFile;
     CharacterFile *characterFile;
@@ -96,15 +101,23 @@ private:
     QString lastFileSelectedPath;
     std::mutex mutex;
     std::condition_variable conditionVar;
+    AnimationCacheUI *animationCacheUI;
+    //QScrollArea *animationCacheSA;
+    QLineEdit *gameFolderLE;
 private slots:
     void openPackedProject();
     void openUnpackedProject();
     void openBehaviorFile(const QModelIndex & index);
     void openAnimationFile(const QString &animationname);
+    void removeAnimation(int index);
     void expandBranches();
     void collapseBranches();
     void refocus();
+    void setGameMode();
+    void viewPathToGameDirectory();
+    void setPathToGameDirectory(const QString & newpath);
     void save();
+    void viewAnimationCache();
     void saveProject();
     void packAndExportProjectToSkyrimDirectory();
     void exportAnimationData() const;

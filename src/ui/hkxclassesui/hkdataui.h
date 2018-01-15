@@ -113,7 +113,7 @@ public slots:
     void eventNameChanged(const QString & newName, int index);
     void eventAdded(const QString & name);
     void eventRemoved(int index);
-    void animationNameChanged(const QString & newName, int index);
+    //void animationNameChanged(const QString & newName, int index);
     void animationAdded(const QString & name);
     //void animationRemoved(int index);
     void variableNameChanged(const QString & newName, int index);
