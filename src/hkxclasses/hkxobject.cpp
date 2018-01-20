@@ -87,11 +87,11 @@ void HkxObject::unlink(){
     //
 }
 
-bool HkxObject::readData(const HkxXmlReader & reader, long index){
+bool HkxObject::readData(const HkxXmlReader & , long ){
     return false;
 }
 
-bool HkxObject::write(HkxXMLWriter *writer){
+bool HkxObject::write(HkxXMLWriter *){
     return false;
 }
 
@@ -127,7 +127,7 @@ bool HkxObject::readReferences(const QByteArray &line, QList <HkxSharedPtr> & ch
                 value[j] = line[start];
                 start++;
             }
-            children.append(HkxSharedPtr(NULL, value.toLong(&ok)));
+            children.append(HkxSharedPtr(nullptr, value.toLong(&ok)));
             if (!ok){
                 return false;
             }
@@ -144,7 +144,7 @@ bool HkxObject::readReferences(const QByteArray &line, QList <HkxSharedPtr> & ch
                 start++;
             }
             if (value == "null"){
-                children.append(HkxSharedPtr(NULL));
+                children.append(HkxSharedPtr(nullptr));
                 ok = true;
             } else {
                 return false;
@@ -429,7 +429,7 @@ HkDynamicObject::HkDynamicObject(HkxFile *parent, long ref)
 }
 
 void HkDynamicObject::addBinding(const QString & path, int varIndex, bool isProperty){
-    static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->addBinding(path, "", varIndex,(hkbVariableBindingSet::hkBinding::BindingType)(isProperty));
+    static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->addBinding(path, varIndex,(hkbVariableBindingSet::hkBinding::BindingType)(isProperty));
 }
 
 void HkDynamicObject::removeBinding(const QString & path){
@@ -448,7 +448,7 @@ bool HkDynamicObject::linkVar(){
     if (ptr){
         if ((*ptr)->getSignature() != HKB_VARIABLE_BINDING_SET){
             getParentFile()->writeToLog("HkDynamicObject: linkVar()!\nThe linked object is not a HKB_VARIABLE_BINDING_SET!\nRemoving the link to the invalid object!");
-            variableBindingSet = NULL;
+            variableBindingSet = nullptr;
             return false;
         }
         variableBindingSet = *ptr;

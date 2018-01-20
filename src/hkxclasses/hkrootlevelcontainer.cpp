@@ -102,7 +102,7 @@ bool hkRootLevelContainer::link(){
         return false;
     }
     for (int i = 0; i < namedVariants.size(); i++){//This is awful, I know. I'll sort it out later...
-        HkxSharedPtr *ptr = NULL;
+        HkxSharedPtr *ptr = nullptr;
         HkxFile *file = dynamic_cast<BehaviorFile *>(getParentFile());
         if (file){
             ptr = static_cast<BehaviorFile *>(getParentFile())->findBehaviorGraph(namedVariants.at(i).variant.getReference());

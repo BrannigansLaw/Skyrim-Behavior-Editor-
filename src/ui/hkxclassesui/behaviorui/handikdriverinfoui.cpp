@@ -27,7 +27,7 @@ QStringList HandIkDriverInfoUI::headerLabels1 = {
 };
 
 HandIkDriverInfoUI::HandIkDriverInfoUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       handDriverGB(new QGroupBox("hkbHandIkDriverInfo")),
       handUI(new HandIkDriverInfoHandUI),
       footDriverLyt(new QGridLayout),

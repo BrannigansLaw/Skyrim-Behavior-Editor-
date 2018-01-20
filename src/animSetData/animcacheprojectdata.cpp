@@ -7,6 +7,14 @@ AnimCacheProjectData::AnimCacheProjectData(const QStringList & files, const QVec
     //
 }
 
+AnimCacheProjectData::~AnimCacheProjectData(){
+    for (int i = 0; i < animSetData.size(); i++){
+        if (animSetData.at(i)){
+            delete animSetData.at(i);
+        }
+    }
+}
+
 bool AnimCacheProjectData::read(QFile *file){
     if (!file || !file->isOpen()){
         return false;

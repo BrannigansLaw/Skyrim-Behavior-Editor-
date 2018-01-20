@@ -328,7 +328,7 @@ HkxObject * hkbBehaviorGraphData::getVariantVariable(int index) const{
             return variableValues->variantVariableValues.at(count).data();
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 hkVariableType hkbBehaviorGraphData::getCharacterPropertyTypeAt(int index) const{

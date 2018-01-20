@@ -51,7 +51,7 @@ private:
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
     void selectTableToView(bool viewproperties, const QString & path);
     void variableRenamed(const QString & name, int index);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
+    void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
 private:
     static QStringList headerLabels;
     hkbBlendingTransitionEffect *bsData;

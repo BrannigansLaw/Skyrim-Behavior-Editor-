@@ -136,8 +136,8 @@ bool hkbVariableValueSet::link(){
     if (!getParentFile()){
         return false;
     }
-    HkxSharedPtr *ptr = NULL;
-    HkxFile *file = NULL;
+    HkxSharedPtr *ptr = nullptr;
+    HkxFile *file = nullptr;
     for (int i = 0; i < variantVariableValues.size(); i++){
         file = dynamic_cast<BehaviorFile *>(getParentFile());
         if (file){

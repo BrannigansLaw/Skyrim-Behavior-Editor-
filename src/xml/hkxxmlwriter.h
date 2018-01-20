@@ -13,7 +13,7 @@ class HkxXMLWriter
 {
     friend class BehaviorFile;
 public:
-    HkxXMLWriter(BehaviorFile *file = NULL);
+    HkxXMLWriter(BehaviorFile *file = nullptr);
     virtual ~HkxXMLWriter();
     bool writeToXMLFile();
 //private:

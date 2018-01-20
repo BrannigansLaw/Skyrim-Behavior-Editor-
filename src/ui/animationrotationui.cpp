@@ -30,7 +30,7 @@ QStringList AnimationRotationUI::headerLabels = {
 };
 
 AnimationRotationUI::AnimationRotationUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       topLyt(new QGridLayout),
       returnPB(new QPushButton("Return")),
       table(new TableWidget),
@@ -117,7 +117,7 @@ void AnimationRotationUI::loadData(SkyrimAnimationRotation *quaternion, qreal ma
         z->setValue(axisAngleRot.z);
         angle->setValue(axisAngleRot.w);
     }else{
-        (qFatal("AnimationRotationUI::loadData(): Data is null!!!"));
+        FATAL_RUNTIME_ERROR("AnimationRotationUI::loadData(): Data is null!!!");
     }
     connectSignals();
 }
@@ -129,7 +129,7 @@ void AnimationRotationUI::setLocalTime(){
             //file->toggleChanged(true);
         }
     }else{
-        (qFatal("AnimationRotationUI::setlocalTime(): Data is null!!!"));
+        FATAL_RUNTIME_ERROR("AnimationRotationUI::setlocalTime(): Data is null!!!");
     }
 }
 
@@ -138,7 +138,7 @@ void AnimationRotationUI::setX(qreal xval){
         bsData->x = xval*sin(angle->value()/2);
         //file->toggleChanged(true);
     }else{
-        (qFatal("AnimationRotationUI::setx(): Data is null!!!"));
+        FATAL_RUNTIME_ERROR("AnimationRotationUI::setx(): Data is null!!!");
     }
 }
 
@@ -147,7 +147,7 @@ void AnimationRotationUI::setY(qreal yval){
         bsData->y = yval*sin(angle->value()/2);
         //file->toggleChanged(true);
     }else{
-        (qFatal("AnimationRotationUI::sety(): Data is null!!!"));
+        FATAL_RUNTIME_ERROR("AnimationRotationUI::sety(): Data is null!!!");
     }
 }
 
@@ -156,7 +156,7 @@ void AnimationRotationUI::setZ(qreal zval){
         bsData->z = zval*sin(angle->value()/2);
         //file->toggleChanged(true);
     }else{
-        (qFatal("AnimationRotationUI::setz(): Data is null!!!"));
+        FATAL_RUNTIME_ERROR("AnimationRotationUI::setz(): Data is null!!!");
     }
 }
 
@@ -165,6 +165,6 @@ void AnimationRotationUI::setAngle(qreal wval){
         bsData->w = cos(wval/2);
         //file->toggleChanged(true);
     }else{
-        (qFatal("AnimationRotationUI::setz(): Data is null!!!"));
+        FATAL_RUNTIME_ERROR("AnimationRotationUI::setz(): Data is null!!!");
     }
 }

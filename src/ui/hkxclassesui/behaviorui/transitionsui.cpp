@@ -50,8 +50,8 @@ QStringList TransitionsUI::headerLabels = {
 };
 
 TransitionsUI::TransitionsUI()
-    : file(NULL),
-      bsData(NULL),
+    : file(nullptr),
+      bsData(nullptr),
       transitionIndex(-1),
       transitionUI(new BlendingTransitionEffectUI()),
       returnPB(new QPushButton("Return")),
@@ -223,7 +223,7 @@ void TransitionsUI::loadData(BehaviorFile *parentfile, hkbStateMachine *parent, 
             transition->setText(static_cast<hkbBlendingTransitionEffect *>(bsData->transition.data())->getName());
         }else{
             transition->setChecked(false);
-            transition->setText("NULL");
+            transition->setText("nullptr");
         }
         if (bsData->condition.data()){
             condition->setText(static_cast<hkbStringCondition *>(bsData->condition.data())->conditionString);
@@ -278,7 +278,7 @@ void TransitionsUI::loadData(BehaviorFile *parentfile, hkbStateMachine *parent, 
             }
         }
     }else{
-        (qFatal("TransitionsUI::loadData(): The data, parent file or parent state machine is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::loadData(): The data, parent file or parent state machine is nullptr!!");
     }
     connectSignals();
 }
@@ -296,7 +296,7 @@ void TransitionsUI::setTriggerIntervalEnterEventId(int index, const QString &nam
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::setTriggerIntervalEnterEventId(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::setTriggerIntervalEnterEventId(): The data is nullptr!!");
     }
 }
 
@@ -313,7 +313,7 @@ void TransitionsUI::setTriggerIntervalExitEventId(int index, const QString &name
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::setTriggerIntervalExitEventId(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::setTriggerIntervalExitEventId(): The data is nullptr!!");
     }
 }
 
@@ -322,7 +322,7 @@ void TransitionsUI::setTriggerIntervalEnterTime(){
         bsData->triggerInterval.enterTime = enterTimeTI->value();
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::setTriggerIntervalEnterTime(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::setTriggerIntervalEnterTime(): The data is nullptr!!");
     }
 }
 
@@ -331,7 +331,7 @@ void TransitionsUI::setTriggerIntervalExitTime(){
         bsData->triggerInterval.exitTime = exitTimeTI->value();
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::setTriggerIntervalExitTime(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::setTriggerIntervalExitTime(): The data is nullptr!!");
     }
 }
 
@@ -348,7 +348,7 @@ void TransitionsUI::setInitiateIntervalEnterEventId(int index, const QString &na
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::setInitiateIntervalEnterEventId(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::setInitiateIntervalEnterEventId(): The data is nullptr!!");
     }
 }
 
@@ -365,7 +365,7 @@ void TransitionsUI::setInitiateIntervalExitEventId(int index, const QString &nam
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::setInitiateIntervalExitEventId(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::setInitiateIntervalExitEventId(): The data is nullptr!!");
     }
 }
 
@@ -374,7 +374,7 @@ void TransitionsUI::setInitiateIntervalEnterTime(){
         bsData->initiateInterval.enterTime = enterTimeII->value();
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::setInitiateIntervalEnterTime(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::setInitiateIntervalEnterTime(): The data is nullptr!!");
     }
 }
 
@@ -383,7 +383,7 @@ void TransitionsUI::setInitiateIntervalExitTime(){
         bsData->initiateInterval.exitTime = exitTimeII->value();
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::setInitiateIntervalExitTime(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::setInitiateIntervalExitTime(): The data is nullptr!!");
     }
 }
 
@@ -392,7 +392,7 @@ void TransitionsUI::viewTransitionEffect(){
         transitionUI->loadData(bsData->transition.data());
         setCurrentIndex(TRANSITION_EFFECT_WIDGET);
     }else{
-        (qFatal("TransitionsUI::viewTransitionEffect(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::viewTransitionEffect(): The data is nullptr!!");
     }
 }
 
@@ -408,7 +408,7 @@ void TransitionsUI::toggleTransitionEffect(bool enable){
             transition->setText(effect->getName());
         }
     }else{
-        (qFatal("TransitionsUI::toggleTransitionEffect(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::toggleTransitionEffect(): The data is nullptr!!");
     }
 }
 
@@ -430,7 +430,7 @@ void TransitionsUI::setCondition(){
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::setCondition(): The data or parent object is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::setCondition(): The data or parent object is nullptr!!");
     }
 }
 
@@ -440,11 +440,11 @@ void TransitionsUI::setEventId(int index, const QString &name){
         if (name != ""){
             table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }else{
-            (qFatal("TransitionsUI::setEventId(): The event name is NULL!!"));
+            FATAL_RUNTIME_ERROR("TransitionsUI::setEventId(): The event name is nullptr!!");
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::setEventId(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::setEventId(): The data is nullptr!!");
     }
 }
 
@@ -463,11 +463,11 @@ void TransitionsUI::setToStateId(const QString &name){
                 emit transitionNamChanged("to_"+name, transitionIndex);
             }
         }else{
-            (qFatal("TransitionsUI::setToStateId(): The event name is NULL!!"));
+            FATAL_RUNTIME_ERROR("TransitionsUI::setToStateId(): The event name is nullptr!!");
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::setToStateId(): The data or parent object is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::setToStateId(): The data or parent object is nullptr!!");
     }
 }
 
@@ -476,11 +476,11 @@ void TransitionsUI::setFromNestedStateId(const QString &name){
         if (name != ""){
             bsData->fromNestedStateId = parentObj->getNestedStateId(name, bsData->toStateId);
         }else{
-            (qFatal("TransitionsUI::setFromNestedStateId(): The event name is NULL!!"));
+            FATAL_RUNTIME_ERROR("TransitionsUI::setFromNestedStateId(): The event name is nullptr!!");
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::setFromNestedStateId(): The data or parent object is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::setFromNestedStateId(): The data or parent object is nullptr!!");
     }
 }
 
@@ -490,11 +490,11 @@ void TransitionsUI::setToNestedStateId(const QString &name){
             bsData->toNestedStateId = parentObj->getNestedStateId(name, bsData->toStateId);
             emit transitionNamChanged("toNestedState_"+toNestedStateId->currentText(), transitionIndex);
         }else{
-            (qFatal("TransitionsUI::setToNestedStateId(): The event name is NULL!!"));
+            FATAL_RUNTIME_ERROR("TransitionsUI::setToNestedStateId(): The event name is nullptr!!");
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::setToNestedStateId(): The data or parent object is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::setToNestedStateId(): The data or parent object is nullptr!!");
     }
 }
 
@@ -503,7 +503,7 @@ void TransitionsUI::setPriority(){
         bsData->priority = priority->value();
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::setPriority(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::setPriority(): The data is nullptr!!");
     }
 }
 
@@ -524,7 +524,7 @@ void TransitionsUI::toggleGlobalWildcardFlag(){
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::toggleGlobalWildcardFlag(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::toggleGlobalWildcardFlag(): The data is nullptr!!");
     }
 }
 
@@ -547,7 +547,7 @@ void TransitionsUI::toggleUseNestedStateFlag(){
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::toggleUseNestedStateFlag(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::toggleUseNestedStateFlag(): The data is nullptr!!");
     }
 }
 
@@ -568,7 +568,7 @@ void TransitionsUI::toggleDisallowRandomTransitionFlag(){
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::toggleDisallowRandomTransitionFlag(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::toggleDisallowRandomTransitionFlag(): The data is nullptr!!");
     }
 }
 
@@ -589,7 +589,7 @@ void TransitionsUI::toggleDisallowReturnToStateFlag(){
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::toggleDisallowReturnToStateFlag(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::toggleDisallowReturnToStateFlag(): The data is nullptr!!");
     }
 }
 
@@ -610,7 +610,7 @@ void TransitionsUI::toggleAbutEndStateFlag(){
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TransitionsUI::toggleAbutEndStateFlag(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::toggleAbutEndStateFlag(): The data is nullptr!!");
     }
 }
 
@@ -633,11 +633,11 @@ void TransitionsUI::eventTableElementSelected(int index, const QString &name){
             setEventId(index, name);
             break;
         default:
-            (qFatal("TransitionsUI::eventTableElementSelected(): Event relayed to wrong table row!!"));
+            FATAL_RUNTIME_ERROR("TransitionsUI::eventTableElementSelected(): Event relayed to wrong table row!!");
             return;
         }
     }else{
-        (qFatal("TransitionsUI::eventTableElementSelected(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::eventTableElementSelected(): The data is nullptr!!");
     }
 }
 
@@ -648,11 +648,11 @@ void TransitionsUI::variableTableElementSelected(int index, const QString &name)
             transitionUI->setBindingVariable(index, name);
             break;
         default:
-            (qFatal("TransitionsUI::variableTableElementSelected(): Event relayed to wrong widget!!"));
+            FATAL_RUNTIME_ERROR("TransitionsUI::variableTableElementSelected(): Event relayed to wrong widget!!");
             return;
         }
     }else{
-        (qFatal("TransitionsUI::variableTableElementSelected(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::variableTableElementSelected(): The data is nullptr!!");
     }
 }
 
@@ -688,7 +688,7 @@ void TransitionsUI::viewSelectedChild(int row, int column){
             }
         }
     }else{
-        (qFatal("BlendingTransitionEffectUI::viewSelectedChild(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BlendingTransitionEffectUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -696,7 +696,7 @@ void TransitionsUI::transitionEffectRenamed(const QString &name){
     if (name != ""){
         transition->setText(name);
     }else{
-        (qFatal("TransitionsUI::transitionEffectRenamed(): The name the empty string!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::transitionEffectRenamed(): The name the empty string!!");
     }
 }
 
@@ -708,6 +708,6 @@ void TransitionsUI::loadTableValue(int row, const QString &value){
             table->item(row, VALUE_COLUMN)->setText("NONE");
         }
     }else{
-        (qFatal("TransitionsUI::loadTableValue(): There is no table item here!!"));
+        FATAL_RUNTIME_ERROR("TransitionsUI::loadTableValue(): There is no table item here!!");
     }
 }

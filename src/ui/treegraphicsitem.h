@@ -49,7 +49,7 @@ private:
     bool getIsExpanded() const;
     void setIsExpanded(bool value);
     void setPathToParent();
-    QList <TreeGraphicsItem *> getAllIconsInBranch(TreeGraphicsItem *iconToFind = NULL) const;
+    QList <TreeGraphicsItem *> getAllIconsInBranch(TreeGraphicsItem *iconToFind = nullptr) const;
 protected:
     Qt::GlobalColor brushColor;
     DataIconManager * itemData;

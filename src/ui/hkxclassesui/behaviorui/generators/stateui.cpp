@@ -42,8 +42,8 @@ QStringList StateUI::headerLabels = {
 };
 
 StateUI::StateUI()
-    : behaviorView(NULL),
-      bsData(NULL),
+    : behaviorView(nullptr),
+      bsData(nullptr),
       stateIndex(-1),
       exitEventsButtonRow(INITIAL_EXIT_EVENT_ROW),
       transitionsButtonRow(INITIAL_ADD_TRANSITION_ROW),
@@ -146,11 +146,11 @@ void StateUI::variableTableElementSelected(int index, const QString &name){
             transitionUI->variableTableElementSelected(index, name);
             break;
         default:
-            (qFatal("StateUI::variableTableElementSelected(): Event relayed to wrong widget!!"));
+            FATAL_RUNTIME_ERROR("StateUI::variableTableElementSelected(): Event relayed to wrong widget!!");
             return;
         }
     }else{
-        (qFatal("StateUI::variableTableElementSelected(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::variableTableElementSelected(): The data is nullptr!!");
     }
 }
 
@@ -171,7 +171,7 @@ void StateUI::loadData(HkxObject *data, int stateindex){
         }
         loadDynamicTableRows();
     }else{
-        (qFatal("StateUI::loadData(): The data is NULL or an incorrect type!!"));
+        FATAL_RUNTIME_ERROR("StateUI::loadData(): The data is nullptr or an incorrect type!!");
     }
     connectSignals();
 }
@@ -223,7 +223,7 @@ void StateUI::loadDynamicTableRows(){
                 if (eventName != ""){
                     setRowItems(i, eventName, events->getClassname(), "Remove", "Edit", "Double click to remove this enter event", "Double click to edit this enter event");
                 }else{
-                    (qFatal("StateUI::loadDynamicTableRows(): Invalid event name!!!"));
+                    FATAL_RUNTIME_ERROR("StateUI::loadDynamicTableRows(): Invalid event name!!!");
                 }
             }
         }
@@ -234,7 +234,7 @@ void StateUI::loadDynamicTableRows(){
                 if (eventName != ""){
                     setRowItems(i, eventName, events->getClassname(), "Remove", "Edit", "Double click to remove this exit event", "Double click to edit this exit event");
                 }else{
-                    (qFatal("StateUI::loadDynamicTableRows(): Invalid event name!!!"));
+                    FATAL_RUNTIME_ERROR("StateUI::loadDynamicTableRows(): Invalid event name!!!");
                 }
             }
         }
@@ -248,7 +248,7 @@ void StateUI::loadDynamicTableRows(){
             table->setRowCount(transitionsButtonRow + 1);
         }
     }else{
-        (qFatal("StateUI::loadDynamicTableRows(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::loadDynamicTableRows(): The data is nullptr!!");
     }
 }
 
@@ -276,15 +276,54 @@ void StateUI::setRowItems(int row, const QString & name, const QString & classna
     }
 }
 
+void StateUI::eventTableElementSelected(int index, const QString &name){
+    //index--;
+    switch (currentIndex()){
+    case EVENT_PAYLOAD_WIDGET:
+        eventUI->setEvent(index, name);
+        break;
+    case TRANSITION_WIDGET:
+        transitionUI->eventTableElementSelected(index, name);
+        break;
+    default:
+        WARNING_MESSAGE("StateUI::eventTableElementSelected(): An unwanted element selected event was recieved!!");
+    }
+    loadDynamicTableRows();
+}
+
+void StateUI::generatorTableElementSelected(int index, const QString &name){
+    switch (currentIndex()){
+    case MAIN_WIDGET:
+        setGenerator(index, name);
+        break;
+    default:
+        WARNING_MESSAGE("StateUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!");
+    }
+}
+
+void StateUI::connectToTables(GenericTableWidget *generators, GenericTableWidget *events){
+    if (generators && events){
+        disconnect(events, SIGNAL(elementSelected(int,QString)), 0, 0);
+        disconnect(generators, SIGNAL(elementSelected(int,QString)), 0, 0);
+        connect(events, SIGNAL(elementSelected(int,QString)), this, SLOT(eventTableElementSelected(int,QString)), Qt::UniqueConnection);
+        connect(generators, SIGNAL(elementSelected(int,QString)), this, SLOT(generatorTableElementSelected(int,QString)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewGenerators(int)), generators, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
+    }else{
+        FATAL_RUNTIME_ERROR("StateUI::connectToTables(): One or more arguments are nullptr!!");
+    }
+}
+
 void StateUI::setName(){
     if (bsData){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             bsData->getParentFile()->setIsChanged(true);
             emit stateNameChanged(name->text(), stateIndex);
+            emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
-        (qFatal("StateUI::setName(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -294,13 +333,13 @@ void StateUI::setStateId(){
             emit stateIdChanged(stateIndex, bsData->stateId, bsData->name);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qWarning("StateUI::setStateId(): Another state has the selected state ID!!! The state ID for this state was not changed!!!"));
+            WARNING_MESSAGE("StateUI::setStateId(): Another state has the selected state ID!!! The state ID for this state was not changed!!!");
             disconnect(stateId, SIGNAL(editingFinished()), this, SLOT(setStateId()));
             stateId->setValue(bsData->stateId);
             connect(stateId, SIGNAL(editingFinished()), this, SLOT(setStateId()), Qt::UniqueConnection);
         }
     }else{
-        (qFatal("StateUI::setStateId(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::setStateId(): The data is nullptr!!");
     }
 }
 
@@ -311,7 +350,7 @@ void StateUI::setProbability(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("StateUI::setProbability(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::setProbability(): The data is nullptr!!");
     }
 }
 
@@ -320,26 +359,12 @@ void StateUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("StateUI::setEnable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::setEnable(): The data is nullptr!!");
     }
-}
-
-void StateUI::eventTableElementSelected(int index, const QString & name){
-    switch (currentIndex()){
-    case EVENT_PAYLOAD_WIDGET:
-        eventUI->setEvent(index, name);
-        break;
-    case TRANSITION_WIDGET:
-        transitionUI->eventTableElementSelected(index, name);
-        break;
-    default:
-        (qWarning("StateMachineUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));
-    }
-    loadDynamicTableRows(); //Inefficient...
 }
 
 void StateUI::addEnterEvent(){
-    hkbStateMachineEventPropertyArray *enterEvents = NULL;
+    hkbStateMachineEventPropertyArray *enterEvents = nullptr;
     if (bsData){
         enterEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
         if (!enterEvents){
@@ -350,33 +375,33 @@ void StateUI::addEnterEvent(){
         enterEvents->events.last().id = 0;
         loadDynamicTableRows();
     }else{
-        (qFatal("StateUI::addEnterEvent(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::addEnterEvent(): The data is nullptr!!");
     }
 }
 
 void StateUI::removeEnterEvent(int index){
-    hkbStateMachineEventPropertyArray *events = NULL;
+    hkbStateMachineEventPropertyArray *events = nullptr;
     if (bsData){
         events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
         if (events){
             if (index < events->events.size() && index >= 0){
                 events->removeEvent(index);
             }else{
-                (qWarning("StateUI::removeEnterEvent(): Invalid row index selected!!"));
+                WARNING_MESSAGE("StateUI::removeEnterEvent(): Invalid row index selected!!");
                 return;
             }
         }else{
-            (qWarning("StateUI::removeEnterEvent(): Event data is NULL!!"));
+            WARNING_MESSAGE("StateUI::removeEnterEvent(): Event data is nullptr!!");
             return;
         }
         loadDynamicTableRows();
     }else{
-        (qFatal("StateUI::removeEnterEvent(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::removeEnterEvent(): The data is nullptr!!");
     }
 }
 
 void StateUI::addExitEvent(){
-    hkbStateMachineEventPropertyArray *exitEvents = NULL;
+    hkbStateMachineEventPropertyArray *exitEvents = nullptr;
     if (bsData){
         exitEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
         if (!exitEvents){
@@ -387,33 +412,33 @@ void StateUI::addExitEvent(){
         exitEvents->events.last().id = 0;
         loadDynamicTableRows();
     }else{
-        (qFatal("StateUI::addExitEvent(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::addExitEvent(): The data is nullptr!!");
     }
 }
 
 void StateUI::removeExitEvent(int index){
-    hkbStateMachineEventPropertyArray *events = NULL;
+    hkbStateMachineEventPropertyArray *events = nullptr;
     if (bsData){
         events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
         if (events){
             if (index < events->events.size() && index >= 0){
                 events->removeEvent(index);
             }else{
-                (qWarning("StateUI::removeExitEvent(): Invalid row index selected!!"));
+                WARNING_MESSAGE("StateUI::removeExitEvent(): Invalid row index selected!!");
                 return;
             }
         }else{
-            (qWarning("StateUI::removeExitEvent(): Event data is NULL!!"));
+            WARNING_MESSAGE("StateUI::removeExitEvent(): Event data is nullptr!!");
             return;
         }
         loadDynamicTableRows();
     }else{
-        (qFatal("StateUI::removeExitEvent(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::removeExitEvent(): The data is nullptr!!");
     }
 }
 
 void StateUI::addTransition(){
-    hkbStateMachineTransitionInfoArray *trans = NULL;
+    hkbStateMachineTransitionInfoArray *trans = nullptr;
     if (bsData){
         trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
         if (!trans){
@@ -423,37 +448,37 @@ void StateUI::addTransition(){
         trans->addTransition();
         loadDynamicTableRows();
     }else{
-        (qFatal("StateUI::addTransition(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::addTransition(): The data is nullptr!!");
     }
 }
 
 void StateUI::removeTransition(int index){
-    hkbStateMachineTransitionInfoArray *trans = NULL;
+    hkbStateMachineTransitionInfoArray *trans = nullptr;
     if (bsData){
         trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
         if (trans){
             if (index < trans->getNumTransitions() && index >= 0){
                 trans->removeTransition(index);
             }else{
-                (qWarning("StateUI::removeTransition(): Invalid row index selected!!"));
+                WARNING_MESSAGE("StateUI::removeTransition(): Invalid row index selected!!");
                 return;
             }
         }else{
-            (qWarning("StateUI::removeTransition(): Transition data is NULL!!"));
+            WARNING_MESSAGE("StateUI::removeTransition(): Transition data is nullptr!!");
             return;
         }
         loadDynamicTableRows();
     }else{
-        (qFatal("StateUI::removeTransition(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::removeTransition(): The data is nullptr!!");
     }
 }
 
 void StateUI::viewSelectedChild(int row, int column){
     int result;
     int count = 0;
-    hkbStateMachineTransitionInfoArray *trans = NULL;
-    hkbStateMachineEventPropertyArray *enterEvents = NULL;
-    hkbStateMachineEventPropertyArray *exitEvents = NULL;
+    hkbStateMachineTransitionInfoArray *trans = nullptr;
+    hkbStateMachineEventPropertyArray *enterEvents = nullptr;
+    hkbStateMachineEventPropertyArray *exitEvents = nullptr;
     if (bsData){
         if (row == GENERATOR_ROW && column == VALUE_COLUMN){
             emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1);
@@ -476,7 +501,7 @@ void StateUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                (qFatal("StateUI::viewSelectedChild(): Invalid index of child to view!!"));
+                FATAL_RUNTIME_ERROR("StateUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }else if (row > exitEventsButtonRow && row < transitionsButtonRow){
             exitEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
@@ -491,7 +516,7 @@ void StateUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                (qFatal("StateUI::viewSelectedChild(): Invalid index of child to view!!"));
+                FATAL_RUNTIME_ERROR("StateUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }else if (row > exitEventsButtonRow && row < table->rowCount()){
             enterEvents = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
@@ -514,37 +539,37 @@ void StateUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                (qFatal("StateUI::viewSelectedChild(): Invalid index of child to view!!"));
+                FATAL_RUNTIME_ERROR("StateUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }
     }else{
-        (qFatal("StateUI::viewSelectedChild(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
 void StateUI::setGenerator(int index, const QString & name){
-    hkbStateMachine *gen = NULL;
-    DataIconManager *ptr = NULL;
+    hkbStateMachine *gen = nullptr;
+    DataIconManager *ptr = nullptr;
     if (bsData){
         if (behaviorView){
             gen = static_cast<hkbStateMachine *>(bsData->getParentStateMachine());
             ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
             if (ptr){
                 if (name != ptr->getName()){
-                    (qFatal("The name of the selected object does not match it's name in the object selection table!!!"));
+                    FATAL_RUNTIME_ERROR("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
                     return;
                 }else if (!gen){
-                    (qFatal("The currently loaded 'hkbStateMachineStateInfo' has no parent 'hkbStateMachine'!!!"));
+                    FATAL_RUNTIME_ERROR("The currently loaded 'hkbStateMachineStateInfo' has no parent 'hkbStateMachine'!!!");
                     return;
                 }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generator.data()), ptr, false)){
-                    (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+                    WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
                     return;
                 }
             }else{
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->generator.data())), stateIndex);
                 }else{
-                    (qFatal("StateUI::setGenerator(): The selected icon is NULL!!"));
+                    FATAL_RUNTIME_ERROR("StateUI::setGenerator(): The selected icon is nullptr!!");
                     return;
                 }
             }
@@ -553,10 +578,10 @@ void StateUI::setGenerator(int index, const QString & name){
             bsData->getParentFile()->setIsChanged(true);
             emit returnToParent(true);
         }else{
-            (qFatal("StateUI::setGenerator(): The 'behaviorView' pointer is NULL!!"));
+            FATAL_RUNTIME_ERROR("StateUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");
         }
     }else{
-        (qFatal("StateUI::setGenerator(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::setGenerator(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -569,10 +594,10 @@ void StateUI::transitionRenamed(const QString &name, int index){
         if (table->item(transitionsButtonRow + index + 1, NAME_COLUMN)){
             table->item(transitionsButtonRow + index + 1, NAME_COLUMN)->setText(name);
         }else{
-            (qFatal("StateUI::transitionRenamed(): Invalid row selected!!"));
+            FATAL_RUNTIME_ERROR("StateUI::transitionRenamed(): Invalid row selected!!");
         }
     }else{
-        (qFatal("StateUI::transitionRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::transitionRenamed(): The data is nullptr!!");
     }
 }
 
@@ -581,7 +606,7 @@ void StateUI::eventRenamed(const QString & name, int index){
         eventUI->eventRenamed(name, index);
         loadDynamicTableRows(); //Inefficient...
     }else{
-        (qFatal("StateUI::eventRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -592,7 +617,7 @@ void StateUI::generatorRenamed(const QString & name, int index){
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        (qFatal("StateUI::generatorRenamed(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("StateUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 

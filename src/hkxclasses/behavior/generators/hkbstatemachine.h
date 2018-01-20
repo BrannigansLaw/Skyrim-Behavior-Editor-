@@ -29,8 +29,8 @@ public:
     int getNumberOfNestedStates(int stateId) const;
     int getIndexToInsertIcon() const;
     bool write(HkxXMLWriter *writer);
-    bool hasChildren() const;
     int generateValidStateId();
+    bool hasChildren() const;
 private:
     QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;

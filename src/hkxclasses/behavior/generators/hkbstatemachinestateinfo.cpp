@@ -40,12 +40,12 @@ hkbStateMachine * hkbStateMachineStateInfo::getParentStateMachine() const{
     if (parentSM && parentSM->getSignature() == HKB_STATE_MACHINE){
         return parentSM;
     }
-    return NULL;
+    return nullptr;
 }
 
 bool hkbStateMachineStateInfo::setStateId(ushort id){
-    hkbStateMachineStateInfo *state = NULL;
-    hkbStateMachineTransitionInfoArray *trans = NULL;
+    hkbStateMachineStateInfo *state = nullptr;
+    hkbStateMachineTransitionInfoArray *trans = nullptr;
     if (parentSM){
         for (int i = 0; i < parentSM->states.size(); i++){
             state = static_cast<hkbStateMachineStateInfo *>(parentSM->states.at(i).data());
@@ -76,6 +76,47 @@ bool hkbStateMachineStateInfo::setStateId(ushort id){
     stateId = id;
     return true;
 }
+
+bool hkbStateMachineStateInfo::hasChildren() const{
+    if (generator.data()){
+        return true;
+    }
+    return false;
+}
+
+QList<DataIconManager *> hkbStateMachineStateInfo::getChildren() const{
+    QList<DataIconManager *> list;
+    if (generator.data()){
+        list.append(static_cast<DataIconManager*>(generator.data()));
+    }
+    return list;
+}
+
+int hkbStateMachineStateInfo::getIndexOfObj(DataIconManager *obj) const{
+    if (generator.data() == (HkxObject *)obj){
+        return 0;
+    }
+    return -1;
+}
+
+bool hkbStateMachineStateInfo::insertObjectAt(int , DataIconManager *obj){
+    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
+        generator = HkxSharedPtr((HkxObject *)obj);
+    }else{
+        return false;
+    }
+    return true;
+}
+
+bool hkbStateMachineStateInfo::removeObjectAt(int index){
+    if (index == 0 || index == -1){
+        generator = HkxSharedPtr();
+    }else{
+        return false;
+    }
+    return true;
+}
+
 
 bool hkbStateMachineStateInfo::readData(const HkxXmlReader &reader, long index){
     bool ok;
@@ -243,7 +284,7 @@ bool hkbStateMachineStateInfo::link(){
 
 void hkbStateMachineStateInfo::unlink(){
     HkDynamicObject::unlink();
-    parentSM = NULL;
+    parentSM = nullptr;
     enterNotifyEvents = HkxSharedPtr();
     exitNotifyEvents = HkxSharedPtr();
     transitions = HkxSharedPtr();

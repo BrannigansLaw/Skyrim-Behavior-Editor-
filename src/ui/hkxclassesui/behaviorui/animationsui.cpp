@@ -24,10 +24,10 @@ QStringList AnimationsUI::headerLabels = {
 };
 
 AnimationsUI::AnimationsUI(const QString &title)
-    : dataUI(NULL),
+    : dataUI(nullptr),
       verLyt(new QVBoxLayout),
-      animData(NULL),
-      loadedData(NULL),
+      animData(nullptr),
+      loadedData(nullptr),
       table(new TableWidget),
       buttonLyt(new QHBoxLayout),
       addObjectPB(new QPushButton("Add Animation")),
@@ -129,7 +129,7 @@ void AnimationsUI::removeAnimation(){
     if (loadedData && !static_cast<CharacterFile *>(loadedData->getParentFile())->isAnimationUsed(table->item(table->currentRow(), table->currentColumn())->text())){
         int index = table->currentRow();
         if (!animData->removeAnimation(index)){
-            (qFatal("AnimationsUI::removeAnimation(): Failed!"));
+            FATAL_RUNTIME_ERROR("AnimationsUI::removeAnimation(): Failed!");
         }
         loadedData->animationNames.removeAt(index);
         if (index < table->rowCount()){

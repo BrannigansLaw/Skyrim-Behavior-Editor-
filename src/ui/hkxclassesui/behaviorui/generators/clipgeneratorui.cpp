@@ -52,7 +52,7 @@ QStringList ClipGeneratorUI::headerLabels = {
 };
 
 ClipGeneratorUI::ClipGeneratorUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       triggerUI(new ClipTriggerUI),
       groupBox(new QGroupBox),
       topLyt(new QGridLayout),
@@ -202,7 +202,7 @@ void ClipGeneratorUI::disconnectSignals(){
 }
 
 void ClipGeneratorUI::addTrigger(){
-    hkbClipTriggerArray *triggers = NULL;
+    hkbClipTriggerArray *triggers = nullptr;
     if (bsData){
         triggers = static_cast<hkbClipTriggerArray *>(bsData->triggers.data());
         if (!triggers){
@@ -215,12 +215,12 @@ void ClipGeneratorUI::addTrigger(){
         bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
-        (qFatal("ClipGeneratorUI::addTrigger(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::addTrigger(): The data is nullptr!!");
     }
 }
 
 void ClipGeneratorUI::removeTrigger(int index){
-    hkbClipTriggerArray *triggers = NULL;
+    hkbClipTriggerArray *triggers = nullptr;
     if (bsData){
         triggers = static_cast<hkbClipTriggerArray *>(bsData->triggers.data());
         if (triggers){
@@ -228,24 +228,24 @@ void ClipGeneratorUI::removeTrigger(int index){
                 triggers->removeTrigger(index);
                 static_cast<BehaviorFile *>(bsData->getParentFile())->removeClipTriggerToAnimDataAt(bsData->name, index);
             }else{
-                (qWarning("ClipGeneratorUI::removeTrigger(): Invalid row index selected!!"));
+                WARNING_MESSAGE("ClipGeneratorUI::removeTrigger(): Invalid row index selected!!");
                 return;
             }
             bsData->getParentFile()->setIsChanged(true);
             loadDynamicTableRows();
         }else{
-            (qWarning("ClipGeneratorUI::removeTrigger(): Event data is NULL!!"));
+            WARNING_MESSAGE("ClipGeneratorUI::removeTrigger(): Event data is nullptr!!");
             return;
         }
     }else{
-        (qFatal("ClipGeneratorUI::removeTrigger(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::removeTrigger(): The data is nullptr!!");
     }
 }
 
 void ClipGeneratorUI::loadData(HkxObject *data){
     disconnectSignals();
     setCurrentIndex(MAIN_WIDGET);
-    hkbVariableBindingSet *varBind = NULL;
+    hkbVariableBindingSet *varBind = nullptr;
     if (data){
         if (data->getSignature() == HKB_CLIP_GENERATOR){
             bsData = static_cast<hkbClipGenerator *>(data);
@@ -316,13 +316,13 @@ void ClipGeneratorUI::loadData(HkxObject *data){
                 }
                 loadDynamicTableRows();
             }else{
-                (qFatal(QString("ClipGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data()));
+                FATAL_RUNTIME_ERROR(QString("ClipGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
             }
         }else{
-            (qFatal(QString("ClipGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
+            FATAL_RUNTIME_ERROR(QString("ClipGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        (qFatal("ClipGeneratorUI::loadData(): Attempting to load a null pointer!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::loadData(): Attempting to load a null pointer!!");
     }
     connectSignals();
 }
@@ -341,7 +341,7 @@ void ClipGeneratorUI::loadDynamicTableRows(){
             }
         }
     }else{
-        (qFatal("ClipGeneratorUI::loadDynamicTableRows(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::loadDynamicTableRows(): The data is nullptr!!");
     }
     //table->setSortingEnabled(true);
 }
@@ -382,21 +382,21 @@ bool ClipGeneratorUI::setBinding(int index, int row, const QString & variableNam
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("ClipGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("ClipGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("ClipGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("ClipGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("ClipGeneratorUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -453,7 +453,7 @@ void ClipGeneratorUI::setBindingVariable(int index, const QString & name){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("ClipGeneratorUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -474,11 +474,11 @@ void ClipGeneratorUI::setName(){
                 disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
                 name->setText(bsData->name);
                 connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-                (qWarning("ClipGeneratorUI::setName(): This clip generator name is already is use elsewhere in the project!!"));
+                WARNING_MESSAGE("ClipGeneratorUI::setName(): This clip generator name is already is use elsewhere in the project!!");
             }
         }
     }else{
-        (qFatal("ClipGeneratorUI::setName(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -490,7 +490,7 @@ void ClipGeneratorUI::setAnimationName(int index, const QString &name){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("ClipGeneratorUI::setAnimationName(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setAnimationName(): The data is nullptr!!");
     }
 }
 
@@ -501,7 +501,7 @@ void ClipGeneratorUI::setCropStartAmountLocalTime(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("ClipGeneratorUI::setCropStartAmountLocalTime(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setCropStartAmountLocalTime(): The data is nullptr!!");
     }
 }
 
@@ -512,7 +512,7 @@ void ClipGeneratorUI::setCropEndAmountLocalTime(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("ClipGeneratorUI::setCropEndAmountLocalTime(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setCropEndAmountLocalTime(): The data is nullptr!!");
     }
 }
 
@@ -523,7 +523,7 @@ void ClipGeneratorUI::setStartTime(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("ClipGeneratorUI::setStartTime(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setStartTime(): The data is nullptr!!");
     }
 }
 
@@ -534,7 +534,7 @@ void ClipGeneratorUI::setPlaybackSpeed(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("ClipGeneratorUI::setPlaybackSpeed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setPlaybackSpeed(): The data is nullptr!!");
     }
 }
 
@@ -545,7 +545,7 @@ void ClipGeneratorUI::setEnforcedDuration(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("ClipGeneratorUI::setEnforcedDuration(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setEnforcedDuration(): The data is nullptr!!");
     }
 }
 
@@ -556,7 +556,7 @@ void ClipGeneratorUI::setUserControlledTimeFraction(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("ClipGeneratorUI::setUserControlledTimeFraction(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setUserControlledTimeFraction(): The data is nullptr!!");
     }
 }
 
@@ -567,7 +567,7 @@ void ClipGeneratorUI::setAnimationBindingIndex(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("ClipGeneratorUI::setAnimationBindingIndex(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setAnimationBindingIndex(): The data is nullptr!!");
     }
 }
 
@@ -578,7 +578,7 @@ void ClipGeneratorUI::setMode(int index){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("ClipGeneratorUI::setMode(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setMode(): The data is nullptr!!");
     }
 }
 
@@ -595,10 +595,10 @@ void ClipGeneratorUI::setFlagContinueMotionAtEnd(){
             bsData->flags = QString::number(flags);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qFatal(QString("ClipGeneratorUI::setFlagContinueMotionAtEnd(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data()));
+            FATAL_RUNTIME_ERROR(QString("ClipGeneratorUI::setFlagContinueMotionAtEnd(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        (qFatal("ClipGeneratorUI::setFlagContinueMotionAtEnd(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setFlagContinueMotionAtEnd(): The data is nullptr!!");
     }
 }
 
@@ -615,10 +615,10 @@ void ClipGeneratorUI::setFlagSyncHalfCycleInPingPongMode(){
             bsData->flags = QString::number(flags);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qFatal(QString("ClipGeneratorUI::setFlagSyncHalfCycleInPingPongMode(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data()));
+            FATAL_RUNTIME_ERROR(QString("ClipGeneratorUI::setFlagSyncHalfCycleInPingPongMode(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        (qFatal("ClipGeneratorUI::setFlagSyncHalfCycleInPingPongMode(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setFlagSyncHalfCycleInPingPongMode(): The data is nullptr!!");
     }
 }
 
@@ -635,10 +635,10 @@ void ClipGeneratorUI::setFlagMirror(){
             bsData->flags = QString::number(flags);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qFatal(QString("ClipGeneratorUI::setFlagMirror(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data()));
+            FATAL_RUNTIME_ERROR(QString("ClipGeneratorUI::setFlagMirror(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        (qFatal("ClipGeneratorUI::setFlagMirror(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setFlagMirror(): The data is nullptr!!");
     }
 }
 
@@ -655,10 +655,10 @@ void ClipGeneratorUI::setFlagForceDensePose(){
             bsData->flags = QString::number(flags);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qFatal(QString("ClipGeneratorUI::setFlagForceDensePose(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data()));
+            FATAL_RUNTIME_ERROR(QString("ClipGeneratorUI::setFlagForceDensePose(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        (qFatal("ClipGeneratorUI::setFlagForceDensePose(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setFlagForceDensePose(): The data is nullptr!!");
     }
 }
 
@@ -675,10 +675,10 @@ void ClipGeneratorUI::setFlagDontConvertAnnotationsToTriggers(){
             bsData->flags = QString::number(flags);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qFatal(QString("ClipGeneratorUI::setFlagDontConvertAnnotationsToTriggers(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data()));
+            FATAL_RUNTIME_ERROR(QString("ClipGeneratorUI::setFlagDontConvertAnnotationsToTriggers(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        (qFatal("ClipGeneratorUI::setFlagDontConvertAnnotationsToTriggers(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setFlagDontConvertAnnotationsToTriggers(): The data is nullptr!!");
     }
 }
 
@@ -695,10 +695,10 @@ void ClipGeneratorUI::setFlagIgnoreMotion(){
             bsData->flags = QString::number(flags);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qFatal(QString("ClipGeneratorUI::setFlagIgnoreMotion(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data()));
+            FATAL_RUNTIME_ERROR(QString("ClipGeneratorUI::setFlagIgnoreMotion(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        (qFatal("ClipGeneratorUI::setFlagIgnoreMotion(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::setFlagIgnoreMotion(): The data is nullptr!!");
     }
 }
 
@@ -766,11 +766,11 @@ void ClipGeneratorUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                (qFatal("ClipGeneratorUI::viewSelectedChild(): Invalid index of child to view!!"));
+                FATAL_RUNTIME_ERROR("ClipGeneratorUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }
     }else{
-        (qFatal("ClipGeneratorUI::viewSelectedChild(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -789,7 +789,7 @@ void ClipGeneratorUI::connectToTables(GenericTableWidget *variables, GenericTabl
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewAnimations(QString)), animations, SLOT(showTable(QString)), Qt::UniqueConnection);
     }else{
-        (qFatal("ClipGeneratorUI::connectToTables(): One or more arguments are NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -811,10 +811,10 @@ void ClipGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindingSet *va
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("ClipGeneratorUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("ClipGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("ClipGeneratorUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -834,7 +834,7 @@ void ClipGeneratorUI::selectTableToView(bool viewproperties, const QString & pat
             }
         }
     }else{
-        (qFatal("ClipGeneratorUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -842,7 +842,7 @@ void ClipGeneratorUI::eventRenamed(const QString & name, int index){
     if (bsData){
         triggerUI->eventRenamed(name, index);
     }else{
-        (qFatal("ClipGeneratorUI::eventRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -850,15 +850,15 @@ void ClipGeneratorUI::eventRenamed(const QString & name, int index){
     if (bsData){
         //if ()
     }else{
-        (qFatal("ClipGeneratorUI::animationRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::animationRenamed(): The data is nullptr!!");
     }
 }*/
 
 void ClipGeneratorUI::variableRenamed(const QString & name, int index){
     int bindIndex = -1;
-    hkbVariableBindingSet *bind = NULL;
+    hkbVariableBindingSet *bind = nullptr;
     if (name == ""){
-        (qWarning("ClipGeneratorUI::variableRenamed(): The new variable name is the empty string!!"));
+        WARNING_MESSAGE("ClipGeneratorUI::variableRenamed(): The new variable name is the empty string!!");
     }
     if (bsData){
         index--;
@@ -894,7 +894,7 @@ void ClipGeneratorUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        (qFatal("ClipGeneratorUI::variableRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ClipGeneratorUI::variableRenamed(): The data is nullptr!!");
     }
 }
 

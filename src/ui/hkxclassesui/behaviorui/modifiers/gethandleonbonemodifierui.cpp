@@ -33,7 +33,7 @@ QStringList GetHandleOnBoneModifierUI::headerLabels = {
 };
 
 GetHandleOnBoneModifierUI::GetHandleOnBoneModifierUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       topLyt(new QGridLayout),
       table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
@@ -101,7 +101,7 @@ void GetHandleOnBoneModifierUI::connectToTables(GenericTableWidget *variables, G
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        (qFatal("GetHandleOnBoneModifierUI::connectToTables(): One or more arguments are NULL!!"));
+        FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -114,7 +114,7 @@ void GetHandleOnBoneModifierUI::loadData(HkxObject *data){
             localFrames.append("None");
             QStringList boneNames;
             boneNames.append("None");
-            hkbVariableBindingSet *varBind = NULL;
+            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbGetHandleOnBoneModifier *>(data);
             name->setText(bsData->name);
             enable->setChecked(bsData->enable);
@@ -124,7 +124,7 @@ void GetHandleOnBoneModifierUI::loadData(HkxObject *data){
             }
             index = localFrameName->findText(bsData->localFrameName);
             if (index < 0 || index >= localFrameName->count()){
-                (qFatal("GetHandleOnBoneModifierUI::loadData(): The local frame name was not loaded correctly!!!"));
+                FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::loadData(): The local frame name was not loaded correctly!!!");
             }
             localFrameName->setCurrentIndex(index);
             if (ragdollBoneIndex->count() == 0){
@@ -152,10 +152,10 @@ void GetHandleOnBoneModifierUI::loadData(HkxObject *data){
                 table->item(ANIMATION_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            (qFatal("GetHandleOnBoneModifierUI::loadData(): The data is an incorrect type!!"));
+            FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        (qFatal("GetHandleOnBoneModifierUI::loadData(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -169,7 +169,7 @@ void GetHandleOnBoneModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        (qFatal("GetHandleOnBoneModifierUI::setName(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -178,7 +178,7 @@ void GetHandleOnBoneModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("GetHandleOnBoneModifierUI::setEnable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -187,7 +187,7 @@ void GetHandleOnBoneModifierUI::setLocalFrameName(const QString & name){
         bsData->localFrameName = name;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("GetHandleOnBoneModifierUI::setLocalFrameName(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::setLocalFrameName(): The data is nullptr!!");
     }
 }
 
@@ -196,7 +196,7 @@ void GetHandleOnBoneModifierUI::setRagdollBoneIndex(int index){
         bsData->ragdollBoneIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("GetHandleOnBoneModifierUI::setRagdollBoneIndex(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::setRagdollBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -205,7 +205,7 @@ void GetHandleOnBoneModifierUI::setAnimationBoneIndex(int index){
         bsData->animationBoneIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("GetHandleOnBoneModifierUI::setAnimationBoneIndex(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::setAnimationBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -243,7 +243,7 @@ void GetHandleOnBoneModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        (qFatal("GetHandleOnBoneModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -263,7 +263,7 @@ void GetHandleOnBoneModifierUI::selectTableToView(bool viewisProperty, const QSt
             }
         }
     }else{
-        (qFatal("GetHandleOnBoneModifierUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -290,7 +290,7 @@ void GetHandleOnBoneModifierUI::variableRenamed(const QString & name, int index)
             }
         }
     }else{
-        (qFatal("GetHandleOnBoneModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -307,21 +307,21 @@ bool GetHandleOnBoneModifierUI::setBinding(int index, int row, const QString &va
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("GetHandleOnBoneModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("GetHandleOnBoneModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("GetHandleOnBoneModifierUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -360,7 +360,7 @@ void GetHandleOnBoneModifierUI::setBindingVariable(int index, const QString &nam
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("GetHandleOnBoneModifierUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -382,9 +382,9 @@ void GetHandleOnBoneModifierUI::loadBinding(int row, int colunm, hkbVariableBind
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("GetHandleOnBoneModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("GetHandleOnBoneModifierUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetHandleOnBoneModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

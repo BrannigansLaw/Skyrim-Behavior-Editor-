@@ -33,10 +33,10 @@ QStringList KeyframeInfoUI::headerLabels = {
 };
 
 KeyframeInfoUI::KeyframeInfoUI()
-    : file(NULL),
+    : file(nullptr),
       keyframeIndex(-1),
-      bsData(NULL),
-      parent(NULL),
+      bsData(nullptr),
+      parent(nullptr),
       topLyt(new QGridLayout),
       returnPB(new QPushButton("Return")),
       table(new TableWidget),
@@ -118,7 +118,7 @@ void KeyframeInfoUI::loadData(BehaviorFile *parentFile, hkbKeyframeBonesModifier
             table->item(IS_VALID_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }
     }else{
-        (qFatal("KeyframeInfoUI::loadData(): Behavior file, bind or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("KeyframeInfoUI::loadData(): Behavior file, bind or event data is null!!!");
     }
     connectSignals();
 }
@@ -141,10 +141,10 @@ void KeyframeInfoUI::loadBinding(int row, int colunm, hkbVariableBindingSet *var
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("KeyframeInfoUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("KeyframeInfoUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("KeyframeInfoUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeInfoUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -161,21 +161,21 @@ bool KeyframeInfoUI::setBinding(int index, int row, const QString & variableName
                 parent->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             file->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("KeyframeInfoUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeInfoUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -214,7 +214,7 @@ void KeyframeInfoUI::setBindingVariable(int index, const QString & name){
         }
         file->setIsChanged(true);
     }else{
-        (qFatal("KeyframeInfoUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeInfoUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -225,7 +225,7 @@ void KeyframeInfoUI::setKeyframedPosition(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("KeyframeInfoUI::setkeyframedPosition(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("KeyframeInfoUI::setkeyframedPosition(): Behavior file or event data is null!!!");
     }
 }
 
@@ -236,7 +236,7 @@ void KeyframeInfoUI::setKeyframedRotation(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("KeyframeInfoUI::setkeyframedRotation(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("KeyframeInfoUI::setkeyframedRotation(): Behavior file or event data is null!!!");
     }
 }
 
@@ -245,7 +245,7 @@ void KeyframeInfoUI::setBoneIndex(int index){
         bsData->boneIndex = index - 1;
         file->setIsChanged(true);
     }else{
-        (qFatal("KeyframeInfoUI::setboneIndex(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("KeyframeInfoUI::setboneIndex(): Behavior file or event data is null!!!");
     }
 }
 
@@ -256,7 +256,7 @@ void KeyframeInfoUI::setIsValid(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("KeyframeInfoUI::setIsAnnotation(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("KeyframeInfoUI::setIsAnnotation(): Behavior file or event data is null!!!");
     }
 }
 
@@ -292,7 +292,7 @@ void KeyframeInfoUI::viewSelectedChild(int row, int column){
             }
         }
     }else{
-        (qFatal("KeyframeInfoUI::viewSelectedChild(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeInfoUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -312,15 +312,15 @@ void KeyframeInfoUI::selectTableToView(bool viewproperties, const QString & path
             }
         }
     }else{
-        (qFatal("KeyframeInfoUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeInfoUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void KeyframeInfoUI::variableRenamed(const QString & name, int index){
     int bindIndex = -1;
-    hkbVariableBindingSet *bind = NULL;
+    hkbVariableBindingSet *bind = nullptr;
     if (name == ""){
-        (qWarning("KeyframeInfoUI::variableRenamed(): The new variable name is the empty string!!"));
+        WARNING_MESSAGE("KeyframeInfoUI::variableRenamed(): The new variable name is the empty string!!");
     }
     if (bsData){
         //index--;
@@ -344,6 +344,6 @@ void KeyframeInfoUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        (qFatal("KeyframeInfoUI::variableRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeInfoUI::variableRenamed(): The data is nullptr!!");
     }
 }

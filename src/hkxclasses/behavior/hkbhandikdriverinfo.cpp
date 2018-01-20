@@ -39,7 +39,7 @@ hkbHandIkDriverInfo::hkbHandIkDriverInfoHand * hkbHandIkDriverInfo::getHandAt(in
     if (index >= 0 && index < hands.size()){
         return &hands[index];
     }
-    return NULL;
+    return nullptr;
 }
 
 bool hkbHandIkDriverInfo::readData(const HkxXmlReader &reader, long index){

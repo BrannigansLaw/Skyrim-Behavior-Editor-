@@ -33,7 +33,7 @@ QStringList TimerModifierUI::headerLabels = {
 };
 
 TimerModifierUI::TimerModifierUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       topLyt(new QGridLayout),
       table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
@@ -97,7 +97,7 @@ void TimerModifierUI::connectToTables(GenericTableWidget *variables, GenericTabl
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        (qFatal("TimerModifierUI::connectToTables(): One or more arguments are NULL!!"));
+        FATAL_RUNTIME_ERROR("TimerModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -106,7 +106,7 @@ void TimerModifierUI::loadData(HkxObject *data){
     if (data){
         if (data->getSignature() == HKB_TIMER_MODIFIER){
             bsData = static_cast<hkbTimerModifier *>(data);
-            hkbVariableBindingSet *varBind = NULL;
+            hkbVariableBindingSet *varBind = nullptr;
             hkbStringEventPayload *payload = static_cast<hkbStringEventPayload *>(bsData->alarmEvent.payload.data());
             name->setText(bsData->name);
             enable->setChecked(bsData->enable);
@@ -131,10 +131,10 @@ void TimerModifierUI::loadData(HkxObject *data){
                 table->item(ALARM_TIME_SECONDS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            (qFatal("TimerModifierUI::loadData(): The data is an incorrect type!!"));
+            FATAL_RUNTIME_ERROR("TimerModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        (qFatal("TimerModifierUI::loadData(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TimerModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -148,7 +148,7 @@ void TimerModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        (qFatal("TimerModifierUI::setName(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TimerModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -157,7 +157,7 @@ void TimerModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TimerModifierUI::setEnable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TimerModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -168,7 +168,7 @@ void TimerModifierUI::setAlarmTimeSeconds(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("TimerModifierUI::setalarmTimeSeconds(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TimerModifierUI::setalarmTimeSeconds(): The data is nullptr!!");
     }
 }
 
@@ -181,7 +181,7 @@ void TimerModifierUI::setAlarmEventId(int index, const QString & name){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("TimerModifierUI::setAlarmEventId(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TimerModifierUI::setAlarmEventId(): The data is nullptr!!");
     }
 }
 
@@ -202,7 +202,7 @@ void TimerModifierUI::setAlarmEventPayload(){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TimerModifierUI::setalarmEventPayload(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TimerModifierUI::setalarmEventPayload(): The data is nullptr!!");
     }
 }
 
@@ -230,7 +230,7 @@ void TimerModifierUI::viewSelected(int row, int column){
             emit viewEvents(bsData->alarmEvent.id + 1);
         }
     }else{
-        (qFatal("TimerModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("TimerModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -250,7 +250,7 @@ void TimerModifierUI::selectTableToView(bool viewisProperty, const QString & pat
             }
         }
     }else{
-        (qFatal("TimerModifierUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TimerModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -261,7 +261,7 @@ void TimerModifierUI::eventRenamed(const QString & name, int index){
             table->item(ALARM_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        (qFatal("TimerModifierUI::eventRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TimerModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -280,7 +280,7 @@ void TimerModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        (qFatal("TimerModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("TimerModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -297,21 +297,21 @@ bool TimerModifierUI::setBinding(int index, int row, const QString &variableName
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("TimerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("TimerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("TimerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("TimerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("TimerModifierUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TimerModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -338,7 +338,7 @@ void TimerModifierUI::setBindingVariable(int index, const QString &name){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("TimerModifierUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TimerModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -360,10 +360,10 @@ void TimerModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *va
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("TimerModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("TimerModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("TimerModifierUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("TimerModifierUI::loadBinding(): The data is nullptr!!");
     }
 }
 

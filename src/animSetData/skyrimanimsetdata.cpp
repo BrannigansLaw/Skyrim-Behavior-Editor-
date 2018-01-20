@@ -7,6 +7,14 @@ SkyrimAnimSetData::SkyrimAnimSetData()
     //
 }
 
+SkyrimAnimSetData::~SkyrimAnimSetData(){
+    for (int i = 0; i < projects.size(); i++){
+        if (projects.at(i)){
+            delete projects.at(i);
+        }
+    }
+}
+
 bool SkyrimAnimSetData::parse(QFile *file){
     if (!file || (!file->isOpen() && !file->open(QIODevice::ReadOnly | QIODevice::Text))){
         return false;
@@ -27,23 +35,23 @@ bool SkyrimAnimSetData::parse(QFile *file){
                     if (line.contains(".txt")){
                         projectNames.append(line);
                     }else{
-                        (qFatal("SkyrimAnimSetData::parse(): Corrupted project filename does not have 'txt' extension!"));
+                        FATAL_RUNTIME_ERROR("SkyrimAnimSetData::parse(): Corrupted project filename does not have 'txt' extension!");
                         return false;
                     }
                 }else{
-                    (qFatal("SkyrimAnimSetData::parse(): Unexpected EOF!"));
+                    FATAL_RUNTIME_ERROR("SkyrimAnimSetData::parse(): Unexpected EOF!");
                     return false;
                 }
             }
             for (int i = 0; i < projectNames.size(); i++){
                 projects.append(new AnimCacheProjectData());
                 if (!projects.last()->read(file)){
-                    (qFatal("SkyrimAnimSetData::parse(): ProjectAnimSetData read failed!"));
+                    FATAL_RUNTIME_ERROR("SkyrimAnimSetData::parse(): ProjectAnimSetData read failed!");
                     return false;
                 }
             }
         }else{
-            (qFatal("SkyrimAnimSetData::parse(): Corrupted length of current block!"));
+            FATAL_RUNTIME_ERROR("SkyrimAnimSetData::parse(): Corrupted length of current block!");
             return false;
         }
     }
@@ -103,7 +111,7 @@ AnimCacheProjectData *SkyrimAnimSetData::getProjectCacheData(const QString & nam
             return projects[i];
         }
     }
-    (qFatal("SkyrimAnimSetData::getProjectCacheData(): getProjectCacheData() failed!"));
+    FATAL_RUNTIME_ERROR("SkyrimAnimSetData::getProjectCacheData(): getProjectCacheData() failed!");
     return nullptr;
 }
 

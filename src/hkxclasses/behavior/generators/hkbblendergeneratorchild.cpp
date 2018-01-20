@@ -29,7 +29,7 @@ hkbGenerator * hkbBlenderGeneratorChild::getParentGenerator() const{
     if (parentBG.data() && (parentBG.data()->getSignature() == HKB_BLENDER_GENERATOR || parentBG.data()->getSignature() == HKB_POSE_MATCHING_GENERATOR)){
         return reinterpret_cast<hkbGenerator *>(parentBG.data());
     }
-    return NULL;
+    return nullptr;
 }
 
 bool hkbBlenderGeneratorChild::readData(const HkxXmlReader &reader, long index){

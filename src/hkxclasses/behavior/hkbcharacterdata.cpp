@@ -48,7 +48,7 @@ HkxObject * hkbCharacterData::getVariantVariable(int index) const{
             return variableValues->variantVariableValues.at(count).data();
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void hkbCharacterData::addVariable(hkVariableType type, const QString & name){

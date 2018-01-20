@@ -50,7 +50,7 @@ private:
     void generatorRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
     void selectTableToView(bool viewproperties, const QString & path);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
+    void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
 private:
     enum ACTIVE_WIDGET {
         MAIN_WIDGET = 0,

@@ -36,7 +36,7 @@ QStringList ExpressionDataArrayUI::headerLabels = {
 };
 
 ExpressionDataArrayUI::ExpressionDataArrayUI()
-    : file(NULL),
+    : file(nullptr),
       topLyt(new QGridLayout),
       returnPB(new QPushButton("Return")),
       table(new TableWidget),
@@ -103,7 +103,7 @@ void ExpressionDataArrayUI::loadData(BehaviorFile *parentFile, hkbExpressionData
         }
         eventMode->setCurrentIndex(EventModeUI.indexOf(bsData->eventMode));
     }else{
-        (qFatal("ExpressionDataArrayUI::loadData(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("ExpressionDataArrayUI::loadData(): Behavior file or event data is null!!!");
     }
     connectSignals();
 }
@@ -115,7 +115,7 @@ void ExpressionDataArrayUI::setExpression(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("ExpressionDataArrayUI::setExpression(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("ExpressionDataArrayUI::setExpression(): Behavior file or event data is null!!!");
     }
 }
 
@@ -124,7 +124,7 @@ void ExpressionDataArrayUI::setEventMode(int index){
         bsData->eventMode = EventModeUI.at(index);
         file->setIsChanged(true);
     }else{
-        (qFatal("ExpressionDataArrayUI::setEventMode(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ExpressionDataArrayUI::setEventMode(): The data is nullptr!!");
     }
 }
 
@@ -137,7 +137,7 @@ void ExpressionDataArrayUI::setAssignmentVariableIndex(int index, const QString 
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("ExpressionDataArrayUI::setAssignmentVariableIndex(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("ExpressionDataArrayUI::setAssignmentVariableIndex(): Behavior file or event data is null!!!");
     }
 }
 
@@ -150,7 +150,7 @@ void ExpressionDataArrayUI::setAssignmentEventIndex(int index, const QString & n
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("ExpressionDataArrayUI::setAssignmentVariableIndex(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("ExpressionDataArrayUI::setAssignmentVariableIndex(): Behavior file or event data is null!!!");
     }
 }
 
@@ -162,7 +162,7 @@ void ExpressionDataArrayUI::viewSelectedChild(int row, int column){
             emit viewEvents(bsData->assignmentEventIndex + 1);
         }
     }else{
-        (qFatal("ExpressionDataArrayUI::viewSelectedChild(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ExpressionDataArrayUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -173,7 +173,7 @@ void ExpressionDataArrayUI::eventRenamed(const QString & name, int index){
             table->item(ASSIGNMENT_EVENT_INDEX_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        (qFatal("ExpressionDataArrayUI::eventRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ExpressionDataArrayUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -183,6 +183,6 @@ void ExpressionDataArrayUI::variableRenamed(const QString & name, int index){
             table->item(ASSIGNMENT_VARIABLE_INDEX_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        (qFatal("ExpressionDataArrayUI::variableRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ExpressionDataArrayUI::variableRenamed(): The data is nullptr!!");
     }
 }

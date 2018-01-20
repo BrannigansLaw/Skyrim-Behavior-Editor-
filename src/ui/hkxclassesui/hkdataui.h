@@ -129,6 +129,7 @@ private:
         MODIFIER_GENERATOR,
         MANUAL_SELECTOR_GENERATOR,
         STATE_MACHINE,
+        STATE,
         BLENDER_GENERATOR,
         BEHAVIOR_GRAPH,
         BS_LIMB_IK_MOD,
@@ -210,6 +211,7 @@ private:
     ModifierGeneratorUI *modGenUI;
     ManualSelectorGeneratorUI *manSelGenUI;
     StateMachineUI *stateMachineUI;
+    StateUI *stateUI;
     BlenderGeneratorUI *blenderGeneratorUI;
     BehaviorGraphUI *behaviorGraphUI;
     BSLimbIKModifierUI *limbIKModUI;

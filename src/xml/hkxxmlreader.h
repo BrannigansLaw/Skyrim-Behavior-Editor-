@@ -31,7 +31,7 @@ public:
         MalformedEndElementTag = -14,
         UnknownError = -50
     };
-    HkxXmlReader(HkxFile *file = NULL);
+    HkxXmlReader(HkxFile *file = nullptr);
     bool parse();
     virtual ~HkxXmlReader();
     void setFile(HkxFile *file);

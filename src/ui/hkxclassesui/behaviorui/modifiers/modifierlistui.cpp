@@ -87,8 +87,8 @@ QStringList ModifierListUI::headerLabels = {
 };
 
 ModifierListUI::ModifierListUI()
-    : behaviorView(NULL),
-      bsData(NULL),
+    : behaviorView(nullptr),
+      bsData(nullptr),
       topLyt(new QGridLayout),
       table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
@@ -140,7 +140,7 @@ void ModifierListUI::disconnectSignals(){
 
 void ModifierListUI::loadData(HkxObject *data){
     disconnectSignals();
-    hkbVariableBindingSet *varBind = NULL;
+    hkbVariableBindingSet *varBind = nullptr;
     if (data){
         if (data->getSignature() == HKB_MODIFIER_LIST){
             bsData = static_cast<hkbModifierList *>(data);
@@ -154,10 +154,10 @@ void ModifierListUI::loadData(HkxObject *data){
             }
             loadDynamicTableRows();
         }else{
-            (qFatal(QString("ModifierListUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
+            FATAL_RUNTIME_ERROR(QString("ModifierListUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        (qFatal("ModifierListUI::loadData(): The data passed to the UI is NULL!!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::loadData(): The data passed to the UI is nullptr!!!");
     }
     connectSignals();
 }
@@ -169,17 +169,17 @@ void ModifierListUI::loadDynamicTableRows(){
         if (table->rowCount() != temp){
             table->setRowCount(temp);
         }
-        hkbModifier *child = NULL;
+        hkbModifier *child = nullptr;
         for (int i = ADD_MODIFIER_ROW + 1, j = 0; j < bsData->modifiers.size(); i++, j++){
             child = static_cast<hkbModifier *>(bsData->modifiers.at(j).data());
             if (child){
                 setRowItems(i, child->getName(), child->getClassname(), "Remove", "Edit", "Double click to remove this modifier", VIEW_MODIFIERS_TABLE_TIP);
             }else{
-                (qFatal("ModifierListUI::loadData(): Null state found!!!"));
+                FATAL_RUNTIME_ERROR("ModifierListUI::loadData(): Null state found!!!");
             }
         }
     }else{
-        (qFatal("ModifierListUI::loadDynamicTableRows(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::loadDynamicTableRows(): The data is nullptr!!");
     }
     //table->setSortingEnabled(true);
 }
@@ -219,7 +219,7 @@ void ModifierListUI::connectToTables(GenericTableWidget *modifiers, GenericTable
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        (qFatal("ModifierListUI::connectToTables(): One or more arguments are NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -236,21 +236,21 @@ bool ModifierListUI::setBinding(int index, int row, const QString & variableName
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("ModifierListUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("ModifierListUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("ModifierListUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("ModifierListUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("ModifierListUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -271,7 +271,7 @@ void ModifierListUI::setBindingVariable(int index, const QString & name){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("ModifierListUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -293,18 +293,18 @@ void ModifierListUI::loadBinding(int row, int colunm, hkbVariableBindingSet *var
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("ModifierListUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("ModifierListUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("ModifierListUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::loadBinding(): The data is nullptr!!");
     }
 }
 
 void ModifierListUI::variableRenamed(const QString &name, int index){
     int bindIndex = -1;
-    hkbVariableBindingSet *bind = NULL;
+    hkbVariableBindingSet *bind = nullptr;
     if (name == ""){
-        (qWarning("ModifierListUI::variableRenamed(): The new variable name is the empty string!!"));
+        WARNING_MESSAGE("ModifierListUI::variableRenamed(): The new variable name is the empty string!!");
     }
     if (bsData){
         index--;
@@ -316,7 +316,7 @@ void ModifierListUI::variableRenamed(const QString &name, int index){
             }
         }
     }else{
-        (qFatal("ModifierListUI::variableRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::variableRenamed(): The data is nullptr!!");
     }
 }
 
@@ -329,10 +329,10 @@ void ModifierListUI::modifierRenamed(const QString &name, int index){
                 table->item(table->currentRow(), VALUE_COLUMN)->setText(name);
             }
         }else{
-            (qFatal("ModifierListUI::generatorRenamed(): Invalid modifier index selected!!"));
+            FATAL_RUNTIME_ERROR("ModifierListUI::generatorRenamed(): Invalid modifier index selected!!");
         }
     }else{
-        (qFatal("ModifierListUI::generatorRenamed(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -356,7 +356,7 @@ void ModifierListUI::selectTableToView(bool viewproperties, const QString &path)
             }
         }
     }else{
-        (qFatal("ModifierListUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -369,7 +369,7 @@ void ModifierListUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        (qFatal("ModifierListUI::setName(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -378,7 +378,7 @@ void ModifierListUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("ModifierListUI::setEnable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -410,11 +410,11 @@ void ModifierListUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                (qFatal("ModifierListUI::viewSelectedChild(): Invalid index of child to view!!"));
+                FATAL_RUNTIME_ERROR("ModifierListUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }
     }else{
-        (qFatal("ModifierListUI::viewSelected(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -427,15 +427,15 @@ void ModifierListUI::swapGeneratorIndices(int index1, int index2){
             behaviorView->getSelectedItem()->reorderChildren();
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qWarning("ModifierListUI::swapGeneratorIndices(): Cannot swap these rows!!"));
+            WARNING_MESSAGE("ModifierListUI::swapGeneratorIndices(): Cannot swap these rows!!");
         }
     }else{
-        (qFatal("ModifierListUI::swapGeneratorIndices(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::swapGeneratorIndices(): The data is nullptr!!");
     }
 }
 
 void ModifierListUI::setModifier(int index, const QString &name){
-    DataIconManager *ptr = NULL;
+    DataIconManager *ptr = nullptr;
     int modifierIndex = table->currentRow() - BASE_NUMBER_OF_ROWS;
     if (bsData){
         if (behaviorView){
@@ -443,17 +443,17 @@ void ModifierListUI::setModifier(int index, const QString &name){
                 ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getModifierDataAt(index - 1);
                 if (ptr){
                     if (name != ptr->getName()){
-                        (qFatal("The name of the selected object does not match it's name in the object selection table!!!"));
+                        FATAL_RUNTIME_ERROR("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
                         return;
                     }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->modifiers.at(modifierIndex).data()), ptr, false)){
-                        (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
+                        WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
                         return;
                     }
                 }else{
                     if (behaviorView->getSelectedItem()){
                         behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->modifiers.at(modifierIndex).data())), modifierIndex);
                     }else{
-                        (qFatal("ModifierListUI::setModifier(): The selected icon is NULL!!"));
+                        FATAL_RUNTIME_ERROR("ModifierListUI::setModifier(): The selected icon is nullptr!!");
                         return;
                     }
                 }
@@ -462,13 +462,13 @@ void ModifierListUI::setModifier(int index, const QString &name){
                 bsData->getParentFile()->setIsChanged(true);
                 loadDynamicTableRows();
             }else{
-                (qFatal("ModifierListUI::setModifier(): Invalid modifier index selected!!"));
+                FATAL_RUNTIME_ERROR("ModifierListUI::setModifier(): Invalid modifier index selected!!");
             }
         }else{
-            (qFatal("ModifierListUI::setModifier(): The 'behaviorView' pointer is NULL!!"));
+            FATAL_RUNTIME_ERROR("ModifierListUI::setModifier(): The 'behaviorView' pointer is nullptr!!");
         }
     }else{
-        (qFatal("ModifierListUI::setModifier(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::setModifier(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -579,11 +579,11 @@ void ModifierListUI::addModifier(){
         }else if (text == "hkbHandIKControlsModifier"){
             behaviorView->appendHandIKControlsModifier();
         }else{
-            (qFatal("ModifierListUI::addModifier(): Invalid type!!"));
+            FATAL_RUNTIME_ERROR("ModifierListUI::addModifier(): Invalid type!!");
         }
         loadDynamicTableRows();
     }else{
-        (qFatal("ModifierListUI::addModifier(): The data or behavior graph pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::addModifier(): The data or behavior graph pointer is nullptr!!");
     }
 }
 
@@ -593,10 +593,10 @@ void ModifierListUI::removeModifier(int index){
             behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(bsData->modifiers.at(index).data()), index);//Reorderchildren?
             behaviorView->removeObjects();
         }else{
-            (qWarning("ModifierListUI::removeModifier(): Invalid index of generator to remove!!"));
+            WARNING_MESSAGE("ModifierListUI::removeModifier(): Invalid index of generator to remove!!");
         }
         loadDynamicTableRows();
     }else{
-        (qFatal("ModifierListUI::removeModifier(): The data or behavior graph pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("ModifierListUI::removeModifier(): The data or behavior graph pointer is nullptr!!");
     }
 }

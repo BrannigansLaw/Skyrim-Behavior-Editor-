@@ -119,6 +119,7 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
       contextMenu(new QMenu(this)),
       appendGeneratorMenu(new QMenu("Append Generator:", contextMenu)),
       appendStateMachineAct(new QAction("State Machine", appendGeneratorMenu)),
+      appendStateAct(new QAction("State", appendGeneratorMenu)),
       appendManualSelectorGeneratorAct(new QAction("Manual Selector Generator", appendGeneratorMenu)),
       appendModifierGeneratorAct(new QAction("Modifier Generator", appendGeneratorMenu)),
       appendBSIStateTaggingGeneratorAct(new QAction("BS iState Tagging Generator", appendGeneratorMenu)),
@@ -200,6 +201,7 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
 {
     contextMenu->addMenu(appendGeneratorMenu);
     appendGeneratorMenu->addAction(appendStateMachineAct);
+    appendGeneratorMenu->addAction(appendStateAct);
     appendGeneratorMenu->addAction(appendManualSelectorGeneratorAct);
     appendGeneratorMenu->addAction(appendModifierGeneratorAct);
     appendGeneratorMenu->addAction(appendBSIStateTaggingGeneratorAct);
@@ -281,6 +283,7 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     //setContextMenu(contextMenu);
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(appendStateMachineAct, SIGNAL(triggered()), this, SLOT(appendStateMachine()));
+    connect(appendStateAct, SIGNAL(triggered()), this, SLOT(appendState()));
     connect(appendManualSelectorGeneratorAct, SIGNAL(triggered()), this, SLOT(appendManualSelectorGenerator()));
     connect(appendModifierGeneratorAct, SIGNAL(triggered()), this, SLOT(appendModifierGenerator()));
     connect(appendBSIStateTaggingGeneratorAct, SIGNAL(triggered()), this, SLOT(appendIStateTaggingGenerator()));
@@ -380,7 +383,7 @@ TreeGraphicsItem * BehaviorGraphView::getSelectedIconsChildIcon(HkxObject *child
     if (getSelectedItem()){
         return getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(child));
     }
-    return NULL;
+    return nullptr;
 }
 
 QStringList BehaviorGraphView::getEventNames() const{
@@ -428,7 +431,7 @@ void BehaviorGraphView::deleteSelectedObjectBranchSlot(){
     if (getSelectedItem()){
         getSelectedItem()->unselect();
         removeItemFromGraph(getSelectedItem(), 0, true, true);
-        ui->changeCurrentDataWidget(NULL);
+        ui->changeCurrentDataWidget(nullptr);
         removeObjects();
     }
 }
@@ -445,7 +448,7 @@ void BehaviorGraphView::removeObjects(){
 template <typename T>
 void BehaviorGraphView::append(T *obj){
     if (getSelectedItem()){
-        TreeGraphicsItem *newIcon = NULL;
+        TreeGraphicsItem *newIcon = nullptr;
         HkxObject *selectedItemData = ((HkxObject *)(getSelectedItem()->itemData));
         HkxSignature sig = selectedItemData->getSignature();
         if (getSelectedItem()->itemData->hasChildren() && sig != HKB_STATE_MACHINE && sig != HKB_MANUAL_SELECTOR_GENERATOR && sig != HKB_BLENDER_GENERATOR && sig != BS_BONE_SWITCH_GENERATOR && sig != HKB_POSE_MATCHING_GENERATOR && sig != HKB_MODIFIER_LIST){
@@ -488,7 +491,7 @@ void BehaviorGraphView::append(T *obj){
         selectedItemData->evaulateDataValidity();
         behavior->setIsChanged(true);
         getSelectedItem()->reposition();
-        treeScene->selectIcon(newIcon, false);
+        treeScene->selectIcon(newIcon, TreeGraphicsScene::EXPAND_CONTRACT_ZERO);
         emit addedGenerator(obj->getName(), obj->getClassname());
     }else{
         delete obj;
@@ -498,6 +501,10 @@ void BehaviorGraphView::append(T *obj){
 
 void BehaviorGraphView::appendStateMachine(){
     append(new hkbStateMachine(behavior));
+}
+
+void BehaviorGraphView::appendState(){
+    append(new hkbStateMachineStateInfo(behavior, (hkbStateMachine *)getSelectedData()));
 }
 
 void BehaviorGraphView::appendManualSelectorGenerator(){
@@ -759,7 +766,7 @@ void BehaviorGraphView::wrap(T *obj){
         TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), static_cast<DataIconManager*>((obj)), -1, true);
         behavior->setIsChanged(true);
         getSelectedItem()->reposition();
-        treeScene->selectIcon(newIcon, false);
+        treeScene->selectIcon(newIcon, TreeGraphicsScene::EXPAND_CONTRACT_ZERO);
         emit addedGenerator(obj->getName(), obj->getClassname());
     }
 }
@@ -880,10 +887,15 @@ void BehaviorGraphView::popUpMenuRequested(const QPoint &pos){
             wrapGeneratorMenu->menuAction()->setDisabled(true);
             wrapBlenderMenu->menuAction()->setDisabled(true);
         }
+        if (sig == HKB_STATE_MACHINE){
+            appendStateAct->setDisabled(false);
+        }else{
+            appendStateAct->setDisabled(true);
+        }
     }
     contextMenu->popup(viewport()->mapToGlobal(pos));
 }
 
 BehaviorGraphView::~BehaviorGraphView(){
-    ui->loadBehaviorView(NULL);
+    ui->loadBehaviorView(nullptr);
 }

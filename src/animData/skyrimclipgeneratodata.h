@@ -18,6 +18,7 @@ public:
     uint lineCount() const;
     void addTrigger(const SkyrimClipTrigger &trig = SkyrimClipTrigger());
     bool removeTrigger(int index);
+    QString getClipGeneratorName() const;
 private:
     ProjectAnimData *parent;
     QString clipGeneratorName;

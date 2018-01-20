@@ -31,7 +31,7 @@ signals:
     void released();
     void clicked(bool b);
 public:
-    CheckBox(const QString & text = "", QWidget *parent = NULL)
+    CheckBox(const QString & text = "", QWidget *parent = nullptr)
         : QWidget(parent),
           checkbox(new QCheckBox(text, parent))
     {
@@ -231,8 +231,8 @@ public:
 
     bool swapRowItems(int row1, int row2){
         if (rowCount() > row1 && rowCount() > row2 && row1 != row2 && row1 >= 0 && row2 >= 0){
-            QTableWidgetItem *item1 = NULL;
-            QTableWidgetItem *item2 = NULL;
+            QTableWidgetItem *item1 = nullptr;
+            QTableWidgetItem *item2 = nullptr;
             for (int i = 0; i < columnCount(); i++){
                 item1 = takeItem(row1, i);
                 item2 = takeItem(row2, i);

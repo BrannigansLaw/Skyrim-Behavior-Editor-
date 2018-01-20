@@ -35,7 +35,7 @@ QStringList GetUpModifierUI::headerLabels = {
 };
 
 GetUpModifierUI::GetUpModifierUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       topLyt(new QGridLayout),
       table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
@@ -120,7 +120,7 @@ void GetUpModifierUI::connectToTables(GenericTableWidget *variables, GenericTabl
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        (qFatal("GetUpModifierUI::connectToTables(): One or more arguments are NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -130,7 +130,7 @@ void GetUpModifierUI::loadData(HkxObject *data){
         if (data->getSignature() == HKB_GET_UP_MODIFIER){
             QStringList boneNames;
             boneNames.append("None");
-            hkbVariableBindingSet *varBind = NULL;
+            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbGetUpModifier *>(data);
             name->setText(bsData->name);
             enable->setChecked(bsData->enable);
@@ -171,10 +171,10 @@ void GetUpModifierUI::loadData(HkxObject *data){
                 table->item(ANOTHER_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            (qFatal("GetUpModifierUI::loadData(): The data is an incorrect type!!"));
+            FATAL_RUNTIME_ERROR("GetUpModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        (qFatal("GetUpModifierUI::loadData(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -188,7 +188,7 @@ void GetUpModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        (qFatal("GetUpModifierUI::setName(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -197,7 +197,7 @@ void GetUpModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("GetUpModifierUI::setEnable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -208,7 +208,7 @@ void GetUpModifierUI::setGroundNormal(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("GetUpModifierUI::setgroundNormal(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::setgroundNormal(): The data is nullptr!!");
     }
 }
 
@@ -219,7 +219,7 @@ void GetUpModifierUI::setDuration(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("GetUpModifierUI::setduration(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::setduration(): The data is nullptr!!");
     }
 }
 
@@ -230,7 +230,7 @@ void GetUpModifierUI::setAlignWithGroundDuration(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("GetUpModifierUI::setalignWithGroundDuration(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::setalignWithGroundDuration(): The data is nullptr!!");
     }
 }
 
@@ -239,7 +239,7 @@ void GetUpModifierUI::setRootBoneIndex(int index){
         bsData->rootBoneIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("GetUpModifierUI::setrootBoneIndex(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::setrootBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -248,7 +248,7 @@ void GetUpModifierUI::setOtherBoneIndex(int index){
         bsData->otherBoneIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("GetUpModifierUI::setotherBoneIndex(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::setotherBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -257,7 +257,7 @@ void GetUpModifierUI::setAnotherBoneIndex(int index){
         bsData->anotherBoneIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("GetUpModifierUI::setanotherBoneIndex(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::setanotherBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -313,7 +313,7 @@ void GetUpModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        (qFatal("GetUpModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -333,7 +333,7 @@ void GetUpModifierUI::selectTableToView(bool viewisProperty, const QString & pat
             }
         }
     }else{
-        (qFatal("GetUpModifierUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -372,7 +372,7 @@ void GetUpModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        (qFatal("GetUpModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -389,21 +389,21 @@ bool GetUpModifierUI::setBinding(int index, int row, const QString &variableName
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("GetUpModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("GetUpModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("GetUpModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("GetUpModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("GetUpModifierUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -460,7 +460,7 @@ void GetUpModifierUI::setBindingVariable(int index, const QString &name){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("GetUpModifierUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -482,9 +482,9 @@ void GetUpModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *va
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("GetUpModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("GetUpModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("GetUpModifierUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("GetUpModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

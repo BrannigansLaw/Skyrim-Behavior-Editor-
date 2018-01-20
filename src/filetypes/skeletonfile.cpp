@@ -20,7 +20,7 @@ HkxSharedPtr * SkeletonFile::findSkeleton(long ref){
             return &skeletons[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 HkxSharedPtr * SkeletonFile::findLocalFrame(long ref){
@@ -29,7 +29,7 @@ HkxSharedPtr * SkeletonFile::findLocalFrame(long ref){
             return &localFrames[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 QStringList SkeletonFile::getBonesFromSkeletonAt(int index) const{
@@ -146,7 +146,7 @@ bool SkeletonFile::parse(){
 
 bool SkeletonFile::link(){
     if (!getRootObject().constData()){
-        writeToLog("SkeletonFile: link() failed!\nThe root object of this character file is NULL!", true);
+        writeToLog("SkeletonFile: link() failed!\nThe root object of this character file is nullptr!", true);
         return false;
     }else if (getRootObject()->getSignature() != HK_ROOT_LEVEL_CONTAINER){
         writeToLog("SkeletonFile: link() failed!\nThe root object of this character file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16), true);

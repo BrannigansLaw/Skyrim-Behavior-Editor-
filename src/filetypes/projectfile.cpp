@@ -48,13 +48,12 @@ bool ProjectFile::readAnimationData(const QString & filename){
         delete animfile;
         animfile = new QFile(QDir::currentPath()+"/animationdatasinglefile.txt");
         if (!animfile->exists()){
-            (qFatal("animationdatasinglefile.txt is missing from the application directory!"));
+            FATAL_RUNTIME_ERROR("animationdatasinglefile.txt is missing from the application directory!");
         }
     }
     if (!skyrimAnimData->parse(animfile, projectname)){
         delete animfile;
-        (qFatal("ProjectFile::readAnimationData(): The project animation data file could not be parsed!!!"));
-        return false;
+        FATAL_RUNTIME_ERROR("ProjectFile::readAnimationData(): The project animation data file could not be parsed!!!");
     }
     delete animfile;
     projectIndex = skyrimAnimData->getProjectIndex(projectname);
@@ -67,13 +66,12 @@ bool ProjectFile::readAnimationSetData(const QString & filename){
         delete animsetfile;
         animsetfile = new QFile(QDir::currentPath()+"/animationsetdatasinglefile.txt");
         if (!animsetfile->exists()){
-            (qFatal("animationsetdatasinglefile.txt is missing from the application directory!"));
+            FATAL_RUNTIME_ERROR("animationsetdatasinglefile.txt is missing from the application directory!");
         }
     }
     if (!skyrimAnimSetData->parse(animsetfile)){
         delete animsetfile;
-        (qFatal("ProjectFile::readAnimationSetData(): The project animation set data file could not be parsed!!!"));
-        return false;
+        FATAL_RUNTIME_ERROR("ProjectFile::readAnimationSetData(): The project animation set data file could not be parsed!!!");
     }
     delete animsetfile;
     return true;
@@ -99,14 +97,14 @@ HkxSharedPtr * ProjectFile::findProjectData(long ref){
     if (projectData.getReference() == ref){
         return &projectData;
     }
-    return NULL;
+    return nullptr;
 }
 
 HkxSharedPtr * ProjectFile::findProjectStringData(long ref){
     if (stringData.getReference() == ref){
         return &stringData;
     }
-    return NULL;
+    return nullptr;
 }
 
 bool ProjectFile::addObjectToFile(HkxObject *obj, long ref){
@@ -186,7 +184,7 @@ bool ProjectFile::parse(){
 
 bool ProjectFile::link(){
     if (!getRootObject().constData()){
-        writeToLog("ProjectFile: link() failed!\nThe root object of this project file is NULL!", true);
+        writeToLog("ProjectFile: link() failed!\nThe root object of this project file is nullptr!", true);
         return false;
     }else if (getRootObject()->getSignature() != HK_ROOT_LEVEL_CONTAINER){
         writeToLog("ProjectFile: link() failed!\nThe root object of this project file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16), true);
@@ -218,18 +216,20 @@ void ProjectFile::setAnimationIndexDuration(int indexofanimationlist, int animat
             project->animationMotionData.at(indexofanimationlist)->duration = duration;
         }
     }else{
-        (qFatal("ProjectFile::setAnimationIndexDuration(): skyrimAnimData->getProjectAnimData Failed!"));
+        FATAL_RUNTIME_ERROR("ProjectFile::setAnimationIndexDuration(): skyrimAnimData->getProjectAnimData Failed!");
     }
 }
 
 void ProjectFile::generateAnimDataForProject(){
     HkxObject *generator;
+    SkyrimClipGeneratoData *clipGenDataPtr;
     for (int i = 0; i < behaviorFiles.size(); i++){
         for (int j = 0; j < behaviorFiles.at(i)->generators.size(); j++){
             generator = behaviorFiles.at(i)->generators.at(j).data();
             if (generator->getSignature() == HKB_CLIP_GENERATOR){
-                if (!skyrimAnimData->appendClipGenerator(projectName, new SkyrimClipGeneratoData(static_cast<hkbClipGenerator *>(generator)->getClipGeneratorAnimData(skyrimAnimData->getProjectAnimData(projectName), getAnimationIndex(static_cast<hkbClipGenerator *>(generator)->animationName))))){
-                    (qFatal("ProjectFile::generateAnimDataForProject(): skyrimAnimData->appendClipGenerator Failed!"));
+                clipGenDataPtr = new SkyrimClipGeneratoData(static_cast<hkbClipGenerator *>(generator)->getClipGeneratorAnimData(skyrimAnimData->getProjectAnimData(projectName), getAnimationIndex(static_cast<hkbClipGenerator *>(generator)->animationName)));
+                if (!skyrimAnimData->appendClipGenerator(projectName, clipGenDataPtr)){
+                    writeToLog((QString("ProjectFile::generateAnimDataForProject(): Duplicate clip generator \""+clipGenDataPtr->getClipGeneratorName()+"found in: "+behaviorFiles.at(i)->fileName().section("/", -1, -1))));
                 }
             }
         }
@@ -285,20 +285,23 @@ QStringList ProjectFile::getAnimationNames() const{
 }
 
 QString ProjectFile::findAnimationNameFromEncryptedData(const QString &encryptedname) const{
-    bool ok;
-    ulong value1;
-    ulong value2 = encryptedname.toULong(&ok, 10);
+    bool ok = true;
+    ULONGLONG value1;
+    ULONGLONG value2 = encryptedname.toULongLong(&ok, 10);
     if (!ok){
-        (qFatal("ProjectFile::findAnimationNameFromEncryptedData(): encryptedname.toULong(&ok, 10) Failed!"));
+        value2 = encryptedname.toULongLong(&ok, 16);
+        if (!ok){
+            FATAL_RUNTIME_ERROR("ProjectFile::findAnimationNameFromEncryptedData(): encryptedname.toULong(&ok, 10) Failed!");
+        }
     }
     for (int i = 0; i < encryptedAnimationNames.size(); i++){
-        value1 = encryptedAnimationNames.at(i).toULong(&ok, 16);
+        value1 = encryptedAnimationNames.at(i).toULongLong(&ok, 16);
         if (!ok){
-            (qFatal("ProjectFile::findAnimationNameFromEncryptedData(): encryptedAnimationNames.at(i).toULong(&ok, 16) Failed!"));
+            FATAL_RUNTIME_ERROR("ProjectFile::findAnimationNameFromEncryptedData(): encryptedAnimationNames.at(i).toULong(&ok, 16) Failed!");
         }
         if (value1 == value2){
             if (!character){
-                (qFatal("ProjectFile::findAnimationNameFromEncryptedData(): character is NULL!"));
+                FATAL_RUNTIME_ERROR("ProjectFile::findAnimationNameFromEncryptedData(): character is nullptr!");
             }
             return character->getAnimationNameAt(i).toLower().section("\\", -1, -1).replace(".hkx", "");
         }
@@ -366,5 +369,18 @@ void ProjectFile::write(){
 }
 
 ProjectFile::~ProjectFile(){
-    //
+    if (character){
+        delete character;
+    }
+    if (skyrimAnimData){
+        delete skyrimAnimData;
+    }
+    if (skyrimAnimSetData){
+        delete skyrimAnimSetData;
+    }
+    for (int i = 0; i < behaviorFiles.size(); i++){
+        if (behaviorFiles.at(i)){
+            delete behaviorFiles.at(i);
+        }
+    }
 }

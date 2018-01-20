@@ -43,6 +43,10 @@ bool SkyrimClipGeneratoData::removeTrigger(int index){
     return false;
 }
 
+QString SkyrimClipGeneratoData::getClipGeneratorName() const{
+    return clipGeneratorName;
+}
+
 bool SkyrimClipGeneratoData::read(QFile *file, uint &lineCount){
     if (!file || !file->isOpen()){
         return false;

@@ -9,7 +9,7 @@
 #include <QSignalMapper>
 
 SkeletonUI::SkeletonUI(const QString & title)
-    : bsData(NULL),
+    : bsData(nullptr),
       lyt(new QVBoxLayout(this)),
       //backPB(new QPushButton("Return")),
       bones(new TableWidget),

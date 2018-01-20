@@ -115,10 +115,10 @@ BehaviorFile::BehaviorFile(MainWindow *window, ProjectFile *projectfile, Charact
 {
     getReader().setFile(this);
     if (!project){
-        (qFatal("BehaviorFile::BehaviorFile(): The project pointer is NULL!"));
+        FATAL_RUNTIME_ERROR("BehaviorFile::BehaviorFile(): The project pointer is nullptr!");
     }
     if (!character){
-        (qFatal("BehaviorFile::BehaviorFile(): The character pointer is NULL!"));
+        FATAL_RUNTIME_ERROR("BehaviorFile::BehaviorFile(): The character pointer is nullptr!");
     }
 }
 
@@ -382,7 +382,7 @@ void BehaviorFile::generateDefaultCharacterData(){
         data->addEvent("2_KillActor");
         data->addEvent("MRh_SpellFire_Event");
     }else{
-        (qFatal("BehaviorFile::generateDefaultCharacterData(): The behavior graph data failed to construct!"));
+        FATAL_RUNTIME_ERROR("BehaviorFile::generateDefaultCharacterData(): The behavior graph data failed to construct!");
     }
 }
 
@@ -482,7 +482,7 @@ QStringList BehaviorFile::getRagdollBoneNames() const{
 
 /*TreeGraphicsItem * BehaviorFile::getRootIcon() const{
     hkRootLevelContainer *root = static_cast<hkRootLevelContainer *>(rootObject.data());
-    hkbBehaviorGraph *graph = NULL;
+    hkbBehaviorGraph *graph = nullptr;
     if (!root->namedVariants.isEmpty() && root->namedVariants.at(0).variant.data() && root->namedVariants.at(0).variant.data()->getSignature() == HKB_BEHAVIOR_GRAPH){
         graph = static_cast<hkbBehaviorGraph *>(root->namedVariants.at(0).variant.data());
         if (!graph->icons.isEmpty()){
@@ -492,7 +492,7 @@ QStringList BehaviorFile::getRagdollBoneNames() const{
             return graph->icons.first();
         }
     }
-    return NULL;
+    return nullptr;
 }*/
 
 bool BehaviorFile::addObjectToFile(HkxObject *obj, long ref){
@@ -549,7 +549,7 @@ bool BehaviorFile::parse(){
                     return false;
                 }
                 if (signature == HKB_STATE_MACHINE_STATE_INFO){
-                    if (!appendAndReadData(index, new hkbStateMachineStateInfo(this, NULL, ref))){
+                    if (!appendAndReadData(index, new hkbStateMachineStateInfo(this, nullptr, ref))){
                         return false;
                     }
                 }else if (signature == HKB_STATE_MACHINE){
@@ -589,7 +589,7 @@ bool BehaviorFile::parse(){
                         return false;
                     }
                 }else if (signature == HKB_BLENDER_GENERATOR_CHILD){
-                    if (!appendAndReadData(index, new hkbBlenderGeneratorChild(this, NULL, ref))){
+                    if (!appendAndReadData(index, new hkbBlenderGeneratorChild(this, nullptr, ref))){
                         return false;
                     }
                 }else if (signature == HKB_BONE_WEIGHT_ARRAY){
@@ -829,7 +829,7 @@ bool BehaviorFile::parse(){
                         return false;
                     }
                 }else if (signature == HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
-                    if (!appendAndReadData(index, new hkbStateMachineTransitionInfoArray(this, NULL, ref))){
+                    if (!appendAndReadData(index, new hkbStateMachineTransitionInfoArray(this, nullptr, ref))){
                         return false;
                     }
                 }else if (signature == HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
@@ -917,7 +917,7 @@ bool BehaviorFile::parse(){
 
 bool BehaviorFile::link(){
     if (!getRootObject().constData()){
-        writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file is NULL!", true);
+        writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file is nullptr!", true);
         return false;
     }else if (getRootObject()->getSignature() != HK_ROOT_LEVEL_CONTAINER){
         writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16), true);
@@ -1016,59 +1016,59 @@ void BehaviorFile::write(){
         }
         getWriter().setFile(this);
         if (!getWriter().writeToXMLFile()){
-            (qFatal("BehaviorFile::write(): writeToXMLFile() failed!!"));
+            FATAL_RUNTIME_ERROR("BehaviorFile::write(): writeToXMLFile() failed!!");
         }
     }else{
-        (qFatal("BehaviorFile::write(): The root object is NULL!!"));
+        FATAL_RUNTIME_ERROR("BehaviorFile::write(): The root object is nullptr!!");
     }
 }
 
 HkxSharedPtr * BehaviorFile::findGenerator(long ref){
     if (ref < 0){
-        return NULL;
+        return nullptr;
     }
     for (int i = 0; i < generators.size(); i++){
         if (ref == generators.at(i).getReference()){
             return &generators[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 HkxSharedPtr * BehaviorFile::findGeneratorChild(long ref){
     if (ref < 0){
-        return NULL;
+        return nullptr;
     }
     for (int i = 0; i < generatorChildren.size(); i++){
         if (ref == generatorChildren.at(i).getReference()){
             return &generatorChildren[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 HkxSharedPtr * BehaviorFile::findModifier(long ref){
     if (ref < 0){
-        return NULL;
+        return nullptr;
     }
     for (int i = 0; i < modifiers.size(); i++){
         if (ref == modifiers.at(i).getReference()){
             return &modifiers[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 HkxSharedPtr * BehaviorFile::findHkxObject(long ref){
     if (ref < 0){
-        return NULL;
+        return nullptr;
     }
     for (int i = 0; i < otherTypes.size(); i++){
         if (ref == otherTypes.at(i).getReference()){
             return &otherTypes[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 int BehaviorFile::addCharacterProperty(int index){
@@ -1127,12 +1127,12 @@ HkxSharedPtr * BehaviorFile::findBehaviorGraph(long ref){
     if (behaviorGraph.getReference() == ref){
         return &behaviorGraph;
     }
-    return NULL;
+    return nullptr;
 }
 
 QVector<int> BehaviorFile::removeGeneratorData(){
     QVector<int> removedIndices;
-    HkxObject *obj = NULL;
+    HkxObject *obj = nullptr;
     for (int i = generators.size() - 1; i >= 0; i--){
         obj = generators.at(i).data();
         if (obj){
@@ -1147,7 +1147,7 @@ QVector<int> BehaviorFile::removeGeneratorData(){
 
 QVector<int> BehaviorFile::removeGeneratorChildrenData(){
     QVector<int> removedIndices;
-    HkxObject *obj = NULL;
+    HkxObject *obj = nullptr;
     for (int i = generatorChildren.size() - 1; i >= 0; i--){
         obj = generatorChildren.at(i).data();
         if (obj){
@@ -1219,7 +1219,7 @@ QStringList BehaviorFile::getModifierTypeNames() const{
 }
 
 int BehaviorFile::getCharacterPropertyIndexFromBehavior(const QString &name) const{
-    hkbBehaviorGraphStringData *strings = NULL;
+    hkbBehaviorGraphStringData *strings = nullptr;
     if (stringData.data()){
         strings = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
         for (int i = 0; i < strings->characterPropertyNames.size(); i++){
@@ -1232,7 +1232,7 @@ int BehaviorFile::getCharacterPropertyIndexFromBehavior(const QString &name) con
 }
 
 int BehaviorFile::getCharacterPropertyIndex(const QString &name) const{
-    hkbCharacterStringData *strings = NULL;
+    hkbCharacterStringData *strings = nullptr;
     if (character && character->stringData.data()){
         strings = static_cast<hkbCharacterStringData *>(character->stringData.data());
         for (int i = 0; i < strings->characterPropertyNames.size(); i++){
@@ -1245,9 +1245,9 @@ int BehaviorFile::getCharacterPropertyIndex(const QString &name) const{
 }
 
 int BehaviorFile::findCharacterPropertyIndexFromCharacter(int indexOfBehaviorProperty) const{
-    hkbCharacterStringData *strings = NULL;
+    hkbCharacterStringData *strings = nullptr;
     QString name;
-    hkbBehaviorGraphStringData *behaviorstrings = NULL;
+    hkbBehaviorGraphStringData *behaviorstrings = nullptr;
     if (character && stringData.data()){
         strings = static_cast<hkbCharacterStringData *>(character->stringData.data());
         behaviorstrings = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
@@ -1268,7 +1268,7 @@ QStringList BehaviorFile::getCharacterPropertyNames() const{
 
 QStringList BehaviorFile::getAllReferencedBehaviorFilePaths() const{
     QStringList list;
-    hkbBehaviorReferenceGenerator *ptr = NULL;
+    hkbBehaviorReferenceGenerator *ptr = nullptr;
     for (int i = 0; i < generators.size(); i++){
         if (generators.at(i).constData() && generators.at(i)->getSignature() == HKB_BEHAVIOR_REFERENCE_GENERATOR){
             ptr = static_cast<hkbBehaviorReferenceGenerator *>(generators.at(i).data());
@@ -1300,7 +1300,7 @@ hkbGenerator *BehaviorFile::getGeneratorDataAt(int index){
     if (index >= 0 && index < generators.size()){
         return static_cast<hkbGenerator *>(generators[index].data());
     }
-    return NULL;
+    return nullptr;
 }
 
 int BehaviorFile::getIndexOfModifier(const HkxSharedPtr & obj) const{
@@ -1319,7 +1319,7 @@ hkbModifier* BehaviorFile::getModifierDataAt(int index){
     if (index >= 0 && index < modifiers.size()){
         return static_cast<hkbModifier *>(modifiers[index].data());
     }
-    return NULL;
+    return nullptr;
 }
 
 QStringList BehaviorFile::getVariableTypenames() const{

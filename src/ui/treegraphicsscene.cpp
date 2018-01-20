@@ -11,8 +11,8 @@
 #define MAX_NUM_GRAPH_ICONS 10000
 
 TreeGraphicsScene::TreeGraphicsScene()
-    : rootIcon(NULL),
-      selectedIcon(NULL),
+    : rootIcon(nullptr),
+      selectedIcon(nullptr),
       canDeleteRoot(false)
 {
     setBackgroundBrush(QBrush(Qt::gray));
@@ -41,19 +41,27 @@ void TreeGraphicsScene::setCanDeleteRoot(bool value){
     clearSelection();
 }*/
 
-void TreeGraphicsScene::selectIcon(TreeGraphicsItem *icon, bool expand){
+void TreeGraphicsScene::selectIcon(TreeGraphicsItem *icon, BranchBehaviorEnum expand){    //Change so expand all sub branches on right click on expand box!!!!!!
     QList <TreeGraphicsItem *> branch;
     if (selectedIcon){
         selectedIcon->unselect();
     }
     selectedIcon = icon;
     if (selectedIcon){
-        if (expand){
+        if (expand > EXPAND_CONTRACT_ZERO){
             if (selectedIcon->getIsExpanded()){
-                contractBranch(selectedIcon);
+                if (expand == EXPAND_CONTRACT_ALL){
+                    contractBranch(selectedIcon, true);
+                }else{
+                    contractBranch(selectedIcon);
+                }
                 selectedIcon->setIsExpanded(false);
             }else{
-                expandBranch(selectedIcon);
+                if (expand == EXPAND_CONTRACT_ONE){
+                    expandBranch(selectedIcon);
+                }else{
+                    expandBranch(selectedIcon, true);
+                }
             }
             if (!selectedIcon->isPrimaryIcon()){
                 selectedIcon = selectedIcon->getPrimaryIcon();
@@ -112,9 +120,9 @@ bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicate
     QList <DataIconManager *> children = rootData->getChildren();
     QList <TreeGraphicsItem *> parentIcons;
     QVector <short> numChildren;
-    TreeGraphicsItem *newIcon = NULL;
+    TreeGraphicsItem *newIcon = nullptr;
     if (rootData){
-        rootIcon = new BehaviorGraphIcon(NULL, rootData);
+        rootIcon = new BehaviorGraphIcon(nullptr, rootData);
         addItem(rootIcon);
         objects.append(children);
         numChildren.append(children.size());
@@ -150,7 +158,7 @@ bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicate
 
 //Appends "data" to the 'itemData' of "selectedIcon" after creating a new icon representing "data" and appending it to "selectedIcon"...
 TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedIcon, DataIconManager *data, int indexToInsert, bool inject, bool allowDuplicates, bool isFirstDraw){
-    TreeGraphicsItem *newIcon = NULL;
+    TreeGraphicsItem *newIcon = nullptr;
     TreeGraphicsItem *parent = ((TreeGraphicsItem *)selectedIcon->parentItem());
     QList <QGraphicsItem *> children;
     if (data){
@@ -165,7 +173,7 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
                             selectedIcon->itemData->wrapObjectAt(indexToInsert, data, parent->itemData);
                             //selectedIcon->setParent(newIcon, newIcon->getIndexofIconWithData(selectedIcon->itemData));//Not sure...
                         }
-                        return NULL;
+                        return nullptr;
                     }
                 }
             }
@@ -174,7 +182,7 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
             if (selectedIcon->getPrimaryIcon()){
                 selectedIcon = selectedIcon->getPrimaryIcon();
             }else{
-                return NULL;    //Error...
+                return nullptr;    //Error...
             }
         }
         if (!inject){
@@ -190,11 +198,11 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
             selectedIcon->setParent(newIcon, newIcon->getIndexofIconWithData(selectedIcon->itemData));
         }else{
             delete newIcon;
-            return NULL;
+            return nullptr;
         }
         if (newIcon->isDataDescendant(newIcon)){
             delete newIcon;
-            return NULL;
+            return nullptr;
         }
         addItem(newIcon);  //newIcon is added to scene already???
         //newIcon->reposition();
@@ -204,9 +212,9 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
 }
 
 bool TreeGraphicsScene::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData, bool removeData){
-    TreeGraphicsItem *iconToReplace = NULL;
-    TreeGraphicsItem *replacementIcon = NULL;
-    TreeGraphicsItem *oldParent = NULL;
+    TreeGraphicsItem *iconToReplace = nullptr;
+    TreeGraphicsItem *replacementIcon = nullptr;
+    TreeGraphicsItem *oldParent = nullptr;
     QList <DataIconManager *> dataChildren;
     //int indexOfReplacementData = -1;
     //int indexOfOldData = -1;
@@ -218,7 +226,7 @@ bool TreeGraphicsScene::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconM
             return true;
         }else if (dataToReplace != replacementData){
             iconToReplace = oldIconParent->getChildWithData(dataToReplace);
-            if (replacementData == NULL){
+            if (replacementData == nullptr){
                 removeItemFromGraph(iconToReplace, oldIconParent->itemData->getIndexOfObj(dataToReplace), removeData);
                 return true;
             }else if (replacementData->icons.isEmpty() || (!oldIconParent->isDataDescendant(replacementData) && !oldIconParent->hasSameData(replacementData))){
@@ -251,11 +259,11 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
     QList <QGraphicsItem *> children;   //Storage for all referenced icons in the branch whose root is "item"...
     QList <QGraphicsItem *> tempList;   //Storage for the children of the first icon stored in "children"...
     QList <QGraphicsItem *> iconsToRemove;  //Storage for all icons to be removed from the graph...
-    TreeGraphicsItem *itemToDeleteParent = NULL;
-    TreeGraphicsItem *itemToDelete = NULL;  //Represents any icons to be removed that had children that were adopted by another icon representing the same data...
+    TreeGraphicsItem *itemToDeleteParent = nullptr;
+    TreeGraphicsItem *itemToDelete = nullptr;  //Represents any icons to be removed that had children that were adopted by another icon representing the same data...
     QList <DataIconManager *> childrenData;//Used to count the data references if less than 2 remove the icon...
     int dataCount = 0;
-    TreeGraphicsItem *iconChild = NULL;
+    TreeGraphicsItem *iconChild = nullptr;
     int count = 0;  //Used to prevent possible infinite looping due to icons referencing ancestors...
     int index = -1; //Used to store the index of the position of "itemToDelete" in "children"...
     if (item){
@@ -268,7 +276,7 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
             if (dataCount < 2 || removeAllSameData){
                 children.append(item);
                 for (; count < MAX_NUM_GRAPH_ICONS, !children.isEmpty(); count++){  //Start cycling through children...
-                    itemToDelete = NULL;
+                    itemToDelete = nullptr;
                     iconChild = (TreeGraphicsItem *)children.first();
                     if (iconChild->hasSameData(dataToKeep)){
                         iconChild->setParent(itemToDeleteParent, itemToDeleteParent->getIndexofIconWithData(item->itemData));
@@ -311,7 +319,7 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
             }
         }else if (canDeleteRoot){  //Icon with no parent must be the root...
             delete item;
-            rootIcon = NULL;
+            rootIcon = nullptr;
         }
         //itemToDeleteParent->reorderChildren();
         if (count < MAX_NUM_GRAPH_ICONS){

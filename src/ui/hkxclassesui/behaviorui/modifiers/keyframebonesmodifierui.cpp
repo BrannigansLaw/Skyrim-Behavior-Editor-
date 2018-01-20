@@ -40,7 +40,7 @@ QStringList KeyframeBonesModifierUI::headerLabels = {
 };
 
 KeyframeBonesModifierUI::KeyframeBonesModifierUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       keyframeInfoUI(new KeyframeInfoUI),
       groupBox(new QGroupBox),
       boneIndexUI(new BoneIndexArrayUI),
@@ -107,7 +107,7 @@ void KeyframeBonesModifierUI::addKeyframeInfo(){
         bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
-        (qFatal("KeyframeBonesModifierUI::addKeyframeInfo(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::addKeyframeInfo(): The data is nullptr!!");
     }
 }
 
@@ -117,17 +117,17 @@ void KeyframeBonesModifierUI::removeKeyframeInfo(int index){
             if (index < bsData->keyframeInfo.size() && index >= 0){
                 bsData->keyframeInfo.removeAt(index);
             }else{
-                (qWarning("KeyframeBonesModifierUI::removeKeyframeInfo(): Invalid row index selected!!"));
+                WARNING_MESSAGE("KeyframeBonesModifierUI::removeKeyframeInfo(): Invalid row index selected!!");
                 return;
             }
             bsData->getParentFile()->setIsChanged(true);
             loadDynamicTableRows();
         }else{
-            (qWarning("KeyframeBonesModifierUI::removeKeyframeInfo(): Ranges is empty!!"));
+            WARNING_MESSAGE("KeyframeBonesModifierUI::removeKeyframeInfo(): Ranges is empty!!");
             return;
         }
     }else{
-        (qFatal("KeyframeBonesModifierUI::removeKeyframeInfo(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::removeKeyframeInfo(): The data is nullptr!!");
     }
 }
 
@@ -136,7 +136,7 @@ void KeyframeBonesModifierUI::loadData(HkxObject *data){
     setCurrentIndex(MAIN_WIDGET);
     if (data){
         if (data->getSignature() == HKB_KEY_FRAME_BONES_MODIFIER){
-            hkbVariableBindingSet *varBind = NULL;
+            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbKeyframeBonesModifier *>(data);
             name->setText(bsData->name);
             enable->setChecked(bsData->enable);
@@ -145,7 +145,7 @@ void KeyframeBonesModifierUI::loadData(HkxObject *data){
                 keyframedBonesList->setText("Click to Edit");
             }else{
                 keyframedBonesList->setChecked(false);
-                keyframedBonesList->setText("NULL");
+                keyframedBonesList->setText("nullptr");
             }
             varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
             if (varBind){
@@ -155,10 +155,10 @@ void KeyframeBonesModifierUI::loadData(HkxObject *data){
             }
             loadDynamicTableRows();
         }else{
-            (qFatal(QString("KeyframeBonesModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data()));
+            FATAL_RUNTIME_ERROR(QString("KeyframeBonesModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        (qFatal("KeyframeBonesModifierUI::loadData(): Attempting to load a null pointer!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::loadData(): Attempting to load a null pointer!!");
     }
     connectSignals();
 }
@@ -174,7 +174,7 @@ void KeyframeBonesModifierUI::loadDynamicTableRows(){
             setRowItems(i, "KeyframeInfo "+QString::number(j), "hkKeyframeInfo", "Remove", "Edit", "Double click to remove this KeyframeInfo", "Double click to edit this KeyframeInfo");
         }
     }else{
-        (qFatal("KeyframeBonesModifierUI::loadDynamicTableRows(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::loadDynamicTableRows(): The data is nullptr!!");
     }
     //table->setSortingEnabled(true);
 }
@@ -215,21 +215,21 @@ bool KeyframeBonesModifierUI::setBinding(int index, int row, const QString & var
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("KeyframeBonesModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("KeyframeBonesModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("KeyframeBonesModifierUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -250,7 +250,7 @@ void KeyframeBonesModifierUI::setBindingVariable(int index, const QString & name
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("KeyframeBonesModifierUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -268,7 +268,7 @@ void KeyframeBonesModifierUI::setName(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("KeyframeBonesModifierUI::setName(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -277,7 +277,7 @@ void KeyframeBonesModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("KeyframeBonesModifierUI::setEnable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -294,7 +294,7 @@ void KeyframeBonesModifierUI::toggleKeyframedBonesList(bool enable){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("KeyframeBonesModifierUI::toggleKeyframedBonesList(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::toggleKeyframedBonesList(): The data is nullptr!!");
     }
 }
 
@@ -303,7 +303,7 @@ void KeyframeBonesModifierUI::viewKeyframedBonesList(){
         boneIndexUI->loadData(bsData->keyframedBonesList.data());
         setCurrentIndex(BONE_INDEX_WIDGET);
     }else{
-        (qFatal("KeyframeBonesModifierUI::viewKeyframedBonesList(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::viewKeyframedBonesList(): The data is nullptr!!");
     }
 }
 
@@ -336,11 +336,11 @@ void KeyframeBonesModifierUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                (qFatal("KeyframeBonesModifierUI::viewSelectedChild(): Invalid index of range to view!!"));
+                FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::viewSelectedChild(): Invalid index of range to view!!");
             }
         }
     }else{
-        (qFatal("KeyframeBonesModifierUI::viewSelectedChild(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -353,7 +353,7 @@ void KeyframeBonesModifierUI::variableTableElementSelected(int index, const QStr
         keyframeInfoUI->setBindingVariable(index, name);
         break;
     default:
-        (qWarning("KeyframeBonesModifierUI::variableTableElementSelected(): An unwanted element selected event was recieved!!"));
+        WARNING_MESSAGE("KeyframeBonesModifierUI::variableTableElementSelected(): An unwanted element selected event was recieved!!");
     }
 }
 
@@ -369,7 +369,7 @@ void KeyframeBonesModifierUI::connectToTables(GenericTableWidget *variables, Gen
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(boneIndexUI, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        (qFatal("KeyframeBonesModifierUI::connectToTables(): One or more arguments are NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -391,10 +391,10 @@ void KeyframeBonesModifierUI::loadBinding(int row, int colunm, hkbVariableBindin
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("KeyframeBonesModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("KeyframeBonesModifierUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -414,15 +414,15 @@ void KeyframeBonesModifierUI::selectTableToView(bool viewproperties, const QStri
             }
         }
     }else{
-        (qFatal("KeyframeBonesModifierUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void KeyframeBonesModifierUI::variableRenamed(const QString & name, int index){
     int bindIndex = -1;
-    hkbVariableBindingSet *bind = NULL;
+    hkbVariableBindingSet *bind = nullptr;
     if (name == ""){
-        (qWarning("KeyframeBonesModifierUI::variableRenamed(): The new variable name is the empty string!!"));
+        WARNING_MESSAGE("KeyframeBonesModifierUI::variableRenamed(): The new variable name is the empty string!!");
     }
     if (bsData){
         index--;
@@ -438,7 +438,7 @@ void KeyframeBonesModifierUI::variableRenamed(const QString & name, int index){
             keyframeInfoUI->variableRenamed(name, index);
         }
     }else{
-        (qFatal("KeyframeBonesModifierUI::variableRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::variableRenamed(): The data is nullptr!!");
     }
 }
 

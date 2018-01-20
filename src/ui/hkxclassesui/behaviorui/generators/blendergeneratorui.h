@@ -66,7 +66,7 @@ private:
     void variableRenamed(const QString & name, int index);
     void generatorRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
+    void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
     void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
 private:
     enum ACTIVE_WIDGET {

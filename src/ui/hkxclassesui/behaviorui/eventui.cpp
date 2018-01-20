@@ -10,7 +10,7 @@
 #include <QLineEdit>
 
 EventUI::EventUI()
-    : file(NULL),
+    : file(nullptr),
       topLyt(new QGridLayout),
       returnPB(new QPushButton("Return")),
       nameL(new QLabel("Event Name:")),
@@ -55,7 +55,7 @@ void EventUI::loadData(BehaviorFile *parentFile, hkEventPayload * event){
         text = file->getEventNameAt(event->id);
         if (text == ""){
             if (event->id != -1){
-                (qWarning("EventUI::loadData(): Invalid event id!!!"));
+                WARNING_MESSAGE("EventUI::loadData(): Invalid event id!!!");
             }
             text = "NONE";
         }
@@ -66,7 +66,7 @@ void EventUI::loadData(BehaviorFile *parentFile, hkEventPayload * event){
             eventPayload->setText("");
         }
     }else{
-        (qFatal("EventUI::loadData(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("EventUI::loadData(): Behavior file or event data is null!!!");
     }
     connectSignals();
 }
@@ -85,7 +85,7 @@ void EventUI::setEvent(int index, const QString & name){
         selectEvent->setText(name);
         file->setIsChanged(true);
     }else{
-        (qFatal("EventUI::setEvent(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("EventUI::setEvent(): Behavior file or event data is null!!!");
     }
 }
 
@@ -106,7 +106,7 @@ void EventUI::setEventPayload(){
         }
         file->setIsChanged(true);
     }else{
-        (qFatal("EventUI::setEventPayload(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("EventUI::setEventPayload(): Behavior file or event data is null!!!");
     }
 }
 
@@ -114,7 +114,7 @@ void EventUI::emitViewEvent(){
     if (eventData){
         emit viewEvents(eventData->id + 1);
     }else{
-        (qFatal("EventUI::emitViewEvent(): Event data is null!!!"));
+        FATAL_RUNTIME_ERROR("EventUI::emitViewEvent(): Event data is null!!!");
     }
 }
 
@@ -124,6 +124,6 @@ void EventUI::eventRenamed(const QString & name, int index){
             selectEvent->setText(name);
         }
     }else{
-        (qFatal("EventUI::eventRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("EventUI::eventRenamed(): The data is nullptr!!");
     }
 }

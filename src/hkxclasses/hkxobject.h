@@ -38,8 +38,8 @@ public:
     bool isDataValid() const;
     virtual bool link() = 0;
     virtual void unlink();
-    virtual bool write(HkxXMLWriter *writer);
-    virtual bool readData(const HkxXmlReader & reader, long index);
+    virtual bool write(HkxXMLWriter *);
+    virtual bool readData(const HkxXmlReader &, long);
     QString getReferenceString() const;
     QString getBoolAsString(bool b) const;
     HkxFile * getParentFile() const;
@@ -73,7 +73,7 @@ private:
 class HkxSharedPtr: public QExplicitlySharedDataPointer <HkxObject>
 {
 public:
-    HkxSharedPtr(HkxObject *obj = NULL, long ref = -1);
+    HkxSharedPtr(HkxObject *obj = nullptr, long ref = -1);
     bool operator==(const HkxSharedPtr & other) const;
     void setReference(long ref);
     long getReference() const;

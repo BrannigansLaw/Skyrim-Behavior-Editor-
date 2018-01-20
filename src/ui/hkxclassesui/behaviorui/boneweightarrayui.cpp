@@ -13,7 +13,7 @@ QStringList BoneWeightArrayUI::headerLabels = {
 };
 
 BoneWeightArrayUI::BoneWeightArrayUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       topLyt(new QGridLayout(this)),
       returnPB(new QPushButton("Return")),
       bones(new TableWidget),
@@ -61,7 +61,7 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
                     boneNames = static_cast<CharacterFile *>(file)->getRigBoneNames();
                 }
             }else{
-                (qFatal("BoneWeightArrayUI::loadData(): Parent file type is unrecognized!!!"));
+                FATAL_RUNTIME_ERROR("BoneWeightArrayUI::loadData(): Parent file type is unrecognized!!!");
             }
         }
         for (int i = 0; i < bsData->boneWeights.size() && i < boneNames.size(); i++){
@@ -88,7 +88,7 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
             bones->setRowHidden(j, true);
         }
     }else{
-        (qFatal("BoneWeightArrayUI::loadData(): The data passed to the UI is NULL!!!"));
+        FATAL_RUNTIME_ERROR("BoneWeightArrayUI::loadData(): The data passed to the UI is nullptr!!!");
     }
     blockSignals(false);
 }
@@ -105,7 +105,7 @@ void BoneWeightArrayUI::setBoneWeight(){
             }
         }
     }else{
-        (qFatal("BoneWeightArrayUI::setBoneWeight(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("BoneWeightArrayUI::setBoneWeight(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -115,6 +115,6 @@ void BoneWeightArrayUI::loadBoneWeight(int row, int){
             selectedBone->setValue(bsData->boneWeights.at(row));
         }
     }else{
-        (qFatal("loadBoneWeight::setBoneWeight(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("loadBoneWeight::setBoneWeight(): The 'bsData' pointer is nullptr!!");
     }
 }

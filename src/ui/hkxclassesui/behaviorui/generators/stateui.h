@@ -19,6 +19,7 @@ class DoubleSpinBox;
 class CheckBox;
 class EventUI;
 class QGroupBox;
+class GenericTableWidget;
 
 class StateUI: public QStackedWidget
 {
@@ -30,12 +31,13 @@ public:
     virtual ~StateUI(){}
     void loadData(HkxObject *data, int stateindex);
 signals:
+    void generatorNameChanged(const QString & newName, int index);
     void stateNameChanged(const QString & newName, int index);
     void stateIdChanged(int stateIndex, int newID, const QString & statename);
     void viewGenerators(int index);
     void returnToParent(bool reloadData);
-    void viewVariables(int index);
-    void viewProperties(int index);
+    //void viewVariables(int index);
+    //void viewProperties(int index);
     void viewEvents(int index);
 private slots:
     void setName();
@@ -46,6 +48,7 @@ private slots:
     void viewSelectedChild(int row, int column);
     void returnToWidget();
     void transitionRenamed(const QString &name, int index);
+    void generatorTableElementSelected(int index, const QString &name);
 private:
     void connectSignals();
     void disconnectSignals();
@@ -59,6 +62,7 @@ private:
     void removeTransition(int index);
     void loadDynamicTableRows();
     void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2);
+    void connectToTables(GenericTableWidget *generators, GenericTableWidget *events);
     void eventRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
     void generatorRenamed(const QString & name, int index);

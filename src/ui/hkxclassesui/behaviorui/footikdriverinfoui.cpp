@@ -26,7 +26,7 @@ QStringList FootIkDriverInfoUI::headerLabels1 = {
 };
 
 FootIkDriverInfoUI::FootIkDriverInfoUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       footDriverGB(new QGroupBox("hkbFootIkDriverInfo")),
       legUI(new FootIkDriverInfoLegUI),
       footDriverLyt(new QGridLayout),

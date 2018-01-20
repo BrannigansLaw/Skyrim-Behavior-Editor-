@@ -7,6 +7,7 @@ class hkbStateMachine;
 
 class hkbStateMachineStateInfo: public hkbGenerator
 {
+    friend class HkDataUI;
     friend class BehaviorGraphView;
     friend class hkbStateMachine;
     friend class hkbStateMachineTransitionInfoArray;
@@ -22,7 +23,12 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    bool hasChildren() const;
 private:
+    QList <DataIconManager *> getChildren() const;
+    int getIndexOfObj(DataIconManager *obj) const;
+    bool insertObjectAt(int, DataIconManager *obj);
+    bool removeObjectAt(int index);
     bool setStateId(ushort id);
     hkbStateMachine * getParentStateMachine() const;
     hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&);

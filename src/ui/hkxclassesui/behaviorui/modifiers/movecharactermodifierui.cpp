@@ -30,7 +30,7 @@ QStringList MoveCharacterModifierUI::headerLabels = {
 };
 
 MoveCharacterModifierUI::MoveCharacterModifierUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       topLyt(new QGridLayout),
       table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
@@ -80,7 +80,7 @@ void MoveCharacterModifierUI::connectToTables(GenericTableWidget *variables, Gen
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        (qFatal("MoveCharacterModifierUI::connectToTables(): One or more arguments are NULL!!"));
+        FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -88,7 +88,7 @@ void MoveCharacterModifierUI::loadData(HkxObject *data){
     disconnectSignals();
     if (data){
         if (data->getSignature() == HKB_MOVE_CHARACTER_MODIFIER){
-            hkbVariableBindingSet *varBind = NULL;
+            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbMoveCharacterModifier *>(data);
             name->setText(bsData->name);
             enable->setChecked(bsData->enable);
@@ -102,10 +102,10 @@ void MoveCharacterModifierUI::loadData(HkxObject *data){
                 table->item(OFFSET_PER_SECOND_MS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            (qFatal("MoveCharacterModifierUI::loadData(): The data is an incorrect type!!"));
+            FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        (qFatal("MoveCharacterModifierUI::loadData(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -119,7 +119,7 @@ void MoveCharacterModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        (qFatal("MoveCharacterModifierUI::setName(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -128,7 +128,7 @@ void MoveCharacterModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("MoveCharacterModifierUI::setEnable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -139,7 +139,7 @@ void MoveCharacterModifierUI::setOffsetPerSecondMS(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("MoveCharacterModifierUI::setOffsetPerSecondMS(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::setOffsetPerSecondMS(): The data is nullptr!!");
     }
 }
 
@@ -165,7 +165,7 @@ void MoveCharacterModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        (qFatal("MoveCharacterModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -185,7 +185,7 @@ void MoveCharacterModifierUI::selectTableToView(bool viewisProperty, const QStri
             }
         }
     }else{
-        (qFatal("MoveCharacterModifierUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -204,7 +204,7 @@ void MoveCharacterModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        (qFatal("MoveCharacterModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -221,21 +221,21 @@ bool MoveCharacterModifierUI::setBinding(int index, int row, const QString &vari
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("MoveCharacterModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("MoveCharacterModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("MoveCharacterModifierUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -262,7 +262,7 @@ void MoveCharacterModifierUI::setBindingVariable(int index, const QString &name)
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("MoveCharacterModifierUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -284,9 +284,9 @@ void MoveCharacterModifierUI::loadBinding(int row, int colunm, hkbVariableBindin
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("MoveCharacterModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("MoveCharacterModifierUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("MoveCharacterModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

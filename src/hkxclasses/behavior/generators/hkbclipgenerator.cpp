@@ -26,7 +26,7 @@ hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, bool addToAnimData
     setType(HKB_CLIP_GENERATOR, TYPE_GENERATOR);
     BehaviorFile *par = static_cast<BehaviorFile *>(getParentFile());
     if (!getParentFile()){
-        (qFatal("hkbClipGenerator(): Parent file is NULL!"));
+        FATAL_RUNTIME_ERROR("hkbClipGenerator(): Parent file is nullptr!");
     }
     par->addObjectToFile(this, ref);
     refCount++;
@@ -35,7 +35,7 @@ hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, bool addToAnimData
         animationName = par->getAnimationNameAt(0);
     }
     if (addToAnimData && !par->addClipGenToAnimationData(name)){
-        (qFatal("hkbClipGenerator::hkbClipGenerator(): The clip generator could not be added to the animation data!"));
+        FATAL_RUNTIME_ERROR("hkbClipGenerator::hkbClipGenerator(): The clip generator could not be added to the animation data!");
     }
 }
 

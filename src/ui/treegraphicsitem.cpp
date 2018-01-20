@@ -30,7 +30,7 @@ TreeGraphicsItem::TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *ob
         if (indexToInsert > -1 && indexToInsert < parentItem()->childItems().size()){
             children = parentItem()->childItems();
             for (int i = 0; i < children.size(); i++){
-                children[i]->setParentItem(NULL);
+                children[i]->setParentItem(nullptr);
             }
             index = children.indexOf(this);
             children.insert(indexToInsert, this);
@@ -58,7 +58,7 @@ TreeGraphicsItem::~TreeGraphicsItem(){
         //scene()->removeItem(path);
     }
     delete path;
-    setParentItem(NULL);
+    setParentItem(nullptr);
 }
 
 QRectF TreeGraphicsItem::boundingRect() const{
@@ -105,9 +105,13 @@ void TreeGraphicsItem::unselect(){
 void TreeGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     if (boundingRect().contains(event->pos())){
         if (branchExpandCollapseBox().contains(event->pos())){
-            ((TreeGraphicsScene *)scene())->selectIcon(this, true);
+            if (event->modifiers() == Qt::ShiftModifier){
+                ((TreeGraphicsScene *)scene())->selectIcon(this, TreeGraphicsScene::EXPAND_CONTRACT_ALL);
+            }else{
+                ((TreeGraphicsScene *)scene())->selectIcon(this, TreeGraphicsScene::EXPAND_CONTRACT_ONE);
+            }
         }else{
-            ((TreeGraphicsScene *)scene())->selectIcon(this, false);
+            ((TreeGraphicsScene *)scene())->selectIcon(this, TreeGraphicsScene::EXPAND_CONTRACT_ZERO);
         }
     }
 }
@@ -151,7 +155,7 @@ bool TreeGraphicsItem::reorderChildren(){
         }
     }
     for (int i = 0; i < children.size(); i++){
-        children[i]->setParentItem(NULL);
+        children[i]->setParentItem(nullptr);
     }
     if (children.size() <= dataChildren.size()){//Fix this...
         for (int i = 0; i < dataChildren.size(); i++){
@@ -173,8 +177,8 @@ bool TreeGraphicsItem::reorderChildren(){
 void TreeGraphicsItem::reposition(){
     QList <QGraphicsItem *> children = childItems();
     QList <QGraphicsItem *> tempList;
-    TreeGraphicsItem *parent = NULL;
-    TreeGraphicsItem *child = NULL;
+    TreeGraphicsItem *parent = nullptr;
+    TreeGraphicsItem *child = nullptr;
     setPosition(QPointF(boundingRect().width()*2, getYCoordinate()));
     while (!children.isEmpty()){
         tempList.clear();
@@ -241,7 +245,7 @@ bool TreeGraphicsItem::isDataDescendant(DataIconManager *data) const{
 
 bool TreeGraphicsItem::isPrimaryIcon() const{
     if (!itemData->icons.isEmpty()){
-        if (itemData->icons.first() == this && itemData->icons.size() > 1){ //Use or???
+        if (itemData->icons.first() == this || itemData->icons.size() > 1){
             return true;
         }
     }
@@ -252,7 +256,7 @@ TreeGraphicsItem *TreeGraphicsItem::getPrimaryIcon() const{
     if (!itemData->icons.isEmpty()){
         return itemData->icons.first();
     }
-    return NULL;
+    return nullptr;
 }
 
 TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int indexToInsert){//Swap paths!!!
@@ -262,10 +266,10 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
     if (oldParent){
         children = oldParent->childItems();
         for (int i = 0; i < children.size(); i++){
-            children[i]->setParentItem(NULL);
+            children[i]->setParentItem(nullptr);
         }
         if (children.removeAll(this) != 1){
-            (qFatal("TreeGraphicsItem::setParent(): Error!!!"));
+            FATAL_RUNTIME_ERROR("TreeGraphicsItem::setParent(): Error!!!");
         }
         for (int i = 0; i < children.size(); i++){
             children[i]->setParentItem(oldParent);
@@ -276,7 +280,7 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
             index = newParent->getIndexofIconWithData(itemData);
             if (indexToInsert > -1 && indexToInsert < children.size()){
                 for (int i = 0; i < children.size(); i++){
-                    children[i]->setParentItem(NULL);
+                    children[i]->setParentItem(nullptr);
                 }
                 if (index < children.size()){
                     children.removeAt(index);
@@ -292,11 +296,11 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
                 setParentItem(newParent);
             }
         }else{
-            setParentItem(NULL);
+            setParentItem(nullptr);
         }
         reposition();
     }else{
-        (qFatal("TreeGraphicsItem::setParent(): Error!!!"));
+        FATAL_RUNTIME_ERROR("TreeGraphicsItem::setParent(): Error!!!");
     }
     return (TreeGraphicsItem *)oldParent;
 }
@@ -317,7 +321,7 @@ TreeGraphicsItem *TreeGraphicsItem::getNextChildAfter(TreeGraphicsItem *child){
     if (index < children.size()){
         return (TreeGraphicsItem *)children.at(index);
     }
-    return NULL;
+    return nullptr;
 }
 
 bool TreeGraphicsItem::hasSameData(TreeGraphicsItem *icon) const{
@@ -342,7 +346,7 @@ int TreeGraphicsItem::getIconIndex(){
 /*int TreeGraphicsItem::determineInsertionIndex() const{
     QList <QGraphicsItem *> children;
     QList <QGraphicsItem *> tempList;
-    TreeGraphicsItem *parent = NULL;
+    TreeGraphicsItem *parent = nullptr;
     TreeGraphicsItem *child = (TreeGraphicsItem *)this;
     parent = (TreeGraphicsItem *)parentItem();
     while (parent){
@@ -377,20 +381,20 @@ TreeGraphicsItem *TreeGraphicsItem::getChildWithData(DataIconManager *data){
             return (TreeGraphicsItem *)children.at(i);
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 /*TreeGraphicsItem *TreeGraphicsItem::getChildWithData(DataIconManager *data, int index){
     //for when duplicates are allowed...
-    return NULL;
+    return nullptr;
 }*/
 
 /*Returns the icon that is closest to "this" that references "data"...
 TreeGraphicsItem *TreeGraphicsItem::getReplacementIcon(DataIconManager *data){
     QList <QGraphicsItem *> children;
     QList <QGraphicsItem *> tempList;
-    TreeGraphicsItem *parent = NULL;
-    TreeGraphicsItem *child = NULL;
+    TreeGraphicsItem *parent = nullptr;
+    TreeGraphicsItem *child = nullptr;
     parent = this;
     while (parent){
         children = parent->childItems();
@@ -413,13 +417,13 @@ TreeGraphicsItem *TreeGraphicsItem::getReplacementIcon(DataIconManager *data){
         child = parent;
         parent = (TreeGraphicsItem *)parent->parentItem();
     }
-    return NULL;
+    return nullptr;
 }*/
 
 TreeGraphicsItem *TreeGraphicsItem::getReplacementIcon(DataIconManager *data){
     QList <QGraphicsItem *> children;
     QList <QGraphicsItem *> tempList;
-    TreeGraphicsItem *parent = NULL;
+    TreeGraphicsItem *parent = nullptr;
     parent = static_cast<TreeGraphicsScene *>(scene())->rootIcon;
     if (parent){
         children = parent->childItems();
@@ -432,7 +436,7 @@ TreeGraphicsItem *TreeGraphicsItem::getReplacementIcon(DataIconManager *data){
             children = tempList + children;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 int TreeGraphicsItem::getIndexOfChild(TreeGraphicsItem *child) const{
@@ -476,13 +480,13 @@ QList <TreeGraphicsItem *> TreeGraphicsItem::getAllIconsInBranch(TreeGraphicsIte
         for (int i = 0; i < MAX_NUM_GRAPH_ICONS, branchTip; i++){
             if (branchTip->parentItem()){
                 if (branchTip->parentItem()->childItems().contains(iconToFind)){
-                    branchTip = NULL;
+                    branchTip = nullptr;
                 }else{
                     list.append((TreeGraphicsItem *)branchTip->parentItem());
                     branchTip = (TreeGraphicsItem *)branchTip->parentItem();
                 }
             }else{
-                branchTip = NULL;
+                branchTip = nullptr;
             }
         }
     }else{
@@ -491,7 +495,7 @@ QList <TreeGraphicsItem *> TreeGraphicsItem::getAllIconsInBranch(TreeGraphicsIte
                 list.append((TreeGraphicsItem *)branchTip->parentItem());
                 branchTip = (TreeGraphicsItem *)branchTip->parentItem();
             }else{
-                branchTip = NULL;
+                branchTip = nullptr;
             }
         }
     }

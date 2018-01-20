@@ -20,9 +20,9 @@ QStringList EventsUI::headerLabels = {
 };
 
 EventsUI::EventsUI(const QString &title)
-    : dataUI(NULL),
+    : dataUI(nullptr),
       verLyt(new QVBoxLayout),
-      loadedData(NULL),
+      loadedData(nullptr),
       table(new TableWidget),
       addObjectPB(new QPushButton("Add Event")),
       removeObjectPB(new QPushButton("Remove Selected Event")),

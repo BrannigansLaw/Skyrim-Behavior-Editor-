@@ -59,6 +59,10 @@ BehaviorGraphIcon::BehaviorGraphIcon(TreeGraphicsItem *parent, DataIconManager *
             break;
         case HKB_STATE_MACHINE:
             path.addPolygon(polygon);
+            rGrad.setColorAt(1.0, Qt::darkBlue);
+            break;
+        case HKB_STATE_MACHINE_STATE_INFO:
+            path.addPolygon(polygon);
             rGrad.setColorAt(1.0, Qt::cyan);
             break;
         case HKB_CLIP_GENERATOR:
@@ -103,7 +107,7 @@ void BehaviorGraphIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     if (itemData->hasChildren()){
         painter->drawRect(button);
         if (itemData->icons.isEmpty()){
-            (qFatal("BehaviorGraphIcon::paint(): Icon data has no icons!!!"));
+            FATAL_RUNTIME_ERROR("BehaviorGraphIcon::paint(): Icon data has no icons!!!");
         }else if (itemData->icons.first() == this){
             if (!childItems().isEmpty()){
                 painter->drawLine(horiz);
@@ -134,6 +138,9 @@ void BehaviorGraphIcon::unselect(){
             rGrad.setColorAt(1.0, Qt::darkRed);
             break;
         case HKB_STATE_MACHINE:
+            rGrad.setColorAt(1.0, Qt::darkBlue);
+            break;
+        case HKB_STATE_MACHINE_STATE_INFO:
             rGrad.setColorAt(1.0, Qt::cyan);
             break;
         case HKB_CLIP_GENERATOR:

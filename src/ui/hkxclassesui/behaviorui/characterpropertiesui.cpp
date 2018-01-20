@@ -44,9 +44,9 @@ QStringList CharacterPropertiesUI::headerLabels = {
 };
 
 CharacterPropertiesUI::CharacterPropertiesUI(const QString &title)
-    : dataUI(NULL),
+    : dataUI(nullptr),
       verLyt(new QVBoxLayout),
-      loadedData(NULL),
+      loadedData(nullptr),
       table(new TableWidget),
       addObjectPB(new QPushButton("Add Variable")),
       removeObjectPB(new QPushButton("Remove Selected Variable")),

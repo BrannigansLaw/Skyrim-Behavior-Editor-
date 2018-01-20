@@ -33,7 +33,7 @@ QStringList BSInterpValueModifierUI::headerLabels = {
 };
 
 BSInterpValueModifierUI::BSInterpValueModifierUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       topLyt(new QGridLayout),
       table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
@@ -104,7 +104,7 @@ void BSInterpValueModifierUI::connectToTables(GenericTableWidget *variables, Gen
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        (qFatal("BSInterpValueModifierUI::connectToTables(): One or more arguments are NULL!!"));
+        FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -112,7 +112,7 @@ void BSInterpValueModifierUI::loadData(HkxObject *data){
     disconnectSignals();
     if (data){
         if (data->getSignature() == BS_INTERP_VALUE_MODIFIER){
-            hkbVariableBindingSet *varBind = NULL;
+            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<BSInterpValueModifier *>(data);
             name->setText(bsData->name);
             enable->setChecked(bsData->enable);
@@ -135,10 +135,10 @@ void BSInterpValueModifierUI::loadData(HkxObject *data){
                 table->item(GAIN_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            (qFatal("BSInterpValueModifierUI::loadData(): The data is an incorrect type!!"));
+            FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        (qFatal("BSInterpValueModifierUI::loadData(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -152,7 +152,7 @@ void BSInterpValueModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        (qFatal("BSInterpValueModifierUI::setName(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -161,7 +161,7 @@ void BSInterpValueModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSInterpValueModifierUI::setEnable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -172,7 +172,7 @@ void BSInterpValueModifierUI::setSource(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("BSInterpValueModifierUI::setSource(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::setSource(): The data is nullptr!!");
     }
 }
 
@@ -183,7 +183,7 @@ void BSInterpValueModifierUI::setTarget(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("BSInterpValueModifierUI::setTarget(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::setTarget(): The data is nullptr!!");
     }
 }
 
@@ -194,7 +194,7 @@ void BSInterpValueModifierUI::setResult(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("BSInterpValueModifierUI::setResult(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::setResult(): The data is nullptr!!");
     }
 }
 
@@ -205,7 +205,7 @@ void BSInterpValueModifierUI::setGain(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("BSInterpValueModifierUI::setGain(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::setGain(): The data is nullptr!!");
     }
 }
 
@@ -249,7 +249,7 @@ void BSInterpValueModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        (qFatal("BSInterpValueModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -269,7 +269,7 @@ void BSInterpValueModifierUI::selectTableToView(bool viewisProperty, const QStri
             }
         }
     }else{
-        (qFatal("BSInterpValueModifierUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -300,7 +300,7 @@ void BSInterpValueModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        (qFatal("BSInterpValueModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -317,21 +317,21 @@ bool BSInterpValueModifierUI::setBinding(int index, int row, const QString &vari
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("BSInterpValueModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("BSInterpValueModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("BSInterpValueModifierUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -376,7 +376,7 @@ void BSInterpValueModifierUI::setBindingVariable(int index, const QString &name)
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSInterpValueModifierUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -398,9 +398,9 @@ void BSInterpValueModifierUI::loadBinding(int row, int colunm, hkbVariableBindin
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("BSInterpValueModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("BSInterpValueModifierUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSInterpValueModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

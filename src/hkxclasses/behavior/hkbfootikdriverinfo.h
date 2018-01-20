@@ -23,7 +23,7 @@ private:
     hkbFootIkDriverInfo(const hkbFootIkDriverInfo &);
 private:
     struct hkbFootIkDriverInfoLeg{
-        hkbFootIkDriverInfoLeg(hkbFootIkDriverInfo *par = NULL)
+        hkbFootIkDriverInfoLeg(hkbFootIkDriverInfo *par = nullptr)
             : parent(par),
               footPlantedAnkleHeightMS(0),
               footRaisedAnkleHeightMS(0),

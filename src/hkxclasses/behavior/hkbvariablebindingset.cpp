@@ -27,7 +27,7 @@ int hkbVariableBindingSet::getNumberOfBindings() const{
     return bindings.size();
 }
 
-bool hkbVariableBindingSet::addBinding(const QString & path, const QString & name, int varIndex, hkBinding::BindingType type){
+bool hkbVariableBindingSet::addBinding(const QString & path, int varIndex, hkBinding::BindingType type){
     int index = -1;
     bool exists = false;
     for (int i = 0; i < bindings.size(); i++){//Do this for below but remove the binding if the paths are the same...

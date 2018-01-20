@@ -42,7 +42,7 @@ QStringList DampingModifierUI::headerLabels = {
 };
 
 DampingModifierUI::DampingModifierUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       topLyt(new QGridLayout),
       table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
@@ -176,7 +176,7 @@ void DampingModifierUI::connectToTables(GenericTableWidget *variables, GenericTa
         connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        (qFatal("DampingModifierUI::connectToTables(): One or more arguments are NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -184,7 +184,7 @@ void DampingModifierUI::loadData(HkxObject *data){
     disconnectSignals();
     if (data){
         if (data->getSignature() == HKB_DAMPING_MODIFIER){
-            hkbVariableBindingSet *varBind = NULL;
+            hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbDampingModifier *>(data);
             name->setText(bsData->name);
             enable->setChecked(bsData->enable);
@@ -234,10 +234,10 @@ void DampingModifierUI::loadData(HkxObject *data){
                 table->item(PREVIOUS_ERROR_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            (qFatal("DampingModifierUI::loadData(): The data is an incorrect type!!"));
+            FATAL_RUNTIME_ERROR("DampingModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        (qFatal("DampingModifierUI::loadData(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -251,7 +251,7 @@ void DampingModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        (qFatal("DampingModifierUI::setName(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -260,7 +260,7 @@ void DampingModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("DampingModifierUI::setEnable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -271,7 +271,7 @@ void DampingModifierUI::setKP(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("DampingModifierUI::setkP(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setkP(): The data is nullptr!!");
     }
 }
 
@@ -282,7 +282,7 @@ void DampingModifierUI::setKI(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("DampingModifierUI::setkI(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setkI(): The data is nullptr!!");
     }
 }
 
@@ -293,7 +293,7 @@ void DampingModifierUI::setKD(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("DampingModifierUI::setkD(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setkD(): The data is nullptr!!");
     }
 }
 
@@ -302,7 +302,7 @@ void DampingModifierUI::setEnableScalarDamping(){
         bsData->enableScalarDamping = enableScalarDamping->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("DampingModifierUI::setenableScalarDamping(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setenableScalarDamping(): The data is nullptr!!");
     }
 }
 
@@ -311,7 +311,7 @@ void DampingModifierUI::setEnableVectorDamping(){
         bsData->enableVectorDamping = enableVectorDamping->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("DampingModifierUI::setenableVectorDamping(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setenableVectorDamping(): The data is nullptr!!");
     }
 }
 
@@ -322,7 +322,7 @@ void DampingModifierUI::setRawValue(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("DampingModifierUI::setrawValue(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setrawValue(): The data is nullptr!!");
     }
 }
 
@@ -333,7 +333,7 @@ void DampingModifierUI::setDampedValue(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("DampingModifierUI::setdampedValue(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setdampedValue(): The data is nullptr!!");
     }
 }
 
@@ -344,7 +344,7 @@ void DampingModifierUI::setRawVector(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("DampingModifierUI::setrawVector(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setrawVector(): The data is nullptr!!");
     }
 }
 
@@ -355,7 +355,7 @@ void DampingModifierUI::setDampedVector(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("DampingModifierUI::setdampedVector(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setdampedVector(): The data is nullptr!!");
     }
 }
 
@@ -366,7 +366,7 @@ void DampingModifierUI::setVecErrorSum(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("DampingModifierUI::setvecErrorSum(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setvecErrorSum(): The data is nullptr!!");
     }
 }
 
@@ -377,7 +377,7 @@ void DampingModifierUI::setVecPreviousError(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("DampingModifierUI::setvecPreviousError(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setvecPreviousError(): The data is nullptr!!");
     }
 }
 
@@ -388,7 +388,7 @@ void DampingModifierUI::setErrorSum(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("DampingModifierUI::seterrorSum(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::seterrorSum(): The data is nullptr!!");
     }
 }
 
@@ -399,7 +399,7 @@ void DampingModifierUI::setPreviousError(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("DampingModifierUI::setpreviousError(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setpreviousError(): The data is nullptr!!");
     }
 }
 
@@ -497,7 +497,7 @@ void DampingModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        (qFatal("DampingModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -517,7 +517,7 @@ void DampingModifierUI::selectTableToView(bool viewisProperty, const QString & p
             }
         }
     }else{
-        (qFatal("DampingModifierUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -584,7 +584,7 @@ void DampingModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        (qFatal("DampingModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -601,21 +601,21 @@ bool DampingModifierUI::setBinding(int index, int row, const QString &variableNa
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("DampingModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("DampingModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("DampingModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("DampingModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("DampingModifierUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -714,7 +714,7 @@ void DampingModifierUI::setBindingVariable(int index, const QString &name){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("DampingModifierUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -736,9 +736,9 @@ void DampingModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("DampingModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("DampingModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("DampingModifierUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("DampingModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

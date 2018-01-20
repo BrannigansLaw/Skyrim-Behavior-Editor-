@@ -165,13 +165,13 @@ QStringList HkDataUI::variableTypes = {
 
 HkDataUI::HkDataUI(const QString &title)
     : //mainUI(mainui),
-      behaviorView(NULL),
+      behaviorView(nullptr),
       verLyt(new QVBoxLayout),
       stack(new QStackedLayout),
-      loadedData(NULL),
-      eventsUI(NULL),
-      variablesUI(NULL),
-      animationsUI(NULL),
+      loadedData(nullptr),
+      eventsUI(nullptr),
+      variablesUI(nullptr),
+      animationsUI(nullptr),
       generatorsTable(new GenericTableWidget("Select a hkbGenerator!")),
       modifiersTable(new GenericTableWidget("Select a hkbModifier!")),
       variablesTable(new GenericTableWidget("Select a Variable!")),
@@ -184,6 +184,7 @@ HkDataUI::HkDataUI(const QString &title)
       modGenUI(new ModifierGeneratorUI),
       manSelGenUI(new ManualSelectorGeneratorUI),
       stateMachineUI(new StateMachineUI),
+      stateUI(new StateUI),
       blenderGeneratorUI(new BlenderGeneratorUI),
       behaviorGraphUI(new BehaviorGraphUI),
       limbIKModUI(new BSLimbIKModifierUI),
@@ -248,6 +249,7 @@ HkDataUI::HkDataUI(const QString &title)
     stack->addWidget(modGenUI);
     stack->addWidget(manSelGenUI);
     stack->addWidget(stateMachineUI);
+    stack->addWidget(stateUI);
     stack->addWidget(blenderGeneratorUI);
     stack->addWidget(behaviorGraphUI);
     stack->addWidget(limbIKModUI);
@@ -309,7 +311,10 @@ HkDataUI::HkDataUI(const QString &title)
     setLayout(verLyt);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    stateUI->returnPB->setVisible(false);
+
     connect(stateMachineUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
+    connect(stateUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
     connect(modGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
     connect(manSelGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
     connect(iStateTagGenUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
@@ -372,7 +377,7 @@ HkDataUI::HkDataUI(const QString &title)
     connect(tweenerModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
     connect(eventsFromRangeModUI, SIGNAL(modifierNameChanged(QString,int)), this, SLOT(modifierNameChanged(QString,int)), Qt::UniqueConnection);
 
-    connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
+    //connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
     connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
     //connect(animationsUI, SIGNAL(animationRemoved(int)), this, SLOT(animationRemoved(int)), Qt::UniqueConnection);
 
@@ -405,7 +410,7 @@ void HkDataUI::unloadDataWidget(){
     disconnect(modifiersTable, SIGNAL(elementSelected(int,QString)), 0, 0);
     disconnect(eventsTable, SIGNAL(elementSelected(int,QString)), 0, 0);
     disconnect(ragdollBonesTable, SIGNAL(elementSelected(int,QString)), 0, 0);
-    loadedData = NULL;
+    loadedData = nullptr;
     stack->setCurrentIndex(DATA_TYPE_LOADED::NO_DATA_SELECTED);
 }
 
@@ -470,6 +475,9 @@ void HkDataUI::generatorNameChanged(const QString & newName, int index){
     case DATA_TYPE_LOADED::STATE_MACHINE:
         stateMachineUI->generatorRenamed(newName, index);
         break;
+    case DATA_TYPE_LOADED::STATE:
+        stateUI->generatorRenamed(newName, index);
+        break;
     case DATA_TYPE_LOADED::MANUAL_SELECTOR_GENERATOR:
         manSelGenUI->generatorRenamed(newName, index);
         break;
@@ -521,6 +529,10 @@ void HkDataUI::generatorRemoved(int index){
         stateMachineUI->loadData(loadedData);
         //stateMachineUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
         break;
+    case DATA_TYPE_LOADED::STATE:
+        stateUI->loadData(loadedData, static_cast<hkbStateMachineStateInfo *>(loadedData)->stateId);
+        //stateUI->connectToTables(generatorsTable, eventsTable);
+        break;
     case DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN:
         iStateTagGenUI->loadData(loadedData);
         //iStateTagGenUI->connectToTables(variablesTable, characterPropertiesTable, generatorsTable);
@@ -558,6 +570,9 @@ void HkDataUI::eventNameChanged(const QString & newName, int index){
     switch (stack->currentIndex()) {
     case DATA_TYPE_LOADED::STATE_MACHINE:
         stateMachineUI->eventRenamed(newName, index);
+        break;
+    case DATA_TYPE_LOADED::STATE:
+        stateUI->eventRenamed(newName, index);
         break;
     /*case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
         cyclicBlendTransGenUI->eventRenamed(newName, index);
@@ -623,6 +638,9 @@ void HkDataUI::eventRemoved(int index){
     switch (stack->currentIndex()){
     case DATA_TYPE_LOADED::STATE_MACHINE:
         stateMachineUI->eventRenamed("NONE", index);
+        break;
+    case DATA_TYPE_LOADED::STATE:
+        stateUI->eventRenamed("NONE", index);
         break;
     /*case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
             cyclicBlendTransGenUI->eventRenamed(newName, index);
@@ -1127,6 +1145,13 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             stack->setCurrentIndex(DATA_TYPE_LOADED::STATE_MACHINE);
             stateMachineUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
             break;
+        case HkxSignature::HKB_STATE_MACHINE_STATE_INFO:
+            if (loadedData != oldData){
+                stateUI->loadData(loadedData, static_cast<hkbStateMachineStateInfo *>(loadedData)->stateId);
+            }
+            stack->setCurrentIndex(DATA_TYPE_LOADED::STATE);
+            stateUI->connectToTables(generatorsTable, eventsTable);
+            break;
         case HkxSignature::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
             if (loadedData != oldData){
                 cyclicBlendTransGenUI->loadData(loadedData);
@@ -1518,6 +1543,7 @@ BehaviorGraphView *HkDataUI::loadBehaviorView(BehaviorGraphView *view){
     modGenUI->setBehaviorView(view);
     manSelGenUI->setBehaviorView(view);
     stateMachineUI->setBehaviorView(view);
+    stateUI->setBehaviorView(view);
     blenderGeneratorUI->setBehaviorView(view);
     behaviorGraphUI->setBehaviorView(view);
     boneSwitchUI->setBehaviorView(view);
@@ -1530,8 +1556,8 @@ BehaviorGraphView *HkDataUI::loadBehaviorView(BehaviorGraphView *view){
     delayedModUI->setBehaviorView(view);
     modifyOnceModUI->setBehaviorView(view);
     if (behaviorView){
-        generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "NULL");
-        modifiersTable->loadTable(behaviorView->behavior->getModifierNames(), behaviorView->behavior->getModifierTypeNames(), "NULL");
+        generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "nullptr");
+        modifiersTable->loadTable(behaviorView->behavior->getModifierNames(), behaviorView->behavior->getModifierTypeNames(), "nullptr");
         variablesTable->loadTable(behaviorView->behavior->getVariableNames(), behaviorView->behavior->getVariableTypenames(), "NONE");
         animationsTable->loadTable(behaviorView->behavior->getAnimationNames(), "hkStringPtr"/*, "NONE"*/);//inefficient...
         eventsTable->loadTable(behaviorView->behavior->getEventNames(), "hkEvent", "NONE");

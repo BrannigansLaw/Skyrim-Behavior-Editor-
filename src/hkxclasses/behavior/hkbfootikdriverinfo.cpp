@@ -47,7 +47,7 @@ hkbFootIkDriverInfo::hkbFootIkDriverInfoLeg * hkbFootIkDriverInfo::getLegAt(int 
     if (index >= 0 && index < legs.size()){
         return &legs[index];
     }
-    return NULL;
+    return nullptr;
 }
 
 bool hkbFootIkDriverInfo::readData(const HkxXmlReader &reader, long index){

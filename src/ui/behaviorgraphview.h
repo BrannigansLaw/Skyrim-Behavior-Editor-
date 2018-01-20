@@ -61,7 +61,7 @@ signals:
     void removedModifier(int index);
 private slots:
     void appendStateMachine();
-    //TODO: void appendState();
+    void appendState();
     void appendManualSelectorGenerator();
     void appendModifierGenerator();
     void appendIStateTaggingGenerator();
@@ -153,6 +153,7 @@ private:
     QMenu *contextMenu;
     QMenu *appendGeneratorMenu;
     QAction *appendStateMachineAct;
+    QAction *appendStateAct;
     QAction *appendManualSelectorGeneratorAct;
     QAction *appendModifierGeneratorAct;
     QAction *appendBSIStateTaggingGeneratorAct;

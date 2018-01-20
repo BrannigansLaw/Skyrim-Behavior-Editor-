@@ -45,7 +45,7 @@ private:
     void generatorRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
     void selectTableToView(bool viewproperties, const QString & path);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
+    void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
     void removeGenerator(int index);
     void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString &tip1, const QString &tip2);
     void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);

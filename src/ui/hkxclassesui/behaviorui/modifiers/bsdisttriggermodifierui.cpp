@@ -35,7 +35,7 @@ QStringList BSDistTriggerModifierUI::headerLabels = {
 };
 
 BSDistTriggerModifierUI::BSDistTriggerModifierUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       topLyt(new QGridLayout),
       table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
@@ -113,7 +113,7 @@ void BSDistTriggerModifierUI::connectToTables(GenericTableWidget *variables, Gen
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        (qFatal("BSDistTriggerModifierUI::connectToTables(): One or more arguments are NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -122,7 +122,7 @@ void BSDistTriggerModifierUI::loadData(HkxObject *data){
     if (data){
         if (data->getSignature() == BS_DIST_TRIGGER_MODIFER){
             bsData = static_cast<BSDistTriggerModifier *>(data);
-            hkbVariableBindingSet *varBind = NULL;
+            hkbVariableBindingSet *varBind = nullptr;
             hkbStringEventPayload *payload = static_cast<hkbStringEventPayload *>(bsData->triggerEvent.payload.data());
             name->setText(bsData->name);
             enable->setChecked(bsData->enable);
@@ -153,10 +153,10 @@ void BSDistTriggerModifierUI::loadData(HkxObject *data){
                 table->item(DISTANCE_TRIGGER_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            (qFatal("BSDistTriggerModifierUI::loadData(): The data is an incorrect type!!"));
+            FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        (qFatal("BSDistTriggerModifierUI::loadData(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -170,7 +170,7 @@ void BSDistTriggerModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        (qFatal("BSDistTriggerModifierUI::setName(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -179,7 +179,7 @@ void BSDistTriggerModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSDistTriggerModifierUI::setEnable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -190,7 +190,7 @@ void BSDistTriggerModifierUI::setTargetPosition(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("BSDistTriggerModifierUI::settargetPosition(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::settargetPosition(): The data is nullptr!!");
     }
 }
 
@@ -201,7 +201,7 @@ void BSDistTriggerModifierUI::setDistance(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("BSDistTriggerModifierUI::setdistance(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::setdistance(): The data is nullptr!!");
     }
 }
 
@@ -212,7 +212,7 @@ void BSDistTriggerModifierUI::setDistanceTrigger(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("BSDistTriggerModifierUI::setdistanceTrigger(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::setdistanceTrigger(): The data is nullptr!!");
     }
 }
 
@@ -225,7 +225,7 @@ void BSDistTriggerModifierUI::setTriggerEventId(int index, const QString & name)
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("BSDistTriggerModifierUI::setTriggerEventId(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::setTriggerEventId(): The data is nullptr!!");
     }
 }
 
@@ -246,7 +246,7 @@ void BSDistTriggerModifierUI::setTriggerEventPayload(){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSDistTriggerModifierUI::setTriggerEventPayload(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::setTriggerEventPayload(): The data is nullptr!!");
     }
 }
 
@@ -286,7 +286,7 @@ void BSDistTriggerModifierUI::viewSelected(int row, int column){
             emit viewEvents(bsData->triggerEvent.id + 1);
         }
     }else{
-        (qFatal("BSDistTriggerModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -306,7 +306,7 @@ void BSDistTriggerModifierUI::selectTableToView(bool viewisProperty, const QStri
             }
         }
     }else{
-        (qFatal("BSDistTriggerModifierUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -317,7 +317,7 @@ void BSDistTriggerModifierUI::eventRenamed(const QString & name, int index){
             table->item(TRIGGER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        (qFatal("BSDistTriggerModifierUI::eventRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -344,7 +344,7 @@ void BSDistTriggerModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        (qFatal("BSDistTriggerModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -361,21 +361,21 @@ bool BSDistTriggerModifierUI::setBinding(int index, int row, const QString &vari
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("BSDistTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("BSDistTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("BSDistTriggerModifierUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -414,7 +414,7 @@ void BSDistTriggerModifierUI::setBindingVariable(int index, const QString &name)
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSDistTriggerModifierUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -436,10 +436,10 @@ void BSDistTriggerModifierUI::loadBinding(int row, int colunm, hkbVariableBindin
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("BSDistTriggerModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("BSDistTriggerModifierUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSDistTriggerModifierUI::loadBinding(): The data is nullptr!!");
     }
 }
 

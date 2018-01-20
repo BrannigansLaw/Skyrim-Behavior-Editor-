@@ -1,4 +1,5 @@
 #include "projectanimdata.h"
+#include "src/utility.h"
 
 bool ProjectAnimData::chopLine(QFile * file, QByteArray & line, uint & linecount){
     if (file){
@@ -200,7 +201,7 @@ SkyrimAnimationMotionData *ProjectAnimData::findMotionData(int animationindex){
             return animationMotionData.at(i);
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void ProjectAnimData::setLocalTimeForClipGenAnimData(const QString &clipname, int triggerindex, qreal time){
@@ -210,7 +211,7 @@ void ProjectAnimData::setLocalTimeForClipGenAnimData(const QString &clipname, in
             return;
         }
     }
-    (qFatal("ProjectAnimData::setLocalTimeForClipGenAnimData(): Failed to set data!"));
+    FATAL_RUNTIME_ERROR("ProjectAnimData::setLocalTimeForClipGenAnimData(): Failed to set data!");
 }
 
 void ProjectAnimData::setEventNameForClipGenAnimData(const QString &clipname, int triggerindex, const QString &eventname){
@@ -220,7 +221,7 @@ void ProjectAnimData::setEventNameForClipGenAnimData(const QString &clipname, in
             return;
         }
     }
-    (qFatal("ProjectAnimData::setEventNameForClipGenAnimData(): Failed to set data!"));
+    FATAL_RUNTIME_ERROR("ProjectAnimData::setEventNameForClipGenAnimData(): Failed to set data!");
 }
 
 void ProjectAnimData::setClipNameAnimData(const QString &oldclipname, const QString &newclipname){
@@ -230,7 +231,7 @@ void ProjectAnimData::setClipNameAnimData(const QString &oldclipname, const QStr
             return;
         }
     }
-    (qFatal("ProjectAnimData::setClipNameAnimData(): Failed to set data!"));
+    FATAL_RUNTIME_ERROR("ProjectAnimData::setClipNameAnimData(): Failed to set data!");
 }
 
 void ProjectAnimData::setAnimationIndexForClipGen(const QString &clipGenName, int index){
@@ -240,7 +241,7 @@ void ProjectAnimData::setAnimationIndexForClipGen(const QString &clipGenName, in
             return;
         }
     }
-    (qFatal("ProjectAnimData::setAnimationIndexForClipGen(): Failed to set data!"));
+    FATAL_RUNTIME_ERROR("ProjectAnimData::setAnimationIndexForClipGen(): Failed to set data!");
 }
 
 void ProjectAnimData::setPlaybackSpeedForClipGen(const QString &clipGenName, qreal speed){
@@ -250,7 +251,7 @@ void ProjectAnimData::setPlaybackSpeedForClipGen(const QString &clipGenName, qre
             return;
         }
     }
-    (qFatal("ProjectAnimData::setPlaybackSpeedForClipGen(): Failed to set data!"));
+    FATAL_RUNTIME_ERROR("ProjectAnimData::setPlaybackSpeedForClipGen(): Failed to set data!");
 }
 
 void ProjectAnimData::setCropStartAmountLocalTimeForClipGen(const QString &clipGenName, qreal time){
@@ -260,7 +261,7 @@ void ProjectAnimData::setCropStartAmountLocalTimeForClipGen(const QString &clipG
             return;
         }
     }
-    (qFatal("ProjectAnimData::setCropStartAmountLocalTimeForClipGen(): Failed to set data!"));
+    FATAL_RUNTIME_ERROR("ProjectAnimData::setCropStartAmountLocalTimeForClipGen(): Failed to set data!");
 }
 
 void ProjectAnimData::setCropEndAmountLocalTimeForClipGen(const QString &clipGenName, qreal time){
@@ -270,7 +271,7 @@ void ProjectAnimData::setCropEndAmountLocalTimeForClipGen(const QString &clipGen
             return;
         }
     }
-    (qFatal("ProjectAnimData::setCropEndAmountLocalTimeForClipGen(): Failed to set data!"));
+    FATAL_RUNTIME_ERROR("ProjectAnimData::setCropEndAmountLocalTimeForClipGen(): Failed to set data!");
 }
 
 void ProjectAnimData::appendClipTriggerToAnimData(const QString &clipGenName, const QString & eventname){
@@ -280,7 +281,7 @@ void ProjectAnimData::appendClipTriggerToAnimData(const QString &clipGenName, co
             return;
         }
     }
-    (qFatal("ProjectAnimData::appendClipTriggerToAnimData(): Failed to set data!"));
+    FATAL_RUNTIME_ERROR("ProjectAnimData::appendClipTriggerToAnimData(): Failed to set data!");
 }
 
 void ProjectAnimData::removeClipTriggerToAnimDataAt(const QString &clipGenName, int index){
@@ -290,5 +291,5 @@ void ProjectAnimData::removeClipTriggerToAnimDataAt(const QString &clipGenName, 
             return;
         }
     }
-    (qFatal("ProjectAnimData::removeClipTriggerToAnimDataAt(): Failed to set data!"));
+    FATAL_RUNTIME_ERROR("ProjectAnimData::removeClipTriggerToAnimDataAt(): Failed to set data!");
 }

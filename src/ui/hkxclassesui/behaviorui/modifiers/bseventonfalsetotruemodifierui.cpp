@@ -42,7 +42,7 @@ QStringList BSEventOnFalseToTrueModifierUI::headerLabels = {
 };
 
 BSEventOnFalseToTrueModifierUI::BSEventOnFalseToTrueModifierUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       topLyt(new QGridLayout),
       table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
@@ -163,7 +163,7 @@ void BSEventOnFalseToTrueModifierUI::connectToTables(GenericTableWidget *variabl
         connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::connectToTables(): One or more arguments are NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -172,7 +172,7 @@ void BSEventOnFalseToTrueModifierUI::loadData(HkxObject *data){
     if (data){
         if (data->getSignature() == BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER){
             bsData = static_cast<BSEventOnFalseToTrueModifier *>(data);
-            hkbVariableBindingSet *varBind = NULL;
+            hkbVariableBindingSet *varBind = nullptr;
             hkbStringEventPayload *payload1 = static_cast<hkbStringEventPayload *>(bsData->eventToSend1.payload.data());
             hkbStringEventPayload *payload2 = static_cast<hkbStringEventPayload *>(bsData->eventToSend2.payload.data());
             hkbStringEventPayload *payload3 = static_cast<hkbStringEventPayload *>(bsData->eventToSend3.payload.data());
@@ -236,10 +236,10 @@ void BSEventOnFalseToTrueModifierUI::loadData(HkxObject *data){
                 table->item(VARIABLE_TO_TEST_3_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            (qFatal("BSEventOnFalseToTrueModifierUI::loadData(): The data is an incorrect type!!"));
+            FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::loadData(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -253,7 +253,7 @@ void BSEventOnFalseToTrueModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::setName(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -262,7 +262,7 @@ void BSEventOnFalseToTrueModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::setEnable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -271,7 +271,7 @@ void BSEventOnFalseToTrueModifierUI::setEnableEvent1(){
         bsData->bEnableEvent1 = bEnableEvent1->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::setbEnableEvent1(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::setbEnableEvent1(): The data is nullptr!!");
     }
 }
 
@@ -280,7 +280,7 @@ void BSEventOnFalseToTrueModifierUI::setVariableToTest1(){
         bsData->bVariableToTest1 = bVariableToTest1->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::setbVariableToTest1(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::setbVariableToTest1(): The data is nullptr!!");
     }
 }
 
@@ -293,7 +293,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend1Id(int index, const QString 
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::seteventToSend1Id(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::seteventToSend1Id(): The data is nullptr!!");
     }
 }
 
@@ -314,7 +314,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend1Payload(){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::seteventToSend1Payload(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::seteventToSend1Payload(): The data is nullptr!!");
     }
 }
 
@@ -323,7 +323,7 @@ void BSEventOnFalseToTrueModifierUI::setEnableEvent2(){
         bsData->bEnableEvent2 = bEnableEvent2->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::setbEnableEvent2(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::setbEnableEvent2(): The data is nullptr!!");
     }
 }
 
@@ -332,7 +332,7 @@ void BSEventOnFalseToTrueModifierUI::setVariableToTest2(){
         bsData->bVariableToTest2 = bVariableToTest2->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::setbVariableToTest2(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::setbVariableToTest2(): The data is nullptr!!");
     }
 }
 
@@ -345,7 +345,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend2Id(int index, const QString 
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::seteventToSend2Id(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::seteventToSend2Id(): The data is nullptr!!");
     }
 }
 
@@ -366,7 +366,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend2Payload(){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::setEventToSend2Payload(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::setEventToSend2Payload(): The data is nullptr!!");
     }
 }
 
@@ -375,7 +375,7 @@ void BSEventOnFalseToTrueModifierUI::setEnableEvent3(){
         bsData->bEnableEvent3 = bEnableEvent3->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::setbEnableEvent3(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::setbEnableEvent3(): The data is nullptr!!");
     }
 }
 
@@ -384,7 +384,7 @@ void BSEventOnFalseToTrueModifierUI::setVariableToTest3(){
         bsData->bVariableToTest3 = bVariableToTest3->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::setbVariableToTest3(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::setbVariableToTest3(): The data is nullptr!!");
     }
 }
 
@@ -397,7 +397,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend3Id(int index, const QString 
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::seteventToSend3Id(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::seteventToSend3Id(): The data is nullptr!!");
     }
 }
 
@@ -418,7 +418,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend3Payload(){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::setEventToSend3Payload(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::setEventToSend3Payload(): The data is nullptr!!");
     }
 }
 
@@ -435,7 +435,7 @@ void BSEventOnFalseToTrueModifierUI::eventTableElementSelected(int index, const 
         setEventToSend3Id(index, name);
         break;
     default:
-        (qWarning("BSEventOnFalseToTrueModifierUI::eventTableElementSelected(): An unwanted element selected event was recieved!!"));
+        WARNING_MESSAGE("BSEventOnFalseToTrueModifierUI::eventTableElementSelected(): An unwanted element selected event was recieved!!");
         return;
     }
 }
@@ -498,7 +498,7 @@ void BSEventOnFalseToTrueModifierUI::viewSelected(int row, int column){
             emit viewEvents(bsData->eventToSend3.id + 1);
         }
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::viewSelected(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -518,7 +518,7 @@ void BSEventOnFalseToTrueModifierUI::selectTableToView(bool viewisProperty, cons
             }
         }
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -535,7 +535,7 @@ void BSEventOnFalseToTrueModifierUI::eventRenamed(const QString & name, int inde
             table->item(EVENT_TO_SEND_3_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::eventRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -574,7 +574,7 @@ void BSEventOnFalseToTrueModifierUI::variableRenamed(const QString & name, int i
             }
         }
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::variableRenamed(): The 'bsData' pointer is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -591,21 +591,21 @@ bool BSEventOnFalseToTrueModifierUI::setBinding(int index, int row, const QStrin
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("BSEventOnFalseToTrueModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("BSEventOnFalseToTrueModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -662,7 +662,7 @@ void BSEventOnFalseToTrueModifierUI::setBindingVariable(int index, const QString
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -684,10 +684,10 @@ void BSEventOnFalseToTrueModifierUI::loadBinding(int row, int colunm, hkbVariabl
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("BSEventOnFalseToTrueModifierUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("BSEventOnFalseToTrueModifierUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSEventOnFalseToTrueModifierUI::loadBinding(): The data is nullptr!!");
     }
 }
 

@@ -35,10 +35,10 @@ QStringList RangesUI::headerLabels = {
 };
 
 RangesUI::RangesUI()
-    : file(NULL),
+    : file(nullptr),
       rangeIndex(-1),
-      bsData(NULL),
-      parent(NULL),
+      bsData(nullptr),
+      parent(nullptr),
       topLyt(new QGridLayout),
       returnPB(new QPushButton("Return")),
       table(new TableWidget),
@@ -106,7 +106,7 @@ void RangesUI::loadData(BehaviorFile *parentFile, hkbSenseHandleModifier::hkRang
         text = file->getEventNameAt(ranges->event.id);
         if (text == ""){
             if (ranges->event.id != -1){
-                (qWarning("RangesUI::loadData(): Invalid event id!!!"));
+                WARNING_MESSAGE("RangesUI::loadData(): Invalid event id!!!");
             }
             text = "NONE";
         }
@@ -135,7 +135,7 @@ void RangesUI::loadData(BehaviorFile *parentFile, hkbSenseHandleModifier::hkRang
             table->item(IGNORE_HANDLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }
     }else{
-        (qFatal("RangesUI::loadData(): Behavior file, bind or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("RangesUI::loadData(): Behavior file, bind or event data is null!!!");
     }
     connectSignals();
 }
@@ -158,10 +158,10 @@ void RangesUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, 
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("RangesUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("RangesUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("RangesUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("RangesUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -178,21 +178,21 @@ bool RangesUI::setBinding(int index, int row, const QString & variableName, cons
                 parent->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             file->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("RangesUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("RangesUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -225,7 +225,7 @@ void RangesUI::setBindingVariable(int index, const QString & name){
         }
         file->setIsChanged(true);
     }else{
-        (qFatal("RangesUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("RangesUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -246,7 +246,7 @@ void RangesUI::setEventId(int index, const QString & name){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("RangesUI::setEvent(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("RangesUI::setEvent(): Behavior file or event data is null!!!");
     }
 }
 
@@ -271,7 +271,7 @@ void RangesUI::setEventPayload(){
         }
         file->setIsChanged(true);
     }else{
-        (qFatal("RangesUI::setEventPayload(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("RangesUI::setEventPayload(): Behavior file or event data is null!!!");
     }
 }
 
@@ -282,7 +282,7 @@ void RangesUI::setMinDistance(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("RangesUI::setMinDistance(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("RangesUI::setMinDistance(): Behavior file or event data is null!!!");
     }
 }
 
@@ -293,7 +293,7 @@ void RangesUI::setMaxDistance(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("RangesUI::setMaxDistance(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("RangesUI::setMaxDistance(): Behavior file or event data is null!!!");
     }
 }
 
@@ -304,7 +304,7 @@ void RangesUI::setIgnoreHandle(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("RangesUI::setIsAnnotation(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("RangesUI::setIsAnnotation(): Behavior file or event data is null!!!");
     }
 }
 
@@ -336,7 +336,7 @@ void RangesUI::viewSelectedChild(int row, int column){
                 emit viewEvents(bsData->event.id + 1);
             }
     }else{
-        (qFatal("RangesUI::viewSelectedChild(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("RangesUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -356,7 +356,7 @@ void RangesUI::selectTableToView(bool viewproperties, const QString & path){
             }
         }
     }else{
-        (qFatal("RangesUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("RangesUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -366,15 +366,15 @@ void RangesUI::eventRenamed(const QString & name, int index){
             table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        (qFatal("RangesUI::eventRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("RangesUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
 void RangesUI::variableRenamed(const QString & name, int index){
     int bindIndex = -1;
-    hkbVariableBindingSet *bind = NULL;
+    hkbVariableBindingSet *bind = nullptr;
     if (name == ""){
-        (qWarning("RangesUI::variableRenamed(): The new variable name is the empty string!!"));
+        WARNING_MESSAGE("RangesUI::variableRenamed(): The new variable name is the empty string!!");
     }
     if (bsData){
         //index--;
@@ -394,6 +394,6 @@ void RangesUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        (qFatal("RangesUI::variableRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("RangesUI::variableRenamed(): The data is nullptr!!");
     }
 }

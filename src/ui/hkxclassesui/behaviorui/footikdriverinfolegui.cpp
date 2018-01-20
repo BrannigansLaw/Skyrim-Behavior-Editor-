@@ -24,7 +24,7 @@ QStringList FootIkDriverInfoLegUI::headerLabels1 = {
 };
 
 FootIkDriverInfoLegUI::FootIkDriverInfoLegUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       lyt(new QVBoxLayout),
       stackLyt(new QStackedLayout),
       returnPB(new QPushButton("Return")),

@@ -25,7 +25,7 @@ QStringList HandIkDriverInfoHandUI::headerLabels1 = {
 };
 
 HandIkDriverInfoHandUI::HandIkDriverInfoHandUI()
-    : bsData(NULL),
+    : bsData(nullptr),
       lyt(new QVBoxLayout),
       stackLyt(new QStackedLayout),
       returnPB(new QPushButton("Return")),
@@ -130,7 +130,7 @@ void HandIkDriverInfoHandUI::loadData(hkbHandIkDriverInfoHand *data, hkbHandIkDr
         enforceEndRotation->setChecked(bsData->enforceEndRotation);
         localFrameName->setText(bsData->localFrameName);
     }else{
-        (qFatal("HandIkDriverInfoHandUI::loadData(): The data or parent object is NULL!!"));
+        FATAL_RUNTIME_ERROR("HandIkDriverInfoHandUI::loadData(): The data or parent object is nullptr!!");
     }
 }
 

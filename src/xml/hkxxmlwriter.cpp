@@ -21,8 +21,8 @@ HkxXMLWriter::HkxXMLWriter(BehaviorFile *file)
       signature("signature"),
       numelements("numelements"),
       nestLevel(0),
-      newfile(NULL),
-      stream(NULL)
+      newfile(nullptr),
+      stream(nullptr)
 {
     //
 }
@@ -65,9 +65,9 @@ bool HkxXMLWriter::writeToXMLFile(){
     }
     newfile->close();
     delete newfile;
-    newfile = NULL;
+    newfile = nullptr;
     delete stream;
-    stream = NULL;
+    stream = nullptr;
     return result;
 }
 

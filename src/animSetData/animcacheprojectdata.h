@@ -10,6 +10,7 @@ class AnimCacheProjectData{
     friend class SkyrimAnimSetData;
 public:
     AnimCacheProjectData(const QStringList & files = QStringList(), const QVector<AnimCacheAnimSetData *> &animdata = QVector <AnimCacheAnimSetData *>());
+    ~AnimCacheProjectData();
     bool read(QFile * file);
     bool write(QFile *file, QTextStream &out) const;
 private:

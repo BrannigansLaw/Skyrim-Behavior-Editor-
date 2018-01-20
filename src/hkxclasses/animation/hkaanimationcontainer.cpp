@@ -92,7 +92,7 @@ bool hkaAnimationContainer::link(){
     if (!getParentFile()){
         return false;
     }
-    HkxSharedPtr *ptr = NULL;
+    HkxSharedPtr *ptr = nullptr;
     for (int i = 0; i < skeletons.size(); i++){
         ptr = static_cast<SkeletonFile *>(getParentFile())->findSkeleton(skeletons.at(i).getReference());
         if (!ptr){

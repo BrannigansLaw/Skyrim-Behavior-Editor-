@@ -36,10 +36,10 @@ QStringList LegUI::headerLabels = {
 };
 
 LegUI::LegUI()
-    : file(NULL),
+    : file(nullptr),
       legIndex(-1),
-      bsData(NULL),
-      parent(NULL),
+      bsData(nullptr),
+      parent(nullptr),
       topLyt(new QGridLayout),
       returnPB(new QPushButton("Return")),
       table(new TableWidget),
@@ -114,7 +114,7 @@ void LegUI::loadData(BehaviorFile *parentFile, hkbFootIkControlsModifier::hkLeg 
         text = file->getEventNameAt(leg->id);
         if (text == ""){
             if (leg->id != -1){
-                (qWarning("LegUI::loadData(): Invalid event id!!!"));
+                WARNING_MESSAGE("LegUI::loadData(): Invalid event id!!!");
             }
             text = "NONE";
         }
@@ -146,7 +146,7 @@ void LegUI::loadData(BehaviorFile *parentFile, hkbFootIkControlsModifier::hkLeg 
             table->item(IS_PLANTED_MS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }
     }else{
-        (qFatal("LegUI::loadData(): Behavior file, bind or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("LegUI::loadData(): Behavior file, bind or event data is null!!!");
     }
     connectSignals();
 }
@@ -169,10 +169,10 @@ void LegUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, con
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("LegUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("LegUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("LegUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("LegUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -189,21 +189,21 @@ bool LegUI::setBinding(int index, int row, const QString & variableName, const Q
                 parent->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             file->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("LegUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("LegUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -242,7 +242,7 @@ void LegUI::setBindingVariable(int index, const QString & name){
         }
         file->setIsChanged(true);
     }else{
-        (qFatal("LegUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("LegUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -255,7 +255,7 @@ void LegUI::setEventId(int index, const QString & name){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("LegUI::setEvent(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("LegUI::setEvent(): Behavior file or event data is null!!!");
     }
 }
 
@@ -280,7 +280,7 @@ void LegUI::setEventPayload(){
         }
         file->setIsChanged(true);
     }else{
-        (qFatal("LegUI::setEventPayload(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("LegUI::setEventPayload(): Behavior file or event data is null!!!");
     }
 }
 
@@ -291,7 +291,7 @@ void LegUI::setGroundPosition(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("LegUI::setGroundPosition(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("LegUI::setGroundPosition(): Behavior file or event data is null!!!");
     }
 }
 
@@ -302,7 +302,7 @@ void LegUI::setVerticalError(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("LegUI::setverticalError(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("LegUI::setverticalError(): Behavior file or event data is null!!!");
     }
 }
 
@@ -313,7 +313,7 @@ void LegUI::setHitSomething(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("LegUI::sethitSomething(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("LegUI::sethitSomething(): Behavior file or event data is null!!!");
     }
 }
 
@@ -324,7 +324,7 @@ void LegUI::setIsPlantedMS(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("LegUI::setIsPlantedMS(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("LegUI::setIsPlantedMS(): Behavior file or event data is null!!!");
     }
 }
 
@@ -362,7 +362,7 @@ void LegUI::viewSelectedChild(int row, int column){
                 emit viewEvents(bsData->id + 1);
             }
     }else{
-        (qFatal("LegUI::viewSelectedChild(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("LegUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -382,7 +382,7 @@ void LegUI::selectTableToView(bool viewproperties, const QString & path){
             }
         }
     }else{
-        (qFatal("LegUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("LegUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -392,15 +392,15 @@ void LegUI::eventRenamed(const QString & name, int index){
             table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        (qFatal("LegUI::eventRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("LegUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
 void LegUI::variableRenamed(const QString & name, int index){
     int bindIndex = -1;
-    hkbVariableBindingSet *bind = NULL;
+    hkbVariableBindingSet *bind = nullptr;
     if (name == ""){
-        (qWarning("LegUI::variableRenamed(): The new variable name is the empty string!!"));
+        WARNING_MESSAGE("LegUI::variableRenamed(): The new variable name is the empty string!!");
     }
     if (bsData){
         //index--;
@@ -424,6 +424,6 @@ void LegUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        (qFatal("LegUI::variableRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("LegUI::variableRenamed(): The data is nullptr!!");
     }
 }

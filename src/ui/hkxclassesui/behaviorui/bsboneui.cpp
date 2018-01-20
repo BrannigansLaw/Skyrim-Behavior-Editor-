@@ -35,10 +35,10 @@ QStringList BSBoneUI::headerLabels = {
 };
 
 BSBoneUI::BSBoneUI()
-    : file(NULL),
+    : file(nullptr),
       bsBoneIndex(-1),
-      bsData(NULL),
-      parent(NULL),
+      bsData(nullptr),
+      parent(nullptr),
       topLyt(new QGridLayout),
       returnPB(new QPushButton("Return")),
       table(new TableWidget),
@@ -145,7 +145,7 @@ void BSBoneUI::loadData(BehaviorFile *parentFile, BSLookAtModifier::BsBone *bon,
             table->item(ENABLED_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }
     }else{
-        (qFatal("BSBoneUI::loadData(): Behavior file, bind or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("BSBoneUI::loadData(): Behavior file, bind or event data is null!!!");
     }
     connectSignals();
 }
@@ -168,10 +168,10 @@ void BSBoneUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, 
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            (qFatal("BSBoneUI::loadBinding(): The variable binding set is NULL!!"));
+            FATAL_RUNTIME_ERROR("BSBoneUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        (qFatal("BSBoneUI::loadBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSBoneUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -188,21 +188,21 @@ bool BSBoneUI::setBinding(int index, int row, const QString & variableName, cons
                 parent->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    (qFatal("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    FATAL_RUNTIME_ERROR("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
-                if (!varBind->addBinding(path, variableName, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    (qFatal("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!"));
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    FATAL_RUNTIME_ERROR("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
             file->setIsChanged(true);
         }else{
-            (qWarning("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!"));
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        (qFatal("BSBoneUI::setBinding(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSBoneUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -253,7 +253,7 @@ void BSBoneUI::setBindingVariable(int index, const QString & name){
         }
         file->setIsChanged(true);
     }else{
-        (qFatal("BSBoneUI::setBindingVariable(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSBoneUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -262,7 +262,7 @@ void BSBoneUI::setIndex(int index){
         bsData->index = index - 1;
         file->setIsChanged(true);
     }else{
-        (qFatal("BSBoneUI::setindex(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("BSBoneUI::setindex(): Behavior file or event data is null!!!");
     }
 }
 
@@ -273,7 +273,7 @@ void BSBoneUI::setFwdAxisLS(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("BSBoneUI::setfwdAxisLS(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("BSBoneUI::setfwdAxisLS(): Behavior file or event data is null!!!");
     }
 }
 
@@ -284,7 +284,7 @@ void BSBoneUI::setLimitAngleDegrees(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("BSBoneUI::setLimitAngleDegrees(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("BSBoneUI::setLimitAngleDegrees(): Behavior file or event data is null!!!");
     }
 }
 
@@ -295,7 +295,7 @@ void BSBoneUI::setOnGain(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("BSBoneUI::setOnGain(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("BSBoneUI::setOnGain(): Behavior file or event data is null!!!");
     }
 }
 
@@ -306,7 +306,7 @@ void BSBoneUI::setOffGain(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("BSBoneUI::setOffGain(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("BSBoneUI::setOffGain(): Behavior file or event data is null!!!");
     }
 }
 
@@ -317,7 +317,7 @@ void BSBoneUI::setEnabled(){
             file->setIsChanged(true);
         }
     }else{
-        (qFatal("BSBoneUI::setEnabled(): Behavior file or event data is null!!!"));
+        FATAL_RUNTIME_ERROR("BSBoneUI::setEnabled(): Behavior file or event data is null!!!");
     }
 }
 
@@ -365,7 +365,7 @@ void BSBoneUI::viewSelectedChild(int row, int column){
             }
         }
     }else{
-        (qFatal("BSBoneUI::viewSelectedChild(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSBoneUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -385,15 +385,15 @@ void BSBoneUI::selectTableToView(bool viewproperties, const QString & path){
             }
         }
     }else{
-        (qFatal("BSBoneUI::selectTableToView(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSBoneUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void BSBoneUI::variableRenamed(const QString & name, int index){
     int bindIndex = -1;
-    hkbVariableBindingSet *bind = NULL;
+    hkbVariableBindingSet *bind = nullptr;
     if (name == ""){
-        (qWarning("BSBoneUI::variableRenamed(): The new variable name is the empty string!!"));
+        WARNING_MESSAGE("BSBoneUI::variableRenamed(): The new variable name is the empty string!!");
     }
     if (bsData){
         //index--;
@@ -425,6 +425,6 @@ void BSBoneUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        (qFatal("BSBoneUI::variableRenamed(): The data is NULL!!"));
+        FATAL_RUNTIME_ERROR("BSBoneUI::variableRenamed(): The data is nullptr!!");
     }
 }

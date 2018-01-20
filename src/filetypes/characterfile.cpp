@@ -16,7 +16,7 @@
 CharacterFile::CharacterFile(MainWindow *window, ProjectFile *projectfile, const QString & name)
     : HkxFile(window, name),
       project(projectfile),
-      skeleton(NULL),
+      skeleton(nullptr),
       largestRef(0)
 {
     getReader().setFile(this);
@@ -26,7 +26,7 @@ HkxSharedPtr * CharacterFile::findCharacterData(long ref){
     if (characterData->getReference() == ref){
         return &characterData;
     }
-    return NULL;
+    return nullptr;
 }
 
 HkxSharedPtr * CharacterFile::findCharacterPropertyValues(long ref){
@@ -35,7 +35,7 @@ HkxSharedPtr * CharacterFile::findCharacterPropertyValues(long ref){
             return &boneWeightArrays[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 /*QString CharacterFile::getRelativeRootBehaviorPath() const{
@@ -66,7 +66,7 @@ hkbCharacterData * CharacterFile::getCharacterData() const{
     if (characterData.data() && characterData->getSignature() == HKB_CHARACTER_DATA){
         return static_cast<hkbCharacterData *>(characterData.data());
     }
-    return NULL;
+    return nullptr;
 }
 
 QStringList CharacterFile::getRigBoneNames() const{
@@ -265,7 +265,7 @@ bool CharacterFile::parse(){
 
 bool CharacterFile::link(){
     if (!getRootObject().constData()){
-        writeToLog("CharacterFile: link() failed!\nThe root object of this character file is NULL!", true);
+        writeToLog("CharacterFile: link() failed!\nThe root object of this character file is nullptr!", true);
         return false;
     }else if (getRootObject()->getSignature() != HK_ROOT_LEVEL_CONTAINER){
         writeToLog("CharacterFile: link() failed!\nThe root object of this character file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16), true);
@@ -340,5 +340,7 @@ void CharacterFile::disableHandIK(){
 }
 
 CharacterFile::~CharacterFile(){
-    //
+    if (skeleton){
+        delete skeleton;
+    }
 }

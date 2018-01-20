@@ -67,7 +67,7 @@ void TreeGraphicsView::expandAllBranches(){
 }
 
 void TreeGraphicsView::selectRoot(){
-    treeScene->selectIcon(treeScene->rootIcon, false);
+    treeScene->selectIcon(treeScene->rootIcon, TreeGraphicsScene::EXPAND_CONTRACT_ZERO);
 }
 
 TreeGraphicsItem *TreeGraphicsView::getSelectedItem() const{
@@ -78,7 +78,7 @@ DataIconManager *TreeGraphicsView::getSelectedData() const{
     if (treeScene->selectedIcon){
         return treeScene->selectedIcon->itemData;
     }
-    return NULL;
+    return nullptr;
 }
 
 bool TreeGraphicsView::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData, bool removeData){
@@ -89,7 +89,7 @@ bool TreeGraphicsView::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconMa
 
 bool TreeGraphicsView::removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove, bool removeData, bool removeAllSameData){
     if (item == treeScene->selectedIcon){
-        treeScene->selectedIcon = NULL;
+        treeScene->selectedIcon = nullptr;
     }
     return treeScene->removeItemFromGraph(item, indexToRemove, removeData, removeAllSameData);
 }

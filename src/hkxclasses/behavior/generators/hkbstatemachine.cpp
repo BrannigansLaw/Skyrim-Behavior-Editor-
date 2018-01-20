@@ -47,7 +47,7 @@ QString hkbStateMachine::getName() const{
 int hkbStateMachine::generateValidStateId(){
     int stateId = 0;
     int prev = 0;
-    hkbStateMachineStateInfo *ptr = NULL;
+    hkbStateMachineStateInfo *ptr = nullptr;
     for (int i = 0; i < states.size(); i++){
         ptr = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
         stateId = ptr->stateId;
@@ -138,6 +138,35 @@ int hkbStateMachine::getNumberOfNestedStates(int stateId) const{
 }
 
 bool hkbStateMachine::insertObjectAt(int index, DataIconManager *obj){
+    //hkbStateMachineStateInfo *objChild;
+    if (obj->getSignature() == HKB_STATE_MACHINE_STATE_INFO)/*if (((HkxObject *)obj)->getType() == TYPE_GENERATOR)*/{
+        if (index >= states.size() || index == -1){
+            /*objChild = new hkbStateMachineStateInfo(getParentFile(), this, -1);
+            states.append(HkxSharedPtr(objChild));
+            objChild->generator = HkxSharedPtr((HkxObject *)obj);*/
+            states.append(HkxSharedPtr(obj));
+        }else if (index == 0){
+            states.replace(index, HkxSharedPtr(obj));
+        }else if (index > -1){
+            states.replace(index, HkxSharedPtr(obj));
+        }else{
+            return false;
+        }/*else if (index == 0){
+            objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
+            objChild->generator = HkxSharedPtr((HkxObject *)obj);
+        }else if (index > -1){
+            objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
+            objChild->generator = HkxSharedPtr((HkxObject *)obj);
+        }else{
+            return false;
+        }*/
+        return true;
+    }else{
+        return false;
+    }
+}
+
+/*bool hkbStateMachine::insertObjectAt(int index, DataIconManager *obj){
     hkbStateMachineStateInfo *objChild;
     if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
         if (index >= states.size() || index == -1){
@@ -157,12 +186,12 @@ bool hkbStateMachine::insertObjectAt(int index, DataIconManager *obj){
     }else{
         return false;
     }
-}
+}*/
 
 bool hkbStateMachine::removeObjectAt(int index){
     if (index < states.size()){
-        hkbStateMachineStateInfo *state = NULL;
-        hkbStateMachineTransitionInfoArray *trans = NULL;
+        hkbStateMachineStateInfo *state = nullptr;
+        hkbStateMachineTransitionInfoArray *trans = nullptr;
         int stateId = 0;
         if (index > -1 && index < states.size()){
             trans = static_cast<hkbStateMachineTransitionInfoArray *>(wildcardTransitions.data());
@@ -221,10 +250,13 @@ bool hkbStateMachine::hasChildren() const{
 }
 
 int hkbStateMachine::getIndexOfObj(DataIconManager *obj) const{
-    hkbStateMachineStateInfo *child;
+    //hkbStateMachineStateInfo *child;
     for (int i = 0; i < states.size(); i++){
-        child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+        /*child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
         if (child->generator.data() == (HkxObject *)obj){
+            return i;
+        }*/
+        if (states.at(i).data() && (HkxObject *)obj){
             return i;
         }
     }
@@ -233,19 +265,22 @@ int hkbStateMachine::getIndexOfObj(DataIconManager *obj) const{
 
 QList<DataIconManager *> hkbStateMachine::getChildren() const{
     QList<DataIconManager *> list;
-    hkbStateMachineStateInfo *child;
+    //hkbStateMachineStateInfo *child;
     for (int i = 0; i < states.size(); i++){
-        child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+        /*child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
         if (child->generator.data()){
             list.append(static_cast<DataIconManager*>(child->generator.data()));
+        }*/if (states.at(i).data()){
+            //list.append(static_cast<DataIconManager*>(child));
+            list.append(static_cast<DataIconManager*>(states.at(i).data()));
         }
     }
     return list;
 }
 
 hkbStateMachine * hkbStateMachine::getNestedStateMachine(int stateId) const{
-    hkbGenerator *gen = NULL;
-    hkbStateMachineStateInfo *state = NULL;
+    hkbGenerator *gen = nullptr;
+    hkbStateMachineStateInfo *state = nullptr;
     qlonglong sig = 0;
     for (int i = 0; i < states.size(); i++){
         state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
@@ -263,12 +298,12 @@ hkbStateMachine * hkbStateMachine::getNestedStateMachine(int stateId) const{
                     gen = static_cast<hkbGenerator *>(static_cast<BSiStateTaggingGenerator *>(gen)->pDefaultGenerator.data());
                     break;
                 default:
-                    return NULL;
+                    return nullptr;
                 }
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){

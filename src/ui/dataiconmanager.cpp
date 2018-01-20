@@ -18,8 +18,7 @@ bool DataIconManager::hasIcons() const{
             return true;
         }
     }else{
-        (qFatal("DataIconManager::hasIcons(): 'icons' is empty!!!"));
-        getParentFile()->writeToLog("DataIconManager::hasIcons(): 'icons' is empty!!!");
+        FATAL_RUNTIME_ERROR("DataIconManager::hasIcons(): 'icons' is empty!!!");
     }
     return false;
 }
@@ -63,7 +62,7 @@ DataIconManager::DataIconManager(HkxFile *parent, long ref)
 }
 
 TreeGraphicsItem * DataIconManager::reconnectToNext(){
-    TreeGraphicsItem *iconToBeRemoved = NULL;
+    TreeGraphicsItem *iconToBeRemoved = nullptr;
     QList<QGraphicsItem *> children;
     if (!icons.isEmpty()){
         if (icons.size() > 1){
@@ -78,10 +77,9 @@ TreeGraphicsItem * DataIconManager::reconnectToNext(){
             }
         }
     }else{
-        (qFatal("DataIconManager::reconnectToNext(): 'icons' is empty!!!"));
-        getParentFile()->writeToLog("DataIconManager::reconnectToNext(): 'icons' is empty!!!");
+        FATAL_RUNTIME_ERROR("DataIconManager::reconnectToNext(): 'icons' is empty!!!");
     }
-    return NULL;
+    return nullptr;
 }
 
 void DataIconManager::appendIcon(TreeGraphicsItem *icon){
@@ -104,7 +102,6 @@ void DataIconManager::removeIcon(TreeGraphicsItem *icon){
     if (!icons.isEmpty()){
         icons.removeAll(icon);
     }else{
-        (qFatal("DataIconManager::removeIcon(): 'icons' is empty!!!"));
-        getParentFile()->writeToLog("DataIconManager::removeIcon(): 'icons' is empty!!!");
+        FATAL_RUNTIME_ERROR("DataIconManager::removeIcon(): 'icons' is empty!!!");
     }
 }

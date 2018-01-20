@@ -84,7 +84,7 @@ void GenericTableWidget::loadTable(const QStringList & names, const QStringList 
             }
         }
     }else{
-        (qWarning("GenericTableWidget: loadTable()\nThe stringlist arguments have different sizes!!!"));
+        WARNING_MESSAGE(QString("GenericTableWidget: loadTable()\nThe stringlist arguments have different sizes!!!"));
     }
 }
 
