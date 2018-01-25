@@ -10,8 +10,9 @@ class HkxFile;
 class hkbProjectStringData: public HkxObject
 {
     friend class BehaviorGraphView;
+    friend class ProjectFile;
 public:
-    hkbProjectStringData(HkxFile *parent, long ref = 0);
+    hkbProjectStringData(HkxFile *parent, long ref = 0, const QString & characterfilename = "");
     virtual ~hkbProjectStringData();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

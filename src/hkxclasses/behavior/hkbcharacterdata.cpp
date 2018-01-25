@@ -24,7 +24,11 @@ QStringList hkbCharacterData::Type = {
 };
 
 hkbCharacterData::hkbCharacterData(HkxFile *parent, long ref)
-    : HkxObject(parent, ref)
+    : HkxObject(parent, ref),
+      modelUpMS(0, 0, 1, 0),
+      modelForwardMS(0, 1, 0, 0),
+      modelRightMS(1, 0, 0, 0),
+      scale(1)
 {
     setType(HKB_CHARACTER_DATA, TYPE_OTHER);
     getParentFile()->addObjectToFile(this, ref);
@@ -94,6 +98,10 @@ void hkbCharacterData::addVariable(hkVariableType type, const QString & name){
 void hkbCharacterData::addVariable(hkVariableType type){
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
+    /*if (!varData){
+        varData = new hkbVariableValueSet(this);
+        characterPropertyValues = HkxSharedPtr(varData);
+    }*/
     hkVariableInfo varInfo;
     switch (type){
     case VARIABLE_TYPE_BOOL:
@@ -466,19 +474,19 @@ bool hkbCharacterData::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (!characterPropertyValues.data()->write(writer)){
+        if (characterPropertyValues.data() && !characterPropertyValues.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'characterPropertyValues'!!!", true);
         }
-        if (!footIkDriverInfo.data()->write(writer)){
+        if (footIkDriverInfo.data() && !footIkDriverInfo.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'footIkDriverInfo'!!!", true);
         }
-        if (!handIkDriverInfo.data()->write(writer)){
+        if (handIkDriverInfo.data() && !handIkDriverInfo.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'handIkDriverInfo'!!!", true);
         }
-        if (!stringData.data()->write(writer)){
+        if (stringData.data() && !stringData.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'stringData'!!!", true);
         }
-        if (!mirroredSkeletonInfo.data()->write(writer)){
+        if (mirroredSkeletonInfo.data() && !mirroredSkeletonInfo.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'mirroredSkeletonInfo'!!!", true);
         }
     }

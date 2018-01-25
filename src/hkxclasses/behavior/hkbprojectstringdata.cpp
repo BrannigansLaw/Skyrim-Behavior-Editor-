@@ -10,12 +10,15 @@ uint hkbProjectStringData::refCount = 0;
 
 QString hkbProjectStringData::classname = "hkbProjectStringData";
 
-hkbProjectStringData::hkbProjectStringData(HkxFile *parent, long ref)
+hkbProjectStringData::hkbProjectStringData(HkxFile *parent, long ref, const QString &characterfilename)
     : HkxObject(parent, ref)
 {
     setType(HKB_PROJECT_STRING_DATA, TYPE_OTHER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
+    if (characterfilename != ""){
+        characterFilenames.append(characterfilename);
+    }
 }
 
 QString hkbProjectStringData::getClassname(){

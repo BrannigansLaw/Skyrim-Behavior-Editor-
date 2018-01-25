@@ -145,6 +145,151 @@ void BehaviorFile::generateDefaultCharacterData(){
     hkbBehaviorGraphData *data = static_cast<hkbBehaviorGraphData *>(graphData.data());
     if (data){
         //Add common variables...
+        data->addVariable(VARIABLE_TYPE_BOOL, "bEquipOk");   //Needs to be initialized to one or custom creatures don't work...
+        data->addVariable(VARIABLE_TYPE_REAL, "Speed"); //Protected variable...
+        data->addVariable(VARIABLE_TYPE_REAL, "Direction"); //Protected variable...
+        data->addVariable(VARIABLE_TYPE_INT32, "iState");
+        data->addVariable(VARIABLE_TYPE_REAL, "TurnDelta"); //Protected variable...
+        data->addVariable(VARIABLE_TYPE_REAL, "SpeedSampled");
+        data->addVariable(VARIABLE_TYPE_REAL, "SpeedDamped");
+        data->addVariable(VARIABLE_TYPE_REAL, "TurnDeltaDamped");
+        data->addVariable(VARIABLE_TYPE_REAL, "weaponSpeedMult"); //Protected variable...
+        data->addVariable(VARIABLE_TYPE_BOOL, "bAnimationDriven");
+        data->addVariable(VARIABLE_TYPE_BOOL, "bAllowRotation");
+        data->addVariable(VARIABLE_TYPE_BOOL, "IsAttacking");
+        data->addVariable(VARIABLE_TYPE_BOOL, "IsStaggering");
+        data->addVariable(VARIABLE_TYPE_BOOL, "IsRecoiling");
+        data->addVariable(VARIABLE_TYPE_BOOL, "bFootIKEnable");   //Creatures use this, humans don't...
+        data->addVariable(VARIABLE_TYPE_BOOL, "bHumanoidFootIKEnable");   //Humans use this, creatures don't...
+        data->addVariable(VARIABLE_TYPE_REAL, "staggerMagnitude");
+        data->addVariable(VARIABLE_TYPE_REAL, "staggerDirection");
+        data->addVariable(VARIABLE_TYPE_BOOL, "bHeadTrackingOn");   //Creatures use this, humans don't...
+        data->addVariable(VARIABLE_TYPE_BOOL, "bHeadTracking"); //Protected variable...
+        data->addVariable(VARIABLE_TYPE_VECTOR4, "TargetLocation");
+        data->addVariable(VARIABLE_TYPE_REAL, "turnSpeedMult");   //Creatures use this, humans???
+        //Add common events...
+        data->addEvent("moveStart");
+        data->addEvent("moveStop");
+        data->addEvent("bleedOutStart");
+        data->addEvent("bleedOutStop");
+        data->addEvent("blockAnticipateStart");
+        data->addEvent("blockHitStart");
+        //Listed in playercharacterresponse.txt
+        data->addEvent("BackupResponse");	//ActorResponse
+        data->addEvent("idleChairSitting");	//PlayerChairEnterHandler
+        data->addEvent("idleBedSleeping");	//PlayerBedEnterHandler
+        data->addEvent("idleChairGetUp");	//PlayerFurnitureExitHandler
+        data->addEvent("idleBedGetUp");	//PlayerFurnitureExitHandler
+        data->addEvent("BowZoomStart");	//BowZoomStartHandler
+        data->addEvent("BowZoomStop");	//BowZoomStopHandler
+        data->addEvent("StartAnimatedCamera");	//AnimatedCameraStartHandler
+        data->addEvent("StartAnimatedCameraDelta");	//AnimatedCameraDeltaStartHandler
+        data->addEvent("EndAnimatedCamera");	//AnimatedCameraEndHandler
+        data->addEvent("GraphDeleting");	//AnimatedCameraEndHandler
+        data->addEvent("PitchOverrideStart");	//PitchOverrideStartHandler
+        data->addEvent("PitchOverrideEnd");	//PitchOverrideEndHandler
+        data->addEvent("ZeroOutCameraPitch");	//ZeroPitchHandler
+        //Listed in actorresponse.txt
+        data->addEvent("weaponSwing");	//WeaponRightSwingHandler
+        data->addEvent("weaponLeftSwing");	//WeaponLeftSwingHandler
+        data->addEvent("AttackWinStart");	//AttackWinStartHandler
+        data->addEvent("AttackWinStartLeft");	//AttackWinStartHandler
+        data->addEvent("AttackWinEnd");	//AttackWinEndHandler
+        data->addEvent("AttackWinEndLeft");	//AttackWinEndHandler
+        data->addEvent("attackStop");	//AttackStopHandler
+        data->addEvent("bashStop");	//AttackStopHandler
+        data->addEvent("recoilStop");	//RecoilStopHandler
+        data->addEvent("MLh_SpellFire_Event");	//LeftHandSpellFireHandler
+        data->addEvent("MRh_SpellFire_Event");	//RightHandSpellFireHandler
+        data->addEvent("Voice_SpellFire_Event");	//VoiceSpellFireHandler
+        data->addEvent("BeginCastLeft");	//LeftHandSpellCastHandler
+        data->addEvent("BeginCastRight");	//RightHandSpellCastHandler
+        data->addEvent("BeginCastVoice");	//VoiceSpellCastHandler
+        data->addEvent("BeginWeaponDraw");	//WeaponBeginDrawRightHandler
+        data->addEvent("BeginWeaponSheathe");	//WeaponBeginSheatheRightHandler
+        data->addEvent("CameraOverrideStart");	//CameraOverrideStartHandler
+        data->addEvent("CameraOverrideStop");	//CameraOverrideStopHandler
+        data->addEvent("weaponDraw");	//RightHandWeaponDrawHandler
+        data->addEvent("weaponSheathe");	//RightHandWeaponSheatheHandler
+        data->addEvent("HitFrame");	//HitFrameHandler
+        data->addEvent("preHitFrame");	//AnticipateAttackHandler
+        data->addEvent("staggerStop");	//StaggeredStopHandler
+        data->addEvent("idleChairSitting");	//ChairEnterHandler
+        data->addEvent("idleBedSleeping");	//BedEnterHandler
+        data->addEvent("idleChairGetUp");	//ChairFurnitureExitHandler
+        data->addEvent("idleBedGetUp");	//BedFurnitureExitHandler
+        data->addEvent("idleSleepGetUp");	//BedFurnitureExitHandler
+        data->addEvent("KillActor");	//KillActorHandler
+        data->addEvent("Decapitate");	//DecapitateHandler
+        data->addEvent("FlightTakeOff");	//FlightTakeOffHandler
+        data->addEvent("FlightCruising");	//FlightCruisingHandler
+        data->addEvent("FlightHovering");	//FlightHoveringHandler
+        data->addEvent("FlightLanding");	//FlightLandingHandler
+        data->addEvent("FlightPerching");	//FlightPerchingHandler
+        data->addEvent("FlightLanded");	//FlightLandHandler
+        data->addEvent("FlightLandEnd");	//FlightLandEndHandler
+        data->addEvent("FlightAction");	//FlightActionHandler
+        data->addEvent("FlightActionEntryEnd");	//FlightActionEntryEndHandler
+        data->addEvent("FlightActionEnd");	//FlightActionEndHandler
+        data->addEvent("FlightActionGrab");	//FlightActionGrabHandler
+        data->addEvent("FlightActionRelease");	//FlightActionReleaseHandler
+        data->addEvent("FlightCrashLandStart");	//FlightCrashLandStartHandler
+        data->addEvent("HeadTrackingOn");	//HeadTrackingOnHandler
+        data->addEvent("HeadTrackingOff");	//HeadTrackingOffHandler
+        data->addEvent("BowDrawn");	//BowDrawnHandler
+        data->addEvent("BowRelease");	//BowReleaseHandler
+        data->addEvent("arrowAttach");	//ArrowAttachHandler
+        data->addEvent("arrowDetach");	//ArrowDetachHandler
+        data->addEvent("bowReset");	//ArrowDetachHandler
+        data->addEvent("arrowRelease");	//ArrowReleaseHandler
+        data->addEvent("InterruptCast");	//InterruptCastHandler
+        data->addEvent("summonStop");	//EndSummonAnimationHandler
+        data->addEvent("PickNewIdle");	//PickNewIdleHandler
+        data->addEvent("DeathStop");	//DeathStopHandler
+        data->addEvent("ActivationDone");	//ActionActivateDoneHandler
+        data->addEvent("StopHorseCamera");	//StopHorseCameraHandler
+        data->addEvent("KillMoveStart");	//KillMoveStartHandler
+        data->addEvent("KillMoveEnd");	//KillMoveEndHandler
+        data->addEvent("pairedStop");	//PairedStopHandler
+        data->addEvent("CameraShake");	//CameraShakeHandler
+        data->addEvent("DeathEmote");	//DeathEmoteHandler
+        data->addEvent("StartMotionDriven");	//MotionDrivenHandler
+        data->addEvent("StartAnimationDriven");	//AnimationDrivenHandler
+        data->addEvent("StartAllowRotation");	//AllowRotationHandler
+        data->addEvent("AddRagdollToWorld");	//AddRagdollHandler
+        data->addEvent("RemoveRagdollFromWorld");	//RemoveRagdollHandler
+        data->addEvent("RemoveCharacterControllerFromWorld");	//RemoveCharacterControllerHandler
+        data->addEvent("GetUpStart");	//GetUpStartHandler
+        data->addEvent("GetUpEnd");	//GetUpEndHandler
+        data->addEvent("MountEnd");	//MountDismountEndHandler
+        data->addEvent("DismountEnd");	//MountDismountEndHandler
+        data->addEvent("ExitCartBegin");	//ExitCartBeginHandler
+        data->addEvent("ExitCartEnd");	//ExitCartEndHandler
+        data->addEvent("EnableBumper");	//EnableCharacterBumperHandler
+        data->addEvent("DisableBumper");	//DisableCharacterBumperHandler
+        data->addEvent("AnimObjLoad");	//AnimationObjectLoadHandler
+        data->addEvent("AnimObjDraw");	//AnimationObjectDrawHandler
+        data->addEvent("EnableCharacterPitch");	//EnableCharacterPitchHandler
+        data->addEvent("DisableCharacterPitch");	//DisableCharacterPitchHandler
+        data->addEvent("JumpBegin");	//JumpAnimEventHandler
+        data->addEvent("IdleDialogueLock");	//IdleDialogueEnterHandler
+        data->addEvent("IdleDialogueUnlock");	//IdleDialogueExitHandler
+        data->addEvent("NPCAttach");	//NPCAttachHandler
+        data->addEvent("NPCDetach");	//NPCDetachHandler
+        data->addEvent("MTState");	//MTStateHandler
+        data->addEvent("VampireFeedEnd");	//VampireFeedEndHandler
+    }else{
+        FATAL_RUNTIME_ERROR("BehaviorFile::generateDefaultCharacterData(): The behavior graph data failed to construct!");
+    }
+}
+
+/*
+void BehaviorFile::generateDefaultCharacterData(){
+    generateNewBehavior();
+    hkbBehaviorGraphData *data = static_cast<hkbBehaviorGraphData *>(graphData.data());
+    if (data){
+        //Add common variables...
+        data->addVariable(VARIABLE_TYPE_BOOL, "bEquipOk");   //Needs to be initialized to one or custom creatures don't work...
         data->addVariable(VARIABLE_TYPE_REAL, "Speed"); //Protected variable...
         data->addVariable(VARIABLE_TYPE_REAL, "Direction"); //Protected variable...
         data->addVariable(VARIABLE_TYPE_INT32, "iState");
@@ -375,7 +520,7 @@ void BehaviorFile::generateDefaultCharacterData(){
         data->addEvent("NPCSoundPlay.NPCKillBodyfall");
         data->addEvent("NPCSoundPlay.NPCKillStabIn");
         data->addEvent("NPCSoundPlay.WPNBlockBlade2HandVsOtherSD");
-        data->addEvent("SoundPlay.WPNBowZoomIn");*/
+        data->addEvent("SoundPlay.WPNBowZoomIn");
         data->addEvent("2_KillMoveStart");
         data->addEvent("2_DeathEmote");
         data->addEvent("2_KillMoveEnd");
@@ -384,7 +529,7 @@ void BehaviorFile::generateDefaultCharacterData(){
     }else{
         FATAL_RUNTIME_ERROR("BehaviorFile::generateDefaultCharacterData(): The behavior graph data failed to construct!");
     }
-}
+}*/
 
 QStringList BehaviorFile::getAllBehaviorFileNames() const{
     QStringList list;

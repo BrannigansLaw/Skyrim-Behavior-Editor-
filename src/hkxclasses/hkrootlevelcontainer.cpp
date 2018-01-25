@@ -97,6 +97,16 @@ bool hkRootLevelContainer::write(HkxXMLWriter *writer){
     return true;
 }
 
+void hkRootLevelContainer::addVariant(const QString &name){
+    namedVariants.append(hkRootLevelContainerNamedVariant(name, name));
+}
+
+void hkRootLevelContainer::setVariantAt(int index, HkxObject * ptr){
+    if (index > -1 && index < namedVariants.size()){
+        namedVariants[index].variant = HkxSharedPtr(ptr);
+    }
+}
+
 bool hkRootLevelContainer::link(){
     if (!getParentFile()){
         return false;

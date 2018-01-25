@@ -772,6 +772,7 @@ void StateMachineUI::addStateWithGenerator(){
     Generator_Type typeEnum;
     if (bsData && behaviorView){
         typeEnum = static_cast<Generator_Type>(typeSelectorCB->currentIndex());
+        behaviorView->appendState();
         switch (typeEnum){
         case STATE_MACHINE:
             behaviorView->appendStateMachine();

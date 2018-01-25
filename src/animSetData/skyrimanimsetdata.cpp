@@ -74,6 +74,17 @@ bool SkyrimAnimSetData::write(const QString &filename){
     return true;
 }
 
+bool SkyrimAnimSetData::addNewProject(const QString &projectname){
+    for (auto i = 0; i < projectNames.size(); i++){
+        if (!QString::compare(projectNames.at(i), projectname, Qt::CaseInsensitive)){
+            return false;
+        }
+    }
+    projectNames.append(projectname);
+    projects.append(new AnimCacheProjectData());
+    return true;
+}
+
 bool SkyrimAnimSetData::addAnimationToCache(const QString &projectname, const QString & eventname, const QVector<AnimCacheAnimationInfo> &animations, const QVector<AnimCacheVariable> &vars, const QVector<AnimCacheClipInfo> &clips){
     int count = 0;
     int index = projectNames.indexOf(projectname);

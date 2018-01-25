@@ -492,11 +492,13 @@ void BehaviorGraphView::append(T *obj){
         behavior->setIsChanged(true);
         getSelectedItem()->reposition();
         treeScene->selectIcon(newIcon, TreeGraphicsScene::EXPAND_CONTRACT_ZERO);
-        emit addedGenerator(obj->getName(), obj->getClassname());
+        if (obj->getSignature() != HKB_STATE_MACHINE_STATE_INFO){
+            emit addedGenerator(obj->getName(), obj->getClassname());
+        }
     }else{
         delete obj;
     }
-    removeObjects();
+    //removeObjects();   //Needed????
 }
 
 void BehaviorGraphView::appendStateMachine(){
@@ -836,12 +838,20 @@ void BehaviorGraphView::popUpMenuRequested(const QPoint &pos){
     }
     HkxObject::HkxType type = ((HkxObject *)(getSelectedItem()->itemData))->getType();
     removeObjBranchAct->setDisabled(false);
+    appendStateAct->setDisabled(true);
     if (type == HkxObject::TYPE_MODIFIER){
         appendGeneratorMenu->menuAction()->setDisabled(true);
         appendBlenderMenu->menuAction()->setDisabled(true);
         wrapGeneratorMenu->menuAction()->setDisabled(true);
         wrapBlenderMenu->menuAction()->setDisabled(true);
         appendModifierMenu->menuAction()->setDisabled(false);
+    }else if (sig == HKB_STATE_MACHINE){
+        disableAllMenuActions(appendGeneratorMenu);
+        appendBlenderMenu->menuAction()->setDisabled(true);
+        appendModifierMenu->menuAction()->setDisabled(true);
+        wrapGeneratorMenu->menuAction()->setDisabled(false);
+        wrapBlenderMenu->menuAction()->setDisabled(false);
+        appendStateAct->setDisabled(false);
     }else if (type == HkxObject::TYPE_GENERATOR){
         appendGeneratorMenu->menuAction()->setDisabled(false);
         enableAllMenuActions(appendGeneratorMenu);
@@ -886,11 +896,6 @@ void BehaviorGraphView::popUpMenuRequested(const QPoint &pos){
         }else if (parentSig == HKB_BEHAVIOR_GRAPH){
             wrapGeneratorMenu->menuAction()->setDisabled(true);
             wrapBlenderMenu->menuAction()->setDisabled(true);
-        }
-        if (sig == HKB_STATE_MACHINE){
-            appendStateAct->setDisabled(false);
-        }else{
-            appendStateAct->setDisabled(true);
         }
     }
     contextMenu->popup(viewport()->mapToGlobal(pos));

@@ -7,6 +7,8 @@ class hkRootLevelContainer: public HkxObject
 {
     friend class BehaviorGraphView;
     friend class BehaviorFile;
+    friend class ProjectFile;
+    friend class CharacterFile;
 public:
     hkRootLevelContainer(HkxFile *parent, long ref = -1);
     virtual ~hkRootLevelContainer();
@@ -17,6 +19,8 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
+    void addVariant(const QString & name);
+    void setVariantAt(int index, HkxObject *ptr);
     hkRootLevelContainer& operator=(const hkRootLevelContainer&);
     hkRootLevelContainer(const hkRootLevelContainer &);
 private:

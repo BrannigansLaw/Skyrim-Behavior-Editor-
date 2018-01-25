@@ -35,6 +35,7 @@ MainWindow::MainWindow()
       exportToSkyrimDirA(new QAction("Export Project To Skyrim Directory", this)),
       exportCurrentFileA(new QAction("Export Current File To Skyrim Directory", this)),
       fileM(new QMenu("File", this)),
+      newProjectA(new QAction("Create New Project", this)),
       saveA(new QAction("Save Viewed Behavior File", this)),
       saveProjectA(new QAction("Save Project", this)),
       exitA(new QAction("Exit", this)),
@@ -60,8 +61,7 @@ MainWindow::MainWindow()
       logGB(new QGroupBox("Debug Log")),
       logGBLyt(new QVBoxLayout(this)),
       lastFileSelected("C:/"),
-      animationCacheUI(nullptr),
-      gameFolderLE(new QLineEdit)
+      animationCacheUI(nullptr)
       //animationCacheSA(new QScrollArea)
 {
     //setStyleSheet("QComboBox {background: yellow};QWidget {background: darkGray}");
@@ -73,8 +73,6 @@ MainWindow::MainWindow()
     animationCacheUI = new AnimationCacheUI();
     animationCacheUI->setWindowTitle("Project Animation Cache Data!");
     animationCacheUI->setVisible(false);
-    gameFolderLE->setWindowTitle("Set the path to the game directory!");
-    gameFolderLE->setVisible(false);
 
     openPackedProjectA->setStatusTip("Open a hkx project file!");
     //openPackedProjectA->setShortcut(QKeySequence::Open);
@@ -90,6 +88,7 @@ MainWindow::MainWindow()
     //saveProjectA->setShortcut(QKeySequence::SaveAs);
     exitA->setStatusTip("Exit!");
     //exitA->setShortcut(QKeySequence::Close);
+    fileM->addAction(newProjectA);
     fileM->addAction(openPackedProjectA);
     fileM->addAction(openUnpackedProjectA);
     fileM->addAction(exportToSkyrimDirA);
@@ -113,6 +112,7 @@ MainWindow::MainWindow()
     topMB->setMaximumHeight(50);
     topMB->addMenu(fileM);
     topMB->addMenu(viewM);
+    topMB->addMenu(settingsM);
     logGBLyt->addWidget(debugLog);
     logGB->setLayout(logGBLyt);
     eventsWid->setHkDataUI(objectDataWid);
@@ -141,6 +141,7 @@ MainWindow::MainWindow()
     if (!findSkyrimDirectory()){
         writeToLog("The TESV executable was not found!");
     }
+    connect(newProjectA, SIGNAL(triggered(bool)), this, SLOT(createNewProject()), Qt::UniqueConnection);
     connect(openPackedProjectA, SIGNAL(triggered(bool)), this, SLOT(openPackedProject()), Qt::UniqueConnection);
     connect(openUnpackedProjectA, SIGNAL(triggered(bool)), this, SLOT(openUnpackedProject()), Qt::UniqueConnection);
     connect(saveA, SIGNAL(triggered(bool)), this, SLOT(save()), Qt::UniqueConnection);
@@ -159,8 +160,7 @@ MainWindow::MainWindow()
     connect(projectUI, SIGNAL(openAnimation(QString)), this, SLOT(openAnimationFile(QString)), Qt::UniqueConnection);
     connect(projectUI, SIGNAL(animationRemoved(int)), this, SLOT(removeAnimation(int)), Qt::UniqueConnection);
     connect(setGameModeA, SIGNAL(changed()), this, SLOT(setGameMode()), Qt::UniqueConnection);
-    connect(setPathToGameFolderA, SIGNAL(toggled(bool)), this, SLOT(viewPathToGameDirectory()), Qt::UniqueConnection);
-    connect(gameFolderLE, SIGNAL(textChanged(QString)), this, SLOT(setPathToGameDirectory(QString)), Qt::UniqueConnection);
+    connect(setPathToGameFolderA, SIGNAL(toggled(bool)), this, SLOT(setPathToGameDirectory()), Qt::UniqueConnection);
 }
 
 MainWindow::~MainWindow(){
@@ -204,7 +204,7 @@ void MainWindow::changedTabs(int index){
                 topLyt->addWidget(behaviorGraphViewGB, 1, 0, 9, 10);
             }else{
                 int graphindex = getBehaviorGraphIndex(tabs->tabText(index));
-                if (graphindex < projectFile->behaviorFiles.size() && graphindex < behaviorGraphs.size()){
+                if (graphindex < projectFile->behaviorFiles.size() && graphindex < behaviorGraphs.size() && graphindex > -1){
                     objectDataWid->changeCurrentDataWidget(nullptr);
                     objectDataWid->loadBehaviorView(behaviorGraphs.at(graphindex));
                     variablesWid->clear();
@@ -284,12 +284,12 @@ void MainWindow::setGameMode(){
     //
 }
 
-void MainWindow::viewPathToGameDirectory(){
-    gameFolderLE->setVisible(true);
-}
-
-void MainWindow::setPathToGameDirectory(const QString &newpath){
-    skyrimDirectory = newpath;
+void MainWindow::setPathToGameDirectory(){
+    bool ok;
+    QString path = QInputDialog::getText(this, tr("Set path to game directory!"), tr("Path:"), QLineEdit::Normal, skyrimDirectory, &ok);
+    if (ok && path != ""){
+        skyrimDirectory = path;
+    }
 }
 
 void MainWindow::save(){
@@ -612,17 +612,12 @@ void MainWindow::openProject(QString & filepath){
         std::thread thread(&ProjectFile::readAnimationSetData, projectFile, lastFileSelectedPath+"/animationsetdatasinglefile.txt");
         if (!projectFile->readAnimationData(lastFileSelectedPath+"/animationdatasinglefile.txt")){
             FATAL_RUNTIME_ERROR("MainWindow::openProject(): The project animation data file could not be parsed!!!");
-            thread.join();
-            return;
         }
         thread.join();
     }
     ProgressDialog dialog("Opening project..."+projectFile->fileName().section("/", -1, -1), "", 0, 100, this);
     if (!projectFile->parse()){
         FATAL_RUNTIME_ERROR(QString("MainWindow::openProject(): The project file "+lastFileSelected+" could not be parsed!!!\nYou have tried to open non-project file or the project file is corrupted!").toLocal8Bit().data());
-        delete projectFile;
-        projectFile = nullptr;
-        return;
     }
     writeToLog("\n-------------------------\nTime taken to open file \""+filepath+
                                "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
@@ -632,11 +627,6 @@ void MainWindow::openProject(QString & filepath){
     characterFile = new CharacterFile(this, projectFile, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));
     if (!characterFile->parse()){
         FATAL_RUNTIME_ERROR(QString("MainWindow::openProject(): The character file "+projectFile->getCharacterFilePathAt(0)+" could not be parsed!!!").toLocal8Bit().data());
-        delete projectFile;
-        projectFile = nullptr;
-        delete characterFile;
-        characterFile = nullptr;
-        return;
     }
     dialog.setProgress("Character data loaded sucessfully!!!", 40);
     projectFile->setCharacterFile(characterFile);
@@ -648,13 +638,6 @@ void MainWindow::openProject(QString & filepath){
     skeletonFile = new SkeletonFile(this, lastFileSelectedPath+"/"+characterFile->getRigName());
     if (!skeletonFile->parse()){
         FATAL_RUNTIME_ERROR(QString("MainWindow::openProject(): The skeleton file "+characterFile->getRigName()+" could not be parsed!!!").toLocal8Bit().data());
-        delete projectFile;
-        projectFile = nullptr;
-        delete characterFile;
-        characterFile = nullptr;
-        delete skeletonFile;
-        skeletonFile = nullptr;
-        return;
     }
     dialog.setProgress("Skeleton data loaded sucessfully!!!", 90);
     characterFile->setSkeletonFile(skeletonFile);
@@ -729,7 +712,7 @@ void MainWindow::openProject(QString & filepath){
         }
     }
     threads.clear();
-    projectFile->generateAnimDataForProject();
+    projectFile->generateAnimClipDataForProject();
     writeToLog("\n-------------------------\nTime taken to open project \""+filepath+
                               "\" is approximately "+QString::number(t.elapsed())+" milliseconds\n-------------------------\n");
     dialog.setProgress("Project loaded sucessfully!!!", dialog.maximum());
@@ -981,7 +964,6 @@ bool MainWindow::findSkyrimDirectory(){
             }
         }
     }
-    gameFolderLE->setText(skyrimDirectory);
     return value;
 }
 
@@ -1026,4 +1008,93 @@ void MainWindow::paintEvent(QPaintEvent *){
     opt.init(this);
     QPainter p(this);
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
+}
+
+void MainWindow::createNewProject(){
+    /*
+     * (1): select skeleton
+     * (2): name project
+     * (3): generate project
+     * (4): check if name is availible
+     * (5): search directory for animation text files
+     * (6): if none use from tool directory
+     * (7): set up directory
+     * (8): generate character and root behavior file
+     * (9): connect to skeleton
+     * (10): reset selected files to project file
+     * (11): generate new project in animation text files
+     * (12): Load UI
+*/
+    if (!projectFile || (projectFile && closeAll())){
+        QString filename = QFileDialog::getOpenFileName(this, tr("Select hkx skeleton file..."), QDir::currentPath(), tr("hkx Files (*.hkx)"));
+        if (filename != ""){
+            objectDataWid->changeCurrentDataWidget(nullptr);
+            lastFileSelected = filename;    //Set these to project file!!!
+            lastFileSelectedPath = filename.section("/", 0, -2);
+            skeletonFile = new SkeletonFile(this, filename);
+            if (!skeletonFile->parse()){
+                FATAL_RUNTIME_ERROR(QString("MainWindow::createNewProject(): The skeleton file "+filename.section("/", -1, -1)+" could not be parsed!!!").toLocal8Bit().data());
+            }
+            bool ok;
+            QString projectname = QInputDialog::getText(this, tr("Set project name!"), tr("Project name:"), QLineEdit::Normal, "", &ok);
+            if (ok && projectname != "" && !projectname.contains(QRegExp("^[a-z-A-Z\\]+$"))){
+                QString projectDirectoryPath = lastFileSelectedPath+"/"+projectname;
+                {
+                    QDir projectDirectory(lastFileSelectedPath);
+                    if (!projectDirectory.mkdir(projectDirectoryPath) && !QDir(projectDirectoryPath).exists()){
+                        FATAL_RUNTIME_ERROR(QString("MainWindow::createNewProject(): Attempt to create '"+projectDirectoryPath+"' directory failed!!!").toUtf8().data());
+                    }
+                }
+                QString relativecharacterpath = "characters/"+projectname+"character.hkx";
+                QDir projectDirectory(projectDirectoryPath);
+                projectUI->setFilePath(projectDirectoryPath);
+                if (projectDirectory.exists()){
+                    QStringList list = {"animations", "behaviors", "character assets", "characters"};
+                    for (auto i = 0; i < list.size(); i++){
+                        if (!projectDirectory.mkdir(list.at(i)) && !QDir(projectDirectoryPath+"/"+list.at(i)).exists()){
+                            FATAL_RUNTIME_ERROR(QString("MainWindow::createNewProject(): Attempt to create '"+list.at(i)+"' directory failed!!!").toUtf8().data());
+                        }
+                    }
+                    if (!projectDirectory.rename(lastFileSelected, projectDirectoryPath+"/character assets/"+skeletonFile->fileName().section("/", -1, -1))){
+                        FATAL_RUNTIME_ERROR("MainWindow::createNewProject(): Attempt to move skeleton file failed!!!");
+                    }
+                    projectFile = new ProjectFile(this, projectDirectoryPath+"/"+projectname+".hkx", true, relativecharacterpath);
+                    {
+                        std::thread thread(&ProjectFile::readAnimationSetData, projectFile, lastFileSelectedPath+"/animationsetdatasinglefile.txt");
+                        if (!projectFile->readAnimationData(lastFileSelectedPath+"/animationdatasinglefile.txt", false)){
+                            FATAL_RUNTIME_ERROR("MainWindow::createNewProject(): The project animation data file could not be parsed!!!");
+                        }
+                        thread.join();
+                    }
+                    if (!projectFile->isProjectNameTaken()){
+                        //link files here...
+                        characterFile = new CharacterFile(this, projectFile, projectDirectoryPath+"/"+relativecharacterpath, true, "character assets/"+skeletonFile->fileName().section("/", -1, -1));
+                        projectFile->setCharacterFile(characterFile);
+                        characterFile->setSkeletonFile(skeletonFile);
+                        projectFile->addProjectToAnimData();
+                        tabs->addTab(projectUI, "Character Data");
+                        projectUI->setProject(projectFile);
+                        projectUI->loadData();
+                        projectUI->setDisabled(false);
+                        projectFile->behaviorFiles.append(new BehaviorFile(this, projectFile, characterFile, projectDirectoryPath+"/behaviors/Master.hkx"));
+                        projectFile->behaviorFiles.last()->generateDefaultCharacterData();
+                        behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.last()));
+                        tabs->addTab(behaviorGraphs.last(), projectFile->behaviorFiles.last()->fileName().section("/", -1, -1));
+                        if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.last()->getBehaviorGraph()))){
+                            FATAL_RUNTIME_ERROR("MainWindow::createNewProject(): The behavior graph was drawn incorrectly!");
+                        }
+                        tabs->setCurrentIndex(tabs->count() - 1);
+                    }else{
+                        closeAll();
+                        WARNING_MESSAGE(QString("MainWindow::createNewProject(): The chosen project name is taken! Choose another project name!"));
+                    }
+                }else{
+                    FATAL_RUNTIME_ERROR("MainWindow::createNewProject(): Invalid 'lastFileSelectedPath'!!!");
+                }
+            }else{
+                closeAll();
+                WARNING_MESSAGE(QString("MainWindow::createNewProject(): Invalid project name!"));
+            }
+        }
+    }
 }

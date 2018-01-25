@@ -624,11 +624,12 @@ void AnimationCacheUI::addCacheFile(){
     if (bsData){
         int index = cacheFiles->rowCount();
         bsData->animSetData.append(new AnimCacheAnimSetData(QStringList("FullBody.txt")));
+        bsData->fileNames.append(projectData->getProjectName()+"ProjectData\\"+projectData->getProjectName()+".txt");
         cacheFiles->setRowCount(index + 1);
         if (cacheFiles->item(index, 0)){
-            cacheFiles->item(index, 0)->setText("NEWProjectData\\NEWProject.txt");
+            cacheFiles->item(index, 0)->setText(bsData->fileNames.last());
         }else{
-            cacheFiles->setItem(index, 0, new TableWidgetItem("NEWProjectData\\NEWProject.txt"));
+            cacheFiles->setItem(index, 0, new TableWidgetItem(bsData->fileNames.last()));
             cacheFiles->setItem(index, 0, new TableWidgetItem("Double Click To Edit"));
         }
     }else{

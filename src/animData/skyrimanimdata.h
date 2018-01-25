@@ -18,6 +18,7 @@ public:
     //bool extract(const QString & projectname);
     bool write(const QString & filename);
     int getProjectIndex(const QString & projectname) const;
+    int addNewProject(const QString &projectname, const QStringList &projectfilerelativepaths);
     ProjectAnimData * getProjectAnimData(const QString & projectname) const;
     bool appendClipGenerator(const QString &projectname, SkyrimClipGeneratoData *animdata);
     bool removeClipGenerator(const QString & projectname, const QString & clipname);
@@ -32,6 +33,7 @@ public:
     void setCropEndAmountLocalTimeAnimData(const QString & projectname, const QString & clipGenName, qreal time);
     void appendClipTriggerToAnimData(const QString & projectname, const QString & clipGenName, const QString &eventname);
     void removeClipTriggerToAnimDataAt(const QString & projectname, const QString & clipGenName, int index);
+    bool isProjectNameTaken(const QString &name) const;
 private:
     QStringList projectNames;
     QVector <ProjectAnimData *> animData;

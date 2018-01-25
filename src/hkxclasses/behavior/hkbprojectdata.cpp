@@ -1,4 +1,5 @@
 #include "hkbprojectdata.h"
+#include "hkbprojectstringdata.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/projectfile.h"
 
@@ -12,12 +13,17 @@ QString hkbProjectData::classname = "hkbProjectData";
 
 QStringList hkbProjectData::EventMode = {"EVENT_MODE_IGNORE_FROM_GENERATOR"};
 
-hkbProjectData::hkbProjectData(HkxFile *parent, long ref)
-    : HkxObject(parent, ref)
+hkbProjectData::hkbProjectData(HkxFile *parent, long ref, hkbProjectStringData *stringdata)
+    : HkxObject(parent, ref),
+      worldUpWS(0, 0, 1, 0),
+      defaultEventMode(EventMode.first())
 {
     setType(HKB_PROJECT_DATA, TYPE_OTHER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
+    if (stringdata){
+        stringData = HkxSharedPtr(stringdata);
+    }
 }
 
 QString hkbProjectData::getClassname(){

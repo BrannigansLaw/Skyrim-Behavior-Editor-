@@ -175,6 +175,21 @@ ProjectAnimData *SkyrimAnimData::getProjectAnimData(const QString &projectname) 
     return nullptr;
 }
 
+int SkyrimAnimData::addNewProject(const QString &projectname, const QStringList &projectfilerelativepaths){
+    for (auto i = 0; i < projectNames.size(); i++){
+        if (!QString::compare(projectNames.at(i), projectname, Qt::CaseInsensitive)){
+            return -1;
+        }
+    }
+    projectNames.append(projectname);
+    animData.append(new ProjectAnimData());
+    for (auto i = 0; i < projectfilerelativepaths.size(); i++){
+        animData.last()->projectFiles.append(projectfilerelativepaths.at(i));
+        animData.last()->animationDataLines++;
+    }
+    return animData.size() - 1;
+}
+
 bool SkyrimAnimData::appendClipGenerator(const QString & projectname, SkyrimClipGeneratoData * animdata){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
@@ -278,5 +293,14 @@ void SkyrimAnimData::removeClipTriggerToAnimDataAt(const QString &projectname, c
         FATAL_RUNTIME_ERROR("SkyrimAnimData::removeClipTriggerToAnimDataAt(): Project was not found!");
     }
     animData.at(indexi)->removeClipTriggerToAnimDataAt(clipGenName, index);
+}
+
+bool SkyrimAnimData::isProjectNameTaken(const QString & name) const{
+    for (auto i = 0; i < projectNames.size(); i++){
+        if (projectNames.at(i) == name){
+            return true;
+        }
+    }
+    return false;
 }
 

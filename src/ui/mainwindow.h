@@ -67,6 +67,7 @@ private:
     QGridLayout *topLyt;
     QMenuBar *topMB;
     QMenu *fileM;
+    QAction *newProjectA;
     QAction *openPackedProjectA;
     QAction *openUnpackedProjectA;
     QAction *saveA;
@@ -103,8 +104,8 @@ private:
     std::condition_variable conditionVar;
     AnimationCacheUI *animationCacheUI;
     //QScrollArea *animationCacheSA;
-    QLineEdit *gameFolderLE;
 private slots:
+    void createNewProject();
     void openPackedProject();
     void openUnpackedProject();
     void openBehaviorFile(const QModelIndex & index);
@@ -114,8 +115,7 @@ private slots:
     void collapseBranches();
     void refocus();
     void setGameMode();
-    void viewPathToGameDirectory();
-    void setPathToGameDirectory(const QString & newpath);
+    void setPathToGameDirectory();
     void save();
     void viewAnimationCache();
     void saveProject();
@@ -138,7 +138,6 @@ private:
     bool exitProgram();
     bool findSkyrimDirectory();
     MainWindow::HKXCMD_RETURN hkxcmd(const QString &filepath, const QString &outputDirectory, const QString &flags = "-f SAVE_CONCISE");
-    //void drawIcons();
     int getBehaviorGraphIndex(const QString & filename);
     void readSettings();
     void writeSettings();

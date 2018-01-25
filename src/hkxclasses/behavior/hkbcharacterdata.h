@@ -57,7 +57,7 @@ public:
 
 private:
     struct hkCharacterControllerInfo{
-        hkCharacterControllerInfo(): capsuleHeight(0), capsuleRadius(0), collisionFilterInfo(0){}
+        hkCharacterControllerInfo(): capsuleHeight(1.7), capsuleRadius(0.4), collisionFilterInfo(1){}
         qreal capsuleHeight;
         qreal capsuleRadius;
         int collisionFilterInfo;

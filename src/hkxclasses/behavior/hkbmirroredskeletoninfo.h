@@ -9,6 +9,7 @@ class BehaviorFile;
 
 class hkbMirroredSkeletonInfo: public HkxObject
 {
+    friend class ProjectFile;
 public:
     hkbMirroredSkeletonInfo(HkxFile *parent, long ref = 0);
     virtual ~hkbMirroredSkeletonInfo();
