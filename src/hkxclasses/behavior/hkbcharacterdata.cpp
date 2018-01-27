@@ -121,7 +121,7 @@ void hkbCharacterData::addVariable(hkVariableType type){
         break;
     case VARIABLE_TYPE_POINTER:
         varInfo.type = "VARIABLE_TYPE_POINTER";
-        varData->variantVariableValues.append(HkxSharedPtr());
+        varData->variantVariableValues.append(HkxSharedPtr((HkxObject *)(static_cast<CharacterFile *>(getParentFile())->addNewBoneWeightArray())));
         break;
     case VARIABLE_TYPE_VECTOR4:
         varInfo.type = "VARIABLE_TYPE_VECTOR4";
@@ -147,7 +147,7 @@ void hkbCharacterData::addVariable(hkVariableType type){
             num++;
             if (num > 1){
                 if (num > 10){
-                    name = name+"_FUCKING RENAME YOUR VARIABLES PROPERLY!";
+                    name = name+"_FUCKING_RENAME_YOUR_VARIABLES_PROPERLY!";
                     break;
                 }
                 i = 0;
@@ -434,12 +434,6 @@ bool hkbCharacterData::write(HkxXMLWriter *writer){
         if (numBonesPerLod.size() > 0){
             writer->writeLine(writer->parameter, false);
         }
-        if (characterPropertyValues.data()){
-            refString = characterPropertyValues.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("characterPropertyValues"), refString);
         if (characterPropertyValues.data()){
             refString = characterPropertyValues.data()->getReferenceString();
         }else{

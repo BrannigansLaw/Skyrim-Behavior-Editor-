@@ -6,6 +6,7 @@
 class SkeletonFile;
 class hkbCharacterData;
 class ProjectFile;
+class hkbBoneWeightArray;
 
 class CharacterFile: public HkxFile
 {
@@ -42,6 +43,7 @@ protected:
     bool parse();
     bool link();
 private:
+    hkbBoneWeightArray * addNewBoneWeightArray();
     void write();
     void setSkeletonFile(SkeletonFile *skel);
     HkxSharedPtr * findCharacterData(long ref);

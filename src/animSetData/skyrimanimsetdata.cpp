@@ -76,12 +76,14 @@ bool SkyrimAnimSetData::write(const QString &filename){
 
 bool SkyrimAnimSetData::addNewProject(const QString &projectname){
     for (auto i = 0; i < projectNames.size(); i++){
-        if (!QString::compare(projectNames.at(i), projectname, Qt::CaseInsensitive)){
+        if (QString::compare(projectNames.at(i), projectname, Qt::CaseInsensitive) == 0){
             return false;
         }
     }
     projectNames.append(projectname);
-    projects.append(new AnimCacheProjectData());
+    QVector <AnimCacheAnimSetData *> vec;
+    vec.append(new AnimCacheAnimSetData());
+    projects.append(new AnimCacheProjectData(QStringList("FullBody.txt"), vec));
     return true;
 }
 

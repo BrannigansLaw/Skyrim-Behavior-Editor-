@@ -29,7 +29,7 @@ public:
 signals:
     void returnToParent();
 private slots:
-    void setName();
+    //void setName();
     void setDuration();
     void viewSelectedChild(int row, int column);
     void returnToWidget();
@@ -57,7 +57,7 @@ private:
     QGridLayout *topLyt;
     TableWidget *table;
     QPushButton *returnPB;
-    LineEdit *name;
+    //LineEdit *name;
     DoubleSpinBox *duration;
 };
 

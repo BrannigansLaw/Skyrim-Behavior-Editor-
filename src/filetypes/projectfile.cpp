@@ -32,6 +32,7 @@ ProjectFile::ProjectFile(MainWindow *window, const QString & name, bool autogene
         root->addVariant("hkbProjectData");
         root->setVariantAt(0, new hkbProjectData(this, 0, new hkbProjectStringData(this, 0, relativecharacterfilepath)));
         setRootObject(HkxSharedPtr(root));
+        setIsChanged(true);
     }
 }
 
@@ -216,16 +217,16 @@ bool ProjectFile::link(){
 
 void ProjectFile::addProjectToAnimData(){   //Unsafe...
     QStringList projectfiles;
-    projectfiles.append(behaviorFiles.first()->fileName().section("/", -1, -2));
-    projectfiles.append(character->fileName().section("/", -1, -2));
-    projectfiles.append(character->skeleton->fileName().section("/", -1, -2));
+    projectfiles.append(behaviorFiles.first()->fileName().section("/", -2, -1).replace("/", "\\"));
+    projectfiles.append(character->fileName().section("/", -2, -1).replace("/", "\\"));
+    projectfiles.append("character assets\\"+character->skeleton->fileName().section("/", -1, -1).replace("/", "\\"));
     auto index = skyrimAnimData->addNewProject(projectName+".txt", projectfiles);
     if (index == -1){
         WARNING_MESSAGE(QString("ProjectFile::addProjectToAnimData(): Project: "+projectName+".txt"+" already exists in the animation data!!!"));
     }else{
         projectIndex = index;
     }
-    if (skyrimAnimSetData->addNewProject(projectName+"ProjectData\\"+projectName+".txt")){
+    if (!skyrimAnimSetData->addNewProject(projectName+"ProjectData\\"+projectName+".txt")){
         WARNING_MESSAGE(QString("ProjectFile::addProjectToAnimData(): Project: "+projectName+".txt"+" already exists in the animation set data!!!"));
     }
 }
@@ -396,10 +397,13 @@ void ProjectFile::removeClipTriggerToAnimDataAt(const QString &clipGenName, int 
 void ProjectFile::write(){
     ulong ref = 1;
     getRootObject().data()->setReference(ref);
+    getRootObject().data()->setIsWritten(false);
     ref++;
     stringData.data()->setReference(ref);
+    stringData.data()->setIsWritten(false);
     ref++;
     projectData.data()->setReference(ref);
+    projectData.data()->setIsWritten(false);
     ref++;
     getWriter().setFile(this);
     getWriter().writeToXMLFile();

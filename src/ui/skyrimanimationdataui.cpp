@@ -39,7 +39,7 @@ SkyrimAnimationDataUI::SkyrimAnimationDataUI()
       translationUI(new AnimationTranslationUI()),
       table(new TableWidget(QColor(Qt::white))),
       returnPB(new QPushButton("Return")),
-      name(new LineEdit),
+      //name(new LineEdit),
       duration(new DoubleSpinBox)
 {
     table->setRowCount(BASE_NUMBER_OF_ROWS);
@@ -48,7 +48,7 @@ SkyrimAnimationDataUI::SkyrimAnimationDataUI()
     table->setItem(NAME_ROW, NAME_COLUMN, new TableWidgetItem("name"));
     table->setItem(NAME_ROW, TYPE_COLUMN, new TableWidgetItem("hkStringPtr", Qt::AlignCenter));
     table->setItem(NAME_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
-    table->setCellWidget(NAME_ROW, VALUE_COLUMN, name);
+    table->setItem(NAME_ROW, VALUE_COLUMN, new TableWidgetItem("", Qt::AlignCenter));
     table->setItem(DURATION_ROW, NAME_COLUMN, new TableWidgetItem("duration"));
     table->setItem(DURATION_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
     table->setItem(DURATION_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
@@ -73,7 +73,7 @@ SkyrimAnimationDataUI::SkyrimAnimationDataUI()
 
 void SkyrimAnimationDataUI::connectSignals(){
     connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
+    //connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
     connect(duration, SIGNAL(editingFinished()), this, SLOT(setDuration()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
     connect(translationUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
@@ -82,7 +82,7 @@ void SkyrimAnimationDataUI::connectSignals(){
 
 void SkyrimAnimationDataUI::disconnectSignals(){
     disconnect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
+    //disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
     disconnect(duration, SIGNAL(editingFinished()), this, SLOT(setDuration()));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
     disconnect(translationUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
@@ -102,10 +102,10 @@ void SkyrimAnimationDataUI::loadData(SkyrimAnimationMotionData *data){
     connectSignals();
 }
 
-void SkyrimAnimationDataUI::setName()
+/*void SkyrimAnimationDataUI::setName()
 {
     //
-}
+}*/
 
 void SkyrimAnimationDataUI::loadDynamicTableRows(){
     if (bsData){

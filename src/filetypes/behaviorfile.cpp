@@ -138,6 +138,7 @@ void BehaviorFile::generateNewBehavior(){
     root->namedVariants.append(hkRootLevelContainer::hkRootLevelContainerNamedVariant());
     root->namedVariants.last().variant = behaviorGraph;
     setRootObject(HkxSharedPtr(root));
+    setIsChanged(true);
 }
 
 void BehaviorFile::generateDefaultCharacterData(){

@@ -1,6 +1,8 @@
 #include "projectanimdata.h"
 #include "src/utility.h"
 
+#define MIN_NUM_LINES 3
+
 bool ProjectAnimData::chopLine(QFile * file, QByteArray & line, uint & linecount){
     if (file){
         if (!file->atEnd()){
@@ -14,7 +16,7 @@ bool ProjectAnimData::chopLine(QFile * file, QByteArray & line, uint & linecount
 }
 
 ProjectAnimData::ProjectAnimData()
-    : animationDataLines(0), animationMotionDataLines(0)
+    : animationDataLines(MIN_NUM_LINES), animationMotionDataLines(0)
 {
     //
 }

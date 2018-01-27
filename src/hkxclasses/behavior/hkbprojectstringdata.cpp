@@ -173,10 +173,10 @@ bool hkbProjectStringData::write(HkxXMLWriter *writer){
         if (eventNames.size() > 0){
             writer->writeLine(writer->parameter, false);
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("animationPath"), animationPath);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("behaviorPath"), behaviorPath);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("characterPath"), characterPath);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fullPathToSource"), fullPathToSource);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("animationPath"), animationPath, true);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("behaviorPath"), behaviorPath, true);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("characterPath"), characterPath, true);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fullPathToSource"), fullPathToSource, true);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");

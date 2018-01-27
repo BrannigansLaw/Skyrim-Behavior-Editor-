@@ -237,7 +237,11 @@ void MainWindow::expandBranches(){
         if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
             behaviorGraphs.at(index)->expandAllBranches();
         }else{
-            FATAL_RUNTIME_ERROR("MainWindow::expandBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
+            if (tabs->count() < 2){
+                WARNING_MESSAGE("No behavior file is currently being viewed!!!")
+            }else{
+                FATAL_RUNTIME_ERROR("MainWindow::expandBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
+            }
         }
     }else{
         writeToLog("MainWindow::expandBranches(): No project opened!");
@@ -251,7 +255,11 @@ void MainWindow::collapseBranches(){
             behaviorGraphs.at(index)->contractAllBranches();
             behaviorGraphs.at(index)->selectRoot();
         }else{
-            FATAL_RUNTIME_ERROR("MainWindow: collapseBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
+            if (tabs->count() < 2){
+                WARNING_MESSAGE("No behavior file is currently being viewed!!!")
+            }else{
+                FATAL_RUNTIME_ERROR("MainWindow::collapseBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
+            }
         }
     }else{
         writeToLog("MainWindow::collapseBranches(): No project opened!");
@@ -267,7 +275,11 @@ void MainWindow::refocus(){
                     writeToLog("MainWindow::refocus(): No behavior graph item is currently selected!");
                 }
             }else{
-                FATAL_RUNTIME_ERROR("MainWindow::refocus() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
+                if (tabs->count() < 2){
+                    WARNING_MESSAGE("No behavior file is currently being viewed!!!")
+                }else{
+                    FATAL_RUNTIME_ERROR("MainWindow::refocus() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
+                }
             }
         }else{
             writeToLog("MainWindow::refocus(): No behavior graph is currently viewed!");
@@ -1029,7 +1041,7 @@ void MainWindow::createNewProject(){
         QString filename = QFileDialog::getOpenFileName(this, tr("Select hkx skeleton file..."), QDir::currentPath(), tr("hkx Files (*.hkx)"));
         if (filename != ""){
             objectDataWid->changeCurrentDataWidget(nullptr);
-            lastFileSelected = filename;    //Set these to project file!!!
+            lastFileSelected = filename;
             lastFileSelectedPath = filename.section("/", 0, -2);
             skeletonFile = new SkeletonFile(this, filename);
             if (!skeletonFile->parse()){
@@ -1058,7 +1070,7 @@ void MainWindow::createNewProject(){
                     if (!projectDirectory.rename(lastFileSelected, projectDirectoryPath+"/character assets/"+skeletonFile->fileName().section("/", -1, -1))){
                         FATAL_RUNTIME_ERROR("MainWindow::createNewProject(): Attempt to move skeleton file failed!!!");
                     }
-                    projectFile = new ProjectFile(this, projectDirectoryPath+"/"+projectname+".hkx", true, relativecharacterpath);
+                    projectFile = new ProjectFile(this, projectDirectoryPath+"/"+projectname+".hkx", true, "characters\\"+projectname+"character.hkx");
                     {
                         std::thread thread(&ProjectFile::readAnimationSetData, projectFile, lastFileSelectedPath+"/animationsetdatasinglefile.txt");
                         if (!projectFile->readAnimationData(lastFileSelectedPath+"/animationdatasinglefile.txt", false)){
@@ -1067,23 +1079,25 @@ void MainWindow::createNewProject(){
                         thread.join();
                     }
                     if (!projectFile->isProjectNameTaken()){
-                        //link files here...
-                        characterFile = new CharacterFile(this, projectFile, projectDirectoryPath+"/"+relativecharacterpath, true, "character assets/"+skeletonFile->fileName().section("/", -1, -1));
+                        lastFileSelected = projectFile->fileName();
+                        lastFileSelectedPath = projectFile->fileName().section("/", 0, -2);
+                        characterFile = new CharacterFile(this, projectFile, projectDirectoryPath+"/"+relativecharacterpath, true, "character assets\\"+skeletonFile->fileName().section("/", -1, -1));
                         projectFile->setCharacterFile(characterFile);
                         characterFile->setSkeletonFile(skeletonFile);
+                        projectFile->behaviorFiles.append(new BehaviorFile(this, projectFile, characterFile, projectDirectoryPath+"/behaviors/Master.hkx"));
+                        projectFile->behaviorFiles.last()->generateDefaultCharacterData();
                         projectFile->addProjectToAnimData();
-                        tabs->addTab(projectUI, "Character Data");
                         projectUI->setProject(projectFile);
                         projectUI->loadData();
                         projectUI->setDisabled(false);
-                        projectFile->behaviorFiles.append(new BehaviorFile(this, projectFile, characterFile, projectDirectoryPath+"/behaviors/Master.hkx"));
-                        projectFile->behaviorFiles.last()->generateDefaultCharacterData();
                         behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.last()));
+                        tabs->addTab(projectUI, "Character Data");
                         tabs->addTab(behaviorGraphs.last(), projectFile->behaviorFiles.last()->fileName().section("/", -1, -1));
                         if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.last()->getBehaviorGraph()))){
                             FATAL_RUNTIME_ERROR("MainWindow::createNewProject(): The behavior graph was drawn incorrectly!");
                         }
                         tabs->setCurrentIndex(tabs->count() - 1);
+                        saveProject();
                     }else{
                         closeAll();
                         WARNING_MESSAGE(QString("MainWindow::createNewProject(): The chosen project name is taken! Choose another project name!"));

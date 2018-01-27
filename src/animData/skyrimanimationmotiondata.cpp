@@ -134,21 +134,21 @@ bool SkyrimAnimationMotionData::write(QFile * file, QTextStream & out) const{
         return false;
     }
     out << QString::number(animationIndex) << "\n";
-    out << QString::number(duration) << "\n";
+    out << QString::number(duration, char('f'), 6) << "\n";
     out << QString::number(translations.size()) << "\n";
     for (int i = 0; i < translations.size(); i++){
-        out << QString::number(translations.at(i).localTime);
-        out << " "+QString::number(translations.at(i).x);
-        out << " "+QString::number(translations.at(i).y);
-        out << " "+QString::number(translations.at(i).z) << "\n";
+        out << QString::number(translations.at(i).localTime, char('f'), 6);
+        out << " "+QString::number(translations.at(i).x, char('f'), 6);
+        out << " "+QString::number(translations.at(i).y, char('f'), 6);
+        out << " "+QString::number(translations.at(i).z, char('f'), 6) << "\n";
     }
     out << QString::number(rotations.size()) << "\n";
     for (int i = 0; i < rotations.size(); i++){
-        out << QString::number(rotations.at(i).localTime);
-        out << " "+QString::number(rotations.at(i).x);
-        out << " "+QString::number(rotations.at(i).y);
-        out << " "+QString::number(rotations.at(i).z);
-        out << " "+QString::number(rotations.at(i).w) << "\n";
+        out << QString::number(rotations.at(i).localTime, char('f'), 6);
+        out << " "+QString::number(rotations.at(i).x, char('f'), 6);
+        out << " "+QString::number(rotations.at(i).y, char('f'), 6);
+        out << " "+QString::number(rotations.at(i).z, char('f'), 6);
+        out << " "+QString::number(rotations.at(i).w, char('f'), 6) << "\n";
     }
     out << "\n";
     return true;

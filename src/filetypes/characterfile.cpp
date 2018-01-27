@@ -36,6 +36,7 @@ CharacterFile::CharacterFile(MainWindow *window, ProjectFile *projectfile, const
         root->addVariant("hkbCharacterData");
         root->setVariantAt(0, characterdata);
         setRootObject(HkxSharedPtr(root));
+        setIsChanged(true);
     }
 }
 
@@ -303,13 +304,36 @@ bool CharacterFile::link(){
     return true;
 }
 
+hkbBoneWeightArray *CharacterFile::addNewBoneWeightArray(){
+    return new hkbBoneWeightArray(this, 0, skeleton->getNumberOfBones());
+}
 
 void CharacterFile::write(){
     ulong ref = 1;
     getRootObject().data()->setReference(ref);
+    getRootObject().data()->setIsWritten(false);
     ref++;
     characterData.data()->setReference(ref);
+    characterData.data()->setIsWritten(false);
     ref++;
+    stringData.data()->setReference(ref);
+    stringData.data()->setIsWritten(false);
+    ref++;
+    if (mirroredSkeletonInfo.data()){
+        mirroredSkeletonInfo.data()->setReference(ref);
+        mirroredSkeletonInfo.data()->setIsWritten(false);
+        ref++;
+    }
+    if (handIkDriverInfo.data()){
+        handIkDriverInfo.data()->setReference(ref);
+        handIkDriverInfo.data()->setIsWritten(false);
+        ref++;
+    }
+    if (footIkDriverInfo.data()){
+        footIkDriverInfo.data()->setReference(ref);
+        footIkDriverInfo.data()->setIsWritten(false);
+        ref++;
+    }
     getWriter().setFile(this);
     getWriter().writeToXMLFile();
 }

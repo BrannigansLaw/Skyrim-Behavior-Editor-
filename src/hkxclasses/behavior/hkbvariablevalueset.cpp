@@ -116,8 +116,8 @@ bool hkbVariableValueSet::write(HkxXMLWriter *writer){
                 refs = refs + "null"+" ";
             }
         }
-        writer->writeLine(refs);
         if (variantVariableValues.size() > 0){
+            writer->writeLine(refs);
             writer->writeLine(writer->parameter, false);
         }
         writer->writeLine(writer->object, false);
