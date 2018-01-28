@@ -62,7 +62,7 @@ TransitionsUI::TransitionsUI()
       exitTimeTI(new DoubleSpinBox),
       enterTimeII(new DoubleSpinBox),
       exitTimeII(new DoubleSpinBox),
-      transition(new CheckButtonCombo("Click to edit")),
+      transition(new CheckButtonCombo("Edit")),
       condition(new ConditionLineEdit),
       toStateId(new ComboBox),
       fromNestedStateId(new ComboBox),

@@ -124,7 +124,7 @@ void FootIkDriverInfoUI::loadData(HkxObject *data){
                 table->setRowCount(table->rowCount() + 1);
                 table->setItem(k, 0, new QTableWidgetItem("Leg "+QString::number(i)));
                 table->setItem(k, 1, new QTableWidgetItem("hkbFootIkDriverInfoLeg"));
-                table->setItem(k, 2, new QTableWidgetItem("Click to Edit"));
+                table->setItem(k, 2, new QTableWidgetItem("Edit"));
             }else{
                 table->setRowHidden(k, false);
                 table->item(k, 0)->setText("Leg "+QString::number(i));
@@ -223,7 +223,7 @@ void FootIkDriverInfoUI::addLeg(){
             table->setRowCount(table->rowCount() + 1);
             table->setItem(result, 0, new QTableWidgetItem("Leg "+QString::number(bsData->legs.size() - 1)));
             table->setItem(result, 1, new QTableWidgetItem("hkbFootIkDriverInfoLeg"));
-            table->setItem(result, 2, new QTableWidgetItem("Click to Edit"));
+            table->setItem(result, 2, new QTableWidgetItem("Edit"));
         }else{
             result--;
             table->setRowHidden(result, false);

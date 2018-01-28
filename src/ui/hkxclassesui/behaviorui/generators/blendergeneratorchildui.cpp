@@ -44,7 +44,7 @@ BlenderGeneratorChildUI::BlenderGeneratorChildUI()
       groupBox(new QGroupBox("hkbBlenderGeneratorChild")),
       returnPB(new QPushButton("Return")),
       table(new TableWidget(QColor(Qt::white))),
-      boneWeights(new CheckButtonCombo("Click to edit")),
+      boneWeights(new CheckButtonCombo("Edit")),
       boneWeightArrayUI(new BoneWeightArrayUI),
       weight(new DoubleSpinBox),
       worldFromModelWeight(new DoubleSpinBox)

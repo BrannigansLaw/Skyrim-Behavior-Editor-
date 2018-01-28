@@ -48,7 +48,7 @@ KeyframeBonesModifierUI::KeyframeBonesModifierUI()
       table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
       enable(new CheckBox),
-      keyframedBonesList(new CheckButtonCombo("Click to edit"))
+      keyframedBonesList(new CheckButtonCombo("Edit"))
 {
     groupBox->setTitle("hkbKeyframeBonesModifier");
     table->setRowCount(BASE_NUMBER_OF_ROWS);
@@ -142,7 +142,7 @@ void KeyframeBonesModifierUI::loadData(HkxObject *data){
             enable->setChecked(bsData->enable);
             if (bsData->keyframedBonesList.data()){
                 keyframedBonesList->setChecked(true);
-                keyframedBonesList->setText("Click to Edit");
+                keyframedBonesList->setText("Edit");
             }else{
                 keyframedBonesList->setChecked(false);
                 keyframedBonesList->setText("nullptr");

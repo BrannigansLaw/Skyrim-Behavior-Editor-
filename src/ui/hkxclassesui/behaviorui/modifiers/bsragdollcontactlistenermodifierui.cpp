@@ -44,7 +44,7 @@ BSRagdollContactListenerModifierUI::BSRagdollContactListenerModifierUI()
       name(new LineEdit),
       enable(new CheckBox),
       contactEventPayload(new QLineEdit),
-      bones(new CheckButtonCombo("Click to edit"))
+      bones(new CheckButtonCombo("Edit"))
 {
     groupBox->setTitle("BSRagdollContactListenerModifierUI");
     table->setRowCount(BASE_NUMBER_OF_ROWS);
@@ -138,7 +138,7 @@ void BSRagdollContactListenerModifierUI::loadData(HkxObject *data){
             }
             if (bsData->bones.data()){
                 bones->setChecked(true);
-                bones->setText("Click to Edit");
+                bones->setText("Edit");
             }else{
                 bones->setChecked(false);
                 bones->setText("nullptr");
@@ -223,7 +223,7 @@ void BSRagdollContactListenerModifierUI::toggleBones(bool enable){
             hkbBoneIndexArray *indices = new hkbBoneIndexArray(bsData->getParentFile());
             bsData->getParentFile()->addObjectToFile(indices, -1);
             bsData->bones = HkxSharedPtr(indices);
-            bones->setText("Click to Edit");
+            bones->setText("Edit");
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{

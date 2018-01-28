@@ -90,7 +90,7 @@ void AnimationsUI::loadData(HkxObject *data, ProjectAnimData *animdata){
             }else{
                 table->setRowCount(row + 1);
                 table->setItem(row, 0, new QTableWidgetItem(loadedData->animationNames.at(i)));
-                table->setItem(row, 1, new QTableWidgetItem("Click To Edit"));
+                table->setItem(row, 1, new QTableWidgetItem("Edit"));
             }
         }
         for (int j = loadedData->animationNames.size(); j < table->rowCount(); j++){
@@ -114,7 +114,7 @@ void AnimationsUI::addAnimation(){
             int row = table->rowCount();
             table->setRowCount(row + 1);
             table->setItem(row, 0, new QTableWidgetItem(loadedData->animationNames.last()));
-            table->setItem(row, 1, new QTableWidgetItem("Click To Edit"));
+            table->setItem(row, 1, new QTableWidgetItem("Edit"));
             if (stackLyt->currentIndex() == ANIMATION_WIDGET){
                 stackLyt->setCurrentIndex(TABLE_WIDGET);
             }

@@ -110,7 +110,7 @@ void EventsUI::loadData(HkxObject *data){
                 table->setRowCount(row + 1);
                 table->setItem(row, 0, new QTableWidgetItem(events->eventNames.at(i)));
                 table->setItem(row, 1, new QTableWidgetItem("hkEvent"));
-                table->setItem(row, 2, new QTableWidgetItem("Click To Edit"));
+                table->setItem(row, 2, new QTableWidgetItem("Edit"));
             }
         }
         for (int j = events->eventNames.size(); j < table->rowCount(); j++){
@@ -133,7 +133,7 @@ void EventsUI::addEvent(){
         table->setRowCount(row + 1);
         table->setItem(row, 0, new QTableWidgetItem(events->eventNames.last()));
         table->setItem(row, 1, new QTableWidgetItem("hkEvent"));
-        table->setItem(row, 2, new QTableWidgetItem("Click To Edit"));
+        table->setItem(row, 2, new QTableWidgetItem("Edit"));
         if (stackLyt->currentIndex() == EVENT_WIDGET){
             stackLyt->setCurrentIndex(TABLE_WIDGET);
         }

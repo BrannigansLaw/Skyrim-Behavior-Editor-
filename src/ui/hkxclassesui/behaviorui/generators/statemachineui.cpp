@@ -72,7 +72,7 @@ StateMachineUI::StateMachineUI()
       bsData(nullptr),
       groupBox(new QGroupBox("hkbStateMachine")),
       topLyt(new QGridLayout),
-      eventToSendWhenStateOrTransitionChanges(new CheckButtonCombo("Click to edit")),
+      eventToSendWhenStateOrTransitionChanges(new CheckButtonCombo("Edit")),
       eventUI(new EventUI),
       stateUI(new StateUI),
       transitionUI(new TransitionsUI),

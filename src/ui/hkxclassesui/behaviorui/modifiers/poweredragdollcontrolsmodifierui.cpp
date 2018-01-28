@@ -57,12 +57,12 @@ PoweredRagdollControlsModifierUI::PoweredRagdollControlsModifierUI()
       damping(new DoubleSpinBox),
       proportionalRecoveryVelocity(new DoubleSpinBox),
       constantRecoveryVelocity(new DoubleSpinBox),
-      bones(new CheckButtonCombo("Click to edit")),
+      bones(new CheckButtonCombo("Edit")),
       poseMatchingBone0(new ComboBox),
       poseMatchingBone1(new ComboBox),
       poseMatchingBone2(new ComboBox),
       mode(new ComboBox),
-      boneWeights(new CheckButtonCombo("Click to edit"))
+      boneWeights(new CheckButtonCombo("Edit"))
 {
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
@@ -202,7 +202,7 @@ void PoweredRagdollControlsModifierUI::loadData(HkxObject *data){
             constantRecoveryVelocity->setValue(bsData->constantRecoveryVelocity);
             if (bsData->bones.data()){
                 bones->setChecked(true);
-                bones->setText("Click to Edit");
+                bones->setText("Edit");
             }else{
                 bones->setChecked(false);
                 bones->setText("nullptr");
@@ -228,7 +228,7 @@ void PoweredRagdollControlsModifierUI::loadData(HkxObject *data){
             mode->setCurrentIndex(bsData->Mode.indexOf(bsData->mode));
             if (bsData->boneWeights.data()){
                 boneWeights->setChecked(true);
-                boneWeights->setText("Click to Edit");
+                boneWeights->setText("Edit");
             }else{
                 boneWeights->setChecked(false);
                 boneWeights->setText("nullptr");
@@ -412,7 +412,7 @@ void PoweredRagdollControlsModifierUI::toggleBoneWeights(bool enable){
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
         }else if (enable && !bsData->boneWeights.data()){
             bsData->boneWeights = HkxSharedPtr(new hkbBoneWeightArray(bsData->getParentFile(), -1, static_cast<BehaviorFile *>(bsData->getParentFile())->getNumberOfBones()));
-            boneWeights->setText("Click to Edit");
+            boneWeights->setText("Edit");
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{

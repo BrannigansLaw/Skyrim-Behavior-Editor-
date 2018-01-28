@@ -65,7 +65,7 @@ RigidBodyRagdollControlsModifierUI::RigidBodyRagdollControlsModifierUI()
       snapMaxLinearDistance(new DoubleSpinBox),
       snapMaxAngularDistance(new DoubleSpinBox),
       durationToBlend(new DoubleSpinBox),
-      bones(new CheckButtonCombo("Click to edit"))
+      bones(new CheckButtonCombo("Edit"))
 {
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
@@ -225,7 +225,7 @@ void RigidBodyRagdollControlsModifierUI::loadData(HkxObject *data){
             durationToBlend->setValue(bsData->durationToBlend);
             if (bsData->bones.data()){
                 bones->setChecked(true);
-                bones->setText("Click to Edit");
+                bones->setText("Edit");
             }else{
                 bones->setChecked(false);
                 bones->setText("nullptr");
@@ -445,7 +445,7 @@ void RigidBodyRagdollControlsModifierUI::toggleBones(bool enable){
             hkbBoneIndexArray *indices = new hkbBoneIndexArray(bsData->getParentFile());
             bsData->getParentFile()->addObjectToFile(indices, -1);
             bsData->bones = HkxSharedPtr(indices);
-            bones->setText("Click to Edit");
+            bones->setText("Edit");
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{

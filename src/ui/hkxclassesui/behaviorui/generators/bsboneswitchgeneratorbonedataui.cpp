@@ -42,7 +42,7 @@ BSBoneSwitchGeneratorBoneDataUI::BSBoneSwitchGeneratorBoneDataUI()
       groupBox(new QGroupBox("BSBoneSwitchGeneratorBoneData")),
       returnPB(new QPushButton("Return")),
       table(new TableWidget(QColor(Qt::white))),
-      spBoneWeight(new CheckButtonCombo("Click to edit")),
+      spBoneWeight(new CheckButtonCombo("Edit")),
       boneWeightArrayUI(new BoneWeightArrayUI)
 {
     table->setRowCount(BASE_NUMBER_OF_ROWS);

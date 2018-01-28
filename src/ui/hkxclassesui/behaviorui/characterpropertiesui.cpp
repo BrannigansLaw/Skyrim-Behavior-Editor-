@@ -29,12 +29,12 @@
 #include <QStackedLayout>
 
 QStringList CharacterPropertiesUI::types = {
-    "VARIABLE_TYPE_BOOL",
-    "VARIABLE_TYPE_INT32",
-    "VARIABLE_TYPE_REAL",
-    "VARIABLE_TYPE_POINTER",
-    "VARIABLE_TYPE_VECTOR4",
-    "VARIABLE_TYPE_QUATERNION"
+    "BOOL",
+    "INT32",
+    "REAL",
+    "POINTER",
+    "VECTOR4",
+    "QUATERNION"
 };
 
 QStringList CharacterPropertiesUI::headerLabels = {
@@ -140,7 +140,7 @@ void CharacterPropertiesUI::setVariableValue(int type){
         loadedData->setWordVariableValueAt(index, intSB->value());
     }else if (type == 2){
         loadedData->setWordVariableValueAt(index, doubleSB->value());
-    }/*else if (type == "VARIABLE_TYPE_POINTER"){
+    }/*else if (type == "POINTER"){
         loadedData->setWordVariableValueAt(index, intSB->value());
     }*/else if (type == 3){
         loadedData->setQuadVariableValueAt(index, quadWidget->value());
@@ -156,7 +156,7 @@ void CharacterPropertiesUI::renameSelectedVariable(int type){
         newName = intName->text();
     }else if (type == 2){
         newName = doubleName->text();
-    }/*else if (type == "VARIABLE_TYPE_POINTER"){
+    }/*else if (type == "POINTER"){
         loadedData->setWordVariableValueAt(index, intSB->value());
     }*/else if (type == 3){
         newName = quadName->text();
@@ -250,19 +250,19 @@ void CharacterPropertiesUI::hideOtherVariables(int indexToView){
 void CharacterPropertiesUI::viewVariable(int row, int column){
     if (column == 2 && loadedData){
         QString type = table->item(row, 1)->text();
-        if (type == "VARIABLE_TYPE_BOOL"){
+        if (type == "BOOL"){
             loadVariable(boolCB);
-        }else if (type == "VARIABLE_TYPE_INT32"){
+        }else if (type == "INT32"){
             loadVariable(intSB);
-        }else if (type == "VARIABLE_TYPE_REAL"){
+        }else if (type == "REAL"){
             loadVariable(doubleSB);
-        }else if (type == "VARIABLE_TYPE_POINTER"){
+        }else if (type == "POINTER"){
             boneWeightArrayWidget->loadData(loadedData->getVariantVariable(row));
             stackLyt->setCurrentIndex(BONE_WEIGHTS_WIDGET);
             return;
-        }else if (type == "VARIABLE_TYPE_VECTOR4"){
+        }else if (type == "VECTOR4"){
             loadVariable(quadWidget);
-        }else if (type == "VARIABLE_TYPE_QUATERNION"){
+        }else if (type == "QUATERNION"){
             loadVariable(quadWidget);
         }else{
             return;
@@ -280,7 +280,7 @@ void CharacterPropertiesUI::addVariableToTable(const QString & name, const QStri
     table->setRowCount(row + 1);
     table->setItem(row, 0, new QTableWidgetItem(name));
     table->setItem(row, 1, new QTableWidgetItem(type));
-    table->setItem(row, 2, new QTableWidgetItem("Click To Edit"));
+    table->setItem(row, 2, new QTableWidgetItem("Edit"));
     if (stackLyt->currentIndex() == VARIABLE_WIDGET){
         stackLyt->setCurrentIndex(TABLE_WIDGET);
     }
@@ -290,6 +290,7 @@ void CharacterPropertiesUI::addVariableToTable(const QString & name, const QStri
 
 void CharacterPropertiesUI::loadData(HkxObject *data){
     if (data && data->getSignature() == HKB_CHARACTER_DATA){
+        table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         loadedData = static_cast<hkbCharacterData *>(data);
         int row;
         hkbCharacterStringData *varNames = static_cast<hkbCharacterStringData *>(loadedData->stringData.data());
@@ -305,13 +306,14 @@ void CharacterPropertiesUI::loadData(HkxObject *data){
             }else{
                 table->setRowCount(row + 1);
                 table->setItem(row, 0, new QTableWidgetItem(varNames->characterPropertyNames.at(i)));
-                table->setItem(row, 1, new QTableWidgetItem(loadedData->characterPropertyInfos.at(i).type));
-                table->setItem(row, 2, new QTableWidgetItem("Click To Edit"));
+                table->setItem(row, 1, new QTableWidgetItem(loadedData->characterPropertyInfos.at(i).type.section("_", -1, -1)));
+                table->setItem(row, 2, new QTableWidgetItem("Edit"));
             }
         }
         for (int j = varNames->characterPropertyNames.size(); j < table->rowCount(); j++){
             table->setRowHidden(j, true);
         }
+        table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     }
 }
 
@@ -323,32 +325,32 @@ void CharacterPropertiesUI::addVariable(){
     case VARIABLE_TYPE_BOOL:
         varType = hkVariableType::VARIABLE_TYPE_BOOL;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->characterPropertyNames.last(), "VARIABLE_TYPE_BOOL");
+        addVariableToTable(vars->characterPropertyNames.last(), "BOOL");
         break;
     case VARIABLE_TYPE_INT32:
         varType = hkVariableType::VARIABLE_TYPE_INT32;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->characterPropertyNames.last(), "VARIABLE_TYPE_INT32");
+        addVariableToTable(vars->characterPropertyNames.last(), "INT32");
         break;
     case VARIABLE_TYPE_REAL:
         varType = hkVariableType::VARIABLE_TYPE_REAL;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->characterPropertyNames.last(), "VARIABLE_TYPE_REAL");
+        addVariableToTable(vars->characterPropertyNames.last(), "REAL");
         break;
     case VARIABLE_TYPE_POINTER:
         varType = hkVariableType::VARIABLE_TYPE_POINTER;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->characterPropertyNames.last(), "VARIABLE_TYPE_POINTER");
+        addVariableToTable(vars->characterPropertyNames.last(), "POINTER");
         break;
     case VARIABLE_TYPE_VECTOR4:
         varType = hkVariableType::VARIABLE_TYPE_VECTOR4;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->characterPropertyNames.last(), "VARIABLE_TYPE_VECTOR4");
+        addVariableToTable(vars->characterPropertyNames.last(), "VECTOR4");
         break;
     case VARIABLE_TYPE_QUATERNION:
         varType = hkVariableType::VARIABLE_TYPE_QUATERNION;
         loadedData->addVariable(varType);
-        addVariableToTable(vars->characterPropertyNames.last(), "VARIABLE_TYPE_QUATERNION");
+        addVariableToTable(vars->characterPropertyNames.last(), "QUATERNION");
         break;
     default:
         return;

@@ -48,8 +48,8 @@ BSCyclicBlendTransitionGeneratorUI::BSCyclicBlendTransitionGeneratorUI()
       topLyt(new QGridLayout),
       table(new TableWidget(QColor(Qt::white))),
       name(new LineEdit),
-      eventToFreezeBlendValue(new CheckButtonCombo("Click to edit")),
-      eventToCrossBlend(new CheckButtonCombo("Click to edit")),
+      eventToFreezeBlendValue(new CheckButtonCombo("Edit")),
+      eventToCrossBlend(new CheckButtonCombo("Edit")),
       fBlendParameter(new DoubleSpinBox),
       fTransitionDuration(new DoubleSpinBox),
       eBlendCurve(new ComboBox)

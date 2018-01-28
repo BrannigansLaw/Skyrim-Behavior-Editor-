@@ -68,7 +68,7 @@ void HandIkDriverInfoUI::loadData(HkxObject *data){
                 table->setRowCount(table->rowCount() + 1);
                 table->setItem(k, 0, new QTableWidgetItem("Hand "+QString::number(i)));
                 table->setItem(k, 1, new QTableWidgetItem("hkbHandIkDriverInfoHand"));
-                table->setItem(k, 2, new QTableWidgetItem("Click to Edit"));
+                table->setItem(k, 2, new QTableWidgetItem("Edit"));
             }else{
                 table->setRowHidden(k, false);
                 table->item(k, 0)->setText("Hand "+QString::number(i));
@@ -97,7 +97,7 @@ void HandIkDriverInfoUI::addHand(){
             table->setRowCount(table->rowCount() + 1);
             table->setItem(result, 0, new QTableWidgetItem("Hand "+QString::number(bsData->hands.size() - 1)));
             table->setItem(result, 1, new QTableWidgetItem("hkbHandIkDriverInfoHand"));
-            table->setItem(result, 2, new QTableWidgetItem("Click to Edit"));
+            table->setItem(result, 2, new QTableWidgetItem("Edit"));
         }else{
             result--;
             table->setRowHidden(result, false);
