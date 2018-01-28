@@ -67,6 +67,7 @@ protected:
     bool isExpanded;
     qreal yCoordinate;
     GraphicsPathItem *path;
+    QFont itemFont;
     //QString name;
     //TreeGraphicsItem *parent;
 };

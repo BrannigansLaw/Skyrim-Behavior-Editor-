@@ -19,7 +19,8 @@ TreeGraphicsItem::TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *ob
       itemData(obj),
       isExpanded(true),
       yCoordinate(0),
-      path(new GraphicsPathItem)
+      path(new GraphicsPathItem),
+      itemFont(QFont("Times", 16, QFont::Bold))
 {
     int index = -1;
     QList <QGraphicsItem *> children;
@@ -79,6 +80,7 @@ void TreeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->setPen(Qt::black);
     painter->setBrush(brushColor);
     painter->drawRect(boundingRect());
+    painter->setFont(itemFont);
     painter->drawText(boundingRect(), itemData->getName());
     if (!childItems().isEmpty()){
         if (!isExpanded){
