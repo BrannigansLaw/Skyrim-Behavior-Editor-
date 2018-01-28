@@ -19,7 +19,7 @@ TreeGraphicsItem::TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *ob
       itemData(obj),
       isExpanded(true),
       yCoordinate(0),
-      path(new QGraphicsPathItem)
+      path(new GraphicsPathItem)
 {
     int index = -1;
     QList <QGraphicsItem *> children;
@@ -468,7 +468,14 @@ void TreeGraphicsItem::setIsExpanded(bool value){
 void TreeGraphicsItem::setPathToParent(){
     if (parentItem()){
         QPainterPath newpath(scenePos());
-        newpath.lineTo(QPointF(scenePos().x() - boundingRect().width(), scenePos().y() - yCoordinate + boundingRect().height()));
+        DataIconManager *ptr = static_cast<TreeGraphicsItem *>(parentItem())->itemData;
+        if (ptr->getSignature() != HKB_BLENDER_GENERATOR && ptr->getSignature() != BS_BONE_SWITCH_GENERATOR && ptr->getSignature() != HKB_POSE_MATCHING_GENERATOR){
+            newpath.lineTo(QPointF(scenePos().x() - boundingRect().width(), scenePos().y() - yCoordinate + boundingRect().height()));
+        }else{
+            newpath.cubicTo(QPointF(scenePos().x() - boundingRect().width()/2, scenePos().y() - yCoordinate),
+                            QPointF(scenePos().x() - boundingRect().width()/2, scenePos().y() + yCoordinate),
+                            QPointF(scenePos().x() - boundingRect().width(), scenePos().y() - yCoordinate + boundingRect().height()));
+        }
         path->setPath(newpath);
     }
 }

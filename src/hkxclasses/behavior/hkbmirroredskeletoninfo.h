@@ -11,7 +11,7 @@ class hkbMirroredSkeletonInfo: public HkxObject
 {
     friend class ProjectFile;
 public:
-    hkbMirroredSkeletonInfo(HkxFile *parent, long ref = 0);
+    hkbMirroredSkeletonInfo(HkxFile *parent, long ref = 0, int size = 0);
     virtual ~hkbMirroredSkeletonInfo();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();

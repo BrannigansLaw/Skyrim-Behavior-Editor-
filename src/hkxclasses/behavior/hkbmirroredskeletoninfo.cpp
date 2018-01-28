@@ -10,13 +10,17 @@ uint hkbMirroredSkeletonInfo::refCount = 0;
 
 QString hkbMirroredSkeletonInfo::classname = "hkbMirroredSkeletonInfo";
 
-hkbMirroredSkeletonInfo::hkbMirroredSkeletonInfo(HkxFile *parent, long ref)
+hkbMirroredSkeletonInfo::hkbMirroredSkeletonInfo(HkxFile *parent, long ref, int size)
     : HkxObject(parent, ref),
       mirrorAxis(1, 0, 0, 0)
 {
     setType(HKB_MIRRORED_SKELETON_INFO, TYPE_OTHER);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
+    //bonePairMap.reserve(size);
+    for (int i = 0; i < size; i++){
+        bonePairMap.append(0);
+    }
 }
 
 QString hkbMirroredSkeletonInfo::getClassname(){

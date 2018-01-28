@@ -2,9 +2,20 @@
 #define TREEGRAPHICSITEM_H
 
 #include <QGraphicsItem>
+#include <QPainter>
 
 class TreeGraphicsScene;
 class DataIconManager;
+
+class GraphicsPathItem: public QGraphicsPathItem
+{
+protected:
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
+        painter->setRenderHints(QPainter::Antialiasing);
+        painter->setPen(QPen(QBrush(Qt::black), 2));
+        painter->drawPath(path());
+    }
+};
 
 class TreeGraphicsItem: public QGraphicsItem
 {
@@ -55,7 +66,7 @@ protected:
     DataIconManager * itemData;
     bool isExpanded;
     qreal yCoordinate;
-    QGraphicsPathItem *path;
+    GraphicsPathItem *path;
     //QString name;
     //TreeGraphicsItem *parent;
 };
