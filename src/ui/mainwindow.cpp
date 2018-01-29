@@ -131,6 +131,7 @@ MainWindow::MainWindow()
     readSettings();
     setLayout(topLyt);
     objectDataSA->setWidget(objectDataWid);
+    objectDataSA->setVisible(false);
     //animationCacheSA->setWidget(animationCacheUI);
     //animationCacheSA->setVisible(false);
     //animationCacheSA->setWindowFlags();

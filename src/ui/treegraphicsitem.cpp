@@ -247,7 +247,7 @@ bool TreeGraphicsItem::isDataDescendant(DataIconManager *data) const{
 
 bool TreeGraphicsItem::isPrimaryIcon() const{
     if (!itemData->icons.isEmpty()){
-        if (itemData->icons.first() == this || itemData->icons.size() > 1){
+        if (itemData->icons.first() == this || itemData->icons.size() < 2){
             return true;
         }
     }

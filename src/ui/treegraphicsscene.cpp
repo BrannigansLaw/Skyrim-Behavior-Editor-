@@ -152,7 +152,14 @@ bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicate
             }
         }
     }
-    //setSceneRect(sceneRect().marginsAdded(QMarginsF(100, 100, 1000, 1000)));
+    QList <QGraphicsView *> view = views();
+    if (!view.isEmpty()){
+        QGraphicsView *ptr = view.front();
+        QRectF rect = ptr->sceneRect();
+        ptr->setSceneRect(rect.marginsAdded(QMarginsF(rect.width(), rect.height(), rect.width(), rect.height())));
+    }else{
+        FATAL_RUNTIME_ERROR("TreeGraphicsScene::drawGraph: No view!!!");
+    }
     return true;
 }
 

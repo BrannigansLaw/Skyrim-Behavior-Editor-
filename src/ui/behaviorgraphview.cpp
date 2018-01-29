@@ -411,8 +411,8 @@ void BehaviorGraphView::removeOtherData(){
 
 bool BehaviorGraphView::refocus(){
     if (getSelectedItem()){
-        resetMatrix();
-        scale(1, 1);
+        //resetMatrix();
+        //scale(1, 1);
         centerOn(getSelectedItem());
         return true;
     }else{
