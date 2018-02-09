@@ -64,6 +64,8 @@ private:
     PlainTextEdit *debugLog;
     QString hkxcmdPath;
     QString skyrimDirectory;
+    QString skyrimSpecialEdtionDirectory;
+    QString skyrimBehaviorUpdateToolFullPath;
     QGridLayout *topLyt;
     QMenuBar *topMB;
     QMenu *fileM;
@@ -80,6 +82,9 @@ private:
     QAction *collapseA;
     QAction *refocusA;
     QAction *viewAnimationCacheA;
+    QMenu *mergeM;
+    QAction *mergeBehaviorsA;
+    QAction *mergeProjectsA;
     QMenu *settingsM;
     QAction *setPathToGameFolderA;
     QAction *setGameModeA;
@@ -122,6 +127,8 @@ private slots:
     void packAndExportProjectToSkyrimDirectory();
     void exportAnimationData() ;
     void packAndExportFileToSkyrimDirectory();
+    void mergeBehaviors();
+    void mergeProjects();
     //void saveAs();
     void exit();
     void changedTabs(int index);
@@ -132,11 +139,11 @@ private:
         HKXCMD_SUCCESS = 0
     };
     QString generateUniqueBehaviorName();
-    void openProject(QString &filepath);
+    void openProject(QString &filepath, bool loadUI = true);
     void saveFile(int index);
     bool openBehavior(const QString & filename, int &taskCount, bool checkisopen = true);
     bool exitProgram();
-    bool findSkyrimDirectory();
+    bool findGameDirectory(const QString &gamename, QString &gamedirectory);
     MainWindow::HKXCMD_RETURN hkxcmd(const QString &filepath, const QString &outputDirectory, const QString &flags = "-f SAVE_CONCISE");
     int getBehaviorGraphIndex(const QString & filename);
     void readSettings();

@@ -28,6 +28,7 @@ public:
     void addAnimation(const QString &name = "");
     QString getAnimationNameAt(int index) const;
     int getAnimationIndex(const QString & name) const;
+    bool merge(hkbCharacterStringData *obj);
 private:
     hkbCharacterStringData& operator=(const hkbCharacterStringData&);
     hkbCharacterStringData(const hkbCharacterStringData &);

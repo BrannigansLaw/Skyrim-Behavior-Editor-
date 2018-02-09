@@ -97,6 +97,26 @@ bool hkRootLevelContainer::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkRootLevelContainer::merge(hkRootLevelContainer *other){
+    bool merged = true;
+    /*auto count = 0;
+    if (other){
+        for (auto i = 0; i < other->namedVariants.size(); i++){
+            for (auto j = 0; j < namedVariants.size(); j++){
+                if (other->namedVariants.at(i) == namedVariants.at(j)){
+                    count++;
+                }
+            }
+            if (count == 0){    //Order doesn't matter here...
+                namedVariants.append(hkRootLevelContainerNamedVariant(other->namedVariants.at(i)));
+            }else if (count > 1){
+                writeToLog(getClassname()+": merge()!\nDuplicates of hkRootLevelContainerNamedVariant found!!!", true);
+            }
+        }
+    }*/
+    return merged;
+}
+
 void hkRootLevelContainer::addVariant(const QString &name){
     namedVariants.append(hkRootLevelContainerNamedVariant(name, name));
 }

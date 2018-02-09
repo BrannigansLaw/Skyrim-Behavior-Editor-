@@ -132,6 +132,18 @@ bool hkbVariableValueSet::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkbVariableValueSet::merge(HkxObject *recessiveobj){
+    if (recessiveobj){
+        if (getSignature() == recessiveobj->getSignature()){
+            //
+        }else{
+            writeToLog(getClassname()+": merge()!\n'recessiveobj' is not the correct type!\n");
+        }
+    }else{
+        writeToLog(getClassname()+": merge()!\n'recessiveobj' is nullptr!\n");
+    }
+}
+
 bool hkbVariableValueSet::link(){
     if (!getParentFile()){
         return false;

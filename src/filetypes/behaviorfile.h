@@ -79,6 +79,8 @@ protected:
     bool parse();
     bool link();
 private:
+    QVector<HkxObject *> merge(BehaviorFile *recessivefile);
+    QVector <HkxObject *> merge(QVector <HkxObject *> dominantobjects);
     void generateDefaultCharacterData();
     void generateNewBehavior();
     HkxObject * getBehaviorGraphData() const;

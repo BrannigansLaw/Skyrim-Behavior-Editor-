@@ -21,6 +21,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    bool merge(HkxObject *recessiveobj);
 private:
     hkbVariableValueSet& operator=(const hkbVariableValueSet&);
     hkbVariableValueSet(const hkbVariableValueSet &);

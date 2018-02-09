@@ -1112,6 +1112,174 @@ bool BehaviorFile::link(){
     return true;
 }
 
+QVector <HkxObject *> BehaviorFile::merge(BehaviorFile *recessivefile){
+    bool found;
+    QVector <HkxObject *> objectsnotfound;
+    if (recessivefile){
+        for (auto i = 0; i < generators.size(); i++){
+            found = false;
+            for (auto j = i; j < recessivefile->generators.size(); j++){
+                if (static_cast<hkbGenerator *>(generators.at(i).data())->getName() == static_cast<hkbGenerator *>(recessivefile->generators.at(j).data())->getName()
+                        && generators.at(i).data()->getSignature() == recessivefile->generators.at(j).data()->getSignature())
+                {
+                    //Cast not needed...
+                    static_cast<hkbGenerator *>(generators.at(i).data())->merge(static_cast<hkbGenerator *>(recessivefile->generators.at(j).data()));
+                    found = true;
+                    break;
+                }
+            }
+            if (!found){
+                for (auto j = 0; j < i; j++){
+                    if (static_cast<hkbGenerator *>(generators.at(i).data())->getName() == static_cast<hkbGenerator *>(recessivefile->generators.at(j).data())->getName()
+                            && generators.at(i).data()->getSignature() == recessivefile->generators.at(j).data()->getSignature())
+                    {
+                        static_cast<hkbGenerator *>(generators.at(i).data())->merge(static_cast<hkbGenerator *>(recessivefile->generators.at(j).data()));
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (!found){
+                objectsnotfound.append(generators.at(i).data());
+                //writeToLog("ProjectFile: merge(): The object type \""+QString::number(generators.at(i).data()->getSignature(), 16)
+                //           +"\" named \""+static_cast<hkbGenerator *>(generators.at(i).data())->getName()+"\" was not found in the recessive behavior!!!");
+            }
+        }
+        for (auto i = 0; i < generatorChildren.size(); i++){
+            found = false;
+            for (auto j = i; j < recessivefile->generatorChildren.size(); j++){
+                if (static_cast<hkbGenerator *>(generatorChildren.at(i).data())->getName() == static_cast<hkbGenerator *>(recessivefile->generatorChildren.at(j).data())->getName()
+                        && generatorChildren.at(i).data()->getSignature() == recessivefile->generatorChildren.at(j).data()->getSignature())
+                {
+                    static_cast<hkbGenerator *>(generatorChildren.at(i).data())->merge(static_cast<hkbGenerator *>(recessivefile->generatorChildren.at(j).data()));
+                    found = true;
+                    break;
+                }
+            }
+            if (!found){
+                for (auto j = 0; j < i; j++){
+                    if (static_cast<hkbGenerator *>(generatorChildren.at(i).data())->getName() == static_cast<hkbGenerator *>(recessivefile->generatorChildren.at(j).data())->getName()
+                            && generatorChildren.at(i).data()->getSignature() == recessivefile->generatorChildren.at(j).data()->getSignature())
+                    {
+                        static_cast<hkbGenerator *>(generatorChildren.at(i).data())->merge(static_cast<hkbGenerator *>(recessivefile->generatorChildren.at(j).data()));
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (!found){
+                objectsnotfound.append(generatorChildren.at(i).data());
+            }
+        }
+        for (auto i = 0; i < modifiers.size(); i++){
+            found = false;
+            for (auto j = i; j < recessivefile->modifiers.size(); j++){
+                if (static_cast<hkbModifier *>(modifiers.at(i).data())->getName() == static_cast<hkbModifier *>(recessivefile->modifiers.at(j).data())->getName()
+                        && modifiers.at(i).data()->getSignature() == recessivefile->modifiers.at(j).data()->getSignature())
+                {
+                    static_cast<hkbModifier *>(modifiers.at(i).data())->merge(static_cast<hkbModifier *>(recessivefile->modifiers.at(j).data()));
+                    found = true;
+                    break;
+                }
+            }
+            if (!found){
+                for (auto j = 0; j < i; j++){
+                    if (static_cast<hkbModifier *>(modifiers.at(i).data())->getName() == static_cast<hkbModifier *>(recessivefile->modifiers.at(j).data())->getName()
+                            && modifiers.at(i).data()->getSignature() == recessivefile->modifiers.at(j).data()->getSignature())
+                    {
+                        static_cast<hkbModifier *>(modifiers.at(i).data())->merge(static_cast<hkbModifier *>(recessivefile->modifiers.at(j).data()));
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (!found){
+                objectsnotfound.append(modifiers.at(i).data());
+            }
+        }
+    }else{
+        writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
+    }
+    return objectsnotfound;
+}
+
+QVector <HkxObject *> BehaviorFile::merge(QVector <HkxObject *> dominantobjects){
+    bool found;
+    for (auto i = dominantobjects.size(); i < -1; i--){
+        found = false;
+        if (dominantobjects.at(i)->getType() == HkxObject::TYPE_GENERATOR){
+            if (dominantobjects.at(i)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || dominantobjects.at(i)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+                for (auto j = i; j < generatorChildren.size(); j++){
+                    if (static_cast<hkbGenerator *>(dominantobjects.at(i))->getName() == static_cast<hkbGenerator *>(generatorChildren.at(j).data())->getName()
+                            && dominantobjects.at(i)->getSignature() == generatorChildren.at(j).data()->getSignature())
+                    {
+                        static_cast<hkbGenerator *>(dominantobjects.at(i))->merge(static_cast<hkbGenerator *>(generatorChildren.at(j).data()));
+                        dominantobjects.removeAt(i);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found){
+                    for (auto j = 0; j < i; j++){
+                        if (static_cast<hkbGenerator *>(dominantobjects.at(i))->getName() == static_cast<hkbGenerator *>(generatorChildren.at(j).data())->getName()
+                                && dominantobjects.at(i)->getSignature() == generatorChildren.at(j).data()->getSignature())
+                        {
+                            static_cast<hkbGenerator *>(dominantobjects.at(i))->merge(static_cast<hkbGenerator *>(generatorChildren.at(j).data()));
+                            dominantobjects.removeAt(i);
+                            break;
+                        }
+                    }
+                }
+            }else{
+                for (auto j = i; j < generators.size(); j++){
+                    if (static_cast<hkbGenerator *>(dominantobjects.at(i))->getName() == static_cast<hkbGenerator *>(generators.at(j).data())->getName()
+                            && dominantobjects.at(i)->getSignature() == generators.at(j).data()->getSignature())
+                    {
+                        static_cast<hkbGenerator *>(dominantobjects.at(i))->merge(static_cast<hkbGenerator *>(generators.at(j).data()));
+                        dominantobjects.removeAt(i);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found){
+                    for (auto j = 0; j < i; j++){
+                        if (static_cast<hkbGenerator *>(dominantobjects.at(i))->getName() == static_cast<hkbGenerator *>(generators.at(j).data())->getName()
+                                && dominantobjects.at(i)->getSignature() == generators.at(j).data()->getSignature())
+                        {
+                            static_cast<hkbGenerator *>(dominantobjects.at(i))->merge(static_cast<hkbGenerator *>(generators.at(j).data()));
+                            dominantobjects.removeAt(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }else if (dominantobjects.at(i)->getType() == HkxObject::TYPE_MODIFIER){
+            for (auto j = i; j < modifiers.size(); j++){
+                if (static_cast<hkbModifier *>(dominantobjects.at(i))->getName() == static_cast<hkbModifier *>(modifiers.at(j).data())->getName()
+                        && dominantobjects.at(i)->getSignature() == modifiers.at(j).data()->getSignature())
+                {
+                    static_cast<hkbModifier *>(dominantobjects.at(i))->merge(static_cast<hkbModifier *>(modifiers.at(j).data()));
+                    dominantobjects.removeAt(i);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found){
+                for (auto j = 0; j < i; j++){
+                    if (static_cast<hkbModifier *>(dominantobjects.at(i))->getName() == static_cast<hkbModifier *>(modifiers.at(j).data())->getName()
+                            && dominantobjects.at(i)->getSignature() == modifiers.at(j).data()->getSignature())
+                    {
+                        static_cast<hkbModifier *>(dominantobjects.at(i))->merge(static_cast<hkbModifier *>(modifiers.at(j).data()));
+                        dominantobjects.removeAt(i);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return dominantobjects;
+}
+
 void BehaviorFile::write(){
     if (getRootObject().data()){
         ulong ref = getRootObject().data()->reference;

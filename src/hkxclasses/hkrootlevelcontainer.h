@@ -19,20 +19,32 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
+    bool merge(hkRootLevelContainer *other);
     void addVariant(const QString & name);
     void setVariantAt(int index, HkxObject *ptr);
     hkRootLevelContainer& operator=(const hkRootLevelContainer&);
     hkRootLevelContainer(const hkRootLevelContainer &);
-private:
-    static QString classname;
-    static uint refCount;
     struct hkRootLevelContainerNamedVariant
     {
-        hkRootLevelContainerNamedVariant(QString varname = "hkbBehaviorGraph", QString classname = "hkbBehaviorGraph"):name(varname), className(classname){}
+        bool operator==(const hkRootLevelContainerNamedVariant & other){
+            if (name == other.name && className == other.className){
+                return true;
+            }
+            return false;
+        }
+        hkRootLevelContainerNamedVariant(QString varname = "hkbBehaviorGraph", QString classname = "hkbBehaviorGraph")
+            : name(varname),
+              className(classname)
+        {
+            //
+        }
         QString name;
         QString className;
         HkxSharedPtr variant;  //This can be one of many (any?) types.
     };
+private:
+    static QString classname;
+    static uint refCount;
     QList <hkRootLevelContainerNamedVariant> namedVariants;
 };
 

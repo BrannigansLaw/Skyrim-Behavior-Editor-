@@ -39,6 +39,7 @@ protected:
     bool link();
     //SkyrimAnimData *getAnimData() const;
 private:
+    bool merge(ProjectFile *recessiveproject);
     void addProjectToAnimData();
     bool removeClipGenFromAnimData(const QString & name);
     bool removeAnimationFromAnimData(const QString & name);

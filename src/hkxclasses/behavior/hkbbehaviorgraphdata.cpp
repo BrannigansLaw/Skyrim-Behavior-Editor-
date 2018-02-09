@@ -616,6 +616,14 @@ QStringList hkbBehaviorGraphData::getVariableTypeNames() const{
     return list;
 }
 
+bool hkbBehaviorGraphData::merge(hkbBehaviorGraphData *other){
+    //
+    //
+    //
+    //
+    return true;
+}
+
 bool hkbBehaviorGraphData::link(){
     if (!getParentFile()){
         return false;

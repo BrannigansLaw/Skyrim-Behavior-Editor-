@@ -91,6 +91,10 @@ bool HkxObject::readData(const HkxXmlReader & , long ){
     return false;
 }
 
+bool HkxObject::merge(HkxObject *){
+    return false;
+}
+
 bool HkxObject::write(HkxXMLWriter *){
     return false;
 }

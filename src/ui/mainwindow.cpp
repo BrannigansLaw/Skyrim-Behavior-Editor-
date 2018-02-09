@@ -45,6 +45,9 @@ MainWindow::MainWindow()
       viewAnimationCacheA(new QAction("View Animation Cache", this)),
       refocusA(new QAction("Refocus On Selected Item", this)),
       settingsM(new QMenu("Settings", this)),
+      mergeM(new QMenu("Merge", this)),
+      mergeBehaviorsA(new QAction("Merge Two Behavior Files", this)),
+      mergeProjectsA(new QAction("Merge Two Projects", this)),
       setPathToGameFolderA(new QAction("Set Path To Game Directory", this)),
       setGameModeA(new QAction("Set Game Mode", this)),
       tabs(new QTabWidget),
@@ -105,6 +108,8 @@ MainWindow::MainWindow()
     setGameModeA->setCheckable(true);
     settingsM->addAction(setPathToGameFolderA);
     settingsM->addAction(setGameModeA);
+    mergeM->addAction(mergeBehaviorsA);
+    mergeM->addAction(mergeProjectsA);
     viewM->addAction(expandA);
     viewM->addAction(collapseA);
     viewM->addAction(refocusA);
@@ -113,6 +118,7 @@ MainWindow::MainWindow()
     topMB->addMenu(fileM);
     topMB->addMenu(viewM);
     topMB->addMenu(settingsM);
+    topMB->addMenu(mergeM);
     logGBLyt->addWidget(debugLog);
     logGB->setLayout(logGBLyt);
     eventsWid->setHkDataUI(objectDataWid);
@@ -139,8 +145,16 @@ MainWindow::MainWindow()
     //variablesWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
     //eventsWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
     logGB->setMaximumSize(size().width()*0.6, size().height()*0.1);
-    if (!findSkyrimDirectory()){
+    if (!findGameDirectory(skyrimDirectory, QString("Skyrim"))){
         writeToLog("The TESV executable was not found!");
+    }
+    if (!findGameDirectory(skyrimSpecialEdtionDirectory, QString("Skyrim Special Edition"))){
+        writeToLog("The SSE executable was not found!");
+    }else{
+        skyrimBehaviorUpdateToolFullPath = skyrimSpecialEdtionDirectory+"/Tools/HavokBehaviorPostProcess/HavokBehaviorPostProcess.exe";
+        if (!QDir(skyrimBehaviorUpdateToolFullPath).exists()){
+            WARNING_MESSAGE(QString("The tool for the conversion of Havok 32bit to Havok 64bit \"HavokBehaviorPostProcess.exe\" was not found!\n\nTo obtain it, you need to download the Creation Kit for Skyrim Special Edition!"));
+        }
     }
     connect(newProjectA, SIGNAL(triggered(bool)), this, SLOT(createNewProject()), Qt::UniqueConnection);
     connect(openPackedProjectA, SIGNAL(triggered(bool)), this, SLOT(openPackedProject()), Qt::UniqueConnection);
@@ -162,6 +176,8 @@ MainWindow::MainWindow()
     connect(projectUI, SIGNAL(animationRemoved(int)), this, SLOT(removeAnimation(int)), Qt::UniqueConnection);
     connect(setGameModeA, SIGNAL(changed()), this, SLOT(setGameMode()), Qt::UniqueConnection);
     connect(setPathToGameFolderA, SIGNAL(toggled(bool)), this, SLOT(setPathToGameDirectory()), Qt::UniqueConnection);
+    connect(mergeBehaviorsA, SIGNAL(triggered(bool)), this, SLOT(mergeBehaviors()), Qt::UniqueConnection);
+    connect(mergeProjectsA, SIGNAL(triggered(bool)), this, SLOT(mergeProjects()), Qt::UniqueConnection);
 }
 
 MainWindow::~MainWindow(){
@@ -504,6 +520,33 @@ void MainWindow::packAndExportFileToSkyrimDirectory(){
     }
 }
 
+void MainWindow::mergeBehaviors(){
+    //
+    //
+    //
+    //
+}
+
+void MainWindow::mergeProjects(){
+    ProjectFile *dominantProject;
+    ProjectFile *recessiveProject;
+    QString recessivefilename;
+    QString dominantfilename = QFileDialog::getOpenFileName(this, tr("Select dominant project file..."), QDir::currentPath(), tr("hkx Files (*.hkx)"));
+    if (dominantfilename != ""){
+        openProject(dominantfilename, false);
+        dominantProject = projectFile;
+        recessivefilename  = QFileDialog::getOpenFileName(this, tr("Select recessive project file..."), QDir::currentPath(), tr("hkx Files (*.hkx)"));
+        openProject(dominantfilename, false);
+        recessiveProject = projectFile;
+        if (!dominantProject->merge(recessiveProject)){
+            WARNING_MESSAGE("The attempt to merge projects failed!");
+        }
+    }
+    //
+    //
+    //
+}
+
 void MainWindow::exit(){
     /*if (exitProgram()) {
         writeSettings();
@@ -600,7 +643,7 @@ void MainWindow::addNewBehavior(bool initData){
     dialog.setProgress("Behavior file creation failed!!", dialog.maximum());
 }
 
-void MainWindow::openProject(QString & filepath){
+void MainWindow::openProject(QString & filepath, bool loadUI){
     if (tabs->count() > 0){
         closeAll();
     }
@@ -635,7 +678,9 @@ void MainWindow::openProject(QString & filepath){
     writeToLog("\n-------------------------\nTime taken to open file \""+filepath+
                                "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
     dialog.setProgress("Loading character data...", 10);
-    projectUI->setFilePath(lastFileSelectedPath);
+    if (loadUI){
+        projectUI->setFilePath(lastFileSelectedPath);
+    }
     time = t.elapsed();
     characterFile = new CharacterFile(this, projectFile, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));
     if (!characterFile->parse()){
@@ -654,12 +699,14 @@ void MainWindow::openProject(QString & filepath){
     }
     dialog.setProgress("Skeleton data loaded sucessfully!!!", 90);
     characterFile->setSkeletonFile(skeletonFile);
-    tabs->addTab(projectUI, "Character Data");
-    projectUI->setProject(projectFile);
-    projectUI->loadData();
+    if (loadUI){
+        tabs->addTab(projectUI, "Character Data");
+        projectUI->setProject(projectFile);
+        projectUI->loadData();
+        projectUI->setDisabled(false);
+    }
     writeToLog("\n-------------------------\nTime taken to open file \""+lastFileSelectedPath+"/"+characterFile->getRigName()+
                                "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
-    projectUI->setDisabled(false);
     //Start opening behavior files...
     QDirIterator it(lastFileSelectedPath+"/"+characterFile->getBehaviorDirectoryName());
     QString behavior;
@@ -693,38 +740,40 @@ void MainWindow::openProject(QString & filepath){
         conditionVar.wait(locker);
     }
     threads.clear();
-    for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
-        behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.at(i)));
-    }
-    for (int i = 0; i < behaviornames.size();){
-        for (uint j = 0; j < std::thread::hardware_concurrency(); j++){
-            if (threads.size() < std::thread::hardware_concurrency()){
-                if (i < behaviornames.size() && i < behaviorGraphs.size()){
-                    threads.push_back(std::thread(&TreeGraphicsView::drawGraph, behaviorGraphs[i], static_cast<DataIconManager *>(projectFile->behaviorFiles.at(i)->getBehaviorGraph()), false));
-                    i++;
-                }else{
-                    break;
-                }
-            }else{
-                for (int k = 0; k < threads.size(); k++){
-                    if (threads.at(k).joinable()){
-                        threads.at(k).join();
+    if (loadUI){
+        for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
+            behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.at(i)));
+        }
+        for (int i = 0; i < behaviornames.size();){
+            for (uint j = 0; j < std::thread::hardware_concurrency(); j++){
+                if (threads.size() < std::thread::hardware_concurrency()){
+                    if (i < behaviornames.size() && i < behaviorGraphs.size()){
+                        threads.push_back(std::thread(&TreeGraphicsView::drawGraph, behaviorGraphs[i], static_cast<DataIconManager *>(projectFile->behaviorFiles.at(i)->getBehaviorGraph()), false));
+                        i++;
                     }else{
-                        FATAL_RUNTIME_ERROR(QString("MainWindow::openProject(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data());
+                        break;
                     }
+                }else{
+                    for (int k = 0; k < threads.size(); k++){
+                        if (threads.at(k).joinable()){
+                            threads.at(k).join();
+                        }else{
+                            FATAL_RUNTIME_ERROR(QString("MainWindow::openProject(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data());
+                        }
+                    }
+                    threads.clear();
                 }
-                threads.clear();
             }
         }
-    }
-    for (int k = 0; k < threads.size(); k++){
-        if (threads.at(k).joinable()){
-            threads.at(k).join();
-        }else{
-            FATAL_RUNTIME_ERROR(QString("MainWindow::openProject(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data());
+        for (int k = 0; k < threads.size(); k++){
+            if (threads.at(k).joinable()){
+                threads.at(k).join();
+            }else{
+                FATAL_RUNTIME_ERROR(QString("MainWindow::openProject(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data());
+            }
         }
+        threads.clear();
     }
-    threads.clear();
     projectFile->generateAnimClipDataForProject();
     writeToLog("\n-------------------------\nTime taken to open project \""+filepath+
                               "\" is approximately "+QString::number(t.elapsed())+" milliseconds\n-------------------------\n");
@@ -950,7 +999,7 @@ void MainWindow::writeSettings(){
     settings.endGroup();
 }
 
-bool MainWindow::findSkyrimDirectory(){
+bool MainWindow::findGameDirectory(const QString & gamename, QString & gamedirectory){
     QFileInfoList drives = QDir::drives();
     QString driveName;
     QString path;
@@ -959,19 +1008,19 @@ bool MainWindow::findSkyrimDirectory(){
     for (int i = 0; i < drives.size(); i++){
         driveName = drives.at(i).absolutePath();
         dir.setPath(driveName);
-        path = driveName+"Program Files/Steam/steamapps/common/Skyrim";
+        path = driveName+"Program Files/Steam/steamapps/common/"+gamename;
         if (dir.exists(path)){
-            skyrimDirectory = path;
+            gamedirectory = path;
             value = true;
         }else{
-            path = driveName+"Steam/steamapps/common/Skyrim";
+            path = driveName+"Steam/steamapps/common/"+gamename;
             if (dir.exists(path)){
-                skyrimDirectory = path;
+                gamedirectory = path;
                 value = true;
             }else{
-                path = driveName+"Steam Games/steamapps/common/Skyrim";
+                path = driveName+"Steam Games/steamapps/common/"+gamename;
                 if (dir.exists(path)){
-                    skyrimDirectory = path;
+                    gamedirectory = path;
                     value = true;
                 }
             }

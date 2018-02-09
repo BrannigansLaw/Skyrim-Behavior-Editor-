@@ -40,6 +40,7 @@ public:
     virtual void unlink();
     virtual bool write(HkxXMLWriter *);
     virtual bool readData(const HkxXmlReader &, long);
+    virtual bool merge(HkxObject *);
     QString getReferenceString() const;
     QString getBoolAsString(bool b) const;
     HkxFile * getParentFile() const;

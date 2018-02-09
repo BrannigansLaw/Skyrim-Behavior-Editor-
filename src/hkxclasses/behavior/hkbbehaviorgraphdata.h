@@ -31,6 +31,7 @@ private:
     hkbBehaviorGraphData& operator=(const hkbBehaviorGraphData&);
     hkbBehaviorGraphData(const hkbBehaviorGraphData &);
 private:
+    bool merge(hkbBehaviorGraphData *other);
     int addVariable(hkVariableType type, const QString & name, bool isProperty = false);
     void addVariable(hkVariableType type);
     void removeVariable(int index);
