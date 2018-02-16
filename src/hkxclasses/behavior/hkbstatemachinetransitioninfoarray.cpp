@@ -264,6 +264,40 @@ bool hkbStateMachineTransitionInfoArray::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkbStateMachineTransitionInfoArray::isEventReferenced(int eventindex) const{
+    for (auto i = 0; i < transitions.size(); i++){
+        if (transitions.at(i).triggerInterval.enterEventId == eventindex ||
+                transitions.at(i).triggerInterval.exitEventId == eventindex ||
+                transitions.at(i).initiateInterval.enterEventId == eventindex ||
+                transitions.at(i).initiateInterval.exitEventId == eventindex ||
+                transitions.at(i).eventId == eventindex)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void hkbStateMachineTransitionInfoArray::updateEventIndices(int eventindex){
+    for (auto i = 0; i < transitions.size(); i++){
+        if (transitions.at(i).triggerInterval.enterEventId > eventindex){
+            transitions[i].triggerInterval.enterEventId--;
+        }
+        if (transitions.at(i).triggerInterval.exitEventId > eventindex){
+            transitions[i].triggerInterval.exitEventId--;
+        }
+        if (transitions.at(i).initiateInterval.enterEventId > eventindex){
+            transitions[i].initiateInterval.enterEventId--;
+        }
+        if (transitions.at(i).initiateInterval.enterEventId > eventindex){
+            transitions[i].initiateInterval.enterEventId--;
+        }
+        if (transitions.at(i).eventId > eventindex){
+            transitions[i].eventId--;
+        }
+    }
+}
+
 bool hkbStateMachineTransitionInfoArray::link(){
     if (!getParentFile()){
         return false;

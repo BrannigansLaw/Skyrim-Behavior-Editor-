@@ -251,6 +251,23 @@ int hkbFootIkControlsModifier::getNumberOfLegs() const{
     return legs.size();
 }
 
+bool hkbFootIkControlsModifier::isEventReferenced(int eventindex) const{
+    for (auto i = 0; i < legs.size(); i++){
+        if (legs.at(i).id == eventindex){
+            return true;
+        }
+    }
+    return false;
+}
+
+void hkbFootIkControlsModifier::updateEventIndices(int eventindex){
+    for (auto i = 0; i < legs.size(); i++){
+        if (legs.at(i).id > eventindex){
+            legs[i].id--;
+        }
+    }
+}
+
 bool hkbFootIkControlsModifier::link(){
     if (!getParentFile()){
         return false;

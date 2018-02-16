@@ -84,6 +84,31 @@ bool hkbStateMachineStateInfo::hasChildren() const{
     return false;
 }
 
+bool hkbStateMachineStateInfo::isEventReferenced(int eventindex) const{
+    if (enterNotifyEvents.constData() && enterNotifyEvents.constData()->isEventReferenced(eventindex)){
+        return true;
+    }
+    if (exitNotifyEvents.constData() && exitNotifyEvents.constData()->isEventReferenced(eventindex)){
+        return true;
+    }
+    if (transitions.constData() && transitions.constData()->isEventReferenced(eventindex)){
+        return true;
+    }
+    return false;
+}
+
+void hkbStateMachineStateInfo::updateEventIndices(int eventindex){
+    if (enterNotifyEvents.data()){
+        enterNotifyEvents.data()->updateEventIndices(eventindex);
+    }
+    if (exitNotifyEvents.data()){
+        exitNotifyEvents.data()->updateEventIndices(eventindex);
+    }
+    if (transitions.data()){
+        transitions.data()->updateEventIndices(eventindex);
+    }
+}
+
 QList<DataIconManager *> hkbStateMachineStateInfo::getChildren() const{
     QList<DataIconManager *> list;
     if (generator.data()){

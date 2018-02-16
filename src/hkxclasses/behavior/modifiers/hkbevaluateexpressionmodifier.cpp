@@ -107,6 +107,19 @@ int hkbEvaluateExpressionModifier::getNumberOfExpressions() const{
     return 0;
 }
 
+bool hkbEvaluateExpressionModifier::isEventReferenced(int eventindex) const{
+    if (expressions.constData() && expressions.constData()->isEventReferenced(eventindex)){
+        return true;
+    }
+    return false;
+}
+
+void hkbEvaluateExpressionModifier::updateEventIndices(int eventindex){
+    if (expressions.data()){
+        expressions.data()->updateEventIndices(eventindex);
+    }
+}
+
 bool hkbEvaluateExpressionModifier::link(){
     if (!getParentFile()){
         return false;

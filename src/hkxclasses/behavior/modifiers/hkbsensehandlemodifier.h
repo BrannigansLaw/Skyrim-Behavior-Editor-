@@ -19,6 +19,8 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfRanges() const;
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
 private:
     hkbSenseHandleModifier& operator=(const hkbSenseHandleModifier&);
     hkbSenseHandleModifier(const hkbSenseHandleModifier &);

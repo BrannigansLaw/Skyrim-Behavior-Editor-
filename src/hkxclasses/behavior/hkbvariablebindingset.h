@@ -36,6 +36,8 @@ public:
     hkBinding::BindingType getBindingType(int index) const;
     hkBinding::BindingType getBindingType(const QString & path) const;
     bool write(HkxXMLWriter *writer);
+    bool isVariableRefed(int variableindex) const;
+    void updateVariableIndices(int index);
 protected:
 private:
     hkbVariableBindingSet& operator=(const hkbVariableBindingSet&);

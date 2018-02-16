@@ -16,6 +16,8 @@ public:
     static QString getClassname();
     int getLastEventIndex() const;
     bool write(HkxXMLWriter *writer);
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
 protected:
 private:
     void addEvent(const hkEventPayload & event = hkEventPayload());

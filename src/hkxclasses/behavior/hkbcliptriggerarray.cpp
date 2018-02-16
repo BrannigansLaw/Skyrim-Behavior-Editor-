@@ -149,6 +149,23 @@ bool hkbClipTriggerArray::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkbClipTriggerArray::isEventReferenced(int eventindex) const{
+    for (auto i = 0; i < triggers.size(); i++){
+        if (triggers.at(i).event.id == eventindex){
+            return true;
+        }
+    }
+    return false;
+}
+
+void hkbClipTriggerArray::updateEventIndices(int eventindex){
+    for (auto i = 0; i < triggers.size(); i++){
+        if (triggers.at(i).event.id > eventindex){
+            triggers[i].event.id--;
+        }
+    }
+}
+
 bool hkbClipTriggerArray::link(){
     if (!getParentFile()){
         return false;

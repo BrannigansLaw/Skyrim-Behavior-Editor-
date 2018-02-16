@@ -360,16 +360,31 @@ void CharacterPropertiesUI::addVariable(){
 }
 
 void CharacterPropertiesUI::removeVariable(){
-    int index = table->currentRow();
-    loadedData->removeVariable(index);
-    if (index < table->rowCount()){
-        table->removeRow(index);
+    if (loadedData){
+        int index = table->currentRow();
+
+        //Need to check if variable is used in hkbExpressionCondition, hkbExpressionDataArray????
+        //dont allow delection of iState var??
+        //removing vars still bugged...
+
+        //Need to update variables in all behaviors...
+        /*QString message = static_cast<BehaviorFile *>(loadedData->getParentFile())->isVariableReferenced(index);
+        if (message == ""){
+            loadedData->removeVariable(index);
+            if (index < table->rowCount()){
+                table->removeRow(index);
+            }
+            if (stackLyt->currentIndex() == VARIABLE_WIDGET){
+                stackLyt->setCurrentIndex(TABLE_WIDGET);
+            }
+            loadedData->getParentFile()->setIsChanged(true);
+            static_cast<BehaviorFile *>(loadedData->getParentFile())->updateVariableIndices(index);
+            emit variableRemoved(index);
+            table->setFocus();
+        }else{
+            WARNING_MESSAGE(message);
+        }*/
     }
-    if (stackLyt->currentIndex() == VARIABLE_WIDGET){
-        stackLyt->setCurrentIndex(TABLE_WIDGET);
-    }
-    loadedData->getParentFile()->setIsChanged(true);
-    emit variableRemoved(index);
 }
 
 void CharacterPropertiesUI::setHkDataUI(HkDataUI *ui){

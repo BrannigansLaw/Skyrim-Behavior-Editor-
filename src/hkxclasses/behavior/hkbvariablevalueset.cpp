@@ -142,6 +142,7 @@ bool hkbVariableValueSet::merge(HkxObject *recessiveobj){
     }else{
         writeToLog(getClassname()+": merge()!\n'recessiveobj' is nullptr!\n");
     }
+    return true;
 }
 
 bool hkbVariableValueSet::link(){

@@ -116,6 +116,19 @@ bool hkbTimerModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkbTimerModifier::isEventReferenced(int eventindex) const{
+    if (alarmEvent.id == eventindex){
+        return true;
+    }
+    return false;
+}
+
+void hkbTimerModifier::updateEventIndices(int eventindex){
+    if (alarmEvent.id > eventindex){
+        alarmEvent.id--;
+    }
+}
+
 bool hkbTimerModifier::link(){
     if (!getParentFile()){
         return false;

@@ -144,16 +144,25 @@ void EventsUI::addEvent(){
 
 void EventsUI::removeEvent(){
     if (loadedData){
+        disconnect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeEvent()));
         int index = table->currentRow();
-        loadedData->removeEvent(index);
-        if (index < table->rowCount()){
-            table->removeRow(index);
+        QString message = static_cast<BehaviorFile *>(loadedData->getParentFile())->isEventReferenced(index);
+        if (message == ""){
+            loadedData->removeEvent(index);
+            if (index < table->rowCount()){
+                table->removeRow(index);
+            }
+            if (stackLyt->currentIndex() == EVENT_WIDGET){
+                stackLyt->setCurrentIndex(TABLE_WIDGET);
+            }
+            loadedData->getParentFile()->setIsChanged(true);
+            static_cast<BehaviorFile *>(loadedData->getParentFile())->updateEventIndices(index);
+            emit eventRemoved(index);
+            table->setFocus();
+        }else{
+            WARNING_MESSAGE(message);
         }
-        if (stackLyt->currentIndex() == EVENT_WIDGET){
-            stackLyt->setCurrentIndex(TABLE_WIDGET);
-        }
-        loadedData->getParentFile()->setIsChanged(true);
-        emit eventRemoved(index);
+        connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeEvent()));
     }
 }
 

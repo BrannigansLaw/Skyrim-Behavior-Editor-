@@ -20,6 +20,8 @@ public:
     int getLastEventDataIndex() const;
     bool write(HkxXMLWriter *writer);
     int getNumberOfRanges() const;
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
 protected:
 private:
     struct hkbEventRangeData

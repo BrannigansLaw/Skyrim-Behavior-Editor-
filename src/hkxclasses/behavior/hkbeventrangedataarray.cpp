@@ -137,6 +137,23 @@ int hkbEventRangeDataArray::getNumberOfRanges() const{
     return eventData.size();
 }
 
+bool hkbEventRangeDataArray::isEventReferenced(int eventindex) const{
+    for (auto i = 0; i < eventData.size(); i++){
+        if (eventData.at(i).event.id == eventindex){
+            return true;
+        }
+    }
+    return false;
+}
+
+void hkbEventRangeDataArray::updateEventIndices(int eventindex){
+    for (auto i = 0; i < eventData.size(); i++){
+        if (eventData.at(i).event.id > eventindex){
+            eventData[i].event.id--;
+        }
+    }
+}
+
 bool hkbEventRangeDataArray::link(){
     if (!getParentFile()){
         return false;

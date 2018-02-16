@@ -18,6 +18,8 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfRanges() const;
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
 private:
     hkbEventsFromRangeModifier& operator=(const hkbEventsFromRangeModifier&);
     hkbEventsFromRangeModifier(const hkbEventsFromRangeModifier &);

@@ -122,6 +122,19 @@ bool BSRagdollContactListenerModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool BSRagdollContactListenerModifier::isEventReferenced(int eventindex) const{
+    if (contactEvent.id == eventindex){
+        return true;
+    }
+    return false;
+}
+
+void BSRagdollContactListenerModifier::updateEventIndices(int eventindex){
+    if (contactEvent.id > eventindex){
+        contactEvent.id--;
+    }
+}
+
 bool BSRagdollContactListenerModifier::link(){
     if (!getParentFile()){
         return false;

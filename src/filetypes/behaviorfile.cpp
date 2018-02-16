@@ -606,6 +606,139 @@ void BehaviorFile::removeClipTriggerToAnimDataAt(const QString &clipGenName, int
     project->removeClipTriggerToAnimDataAt(clipGenName, index);
 }
 
+QString BehaviorFile::isEventReferenced(int eventindex) const{
+    hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    QString objnames;
+    int size;
+    if (stringdata && stringdata->eventNames.size() > eventindex && eventindex > -1){
+        objnames = "The event \""+stringdata->getEventNameAt(eventindex)+" \" is referenced by the following objects: \n";
+        size = objnames.size();
+        for (auto i = 0; i < generators.size(); i++){
+            if (generators.at(i).constData()->isEventReferenced(eventindex)){
+                objnames.append(static_cast<const hkbGenerator *>(generators.at(i).constData())->getName()+"\n");
+            }
+            if (objnames.size() > MAX_ERROR_STRING_SIZE){
+                objnames.append("...");
+                break;
+            }
+        }
+        for (auto i = 0; i < generatorChildren.size(); i++){
+            if (generatorChildren.at(i).constData()->isEventReferenced(eventindex)){
+                objnames.append(static_cast<const hkbGenerator *>(generatorChildren.at(i).constData())->getName()+"\n");
+            }
+            if (objnames.size() > MAX_ERROR_STRING_SIZE){
+                objnames.append("...");
+                break;
+            }
+        }
+        for (auto i = 0; i < modifiers.size(); i++){
+            if (modifiers.at(i).constData()->isEventReferenced(eventindex)){
+                objnames.append(static_cast<const hkbGenerator *>(modifiers.at(i).constData())->getName()+"\n");
+            }
+            if (objnames.size() > MAX_ERROR_STRING_SIZE){
+                objnames.append("...");
+                break;
+            }
+        }
+    }else{
+        FATAL_RUNTIME_ERROR(QString("BehaviorFile::isEventReferenced(): stringdata null or invalid variable index!!!"));
+    }
+    if (objnames.size() > size){
+        return objnames;
+    }else{
+        return "";
+    }
+}
+
+void BehaviorFile::updateEventIndices(int index){
+    hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    if (stringdata && stringdata->eventNames.size() >= index && index > -1){
+        for (auto i = 0; i < generators.size(); i++){
+            generators.at(i).data()->updateEventIndices(index);
+        }
+        for (auto i = 0; i < generatorChildren.size(); i++){
+            generatorChildren.at(i).data()->updateEventIndices(index);
+        }
+        for (auto i = 0; i < modifiers.size(); i++){
+            modifiers.at(i).data()->updateEventIndices(index);
+        }
+    }else{
+        FATAL_RUNTIME_ERROR(QString("BehaviorFile::updateEventIndices(): stringdata null or invalid event index!!!"));
+    }
+}
+
+QString BehaviorFile::isVariableReferenced(int variableindex) const{
+    hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    QString objnames;
+    int size;
+    if (stringdata && stringdata->variableNames.size() > variableindex && variableindex > -1){
+        objnames = "The variable \""+stringdata->getVariableNameAt(variableindex)+" \" is referenced by the following objects: \n";
+        size = objnames.size();
+        for (auto i = 0; i < generators.size(); i++){
+            if (generators.at(i).constData()->isVariableReferenced(variableindex)){
+                objnames.append(static_cast<const hkbGenerator *>(generators.at(i).constData())->getName()+"\n");
+            }
+            if (objnames.size() > MAX_ERROR_STRING_SIZE){
+                objnames.append("...");
+                break;
+            }
+        }
+        for (auto i = 0; i < generatorChildren.size(); i++){
+            if (generatorChildren.at(i).constData()->isVariableReferenced(variableindex)){
+                objnames.append(static_cast<const hkbGenerator *>(generatorChildren.at(i).constData())->getName()+"\n");
+            }
+            if (objnames.size() > MAX_ERROR_STRING_SIZE){
+                objnames.append("...");
+                break;
+            }
+        }
+        for (auto i = 0; i < modifiers.size(); i++){
+            if (modifiers.at(i).constData()->isVariableReferenced(variableindex)){
+                objnames.append(static_cast<const hkbGenerator *>(modifiers.at(i).constData())->getName()+"\n");
+            }
+            if (objnames.size() > MAX_ERROR_STRING_SIZE){
+                objnames.append("...");
+                break;
+            }
+        }
+        for (auto i = 0; i < otherTypes.size(); i++){
+            if (otherTypes.at(i).constData()->getSignature() == HKB_VARIABLE_BINDING_SET){
+                const hkbVariableBindingSet *tempptr = static_cast<const hkbVariableBindingSet *>(otherTypes.at(i).constData());
+                tempptr->getSignature();
+            }
+            if (otherTypes.at(i).constData()->getSignature() == HKB_BLENDING_TRANSITION_EFFECT && otherTypes.at(i).constData()->isVariableReferenced(variableindex)){
+                objnames.append(static_cast<const hkbBlendingTransitionEffect *>(otherTypes.at(i).constData())->getName()+"\n");
+            }/*else if (otherTypes.at(i).constData()->getSignature() != HKB_VARIABLE_BINDING_SET){
+                objnames.append(QString::number(otherTypes.at(i).constData()->getSignature(), 16)+"\n");
+            }*/
+            if (objnames.size() > MAX_ERROR_STRING_SIZE){
+                objnames.append("...");
+                break;
+            }
+        }
+    }else{
+        FATAL_RUNTIME_ERROR(QString("BehaviorFile::isVariableReferenced(): stringdata null or invalid variable index!!!"));
+    }
+    if (objnames.size() > size){
+        return objnames;
+    }else{
+        return "";
+    }
+}
+
+void BehaviorFile::updateVariableIndices(int index){
+    hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    if (stringdata && stringdata->variableNames.size() >= index && index > -1){
+        for (auto i = 0; i < otherTypes.size(); i++){
+            if (otherTypes.at(i).data()->getSignature() == HKB_VARIABLE_BINDING_SET){
+                static_cast<hkbVariableBindingSet *>(otherTypes.at(i).data())->updateVariableIndices(index);
+            }
+        }
+    }else{
+        FATAL_RUNTIME_ERROR(QString("BehaviorFile::updateVariableIndices(): stringdata null or invalid variable index!!!"));
+    }
+}
+
 HkxObject * BehaviorFile::getRootStateMachine() const{
     return static_cast<hkbBehaviorGraph *>(behaviorGraph.data())->rootGenerator.data();
 }
@@ -1122,8 +1255,7 @@ QVector <HkxObject *> BehaviorFile::merge(BehaviorFile *recessivefile){
                 if (static_cast<hkbGenerator *>(generators.at(i).data())->getName() == static_cast<hkbGenerator *>(recessivefile->generators.at(j).data())->getName()
                         && generators.at(i).data()->getSignature() == recessivefile->generators.at(j).data()->getSignature())
                 {
-                    //Cast not needed...
-                    static_cast<hkbGenerator *>(generators.at(i).data())->merge(static_cast<hkbGenerator *>(recessivefile->generators.at(j).data()));
+                    generators.at(i).data()->merge(recessivefile->generators.at(j).data());
                     found = true;
                     break;
                 }
@@ -1133,7 +1265,7 @@ QVector <HkxObject *> BehaviorFile::merge(BehaviorFile *recessivefile){
                     if (static_cast<hkbGenerator *>(generators.at(i).data())->getName() == static_cast<hkbGenerator *>(recessivefile->generators.at(j).data())->getName()
                             && generators.at(i).data()->getSignature() == recessivefile->generators.at(j).data()->getSignature())
                     {
-                        static_cast<hkbGenerator *>(generators.at(i).data())->merge(static_cast<hkbGenerator *>(recessivefile->generators.at(j).data()));
+                        generators.at(i).data()->merge(recessivefile->generators.at(j).data());
                         found = true;
                         break;
                     }
@@ -1151,7 +1283,7 @@ QVector <HkxObject *> BehaviorFile::merge(BehaviorFile *recessivefile){
                 if (static_cast<hkbGenerator *>(generatorChildren.at(i).data())->getName() == static_cast<hkbGenerator *>(recessivefile->generatorChildren.at(j).data())->getName()
                         && generatorChildren.at(i).data()->getSignature() == recessivefile->generatorChildren.at(j).data()->getSignature())
                 {
-                    static_cast<hkbGenerator *>(generatorChildren.at(i).data())->merge(static_cast<hkbGenerator *>(recessivefile->generatorChildren.at(j).data()));
+                    generatorChildren.at(i).data()->merge(recessivefile->generatorChildren.at(j).data());
                     found = true;
                     break;
                 }
@@ -1161,7 +1293,7 @@ QVector <HkxObject *> BehaviorFile::merge(BehaviorFile *recessivefile){
                     if (static_cast<hkbGenerator *>(generatorChildren.at(i).data())->getName() == static_cast<hkbGenerator *>(recessivefile->generatorChildren.at(j).data())->getName()
                             && generatorChildren.at(i).data()->getSignature() == recessivefile->generatorChildren.at(j).data()->getSignature())
                     {
-                        static_cast<hkbGenerator *>(generatorChildren.at(i).data())->merge(static_cast<hkbGenerator *>(recessivefile->generatorChildren.at(j).data()));
+                        generatorChildren.at(i).data()->merge(recessivefile->generatorChildren.at(j).data());
                         found = true;
                         break;
                     }
@@ -1177,7 +1309,7 @@ QVector <HkxObject *> BehaviorFile::merge(BehaviorFile *recessivefile){
                 if (static_cast<hkbModifier *>(modifiers.at(i).data())->getName() == static_cast<hkbModifier *>(recessivefile->modifiers.at(j).data())->getName()
                         && modifiers.at(i).data()->getSignature() == recessivefile->modifiers.at(j).data()->getSignature())
                 {
-                    static_cast<hkbModifier *>(modifiers.at(i).data())->merge(static_cast<hkbModifier *>(recessivefile->modifiers.at(j).data()));
+                    modifiers.at(i).data()->merge(recessivefile->modifiers.at(j).data());
                     found = true;
                     break;
                 }
@@ -1187,7 +1319,7 @@ QVector <HkxObject *> BehaviorFile::merge(BehaviorFile *recessivefile){
                     if (static_cast<hkbModifier *>(modifiers.at(i).data())->getName() == static_cast<hkbModifier *>(recessivefile->modifiers.at(j).data())->getName()
                             && modifiers.at(i).data()->getSignature() == recessivefile->modifiers.at(j).data()->getSignature())
                     {
-                        static_cast<hkbModifier *>(modifiers.at(i).data())->merge(static_cast<hkbModifier *>(recessivefile->modifiers.at(j).data()));
+                        modifiers.at(i).data()->merge(recessivefile->modifiers.at(j).data());
                         found = true;
                         break;
                     }
@@ -1213,7 +1345,7 @@ QVector <HkxObject *> BehaviorFile::merge(QVector <HkxObject *> dominantobjects)
                     if (static_cast<hkbGenerator *>(dominantobjects.at(i))->getName() == static_cast<hkbGenerator *>(generatorChildren.at(j).data())->getName()
                             && dominantobjects.at(i)->getSignature() == generatorChildren.at(j).data()->getSignature())
                     {
-                        static_cast<hkbGenerator *>(dominantobjects.at(i))->merge(static_cast<hkbGenerator *>(generatorChildren.at(j).data()));
+                        dominantobjects.at(i)->merge(generatorChildren.at(j).data());
                         dominantobjects.removeAt(i);
                         found = true;
                         break;
@@ -1224,7 +1356,7 @@ QVector <HkxObject *> BehaviorFile::merge(QVector <HkxObject *> dominantobjects)
                         if (static_cast<hkbGenerator *>(dominantobjects.at(i))->getName() == static_cast<hkbGenerator *>(generatorChildren.at(j).data())->getName()
                                 && dominantobjects.at(i)->getSignature() == generatorChildren.at(j).data()->getSignature())
                         {
-                            static_cast<hkbGenerator *>(dominantobjects.at(i))->merge(static_cast<hkbGenerator *>(generatorChildren.at(j).data()));
+                            dominantobjects.at(i)->merge(generatorChildren.at(j).data());
                             dominantobjects.removeAt(i);
                             break;
                         }
@@ -1235,7 +1367,7 @@ QVector <HkxObject *> BehaviorFile::merge(QVector <HkxObject *> dominantobjects)
                     if (static_cast<hkbGenerator *>(dominantobjects.at(i))->getName() == static_cast<hkbGenerator *>(generators.at(j).data())->getName()
                             && dominantobjects.at(i)->getSignature() == generators.at(j).data()->getSignature())
                     {
-                        static_cast<hkbGenerator *>(dominantobjects.at(i))->merge(static_cast<hkbGenerator *>(generators.at(j).data()));
+                        dominantobjects.at(i)->merge(generators.at(j).data());
                         dominantobjects.removeAt(i);
                         found = true;
                         break;
@@ -1246,7 +1378,7 @@ QVector <HkxObject *> BehaviorFile::merge(QVector <HkxObject *> dominantobjects)
                         if (static_cast<hkbGenerator *>(dominantobjects.at(i))->getName() == static_cast<hkbGenerator *>(generators.at(j).data())->getName()
                                 && dominantobjects.at(i)->getSignature() == generators.at(j).data()->getSignature())
                         {
-                            static_cast<hkbGenerator *>(dominantobjects.at(i))->merge(static_cast<hkbGenerator *>(generators.at(j).data()));
+                            dominantobjects.at(i)->merge(generators.at(j).data());
                             dominantobjects.removeAt(i);
                             break;
                         }
@@ -1258,7 +1390,7 @@ QVector <HkxObject *> BehaviorFile::merge(QVector <HkxObject *> dominantobjects)
                 if (static_cast<hkbModifier *>(dominantobjects.at(i))->getName() == static_cast<hkbModifier *>(modifiers.at(j).data())->getName()
                         && dominantobjects.at(i)->getSignature() == modifiers.at(j).data()->getSignature())
                 {
-                    static_cast<hkbModifier *>(dominantobjects.at(i))->merge(static_cast<hkbModifier *>(modifiers.at(j).data()));
+                    dominantobjects.at(i)->merge(modifiers.at(j).data());
                     dominantobjects.removeAt(i);
                     found = true;
                     break;
@@ -1269,7 +1401,7 @@ QVector <HkxObject *> BehaviorFile::merge(QVector <HkxObject *> dominantobjects)
                     if (static_cast<hkbModifier *>(dominantobjects.at(i))->getName() == static_cast<hkbModifier *>(modifiers.at(j).data())->getName()
                             && dominantobjects.at(i)->getSignature() == modifiers.at(j).data()->getSignature())
                     {
-                        static_cast<hkbModifier *>(dominantobjects.at(i))->merge(static_cast<hkbModifier *>(modifiers.at(j).data()));
+                        dominantobjects.at(i)->merge(modifiers.at(j).data());
                         dominantobjects.removeAt(i);
                         break;
                     }

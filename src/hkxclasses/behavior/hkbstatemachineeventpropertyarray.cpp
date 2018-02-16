@@ -114,6 +114,23 @@ bool hkbStateMachineEventPropertyArray::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkbStateMachineEventPropertyArray::isEventReferenced(int eventindex) const{
+    for (auto i = 0; i < events.size(); i++){
+        if (events.at(i).id == eventindex){
+            return true;
+        }
+    }
+    return false;
+}
+
+void hkbStateMachineEventPropertyArray::updateEventIndices(int eventindex){
+    for (auto i = 0; i < events.size(); i++){
+        if (events.at(i).id > eventindex){
+            events[i].id--;
+        }
+    }
+}
+
 bool hkbStateMachineEventPropertyArray::link(){
     if (!getParentFile()){
         return false;

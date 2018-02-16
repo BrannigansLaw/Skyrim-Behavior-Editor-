@@ -162,6 +162,22 @@ bool BSEventEveryNEventsModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool BSEventEveryNEventsModifier::isEventReferenced(int eventindex) const{
+    if (eventToCheckFor.id == eventindex || eventToSend.id == eventindex){
+        return true;
+    }
+    return false;
+}
+
+void BSEventEveryNEventsModifier::updateEventIndices(int eventindex){
+    if (eventToCheckFor.id > eventindex){
+        eventToCheckFor.id--;
+    }
+    if (eventToSend.id > eventindex){
+        eventToSend.id--;
+    }
+}
+
 bool BSEventEveryNEventsModifier::link(){
     if (!getParentFile()){
         return false;

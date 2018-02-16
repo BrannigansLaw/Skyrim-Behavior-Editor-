@@ -182,6 +182,19 @@ QString hkbClipGenerator::getAnimationName() const{
     return animationName;
 }
 
+bool hkbClipGenerator::isEventReferenced(int eventindex) const{
+    if (triggers.constData() && triggers.constData()->isEventReferenced(eventindex)){
+        return true;
+    }
+    return false;
+}
+
+void hkbClipGenerator::updateEventIndices(int eventindex){
+    if (triggers.data()){
+        triggers.data()->updateEventIndices(eventindex);
+    }
+}
+
 SkyrimClipGeneratoData hkbClipGenerator::getClipGeneratorAnimData(ProjectAnimData *parent, uint animationIndex) const{
     QVector <SkyrimClipTrigger> animTrigs;
     hkbClipTriggerArray *trigs = static_cast<hkbClipTriggerArray *>(triggers.data());

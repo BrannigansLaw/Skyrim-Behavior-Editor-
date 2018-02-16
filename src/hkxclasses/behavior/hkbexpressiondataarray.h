@@ -26,6 +26,8 @@ public:
     void removeExpression(const QString & exp);
     void removeExpression(int index);
     bool write(HkxXMLWriter *writer);
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
 protected:
 private:
     hkbExpressionDataArray& operator=(const hkbExpressionDataArray&);

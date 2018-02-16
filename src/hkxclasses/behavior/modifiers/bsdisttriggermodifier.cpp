@@ -129,6 +129,19 @@ bool BSDistTriggerModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool BSDistTriggerModifier::isEventReferenced(int eventindex) const{
+    if (triggerEvent.id == eventindex){
+        return true;
+    }
+    return false;
+}
+
+void BSDistTriggerModifier::updateEventIndices(int eventindex){
+    if (triggerEvent.id > eventindex){
+        triggerEvent.id--;
+    }
+}
+
 bool BSDistTriggerModifier::link(){
     if (!getParentFile()){
         return false;

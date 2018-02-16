@@ -217,7 +217,8 @@ bool ProjectFile::link(){
     return true;
 }
 
-bool ProjectFile::merge(ProjectFile *recessiveproject){
+bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update event and variable indices when merging!!!
+    bool value = false;
     if (recessiveproject){
         QList <BehaviorFile *> dominantbehaviors(behaviorFiles);
         QList <BehaviorFile *> recessivebehaviors(recessiveproject->behaviorFiles);
@@ -246,12 +247,14 @@ bool ProjectFile::merge(ProjectFile *recessiveproject){
                     }
                 }
             }
+            value = true;
         }else{
             writeToLog("ProjectFile: merge() failed!\nProject names are different!\n");
         }
     }else{
         writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
     }
+    return value;
 }
 
 void ProjectFile::addProjectToAnimData(){   //Unsafe...

@@ -249,6 +249,40 @@ bool hkbStateMachine::hasChildren() const{
     return false;
 }
 
+bool hkbStateMachine::isEventReferenced(int eventindex) const{
+    if (eventToSendWhenStateOrTransitionChanges.id == eventindex ||
+            returnToPreviousStateEventId == eventindex ||
+            randomTransitionEventId == eventindex ||
+            transitionToNextHigherStateEventId == eventindex ||
+            transitionToNextLowerStateEventId == eventindex ||
+            (wildcardTransitions.constData() && wildcardTransitions.constData()->isEventReferenced(eventindex)))
+    {
+        return true;
+    }
+    return false;
+}
+
+void hkbStateMachine::updateEventIndices(int eventindex){
+    if (eventToSendWhenStateOrTransitionChanges.id > eventindex){
+        eventToSendWhenStateOrTransitionChanges.id--;
+    }
+    if (returnToPreviousStateEventId > eventindex){
+        returnToPreviousStateEventId--;
+    }
+    if (randomTransitionEventId > eventindex){
+        randomTransitionEventId--;
+    }
+    if (transitionToNextHigherStateEventId > eventindex){
+        transitionToNextHigherStateEventId--;
+    }
+    if (transitionToNextLowerStateEventId > eventindex){
+        transitionToNextLowerStateEventId--;
+    }
+    if (wildcardTransitions.data()){
+        wildcardTransitions.data()->updateEventIndices(eventindex);
+    }
+}
+
 int hkbStateMachine::getIndexOfObj(DataIconManager *obj) const{
     //hkbStateMachineStateInfo *child;
     for (int i = 0; i < states.size(); i++){

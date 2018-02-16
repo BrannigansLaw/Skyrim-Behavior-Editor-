@@ -616,7 +616,7 @@ QStringList hkbBehaviorGraphData::getVariableTypeNames() const{
     return list;
 }
 
-bool hkbBehaviorGraphData::merge(hkbBehaviorGraphData *other){
+bool hkbBehaviorGraphData::merge(HkxObject *recessiveobj){ //Make sure to update event and variable indices when merging!!!
     //
     //
     //

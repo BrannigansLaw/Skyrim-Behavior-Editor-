@@ -128,6 +128,19 @@ bool BSPassByTargetTriggerModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool BSPassByTargetTriggerModifier::isEventReferenced(int eventindex) const{
+    if (triggerEvent.id == eventindex){
+        return true;
+    }
+    return false;
+}
+
+void BSPassByTargetTriggerModifier::updateEventIndices(int eventindex){
+    if (triggerEvent.id > eventindex){
+        triggerEvent.id--;
+    }
+}
+
 bool BSPassByTargetTriggerModifier::link(){
     if (!getParentFile()){
         return false;

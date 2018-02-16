@@ -113,6 +113,22 @@ bool hkbPoseMatchingGenerator::hasChildren() const{
     return false;
 }
 
+bool hkbPoseMatchingGenerator::isEventReferenced(int eventindex) const{
+    if (startPlayingEventId == eventindex || startMatchingEventId == eventindex){
+        return true;
+    }
+    return false;
+}
+
+void hkbPoseMatchingGenerator::updateEventIndices(int eventindex){
+    if (startPlayingEventId > eventindex){
+        startPlayingEventId--;
+    }
+    if (startMatchingEventId > eventindex){
+        startMatchingEventId--;
+    }
+}
+
 int hkbPoseMatchingGenerator::getIndexOfObj(DataIconManager *obj) const{
     hkbBlenderGeneratorChild *child;
     for (int i = 0; i < children.size(); i++){

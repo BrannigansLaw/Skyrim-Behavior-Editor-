@@ -95,6 +95,18 @@ bool HkxObject::merge(HkxObject *){
     return false;
 }
 
+bool HkxObject::isEventReferenced(int) const{
+    return false;
+}
+
+bool HkxObject::isVariableReferenced(int) const{
+    return false;
+}
+
+void HkxObject::updateEventIndices(int ){
+    //
+}
+
 bool HkxObject::write(HkxXMLWriter *){
     return false;
 }
@@ -442,6 +454,13 @@ void HkDynamicObject::removeBinding(const QString & path){
 
 void HkDynamicObject::removeBinding(int varIndex){
     static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->removeBinding(varIndex);
+}
+
+bool HkDynamicObject::isVariableReferenced(int variableindex) const{
+    if (variableBindingSet.constData() && static_cast<const hkbVariableBindingSet *>(variableBindingSet.constData())->isVariableRefed(variableindex)){
+        return true;
+    }
+    return false;
 }
 
 bool HkDynamicObject::linkVar(){

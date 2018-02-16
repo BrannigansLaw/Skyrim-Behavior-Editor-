@@ -145,14 +145,14 @@ MainWindow::MainWindow()
     //variablesWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
     //eventsWid->setMaximumSize(size().width()*0.4, size().height()*0.25);
     logGB->setMaximumSize(size().width()*0.6, size().height()*0.1);
-    if (!findGameDirectory(skyrimDirectory, QString("Skyrim"))){
+    if (!findGameDirectory(QString("Skyrim"), skyrimDirectory)){
         writeToLog("The TESV executable was not found!");
     }
-    if (!findGameDirectory(skyrimSpecialEdtionDirectory, QString("Skyrim Special Edition"))){
+    if (!findGameDirectory(QString("Skyrim Special Edition"), skyrimSpecialEdtionDirectory)){
         writeToLog("The SSE executable was not found!");
     }else{
         skyrimBehaviorUpdateToolFullPath = skyrimSpecialEdtionDirectory+"/Tools/HavokBehaviorPostProcess/HavokBehaviorPostProcess.exe";
-        if (!QDir(skyrimBehaviorUpdateToolFullPath).exists()){
+        if (!QFile(skyrimBehaviorUpdateToolFullPath).exists()){
             WARNING_MESSAGE(QString("The tool for the conversion of Havok 32bit to Havok 64bit \"HavokBehaviorPostProcess.exe\" was not found!\n\nTo obtain it, you need to download the Creation Kit for Skyrim Special Edition!"));
         }
     }

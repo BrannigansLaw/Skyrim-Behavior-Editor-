@@ -642,9 +642,9 @@ void HkDataUI::eventRemoved(int index){
     case DATA_TYPE_LOADED::STATE:
         stateUI->eventRenamed("NONE", index);
         break;
-    /*case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
-            cyclicBlendTransGenUI->eventRenamed(newName, index);
-            break;*/
+    case DATA_TYPE_LOADED::BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+        cyclicBlendTransGenUI->eventRenamed("NONE", index);
+        break;
     case DATA_TYPE_LOADED::POSE_MATCHING_GENERATOR:
         poseMatchGenUI->eventRenamed("NONE", index);
         break;
@@ -1078,7 +1078,6 @@ void HkDataUI::variableRemoved(int index){
         eventsFromRangeModUI->variableRenamed("NONE", index);
         break;
     }
-    behaviorView->behavior->removeBindings(index);
     behaviorView->removeOtherData();
 }
 

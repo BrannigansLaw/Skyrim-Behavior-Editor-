@@ -24,6 +24,8 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
 private:
     QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;

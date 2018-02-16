@@ -20,6 +20,8 @@ public:
     int getIndexToInsertIcon(HkxObject *child) const;
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
     enum BlenderFlag{
         FLAG_NONE = 0,
         FLAG_SYNC = 1,

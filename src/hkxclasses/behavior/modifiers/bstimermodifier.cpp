@@ -122,6 +122,19 @@ bool BSTimerModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool BSTimerModifier::isEventReferenced(int eventindex) const{
+    if (alarmEvent.id == eventindex){
+        return true;
+    }
+    return false;
+}
+
+void BSTimerModifier::updateEventIndices(int eventindex){
+    if (alarmEvent.id > eventindex){
+        alarmEvent.id--;
+    }
+}
+
 bool BSTimerModifier::link(){
     if (!getParentFile()){
         return false;

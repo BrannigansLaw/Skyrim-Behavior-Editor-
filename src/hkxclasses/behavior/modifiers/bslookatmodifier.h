@@ -20,6 +20,8 @@ public:
     bool write(HkxXMLWriter *writer);
     int getNumberOfBones() const;
     int getNumberOfEyeBones() const;
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
 private:
     BSLookAtModifier& operator=(const BSLookAtModifier&);
     BSLookAtModifier(const BSLookAtModifier &);

@@ -263,6 +263,23 @@ int hkbSenseHandleModifier::getNumberOfRanges() const{
     return ranges.size();
 }
 
+bool hkbSenseHandleModifier::isEventReferenced(int eventindex) const{
+    for (auto i = 0; i < ranges.size(); i++){
+        if (ranges.at(i).event.id == eventindex){
+            return true;
+        }
+    }
+    return false;
+}
+
+void hkbSenseHandleModifier::updateEventIndices(int eventindex){
+    for (auto i = 0; i < ranges.size(); i++){
+        if (ranges.at(i).event.id > eventindex){
+            ranges[i].event.id--;
+        }
+    }
+}
+
 bool hkbSenseHandleModifier::link(){
     if (!getParentFile()){
         return false;

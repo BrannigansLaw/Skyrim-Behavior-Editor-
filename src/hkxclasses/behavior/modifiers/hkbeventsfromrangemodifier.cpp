@@ -121,6 +121,19 @@ int hkbEventsFromRangeModifier::getNumberOfRanges() const{
     return 0;
 }
 
+bool hkbEventsFromRangeModifier::isEventReferenced(int eventindex) const{
+    if (eventRanges.constData() && eventRanges.constData()->isEventReferenced(eventindex)){
+        return true;
+    }
+    return false;
+}
+
+void hkbEventsFromRangeModifier::updateEventIndices(int eventindex){
+    if (eventRanges.data()){
+        eventRanges.data()->updateEventIndices(eventindex);
+    }
+}
+
 bool hkbEventsFromRangeModifier::link(){
     if (!getParentFile()){
         return false;

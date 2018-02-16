@@ -118,6 +118,23 @@ bool hkbExpressionDataArray::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkbExpressionDataArray::isEventReferenced(int eventindex) const{
+    for (auto i = 0; i < expressionsData.size(); i++){
+        if (expressionsData.at(i).assignmentEventIndex == eventindex){
+            return true;
+        }
+    }
+    return false;
+}
+
+void hkbExpressionDataArray::updateEventIndices(int eventindex){
+    for (auto i = 0; i < expressionsData.size(); i++){
+        if (expressionsData.at(i).assignmentEventIndex > eventindex){
+            expressionsData[i].assignmentEventIndex--;
+        }
+    }
+}
+
 bool hkbExpressionDataArray::link(){
     return true;
 }

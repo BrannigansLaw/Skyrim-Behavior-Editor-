@@ -206,7 +206,7 @@ public:
         setMouseTracking(true);
         //setStyleSheet("QTableWidget { background:cyan }");
         setStyleSheet("QHeaderView::section { background-color:grey }");
-        verticalHeader()->setVisible(false);
+        //verticalHeader()->setVisible(false);
         setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
         horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         horizontalHeader()->setSectionsClickable(false);

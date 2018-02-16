@@ -17,6 +17,8 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
 private:
     BSRagdollContactListenerModifier& operator=(const BSRagdollContactListenerModifier&);
     BSRagdollContactListenerModifier(const BSRagdollContactListenerModifier &);

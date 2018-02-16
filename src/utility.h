@@ -23,6 +23,8 @@
 #define VIEW_BONES_TABLE_TIP "Double click to view the table of bones"
 #define DRAG_DROP_N_SWAP "Hold click to start drag, release click to swap dragged item with item under the mouse cursor"
 
+#define MAX_ERROR_STRING_SIZE 200
+
 enum hkVariableType {
     VARIABLE_TYPE_BOOL,
     VARIABLE_TYPE_INT8,

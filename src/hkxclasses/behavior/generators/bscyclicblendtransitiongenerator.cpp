@@ -58,6 +58,22 @@ bool BSCyclicBlendTransitionGenerator::hasChildren() const{
     return false;
 }
 
+bool BSCyclicBlendTransitionGenerator::isEventReferenced(int eventindex) const{
+    if (eventToFreezeBlendValue.id == eventindex || eventToCrossBlend.id == eventindex){
+        return true;
+    }
+    return false;
+}
+
+void BSCyclicBlendTransitionGenerator::updateEventIndices(int eventindex){
+    if (eventToFreezeBlendValue.id > eventindex){
+        eventToFreezeBlendValue.id--;
+    }
+    if (eventToCrossBlend.id > eventindex){
+        eventToCrossBlend.id--;
+    }
+}
+
 QList<DataIconManager *> BSCyclicBlendTransitionGenerator::getChildren() const{
     QList<DataIconManager *> list;
     if (pBlenderGenerator.data()){

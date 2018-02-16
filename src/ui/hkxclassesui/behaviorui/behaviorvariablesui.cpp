@@ -380,16 +380,25 @@ void BehaviorVariablesUI::addVariable(){
 
 void BehaviorVariablesUI::removeVariable(){
     if (loadedData){
+        disconnect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeVariable()));
         int index = table->currentRow();
-        loadedData->removeVariable(index);
-        if (index < table->rowCount()){
-            table->removeRow(index);
+        QString message = static_cast<BehaviorFile *>(loadedData->getParentFile())->isVariableReferenced(index);
+        if (message == ""){
+            loadedData->removeVariable(index);
+            if (index < table->rowCount()){
+                table->removeRow(index);
+            }
+            if (stackLyt->currentIndex() == VARIABLE_WIDGET){
+                stackLyt->setCurrentIndex(TABLE_WIDGET);
+            }
+            loadedData->getParentFile()->setIsChanged(true);
+            static_cast<BehaviorFile *>(loadedData->getParentFile())->updateVariableIndices(index);
+            emit variableRemoved(index);
+            table->setFocus();
+        }else{
+            WARNING_MESSAGE(message);
         }
-        if (stackLyt->currentIndex() == VARIABLE_WIDGET){
-            stackLyt->setCurrentIndex(TABLE_WIDGET);
-        }
-        loadedData->getParentFile()->setIsChanged(true);
-        emit variableRemoved(index);
+        connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeVariable()));
     }
 }
 

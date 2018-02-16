@@ -109,6 +109,19 @@ bool BSEventOnDeactivateModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool BSEventOnDeactivateModifier::isEventReferenced(int eventindex) const{
+    if (event.id == eventindex){
+        return true;
+    }
+    return false;
+}
+
+void BSEventOnDeactivateModifier::updateEventIndices(int eventindex){
+    if (event.id > eventindex){
+        event.id--;
+    }
+}
+
 bool BSEventOnDeactivateModifier::link(){
     if (!getParentFile()){
         return false;

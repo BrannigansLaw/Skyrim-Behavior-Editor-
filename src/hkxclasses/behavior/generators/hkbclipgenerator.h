@@ -22,6 +22,8 @@ public:
     bool write(HkxXMLWriter *writer);
     int getNumberOfTriggers() const;
     QString getAnimationName() const;
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
     enum ClipFlag{
         FLAG_NONE = 0,
         FLAG_CONTINUE_MOTION_AT_END = 1,

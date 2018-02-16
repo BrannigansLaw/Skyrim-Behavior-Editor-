@@ -24,6 +24,8 @@ public:
     void removeTransition(int index);
     void removeTransitionToState(uint stateId);
     bool write(HkxXMLWriter *writer);
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
     struct HkTransition
     {
         HkTransition(): eventId(-1), toStateId(0), fromNestedStateId(0), toNestedStateId(0), priority(0), flags("0"){}

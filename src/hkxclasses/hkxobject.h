@@ -41,6 +41,9 @@ public:
     virtual bool write(HkxXMLWriter *);
     virtual bool readData(const HkxXmlReader &, long);
     virtual bool merge(HkxObject *);
+    virtual bool isEventReferenced(int ) const;
+    virtual bool isVariableReferenced(int ) const;
+    virtual void updateEventIndices(int);
     QString getReferenceString() const;
     QString getBoolAsString(bool b) const;
     HkxFile * getParentFile() const;
@@ -99,6 +102,7 @@ public:
     void addBinding(const QString & path, int varIndex, bool isProperty = false);
     void removeBinding(const QString & path);
     void removeBinding(int varIndex);
+    bool isVariableReferenced(int variableindex) const;
 protected:
     HkDynamicObject(HkxFile *parent, long ref = -1);
 protected:

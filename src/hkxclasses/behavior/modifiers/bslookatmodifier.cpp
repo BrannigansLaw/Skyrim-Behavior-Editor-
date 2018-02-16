@@ -331,6 +331,19 @@ int BSLookAtModifier::getNumberOfEyeBones() const{
     return eyeBones.size();
 }
 
+bool BSLookAtModifier::isEventReferenced(int eventindex) const{
+    if (id == eventindex){
+        return true;
+    }
+    return false;
+}
+
+void BSLookAtModifier::updateEventIndices(int eventindex){
+    if (id > eventindex){
+        id--;
+    }
+}
+
 bool BSLookAtModifier::link(){
     if (!getParentFile()){
         return false;

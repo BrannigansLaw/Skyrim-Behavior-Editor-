@@ -145,6 +145,19 @@ bool hkbDetectCloseToGroundModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkbDetectCloseToGroundModifier::isEventReferenced(int eventindex) const{
+    if (closeToGroundEvent.id == eventindex){
+        return true;
+    }
+    return false;
+}
+
+void hkbDetectCloseToGroundModifier::updateEventIndices(int eventindex){
+    if (closeToGroundEvent.id > eventindex){
+        closeToGroundEvent.id--;
+    }
+}
+
 bool hkbDetectCloseToGroundModifier::link(){
     if (!getParentFile()){
         return false;

@@ -284,6 +284,28 @@ bool hkbAttachmentModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkbAttachmentModifier::isEventReferenced(int eventindex) const{
+    if (sendToAttacherOnAttach.id == eventindex || sendToAttacheeOnAttach.id == eventindex || sendToAttacherOnDetach.id == eventindex || sendToAttacheeOnDetach.id == eventindex ){
+        return true;
+    }
+    return false;
+}
+
+void hkbAttachmentModifier::updateEventIndices(int eventindex){
+    if (sendToAttacherOnAttach.id > eventindex){
+        sendToAttacherOnAttach.id--;
+    }
+    if (sendToAttacheeOnAttach.id > eventindex){
+        sendToAttacheeOnAttach.id--;
+    }
+    if (sendToAttacherOnDetach.id > eventindex){
+        sendToAttacherOnDetach.id--;
+    }
+    if (sendToAttacheeOnDetach.id > eventindex){
+        sendToAttacheeOnDetach.id--;
+    }
+}
+
 bool hkbAttachmentModifier::link(){
     if (!getParentFile()){
         return false;

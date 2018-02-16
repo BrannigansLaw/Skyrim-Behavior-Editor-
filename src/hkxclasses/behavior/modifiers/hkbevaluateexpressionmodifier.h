@@ -18,6 +18,8 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfExpressions() const;
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
 private:
     hkbEvaluateExpressionModifier& operator=(const hkbEvaluateExpressionModifier&);
     hkbEvaluateExpressionModifier(const hkbEvaluateExpressionModifier &);

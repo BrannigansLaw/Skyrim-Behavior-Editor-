@@ -31,6 +31,8 @@ public:
     bool write(HkxXMLWriter *writer);
     int generateValidStateId();
     bool hasChildren() const;
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
 private:
     QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;

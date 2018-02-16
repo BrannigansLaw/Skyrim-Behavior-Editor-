@@ -212,6 +212,25 @@ bool BSEventOnFalseToTrueModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool BSEventOnFalseToTrueModifier::isEventReferenced(int eventindex) const{
+    if (eventToSend1.id == eventindex || eventToSend2.id == eventindex || eventToSend3.id == eventindex){
+        return true;
+    }
+    return false;
+}
+
+void BSEventOnFalseToTrueModifier::updateEventIndices(int eventindex){
+    if (eventToSend1.id > eventindex){
+        eventToSend1.id--;
+    }
+    if (eventToSend2.id > eventindex){
+        eventToSend2.id--;
+    }
+    if (eventToSend3.id > eventindex){
+        eventToSend3.id--;
+    }
+}
+
 bool BSEventOnFalseToTrueModifier::link(){
     if (!getParentFile()){
         return false;

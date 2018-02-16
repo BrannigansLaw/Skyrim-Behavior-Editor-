@@ -140,6 +140,7 @@ void AnimationsUI::removeAnimation(){
         }
         loadedData->getParentFile()->setIsChanged(true);
         emit animationRemoved(index);
+        table->setFocus();
     }else{
         WARNING_MESSAGE(QString("Animation is in use! Check the text log for information on where the animation is used..."))
     }

@@ -214,6 +214,23 @@ bool hkbVariableBindingSet::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkbVariableBindingSet::isVariableRefed(int variableindex) const{
+    for (auto i = 0; i < bindings.size(); i++){
+        if (bindings.at(i).variableIndex == variableindex && bindings.at(i).bindingType == hkBinding::BINDING_TYPE_VARIABLE){
+            return true;
+        }
+    }
+    return false;
+}
+
+void hkbVariableBindingSet::updateVariableIndices(int index){
+    for (auto i = 0; i < bindings.size(); i++){
+        if (bindings.at(i).variableIndex > index && bindings.at(i).bindingType == hkBinding::BINDING_TYPE_VARIABLE){
+            bindings[i].variableIndex--;
+        }
+    }
+}
+
 bool hkbVariableBindingSet::link(){
     return true;
 }
