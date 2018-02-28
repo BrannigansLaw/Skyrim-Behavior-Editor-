@@ -16,7 +16,8 @@ EventUI::EventUI()
       nameL(new QLabel("Event Name:")),
       selectEvent(new QPushButton("NONE")),
       payloadL(new QLabel("Payload String:")),
-      eventPayload(new QLineEdit)
+      eventPayload(new QLineEdit),
+      eventData(nullptr)
 {
     setMinimumHeight(400);
     setMaximumHeight(400);

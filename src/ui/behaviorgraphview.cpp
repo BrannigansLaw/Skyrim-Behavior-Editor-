@@ -492,6 +492,8 @@ void BehaviorGraphView::append(T *obj){
         behavior->setIsChanged(true);
         getSelectedItem()->reposition();
         treeScene->selectIcon(newIcon, TreeGraphicsScene::EXPAND_CONTRACT_ZERO);
+        QRectF rect = sceneRect();
+        setSceneRect(rect.marginsAdded(QMarginsF(0, 0, newIcon->boundingRect().width()*2, newIcon->boundingRect().height()*2)));
         if (obj->getSignature() != HKB_STATE_MACHINE_STATE_INFO){
             emit addedGenerator(obj->getName(), obj->getClassname());
         }

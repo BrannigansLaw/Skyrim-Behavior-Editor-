@@ -24,7 +24,7 @@ VERSION = 0.90
 QMAKE_TARGET_COMPANY = WK Inc.
 #QMAKE_TARGET_PRODUCT = "Skyrim Behavior Editor"
 QMAKE_TARGET_DESCRIPTION = Skyrim Behavior Editor
-QMAKE_TARGET_COPYRIGHT = Wayne Kelly
+QMAKE_TARGET_COPYRIGHT = Wayne K
 
 SOURCES += \
     src/main.cpp \

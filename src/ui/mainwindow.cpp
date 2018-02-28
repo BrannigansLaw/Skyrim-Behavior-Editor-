@@ -626,6 +626,8 @@ void MainWindow::addNewBehavior(bool initData){
                 }
                 tabs->setCurrentIndex(tabs->count() - 1);
                 dialog.setProgress("Writing to file...", 50);
+                projectFile->behaviorFiles.last()->setIsChanged(true);
+                save();
                 //???
                 //projectFile->behaviorFiles.last()->toggleChanged(true);
                 //saveFile(tabs->count() - 2);
