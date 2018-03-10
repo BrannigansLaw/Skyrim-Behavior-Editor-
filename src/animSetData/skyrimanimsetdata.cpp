@@ -113,7 +113,7 @@ bool SkyrimAnimSetData::removeAnimationFromCache(const QString & projectname, co
         return false;
     }
     for (int i = 0; i < projects.at(index)->animSetData.size(); i++){
-        projects[index]->animSetData[i]->removeAnimationFromCache(animationname, variablename, clipname);
+        projects[index]->animSetData[i]->removeAnimationFromCache(animationname, clipname, variablename);
     }
     return true;
 }

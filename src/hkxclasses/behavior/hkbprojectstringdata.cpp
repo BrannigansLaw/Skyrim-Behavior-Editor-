@@ -159,7 +159,7 @@ bool hkbProjectStringData::write(HkxXMLWriter *writer){
         list4 = {"characterFilenames", QString::number(characterFilenames.size())};
         writer->writeLine(writer->parameter, list3, list4, "");
         for (int i = 0; i < characterFilenames.size(); i++){
-            writer->writeLine(writer->string, QStringList(), QStringList(), characterFilenames.at(i));
+            writer->writeLine(writer->string, QStringList(), QStringList(), QString(characterFilenames.at(i)).replace("/", "\\"));
         }
         if (characterFilenames.size() > 0){
             writer->writeLine(writer->parameter, false);

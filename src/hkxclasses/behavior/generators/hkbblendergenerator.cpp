@@ -119,6 +119,13 @@ int hkbBlenderGenerator::getIndexOfChild(hkbBlenderGeneratorChild *child) const{
     return -1;
 }
 
+bool hkbBlenderGenerator::isParametricBlend() const{
+    if (flags.contains(FLAG_PARAMETRIC_BLEND)){
+        return true;
+    }
+    return false;
+}
+
 QList<DataIconManager *> hkbBlenderGenerator::getChildren() const{
     QList<DataIconManager *> list;
     hkbBlenderGeneratorChild *child;

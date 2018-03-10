@@ -459,12 +459,12 @@ void MainWindow::exportAnimationData(){
     if (animData.exists()){
         QDir dir(skyrimDirectory+"/data/meshes");
         if (dir.exists()){
-            if (!animData.copy(skyrimDirectory+"/data/meshes")){
+            if (!animData.copy(skyrimDirectory+"/data/meshes/animationdatasinglefile.txt")){
                 writeToLog("Failed to export animationdatasinglefile.txt to the game directory!");
             }
         }else{
             if (QDir().mkdir(skyrimDirectory+"/data/meshes")){
-                if (!animData.copy(skyrimDirectory+"/data/meshes")){
+                if (!animData.copy(skyrimDirectory+"/data/meshes/animationdatasinglefile.txt")){
                     writeToLog("Failed to export animationdatasinglefile.txt to the game directory!");
                 }
             }else{
@@ -478,12 +478,12 @@ void MainWindow::exportAnimationData(){
     if (animSetData.exists()){
         QDir dir(skyrimDirectory+"/data/meshes");
         if (dir.exists()){
-            if (!animSetData.copy(skyrimDirectory+"/data/meshes")){
+            if (!animSetData.copy(skyrimDirectory+"/data/meshes/animationsetdatasinglefile.txt")){
                 writeToLog("Failed to export animationsetdatasinglefile.txt to the game directory!");
             }
         }else{
             if (QDir().mkdir(skyrimDirectory+"/data/meshes")){
-                if (!animSetData.copy(skyrimDirectory+"/data/meshes")){
+                if (!animSetData.copy(skyrimDirectory+"/data/meshes/animationsetdatasinglefile.txt")){
                     writeToLog("Failed to export animationsetdatasinglefile.txt to the game directory!");
                 }
             }else{
@@ -867,6 +867,21 @@ bool MainWindow::closeAll(){
         }
     }else{
         return true;
+    }
+}
+
+void MainWindow::removeBehaviorGraphs(const QStringList & filenames){
+    for (auto i = 0; i < behaviorGraphs.size(); i++){
+        for (auto j = 0; j < filenames.size(); j++){
+            if (behaviorGraphs.at(i)->behavior->fileName() == filenames.at(j)){
+                behaviorGraphs.at(i)->deleteAllObjectBranches();
+                delete behaviorGraphs.at(i);
+                behaviorGraphs.removeAt(i);
+                projectFile->deleteBehaviorFile(filenames.at(j));
+                i = 0;
+                j = filenames.size();
+            }
+        }
     }
 }
 

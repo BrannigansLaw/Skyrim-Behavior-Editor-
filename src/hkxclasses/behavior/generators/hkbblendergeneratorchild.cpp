@@ -109,6 +109,15 @@ bool hkbBlenderGeneratorChild::write(HkxXMLWriter *writer){
     return true;
 }
 
+bool hkbBlenderGeneratorChild::isParametricBlend() const{
+    if (parentBG.constData()){
+        return static_cast<const hkbBlenderGenerator *>(parentBG.constData())->isParametricBlend();
+    }else{
+        getParentFile()->writeToLog(getClassname()+": isParametricBlend()!\nNo parent blender generator'!!!", true);
+    }
+    return false;
+}
+
 bool hkbBlenderGeneratorChild::link(){
     if (!getParentFile()){
         return false;

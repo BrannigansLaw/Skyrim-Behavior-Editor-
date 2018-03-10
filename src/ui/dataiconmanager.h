@@ -14,6 +14,7 @@ class DataIconManager: public HkDynamicObject
     friend class TreeGraphicsScene;
     friend class TreeGraphicsItem;
     friend class BehaviorGraphIcon;
+    friend class BehaviorGraphView;
 public:
     virtual QString getName() const;
     virtual bool hasChildren() const;

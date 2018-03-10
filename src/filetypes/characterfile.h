@@ -39,6 +39,7 @@ public:
     int getAnimationIndex(const QString & name) const;
     int getNumberOfAnimations() const;
     bool isAnimationUsed(const QString & animationname) const;
+    QString getRootBehaviorFilename() const;
 protected:
     bool parse();
     bool link();

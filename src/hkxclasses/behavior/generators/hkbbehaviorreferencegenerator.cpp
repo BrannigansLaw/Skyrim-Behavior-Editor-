@@ -69,7 +69,7 @@ bool hkbBehaviorReferenceGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("behaviorName"), behaviorName);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("behaviorName"), QString(behaviorName).replace("/", "\\"));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
@@ -78,6 +78,16 @@ bool hkbBehaviorReferenceGenerator::write(HkxXMLWriter *writer){
         }
     }
     return true;
+}
+
+QString hkbBehaviorReferenceGenerator::getBehaviorName() const{
+    if (behaviorName.contains("\\")){
+        return behaviorName.section("\\", -1, -1);
+    }else if (behaviorName.contains("/")){
+        return behaviorName.section("/", -1, -1);
+    }
+    getParentFile()->writeToLog(getClassname()+": getBehaviorName()!\nInvalid behaviorName!!!", true);
+    return behaviorName;
 }
 
 bool hkbBehaviorReferenceGenerator::link(){
@@ -100,5 +110,6 @@ bool hkbBehaviorReferenceGenerator::evaulateDataValidity(){
 }
 
 hkbBehaviorReferenceGenerator::~hkbBehaviorReferenceGenerator(){
+    static_cast<BehaviorFile *>(getParentFile())->removeUnreferencedFiles(this);
     refCount--;
 }

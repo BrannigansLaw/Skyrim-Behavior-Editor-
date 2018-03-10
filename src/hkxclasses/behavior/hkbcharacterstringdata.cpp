@@ -245,7 +245,7 @@ bool hkbCharacterStringData::write(HkxXMLWriter *writer){
         list4 = {"animationNames", QString::number(animationNames.size())};
         writer->writeLine(writer->parameter, list3, list4, "");
         for (int i = 0; i < animationNames.size(); i++){
-            writer->writeLine(writer->string, QStringList(), QStringList(), animationNames.at(i));
+            writer->writeLine(writer->string, QStringList(), QStringList(), QString(animationNames.at(i)).replace("/", "\\"));
         }
         if (animationNames.size() > 0){
             writer->writeLine(writer->parameter, false);
@@ -305,9 +305,9 @@ bool hkbCharacterStringData::write(HkxXMLWriter *writer){
             writer->writeLine(writer->parameter, false);
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("rigName"), rigName);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("ragdollName"), ragdollName);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("behaviorFilename"), behaviorFilename);
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("rigName"), QString(rigName).replace("/", "\\"));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("ragdollName"), QString(ragdollName).replace("/", "\\"));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("behaviorFilename"), QString(behaviorFilename).replace("/", "\\"));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");

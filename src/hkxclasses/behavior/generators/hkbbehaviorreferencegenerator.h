@@ -18,6 +18,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    QString getBehaviorName() const;
 private:
     hkbBehaviorReferenceGenerator& operator=(const hkbBehaviorReferenceGenerator&);
     hkbBehaviorReferenceGenerator(const hkbBehaviorReferenceGenerator &);

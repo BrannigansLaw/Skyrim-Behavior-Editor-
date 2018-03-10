@@ -8,6 +8,7 @@ class CharacterFile;
 class hkbModifier;
 class ProjectFile;
 class SkyrimClipGeneratoData;
+class hkbBehaviorReferenceGenerator;
 
 class BehaviorFile: public HkxFile
 {
@@ -67,7 +68,7 @@ public:
     bool isClipGenNameTaken(const QString & name) const;
     bool isClipGenNameAvailable(const QString & name) const;
     bool addClipGenToAnimationData(const QString & name);
-    bool removeClipGenFromAnimData(const QString & name);
+    bool removeClipGenFromAnimData(const QString & animationname, const QString &clipname, const QString &variablename = "");
     void setClipNameAnimData(const QString &oldclipname, const QString &newclipname);
     void setAnimationIndexAnimData(int index, const QString &clipGenName);
     void setPlaybackSpeedAnimData(const QString & clipGenName, qreal speed);
@@ -79,6 +80,9 @@ public:
     void updateEventIndices(int index);
     QString isVariableReferenced(int variableindex) const;
     void updateVariableIndices(int index);
+    void removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *gentoignore);
+    QStringList getReferencedBehaviors(const hkbBehaviorReferenceGenerator *gentoignore) const;
+    void removeAllData();
 protected:
     bool parse();
     bool link();

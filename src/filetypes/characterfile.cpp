@@ -171,6 +171,19 @@ bool CharacterFile::isAnimationUsed(const QString &animationname) const{
     return project->isAnimationUsed(animationname);
 }
 
+QString CharacterFile::getRootBehaviorFilename() const{
+    if (stringData.data() && stringData->getSignature() == HKB_CHARACTER_STRING_DATA){
+        QString string = static_cast<hkbCharacterStringData *>(stringData.data())->behaviorFilename;
+        if (string.contains("\\")){
+            return string.section("\\", -1, -1);
+        }else if (string.contains("/")){
+            return string.section("/", -1, -1);
+        }
+        return string;
+    }
+    return "";
+}
+
 void CharacterFile::setSkeletonFile(SkeletonFile *skel){
     skeleton = skel;
 }

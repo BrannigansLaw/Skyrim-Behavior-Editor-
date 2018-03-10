@@ -1,7 +1,7 @@
 #include "projectanimdata.h"
 #include "src/utility.h"
 
-#define MIN_NUM_LINES 3
+#define MIN_NUM_LINES 4
 
 bool ProjectAnimData::chopLine(QFile * file, QByteArray & line, uint & linecount){
     if (file){
@@ -138,6 +138,8 @@ bool ProjectAnimData::write(QFile & file, QTextStream & out) const{
     }
     if (animationData.size() > 0){
         out << "1" << "\n";
+    }else{
+        out << "0" << "\n";
     }
     for (int i = 0; i < animationData.size(); i++){
         if (!animationData.at(i)->write(&file, out)){
@@ -294,4 +296,14 @@ void ProjectAnimData::removeClipTriggerToAnimDataAt(const QString &clipGenName, 
         }
     }
     FATAL_RUNTIME_ERROR("ProjectAnimData::removeClipTriggerToAnimDataAt(): Failed to set data!");
+}
+
+bool ProjectAnimData::removeBehaviorFromProject(const QString &behaviorname){
+    for (int i = 0; i < projectFiles.size(); i++){
+        if (!QString::compare(projectFiles.at(i), behaviorname, Qt::CaseInsensitive)){
+            projectFiles.removeAt(i);animationDataLines--;
+            return true;
+        }
+    }
+    return false;
 }

@@ -15,6 +15,7 @@ class HkxFile: public QFile
     friend class MainWindow;
     friend class BehaviorGraphView;
     friend class HkxXMLWriter;
+    friend class ProjectFile;
 public:
     void writeToLog(const QString & message, bool isError = false);
     HkxFile(MainWindow *window, const QString & name);

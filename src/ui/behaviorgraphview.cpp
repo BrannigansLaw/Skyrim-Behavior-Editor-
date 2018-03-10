@@ -445,6 +445,20 @@ void BehaviorGraphView::removeObjects(){
     behavior->setIsChanged(true);
 }
 
+void BehaviorGraphView::deleteAllObjectBranches(){
+    hkbBehaviorGraph *graph = static_cast<hkbBehaviorGraph *>(behavior->behaviorGraph.data());
+    if (!graph->icons.isEmpty()){
+        QList <QGraphicsItem *> list = graph->icons.first()->childItems();
+        if (!list.isEmpty()){
+            TreeGraphicsItem *root = static_cast<TreeGraphicsItem *>(list.first());
+            root->unselect();
+            removeItemFromGraph(root, 0, true, true);
+            ui->changeCurrentDataWidget(nullptr);
+            removeObjects();
+        }
+    }
+}
+
 template <typename T>
 void BehaviorGraphView::append(T *obj){
     if (getSelectedItem()){

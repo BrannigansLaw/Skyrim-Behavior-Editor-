@@ -304,3 +304,11 @@ bool SkyrimAnimData::isProjectNameTaken(const QString & name) const{
     return false;
 }
 
+bool SkyrimAnimData::removeBehaviorFromProject(const QString &projectname, const QString &behaviorfilename){
+    int index = getProjectIndex(projectname);
+    if (index < 0 || index >= animData.size()){
+        FATAL_RUNTIME_ERROR("SkyrimAnimData::removeBehaviorFromProject(): Project was not found!");
+    }
+    animData.at(index)->removeBehaviorFromProject(behaviorfilename);
+}
+

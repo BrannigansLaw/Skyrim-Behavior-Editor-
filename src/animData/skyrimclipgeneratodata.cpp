@@ -126,7 +126,7 @@ bool SkyrimClipGeneratoData::write(QFile *file, QTextStream & out) const{
         return false;
     }
     out << clipGeneratorName << "\n";
-    out << QString::number(animationIndex, char('f'), 6) << "\n";
+    out << QString::number(animationIndex) << "\n";
     out << QString::number(playbackSpeed, char('f'), 6) << "\n";
     out << QString::number(cropStartTime, char('f'), 6) << "\n";
     out << QString::number(cropEndTime, char('f'), 6) << "\n";

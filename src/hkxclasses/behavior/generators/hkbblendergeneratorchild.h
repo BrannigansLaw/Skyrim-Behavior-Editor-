@@ -22,6 +22,7 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    bool isParametricBlend() const;
 private:
     hkbGenerator *getParentGenerator() const;
     hkbBlenderGeneratorChild& operator=(const hkbBlenderGeneratorChild&);

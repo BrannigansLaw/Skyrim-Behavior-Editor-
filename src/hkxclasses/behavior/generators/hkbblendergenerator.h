@@ -24,6 +24,7 @@ public:
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
     int getIndexOfChild(hkbBlenderGeneratorChild *child) const;
+    bool isParametricBlend() const;
     enum BlenderFlag{
         FLAG_NONE = 0,
         FLAG_SYNC = 1,

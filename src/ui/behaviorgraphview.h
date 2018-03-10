@@ -147,6 +147,7 @@ private:
     bool confirmationDialogue(const QString & message, QWidget *parent);
     TreeGraphicsItem * getSelectedIconsChildIcon(HkxObject *child);
     void removeObjects();
+    void deleteAllObjectBranches();
 private:
     HkDataUI *ui;
     BehaviorFile *behavior;

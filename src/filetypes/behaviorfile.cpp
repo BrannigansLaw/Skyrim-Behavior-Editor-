@@ -574,8 +574,8 @@ bool BehaviorFile::addClipGenToAnimationData(const QString &name){
     return project->appendClipGeneratorAnimData(name);
 }
 
-bool BehaviorFile::removeClipGenFromAnimData(const QString &name){
-    return project->removeClipGenFromAnimData(name);
+bool BehaviorFile::removeClipGenFromAnimData(const QString & animationname, const QString & clipname, const QString & variablename){
+    return project->removeClipGenFromAnimData(animationname, clipname, variablename);
 }
 
 void BehaviorFile::setClipNameAnimData(const QString &oldclipname, const QString &newclipname){
@@ -737,6 +737,30 @@ void BehaviorFile::updateVariableIndices(int index){
     }else{
         FATAL_RUNTIME_ERROR(QString("BehaviorFile::updateVariableIndices(): stringdata null or invalid variable index!!!"));
     }
+}
+
+void BehaviorFile::removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *gentoignore){
+    project->removeUnreferencedFiles(gentoignore);
+}
+
+QStringList BehaviorFile::getReferencedBehaviors(const hkbBehaviorReferenceGenerator *gentoignore) const{
+    QStringList list;
+    QString name;
+    for (auto i = 0; i < generators.size(); i++){
+        if (generators.at(i).data()->getSignature() == HKB_BEHAVIOR_REFERENCE_GENERATOR && gentoignore != generators.at(i).constData()){
+            name = static_cast<hkbBehaviorReferenceGenerator *>(generators.at(i).data())->getBehaviorName();
+            if (!list.contains(name)){
+                list.append(name);
+            }
+        }
+    }
+    return list;
+}
+
+void BehaviorFile::removeAllData(){
+    removeGeneratorData();
+    removeModifierData();
+    removeOtherData();
 }
 
 HkxObject * BehaviorFile::getRootStateMachine() const{

@@ -127,6 +127,13 @@ void BlenderGeneratorChildUI::loadData(HkxObject *data, int childindex){
                 table->item(WEIGHT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
                 table->item(WORLD_FROM_MODEL_WEIGHT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
+            if (bsData->isParametricBlend()){
+                weight->setMaximum(1);
+                weight->setMinimum(0);
+            }else{
+                weight->setMaximum(std::numeric_limits<int>::max());
+                weight->setMinimum(std::numeric_limits<int>::min());
+            }
         }else{
             FATAL_RUNTIME_ERROR(QString("BlenderGeneratorChildUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }

@@ -200,7 +200,7 @@ SkyrimClipGeneratoData hkbClipGenerator::getClipGeneratorAnimData(ProjectAnimDat
     hkbClipTriggerArray *trigs = static_cast<hkbClipTriggerArray *>(triggers.data());
     if (trigs){
         for (int i = 0; i < trigs->triggers.size(); i++){
-            animTrigs.append(SkyrimClipTrigger(trigs->triggers.at(i).localTime, static_cast<BehaviorFile *>(getParentFile())->getAnimationNameAt(trigs->triggers.at(i).event.id)));
+            animTrigs.append(SkyrimClipTrigger(trigs->triggers.at(i).localTime, static_cast<BehaviorFile *>(getParentFile())->getEventNameAt(trigs->triggers.at(i).event.id)));
         }
     }
     return SkyrimClipGeneratoData(parent, name, animationIndex, playbackSpeed, cropStartAmountLocalTime, cropEndAmountLocalTime, animTrigs);
@@ -269,6 +269,6 @@ bool hkbClipGenerator::evaulateDataValidity(){
 }
 
 hkbClipGenerator::~hkbClipGenerator(){
-    static_cast<BehaviorFile *>(getParentFile())->removeClipGenFromAnimData(name);
+    static_cast<BehaviorFile *>(getParentFile())->removeClipGenFromAnimData(animationName.section("\\", -1, -1), name);
     refCount--;
 }

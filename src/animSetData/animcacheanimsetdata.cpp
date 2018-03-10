@@ -154,7 +154,17 @@ bool AnimCacheAnimSetData::addAnimationToCache(const QString & event, const QVec
 
 void AnimCacheAnimSetData::removeAnimationFromCache(const QString &animationname, const QString &clipname,  const QString &variablename){
     if (animationname != ""){
-        QString animationhash = QString(HkCRC().compute(animationname.toLocal8Bit().toLower()));
+        QString temp = animationname;
+        if (temp.contains("/")){
+            temp = temp.section("/", -1, -1);
+        }else if (temp.contains("\\")){
+            temp = temp.section("\\", -1, -1);
+        }
+        if (temp.contains(".")){
+            int index = temp.indexOf(".");
+            temp.remove(index, temp.size() - index);
+        }
+        QString animationhash = QString(HkCRC().compute(temp.toLocal8Bit().toLower()));
         for (int i = animations.size() - 1; i >= 0; i--){
             if (animations.at(i).crcAnimationName == animationhash){
                 animations.removeAt(i);

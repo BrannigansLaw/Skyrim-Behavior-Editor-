@@ -7,6 +7,7 @@
 
 class CharacterFile;
 class BehaviorFile;
+class hkbBehaviorReferenceGenerator;
 
 class ProjectFile: public HkxFile
 {
@@ -39,9 +40,10 @@ protected:
     bool link();
     //SkyrimAnimData *getAnimData() const;
 private:
+    void removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *gentoignore);
     bool merge(ProjectFile *recessiveproject);
     void addProjectToAnimData();
-    bool removeClipGenFromAnimData(const QString & name);
+    bool removeClipGenFromAnimData(const QString & animationname, const QString &clipname, const QString &variablename = "");
     bool removeAnimationFromAnimData(const QString & name);
     bool appendClipGeneratorAnimData(const QString & name);
     void setLocalTimeForClipGenAnimData(const QString &clipname, int triggerindex, qreal time);
@@ -59,6 +61,7 @@ private:
     void loadEncryptedAnimationNames();
     void addEncryptedAnimationName(const QString & unencryptedname);
     void removeEncryptedAnimationName(int index);
+    void deleteBehaviorFile(const QString & filename);
 private:
     HkxSharedPtr * findProjectData(long ref);
     HkxSharedPtr * findProjectStringData(long ref);

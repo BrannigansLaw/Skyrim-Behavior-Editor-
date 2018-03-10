@@ -29,6 +29,7 @@ public:
     void setCropEndAmountLocalTimeForClipGen(const QString & clipGenName, qreal time);
     void appendClipTriggerToAnimData(const QString & clipGenName, const QString & eventname);
     void removeClipTriggerToAnimDataAt(const QString & clipGenName, int index);
+    bool removeBehaviorFromProject(const QString &behaviorname);
 private:
     uint animationDataLines;
     uint animationMotionDataLines;

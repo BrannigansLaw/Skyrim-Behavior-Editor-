@@ -57,6 +57,7 @@ public:
     MainWindow();
     virtual ~MainWindow();
     void writeToLog(const QString & message, bool isError = false);
+    void removeBehaviorGraphs(const QStringList & filenames);
 protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
     void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
