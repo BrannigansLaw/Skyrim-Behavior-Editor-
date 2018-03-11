@@ -27,7 +27,7 @@ public:
     QString getCharacterFilePathAt(int index) const;
     void setCharacterFile(CharacterFile *file);
     bool isClipGenNameTaken(const QString & name) const;
-    bool readAnimationData(const QString &filename, bool searchforproject = true);
+    bool readAnimationData(const QString &filename, const QStringList &behaviorfilenames = QStringList());
     bool readAnimationSetData(const QString & filename);
     int getAnimationIndex(const QString & name) const;
     bool isAnimationUsed(const QString & animationname);

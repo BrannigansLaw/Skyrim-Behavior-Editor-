@@ -665,10 +665,22 @@ void MainWindow::openProject(QString & filepath, bool loadUI){
         }
     }
     int time = t.elapsed();
+    //Get behavior filenames...
+    QDirIterator it(lastFileSelectedPath+"/behaviors"); //Wont work for dogs, wolves!!!
+    QString behavior;
+    QStringList behaviornames;
+    QStringList behaviornamesanimdata;
+    while (it.hasNext()){
+        behavior = it.next();
+        if (behavior.contains(".hkx")){
+            behaviornames.append(behavior);
+            behaviornamesanimdata.append(behavior.section("/", -2, -1).replace("/", "\\"));
+        }
+    }
     projectFile = new ProjectFile(this, lastFileSelected);
     {
         std::thread thread(&ProjectFile::readAnimationSetData, projectFile, lastFileSelectedPath+"/animationsetdatasinglefile.txt");
-        if (!projectFile->readAnimationData(lastFileSelectedPath+"/animationdatasinglefile.txt")){
+        if (!projectFile->readAnimationData(lastFileSelectedPath+"/animationdatasinglefile.txt", behaviornamesanimdata)){
             FATAL_RUNTIME_ERROR("MainWindow::openProject(): The project animation data file could not be parsed!!!");
         }
         thread.join();
@@ -709,16 +721,7 @@ void MainWindow::openProject(QString & filepath, bool loadUI){
     }
     writeToLog("\n-------------------------\nTime taken to open file \""+lastFileSelectedPath+"/"+characterFile->getRigName()+
                                "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
-    //Start opening behavior files...
-    QDirIterator it(lastFileSelectedPath+"/"+characterFile->getBehaviorDirectoryName());
-    QString behavior;
-    QStringList behaviornames;
-    while (it.hasNext()){
-        behavior = it.next();
-        if (behavior.contains(".hkx")){
-            behaviornames.append(behavior);
-        }
-    }
+    //Start reading behavior files...
     //This also reads files that may not belong to the current project! See dog!!
     std::vector <std::thread> threads;
     std::unique_lock<std::mutex> locker(mutex);
@@ -1140,7 +1143,7 @@ void MainWindow::createNewProject(){
                     projectFile = new ProjectFile(this, projectDirectoryPath+"/"+projectname+".hkx", true, "characters\\"+projectname+"character.hkx");
                     {
                         std::thread thread(&ProjectFile::readAnimationSetData, projectFile, lastFileSelectedPath+"/animationsetdatasinglefile.txt");
-                        if (!projectFile->readAnimationData(lastFileSelectedPath+"/animationdatasinglefile.txt", false)){
+                        if (!projectFile->readAnimationData(lastFileSelectedPath+"/animationdatasinglefile.txt", QStringList("Behaviors\\Master.hkx"))){
                             FATAL_RUNTIME_ERROR("MainWindow::createNewProject(): The project animation data file could not be parsed!!!");
                         }
                         thread.join();

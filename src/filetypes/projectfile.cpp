@@ -52,7 +52,7 @@ bool ProjectFile::isClipGenNameTaken(const QString &name) const{
     return false;
 }
 
-bool ProjectFile::readAnimationData(const QString & filename, bool searchforproject){
+bool ProjectFile::readAnimationData(const QString & filename, const QStringList & behaviorfilenames){
     QFile *animfile = new QFile(filename);
     QString projectname = fileName().section("/", -1, -1);
     if (!animfile->exists()){
@@ -63,8 +63,8 @@ bool ProjectFile::readAnimationData(const QString & filename, bool searchforproj
         }
     }
     bool result = true;
-    if (searchforproject){
-        result = skyrimAnimData->parse(animfile, projectname);
+    if (!behaviorfilenames.isEmpty()){
+        result = skyrimAnimData->parse(animfile, projectname, behaviorfilenames);
     }else{
         result = skyrimAnimData->parse(animfile);
     }

@@ -203,7 +203,7 @@ bool hkaSkeleton::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < parentIndices.size(); i++){
             bonesS = bonesS+QString::number(parentIndices.at(i));
-            if (i > 0 && i % 16 == 0){
+            if (i > 0 && i % 15 == 0){
                 bonesS = bonesS+"\n";
             }else{
                 bonesS = bonesS+" ";
@@ -231,7 +231,7 @@ bool hkaSkeleton::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < referenceFloats.size(); i++){
             bonesS = bonesS+QString::number(referenceFloats.at(i), char('f'), 6);
-            if (i > 0 && i % 16 == 0){
+            if (i > 0 && i % 15 == 0){
                 bonesS = bonesS+"\n";
             }else{
                 bonesS = bonesS+" ";

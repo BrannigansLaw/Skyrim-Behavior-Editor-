@@ -475,7 +475,7 @@ bool hkbStateMachine::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0; i < states.size(); i++){
             refString = refString+states.at(i).data()->getReferenceString();
-            if (i > 0 && i % 16 == 0){
+            if (i > 0 && i % 15 == 0){
                 refString = refString+"\n";
             }else{
                 refString = refString+" ";

@@ -1,7 +1,7 @@
 #include "projectanimdata.h"
 #include "src/utility.h"
 
-#define MIN_NUM_LINES 4
+#define MIN_NUM_LINES 3
 
 bool ProjectAnimData::chopLine(QFile * file, QByteArray & line, uint & linecount){
     if (file){
@@ -138,19 +138,19 @@ bool ProjectAnimData::write(QFile & file, QTextStream & out) const{
     }
     if (animationData.size() > 0){
         out << "1" << "\n";
+        for (int i = 0; i < animationData.size(); i++){
+            if (!animationData.at(i)->write(&file, out)){
+                return false;
+            }
+        }
+        out << QString::number(animationMotionDataLines) << "\n";
+        for (int i = 0; i < animationMotionData.size(); i++){
+            if (!animationMotionData.at(i)->write(&file, out)){
+                return false;
+            }
+        }
     }else{
         out << "0" << "\n";
-    }
-    for (int i = 0; i < animationData.size(); i++){
-        if (!animationData.at(i)->write(&file, out)){
-            return false;
-        }
-    }
-    out << QString::number(animationMotionDataLines) << "\n";
-    for (int i = 0; i < animationMotionData.size(); i++){
-        if (!animationMotionData.at(i)->write(&file, out)){
-            return false;
-        }
     }
     return true;
 }

@@ -3,12 +3,14 @@
 #include "projectanimdata.h"
 #include <QTextStream>
 
+#define MIN_NUM_LINES 3
+
 SkyrimAnimData::SkyrimAnimData()
 {
     //
 }
 
-bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore){
+bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore, const QStringList & behaviorfilenames){
     if (!file || (!file->isOpen() && !file->open(QIODevice::ReadOnly | QIODevice::Text))){
         return false;
     }
@@ -96,17 +98,26 @@ bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore){
         if (!ok || numFiles <= 2 || file->atEnd()){
             return false;
         }
+        animData.last()->projectFiles = behaviorfilenames;
         for (int i = 0; i < numFiles && !file->atEnd(); i++){
             line = file->readLine();
             if ((!line.contains(".hkx") && !line.contains(".HKX"))){
                 return false;
             }
             line.chop(1);
-            animData.last()->projectFiles.append(line);
+            ok = false;
+            for (auto k = 0; k < behaviorfilenames.size(); k++){
+                if (!QString::compare(behaviorfilenames.at(k), line, Qt::CaseInsensitive)){
+                    ok = true;
+                }
+            }
+            if (!ok){
+                animData.last()->projectFiles.append(line);
+            }
         }
-        animData.last()->animationDataLines = numFiles + 2;
-        for (int i = numFiles + 2; i < blocksize && !file->atEnd(); i++){
-            file->readLine();
+        animData.last()->animationDataLines = numFiles + MIN_NUM_LINES + 1;
+        for (int i = numFiles + MIN_NUM_LINES - 1; i < blocksize && !file->atEnd(); i++){
+            line = file->readLine();
         }
         if (!animData.last()->readMotionOnly(file)){
             FATAL_RUNTIME_ERROR("SkyrimAnimData::parse(): readMotionOnly read failed!");
@@ -310,5 +321,6 @@ bool SkyrimAnimData::removeBehaviorFromProject(const QString &projectname, const
         FATAL_RUNTIME_ERROR("SkyrimAnimData::removeBehaviorFromProject(): Project was not found!");
     }
     animData.at(index)->removeBehaviorFromProject(behaviorfilename);
+    return true;
 }
 
