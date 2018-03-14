@@ -904,7 +904,9 @@ void SenseHandleModifierUI::selectTableToView(bool viewproperties, const QString
 
 void SenseHandleModifierUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        rangeUI->eventRenamed(name, index);
+        if (currentIndex() == CHILD_WIDGET){
+            rangeUI->eventRenamed(name, index);
+        }
     }else{
         FATAL_RUNTIME_ERROR("SenseHandleModifierUI::eventRenamed(): The data is nullptr!!");
     }

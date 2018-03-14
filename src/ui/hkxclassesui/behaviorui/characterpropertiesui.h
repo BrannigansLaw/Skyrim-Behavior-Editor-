@@ -19,6 +19,7 @@ class SpinBox;
 class DoubleSpinBox;
 class QuadVariableWidget;
 class BoneWeightArrayUI;
+class QTableWidgetItem;
 
 class CharacterPropertiesUI: public QGroupBox
 {
@@ -34,6 +35,7 @@ private slots:
     void removeVariable();
     void setVariableValue(int type);
     void renameSelectedVariable(int type);
+    void setVariableName(QTableWidgetItem *item);
     void viewVariable(int row, int column);
     void returnToTable();
 signals:

@@ -385,7 +385,9 @@ void EvaluateExpressionModifierUI::selectTableToView(bool viewproperties, const 
 
 void EvaluateExpressionModifierUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        expressionUI->eventRenamed(name, index);
+        if (currentIndex() == CHILD_WIDGET){
+            expressionUI->eventRenamed(name, index);
+        }
     }else{
         FATAL_RUNTIME_ERROR("EvaluateExpressionModifierUI::eventRenamed(): The data is nullptr!!");
     }

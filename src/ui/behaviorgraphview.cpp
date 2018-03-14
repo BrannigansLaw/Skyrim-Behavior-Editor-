@@ -781,7 +781,7 @@ template <typename T>
 void BehaviorGraphView::wrap(T *obj){
     if (getSelectedItem() && ((TreeGraphicsItem *)getSelectedItem()->parentItem()) && ((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData){
         behavior->setIsChanged(true);
-        TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), static_cast<DataIconManager*>((obj)), -1, true);
+        TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), static_cast<DataIconManager*>((obj)), -1, true);  //TO DO: DEAL WITH WRAPPING STATES!!!
         behavior->setIsChanged(true);
         getSelectedItem()->reposition();
         treeScene->selectIcon(newIcon, TreeGraphicsScene::EXPAND_CONTRACT_ZERO);

@@ -151,15 +151,18 @@ bool hkbManualSelectorGenerator::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"generators", QString::number(generators.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < generators.size(); i++){
-            refString = refString+generators.at(i).data()->getReferenceString();
-            if (i > 0 && i % 15 == 0){
-                refString = refString+"\n";
+        for (int i = 0, j = 1; i < generators.size(); i++, j++){
+            refString.append(generators.at(i).data()->getReferenceString());
+            if (j % 16 == 0){
+                refString.append("\n");
             }else{
-                refString = refString+" ";
+                refString.append(" ");
             }
         }
         if (generators.size() > 0){
+            if (refString.endsWith(" \0")){
+                refString.remove(refString.lastIndexOf(" "), 1);
+            }
             writer->writeLine(refString);
             writer->writeLine(writer->parameter, false);
         }

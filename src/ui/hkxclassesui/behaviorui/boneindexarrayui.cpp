@@ -145,6 +145,7 @@ void BoneIndexArrayUI::setRagdollBone(int index, const QString &name){
             if (row >= 0 && row < bsData->boneIndices.size()){
                 if (index >= 0){
                     bsData->boneIndices[row] = index;
+                    bsData->getParentFile()->setIsChanged(true);
                     if (table->item(table->currentRow(), NAME_COLUMN)){
                         table->item(table->currentRow(), NAME_COLUMN)->setText(name);
                     }else{
@@ -167,6 +168,7 @@ void BoneIndexArrayUI::setRagdollBone(int index, const QString &name){
 void BoneIndexArrayUI::addRagdollBone(){
     if (bsData){
         bsData->boneIndices.append(0);
+        bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
         FATAL_RUNTIME_ERROR("BoneIndexArrayUI::addRagdollBone(): The data is nullptr!!");
@@ -177,6 +179,7 @@ void BoneIndexArrayUI::removeRagdollBone(int index){
     if (bsData){
         if (index < bsData->boneIndices.size() && index >= 0){
             bsData->boneIndices.removeAt(index);
+            bsData->getParentFile()->setIsChanged(true);
         }else{
             WARNING_MESSAGE("BoneIndexArrayUI::removeRagdollBone(): Invalid index!!");
         }

@@ -458,7 +458,9 @@ void EventsFromRangeModifierUI::selectTableToView(bool viewproperties, const QSt
 
 void EventsFromRangeModifierUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        rangeUI->eventRenamed(name, index);
+        if (currentIndex() == CHILD_WIDGET){
+            rangeUI->eventRenamed(name, index);
+        }
     }else{
         FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::eventRenamed(): The data is nullptr!!");
     }

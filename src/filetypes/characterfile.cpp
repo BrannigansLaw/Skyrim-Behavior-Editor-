@@ -318,37 +318,57 @@ bool CharacterFile::link(){
 }
 
 hkbBoneWeightArray *CharacterFile::addNewBoneWeightArray(){
-    return new hkbBoneWeightArray(this, 0, skeleton->getNumberOfBones());
+    hkbBoneWeightArray *ptr = new hkbBoneWeightArray(this, 0, skeleton->getNumberOfBones());
+    boneWeightArrays.append(HkxSharedPtr(ptr));
+    return ptr;
 }
 
 void CharacterFile::write(){
-    ulong ref = 1;
-    getRootObject().data()->setReference(ref);
-    getRootObject().data()->setIsWritten(false);
-    ref++;
-    characterData.data()->setReference(ref);
-    characterData.data()->setIsWritten(false);
-    ref++;
-    stringData.data()->setReference(ref);
-    stringData.data()->setIsWritten(false);
-    ref++;
-    if (mirroredSkeletonInfo.data()){
+    if (getRootObject().data()){
+        ulong ref = getRootObject().data()->getReference();
+        getRootObject().data()->setIsWritten(false);
+        stringData.data()->setIsWritten(false);
+        characterData.data()->setIsWritten(false);
+        characterPropertyValues.data()->setIsWritten(false);
+        if (mirroredSkeletonInfo.data()){
+            mirroredSkeletonInfo.data()->setIsWritten(false);
+        }else{
+            FATAL_RUNTIME_ERROR("CharacterFile::write(): no mirroredSkeletonInfo!!");
+        }
+        if (handIkDriverInfo.data()){
+            handIkDriverInfo.data()->setIsWritten(false);
+        }
+        if (footIkDriverInfo.data()){
+            footIkDriverInfo.data()->setIsWritten(false);
+        }
+        ref++;
+        stringData.data()->setReference(ref);
+        ref++;
+        characterData.data()->setReference(ref);
+        ref++;
+        characterPropertyValues.data()->setReference(ref);
+        ref++;
         mirroredSkeletonInfo.data()->setReference(ref);
-        mirroredSkeletonInfo.data()->setIsWritten(false);
         ref++;
+        if (handIkDriverInfo.data()){
+            handIkDriverInfo.data()->setReference(ref);
+            ref++;
+        }
+        if (footIkDriverInfo.data()){
+            footIkDriverInfo.data()->setReference(ref);
+            ref++;
+        }
+        for (int i = 0; i < boneWeightArrays.size(); i++, ref++){
+            boneWeightArrays.at(i).data()->setIsWritten(false);
+            boneWeightArrays.at(i).data()->setReference(ref);
+        }
+        getWriter().setFile(this);
+        if (!getWriter().writeToXMLFile()){
+            FATAL_RUNTIME_ERROR("CharacterFile::write(): writeToXMLFile() failed!!");
+        }
+    }else{
+        FATAL_RUNTIME_ERROR("CharacterFile::write(): The root object is nullptr!!");
     }
-    if (handIkDriverInfo.data()){
-        handIkDriverInfo.data()->setReference(ref);
-        handIkDriverInfo.data()->setIsWritten(false);
-        ref++;
-    }
-    if (footIkDriverInfo.data()){
-        footIkDriverInfo.data()->setReference(ref);
-        footIkDriverInfo.data()->setIsWritten(false);
-        ref++;
-    }
-    getWriter().setFile(this);
-    getWriter().writeToXMLFile();
 }
 
 void CharacterFile::addFootIK(){

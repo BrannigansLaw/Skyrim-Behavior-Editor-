@@ -603,7 +603,11 @@ void StateUI::transitionRenamed(const QString &name, int index){
 
 void StateUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        eventUI->eventRenamed(name, index);
+        if (currentIndex() == EVENT_PAYLOAD_WIDGET){
+            eventUI->eventRenamed(name, index);
+        }else if (currentIndex() == TRANSITION_WIDGET){
+            transitionUI->eventRenamed(name, index);
+        }
         loadDynamicTableRows(); //Inefficient...
     }else{
         FATAL_RUNTIME_ERROR("StateUI::eventRenamed(): The data is nullptr!!");

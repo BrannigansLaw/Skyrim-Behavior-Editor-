@@ -885,17 +885,20 @@ void BlenderGeneratorUI::variableRenamed(const QString & name, int index){
                 table->item(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN)->setText(name);
             }
         }
-        childUI->variableRenamed(name, index);
+        if (currentIndex() == CHILD_WIDGET){
+            childUI->variableRenamed(name, index);
+        }
     }else{
         FATAL_RUNTIME_ERROR("BlenderGeneratorUI::variableRenamed(): The data is nullptr!!");
     }
 }
 
 void BlenderGeneratorUI::generatorRenamed(const QString &name, int index){
-    if (name == ""){
-        WARNING_MESSAGE("BlenderGeneratorUI::generatorRenamed(): The new variable name is the empty string!!");
+    switch (currentIndex()){
+    case CHILD_WIDGET:
+        childUI->generatorRenamed(name, index);
+        break;
     }
-    childUI->generatorRenamed(name, index);
 }
 
 void BlenderGeneratorUI::setBehaviorView(BehaviorGraphView *view){

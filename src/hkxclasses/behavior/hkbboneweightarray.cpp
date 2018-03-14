@@ -71,15 +71,18 @@ bool hkbBoneWeightArray::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"boneWeights", QString::number(boneWeights.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < boneWeights.size(); i++){
-            bones = bones+QString::number(boneWeights.at(i), char('f'), 6);
-            if (i > 0 && i % 15 == 0){
-                bones = bones+"\n";
+        for (int i = 0, j = 1; i < boneWeights.size(); i++, j++){
+            bones.append(QString::number(boneWeights.at(i), char('f'), 6));
+            if (j % 16 == 0){
+                bones.append("\n");
             }else{
-                bones = bones+" ";
+                bones.append(" ");
             }
         }
         if (boneWeights.size() > 0){
+            if (bones.endsWith(" \0")){
+                bones.remove(bones.lastIndexOf(" "), 1);
+            }
             writer->writeLine(bones);
             writer->writeLine(writer->parameter, false);
         }

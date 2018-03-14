@@ -93,7 +93,7 @@ int hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name,
             if (type > VARIABLE_TYPE_POINTER){
                 varData->quadVariableValues.append(hkQuadVariable());
             }else if (type == VARIABLE_TYPE_POINTER){
-                varData->variantVariableValues.append(HkxSharedPtr());
+                //varData->variantVariableValues.append(HkxSharedPtr());
             }
         }
     }

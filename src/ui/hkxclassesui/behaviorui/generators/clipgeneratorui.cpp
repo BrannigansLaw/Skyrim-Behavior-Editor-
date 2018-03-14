@@ -840,7 +840,9 @@ void ClipGeneratorUI::selectTableToView(bool viewproperties, const QString & pat
 
 void ClipGeneratorUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        triggerUI->eventRenamed(name, index);
+        if (currentIndex() == CHILD_WIDGET){
+            triggerUI->eventRenamed(name, index);
+        }
     }else{
         FATAL_RUNTIME_ERROR("ClipGeneratorUI::eventRenamed(): The data is nullptr!!");
     }

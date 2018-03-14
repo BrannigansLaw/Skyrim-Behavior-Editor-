@@ -399,7 +399,9 @@ void BSBoneSwitchGeneratorUI::variableRenamed(const QString & name, int index){
     }
     if (bsData){
         index--;
-        childUI->variableRenamed(name, index);
+        if (currentIndex() == CHILD_WIDGET){
+            childUI->variableRenamed(name, index);
+        }
     }else{
         FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorUI::variableRenamed(): The data is nullptr!!");
     }
@@ -413,7 +415,11 @@ void BSBoneSwitchGeneratorUI::generatorRenamed(const QString &name, int index){
     if (index == static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pDefaultGenerator)){
         table->item(DEFAULT_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
     }
-    childUI->generatorRenamed(name, index);
+    switch (currentIndex()){
+    case CHILD_WIDGET:
+        childUI->generatorRenamed(name, index);
+        break;
+    }
 }
 
 void BSBoneSwitchGeneratorUI::setBehaviorView(BehaviorGraphView *view){

@@ -1438,51 +1438,36 @@ QVector <HkxObject *> BehaviorFile::merge(QVector <HkxObject *> dominantobjects)
 
 void BehaviorFile::write(){
     if (getRootObject().data()){
-        ulong ref = getRootObject().data()->reference;
+        ulong ref = getRootObject().data()->getReference();
         getRootObject().data()->setIsWritten(false);
         stringData.data()->setIsWritten(false);
         variableValues.data()->setIsWritten(false);
         graphData.data()->setIsWritten(false);
         behaviorGraph.data()->setIsWritten(false);
-        if (getRootObject().data()->getReference() == 1){
-            for (int i = 0; i < generators.size(); i++, ref++){
-                generators.at(i).data()->setIsWritten(false);
-            }
-            for (int i = 0; i < generatorChildren.size(); i++, ref++){
-                generatorChildren.at(i).data()->setIsWritten(false);
-            }
-            for (int i = 0; i < modifiers.size(); i++, ref++){
-                modifiers.at(i).data()->setIsWritten(false);
-            }
-            for (int i = 0; i < otherTypes.size(); i++, ref++){
-                otherTypes.at(i).data()->setIsWritten(false);
-            }
-        }else{
-            getRootObject().data()->setReference(ref);
-            ref++;
-            stringData.data()->setReference(ref);
-            ref++;
-            variableValues.data()->setReference(ref);
-            ref++;
-            graphData.data()->setReference(ref);
-            ref++;
-            behaviorGraph.data()->setIsWritten(false);
-            for (int i = 0; i < generators.size(); i++, ref++){
-                generators.at(i).data()->setIsWritten(false);
-                generators.at(i).data()->setReference(ref);
-            }
-            for (int i = 0; i < generatorChildren.size(); i++, ref++){
-                generatorChildren.at(i).data()->setIsWritten(false);
-                generatorChildren.at(i).data()->setReference(ref);
-            }
-            for (int i = 0; i < modifiers.size(); i++, ref++){
-                modifiers.at(i).data()->setIsWritten(false);
-                modifiers.at(i).data()->setReference(ref);
-            }
-            for (int i = 0; i < otherTypes.size(); i++, ref++){
-                otherTypes.at(i).data()->setIsWritten(false);
-                otherTypes.at(i).data()->setReference(ref);
-            }
+        ref++;
+        stringData.data()->setReference(ref);
+        ref++;
+        variableValues.data()->setReference(ref);
+        ref++;
+        graphData.data()->setReference(ref);
+        ref++;
+        behaviorGraph.data()->setReference(ref);
+        ref++;
+        for (int i = 0; i < generators.size(); i++, ref++){
+            generators.at(i).data()->setIsWritten(false);
+            generators.at(i).data()->setReference(ref);
+        }
+        for (int i = 0; i < generatorChildren.size(); i++, ref++){
+            generatorChildren.at(i).data()->setIsWritten(false);
+            generatorChildren.at(i).data()->setReference(ref);
+        }
+        for (int i = 0; i < modifiers.size(); i++, ref++){
+            modifiers.at(i).data()->setIsWritten(false);
+            modifiers.at(i).data()->setReference(ref);
+        }
+        for (int i = 0; i < otherTypes.size(); i++, ref++){
+            otherTypes.at(i).data()->setIsWritten(false);
+            otherTypes.at(i).data()->setReference(ref);
         }
         getWriter().setFile(this);
         if (!getWriter().writeToXMLFile()){

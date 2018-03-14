@@ -763,8 +763,8 @@ void StateMachineUI::generatorRenamed(const QString &name, int index){
     case STATE_WIDGET:
         stateUI->generatorRenamed(name, index);
         break;
-    default:
-        WARNING_MESSAGE("StateMachineUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!");
+    //default:
+        //WARNING_MESSAGE("StateMachineUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!");
     }
 }
 

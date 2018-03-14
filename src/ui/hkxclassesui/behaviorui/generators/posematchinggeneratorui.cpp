@@ -1350,7 +1350,9 @@ void PoseMatchingGeneratorUI::variableRenamed(const QString & name, int index){
                 table->item(PELVIS_INDEX_ROW, BINDING_COLUMN)->setText(name);
             }
         }
-        childUI->variableRenamed(name, index);
+        if (currentIndex() == CHILD_WIDGET){
+            childUI->variableRenamed(name, index);
+        }
     }else{
         FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::variableRenamed(): The data is nullptr!!");
     }

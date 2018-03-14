@@ -711,3 +711,25 @@ void TransitionsUI::loadTableValue(int row, const QString &value){
         FATAL_RUNTIME_ERROR("TransitionsUI::loadTableValue(): There is no table item here!!");
     }
 }
+
+void TransitionsUI::eventRenamed(const QString &name, int index){
+    if (bsData){
+        if (index == bsData->triggerInterval.enterEventId){
+            table->item(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+        }
+        if (index == bsData->triggerInterval.exitEventId){
+            table->item(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+        }
+        if (index == bsData->initiateInterval.enterEventId){
+            table->item(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+        }
+        if (index == bsData->initiateInterval.exitEventId){
+            table->item(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+        }
+        if (index == bsData->eventId){
+            table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
+        }
+    }else{
+        FATAL_RUNTIME_ERROR("TransitionsUI::eventRenamed(): The data is nullptr!!");
+    }
+}

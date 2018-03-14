@@ -65,15 +65,18 @@ bool hkbBoneIndexArray::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"boneIndices", QString::number(boneIndices.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < boneIndices.size(); i++){
-            bones = bones+QString::number(boneIndices.at(i));
-            if (i > 0 && i % 15 == 0){
-                bones = bones+"\n";
+        for (int i = 0, j = 1; i < boneIndices.size(); i++, j++){
+            bones.append(QString::number(boneIndices.at(i)));
+            if (j % 16 == 0){
+                bones.append("\n");
             }else{
-                bones = bones+" ";
+                bones.append(" ");
             }
         }
         if (boneIndices.size() > 0){
+            if (bones.endsWith(" \0")){
+                bones.remove(bones.lastIndexOf(" "), 1);
+            }
             writer->writeLine(bones);
             writer->writeLine(writer->parameter, false);
         }

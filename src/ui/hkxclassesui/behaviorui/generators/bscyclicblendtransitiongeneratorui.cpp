@@ -143,6 +143,7 @@ void BSCyclicBlendTransitionGeneratorUI::loadData(HkxObject *data){
             if (eBlendCurve->count() == 0){
                 eBlendCurve->insertItems(0, bsData->BlendCurve);
             }
+            fTransitionDuration->setValue(bsData->fTransitionDuration);
             eBlendCurve->setCurrentIndex(bsData->BlendCurve.indexOf(bsData->eBlendCurve));
             if (bsData->pBlenderGenerator.data()){
                 table->item(BLENDER_GENERATOR_ROW, VALUE_COLUMN)->setText(static_cast<hkbGenerator *>(bsData->pBlenderGenerator.data())->getName());

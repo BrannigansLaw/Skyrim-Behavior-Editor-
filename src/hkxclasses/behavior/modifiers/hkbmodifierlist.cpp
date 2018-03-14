@@ -147,15 +147,18 @@ bool hkbModifierList::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"modifiers", QString::number(modifiers.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < modifiers.size(); i++){
-            refString = refString+modifiers.at(i).data()->getReferenceString();
-            if (i > 0 && i % 15 == 0){
-                refString = refString+"\n";
+        for (int i = 0, j = 1; i < modifiers.size(); i++, j++){
+            refString.append(modifiers.at(i).data()->getReferenceString());
+            if (j % 16 == 0){
+                refString.append("\n");
             }else{
-                refString = refString+" ";
+                refString.append(" ");
             }
         }
         if (modifiers.size() > 0){
+            if (refString.endsWith(" \0")){
+                refString.remove(refString.lastIndexOf(" "), 1);
+            }
             writer->writeLine(refString);
             writer->writeLine(writer->parameter, false);
         }

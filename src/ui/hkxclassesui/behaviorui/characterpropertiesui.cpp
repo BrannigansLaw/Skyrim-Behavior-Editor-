@@ -83,6 +83,7 @@ CharacterPropertiesUI::CharacterPropertiesUI(const QString &title)
     //table->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     table->setColumnCount(3);
     table->setHorizontalHeaderLabels(headerLabels);
+    table->setEditTriggers(QAbstractItemView::DoubleClicked);
     verLyt->addLayout(buttonLyt, 1);
     verLyt->addLayout(stackLyt, 10);
     variableWidget->setRowCount(4);
@@ -116,16 +117,17 @@ CharacterPropertiesUI::CharacterPropertiesUI(const QString &title)
     connect(doubleSB, SIGNAL(editingFinished()), valueMapper, SLOT(map()));
     connect(quadWidget, SIGNAL(editingFinished()), valueMapper, SLOT(map()));
     setLayout(verLyt);
-    connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeVariable()));
-    connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addVariable()));
-    connect(nameMapper, SIGNAL(mapped(int)), this, SLOT(renameSelectedVariable(int)));
-    connect(valueMapper, SIGNAL(mapped(int)), this, SLOT(setVariableValue(int)));
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewVariable(int,int)));
-    connect(returnBoolPB, SIGNAL(released()), this, SLOT(returnToTable()));
-    connect(returnIntPB, SIGNAL(released()), this, SLOT(returnToTable()));
-    connect(returnDoublePB, SIGNAL(released()), this, SLOT(returnToTable()));
-    connect(returnQuadPB, SIGNAL(released()), this, SLOT(returnToTable()));
-    connect(boneWeightArrayWidget, SIGNAL(returnToParent()), this, SLOT(returnToTable()));
+    connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeVariable()), Qt::UniqueConnection);
+    connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addVariable()), Qt::UniqueConnection);
+    connect(nameMapper, SIGNAL(mapped(int)), this, SLOT(renameSelectedVariable(int)), Qt::UniqueConnection);
+    connect(valueMapper, SIGNAL(mapped(int)), this, SLOT(setVariableValue(int)), Qt::UniqueConnection);
+    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewVariable(int,int)), Qt::UniqueConnection);
+    connect(returnBoolPB, SIGNAL(released()), this, SLOT(returnToTable()), Qt::UniqueConnection);
+    connect(returnIntPB, SIGNAL(released()), this, SLOT(returnToTable()), Qt::UniqueConnection);
+    connect(returnDoublePB, SIGNAL(released()), this, SLOT(returnToTable()), Qt::UniqueConnection);
+    connect(returnQuadPB, SIGNAL(released()), this, SLOT(returnToTable()), Qt::UniqueConnection);
+    connect(boneWeightArrayWidget, SIGNAL(returnToParent()), this, SLOT(returnToTable()), Qt::UniqueConnection);
+    connect(table, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(setVariableName(QTableWidgetItem*)), Qt::UniqueConnection);
 }
 
 /*QSize CharacterPropertiesUI::sizeHint() const{
@@ -165,6 +167,17 @@ void CharacterPropertiesUI::renameSelectedVariable(int type){
     loadedData->setVariableNameAt(table->currentRow(), newName);
     loadedData->getParentFile()->setIsChanged(true);
     emit variableNameChanged(newName, table->currentRow());
+}
+
+void CharacterPropertiesUI::setVariableName(QTableWidgetItem *item){
+    if (item && item->text() != "" && loadedData){
+        int column = table->column(item);
+        if (column == 0){
+            loadedData->setVariableNameAt(table->row(item), item->text());
+        }
+    }else{
+        WARNING_MESSAGE("CharacterPropertiesUI::setVariableName: error!!");
+    }
 }
 
 void CharacterPropertiesUI::removeVariableFromTable(int row){

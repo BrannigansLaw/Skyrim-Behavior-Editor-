@@ -362,6 +362,7 @@ bool hkbCharacterData::readData(const HkxXmlReader &reader, long index){
                     return false;
                 }
             }
+            index--;
         }else if (text == "characterPropertyValues"){
             if (!characterPropertyValues.readReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'characterPropertyValues' reference!\nObject Reference: "+ref);

@@ -98,6 +98,7 @@ void BoneWeightArrayUI::setBoneWeight(){
     if (bsData){
         if (bsData->boneWeights.size() > row && row >= 0){
             bsData->boneWeights[row] = selectedBone->value();
+            bsData->getParentFile()->setIsChanged(true);
             if (bones->item(row, VALUE_COLUMN)){
                 bones->item(row, VALUE_COLUMN)->setText(QString::number(selectedBone->value(), char('f'), 6));
             }else{

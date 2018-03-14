@@ -201,15 +201,18 @@ bool hkaSkeleton::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"parentIndices", QString::number(parentIndices.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < parentIndices.size(); i++){
-            bonesS = bonesS+QString::number(parentIndices.at(i));
-            if (i > 0 && i % 15 == 0){
-                bonesS = bonesS+"\n";
+        for (int i = 0, j = 1; i < parentIndices.size(); i++, j++){
+            bonesS.append(QString::number(parentIndices.at(i), char('f'), 6));
+            if (j % 16 == 0){
+                bonesS.append("\n");
             }else{
-                bonesS = bonesS+" ";
+                bonesS.append(" ");
             }
         }
         if (parentIndices.size() > 0){
+            if (bonesS.endsWith(" \0")){
+                bonesS.remove(bonesS.lastIndexOf(" "), 1);
+            }
             writer->writeLine(bonesS);
             writer->writeLine(writer->parameter, false);
         }
@@ -229,15 +232,18 @@ bool hkaSkeleton::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"referenceFloats", QString::number(referenceFloats.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < referenceFloats.size(); i++){
-            bonesS = bonesS+QString::number(referenceFloats.at(i), char('f'), 6);
-            if (i > 0 && i % 15 == 0){
-                bonesS = bonesS+"\n";
+        for (int i = 0, j = 1; i < referenceFloats.size(); i++, j++){
+            bonesS.append(QString::number(referenceFloats.at(i), char('f'), 6));
+            if (j % 16 == 0){
+                bonesS.append("\n");
             }else{
-                bonesS = bonesS+" ";
+                bonesS.append(" ");
             }
         }
         if (referenceFloats.size() > 0){
+            if (bonesS.endsWith(" \0")){
+                bonesS.remove(bonesS.lastIndexOf(" "), 1);
+            }
             writer->writeLine(bonesS);
             writer->writeLine(writer->parameter, false);
         }

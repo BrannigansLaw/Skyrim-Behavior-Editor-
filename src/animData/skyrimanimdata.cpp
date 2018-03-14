@@ -115,7 +115,7 @@ bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore, const Q
                 animData.last()->projectFiles.append(line);
             }
         }
-        animData.last()->animationDataLines = numFiles + MIN_NUM_LINES + 1;
+        animData.last()->animationDataLines = numFiles + MIN_NUM_LINES;
         for (int i = numFiles + MIN_NUM_LINES - 1; i < blocksize && !file->atEnd(); i++){
             line = file->readLine();
         }

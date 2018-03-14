@@ -109,14 +109,18 @@ bool hkbVariableValueSet::write(HkxXMLWriter *writer){
         list2 = {"variantVariableValues", QString::number(variantVariableValues.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
         QString refs;
-        for (int i = 0; i < variantVariableValues.size(); i++){
-            if (variantVariableValues.at(i).data()){
-                refs = refs + variantVariableValues.at(i).data()->getReferenceString()+" ";
+        for (int i = 0, j = 1; i < variantVariableValues.size(); i++, j++){
+            refs.append(variantVariableValues.at(i).data()->getReferenceString());
+            if (j % 16 == 0){
+                refs.append("\n");
             }else{
-                refs = refs + "null"+" ";
+                refs.append(" ");
             }
         }
         if (variantVariableValues.size() > 0){
+            if (refs.endsWith(" \0")){
+                refs.remove(refs.lastIndexOf(" "), 1);
+            }
             writer->writeLine(refs);
             writer->writeLine(writer->parameter, false);
         }

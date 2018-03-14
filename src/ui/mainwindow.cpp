@@ -237,7 +237,7 @@ void MainWindow::changedTabs(int index){
                     eventsWid->show();
                     objectDataSA->show();
                 }else{
-                    FATAL_RUNTIME_ERROR("MainWindow::changedTabs(): The tab index is out of sync with the behavior files or behavior graphs!");
+                    WARNING_MESSAGE("MainWindow::changedTabs(): The tab index is out of sync with the behavior files or behavior graphs!");
                 }
             }
         }
@@ -257,7 +257,7 @@ void MainWindow::expandBranches(){
             if (tabs->count() < 2){
                 WARNING_MESSAGE("No behavior file is currently being viewed!!!")
             }else{
-                FATAL_RUNTIME_ERROR("MainWindow::expandBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
+                WARNING_MESSAGE("MainWindow::expandBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
             }
         }
     }else{
@@ -275,7 +275,7 @@ void MainWindow::collapseBranches(){
             if (tabs->count() < 2){
                 WARNING_MESSAGE("No behavior file is currently being viewed!!!")
             }else{
-                FATAL_RUNTIME_ERROR("MainWindow::collapseBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
+                WARNING_MESSAGE("MainWindow::collapseBranches() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
             }
         }
     }else{
@@ -295,7 +295,7 @@ void MainWindow::refocus(){
                 if (tabs->count() < 2){
                     WARNING_MESSAGE("No behavior file is currently being viewed!!!")
                 }else{
-                    FATAL_RUNTIME_ERROR("MainWindow::refocus() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
+                    WARNING_MESSAGE("MainWindow::refocus() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
                 }
             }
         }else{
@@ -459,11 +459,19 @@ void MainWindow::exportAnimationData(){
     if (animData.exists()){
         QDir dir(skyrimDirectory+"/data/meshes");
         if (dir.exists()){
+            QFile file(skyrimDirectory+"/data/meshes/animationdatasinglefile.txt");
+            if (file.exists()){
+                file.remove();
+            }
             if (!animData.copy(skyrimDirectory+"/data/meshes/animationdatasinglefile.txt")){
                 writeToLog("Failed to export animationdatasinglefile.txt to the game directory!");
             }
         }else{
             if (QDir().mkdir(skyrimDirectory+"/data/meshes")){
+                QFile file(skyrimDirectory+"/data/meshes/animationdatasinglefile.txt");
+                if (file.exists()){
+                    file.remove();
+                }
                 if (!animData.copy(skyrimDirectory+"/data/meshes/animationdatasinglefile.txt")){
                     writeToLog("Failed to export animationdatasinglefile.txt to the game directory!");
                 }
@@ -478,11 +486,19 @@ void MainWindow::exportAnimationData(){
     if (animSetData.exists()){
         QDir dir(skyrimDirectory+"/data/meshes");
         if (dir.exists()){
+            QFile file(skyrimDirectory+"/data/meshes/animationsetdatasinglefile.txt");
+            if (file.exists()){
+                file.remove();
+            }
             if (!animSetData.copy(skyrimDirectory+"/data/meshes/animationsetdatasinglefile.txt")){
                 writeToLog("Failed to export animationsetdatasinglefile.txt to the game directory!");
             }
         }else{
             if (QDir().mkdir(skyrimDirectory+"/data/meshes")){
+                QFile file(skyrimDirectory+"/data/meshes/animationsetdatasinglefile.txt");
+                if (file.exists()){
+                    file.remove();
+                }
                 if (!animSetData.copy(skyrimDirectory+"/data/meshes/animationsetdatasinglefile.txt")){
                     writeToLog("Failed to export animationsetdatasinglefile.txt to the game directory!");
                 }
@@ -606,11 +622,18 @@ QString MainWindow::generateUniqueBehaviorName(){
 }
 
 void MainWindow::addNewBehavior(bool initData){
-    ProgressDialog dialog("Creating new behavior file in the current project...", "", 0, 100, this);
+    //ProgressDialog dialog("Creating new behavior file in the current project...", "", 0, 100, this);
     objectDataWid->unloadDataWidget();
     if (projectFile){
         if (characterFile){
-            QString filename = generateUniqueBehaviorName();
+            bool ok;
+            QString filename = QInputDialog::getText(this, "Add A New Behavior File To The Current Project!", "Behavior Name:", QLineEdit::Normal, "NEW_BEHAVIOR", &ok);
+            if (!ok && filename.isEmpty()){
+                return;
+            }else if (filename.contains(QRegExp("^[a-z-A-Z\\]+$"))){
+                WARNING_MESSAGE("Invalid filename!!! Only letters allowed in the filename!!!");
+                return;
+            }
             if (filename != ""){
                 projectFile->behaviorFiles.append(new BehaviorFile(this, projectFile, characterFile, filename));
                 if (initData){
@@ -618,20 +641,20 @@ void MainWindow::addNewBehavior(bool initData){
                 }else{
                     projectFile->behaviorFiles.last()->generateNewBehavior();
                 }
-                dialog.setProgress("Drawing behavior graph...", 50);
+                //dialog.setProgress("Drawing behavior graph...", 50);
                 behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.last()));
                 tabs->addTab(behaviorGraphs.last(), filename.section("/", -1, -1));
                 if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.last()->getBehaviorGraph()))){
                     FATAL_RUNTIME_ERROR("MainWindow::addNewBehavior(): The behavior graph was drawn incorrectly!");
                 }
                 tabs->setCurrentIndex(tabs->count() - 1);
-                dialog.setProgress("Writing to file...", 50);
+                //dialog.setProgress("Writing to file...", 50);
                 projectFile->behaviorFiles.last()->setIsChanged(true);
                 save();
                 //???
                 //projectFile->behaviorFiles.last()->toggleChanged(true);
                 //saveFile(tabs->count() - 2);
-                dialog.setProgress("Behavior file creation sucessful!!", dialog.maximum());
+                //dialog.setProgress("Behavior file creation sucessful!!", dialog.maximum());
                 return;
             }else{
                 writeToLog("Name generation failed!");
@@ -642,7 +665,7 @@ void MainWindow::addNewBehavior(bool initData){
     }else{
         writeToLog("No project open!");
     }
-    dialog.setProgress("Behavior file creation failed!!", dialog.maximum());
+    //dialog.setProgress("Behavior file creation failed!!", dialog.maximum());
 }
 
 void MainWindow::openProject(QString & filepath, bool loadUI){
