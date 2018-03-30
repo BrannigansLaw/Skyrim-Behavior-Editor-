@@ -265,9 +265,9 @@ void PoseMatchingGeneratorUI::connectSignals(){
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
     connect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)), Qt::UniqueConnection);
     connect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)), Qt::UniqueConnection);
-    connect(childUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
-    connect(childUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
-    connect(childUI, SIGNAL(viewGenerators(int)), this, SIGNAL(viewGenerators(int)), Qt::UniqueConnection);
+    connect(childUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
+    connect(childUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
+    connect(childUI, SIGNAL(viewGenerators(int,QString,QStringList)), this, SIGNAL(viewGenerators(int,QString,QStringList)), Qt::UniqueConnection);
 }
 
 void PoseMatchingGeneratorUI::disconnectSignals(){
@@ -297,9 +297,9 @@ void PoseMatchingGeneratorUI::disconnectSignals(){
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
     disconnect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)));
     disconnect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)));
-    disconnect(childUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
-    disconnect(childUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)));
-    disconnect(childUI, SIGNAL(viewGenerators(int)), this, SIGNAL(viewGenerators(int)));
+    disconnect(childUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
+    disconnect(childUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
+    disconnect(childUI, SIGNAL(viewGenerators(int,QString,QStringList)), this, SIGNAL(viewGenerators(int,QString,QStringList)));
 }
 
 void PoseMatchingGeneratorUI::loadTableValue(int row, const QString &value){
@@ -491,7 +491,7 @@ bool PoseMatchingGeneratorUI::setBinding(int index, int row, const QString & var
     hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
                   (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
@@ -628,6 +628,13 @@ void PoseMatchingGeneratorUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
+            for (auto i = 0; i < bsData->children.size(); i++){
+                if (bsData->children.at(i).data()){
+                    static_cast<DataIconManager*>(bsData->children.at(i).data())->updateIconNames();
+                }else{
+                    FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setName():\n Children contain nullptr's!!!");
+                }
+            }
             emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
             bsData->getParentFile()->setIsChanged(true);
         }
@@ -958,6 +965,7 @@ void PoseMatchingGeneratorUI::addChildWithGenerator(){
     Generator_Type typeEnum;
     if (bsData && behaviorView){
         typeEnum = static_cast<Generator_Type>(typeSelectorCB->currentIndex());
+        behaviorView->appendBlenderGeneratorChild();
         switch (typeEnum){
         case STATE_MACHINE:
             behaviorView->appendStateMachine();
@@ -1124,9 +1132,9 @@ void PoseMatchingGeneratorUI::viewSelectedChild(int row, int column){
                 }
             }else if (column == VALUE_COLUMN){
                 if (row == START_PLAYING_EVENT_ID_ROW){
-                    emit viewEvents(bsData->startPlayingEventId + 1);
+                    emit viewEvents(bsData->startPlayingEventId + 1, QString(), QStringList());
                 }else if (row == START_MATCHING_EVENT_ID_ROW){
-                    emit viewEvents(bsData->startMatchingEventId + 1);
+                    emit viewEvents(bsData->startMatchingEventId + 1, QString(), QStringList());
                 }
             }
         }else if (row == ADD_CHILD_ROW && column == NAME_COLUMN){
@@ -1224,10 +1232,10 @@ void PoseMatchingGeneratorUI::connectToTables(GenericTableWidget *generators, Ge
         connect(variables, SIGNAL(elementSelected(int,QString)), this, SLOT(variableTableElementSelected(int,QString)), Qt::UniqueConnection);
         connect(properties, SIGNAL(elementSelected(int,QString)), this, SLOT(variableTableElementSelected(int,QString)), Qt::UniqueConnection);
         connect(generators, SIGNAL(elementSelected(int,QString)), this, SLOT(generatorTableElementSelected(int,QString)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewGenerators(int)), generators, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewGenerators(int,QString,QStringList)), generators, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
         FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }
@@ -1262,15 +1270,15 @@ void PoseMatchingGeneratorUI::selectTableToView(bool viewproperties, const QStri
     if (bsData){
         if (viewproperties){
             if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewProperties(0);
+                emit viewProperties(0, QString(), QStringList());
             }
         }else{
             if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewVariables(0);
+                emit viewVariables(0, QString(), QStringList());
             }
         }
     }else{

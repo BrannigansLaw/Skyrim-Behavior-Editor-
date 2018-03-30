@@ -49,20 +49,11 @@ int hkbBlenderGenerator::getIndexToInsertIcon() const{
 }
 
 bool hkbBlenderGenerator::insertObjectAt(int index, DataIconManager *obj){
-    hkbBlenderGeneratorChild *objChild;
-    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
+    if (obj->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
         if (index >= children.size() || index == -1){
-            objChild = new hkbBlenderGeneratorChild(getParentFile(), this, -1);
-            children.append(HkxSharedPtr(objChild));
-            objChild->generator = HkxSharedPtr((HkxObject *)obj);
-        }else if (index == 0){
-            objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
-            objChild->generator = HkxSharedPtr((HkxObject *)obj);
-        }else if (index > -1){
-            objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
-            objChild->generator = HkxSharedPtr((HkxObject *)obj);
-        }else{
-            return false;
+            children.append(HkxSharedPtr(obj));
+        }else if (index == 0 || !children.isEmpty()){
+            children.replace(index, HkxSharedPtr(obj));
         }
         return true;
     }else{
@@ -89,10 +80,8 @@ bool hkbBlenderGenerator::removeObjectAt(int index){
 }
 
 bool hkbBlenderGenerator::hasChildren() const{
-    hkbBlenderGeneratorChild *child;
     for (int i = 0; i < children.size(); i++){
-        child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
-        if (child->generator.data()){
+        if (static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())){
             return true;
         }
     }
@@ -100,10 +89,8 @@ bool hkbBlenderGenerator::hasChildren() const{
 }
 
 int hkbBlenderGenerator::getIndexOfObj(DataIconManager *obj) const{
-    hkbBlenderGeneratorChild *child;
     for (int i = 0; i < children.size(); i++){
-        child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
-        if (child->generator.data() == (HkxObject *)obj){
+        if (children.at(i).data() == (HkxObject *)obj){
             return i;
         }
     }
@@ -128,17 +115,15 @@ bool hkbBlenderGenerator::isParametricBlend() const{
 
 QList<DataIconManager *> hkbBlenderGenerator::getChildren() const{
     QList<DataIconManager *> list;
-    hkbBlenderGeneratorChild *child;
     for (int i = 0; i < children.size(); i++){
-        child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
-        if (child->generator.data()){
-            list.append(static_cast<DataIconManager*>(child->generator.data()));
+        if (children.at(i).data()){
+            list.append(static_cast<DataIconManager*>(children.at(i).data()));
         }
     }
     return list;
 }
 
-int hkbBlenderGenerator::generatorCount(hkbGenerator *gen){
+/*int hkbBlenderGenerator::generatorCount(hkbGenerator *gen){
     hkbBlenderGeneratorChild *child;
     int count = 0;
     for (int i = 0; i < children.size(); i++){
@@ -148,7 +133,7 @@ int hkbBlenderGenerator::generatorCount(hkbGenerator *gen){
         }
     }
     return count;
-}
+}*/
 
 bool hkbBlenderGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
@@ -280,7 +265,8 @@ bool hkbBlenderGenerator::link(){
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < children.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(children.at(i).getReference());
+        //ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(children.at(i).getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(children.at(i).getReference());
         if (!ptr){
             writeToLog(getClassname()+":  link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
             setDataValidity(false);

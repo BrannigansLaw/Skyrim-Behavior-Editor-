@@ -12,13 +12,16 @@ QString hkbBlenderGeneratorChild::classname = "hkbBlenderGeneratorChild";
 
 hkbBlenderGeneratorChild::hkbBlenderGeneratorChild(HkxFile *parent, hkbGenerator *parentBG, long ref)
     : hkbGenerator(parent, ref),
-      weight(0),
-      worldFromModelWeight(0),
+      weight(1),
+      worldFromModelWeight(1),
       parentBG(parentBG)
 {
     setType(HKB_BLENDER_GENERATOR_CHILD, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
+    if (parentBG && (parentBG->getSignature() != HKB_BLENDER_GENERATOR && parentBG->getSignature() != HKB_POSE_MATCHING_GENERATOR)){
+        FATAL_RUNTIME_ERROR("hkbBlenderGeneratorChild::hkbBlenderGeneratorChild: parentBG is incorrect type!!!");
+    }
 }
 
 QString hkbBlenderGeneratorChild::getClassname(){
@@ -116,6 +119,64 @@ bool hkbBlenderGeneratorChild::isParametricBlend() const{
         getParentFile()->writeToLog(getClassname()+": isParametricBlend()!\nNo parent blender generator'!!!", true);
     }
     return false;
+}
+
+bool hkbBlenderGeneratorChild::hasChildren() const{
+    if (generator.data()){
+        return true;
+    }
+    return false;
+}
+
+QString hkbBlenderGeneratorChild::getName() const{
+    if (parentBG.constData()){
+        return static_cast<const hkbBlenderGenerator *>(parentBG.constData())->getName()+"_CHILD";
+    }else{
+        getParentFile()->writeToLog(getClassname()+": getName()!\nNo parent blender generator'!!!", true);
+    }
+    return "";
+}
+
+int hkbBlenderGeneratorChild::getThisIndex() const{
+    if (parentBG.constData()){
+        return static_cast<DataIconManager *>(parentBG.data())->getIndexOfObj((DataIconManager *)this);
+    }else{
+        FATAL_RUNTIME_ERROR("hkbBlenderGeneratorChild:::getThisIndex() !\nNo parent blender generator'!!!");
+    }
+    return -1;
+}
+
+QList<DataIconManager *> hkbBlenderGeneratorChild::getChildren() const{
+    QList<DataIconManager *> list;
+    if (generator.data()){
+        list.append(static_cast<DataIconManager*>(generator.data()));
+    }
+    return list;
+}
+
+int hkbBlenderGeneratorChild::getIndexOfObj(DataIconManager *obj) const{
+    if (generator.data() == (HkxObject *)obj){
+        return 0;
+    }
+    return -1;
+}
+
+bool hkbBlenderGeneratorChild::insertObjectAt(int , DataIconManager *obj){
+    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
+        generator = HkxSharedPtr((HkxObject *)obj);
+    }else{
+        return false;
+    }
+    return true;
+}
+
+bool hkbBlenderGeneratorChild::removeObjectAt(int index){
+    if (index == 0 || index == -1){
+        generator = HkxSharedPtr();
+    }else{
+        return false;
+    }
+    return true;
 }
 
 bool hkbBlenderGeneratorChild::link(){

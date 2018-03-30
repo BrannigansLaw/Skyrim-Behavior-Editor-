@@ -167,8 +167,8 @@ void TransitionsUI::connectSignals(){
     connect(flagDisallowRandomTransition, SIGNAL(released()), this, SLOT(toggleDisallowRandomTransitionFlag()), Qt::UniqueConnection);
     connect(flagDisallowReturnToState, SIGNAL(released()), this, SLOT(toggleDisallowReturnToStateFlag()), Qt::UniqueConnection);
     connect(flagAbutEndState, SIGNAL(released()), this, SLOT(toggleAbutEndStateFlag()), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
     connect(transitionUI, SIGNAL(transitionEffectRenamed(QString)), this, SLOT(transitionEffectRenamed(QString)), Qt::UniqueConnection);
     connect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
@@ -192,8 +192,8 @@ void TransitionsUI::disconnectSignals(){
     disconnect(flagDisallowRandomTransition, SIGNAL(released()), this, SLOT(toggleDisallowRandomTransitionFlag()));
     disconnect(flagDisallowReturnToState, SIGNAL(released()), this, SLOT(toggleDisallowReturnToStateFlag()));
     disconnect(flagAbutEndState, SIGNAL(released()), this, SLOT(toggleAbutEndStateFlag()));
-    disconnect(transitionUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
-    disconnect(transitionUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)));
+    disconnect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
+    disconnect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
     disconnect(transitionUI, SIGNAL(transitionEffectRenamed(QString)), this, SLOT(transitionEffectRenamed(QString)));
     disconnect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
@@ -425,7 +425,11 @@ void TransitionsUI::setCondition(){
         }else{
             bsData->condition = HkxSharedPtr();
             if (!bsData->flags.contains("FLAG_DISABLE_CONDITION")){
-                bsData->flags.append("|FLAG_DISABLE_CONDITION");
+                if (bsData->flags == "0"){
+                    bsData->flags = "FLAG_DISABLE_CONDITION";
+                }else{
+                    bsData->flags.append("|FLAG_DISABLE_CONDITION");
+                }
             }
         }
         parentObj->getParentFile()->setIsChanged(true);
@@ -510,8 +514,8 @@ void TransitionsUI::setPriority(){
 void TransitionsUI::toggleGlobalWildcardFlag(){
     if (bsData){
         if (flagGlobalWildcard->isChecked()){
-            if (bsData->flags == ""){
-                bsData->flags.append("FLAG_IS_GLOBAL_WILDCARD");
+            if (bsData->flags == "0"){
+                bsData->flags = "FLAG_IS_GLOBAL_WILDCARD";
             }else if (!bsData->flags.contains("FLAG_IS_GLOBAL_WILDCARD")){
                 bsData->flags.append("|FLAG_IS_GLOBAL_WILDCARD");
             }
@@ -531,8 +535,8 @@ void TransitionsUI::toggleGlobalWildcardFlag(){
 void TransitionsUI::toggleUseNestedStateFlag(){
     if (bsData){
         if (flagUseNestedState->isChecked()){
-            if (bsData->flags == ""){
-                bsData->flags.append("FLAG_TO_NESTED_STATE_ID_IS_VALID");
+            if (bsData->flags == "0"){
+                bsData->flags = "FLAG_TO_NESTED_STATE_ID_IS_VALID";
             }else if (!bsData->flags.contains("FLAG_TO_NESTED_STATE_ID_IS_VALID")){
                 bsData->flags.append("|FLAG_TO_NESTED_STATE_ID_IS_VALID");
             }
@@ -554,8 +558,8 @@ void TransitionsUI::toggleUseNestedStateFlag(){
 void TransitionsUI::toggleDisallowRandomTransitionFlag(){
     if (bsData){
         if (flagDisallowRandomTransition->isChecked()){
-            if (bsData->flags == ""){
-                bsData->flags.append("FLAG_DISALLOW_RANDOM_TRANSITION");
+            if (bsData->flags == "0"){
+                bsData->flags = "FLAG_DISALLOW_RANDOM_TRANSITION";
             }else if (!bsData->flags.contains("FLAG_DISALLOW_RANDOM_TRANSITION")){
                 bsData->flags.append("|FLAG_DISALLOW_RANDOM_TRANSITION");
             }
@@ -575,8 +579,8 @@ void TransitionsUI::toggleDisallowRandomTransitionFlag(){
 void TransitionsUI::toggleDisallowReturnToStateFlag(){
     if (bsData){
         if (flagDisallowReturnToState->isChecked()){
-            if (bsData->flags == ""){
-                bsData->flags.append("FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE");
+            if (bsData->flags == "0"){
+                bsData->flags = "FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE";
             }else if (!bsData->flags.contains("FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE")){
                 bsData->flags.append("|FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE");
             }
@@ -596,8 +600,8 @@ void TransitionsUI::toggleDisallowReturnToStateFlag(){
 void TransitionsUI::toggleAbutEndStateFlag(){
     if (bsData){
         if (flagAbutEndState->isChecked()){
-            if (bsData->flags == ""){
-                bsData->flags.append("FLAG_ABUT_AT_END_OF_FROM_GENERATOR");
+            if (bsData->flags == "0"){
+                bsData->flags = "FLAG_ABUT_AT_END_OF_FROM_GENERATOR";
             }else if (!bsData->flags.contains("FLAG_ABUT_AT_END_OF_FROM_GENERATOR")){
                 bsData->flags.append("|FLAG_ABUT_AT_END_OF_FROM_GENERATOR");
             }
@@ -684,7 +688,7 @@ void TransitionsUI::viewSelectedChild(int row, int column){
                 default:
                     return;
                 }
-                emit viewEvents(index + 1);
+                emit viewEvents(index + 1, QString(), QStringList());
             }
         }
     }else{

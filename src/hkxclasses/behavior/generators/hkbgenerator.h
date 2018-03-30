@@ -14,7 +14,7 @@ public:
     virtual ~hkbGenerator();
     bool link();
     virtual QString getName() const;
-    QString getClassname() const;
+   QString getClassname() const;
 protected:
     hkbGenerator(HkxFile *parent, long ref = -1);
 };

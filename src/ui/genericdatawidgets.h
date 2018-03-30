@@ -428,12 +428,19 @@ signals:
 protected:
 private slots:
     void itemSelected();
+    void itemSelectedAt(int row, int );
     //void itemAdded();
-    void showTable(int index);
-    void showTable(const QString & name);
+    void showTable(int index, const QString &typeallowed = "", const QStringList &typesdisallowed = QStringList());
+    void showTable(const QString & name, const QString &typeallowed = "", const QStringList &typesdisallowed = QStringList());
+    void filterItems();
+    void setTypeFilter(const QString & typeallowed, const QStringList &typesdisallowed = QStringList());
 private:
+    QString onlyTypeAllowed;
+    QStringList typesDisallowed;
     QGridLayout *lyt;
     QTableWidget *table;
+    QPushButton *filterPB;
+    QLineEdit *filterLE;
     QPushButton *selectPB;
     QPushButton *cancelPB;
     //QPushButton *newPB;

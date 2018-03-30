@@ -25,8 +25,8 @@ public:
     BSBoneUI();
     void loadData(BehaviorFile *parentFile, BSLookAtModifier::BsBone *bon, BSLookAtModifier *par, int ind, bool isEyeBone);
 signals:
-    void viewProperties(int index);
-    void viewVariables(int index);
+    void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void returnToParent();
 private slots:
     void setIndex(int index);

@@ -43,7 +43,7 @@ private:
     bool removeObjectAt(int index);
     hkbBlenderGenerator& operator=(const hkbBlenderGenerator&);
     hkbBlenderGenerator(const hkbBlenderGenerator &);
-    int generatorCount(hkbGenerator *gen);
+    //int generatorCount(hkbGenerator *gen);
 private:
     static uint refCount;
     static QString classname;

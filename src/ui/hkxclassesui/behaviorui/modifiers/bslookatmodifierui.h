@@ -31,9 +31,9 @@ public:
     void loadData(HkxObject *data);
 signals:
     void modifierNameChanged(const QString & newName, int index);
-    void viewVariables(int index);
-    void viewProperties(int index);
-    void viewEvents(int index);
+    void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
     void setName();
     void setEnable();

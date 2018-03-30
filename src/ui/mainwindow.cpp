@@ -84,9 +84,9 @@ MainWindow::MainWindow()
     exportToSkyrimDirA->setStatusTip("Pack and export the current project to the working Skyrim directory!");
     //exportToSkyrimDirA->setShortcut(QKeySequence::Copy);
     exportCurrentFileA->setStatusTip("Pack and export the current file to the working Skyrim directory!");
-    //exportCurrentFileA->setShortcut(QKeySequence::Paste);
+    exportCurrentFileA->setShortcut(QKeySequence::Paste);
     saveA->setStatusTip("Save file!");
-    //saveA->setShortcut(QKeySequence::Save);
+    saveA->setShortcut(QKeySequence::Save);
     saveProjectA->setStatusTip("Save project!");
     //saveProjectA->setShortcut(QKeySequence::SaveAs);
     exitA->setStatusTip("Exit!");

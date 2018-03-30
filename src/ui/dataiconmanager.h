@@ -20,9 +20,9 @@ public:
     virtual bool hasChildren() const;
     bool hasIcons() const;
     void updateIconNames();
+    virtual int getIndexOfObj(DataIconManager *) const;
 protected:
     virtual QList <DataIconManager *> getChildren() const;
-    virtual int getIndexOfObj(DataIconManager *) const;
     virtual bool insertObjectAt(int , DataIconManager *);
     virtual bool removeObjectAt(int );//If index is -1 remove all...
     DataIconManager(HkxFile *parent, long ref = -1);

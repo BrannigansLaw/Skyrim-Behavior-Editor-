@@ -34,14 +34,14 @@ signals:
     void generatorNameChanged(const QString & newName, int index);
     void stateNameChanged(const QString & newName, int index);
     void stateIdChanged(int stateIndex, int newID, const QString & statename);
-    void viewGenerators(int index);
+    void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void returnToParent(bool reloadData);
-    //void viewVariables(int index);
-    //void viewProperties(int index);
-    void viewEvents(int index);
+    void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
     void setName();
-    void setStateId();
+    void setStateId(int id);
     void setProbability();
     void setEnable();
     void eventTableElementSelected(int index, const QString & name);

@@ -24,10 +24,10 @@ bool DataIconManager::hasIcons() const{
 }
 
 void DataIconManager::updateIconNames(){
-    icons.first()->scene()->update();
-    /*for (int i = 0; i < icons.size(); i++){
-        icons.at(i)->update(QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size())));
-    }*/
+    //icons.first()->scene()->update();
+    for (int i = 0; i < icons.size(); i++){
+        icons.at(i)->update(/*QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size()))*/);
+    }
 }
 
 QList<DataIconManager *> DataIconManager::getChildren() const{

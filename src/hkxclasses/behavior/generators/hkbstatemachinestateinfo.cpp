@@ -39,6 +39,8 @@ QString hkbStateMachineStateInfo::getName() const{
 hkbStateMachine * hkbStateMachineStateInfo::getParentStateMachine() const{
     if (parentSM && parentSM->getSignature() == HKB_STATE_MACHINE){
         return parentSM;
+    }else{
+        WARNING_MESSAGE(QString("The state "+getName()+" has no parent!!!"));
     }
     return nullptr;
 }
@@ -141,7 +143,6 @@ bool hkbStateMachineStateInfo::removeObjectAt(int index){
     }
     return true;
 }
-
 
 bool hkbStateMachineStateInfo::readData(const HkxXmlReader &reader, long index){
     bool ok;

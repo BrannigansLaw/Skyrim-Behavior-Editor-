@@ -86,7 +86,7 @@ void KeyframeBonesModifierUI::connectSignals(){
     connect(keyframedBonesList, SIGNAL(pressed()), this, SLOT(viewKeyframedBonesList()), Qt::UniqueConnection);
     connect(keyframedBonesList, SIGNAL(enabled(bool)), this, SLOT(toggleKeyframedBonesList(bool)), Qt::UniqueConnection);
     connect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(keyframeInfoUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
+    connect(keyframeInfoUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
     connect(keyframeInfoUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
 }
 
@@ -97,7 +97,7 @@ void KeyframeBonesModifierUI::disconnectSignals(){
     disconnect(keyframedBonesList, SIGNAL(pressed()), this, SLOT(viewKeyframedBonesList()));
     disconnect(keyframedBonesList, SIGNAL(enabled(bool)), this, SLOT(toggleKeyframedBonesList(bool)));
     disconnect(boneIndexUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    disconnect(keyframeInfoUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
+    disconnect(keyframeInfoUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
     disconnect(keyframeInfoUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
 }
 
@@ -206,7 +206,7 @@ bool KeyframeBonesModifierUI::setBinding(int index, int row, const QString & var
     hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
                   (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
@@ -365,9 +365,9 @@ void KeyframeBonesModifierUI::connectToTables(GenericTableWidget *variables, Gen
         connect(variables, SIGNAL(elementSelected(int,QString)), this, SLOT(variableTableElementSelected(int,QString)), Qt::UniqueConnection);
         connect(properties, SIGNAL(elementSelected(int,QString)), this, SLOT(variableTableElementSelected(int,QString)), Qt::UniqueConnection);
         connect(ragdollBones, SIGNAL(elementSelected(int,QString)), boneIndexUI, SLOT(setRagdollBone(int,QString)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(boneIndexUI, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(boneIndexUI, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
         FATAL_RUNTIME_ERROR("KeyframeBonesModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
@@ -402,15 +402,15 @@ void KeyframeBonesModifierUI::selectTableToView(bool viewproperties, const QStri
     if (bsData){
         if (viewproperties){
             if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewProperties(0);
+                emit viewProperties(0, QString(), QStringList());
             }
         }else{
             if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewVariables(0);
+                emit viewVariables(0, QString(), QStringList());
             }
         }
     }else{

@@ -18,20 +18,22 @@ class QGroupBox;
 class QGridLayout;
 class CheckButtonCombo;
 class hkbVariableBindingSet;
+class GenericTableWidget;
 
 class BlenderGeneratorChildUI: public QStackedWidget
 {
     Q_OBJECT
     friend class BlenderGeneratorUI;
     friend class PoseMatchingGeneratorUI;
+    friend class HkDataUI;
 public:
     BlenderGeneratorChildUI();
     virtual ~BlenderGeneratorChildUI(){}
     void loadData(HkxObject *data, int childindex);
 signals:
-    void viewVariables(int index);
-    void viewGenerators(int index);
-    void viewProperties(int index);
+    void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void returnToParent(bool reloadData);
 private slots:
     void setWeight();
@@ -40,6 +42,8 @@ private slots:
     void viewBoneWeights();
     void toggleBoneWeights(bool enable);
     void returnToWidget();
+    void generatorTableElementSelected(int index, const QString &name);
+    void variableTableElementSelected(int index, const QString &name);
 private:
     void connectSignals();
     void disconnectSignals();
@@ -49,6 +53,7 @@ private:
     void variableRenamed(const QString & name, int index);
     void generatorRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
+    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
     void selectTableToView(bool viewproperties, const QString & path);
     void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
 private:

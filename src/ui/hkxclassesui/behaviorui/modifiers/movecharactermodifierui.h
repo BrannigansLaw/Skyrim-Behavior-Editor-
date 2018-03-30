@@ -24,8 +24,8 @@ public:
     virtual ~MoveCharacterModifierUI(){}
     void loadData(HkxObject *data);
 signals:
-    void viewVariables(int index);
-    void viewProperties(int index);
+    void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void modifierNameChanged(const QString & newName, int index);
 private slots:
     void setName();

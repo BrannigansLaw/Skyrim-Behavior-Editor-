@@ -81,8 +81,8 @@ DataIconManager *TreeGraphicsView::getSelectedData() const{
     return nullptr;
 }
 
-bool TreeGraphicsView::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData, bool removeData){
-    bool result = treeScene->reconnectIcon(oldIconParent, dataToReplace, replacementData, removeData);
+bool TreeGraphicsView::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, int replaceindex, DataIconManager *replacementData, bool removeData){
+    bool result = treeScene->reconnectIcon(oldIconParent, dataToReplace, replaceindex, replacementData, removeData);
     //oldIconParent->reposition();
     return result;
 }

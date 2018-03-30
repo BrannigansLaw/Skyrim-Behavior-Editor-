@@ -43,39 +43,41 @@ int BSBoneSwitchGenerator::getIndexToInsertIcon() const{
 }
 
 bool BSBoneSwitchGenerator::insertObjectAt(int index, DataIconManager *obj){
-    BSBoneSwitchGeneratorBoneData *objChild;
-    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
+    if (((HkxObject *)obj)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA){
+        if (index == 0){
+            return false;
+        }else if (index >= ChildrenA.size() || index == -1){
+            ChildrenA.append(HkxSharedPtr(obj));
+        }else if (index == 1 || !ChildrenA.isEmpty()){
+            ChildrenA.replace(index - 1, HkxSharedPtr(obj));
+        }
+        return true;
+    }else if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
         if (index == 0){
             pDefaultGenerator = HkxSharedPtr((HkxObject *)obj);
-        }else if (index == 1){
-            objChild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index - 1).data());
-            objChild->pGenerator = HkxSharedPtr((HkxObject *)obj);
-        }else if (index >= ChildrenA.size() || index == -1){
-            objChild = new BSBoneSwitchGeneratorBoneData(getParentFile(), -1);
-            ChildrenA.append(HkxSharedPtr(objChild));
-            objChild->pGenerator = HkxSharedPtr((HkxObject *)obj);
-        }else if (index > -1){
-            objChild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(index - 1).data());
-            objChild->pGenerator = HkxSharedPtr((HkxObject *)obj);
         }else{
             return false;
         }
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 bool BSBoneSwitchGenerator::hasChildren() const{
     if (pDefaultGenerator.data()){
         return true;
     }
-    BSBoneSwitchGeneratorBoneData *child;
     for (int i = 0; i < ChildrenA.size(); i++){
-        child = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data());
-        if (child->pGenerator.data()){
+        if (ChildrenA.at(i).data()){
             return true;
         }
+    }
+    return false;
+}
+
+bool BSBoneSwitchGenerator::hasGenerator() const{
+    if (pDefaultGenerator.data()){
+        return true;
     }
     return false;
 }
@@ -85,24 +87,20 @@ QList<DataIconManager *> BSBoneSwitchGenerator::getChildren() const{
     if (pDefaultGenerator.data()){
         list.append(static_cast<DataIconManager*>(pDefaultGenerator.data()));
     }
-    BSBoneSwitchGeneratorBoneData *child;
     for (int i = 0; i < ChildrenA.size(); i++){
-        child = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data());
-        if (child->pGenerator.data()){
-            list.append(static_cast<DataIconManager*>(child->pGenerator.data()));
+        if (ChildrenA.at(i).data()){
+            list.append(static_cast<DataIconManager*>(ChildrenA.at(i).data()));
         }
     }
     return list;
 }
 
 int BSBoneSwitchGenerator::getIndexOfObj(DataIconManager *obj) const{
-    BSBoneSwitchGeneratorBoneData *child;
     if (pDefaultGenerator.data() == (HkxObject *)obj){
         return 0;
     }else{
         for (int i = 0; i < ChildrenA.size(); i++){
-            child = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data());
-            if (child->pGenerator.data() == (HkxObject *)obj){
+            if (static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data()) == (HkxObject *)obj){
                 return i + 1;
             }
         }
@@ -237,7 +235,8 @@ bool BSBoneSwitchGenerator::link(){
         pDefaultGenerator = *ptr;
     }
     for (int i = 0; i < ChildrenA.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(ChildrenA.at(i).getReference());
+        //ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(ChildrenA.at(i).getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(ChildrenA.at(i).getReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'ChildrenA' data field!");
             setDataValidity(false);
@@ -247,6 +246,7 @@ bool BSBoneSwitchGenerator::link(){
             ChildrenA[i] = *ptr;
         }else{
             ChildrenA[i] = *ptr;
+            static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA[i].data())->parentBSG = this;
         }
     }
     return true;

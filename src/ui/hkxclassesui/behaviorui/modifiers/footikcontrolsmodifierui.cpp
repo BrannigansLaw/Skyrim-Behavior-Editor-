@@ -171,8 +171,8 @@ void FootIkControlsModifierUI::connectSignals(){
     connect(errorOutTranslation, SIGNAL(editingFinished()), this, SLOT(seterrorOutTranslation()), Qt::UniqueConnection);
     connect(alignWithGroundRotation, SIGNAL(editingFinished()), this, SLOT(setalignWithGroundRotation()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-    connect(legUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)), Qt::UniqueConnection);
-    connect(legUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
+    connect(legUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
+    connect(legUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
     connect(legUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
 }
 
@@ -194,8 +194,8 @@ void FootIkControlsModifierUI::disconnectSignals(){
     disconnect(errorOutTranslation, SIGNAL(editingFinished()), this, SLOT(seterrorOutTranslation()));
     disconnect(alignWithGroundRotation, SIGNAL(editingFinished()), this, SLOT(setalignWithGroundRotation()));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
-    disconnect(legUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)));
-    disconnect(legUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
+    disconnect(legUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
+    disconnect(legUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
     disconnect(legUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
 }
 
@@ -339,7 +339,7 @@ bool FootIkControlsModifierUI::setBinding(int index, int row, const QString & va
     hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
                   (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
@@ -794,9 +794,9 @@ void FootIkControlsModifierUI::connectToTables(GenericTableWidget *variables, Ge
         connect(variables, SIGNAL(elementSelected(int,QString)), this, SLOT(variableTableElementSelected(int,QString)), Qt::UniqueConnection);
         connect(events, SIGNAL(elementSelected(int,QString)), legUI, SLOT(setEventId(int,QString)), Qt::UniqueConnection);
         connect(properties, SIGNAL(elementSelected(int,QString)), this, SLOT(variableTableElementSelected(int,QString)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
         FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
@@ -831,15 +831,15 @@ void FootIkControlsModifierUI::selectTableToView(bool viewproperties, const QStr
     if (bsData){
         if (viewproperties){
             if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewProperties(0);
+                emit viewProperties(0, QString(), QStringList());
             }
         }else{
             if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewVariables(0);
+                emit viewVariables(0, QString(), QStringList());
             }
         }
     }else{

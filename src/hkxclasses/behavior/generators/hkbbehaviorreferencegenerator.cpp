@@ -110,6 +110,5 @@ bool hkbBehaviorReferenceGenerator::evaulateDataValidity(){
 }
 
 hkbBehaviorReferenceGenerator::~hkbBehaviorReferenceGenerator(){
-    static_cast<BehaviorFile *>(getParentFile())->removeUnreferencedFiles(this);
     refCount--;
 }

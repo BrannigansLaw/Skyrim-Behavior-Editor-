@@ -21,6 +21,13 @@ hkbBoneWeightArray::hkbBoneWeightArray(HkxFile *parent, long ref, int size)
     refCount++;
 }
 
+void hkbBoneWeightArray::copyBoneWeights(const hkbBoneWeightArray *other){
+    boneWeights.resize(other->boneWeights.size());
+    for (auto i = 0; i < boneWeights.size(); i++){
+        boneWeights[i] = other->boneWeights.at(i);
+    }
+}
+
 QString hkbBoneWeightArray::getClassname(){
     return classname;
 }

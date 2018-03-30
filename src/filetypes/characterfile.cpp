@@ -184,6 +184,28 @@ QString CharacterFile::getRootBehaviorFilename() const{
     return "";
 }
 
+void CharacterFile::getCharacterPropertyBoneWeightArray(const QString &name, hkbBoneWeightArray *ptrtosetdata) const{
+    hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
+    hkbCharacterData *data = static_cast<hkbCharacterData *>(characterData.data());
+    hkbVariableValueSet *values = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
+    int count = -1;
+    if (strData && data && values){
+        int index = strData->characterPropertyNames.indexOf(name);
+        if (index < strData->characterPropertyNames.size() && index < data->characterPropertyInfos.size()){
+            if (data->characterPropertyInfos.at(index).type == "VARIABLE_TYPE_POINTER"){
+                for (int i = 0; i <= index; i++){
+                    if (data->characterPropertyInfos.at(i).type == "VARIABLE_TYPE_POINTER"){
+                        count++;
+                    }
+                }
+                if (count < values->variantVariableValues.size() && count > -1 && values->variantVariableValues.at(count).constData()->getSignature() == HKB_BONE_WEIGHT_ARRAY){
+                    ptrtosetdata->copyBoneWeights(static_cast<const hkbBoneWeightArray *>(values->variantVariableValues.at(count).constData()));
+                }
+            }
+        }
+    }
+}
+
 void CharacterFile::setSkeletonFile(SkeletonFile *skel){
     skeleton = skel;
 }

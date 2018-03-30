@@ -82,6 +82,8 @@ class HandIkControlsModifierUI;
 class BSTweenerModifierUI;
 class BGSGamebryoSequenceGeneratorUI;
 class EventsFromRangeModifierUI;
+class BlenderGeneratorChildUI;
+class BSBoneSwitchGeneratorBoneDataUI;
 
 class MainWindow;
 
@@ -101,7 +103,7 @@ public:
     void setEventsVariablesAnimationsUI(EventsUI *events, BehaviorVariablesUI *variables, AnimationsUI *animations);
     void unloadDataWidget();
 signals:
-    void newAnimationAdded(const QString & name);
+    //void newAnimationAdded(const QString & name);
 public slots:
     void changeCurrentDataWidget(TreeGraphicsItem *icon);
     void modifierAdded(const QString & name, const QString & type);
@@ -131,9 +133,11 @@ private:
         STATE_MACHINE,
         STATE,
         BLENDER_GENERATOR,
+        BLENDER_GENERATOR_CHILD,
         BEHAVIOR_GRAPH,
         BS_LIMB_IK_MOD,
         BS_BONE_SWITCH_GENERATOR,
+        BS_BS_BONE_SWITCH_GENERATOR_CHILD,
         BS_OFFSET_ANIMATION_GENERATOR,
         BS_CYCLIC_BLEND_TRANSITION_GENERATOR,
         POSE_MATCHING_GENERATOR,
@@ -213,9 +217,11 @@ private:
     StateMachineUI *stateMachineUI;
     StateUI *stateUI;
     BlenderGeneratorUI *blenderGeneratorUI;
+    BlenderGeneratorChildUI *blenderGeneratorChildUI;
     BehaviorGraphUI *behaviorGraphUI;
     BSLimbIKModifierUI *limbIKModUI;
     BSBoneSwitchGeneratorUI *boneSwitchUI;
+    BSBoneSwitchGeneratorBoneDataUI *boneSwitchChildUI;
     BSOffsetAnimationGeneratorUI *offsetAnimGenUI;
     BSCyclicBlendTransitionGeneratorUI *cyclicBlendTransGenUI;
     PoseMatchingGeneratorUI *poseMatchGenUI;

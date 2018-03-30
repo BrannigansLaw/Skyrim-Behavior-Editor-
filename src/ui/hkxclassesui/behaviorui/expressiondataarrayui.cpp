@@ -157,9 +157,9 @@ void ExpressionDataArrayUI::setAssignmentEventIndex(int index, const QString & n
 void ExpressionDataArrayUI::viewSelectedChild(int row, int column){
     if (bsData){
         if (row == ASSIGNMENT_VARIABLE_INDEX_ROW && column == VALUE_COLUMN){
-            emit viewVariables(bsData->assignmentVariableIndex + 1);
+            emit viewVariables(bsData->assignmentVariableIndex + 1, QString(), QStringList());
         }else if (row == ASSIGNMENT_EVENT_INDEX_ROW && column == VALUE_COLUMN){
-            emit viewEvents(bsData->assignmentEventIndex + 1);
+            emit viewEvents(bsData->assignmentEventIndex + 1, QString(), QStringList());
         }
     }else{
         FATAL_RUNTIME_ERROR("ExpressionDataArrayUI::viewSelectedChild(): The data is nullptr!!");

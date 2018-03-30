@@ -26,9 +26,9 @@ public:
     void loadData(HkxObject *data);
 signals:
     void generatorNameChanged(const QString & newName, int index);
-    void viewVariables(int index);
-    void viewGenerators(int index);
-    void viewProperties(int index);
+    void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
     void setName();
     void setSelectedGeneratorIndex();
@@ -53,7 +53,8 @@ private:
     void loadDynamicTableRows();
 private:
     enum Generator_Type {
-        STATE_MACHINE = 0,
+        NONE = 0,
+        STATE_MACHINE,
         MANUAL_SELECTOR_GENERATOR,
         BLENDER_GENERATOR,
         I_STATE_TAGGING_GENERATOR,

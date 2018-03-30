@@ -34,10 +34,10 @@ public:
     void loadData(HkxObject *data);
 signals:
     void generatorNameChanged(const QString & newName, int index);
-    void viewVariables(int index);
-    void viewProperties(int index);
-    void viewEvents(int index);
-    void viewGenerators(int index);
+    void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
     void setName();
     void setStartStateId(int index);
@@ -45,7 +45,7 @@ private slots:
     void setRandomTransitionEventId(int index, const QString &name);
     void setTransitionToNextHigherStateEventId(int index, const QString &name);
     void setTransitionToNextLowerStateEventId(int index, const QString &name);
-    void setSyncVariableIndex(int index);
+    void setSyncVariableIndex(int index, const QString &name);
     void setWrapAroundStateId(bool checked);
     void setMaxSimultaneousTransitions();
     void setStartStateMode(int index);

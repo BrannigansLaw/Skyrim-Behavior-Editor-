@@ -49,6 +49,10 @@ BehaviorGraphIcon::BehaviorGraphIcon(TreeGraphicsItem *parent, DataIconManager *
             path.addRect(square);
             rGrad.setColorAt(1.0, Qt::darkRed);
             break;
+        case HKB_BLENDER_GENERATOR_CHILD:
+            path.addRect(square);
+            rGrad.setColorAt(1.0, Qt::darkMagenta);
+            break;
         case HKB_POSE_MATCHING_GENERATOR:
             path.addRect(square);
             rGrad.setColorAt(1.0, Qt::darkRed);
@@ -56,6 +60,10 @@ BehaviorGraphIcon::BehaviorGraphIcon(TreeGraphicsItem *parent, DataIconManager *
         case BS_BONE_SWITCH_GENERATOR:
             path.addRect(square);
             rGrad.setColorAt(1.0, Qt::darkRed);
+            break;
+        case BS_BONE_SWITCH_GENERATOR_BONE_DATA:
+            path.addRect(square);
+            rGrad.setColorAt(1.0, Qt::darkMagenta);
             break;
         case HKB_STATE_MACHINE:
             path.addPolygon(polygon);
@@ -131,11 +139,17 @@ void BehaviorGraphIcon::unselect(){
         case HKB_BLENDER_GENERATOR:
             rGrad.setColorAt(1.0, Qt::darkRed);
             break;
+        case HKB_BLENDER_GENERATOR_CHILD:
+            rGrad.setColorAt(1.0, Qt::darkMagenta);
+            break;
         case HKB_POSE_MATCHING_GENERATOR:
             rGrad.setColorAt(1.0, Qt::darkRed);
             break;
         case BS_BONE_SWITCH_GENERATOR:
             rGrad.setColorAt(1.0, Qt::darkRed);
+            break;
+        case BS_BONE_SWITCH_GENERATOR_BONE_DATA:
+            rGrad.setColorAt(1.0, Qt::darkMagenta);
             break;
         case HKB_STATE_MACHINE:
             rGrad.setColorAt(1.0, Qt::darkBlue);

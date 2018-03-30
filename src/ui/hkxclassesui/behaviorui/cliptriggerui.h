@@ -25,7 +25,7 @@ public:
     //QSize sizeHint() const Q_DECL_OVERRIDE;
     //QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 signals:
-    void viewEvents(int index);
+    void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void returnToParent();
 private slots:
     void setEventId(int index, const QString &name);

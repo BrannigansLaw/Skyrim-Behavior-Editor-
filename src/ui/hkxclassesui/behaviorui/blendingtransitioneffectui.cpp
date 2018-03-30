@@ -320,14 +320,14 @@ void BlendingTransitionEffectUI::setBlendCurve(int index){
 void BlendingTransitionEffectUI::toggleSyncFlag(){
     if (bsData){
         if (flagSync->isChecked()){
-            if (bsData->flags == ""){
-                bsData->flags.append("FLAG_SYNC");
+            if (bsData->flags == "FLAG_NONE"){
+                bsData->flags= "FLAG_SYNC";
             }else if (!bsData->flags.contains("FLAG_SYNC")){
                 bsData->flags.append("|FLAG_SYNC");
             }
         }else{
             if (bsData->flags == "FLAG_SYNC"){
-                bsData->flags = "0";
+                bsData->flags = "FLAG_NONE";
             }else{
                 bsData->flags.remove("|FLAG_SYNC");
             }
@@ -341,14 +341,14 @@ void BlendingTransitionEffectUI::toggleSyncFlag(){
 void BlendingTransitionEffectUI::toggleIgnoreFromWorldFromModelFlag(){
     if (bsData){
         if (flagIgnoreFromWorldFromModel->isChecked()){
-            if (bsData->flags == ""){
-                bsData->flags.append("FLAG_IGNORE_FROM_WORLD_FROM_MODEL");
+            if (bsData->flags == "FLAG_NONE"){
+                bsData->flags = ("FLAG_IGNORE_FROM_WORLD_FROM_MODEL");
             }else if (!bsData->flags.contains("FLAG_IGNORE_FROM_WORLD_FROM_MODEL")){
                 bsData->flags.append("|FLAG_IGNORE_FROM_WORLD_FROM_MODEL");
             }
         }else{
             if (bsData->flags == "FLAG_IGNORE_FROM_WORLD_FROM_MODEL"){
-                bsData->flags = "0";
+                bsData->flags = "FLAG_NONE";
             }else{
                 bsData->flags.remove("|FLAG_IGNORE_FROM_WORLD_FROM_MODEL");
             }
@@ -362,14 +362,14 @@ void BlendingTransitionEffectUI::toggleIgnoreFromWorldFromModelFlag(){
 void BlendingTransitionEffectUI::toggleIgnoreToWorldFromModelFlag(){
     if (bsData){
         if (flagIgnoreToWorldFromModel->isChecked()){
-            if (bsData->flags == ""){
-                bsData->flags.append("FLAG_IGNORE_TO_WORLD_FROM_MODEL");
+            if (bsData->flags == "FLAG_NONE"){
+                bsData->flags = "FLAG_IGNORE_TO_WORLD_FROM_MODEL";
             }else if (!bsData->flags.contains("FLAG_IGNORE_TO_WORLD_FROM_MODEL")){
                 bsData->flags.append("|FLAG_IGNORE_TO_WORLD_FROM_MODEL");
             }
         }else{
             if (bsData->flags == "FLAG_IGNORE_TO_WORLD_FROM_MODEL"){
-                bsData->flags = "0";
+                bsData->flags = "FLAG_NONE";
             }else{
                 bsData->flags.remove("|FLAG_IGNORE_TO_WORLD_FROM_MODEL");
             }
@@ -384,15 +384,15 @@ void BlendingTransitionEffectUI::selectTableToView(bool viewproperties, const QS
     if (bsData){
         if (viewproperties){
             if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewProperties(0);
+                emit viewProperties(0, QString(), QStringList());
             }
         }else{
             if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewVariables(0);
+                emit viewVariables(0, QString(), QStringList());
             }
         }
     }else{
@@ -449,7 +449,7 @@ void BlendingTransitionEffectUI::setBinding(int index, int row, const QString & 
     hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
                   (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){

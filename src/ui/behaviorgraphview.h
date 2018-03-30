@@ -70,7 +70,9 @@ private slots:
     void appendCyclicBlendTransitionGenerator();
     void appendPoseMatchingGenerator();
     void appendBlenderGenerator();
+    void appendBlenderGeneratorChild();
     void appendBoneSwitchGenerator();
+    void appendBoneSwitchGeneratorChild();
     void appendClipGenerator();
     void appendBehaviorReferenceGenerator();
     void appendBGSGamebryoSequenceGenerator();
@@ -167,7 +169,9 @@ private:
     QAction *appendBGSGamebryoSequenceGeneratorAct;
     QMenu *appendBlenderMenu;
     QAction *appendBlenderGeneratorAct;
+    QAction *appendBlenderGeneratorChildAct;
     QAction *appendBSBoneSwitchGeneratorAct;
+    QAction *appendBSBoneSwitchGeneratorChildAct;
     QMenu *wrapGeneratorMenu;
     QAction *wrapStateMachineAct;
     QAction *wrapManualSelectorGeneratorAct;

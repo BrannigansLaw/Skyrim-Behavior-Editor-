@@ -211,55 +211,46 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
             delete newIcon;
             return nullptr;
         }
-        addItem(newIcon);  //newIcon is added to scene already???
+        if (!newIcon->scene()){
+            addItem(newIcon);  //newIcon is added to scene already???
+        }
         //newIcon->reposition();
         addItem(newIcon->path);
     }
     return newIcon;
 }
 
-bool TreeGraphicsScene::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData, bool removeData){
+bool TreeGraphicsScene::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, int replaceindex, DataIconManager *replacementData, bool removeData){
     TreeGraphicsItem *iconToReplace = nullptr;
     TreeGraphicsItem *replacementIcon = nullptr;
     TreeGraphicsItem *oldParent = nullptr;
-    QList <DataIconManager *> dataChildren;
-    //int indexOfReplacementData = -1;
-    //int indexOfOldData = -1;
-    int index = -1;
     if (oldIconParent){
-        if (!dataToReplace){
-            addItemToGraph(oldIconParent, replacementData, oldIconParent->itemData->getIndexOfObj(dataToReplace));
+        if (!dataToReplace || (dataToReplace == replacementData && !oldIconParent->hasSameData(replacementData))){
+            addItemToGraph(oldIconParent, replacementData, replaceindex);
             oldIconParent->reposition();
-            return true;
         }else if (dataToReplace != replacementData){
             iconToReplace = oldIconParent->getChildWithData(dataToReplace);
             if (replacementData == nullptr){
-                removeItemFromGraph(iconToReplace, oldIconParent->itemData->getIndexOfObj(dataToReplace), removeData);
-                return true;
-            }else if (replacementData->icons.isEmpty() || (!oldIconParent->isDataDescendant(replacementData) && !oldIconParent->hasSameData(replacementData))){
-                dataChildren = oldIconParent->itemData->getChildren();
-                //indexOfReplacementData = dataChildren.indexOf(replacementData);
-                //indexOfOldData = dataChildren.indexOf(dataToReplace);
+                removeItemFromGraph(iconToReplace, replaceindex, removeData);
+            }else if ((!oldIconParent->isDataDescendant(replacementData) && !oldIconParent->hasSameData(replacementData))){
                 replacementIcon = oldIconParent->getReplacementIcon(replacementData);
-                index = oldIconParent->getIndexOfChild(iconToReplace);
                 if (iconToReplace){
-                    removeItemFromGraph(iconToReplace, oldIconParent->itemData->getIndexOfObj(dataToReplace), removeData, false, replacementData);
+                    removeItemFromGraph(iconToReplace, replaceindex, removeData, false, replacementData);
                 }
                 if (replacementIcon){
-                    oldParent = replacementIcon->setParent(oldIconParent, index);
-                    addItemToGraph(oldParent, replacementData, oldIconParent->itemData->getIndexOfObj(replacementData));
-                    oldIconParent->itemData->insertObjectAt(oldIconParent->itemData->getIndexOfObj(dataToReplace), replacementData);
+                    oldParent = replacementIcon->setParent(oldIconParent, replaceindex);
+                    addItemToGraph(oldParent, replacementData, replaceindex);
+                    oldIconParent->itemData->insertObjectAt(replaceindex, replacementData);
                 }else{
-                    addItemToGraph(oldIconParent, replacementData, oldIconParent->itemData->getIndexOfObj(dataToReplace));
+                    addItemToGraph(oldIconParent, replacementData, replaceindex);
                 }
                 if (!oldIconParent->reorderChildren()){
                     return false;
                 }
-                return true;
             }
         }
     }
-    return false;
+    return true;
 }
 
 bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove, bool removeData, bool removeAllSameData, DataIconManager *dataToKeep){

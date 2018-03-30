@@ -81,6 +81,8 @@ QString hkbStateMachineTransitionInfoArray::getTransitionNameAt(int index){
                 }
                 return "to_"+stateMachine->getStateName(transitions.at(index).toStateId);
             }
+        }else{
+            WARNING_MESSAGE(QString("hkbStateMachineTransitionInfoArray::getTransitionNameAt: No parent!!! REF: "+getReferenceString()));
         }
     }
     return "";

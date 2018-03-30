@@ -19,7 +19,7 @@ QStringList hkbStateMachine::SelfTransitionMode = {"SELF_TRANSITION_MODE_NO_TRAN
 hkbStateMachine::hkbStateMachine(HkxFile *parent, long ref)
     : hkbGenerator(parent, ref),
       userData(0),
-      startStateId(-1),
+      startStateId(0),
       returnToPreviousStateEventId(-1),
       randomTransitionEventId(-1),
       transitionToNextHigherStateEventId(-1),
@@ -138,28 +138,12 @@ int hkbStateMachine::getNumberOfNestedStates(int stateId) const{
 }
 
 bool hkbStateMachine::insertObjectAt(int index, DataIconManager *obj){
-    //hkbStateMachineStateInfo *objChild;
-    if (obj->getSignature() == HKB_STATE_MACHINE_STATE_INFO)/*if (((HkxObject *)obj)->getType() == TYPE_GENERATOR)*/{
+    if (obj->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
         if (index >= states.size() || index == -1){
-            /*objChild = new hkbStateMachineStateInfo(getParentFile(), this, -1);
-            states.append(HkxSharedPtr(objChild));
-            objChild->generator = HkxSharedPtr((HkxObject *)obj);*/
             states.append(HkxSharedPtr(obj));
-        }else if (index == 0){
+        }else if (index == 0 || !states.isEmpty()){
             states.replace(index, HkxSharedPtr(obj));
-        }else if (index > -1){
-            states.replace(index, HkxSharedPtr(obj));
-        }else{
-            return false;
-        }/*else if (index == 0){
-            objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
-            objChild->generator = HkxSharedPtr((HkxObject *)obj);
-        }else if (index > -1){
-            objChild = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
-            objChild->generator = HkxSharedPtr((HkxObject *)obj);
-        }else{
-            return false;
-        }*/
+        }
         return true;
     }else{
         return false;
@@ -239,10 +223,13 @@ bool hkbStateMachine::removeObjectAt(int index){
 }
 
 bool hkbStateMachine::hasChildren() const{
-    hkbStateMachineStateInfo *child;
+    //hkbStateMachineStateInfo *child;
     for (int i = 0; i < states.size(); i++){
-        child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+        /*child = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
         if (child->generator.data()){
+            return true;
+        }*/
+        if (static_cast<hkbStateMachineStateInfo *>(states.at(i).data())){
             return true;
         }
     }
@@ -522,6 +509,7 @@ bool hkbStateMachine::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
+    hkbStateMachineTransitionInfoArray *trans = nullptr;
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToSendWhenStateOrTransitionChanges.payload.getReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
@@ -530,7 +518,8 @@ bool hkbStateMachine::link(){
         eventToSendWhenStateOrTransitionChanges.payload = *ptr;
     }
     for (int i = 0; i < states.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(states.at(i).getReference());
+        //ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(states.at(i).getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(states.at(i).getReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'states' data field!\nObject Name: "+name);
             setDataValidity(false);
@@ -541,6 +530,10 @@ bool hkbStateMachine::link(){
         }else{
             states[i] = *ptr;
             static_cast<hkbStateMachineStateInfo *>(states[i].data())->parentSM = this;
+            trans = static_cast<hkbStateMachineTransitionInfoArray *>(static_cast<hkbStateMachineStateInfo *>(states[i].data())->transitions.data());
+            if (trans){
+                trans->parent = this;
+            }
         }
     }
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(wildcardTransitions.getReference());

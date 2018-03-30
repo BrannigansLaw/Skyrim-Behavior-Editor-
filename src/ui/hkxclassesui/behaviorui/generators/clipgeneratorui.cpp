@@ -176,7 +176,7 @@ void ClipGeneratorUI::connectSignals(){
     connect(flagDontConvertAnnotationsToTriggers, SIGNAL(released()), this, SLOT(setFlagDontConvertAnnotationsToTriggers()), Qt::UniqueConnection);
     connect(flagIgnoreMotion, SIGNAL(released()), this, SLOT(setFlagIgnoreMotion()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-    connect(triggerUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)), Qt::UniqueConnection);
+    connect(triggerUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
     connect(triggerUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
 }
 
@@ -197,7 +197,7 @@ void ClipGeneratorUI::disconnectSignals(){
     disconnect(flagDontConvertAnnotationsToTriggers, SIGNAL(released()), this, SLOT(setFlagDontConvertAnnotationsToTriggers()));
     disconnect(flagIgnoreMotion, SIGNAL(released()), this, SLOT(setFlagIgnoreMotion()));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
-    disconnect(triggerUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)));
+    disconnect(triggerUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
     disconnect(triggerUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
 }
 
@@ -232,6 +232,10 @@ void ClipGeneratorUI::removeTrigger(int index){
                 return;
             }
             bsData->getParentFile()->setIsChanged(true);
+            if (triggers->triggers.isEmpty()){
+                bsData->triggers = HkxSharedPtr();
+                static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
+            }
             loadDynamicTableRows();
         }else{
             WARNING_MESSAGE("ClipGeneratorUI::removeTrigger(): Event data is nullptr!!");
@@ -373,7 +377,7 @@ bool ClipGeneratorUI::setBinding(int index, int row, const QString & variableNam
     hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
                   (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
@@ -784,9 +788,9 @@ void ClipGeneratorUI::connectToTables(GenericTableWidget *variables, GenericTabl
         connect(events, SIGNAL(elementSelected(int,QString)), triggerUI, SLOT(setEventId(int,QString)), Qt::UniqueConnection);
         connect(properties, SIGNAL(elementSelected(int,QString)), this, SLOT(setBindingVariable(int,QString)), Qt::UniqueConnection);
         connect(animations, SIGNAL(elementSelected(int,QString)), this, SLOT(setAnimationName(int,QString)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewAnimations(QString)), animations, SLOT(showTable(QString)), Qt::UniqueConnection);
     }else{
         FATAL_RUNTIME_ERROR("ClipGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
@@ -822,15 +826,15 @@ void ClipGeneratorUI::selectTableToView(bool viewproperties, const QString & pat
     if (bsData){
         if (viewproperties){
             if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewProperties(0);
+                emit viewProperties(0, QString(), QStringList());
             }
         }else{
             if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewVariables(0);
+                emit viewVariables(0, QString(), QStringList());
             }
         }
     }else{

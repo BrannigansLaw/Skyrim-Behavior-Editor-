@@ -1,6 +1,8 @@
 #include "blendergeneratorchildui.h"
 #include "src/hkxclasses/hkxobject.h"
 #include "src/hkxclasses/behavior/generators/hkbblendergeneratorchild.h"
+#include "src/hkxclasses/behavior/generators/hkbstatemachinestateinfo.h"
+#include "src/hkxclasses/behavior/generators/bsboneswitchgeneratorbonedata.h"
 #include "src/hkxclasses/behavior/generators/hkbblendergenerator.h"
 #include "src/ui/genericdatawidgets.h"
 #include "src/ui/hkxclassesui/behaviorui/boneweightarrayui.h"
@@ -55,7 +57,7 @@ BlenderGeneratorChildUI::BlenderGeneratorChildUI()
     table->setItem(BONE_WEIGHTS_ROW, NAME_COLUMN, new TableWidgetItem("boneWeights"));
     table->setItem(BONE_WEIGHTS_ROW, TYPE_COLUMN, new TableWidgetItem("hkbBoneWeightArray", Qt::AlignCenter));
     table->setItem(BONE_WEIGHTS_ROW, BINDING_COLUMN, new TableWidgetItem(BINDING_ITEM_LABEL+"NONE", Qt::AlignLeft | Qt::AlignVCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_VARIABLES_TABLE_TIP, true));
-    table->setItem(BONE_WEIGHTS_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray)));
+    //table->setItem(BONE_WEIGHTS_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray)));
     table->setCellWidget(BONE_WEIGHTS_ROW, VALUE_COLUMN, boneWeights);
     table->setItem(WEIGHT_ROW, NAME_COLUMN, new TableWidgetItem("weight"));
     table->setItem(WEIGHT_ROW, TYPE_COLUMN, new TableWidgetItem("hkReal", Qt::AlignCenter));
@@ -182,7 +184,7 @@ void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
                 }else if (!gen){
                     FATAL_RUNTIME_ERROR("The currently loaded 'hkbBlenderGeneratorChild' has no parent 'hkbBlenderGenerator' or 'hkbPoseMatchingGenerator'!!!");
                     return;
-                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generator.data()), ptr, false)){
+                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generator.data()), 0, ptr, false)){
                     WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
                     return;
                 }
@@ -210,21 +212,31 @@ void BlenderGeneratorChildUI::setBinding(int index, int row, const QString & var
     hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
                   (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                varBind->addBinding(path, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY);
+            if (type == VARIABLE_TYPE_POINTER){
+                if (varBind){
+                    varBind->removeBinding(path);
+                }
+                hkbBoneWeightArray *ptr = new hkbBoneWeightArray(bsData->getParentFile());
+                static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyBoneWeightArray(variableName, ptr);
+                bsData->boneWeights = HkxSharedPtr(ptr);
+                boneWeights->setChecked(true);
             }else{
-                varBind->addBinding(path, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
+                if (!varBind){
+                    varBind = new hkbVariableBindingSet(bsData->getParentFile());
+                    bsData->variableBindingSet = HkxSharedPtr(varBind);
+                }
+                if (isProperty){
+                    varBind->addBinding(path, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY);
+                }else{
+                    varBind->addBinding(path, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
+                }
+                table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
+                bsData->getParentFile()->setIsChanged(true);
             }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -313,15 +325,15 @@ void BlenderGeneratorChildUI::selectTableToView(bool viewproperties, const QStri
     if (bsData){
         if (viewproperties){
             if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewProperties(0);
+                emit viewProperties(0, QString(), QStringList());
             }
         }else{
             if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewVariables(0);
+                emit viewVariables(0, QString(), QStringList());
             }
         }
     }else{
@@ -354,7 +366,8 @@ void BlenderGeneratorChildUI::viewSelected(int row, int column){
                 break;
             }
         }else if (row == GENERATOR_ROW && column == VALUE_COLUMN){
-            emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1);
+            QStringList list = {hkbStateMachineStateInfo::getClassname(), hkbBlenderGeneratorChild::getClassname(), BSBoneSwitchGeneratorBoneData::getClassname()};
+            emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1, QString(), list);
         }
     }else{
         FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::viewSelected(): The 'bsData' pointer is nullptr!!");
@@ -363,6 +376,26 @@ void BlenderGeneratorChildUI::viewSelected(int row, int column){
 
 void BlenderGeneratorChildUI::returnToWidget(){
     setCurrentIndex(MAIN_WIDGET);
+}
+
+void BlenderGeneratorChildUI::generatorTableElementSelected(int index, const QString &name){
+    switch (currentIndex()){
+    case MAIN_WIDGET:
+        setGenerator(index, name);
+        break;
+    default:
+        WARNING_MESSAGE("BlenderGeneratorChildUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!");
+    }
+}
+
+void BlenderGeneratorChildUI::variableTableElementSelected(int index, const QString &name){
+    switch (currentIndex()){
+    case MAIN_WIDGET:
+        setBindingVariable(index, name);
+        break;
+    default:
+        WARNING_MESSAGE("BlenderGeneratorChildUI::variableTableElementSelected(): An unwanted element selected event was recieved!!");
+    }
 }
 
 void BlenderGeneratorChildUI::variableRenamed(const QString & name, int index){
@@ -401,4 +434,20 @@ void BlenderGeneratorChildUI::generatorRenamed(const QString &name, int index){
 
 void BlenderGeneratorChildUI::setBehaviorView(BehaviorGraphView *view){
     behaviorView = view;
+}
+
+void BlenderGeneratorChildUI::connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties){
+    if (variables && properties && generators){
+        disconnect(variables, SIGNAL(elementSelected(int,QString)), 0, 0);
+        disconnect(properties, SIGNAL(elementSelected(int,QString)), 0, 0);
+        disconnect(generators, SIGNAL(elementSelected(int,QString)), 0, 0);
+        connect(variables, SIGNAL(elementSelected(int,QString)), this, SLOT(variableTableElementSelected(int,QString)), Qt::UniqueConnection);
+        connect(properties, SIGNAL(elementSelected(int,QString)), this, SLOT(variableTableElementSelected(int,QString)), Qt::UniqueConnection);
+        connect(generators, SIGNAL(elementSelected(int,QString)), this, SLOT(generatorTableElementSelected(int,QString)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewGenerators(int,QString,QStringList)), generators, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+    }else{
+        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::connectToTables(): One or more arguments are nullptr!!");
+    }
 }

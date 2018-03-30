@@ -28,8 +28,8 @@ public:
     virtual ~BlendingTransitionEffectUI(){}
     void loadData(HkxObject *data);
 signals:
-    void viewVariables(int index);
-    void viewProperties(int index);
+    void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void transitionEffectRenamed(const QString & name);
     void returnToParent();
 private slots:

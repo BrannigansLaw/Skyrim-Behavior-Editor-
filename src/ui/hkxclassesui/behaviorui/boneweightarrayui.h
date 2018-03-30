@@ -11,6 +11,7 @@ class HkxObject;
 class QPushButton;
 class QGridLayout;
 class QLabel;
+class QCheckBox;
 
 class BoneWeightArrayUI: public QGroupBox
 {
@@ -32,6 +33,7 @@ private:
     TableWidget *bones;
     QLabel *label;
     DoubleSpinBox *selectedBone;
+    QCheckBox *setAllCB;
 };
 
 #endif // BONEWEIGHTARRAYUI_H

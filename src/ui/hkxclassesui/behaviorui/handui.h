@@ -26,8 +26,8 @@ public:
     HandUI();
     void loadData(BehaviorFile *parentFile, hkbHandIkControlsModifier::hkHand *bon, hkbHandIkControlsModifier *par, int ind);
 signals:
-    void viewProperties(int index);
-    void viewVariables(int index);
+    void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void returnToParent();
 private slots:
     void setTargetPosition();

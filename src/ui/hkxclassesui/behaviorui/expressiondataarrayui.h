@@ -19,8 +19,8 @@ public:
     ExpressionDataArrayUI();
     void loadData(BehaviorFile *parentFile, hkbExpressionDataArray::hkExpression *exp);
 signals:
-    void viewEvents(int index);
-    void viewVariables(int index);
+    void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void returnToParent();
 private slots:
     void setExpression();

@@ -25,8 +25,8 @@ public:
     KeyframeInfoUI();
     void loadData(BehaviorFile *parentFile, hkbKeyframeBonesModifier::hkKeyframeInfo *key, hkbKeyframeBonesModifier *par, int index);
 signals:
-    void viewProperties(int index);
-    void viewVariables(int index);
+    void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void returnToParent();
 private slots:
     void setKeyframedPosition();

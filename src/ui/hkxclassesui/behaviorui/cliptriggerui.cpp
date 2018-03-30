@@ -226,7 +226,7 @@ void ClipTriggerUI::setIsAnnotation(){
 void ClipTriggerUI::viewSelectedChild(int row, int column){
     if (bsData){
         if (row == EVENT_ROW && column == VALUE_COLUMN){
-            emit viewEvents(bsData->event.id + 1);
+            emit viewEvents(bsData->event.id + 1, QString(), QStringList());
         }
     }else{
         FATAL_RUNTIME_ERROR("ClipTriggerUI::viewSelectedChild(): The data is nullptr!!");

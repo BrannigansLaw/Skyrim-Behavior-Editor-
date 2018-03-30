@@ -10,7 +10,7 @@ class BSBoneSwitchGeneratorBoneData: public hkbGenerator
     friend class BSBoneSwitchGeneratorUI;
     friend class BSBoneSwitchGeneratorBoneDataUI;
 public:
-    BSBoneSwitchGeneratorBoneData(HkxFile *parent, long ref = 0);
+    BSBoneSwitchGeneratorBoneData(HkxFile *parent, hkbGenerator *parentBSG, long ref = 0);
     virtual ~BSBoneSwitchGeneratorBoneData();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
@@ -18,12 +18,20 @@ public:
     bool evaulateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    bool hasChildren() const;
+    QString getName() const;
+    int getThisIndex() const;
 private:
+    QList <DataIconManager *> getChildren() const;
+    int getIndexOfObj(DataIconManager *obj) const;
+    bool insertObjectAt(int, DataIconManager *obj);
+    bool removeObjectAt(int index);
     BSBoneSwitchGeneratorBoneData& operator=(const BSBoneSwitchGeneratorBoneData&);
     BSBoneSwitchGeneratorBoneData(const BSBoneSwitchGeneratorBoneData &);
 private:
     static uint refCount;
     static QString classname;
+    HkxSharedPtr parentBSG;
     HkxSharedPtr pGenerator;
     HkxSharedPtr spBoneWeight;
 };

@@ -113,7 +113,7 @@ void EventUI::setEventPayload(){
 
 void EventUI::emitViewEvent(){
     if (eventData){
-        emit viewEvents(eventData->id + 1);
+        emit viewEvents(eventData->id + 1, QString(), QStringList());
     }else{
         FATAL_RUNTIME_ERROR("EventUI::emitViewEvent(): Event data is null!!!");
     }

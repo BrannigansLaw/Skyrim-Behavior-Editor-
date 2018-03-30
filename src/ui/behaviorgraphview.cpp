@@ -132,7 +132,9 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
       appendBGSGamebryoSequenceGeneratorAct(new QAction("BGS Gamebryo Sequence Generator", appendGeneratorMenu)),
       appendBlenderMenu(new QMenu("Append Blend:", contextMenu)),
       appendBlenderGeneratorAct(new QAction("Blender Generator", appendBlenderMenu)),
+      appendBlenderGeneratorChildAct(new QAction("Blender Generator Child", appendBlenderMenu)),
       appendBSBoneSwitchGeneratorAct(new QAction("BS Bone Switch Generator", appendBlenderMenu)),
+      appendBSBoneSwitchGeneratorChildAct(new QAction("BS Bone Switch Generator Child", appendBlenderMenu)),
       wrapGeneratorMenu(new QMenu("Wrap inside Generator:", contextMenu)),
       wrapStateMachineAct(new QAction("State Machine", wrapGeneratorMenu)),
       wrapManualSelectorGeneratorAct(new QAction("Manual Selector Generator", wrapGeneratorMenu)),
@@ -214,7 +216,9 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     appendGeneratorMenu->addAction(appendBGSGamebryoSequenceGeneratorAct);
     contextMenu->addMenu(appendBlenderMenu);
     appendBlenderMenu->addAction(appendBlenderGeneratorAct);
+    appendBlenderMenu->addAction(appendBlenderGeneratorChildAct);
     appendBlenderMenu->addAction(appendBSBoneSwitchGeneratorAct);
+    appendBlenderMenu->addAction(appendBSBoneSwitchGeneratorChildAct);
     contextMenu->addMenu(wrapGeneratorMenu);
     wrapGeneratorMenu->addAction(wrapStateMachineAct);
     wrapGeneratorMenu->addAction(wrapManualSelectorGeneratorAct);
@@ -292,7 +296,9 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     connect(appendBSCyclicBlendTransitionGeneratorAct, SIGNAL(triggered()), this, SLOT(appendCyclicBlendTransitionGenerator()));
     connect(appendPoseMatchingGeneratorAct, SIGNAL(triggered()), this, SLOT(appendPoseMatchingGenerator()));
     connect(appendBlenderGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBlenderGenerator()));
+    connect(appendBlenderGeneratorChildAct, SIGNAL(triggered()), this, SLOT(appendBlenderGeneratorChild()));
     connect(appendBSBoneSwitchGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBoneSwitchGenerator()));
+    connect(appendBSBoneSwitchGeneratorChildAct, SIGNAL(triggered()), this, SLOT(appendBoneSwitchGeneratorChild()));
     connect(appendClipGeneratorAct, SIGNAL(triggered()), this, SLOT(appendClipGenerator()));
     connect(appendBehaviorReferenceGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBehaviorReferenceGenerator()));
     connect(appendBGSGamebryoSequenceGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBGSGamebryoSequenceGenerator()));
@@ -438,8 +444,8 @@ void BehaviorGraphView::deleteSelectedObjectBranchSlot(){
 
 void BehaviorGraphView::removeObjects(){
     removeGeneratorData();
-    behavior->removeGeneratorChildrenData();
-    removeGeneratorData();//Inefficient...
+    //behavior->removeGeneratorChildrenData();
+    //removeGeneratorData();//Inefficient...
     removeModifierData();
     behavior->removeOtherData();
     behavior->setIsChanged(true);
@@ -463,58 +469,64 @@ template <typename T>
 void BehaviorGraphView::append(T *obj){
     if (getSelectedItem()){
         TreeGraphicsItem *newIcon = nullptr;
-        HkxObject *selectedItemData = ((HkxObject *)(getSelectedItem()->itemData));
-        HkxSignature sig = selectedItemData->getSignature();
-        if (getSelectedItem()->itemData->hasChildren() && sig != HKB_STATE_MACHINE && sig != HKB_MANUAL_SELECTOR_GENERATOR && sig != HKB_BLENDER_GENERATOR && sig != BS_BONE_SWITCH_GENERATOR && sig != HKB_POSE_MATCHING_GENERATOR && sig != HKB_MODIFIER_LIST){
-            if (!confirmationDialogue("WARNING! THIS WILL REPLACE THE CURRENT GENERATOR/MODIFIER!!!\n\nARE YOU SURE YOU WANT TO DO THIS?", this)){
-                if (obj->getType() == HkxObject::TYPE_GENERATOR){
-                    behavior->removeGeneratorData();
-                }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
-                    behavior->removeModifierData();
-                }else if (obj->getType() == HkxObject::TYPE_OTHER){
-                    behavior->removeOtherData();
-                }
-                return;
-            }
-            if (!getSelectedItem()->childItems().isEmpty()){
-                if (sig == HKB_MODIFIER_GENERATOR){
-                    if (getSelectedItem()->childItems().size() == 2 && obj->getType() == HkxObject::TYPE_GENERATOR){
-                        removeItemFromGraph(((TreeGraphicsItem *)getSelectedItem()->childItems()[1]), 1);
-                    }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
-                        if (((TreeGraphicsItem *)getSelectedItem()->childItems().first())->itemData->getType() == HkxObject::TYPE_MODIFIER){
-                            removeItemFromGraph(((TreeGraphicsItem *)getSelectedItem()->childItems().first()), 0);
-                            newIcon = addItemToGraph(getSelectedItem(), obj, 0);
-                        }else{
-                            newIcon = addItemToGraph(getSelectedItem(), obj, 0);
-                        }
+        DataIconManager *selectedItemData = static_cast<DataIconManager *>(getSelectedItem()->itemData);
+        if (selectedItemData){
+            HkxSignature sig = selectedItemData->getSignature();
+            if (selectedItemData->hasChildren() && sig != HKB_STATE_MACHINE && sig != HKB_MANUAL_SELECTOR_GENERATOR && sig != HKB_BLENDER_GENERATOR && sig != BS_BONE_SWITCH_GENERATOR && sig != HKB_POSE_MATCHING_GENERATOR && sig != HKB_MODIFIER_LIST){
+                /*if (sig == HKB_MODIFIER_GENERATOR){
+                    if (selectedItemData->getIndexOfObj(nullptr) == 0 && obj->getType() == HkxObject::TYPE_MODIFIER && !confirmationDialogue("WARNING! THIS WILL REPLACE THE CURRENT MODIFIER!!!\n\nARE YOU SURE YOU WANT TO DO THIS?", this)){
+                        behavior->removeModifierData();
+                    }else if (selectedItemData->getIndexOfObj(nullptr) == 1 && obj->getType() == HkxObject::TYPE_GENERATOR && !confirmationDialogue("WARNING! THIS WILL REPLACE THE CURRENT MODIFIER!!!\n\nARE YOU SURE YOU WANT TO DO THIS?", this)){
+                        behavior->removeGeneratorData();
                     }
-                }else{
-                    removeItemFromGraph(((TreeGraphicsItem *)getSelectedItem()->childItems().first()), 0);
+                    return;
+                }else{*/
+                    if (!confirmationDialogue("WARNING! THIS WILL REPLACE THE CURRENT GENERATOR/MODIFIER!!!\n\nARE YOU SURE YOU WANT TO DO THIS?", this)){
+                        if (obj->getType() == HkxObject::TYPE_GENERATOR){
+                            behavior->removeGeneratorData();
+                        }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
+                            behavior->removeModifierData();
+                        }/*else if (obj->getType() == HkxObject::TYPE_OTHER){
+                            behavior->removeOtherData();
+                        }*/
+                        return;
+                    //}
+                }
+                if (!getSelectedItem()->childItems().isEmpty()){
+                    if (sig == HKB_MODIFIER_GENERATOR){
+                        if (getSelectedItem()->childItems().size() == 2 && obj->getType() == HkxObject::TYPE_GENERATOR){
+                            removeItemFromGraph(((TreeGraphicsItem *)getSelectedItem()->childItems()[1]), 1);
+                        }else if (obj->getType() == HkxObject::TYPE_MODIFIER){
+                            if (((TreeGraphicsItem *)getSelectedItem()->childItems().first())->itemData->getType() == HkxObject::TYPE_MODIFIER){
+                                removeItemFromGraph(((TreeGraphicsItem *)getSelectedItem()->childItems().first()), 0);
+                                newIcon = addItemToGraph(getSelectedItem(), obj, 0);
+                            }else{
+                                newIcon = addItemToGraph(getSelectedItem(), obj, 0);
+                            }
+                        }
+                    }else{
+                        removeItemFromGraph(((TreeGraphicsItem *)getSelectedItem()->childItems().first()), 0);
+                    }
                 }
             }
-        }
-        if (!newIcon){
-            newIcon = addItemToGraph(getSelectedItem(), obj, -1);
-            /*if (!newIcon){
-                delete obj;
-            }*/
-        }
-        if (((TreeGraphicsItem *)getSelectedItem()->parentItem())){
-            ((HkxObject *)((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData)->evaulateDataValidity();
-        }
-        selectedItemData->evaulateDataValidity();
-        behavior->setIsChanged(true);
-        getSelectedItem()->reposition();
-        treeScene->selectIcon(newIcon, TreeGraphicsScene::EXPAND_CONTRACT_ZERO);
-        QRectF rect = sceneRect();
-        setSceneRect(rect.marginsAdded(QMarginsF(0, 0, newIcon->boundingRect().width()*2, newIcon->boundingRect().height()*2)));
-        if (obj->getSignature() != HKB_STATE_MACHINE_STATE_INFO){
+            if (!newIcon){
+                newIcon = addItemToGraph(getSelectedItem(), obj, -1);
+            }
+            if (((TreeGraphicsItem *)getSelectedItem()->parentItem())){
+                ((HkxObject *)((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData)->evaulateDataValidity();
+            }
+            selectedItemData->evaulateDataValidity();
+            behavior->setIsChanged(true);
+            getSelectedItem()->reposition();
+            treeScene->selectIcon(newIcon, TreeGraphicsScene::EXPAND_CONTRACT_ZERO);    //Removing this breaks adding child with generator!!!
+            QRectF rect = sceneRect();
+            setSceneRect(rect.marginsAdded(QMarginsF(0, 0, newIcon->boundingRect().width()*2, newIcon->boundingRect().height()*2)));
             emit addedGenerator(obj->getName(), obj->getClassname());
+        }else{
+            delete obj;
+            FATAL_RUNTIME_ERROR("BehaviorGraphView::append(): \n The selected icon has no data!!");
         }
-    }else{
-        delete obj;
     }
-    //removeObjects();   //Needed????
 }
 
 void BehaviorGraphView::appendStateMachine(){
@@ -557,8 +569,16 @@ void BehaviorGraphView::appendBlenderGenerator(){
     append(new hkbBlenderGenerator(behavior));
 }
 
+void BehaviorGraphView::appendBlenderGeneratorChild(){
+    append(new hkbBlenderGeneratorChild(behavior, (hkbBlenderGenerator *)getSelectedData()));
+}
+
 void BehaviorGraphView::appendBoneSwitchGenerator(){
     append(new BSBoneSwitchGenerator(behavior));
+}
+
+void BehaviorGraphView::appendBoneSwitchGeneratorChild(){
+    append(new BSBoneSwitchGeneratorBoneData(behavior, (BSBoneSwitchGenerator *)getSelectedData()));
 }
 
 void BehaviorGraphView::appendClipGenerator(){
@@ -781,7 +801,7 @@ template <typename T>
 void BehaviorGraphView::wrap(T *obj){
     if (getSelectedItem() && ((TreeGraphicsItem *)getSelectedItem()->parentItem()) && ((TreeGraphicsItem *)getSelectedItem()->parentItem())->itemData){
         behavior->setIsChanged(true);
-        TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), static_cast<DataIconManager*>((obj)), -1, true);  //TO DO: DEAL WITH WRAPPING STATES!!!
+        TreeGraphicsItem *newIcon = addItemToGraph(getSelectedItem(), static_cast<DataIconManager*>((obj)), -1, true);  //TO DO: DEAL WITH WRAPPING STATES + BLENDER GENERATOR CHILDREN!!!
         behavior->setIsChanged(true);
         getSelectedItem()->reposition();
         treeScene->selectIcon(newIcon, TreeGraphicsScene::EXPAND_CONTRACT_ZERO);
@@ -878,10 +898,23 @@ void BehaviorGraphView::popUpMenuRequested(const QPoint &pos){
         wrapBlenderMenu->menuAction()->setDisabled(false);
         enableAllMenuActions(wrapBlenderMenu);
         appendModifierMenu->menuAction()->setDisabled(true);
-        if (sig == HKB_BLENDER_GENERATOR){
-            enableAllMenuActions(appendGeneratorMenu);
-            disableAllMenuActions(wrapGeneratorMenu);
-            wrapBSCyclicBlendTransitionGeneratorAct->setDisabled(false);
+        appendStateAct->setDisabled(true);
+        appendBlenderGeneratorChildAct->setDisabled(true);
+        appendBSBoneSwitchGeneratorChildAct->setDisabled(true);
+        if (sig == HKB_BLENDER_GENERATOR || sig == HKB_POSE_MATCHING_GENERATOR){
+            disableAllMenuActions(appendGeneratorMenu);
+            disableAllMenuActions(appendBlenderMenu);
+            enableAllMenuActions(wrapGeneratorMenu);
+            appendBlenderGeneratorChildAct->setDisabled(false);
+        }else if (sig == BS_BONE_SWITCH_GENERATOR){
+            enableAllMenuActions(wrapGeneratorMenu);
+            if (static_cast<BSBoneSwitchGenerator *>(getSelectedItem()->itemData)->hasGenerator()){
+                disableAllMenuActions(appendBlenderMenu);
+                disableAllMenuActions(appendGeneratorMenu);
+                appendBSBoneSwitchGeneratorChildAct->setDisabled(false);
+            }else{
+                enableAllMenuActions(appendGeneratorMenu);
+            }
         }else if (sig == HKB_CLIP_GENERATOR || sig == HKB_BEHAVIOR_REFERENCE_GENERATOR || sig == BGS_GAMEBYRO_SEQUENCE_GENERATOR){
             appendGeneratorMenu->menuAction()->setDisabled(true);
             appendBlenderMenu->menuAction()->setDisabled(true);
@@ -901,6 +934,9 @@ void BehaviorGraphView::popUpMenuRequested(const QPoint &pos){
             wrapBlenderMenu->menuAction()->setDisabled(true);
             appendStateMachineAct->setDisabled(false);
             removeObjBranchAct->setDisabled(true);
+        }else if (sig == HKB_STATE_MACHINE_STATE_INFO || sig == HKB_BLENDER_GENERATOR_CHILD || sig == BS_BONE_SWITCH_GENERATOR_BONE_DATA){
+            wrapGeneratorMenu->menuAction()->setDisabled(true);
+            wrapBlenderMenu->menuAction()->setDisabled(true);
         }
         if (parentSig == BS_SYNCHRONIZED_CLIP_GENERATOR || parentSig == BS_OFFSET_ANIMATION_GENERATOR){
             wrapGeneratorMenu->menuAction()->setDisabled(true);

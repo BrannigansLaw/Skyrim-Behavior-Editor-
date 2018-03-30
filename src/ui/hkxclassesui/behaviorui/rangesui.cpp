@@ -169,7 +169,7 @@ bool RangesUI::setBinding(int index, int row, const QString & variableName, cons
     hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data());
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(parent)->variableBindingSet = HkxSharedPtr();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && static_cast<BehaviorFile *>(file)->getVariableTypeAt(index - 1) == type) ||
                   (isProperty && static_cast<BehaviorFile *>(file)->getCharacterPropertyTypeAt(index - 1) == type)){
@@ -333,7 +333,7 @@ void RangesUI::viewSelectedChild(int row, int column){
                 break;
             }
         }else if (row == EVENT_ID_ROW && column == VALUE_COLUMN){
-                emit viewEvents(bsData->event.id + 1);
+                emit viewEvents(bsData->event.id + 1, QString(), QStringList());
             }
     }else{
         FATAL_RUNTIME_ERROR("RangesUI::viewSelectedChild(): The data is nullptr!!");
@@ -344,15 +344,15 @@ void RangesUI::selectTableToView(bool viewproperties, const QString & path){
     if (bsData){
         if (viewproperties){
             if (parent->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewProperties(static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewProperties(0);
+                emit viewProperties(0, QString(), QStringList());
             }
         }else{
             if (parent->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewVariables(static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewVariables(0);
+                emit viewVariables(0, QString(), QStringList());
             }
         }
     }else{

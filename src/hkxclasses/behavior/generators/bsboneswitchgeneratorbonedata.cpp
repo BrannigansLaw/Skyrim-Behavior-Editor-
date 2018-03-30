@@ -1,4 +1,6 @@
 #include "bsboneswitchgeneratorbonedata.h"
+#include "bsboneswitchgenerator.h"
+#include "bsboneswitchgeneratorbonedata.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 
@@ -10,12 +12,16 @@ uint BSBoneSwitchGeneratorBoneData::refCount = 0;
 
 QString BSBoneSwitchGeneratorBoneData::classname = "BSBoneSwitchGeneratorBoneData";
 
-BSBoneSwitchGeneratorBoneData::BSBoneSwitchGeneratorBoneData(HkxFile *parent, long ref)
-    : hkbGenerator(parent, ref)
+BSBoneSwitchGeneratorBoneData::BSBoneSwitchGeneratorBoneData(HkxFile *parent, hkbGenerator *parentBSG, long ref)
+    : hkbGenerator(parent, ref),
+      parentBSG(parentBSG)
 {
     setType(BS_BONE_SWITCH_GENERATOR_BONE_DATA, TYPE_GENERATOR);
     getParentFile()->addObjectToFile(this, ref);
     refCount++;
+    if (parentBSG && (parentBSG->getSignature() != BS_BONE_SWITCH_GENERATOR)){
+        FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneData::BSBoneSwitchGeneratorBoneData: parentBSG is incorrect type!!!");
+    }
 }
 
 QString BSBoneSwitchGeneratorBoneData::getClassname(){
@@ -82,6 +88,64 @@ bool BSBoneSwitchGeneratorBoneData::write(HkxXMLWriter *writer){
         if (spBoneWeight.data() && !spBoneWeight.data()->write(writer)){
             getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'spBoneWeight'!!!", true);
         }
+    }
+    return true;
+}
+
+bool BSBoneSwitchGeneratorBoneData::hasChildren() const{
+    if (pGenerator.data()){
+        return true;
+    }
+    return false;
+}
+
+QString BSBoneSwitchGeneratorBoneData::getName() const{
+    if (parentBSG.constData()){
+        return static_cast<const BSBoneSwitchGenerator *>(parentBSG.constData())->getName()+"_CHILD";
+    }else{
+        getParentFile()->writeToLog(getClassname()+": getName()!\nNo parent BSBoneSwitchGenerator'!!!", true);
+    }
+    return "";
+}
+
+int BSBoneSwitchGeneratorBoneData::getThisIndex() const{
+    if (parentBSG.constData()){
+        return static_cast<DataIconManager *>(parentBSG.data())->getIndexOfObj((DataIconManager *)this);
+    }else{
+        FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneData:::getThisIndex() !\nNo parent BSBoneSwitchGenerator'!!!");
+    }
+    return -1;
+}
+
+QList<DataIconManager *> BSBoneSwitchGeneratorBoneData::getChildren() const{
+    QList<DataIconManager *> list;
+    if (pGenerator.data()){
+        list.append(static_cast<DataIconManager *>(pGenerator.data()));
+    }
+    return list;
+}
+
+int BSBoneSwitchGeneratorBoneData::getIndexOfObj(DataIconManager *obj) const{
+    if (pGenerator.data() == (HkxObject *)obj){
+        return 0;
+    }
+    return -1;
+}
+
+bool BSBoneSwitchGeneratorBoneData::insertObjectAt(int , DataIconManager *obj){
+    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
+        pGenerator = HkxSharedPtr((HkxObject *)obj);
+    }else{
+        return false;
+    }
+    return true;
+}
+
+bool BSBoneSwitchGeneratorBoneData::removeObjectAt(int index){
+    if (index == 0 || index == -1){
+        pGenerator = HkxSharedPtr();
+    }else{
+        return false;
     }
     return true;
 }

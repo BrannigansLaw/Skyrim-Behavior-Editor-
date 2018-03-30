@@ -1,6 +1,7 @@
 #include "behaviorgraphui.h"
 #include "src/hkxclasses/hkxobject.h"
 #include "src/hkxclasses/behavior/generators/hkbbehaviorgraph.h"
+#include "src/hkxclasses/behavior/generators/hkbstatemachine.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/ui/genericdatawidgets.h"
 #include "src/ui/behaviorgraphview.h"
@@ -102,7 +103,7 @@ void BehaviorGraphUI::viewSelectedChild(int row, int column){
     if (bsData){
         if (row == ROOT_GENERATOR_ROW && column == VALUE_COLUMN){
             if (bsData->getParentFile()){
-                emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->rootGenerator) + 1);
+                emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->rootGenerator) + 1, hkbStateMachine::getClassname(), QStringList());
             }else{
                 FATAL_RUNTIME_ERROR("BehaviorGraphUI::viewSelectedChild(): The parent file is nullptr!!");
             }
@@ -125,7 +126,7 @@ void BehaviorGraphUI::setRootGenerator(int index, const QString &name){
                 }else if (ptr->getSignature() != HKB_STATE_MACHINE){
                     WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nThe selected object is not a hkbStateMachine!!!");
                     return;
-                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->rootGenerator.data()), ptr, false)){
+                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->rootGenerator.data()), 0, ptr, false)){
                     WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
                     return;
                 }
@@ -156,7 +157,7 @@ void BehaviorGraphUI::connectToTables(GenericTableWidget *generators){
     if (generators){
         disconnect(generators, SIGNAL(elementSelected(int,QString)), 0, 0);
         connect(generators, SIGNAL(elementSelected(int,QString)), this, SLOT(setRootGenerator(int,QString)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewGenerators(int)), generators, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewGenerators(int,QString,QStringList)), generators, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
         FATAL_RUNTIME_ERROR("BehaviorGraphUI::connectToTables(): The argument is nullptr!!");
     }

@@ -18,7 +18,8 @@ BoneWeightArrayUI::BoneWeightArrayUI()
       returnPB(new QPushButton("Return")),
       bones(new TableWidget),
       selectedBone(new DoubleSpinBox),
-      label(new QLabel("Selected Bone Weight:"))
+      label(new QLabel("Selected Bone Weight:")),
+      setAllCB(new QCheckBox("Set All"))
 {
     setTitle("hkbBoneWeightArray");
     bones->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -27,6 +28,7 @@ BoneWeightArrayUI::BoneWeightArrayUI()
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
     topLyt->addWidget(bones, 1, 0, 8, 3);
     topLyt->addWidget(label, 10, 0, 2, 1);
+    topLyt->addWidget(setAllCB, 10, 1, 2, 1);
     topLyt->addWidget(selectedBone, 10, 2, 2, 1);
     setLayout(topLyt);
     //label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -97,13 +99,24 @@ void BoneWeightArrayUI::setBoneWeight(){
     int row = bones->currentRow();
     if (bsData){
         if (bsData->boneWeights.size() > row && row >= 0){
-            bsData->boneWeights[row] = selectedBone->value();
-            bsData->getParentFile()->setIsChanged(true);
-            if (bones->item(row, VALUE_COLUMN)){
-                bones->item(row, VALUE_COLUMN)->setText(QString::number(selectedBone->value(), char('f'), 6));
+            if (setAllCB->isChecked()){
+                for (auto i = 0; i < bsData->boneWeights.size(); i++){
+                    bsData->boneWeights[i] = selectedBone->value();
+                    if (bones->item(i, VALUE_COLUMN)){
+                        bones->item(i, VALUE_COLUMN)->setText(QString::number(selectedBone->value(), char('f'), 6));
+                    }else{
+                        bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(selectedBone->value(), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
+                    }
+                }
             }else{
-                bones->setItem(row, VALUE_COLUMN, new TableWidgetItem(QString::number(selectedBone->value(), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
+                bsData->boneWeights[row] = selectedBone->value();
+                if (bones->item(row, VALUE_COLUMN)){
+                    bones->item(row, VALUE_COLUMN)->setText(QString::number(selectedBone->value(), char('f'), 6));
+                }else{
+                    bones->setItem(row, VALUE_COLUMN, new TableWidgetItem(QString::number(selectedBone->value(), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
+                }
             }
+            bsData->getParentFile()->setIsChanged(true);
         }
     }else{
         FATAL_RUNTIME_ERROR("BoneWeightArrayUI::setBoneWeight(): The 'bsData' pointer is nullptr!!");

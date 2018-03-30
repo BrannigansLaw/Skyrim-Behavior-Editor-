@@ -1,5 +1,8 @@
 #include "modifiergeneratorui.h"
 #include "src/hkxclasses/hkxobject.h"
+#include "src/hkxclasses/behavior/generators/hkbblendergeneratorchild.h"
+#include "src/hkxclasses/behavior/generators/hkbstatemachinestateinfo.h"
+#include "src/hkxclasses/behavior/generators/bsboneswitchgeneratorbonedata.h"
 #include "src/hkxclasses/behavior/generators/hkbmodifiergenerator.h"
 #include "src/hkxclasses/behavior/modifiers/hkbmodifier.h"
 #include "src/ui/genericdatawidgets.h"
@@ -77,8 +80,8 @@ void ModifierGeneratorUI::connectToTables(GenericTableWidget *modifiers, Generic
         disconnect(generators, SIGNAL(elementSelected(int,QString)), 0, 0);
         connect(modifiers, SIGNAL(elementSelected(int,QString)), this, SLOT(setModifier(int,QString)), Qt::UniqueConnection);
         connect(generators, SIGNAL(elementSelected(int,QString)), this, SLOT(setGenerator(int,QString)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewGenerators(int)), generators, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewModifiers(int)), modifiers, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewGenerators(int,QString,QStringList)), generators, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewModifiers(int,QString,QStringList)), modifiers, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
         FATAL_RUNTIME_ERROR("ModifierGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }
@@ -133,7 +136,7 @@ void ModifierGeneratorUI::setModifier(int index, const QString &name){
                 if (name != ptr->getName()){
                     FATAL_RUNTIME_ERROR("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
                     return;
-                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->modifier.data()), ptr, false)){
+                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->modifier.data()), 0, ptr, false)){
                     WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
                     return;
                 }
@@ -167,7 +170,7 @@ void ModifierGeneratorUI::setGenerator(int index, const QString & name){
                 if (name != ptr->getName()){
                     FATAL_RUNTIME_ERROR("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
                     return;
-                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generator.data()), ptr, false)){
+                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generator.data()), 1, ptr, false)){
                     WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
                     return;
                 }
@@ -194,9 +197,10 @@ void ModifierGeneratorUI::viewSelected(int row, int column){
     if (bsData){
         if (column == VALUE_COLUMN){
             if (row == MODIFIER_ROW){
-                emit viewModifiers(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1);
+                emit viewModifiers(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData->modifier) + 1, QString(), QStringList());
             }else if (row == GENERATOR_ROW){
-                emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1);
+                QStringList list = {hkbStateMachineStateInfo::getClassname(), hkbBlenderGeneratorChild::getClassname(), BSBoneSwitchGeneratorBoneData::getClassname()};
+                emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1, QString(), list);
             }
         }
     }else{

@@ -24,9 +24,9 @@ public:
     virtual ~BSiStateTaggingGeneratorUI(){}
     void loadData(HkxObject *data);
 signals:
-    void viewVariables(int index);
-    void viewGenerators(int index);
-    void viewProperties(int index);
+    void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void generatorNameChanged(const QString & newName, int index);
 private slots:
     void setName();

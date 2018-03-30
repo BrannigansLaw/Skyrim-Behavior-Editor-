@@ -376,6 +376,7 @@ void CharacterPropertiesUI::removeVariable(){
     if (loadedData){
         int index = table->currentRow();
 
+        //TO DO:
         //Need to check if variable is used in hkbExpressionCondition, hkbExpressionDataArray????
         //dont allow delection of iState var??
         //removing vars still bugged...

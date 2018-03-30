@@ -23,14 +23,21 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool isParametricBlend() const;
+    bool hasChildren() const;
+    QString getName() const;
+    int getThisIndex() const;
 private:
+    QList <DataIconManager *> getChildren() const;
+    int getIndexOfObj(DataIconManager *obj) const;
+    bool insertObjectAt(int, DataIconManager *obj);
+    bool removeObjectAt(int index);
     hkbGenerator *getParentGenerator() const;
     hkbBlenderGeneratorChild& operator=(const hkbBlenderGeneratorChild&);
     hkbBlenderGeneratorChild(const hkbBlenderGeneratorChild &);
 private:
-    HkxSharedPtr parentBG;
     static uint refCount;
     static QString classname;
+    HkxSharedPtr parentBG;
     HkxSharedPtr generator;
     HkxSharedPtr boneWeights;
     qreal weight;

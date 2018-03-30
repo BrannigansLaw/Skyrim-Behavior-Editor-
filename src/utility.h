@@ -11,7 +11,8 @@
 
 #define MAX_HKXXML_LINE_LENGTH 512
 
-#define FATAL_RUNTIME_ERROR(message){QFile log(QDir::currentPath()+"/DebugLog.txt");if (log.open(QIODevice::WriteOnly | QIODevice::Text)){QTextStream stream(&log);stream << message << "\n\n";abort();}}
+//#define FATAL_RUNTIME_ERROR(message){QFile log(QDir::currentPath()+"/DebugLog.txt");if (log.open(QIODevice::WriteOnly | QIODevice::Text)){QTextStream stream(&log);stream << message << "\n\n";abort();}}
+#define FATAL_RUNTIME_ERROR(message){QString str(message);QMessageBox msg;msg.setModal(true);msg.setText("WARNING: "+str);msg.exec();abort();}
 #define CRITICAL_ERROR_MESSAGE(message){QMessageBox msg;msg.setModal(true);msg.setText("CRITICAL ERROR: "+message+"\n\nWe advise that you close the application and contact the author!!!");msg.exec();}
 #define WARNING_MESSAGE(message){QString str(message);QMessageBox msg;msg.setModal(true);msg.setText("WARNING: "+str);msg.exec();}
 

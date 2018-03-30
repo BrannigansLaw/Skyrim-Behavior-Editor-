@@ -3,6 +3,8 @@
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbcliptriggerarray.h"
 
+#define MAX_TRIES 5
+
 uint hkbClipGenerator::refCount = 0;
 
 QString hkbClipGenerator::classname = "hkbClipGenerator";
@@ -35,7 +37,16 @@ hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, bool addToAnimData
         animationName = par->getAnimationNameAt(0);
     }
     if (addToAnimData && !par->addClipGenToAnimationData(name)){
-        FATAL_RUNTIME_ERROR("hkbClipGenerator::hkbClipGenerator(): The clip generator could not be added to the animation data!");
+        int count = 0;
+        bool added = par->addClipGenToAnimationData(name);
+        while (!added && count < MAX_TRIES){
+            name = "ClipGenerator"+QString::number(refCount)+QString::number(qrand());
+            added = par->addClipGenToAnimationData(name);
+            count++;
+        }
+        if (!added){
+            FATAL_RUNTIME_ERROR("hkbClipGenerator::hkbClipGenerator(): The clip generator could not be added to the animation data!");
+        }
     }
 }
 

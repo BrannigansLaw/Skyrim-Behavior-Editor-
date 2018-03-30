@@ -27,9 +27,9 @@ public:
     void loadData(HkxObject *data);
 signals:
     void generatorNameChanged(const QString & newName, int index);
-    void viewVariables(int index);
-    void viewGenerators(int index);
-    void viewProperties(int index);
+    void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
     void setName();
     void setClipGenerator(int index, const QString & name);

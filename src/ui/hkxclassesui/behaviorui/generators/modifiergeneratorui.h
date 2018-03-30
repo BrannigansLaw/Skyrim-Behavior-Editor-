@@ -21,8 +21,8 @@ public:
     void loadData(HkxObject *data);
 signals:
     void generatorNameChanged(const QString & newName, int index);
-    void viewGenerators(int index);
-    void viewModifiers(int index);
+    void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewModifiers(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
     void setName();
     void setModifier(int index, const QString & name);

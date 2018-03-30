@@ -186,8 +186,8 @@ void BSLookAtModifierUI::connectSignals(){
     connect(lookAtCameraY, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraY()), Qt::UniqueConnection);
     connect(lookAtCameraZ, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraZ()), Qt::UniqueConnection);
     connect(boneUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(boneUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
-    connect(boneUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
+    connect(boneUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
+    connect(boneUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
 }
 
@@ -209,8 +209,8 @@ void BSLookAtModifierUI::disconnectSignals(){
     disconnect(lookAtCameraY, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraY()));
     disconnect(lookAtCameraZ, SIGNAL(editingFinished()), this, SLOT(setLookAtCameraZ()));
     disconnect(boneUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    disconnect(boneUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
-    disconnect(boneUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)));
+    disconnect(boneUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
+    disconnect(boneUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
 }
 
@@ -540,7 +540,7 @@ bool BSLookAtModifierUI::setBinding(int index, int row, const QString & variable
     hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
                   (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
@@ -670,15 +670,15 @@ void BSLookAtModifierUI::selectTableToView(bool viewproperties, const QString & 
     if (bsData){
         if (viewproperties){
             if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewProperties(0);
+                emit viewProperties(0, QString(), QStringList());
             }
         }else{
             if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewVariables(0);
+                emit viewVariables(0, QString(), QStringList());
             }
         }
     }else{
@@ -692,7 +692,7 @@ void BSLookAtModifierUI::viewSelectedChild(int row, int column){
     if (bsData){
         if (row < ADD_BONE_ROW && row >= 0){
             if (column == VALUE_COLUMN && row == TARGET_OUT_OF_LIMIT_EVENT_ID_ROW){
-                emit viewEvents(bsData->id + 1);
+                emit viewEvents(bsData->id + 1, QString(), QStringList());
             }else if (column == BINDING_COLUMN){
                 switch (row){
                 case ENABLE_ROW:
@@ -885,9 +885,9 @@ void BSLookAtModifierUI::connectToTables(GenericTableWidget *variables, GenericT
         connect(events, SIGNAL(elementSelected(int,QString)), this, SLOT(setTargetOutOfLimitEventId(int,QString)), Qt::UniqueConnection);
         connect(variables, SIGNAL(elementSelected(int,QString)), this, SLOT(variableTableElementSelected(int,QString)), Qt::UniqueConnection);
         connect(properties, SIGNAL(elementSelected(int,QString)), this, SLOT(variableTableElementSelected(int,QString)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
         FATAL_RUNTIME_ERROR("BSLookAtModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }

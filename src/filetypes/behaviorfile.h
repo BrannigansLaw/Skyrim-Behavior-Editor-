@@ -9,6 +9,7 @@ class hkbModifier;
 class ProjectFile;
 class SkyrimClipGeneratoData;
 class hkbBehaviorReferenceGenerator;
+class hkbBoneWeightArray;
 
 class BehaviorFile: public HkxFile
 {
@@ -23,11 +24,11 @@ public:
     virtual ~BehaviorFile();
     HkxSharedPtr * findHkxObject(long ref);
     HkxSharedPtr * findGenerator(long ref);
-    HkxSharedPtr * findGeneratorChild(long ref);
+    //HkxSharedPtr * findGeneratorChild(long ref);
     HkxSharedPtr * findModifier(long ref);
     HkxSharedPtr * findBehaviorGraph(long ref);
     QVector<int> removeGeneratorData();
-    QVector<int> removeGeneratorChildrenData();
+    //QVector<int> removeGeneratorChildrenData();
     QVector<int> removeModifierData();
     QVector<int> removeOtherData();
     int getIndexOfGenerator(const HkxSharedPtr & obj) const;
@@ -83,6 +84,7 @@ public:
     void removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *gentoignore);
     QStringList getReferencedBehaviors(const hkbBehaviorReferenceGenerator *gentoignore) const;
     void removeAllData();
+    void getCharacterPropertyBoneWeightArray(const QString &name, hkbBoneWeightArray *ptrtosetdata) const;
 protected:
     bool parse();
     bool link();
@@ -105,7 +107,7 @@ private:
     HkxSharedPtr variableValues;
     HkxSharedPtr graphData;
     QList <HkxSharedPtr> generators;
-    QList <HkxSharedPtr> generatorChildren;
+    //QList <HkxSharedPtr> generatorChildren;
     QList <HkxSharedPtr> modifiers;
     QList <HkxSharedPtr> otherTypes;
     QStringList referencedBehaviors;

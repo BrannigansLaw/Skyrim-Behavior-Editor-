@@ -76,7 +76,7 @@ void BoneIndexArrayUI::loadDynamicTableRows(){
             if (temp < bones.size() && temp >= 0){
                 setRowItems(i, bones.at(temp), "Remove", "Edit", "Double click to remove this ragdoll bone", VIEW_BONES_TABLE_TIP);
             }else{
-                FATAL_RUNTIME_ERROR("BoneIndexArrayUI::loadDynamicTableRows(): Invalid bone index found!!");
+                WARNING_MESSAGE("BoneIndexArrayUI::loadDynamicTableRows(): Invalid bone index found!!");
             }
         }
     }else{
@@ -107,7 +107,7 @@ void BoneIndexArrayUI::connectToTables(GenericTableWidget *ragdollBones){
     if (ragdollBones){
         disconnect(ragdollBones, SIGNAL(elementSelected(int,QString)), 0, 0);
         connect(ragdollBones, SIGNAL(elementSelected(int,QString)), this, SLOT(setRagdollBone(int,QString)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
         FATAL_RUNTIME_ERROR("BoneIndexArrayUI::connectToTables(): One or more arguments are nullptr!!");
     }

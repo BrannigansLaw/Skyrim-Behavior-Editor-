@@ -105,7 +105,7 @@ public:
     bool isVariableReferenced(int variableindex) const;
 protected:
     HkDynamicObject(HkxFile *parent, long ref = -1);
-protected:
+public:
     HkxSharedPtr variableBindingSet;
 private:
     HkDynamicObject& operator=(const HkDynamicObject&);

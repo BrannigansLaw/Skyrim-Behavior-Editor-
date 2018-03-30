@@ -63,20 +63,11 @@ int hkbPoseMatchingGenerator::getIndexToInsertIcon(HkxObject *child) const{
 }
 
 bool hkbPoseMatchingGenerator::insertObjectAt(int index, DataIconManager *obj){
-    hkbBlenderGeneratorChild *objChild;
-    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
+    if (((HkxObject *)obj)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
         if (index >= children.size() || index == -1){
-            objChild = new hkbBlenderGeneratorChild(getParentFile(), this, -1);
-            children.append(HkxSharedPtr(objChild));
-            objChild->generator = HkxSharedPtr((HkxObject *)obj);
-        }else if (index == 0){
-            objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
-            objChild->generator = HkxSharedPtr((HkxObject *)obj);
-        }else if (index > -1){
-            objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
-            objChild->generator = HkxSharedPtr((HkxObject *)obj);
-        }else{
-            return false;
+            children.append(HkxSharedPtr(obj));
+        }else if (index == 0 || !children.isEmpty()){
+            children.replace(index, HkxSharedPtr(obj));
         }
         return true;
     }else{
@@ -103,10 +94,8 @@ bool hkbPoseMatchingGenerator::removeObjectAt(int index){
 }
 
 bool hkbPoseMatchingGenerator::hasChildren() const{
-    hkbBlenderGeneratorChild *child;
     for (int i = 0; i < children.size(); i++){
-        child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
-        if (child->generator.data()){
+        if (children.at(i).data()){
             return true;
         }
     }
@@ -130,10 +119,8 @@ void hkbPoseMatchingGenerator::updateEventIndices(int eventindex){
 }
 
 int hkbPoseMatchingGenerator::getIndexOfObj(DataIconManager *obj) const{
-    hkbBlenderGeneratorChild *child;
     for (int i = 0; i < children.size(); i++){
-        child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
-        if (child->generator.data() == (HkxObject *)obj){
+        if (children.at(i).data() == (HkxObject *)obj){
             return i;
         }
     }
@@ -142,11 +129,9 @@ int hkbPoseMatchingGenerator::getIndexOfObj(DataIconManager *obj) const{
 
 QList<DataIconManager *> hkbPoseMatchingGenerator::getChildren() const{
     QList<DataIconManager *> list;
-    hkbBlenderGeneratorChild *child;
     for (int i = 0; i < children.size(); i++){
-        child = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
-        if (child->generator.data()){
-            list.append(static_cast<DataIconManager*>(child->generator.data()));
+        if (children.at(i).data()){
+            list.append(static_cast<DataIconManager*>(children.at(i).data()));
         }
     }
     return list;
@@ -354,7 +339,8 @@ bool hkbPoseMatchingGenerator::link(){
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < children.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(children.at(i).getReference());
+        //ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(children.at(i).getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(children.at(i).getReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
             setDataValidity(false);

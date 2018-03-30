@@ -23,9 +23,9 @@ public:
     RangesUI();
     void loadData(BehaviorFile *parentFile, hkbSenseHandleModifier::hkRanges *ranges, hkbSenseHandleModifier *par, int index);
 signals:
-    void viewEvents(int index);
-    void viewProperties(int index);
-    void viewVariables(int index);
+    void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
+    void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void returnToParent();
 private slots:
     void setEventId(int index, const QString &name);

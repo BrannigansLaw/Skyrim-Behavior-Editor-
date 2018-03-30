@@ -41,11 +41,9 @@ int hkbManualSelectorGenerator::getIndexToInsertIcon(HkxObject *child) const{
 bool hkbManualSelectorGenerator::insertObjectAt(int index, DataIconManager *obj){
     if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
         if (index >= generators.size() || index == -1){
-            generators.append(HkxSharedPtr((HkxObject *)obj));
-        }else if (index > -1){
-            generators[index] = HkxSharedPtr((HkxObject *)obj);
-        }else{
-            return false;
+            generators.append(HkxSharedPtr(obj));
+        }else if (index == 0 || !generators.isEmpty()){
+            generators.replace(index, HkxSharedPtr(obj));
         }
         return true;
     }else{

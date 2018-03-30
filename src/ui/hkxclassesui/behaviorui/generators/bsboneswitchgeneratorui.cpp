@@ -3,6 +3,8 @@
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/hkxobject.h"
 #include "src/hkxclasses/behavior/generators/bsboneswitchgenerator.h"
+#include "src/hkxclasses/behavior/generators/hkbblendergeneratorchild.h"
+#include "src/hkxclasses/behavior/generators/hkbstatemachinestateinfo.h"
 #include "src/hkxclasses/behavior/generators/bsboneswitchgeneratorbonedata.h"
 #include "src/hkxclasses/behavior/hkbvariablebindingset.h"
 #include "src/ui/genericdatawidgets.h"
@@ -97,9 +99,9 @@ void BSBoneSwitchGeneratorUI::connectSignals(){
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
     connect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)), Qt::UniqueConnection);
     connect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)), Qt::UniqueConnection);
-    connect(childUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
-    connect(childUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
-    connect(childUI, SIGNAL(viewGenerators(int)), this, SIGNAL(viewGenerators(int)), Qt::UniqueConnection);
+    connect(childUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
+    connect(childUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
+    connect(childUI, SIGNAL(viewGenerators(int,QString,QStringList)), this, SIGNAL(viewGenerators(int,QString,QStringList)), Qt::UniqueConnection);
 }
 
 void BSBoneSwitchGeneratorUI::disconnectSignals(){
@@ -107,9 +109,9 @@ void BSBoneSwitchGeneratorUI::disconnectSignals(){
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
     disconnect(table, SIGNAL(itemDropped(int,int)), this, SLOT(swapGeneratorIndices(int,int)));
     disconnect(childUI, SIGNAL(returnToParent(bool)), this, SLOT(returnToWidget(bool)));
-    disconnect(childUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
-    disconnect(childUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)));
-    disconnect(childUI, SIGNAL(viewGenerators(int)), this, SIGNAL(viewGenerators(int)));
+    disconnect(childUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
+    disconnect(childUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
+    disconnect(childUI, SIGNAL(viewGenerators(int,QString,QStringList)), this, SIGNAL(viewGenerators(int,QString,QStringList)));
 }
 
 void BSBoneSwitchGeneratorUI::loadData(HkxObject *data){
@@ -184,6 +186,13 @@ void BSBoneSwitchGeneratorUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
+            for (auto i = 0; i < bsData->ChildrenA.size(); i++){
+                if (bsData->ChildrenA.at(i).data()){
+                    static_cast<DataIconManager*>(bsData->ChildrenA.at(i).data())->updateIconNames();
+                }else{
+                    FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorUI::setName():\n Children contain nullptr's!!!");
+                }
+            }
             emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
             bsData->getParentFile()->setIsChanged(true);
         }
@@ -216,6 +225,7 @@ void BSBoneSwitchGeneratorUI::addChildWithGenerator(){
     Generator_Type typeEnum;
     if (bsData && behaviorView){
         typeEnum = static_cast<Generator_Type>(typeSelectorCB->currentIndex());
+        behaviorView->appendBoneSwitchGeneratorChild();
         switch (typeEnum){
         case STATE_MACHINE:
             behaviorView->appendStateMachine();
@@ -286,7 +296,8 @@ void BSBoneSwitchGeneratorUI::viewSelectedChild(int row, int column){
     int result = -1;
     if (bsData){
         if (row == DEFAULT_GENERATOR_ROW && column == VALUE_COLUMN){
-            emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pDefaultGenerator) + 1);
+            QStringList list = {hkbStateMachineStateInfo::getClassname(), hkbBlenderGeneratorChild::getClassname(), BSBoneSwitchGeneratorBoneData::getClassname()};
+            emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pDefaultGenerator) + 1, QString(), list);
         }else if (row == ADD_CHILD_ROW && column == NAME_COLUMN){
             addChildWithGenerator();
         }else if (row > ADD_CHILD_ROW && row < ADD_CHILD_ROW + bsData->ChildrenA.size() + 1){
@@ -321,7 +332,7 @@ void BSBoneSwitchGeneratorUI::setDefaultGenerator(int index, const QString & nam
                     if (name != ptr->getName()){
                         FATAL_RUNTIME_ERROR("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
                         return;
-                    }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->pDefaultGenerator.data()), ptr, false)){
+                    }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->pDefaultGenerator.data()), 0, ptr, false)){
                         WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
                         return;
                     }
@@ -385,9 +396,9 @@ void BSBoneSwitchGeneratorUI::connectToTables(GenericTableWidget *generators, Ge
         connect(variables, SIGNAL(elementSelected(int,QString)), this, SLOT(variableTableElementSelected(int,QString)), Qt::UniqueConnection);
         connect(properties, SIGNAL(elementSelected(int,QString)), this, SLOT(variableTableElementSelected(int,QString)), Qt::UniqueConnection);
         connect(generators, SIGNAL(elementSelected(int,QString)), this, SLOT(generatorTableElementSelected(int,QString)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewGenerators(int)), generators, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewGenerators(int,QString,QStringList)), generators, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
         FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }

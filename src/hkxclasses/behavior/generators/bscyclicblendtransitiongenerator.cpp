@@ -113,7 +113,7 @@ bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long
             if (!pBlenderGenerator.readReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'pBlenderGenerator' reference!\nObject Reference: "+ref);
             }
-        }else if (text == "eventToFreezeBlendValue"){
+        }else if (text == "EventToFreezeBlendValue"){
             index++;
             while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                 text = reader.getNthAttributeValueAt(index, 0);
@@ -130,7 +130,7 @@ bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long
                 }
                 index++;
             }
-        }else if (text == "eventToCrossBlend"){
+        }else if (text == "EventToCrossBlend"){
             index++;
             while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                 text = reader.getNthAttributeValueAt(index, 0);
@@ -189,7 +189,7 @@ bool BSCyclicBlendTransitionGenerator::write(HkxXMLWriter *writer){
             refString = "null";
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pBlenderGenerator"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("eventToFreezeBlendValue"), "");
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("EventToFreezeBlendValue"), "");
         writer->writeLine(writer->object, true);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventToFreezeBlendValue.id));
         if (eventToFreezeBlendValue.payload.data()){
@@ -200,7 +200,7 @@ bool BSCyclicBlendTransitionGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("eventToCrossBlend"), "");
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("EventToCrossBlend"), "");
         writer->writeLine(writer->object, true);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventToCrossBlend.id));
         if (eventToCrossBlend.payload.data()){

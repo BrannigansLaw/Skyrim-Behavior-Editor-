@@ -1,5 +1,8 @@
 #include "ManualSelectorGeneratorUI.h"
 #include "src/hkxclasses/hkxobject.h"
+#include "src/hkxclasses/behavior/generators/hkbblendergeneratorchild.h"
+#include "src/hkxclasses/behavior/generators/hkbstatemachinestateinfo.h"
+#include "src/hkxclasses/behavior/generators/bsboneswitchgeneratorbonedata.h"
 #include "src/hkxclasses/behavior/generators/hkbmanualselectorgenerator.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/ui/behaviorgraphview.h"
@@ -26,6 +29,7 @@
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
 QStringList ManualSelectorGeneratorUI::types = {
+    "None",
     "hkbStateMachine",
     "hkbManualSelectorGenerator",
     "hkbBlenderGenerator",
@@ -148,7 +152,8 @@ void ManualSelectorGeneratorUI::loadDynamicTableRows(){
             if (child){
                 setRowItems(i, child->getName(), child->getClassname(), "Remove", "Edit", "Double click to remove this generator", VIEW_GENERATORS_TABLE_TIP);
             }else{
-                FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::loadData(): Null state found!!!");
+                setRowItems(i, "NONE", "NONE", "Remove", "Edit", "Double click to remove this generator", VIEW_GENERATORS_TABLE_TIP);
+                //FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::loadData(): Null state found!!!");
             }
         }
     }else{
@@ -188,9 +193,9 @@ void ManualSelectorGeneratorUI::connectToTables(GenericTableWidget *generators, 
         connect(variables, SIGNAL(elementSelected(int,QString)), this, SLOT(setBindingVariable(int,QString)), Qt::UniqueConnection);
         connect(properties, SIGNAL(elementSelected(int,QString)), this, SLOT(setBindingVariable(int,QString)), Qt::UniqueConnection);
         connect(generators, SIGNAL(elementSelected(int,QString)), this, SLOT(setGenerator(int,QString)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewGenerators(int)), generators, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewVariables(int)), variables, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewProperties(int)), properties, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewGenerators(int,QString,QStringList)), generators, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
         FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }
@@ -200,7 +205,7 @@ void ManualSelectorGeneratorUI::setBinding(int index, int row, const QString & v
     hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
                   (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
@@ -311,7 +316,7 @@ void ManualSelectorGeneratorUI::generatorRenamed(const QString &name, int index)
                 table->item(table->currentRow(), VALUE_COLUMN)->setText(name);
             }
         }else{
-            FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::generatorRenamed(): Invalid generator index selected!!");
+            WARNING_MESSAGE("ManualSelectorGeneratorUI::generatorRenamed(): Invalid generator index selected!!");
         }
     }else{
         FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
@@ -326,15 +331,15 @@ void ManualSelectorGeneratorUI::selectTableToView(bool viewproperties, const QSt
     if (bsData){
         if (viewproperties){
             if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewProperties(0);
+                emit viewProperties(0, QString(), QStringList());
             }
         }else{
             if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1);
+                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
-                emit viewVariables(0);
+                emit viewVariables(0, QString(), QStringList());
             }
         }
     }else{
@@ -404,7 +409,8 @@ void ManualSelectorGeneratorUI::viewSelectedChild(int row, int column){
             result = row - BASE_NUMBER_OF_ROWS;
             if (bsData->generators.size() > result && result >= 0){
                 if (column == VALUE_COLUMN){
-                    emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generators.at(result)) + 1);
+                    QStringList list = {hkbStateMachineStateInfo::getClassname(), hkbBlenderGeneratorChild::getClassname(), BSBoneSwitchGeneratorBoneData::getClassname()};
+                    emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generators.at(result)) + 1, QString(), list);
                 }else if (column == BINDING_COLUMN){
                     if (MainWindow::yesNoDialogue("Are you sure you want to remove the generator \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
                         removeGenerator(result);
@@ -458,9 +464,9 @@ void ManualSelectorGeneratorUI::setGenerator(int index, const QString &name){
                 ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
                 if (ptr){
                     if (name != ptr->getName()){
-                        FATAL_RUNTIME_ERROR("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
+                        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::setGenerator():The name of the selected object does not match it's name in the object selection table!!!");
                         return;
-                    }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generators.at(generatorIndex).data()), ptr, false)){
+                    }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generators.at(generatorIndex).data()), generatorIndex, ptr, false)){
                         WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
                         return;
                     }
@@ -492,6 +498,9 @@ void ManualSelectorGeneratorUI::addGenerator(){
     if (bsData && behaviorView){
         typeEnum = static_cast<Generator_Type>(typeSelectorCB->currentIndex());
         switch (typeEnum){
+        case NONE:
+            bsData->generators.append(HkxSharedPtr());
+            break;
         case STATE_MACHINE:
             behaviorView->appendStateMachine();
             break;

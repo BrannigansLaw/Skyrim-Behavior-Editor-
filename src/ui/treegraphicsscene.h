@@ -30,7 +30,7 @@ private:
     void expandBranch(TreeGraphicsItem *icon, bool expandAll = false);
     bool drawGraph(DataIconManager *rootData, bool allowDuplicates);
     TreeGraphicsItem * addItemToGraph(TreeGraphicsItem *selectedIcon, DataIconManager *data, int indexToInsert, bool inject = false, bool allowDuplicates = false, bool isFirstDraw = false);
-    bool reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, DataIconManager *replacementData, bool removeData = true);
+    bool reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, int replaceindex, DataIconManager *replacementData, bool removeData = true);
     bool removeItemFromGraph(TreeGraphicsItem *item, int indexToRemove, bool removeData = true, bool removeAllSameData = false, DataIconManager *dataToKeep = nullptr);
 private:
     TreeGraphicsItem *rootIcon;

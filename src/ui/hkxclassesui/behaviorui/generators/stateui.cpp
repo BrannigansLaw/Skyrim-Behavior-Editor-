@@ -2,7 +2,9 @@
 #include "StateUI.h"
 #include "src/hkxclasses/hkxobject.h"
 #include "src/hkxclasses/behavior/generators/hkbstatemachine.h"
+#include "src/hkxclasses/behavior/generators/hkbblendergeneratorchild.h"
 #include "src/hkxclasses/behavior/generators/hkbstatemachinestateinfo.h"
+#include "src/hkxclasses/behavior/generators/bsboneswitchgeneratorbonedata.h"
 #include "src/hkxclasses/behavior/hkbstatemachineeventpropertyarray.h"
 #include "src/hkxclasses/behavior/hkbstringeventpayload.h"
 #include "src/ui/genericdatawidgets.h"
@@ -59,7 +61,7 @@ StateUI::StateUI()
       enable(new CheckBox),
       enableTransitions(new CheckBox("Enable Transitions"))
 {
-    stateId->setReadOnly(true);
+    //stateId->setReadOnly(true);
     transitionUI->flagGlobalWildcard->setDisabled(true);
     table->setRowCount(BASE_NUMBER_OF_ROWS);
     table->setColumnCount(headerLabels.size());
@@ -79,7 +81,7 @@ StateUI::StateUI()
     table->setItem(ENABLE_ROW, NAME_COLUMN, new TableWidgetItem("enable"));
     table->setItem(ENABLE_ROW, TYPE_COLUMN, new TableWidgetItem("hkBool", Qt::AlignCenter));
     table->setItem(ENABLE_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
-    table->setItem(ENABLE_ROW, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter, QColor(Qt::lightGray)));
+    //table->setItem(ENABLE_ROW, VALUE_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter, QColor(Qt::lightGray)));
     table->setCellWidget(ENABLE_ROW, VALUE_COLUMN, enable);
     table->setItem(GENERATOR_ROW, NAME_COLUMN, new TableWidgetItem("generator"));
     table->setItem(GENERATOR_ROW, TYPE_COLUMN, new TableWidgetItem("hkbGenerator", Qt::AlignCenter));
@@ -110,15 +112,15 @@ StateUI::StateUI()
 void StateUI::connectSignals(){
     connect(returnPB, SIGNAL(clicked(bool)), this, SIGNAL(returnToParent(bool)), Qt::UniqueConnection);
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(stateId, SIGNAL(editingFinished()), this, SLOT(setStateId()), Qt::UniqueConnection);
+    connect(stateId, SIGNAL(valueChanged(int)), this, SLOT(setStateId(int)), Qt::UniqueConnection);
     connect(probability, SIGNAL(editingFinished()), this, SLOT(setProbability()), Qt::UniqueConnection);
     connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
     connect(eventUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(eventUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)), Qt::UniqueConnection);
+    connect(eventUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
     connect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
     connect(transitionUI, SIGNAL(transitionNamChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)), Qt::UniqueConnection);
 }
@@ -126,15 +128,15 @@ void StateUI::connectSignals(){
 void StateUI::disconnectSignals(){
     disconnect(returnPB, SIGNAL(clicked(bool)), this, SIGNAL(returnToParent(bool)));
     disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(stateId, SIGNAL(editingFinished()), this, SLOT(setStateId()));
+    disconnect(stateId, SIGNAL(valueChanged(int)), this, SLOT(setStateId(int)));
     disconnect(probability, SIGNAL(editingFinished()), this, SLOT(setProbability()));
     disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
     disconnect(eventUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    disconnect(eventUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)));
-    disconnect(transitionUI, SIGNAL(viewEvents(int)), this, SIGNAL(viewEvents(int)));
-    disconnect(transitionUI, SIGNAL(viewVariables(int)), this, SIGNAL(viewVariables(int)));
-    disconnect(transitionUI, SIGNAL(viewProperties(int)), this, SIGNAL(viewProperties(int)));
+    disconnect(eventUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
+    disconnect(transitionUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
+    disconnect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
+    disconnect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
     disconnect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
     disconnect(transitionUI, SIGNAL(transitionNamChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)));
 }
@@ -307,8 +309,8 @@ void StateUI::connectToTables(GenericTableWidget *generators, GenericTableWidget
         disconnect(generators, SIGNAL(elementSelected(int,QString)), 0, 0);
         connect(events, SIGNAL(elementSelected(int,QString)), this, SLOT(eventTableElementSelected(int,QString)), Qt::UniqueConnection);
         connect(generators, SIGNAL(elementSelected(int,QString)), this, SLOT(generatorTableElementSelected(int,QString)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewGenerators(int)), generators, SLOT(showTable(int)), Qt::UniqueConnection);
-        connect(this, SIGNAL(viewEvents(int)), events, SLOT(showTable(int)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewGenerators(int,QString,QStringList)), generators, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
         FATAL_RUNTIME_ERROR("StateUI::connectToTables(): One or more arguments are nullptr!!");
     }
@@ -327,16 +329,16 @@ void StateUI::setName(){
     }
 }
 
-void StateUI::setStateId(){
+void StateUI::setStateId(int id){
     if (bsData){
-        if (bsData->setStateId(stateId->value())){
+        if (bsData->setStateId(id)){
             emit stateIdChanged(stateIndex, bsData->stateId, bsData->name);
             bsData->getParentFile()->setIsChanged(true);
         }else{
             WARNING_MESSAGE("StateUI::setStateId(): Another state has the selected state ID!!! The state ID for this state was not changed!!!");
-            disconnect(stateId, SIGNAL(editingFinished()), this, SLOT(setStateId()));
+            disconnect(stateId, SIGNAL(valueChanged(int)), this, SLOT(setStateId(int)));
             stateId->setValue(bsData->stateId);
-            connect(stateId, SIGNAL(editingFinished()), this, SLOT(setStateId()), Qt::UniqueConnection);
+            connect(stateId, SIGNAL(valueChanged(int)), this, SLOT(setStateId(int)), Qt::UniqueConnection);
         }
     }else{
         FATAL_RUNTIME_ERROR("StateUI::setStateId(): The data is nullptr!!");
@@ -386,6 +388,9 @@ void StateUI::removeEnterEvent(int index){
         if (events){
             if (index < events->events.size() && index >= 0){
                 events->removeEvent(index);
+                if (events->events.isEmpty()){
+                    bsData->enterNotifyEvents = HkxSharedPtr();
+                }
             }else{
                 WARNING_MESSAGE("StateUI::removeEnterEvent(): Invalid row index selected!!");
                 return;
@@ -423,6 +428,9 @@ void StateUI::removeExitEvent(int index){
         if (events){
             if (index < events->events.size() && index >= 0){
                 events->removeEvent(index);
+                if (events->events.isEmpty()){
+                    bsData->exitNotifyEvents = HkxSharedPtr();
+                }
             }else{
                 WARNING_MESSAGE("StateUI::removeExitEvent(): Invalid row index selected!!");
                 return;
@@ -459,6 +467,9 @@ void StateUI::removeTransition(int index){
         if (trans){
             if (index < trans->getNumTransitions() && index >= 0){
                 trans->removeTransition(index);
+                if (trans->getNumTransitions() == 0){
+                    bsData->transitions = HkxSharedPtr();
+                }
             }else{
                 WARNING_MESSAGE("StateUI::removeTransition(): Invalid row index selected!!");
                 return;
@@ -481,7 +492,8 @@ void StateUI::viewSelectedChild(int row, int column){
     hkbStateMachineEventPropertyArray *exitEvents = nullptr;
     if (bsData){
         if (row == GENERATOR_ROW && column == VALUE_COLUMN){
-            emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1);
+            QStringList list = {hkbStateMachineStateInfo::getClassname(), hkbBlenderGeneratorChild::getClassname(), BSBoneSwitchGeneratorBoneData::getClassname()};
+            emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1, QString(), list);
         }else if (row == ADD_ENTER_EVENT_ROW && column == NAME_COLUMN){
             addEnterEvent();
         }else if (row == exitEventsButtonRow && column == NAME_COLUMN){
@@ -561,7 +573,7 @@ void StateUI::setGenerator(int index, const QString & name){
                 }else if (!gen){
                     FATAL_RUNTIME_ERROR("The currently loaded 'hkbStateMachineStateInfo' has no parent 'hkbStateMachine'!!!");
                     return;
-                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generator.data()), ptr, false)){
+                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generator.data()), 0, ptr, false)){
                     WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
                     return;
                 }
