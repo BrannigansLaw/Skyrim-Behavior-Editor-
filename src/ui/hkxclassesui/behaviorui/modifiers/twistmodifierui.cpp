@@ -127,7 +127,7 @@ void TwistModifierUI::connectToTables(GenericTableWidget *variables, GenericTabl
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -179,10 +179,10 @@ void TwistModifierUI::loadData(HkxObject *data){
                 table->item(IS_ADDITIVE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR("TwistModifierUI::loadData(): The data is an incorrect type!!");
+            CRITICAL_ERROR_MESSAGE("TwistModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -196,7 +196,7 @@ void TwistModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -205,7 +205,7 @@ void TwistModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -216,7 +216,7 @@ void TwistModifierUI::setAxisOfRotation(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::setaxisOfRotation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setaxisOfRotation(): The data is nullptr!!");
     }
 }
 
@@ -225,7 +225,7 @@ void TwistModifierUI::setStartBoneIndex(int index){
         bsData->startBoneIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::setStartBoneIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setStartBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -234,7 +234,7 @@ void TwistModifierUI::setEndBoneIndex(int index){
         bsData->endBoneIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::setEndBoneIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setEndBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -245,7 +245,7 @@ void TwistModifierUI::setTwistAngle(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::settwistAngle(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::settwistAngle(): The data is nullptr!!");
     }
 }
 
@@ -254,7 +254,7 @@ void TwistModifierUI::setSetAngleMethod(int index){
         bsData->setAngleMethod = bsData->SetAngleMethod.at(index);
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::setSetAngleMethod(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setSetAngleMethod(): The data is nullptr!!");
     }
 }
 
@@ -263,7 +263,7 @@ void TwistModifierUI::setRotationAxisCoordinates(int index){
         bsData->rotationAxisCoordinates = bsData->RotationAxisCoordinates.at(index);
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::setRotationAxisCoordinates(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setRotationAxisCoordinates(): The data is nullptr!!");
     }
 }
 
@@ -272,7 +272,7 @@ void TwistModifierUI::setIsAdditive(){
         bsData->isAdditive = isAdditive->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::setIsAdditive(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setIsAdditive(): The data is nullptr!!");
     }
 }
 
@@ -322,7 +322,7 @@ void TwistModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -342,7 +342,7 @@ void TwistModifierUI::selectTableToView(bool viewisProperty, const QString & pat
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -377,7 +377,7 @@ void TwistModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -387,19 +387,19 @@ bool TwistModifierUI::setBinding(int index, int row, const QString &variableName
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("TwistModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("TwistModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("TwistModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("TwistModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -408,7 +408,7 @@ bool TwistModifierUI::setBinding(int index, int row, const QString &variableName
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -459,7 +459,7 @@ void TwistModifierUI::setBindingVariable(int index, const QString &name){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -481,9 +481,9 @@ void TwistModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *va
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("TwistModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("TwistModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("TwistModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TwistModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

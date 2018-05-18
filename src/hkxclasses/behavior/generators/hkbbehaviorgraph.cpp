@@ -86,7 +86,7 @@ bool hkbBehaviorGraph::readData(const HkxXmlReader &reader, long index){
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -105,11 +105,11 @@ bool hkbBehaviorGraph::readData(const HkxXmlReader &reader, long index){
                 writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'variableMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "rootGenerator"){
-            if (!rootGenerator.readReference(index, reader)){
+            if (!rootGenerator.readShdPtrReference(index, reader)){
                 writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'rootGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "data"){
-            if (!data.readReference(index, reader)){
+            if (!data.readShdPtrReference(index, reader)){
                 writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'data' reference!\nObject Reference: "+ref);
             }
         }
@@ -169,7 +169,7 @@ bool hkbBehaviorGraph::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(rootGenerator.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(rootGenerator.getShdPtrReference());
     if (!ptr){
         writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'rootGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
@@ -200,8 +200,8 @@ void hkbBehaviorGraph::unlink(){
     data = HkxSharedPtr();
 }
 
-bool hkbBehaviorGraph::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbBehaviorGraph::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (!rootGenerator.data() || rootGenerator.data()->getSignature() != HKB_STATE_MACHINE){
     }else if (!data.data() || data.data()->getSignature() != HKB_BEHAVIOR_GRAPH_DATA){

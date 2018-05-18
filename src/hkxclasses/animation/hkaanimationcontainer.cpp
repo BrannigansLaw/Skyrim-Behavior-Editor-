@@ -94,7 +94,7 @@ bool hkaAnimationContainer::link(){
     }
     HkxSharedPtr *ptr = nullptr;
     for (int i = 0; i < skeletons.size(); i++){
-        ptr = static_cast<SkeletonFile *>(getParentFile())->findSkeleton(skeletons.at(i).getReference());
+        ptr = static_cast<SkeletonFile *>(getParentFile())->findSkeleton(skeletons.at(i).getShdPtrReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'skeletons' data field!\n");
             setDataValidity(false);
@@ -109,7 +109,7 @@ bool hkaAnimationContainer::link(){
     return true;
 }
 
-bool hkaAnimationContainer::evaulateDataValidity(){
+bool hkaAnimationContainer::evaluateDataValidity(){
     for (int i = 0; i < skeletons.size(); i++){
         if (!skeletons.at(i).data() || skeletons.at(i).data()->getSignature() != HKA_SKELETON){
             setDataValidity(false);

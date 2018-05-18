@@ -25,7 +25,7 @@ public:
     virtual ~hkbVariableBindingSet();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     int getNumberOfBindings() const;
     bool addBinding(const QString & path, int varIndex, hkBinding::BindingType type = hkBinding::BINDING_TYPE_VARIABLE);
@@ -38,6 +38,8 @@ public:
     bool write(HkxXMLWriter *writer);
     bool isVariableRefed(int variableindex) const;
     void updateVariableIndices(int index);
+    void mergeVariableIndex(int oldindex, int newindex);
+    bool merge(HkxObject *recessiveObject);
 protected:
 private:
     hkbVariableBindingSet& operator=(const hkbVariableBindingSet&);

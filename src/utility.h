@@ -11,9 +11,9 @@
 
 #define MAX_HKXXML_LINE_LENGTH 512
 
-//#define FATAL_RUNTIME_ERROR(message){QFile log(QDir::currentPath()+"/DebugLog.txt");if (log.open(QIODevice::WriteOnly | QIODevice::Text)){QTextStream stream(&log);stream << message << "\n\n";abort();}}
-#define FATAL_RUNTIME_ERROR(message){QString str(message);QMessageBox msg;msg.setModal(true);msg.setText("WARNING: "+str);msg.exec();abort();}
-#define CRITICAL_ERROR_MESSAGE(message){QMessageBox msg;msg.setModal(true);msg.setText("CRITICAL ERROR: "+message+"\n\nWe advise that you close the application and contact the author!!!");msg.exec();}
+//#define CRITICAL_ERROR_MESSAGE(message){QFile log(QDir::currentPath()+"/DebugLog.txt");if (log.open(QIODevice::WriteOnly | QIODevice::Text)){QTextStream stream(&log);stream << message << "\n\n";abort();}}
+//#define FATAL_ERROR_MESSAGE(message){QString str(message);QMessageBox msg;msg.setModal(true);msg.setText("WARNING: "+str);msg.exec();abort();}
+#define CRITICAL_ERROR_MESSAGE(message){QString str(message);QMessageBox msg;msg.setModal(true);msg.setText("CRITICAL ERROR: "+str+"\n\nWe advise that you save and then close the application and contact the author!!!");msg.exec();}
 #define WARNING_MESSAGE(message){QString str(message);QMessageBox msg;msg.setModal(true);msg.setText("WARNING: "+str);msg.exec();}
 
 #define VIEW_GENERATORS_TABLE_TIP "Double click to view the table of generators"
@@ -36,6 +36,17 @@ enum hkVariableType {
     VARIABLE_TYPE_VECTOR4,
     VARIABLE_TYPE_QUATERNION
 };
+
+namespace {
+
+bool areVariableTypesCompatible(hkVariableType type1, hkVariableType type2){
+    if (type1 == type2 || (type1 < VARIABLE_TYPE_REAL && type2 < VARIABLE_TYPE_REAL)){
+        return true;
+    }
+    return false;
+}
+
+}
 
 struct hkVector3
 {

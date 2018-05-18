@@ -49,7 +49,7 @@ bool hkbRigidBodyRagdollControlsModifier::readData(const HkxXmlReader &reader, l
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -133,7 +133,7 @@ bool hkbRigidBodyRagdollControlsModifier::readData(const HkxXmlReader &reader, l
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'durationToBlend' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bones"){
-            if (!bones.readReference(index, reader)){
+            if (!bones.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'bones' reference!\nObject Reference: "+ref);
             }
         }
@@ -205,7 +205,7 @@ bool hkbRigidBodyRagdollControlsModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(bones.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(bones.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_INDEX_ARRAY){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'bones' is not a HKB_BONE_INDEX_ARRAY!");
@@ -221,8 +221,8 @@ void hkbRigidBodyRagdollControlsModifier::unlink(){
     bones = HkxSharedPtr();
 }
 
-bool hkbRigidBodyRagdollControlsModifier::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbRigidBodyRagdollControlsModifier::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (!bones.data()){

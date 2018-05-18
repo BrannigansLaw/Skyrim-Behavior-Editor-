@@ -77,10 +77,10 @@ void BehaviorReferenceGeneratorUI::loadData(HkxObject *data){
                 behaviorName->setCurrentIndex(index);
             }
         }else{
-            FATAL_RUNTIME_ERROR(QString("BehaviorReferenceGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("BehaviorReferenceGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BehaviorReferenceGeneratorUI::loadData(): The data passed to the UI is nullptr!!!");
+        CRITICAL_ERROR_MESSAGE("BehaviorReferenceGeneratorUI::loadData(): The data passed to the UI is nullptr!!!");
     }
     connectSignals();
 }
@@ -94,7 +94,7 @@ void BehaviorReferenceGeneratorUI::setName(){
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("BehaviorReferenceGeneratorUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BehaviorReferenceGeneratorUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -110,7 +110,7 @@ void BehaviorReferenceGeneratorUI::setBehaviorName(const QString & text){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BehaviorReferenceGeneratorUI::setBehaviorName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BehaviorReferenceGeneratorUI::setBehaviorName(): The data is nullptr!!");
     }
 }
 

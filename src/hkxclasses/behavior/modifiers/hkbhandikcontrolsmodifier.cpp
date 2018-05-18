@@ -37,7 +37,7 @@ bool hkbHandIkControlsModifier::readData(const HkxXmlReader &reader, long index)
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -79,7 +79,7 @@ bool hkbHandIkControlsModifier::readData(const HkxXmlReader &reader, long index)
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'targetNormal' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "targetHandle"){
-                        if (!hands.last().controlData.targetHandle.readReference(index, reader)){
+                        if (!hands.last().controlData.targetHandle.readShdPtrReference(index, reader)){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'targetHandle' reference!\nObject Reference: "+ref);
                         }
                     }else if (text == "transformOnFraction"){
@@ -221,8 +221,8 @@ void hkbHandIkControlsModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool hkbHandIkControlsModifier::evaulateDataValidity(){  //Check for valid event id???
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbHandIkControlsModifier::evaluateDataValidity(){  //Check for valid event id???
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else{

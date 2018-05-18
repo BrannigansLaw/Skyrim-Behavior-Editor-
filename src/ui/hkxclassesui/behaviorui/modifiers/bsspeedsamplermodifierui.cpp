@@ -105,7 +105,7 @@ void BSSpeedSamplerModifierUI::connectToTables(GenericTableWidget *variables, Ge
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -136,10 +136,10 @@ void BSSpeedSamplerModifierUI::loadData(HkxObject *data){
                 table->item(SPEED_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::loadData(): The data is an incorrect type!!");
+            CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -153,7 +153,7 @@ void BSSpeedSamplerModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -162,7 +162,7 @@ void BSSpeedSamplerModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -173,7 +173,7 @@ void BSSpeedSamplerModifierUI::setState(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::setstate(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::setstate(): The data is nullptr!!");
     }
 }
 
@@ -184,7 +184,7 @@ void BSSpeedSamplerModifierUI::setDirection(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::setdirection(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::setdirection(): The data is nullptr!!");
     }
 }
 
@@ -195,7 +195,7 @@ void BSSpeedSamplerModifierUI::setGoalSpeed(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::setgoalSpeed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::setgoalSpeed(): The data is nullptr!!");
     }
 }
 
@@ -206,7 +206,7 @@ void BSSpeedSamplerModifierUI::setSpeedOut(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::setspeedOut(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::setspeedOut(): The data is nullptr!!");
     }
 }
 
@@ -250,7 +250,7 @@ void BSSpeedSamplerModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -270,7 +270,7 @@ void BSSpeedSamplerModifierUI::selectTableToView(bool viewisProperty, const QStr
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -301,7 +301,7 @@ void BSSpeedSamplerModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -311,19 +311,19 @@ bool BSSpeedSamplerModifierUI::setBinding(int index, int row, const QString &var
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -332,7 +332,7 @@ bool BSSpeedSamplerModifierUI::setBinding(int index, int row, const QString &var
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -377,7 +377,7 @@ void BSSpeedSamplerModifierUI::setBindingVariable(int index, const QString &name
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -399,9 +399,9 @@ void BSSpeedSamplerModifierUI::loadBinding(int row, int colunm, hkbVariableBindi
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSpeedSamplerModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSpeedSamplerModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

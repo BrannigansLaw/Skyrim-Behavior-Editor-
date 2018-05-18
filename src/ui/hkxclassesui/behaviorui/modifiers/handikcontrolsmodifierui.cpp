@@ -91,7 +91,7 @@ void HandIkControlsModifierUI::addHand(){
         bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::addHand(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::addHand(): The data is nullptr!!");
     }
 }
 
@@ -111,7 +111,7 @@ void HandIkControlsModifierUI::removeHand(int index){
             return;
         }
     }else{
-        FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::removeHand(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::removeHand(): The data is nullptr!!");
     }
 }
 
@@ -132,10 +132,10 @@ void HandIkControlsModifierUI::loadData(HkxObject *data){
             }
             loadDynamicTableRows();
         }else{
-            FATAL_RUNTIME_ERROR(QString("HandIkControlsModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("HandIkControlsModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::loadData(): Attempting to load a null pointer!!");
+        CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::loadData(): Attempting to load a null pointer!!");
     }
     connectSignals();
 }
@@ -151,7 +151,7 @@ void HandIkControlsModifierUI::loadDynamicTableRows(){
             setRowItems(i, "Hand "+QString::number(j), "hkHand", "Remove", "Edit", "Double click to remove this Hand", "Double click to edit this Hand");
         }
     }else{
-        FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::loadDynamicTableRows(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::loadDynamicTableRows(): The data is nullptr!!");
     }
     //table->setSortingEnabled(true);
 }
@@ -185,19 +185,19 @@ bool HandIkControlsModifierUI::setBinding(int index, int row, const QString & va
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -206,7 +206,7 @@ bool HandIkControlsModifierUI::setBinding(int index, int row, const QString & va
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -227,7 +227,7 @@ void HandIkControlsModifierUI::setBindingVariable(int index, const QString & nam
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -245,7 +245,7 @@ void HandIkControlsModifierUI::setName(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -254,7 +254,7 @@ void HandIkControlsModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -287,11 +287,11 @@ void HandIkControlsModifierUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::viewSelectedChild(): Invalid index of range to view!!");
+                CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::viewSelectedChild(): Invalid index of range to view!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::viewSelectedChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -317,7 +317,7 @@ void HandIkControlsModifierUI::connectToTables(GenericTableWidget *variables, Ge
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -339,10 +339,10 @@ void HandIkControlsModifierUI::loadBinding(int row, int colunm, hkbVariableBindi
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -362,7 +362,7 @@ void HandIkControlsModifierUI::selectTableToView(bool viewproperties, const QStr
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -386,7 +386,7 @@ void HandIkControlsModifierUI::variableRenamed(const QString & name, int index){
             handUI->variableRenamed(name, index);
         }
     }else{
-        FATAL_RUNTIME_ERROR("HandIkControlsModifierUI::variableRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::variableRenamed(): The data is nullptr!!");
     }
 }
 

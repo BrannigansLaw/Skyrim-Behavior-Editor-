@@ -175,10 +175,10 @@ void BSSynchronizedClipGeneratorUI::loadData(HkxObject *data){
                 table->item(ANIMATION_BINDING_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR(QString("BSSynchronizedClipGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("BSSynchronizedClipGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSynchronizedClipGeneratorUI::loadData(): Attempting to load a null pointer!!");
+        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::loadData(): Attempting to load a null pointer!!");
     }
     connectSignals();
 }
@@ -192,7 +192,7 @@ void BSSynchronizedClipGeneratorUI::setName(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSynchronizedClipGeneratorUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -203,7 +203,7 @@ void BSSynchronizedClipGeneratorUI::setSyncAnimPrefix(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSynchronizedClipGeneratorUI::setSyncAnimPrefix(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::setSyncAnimPrefix(): The data is nullptr!!");
     }
 }
 
@@ -214,7 +214,7 @@ void BSSynchronizedClipGeneratorUI::setSyncClipIgnoreMarkPlacement(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSOffsetAnimationGeneratorUI::setSyncClipIgnoreMarkPlacement(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setSyncClipIgnoreMarkPlacement(): The data is nullptr!!");
     }
 }
 
@@ -225,7 +225,7 @@ void BSSynchronizedClipGeneratorUI::setGetToMarkTime(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSOffsetAnimationGeneratorUI::setGetToMarkTime(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setGetToMarkTime(): The data is nullptr!!");
     }
 }
 
@@ -236,7 +236,7 @@ void BSSynchronizedClipGeneratorUI::setMarkErrorThreshold(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSOffsetAnimationGeneratorUI::setMarkErrorThreshold(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setMarkErrorThreshold(): The data is nullptr!!");
     }
 }
 
@@ -247,7 +247,7 @@ void BSSynchronizedClipGeneratorUI::setLeadCharacter(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSOffsetAnimationGeneratorUI::setLeadCharacter(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setLeadCharacter(): The data is nullptr!!");
     }
 }
 
@@ -258,7 +258,7 @@ void BSSynchronizedClipGeneratorUI::setReorientSupportChar(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSOffsetAnimationGeneratorUI::setReorientSupportChar(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setReorientSupportChar(): The data is nullptr!!");
     }
 }
 
@@ -269,7 +269,7 @@ void BSSynchronizedClipGeneratorUI::setApplyMotionFromRoot(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSOffsetAnimationGeneratorUI::setApplyMotionFromRoot(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setApplyMotionFromRoot(): The data is nullptr!!");
     }
 }
 
@@ -280,7 +280,7 @@ void BSSynchronizedClipGeneratorUI::setAnimationBindingIndex(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSOffsetAnimationGeneratorUI::setAnimationBindingIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setAnimationBindingIndex(): The data is nullptr!!");
     }
 }
 
@@ -300,7 +300,7 @@ void BSSynchronizedClipGeneratorUI::selectTableToView(bool viewproperties, const
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSOffsetAnimationGeneratorUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -358,7 +358,7 @@ void BSSynchronizedClipGeneratorUI::viewSelectedChild(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSynchronizedClipGeneratorUI::viewSelectedChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -371,7 +371,7 @@ void BSSynchronizedClipGeneratorUI::setClipGenerator(int index, const QString & 
             indexOfGenerator = bsData->getIndexOfObj(static_cast<DataIconManager*>(bsData->pClipGenerator.data()));
             if (ptr){
                 if (name != ptr->getName()){
-                    FATAL_RUNTIME_ERROR("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
+                    CRITICAL_ERROR_MESSAGE("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
                     return;
                 }else if (ptr->getSignature() != HKB_CLIP_GENERATOR){
                     WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nInvalid object type selected! You must select a clip generator for the 'pClipGenerator' data field!!!");
@@ -384,7 +384,7 @@ void BSSynchronizedClipGeneratorUI::setClipGenerator(int index, const QString & 
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->pClipGenerator.data())), indexOfGenerator);
                 }else{
-                    FATAL_RUNTIME_ERROR("BSSynchronizedClipGeneratorUI::setClipGenerator(): The selected icon is nullptr!!");
+                    CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::setClipGenerator(): The selected icon is nullptr!!");
                     return;
                 }
             }
@@ -392,10 +392,10 @@ void BSSynchronizedClipGeneratorUI::setClipGenerator(int index, const QString & 
             table->item(CLIP_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            FATAL_RUNTIME_ERROR("BSSynchronizedClipGeneratorUI::setClipGenerator(): The 'behaviorView' pointer is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::setClipGenerator(): The 'behaviorView' pointer is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSynchronizedClipGeneratorUI::setClipGenerator(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::setClipGenerator(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -406,7 +406,7 @@ void BSSynchronizedClipGeneratorUI::loadBinding(int row, int colunm, hkbVariable
             QString varName;
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, false);
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
                     table->item(row, colunm)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
@@ -417,10 +417,10 @@ void BSSynchronizedClipGeneratorUI::loadBinding(int row, int colunm, hkbVariable
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("BSSynchronizedClipGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSynchronizedClipGeneratorUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -430,8 +430,8 @@ bool BSSynchronizedClipGeneratorUI::setBinding(int index, int row, const QString
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
@@ -447,7 +447,7 @@ bool BSSynchronizedClipGeneratorUI::setBinding(int index, int row, const QString
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSynchronizedClipGeneratorUI::setBinding(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::setBinding(): The 'bsData' pointer is nullptr!!");
         return false;
     }
     return true;
@@ -505,7 +505,7 @@ void BSSynchronizedClipGeneratorUI::setBindingVariable(int index, const QString 
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSSynchronizedClipGeneratorUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -521,7 +521,7 @@ void BSSynchronizedClipGeneratorUI::connectToTables(GenericTableWidget *generato
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("BSSynchronizedClipGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -565,7 +565,7 @@ void BSSynchronizedClipGeneratorUI::variableRenamed(const QString & name, int in
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSSynchronizedClipGeneratorUI::variableRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::variableRenamed(): The data is nullptr!!");
     }
 }
 

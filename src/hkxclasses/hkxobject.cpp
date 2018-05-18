@@ -15,6 +15,7 @@ HkxObject::HkxObject(HkxFile *parent, long ref)
     : parentFile(parent),
       dataValid(true),
       isWritten(false),
+      isMerged(false),
       reference(ref)
 {
     //
@@ -30,6 +31,16 @@ void HkxObject::setReference(int ref){
 
 long HkxObject::getReference() const{
     return reference;
+}
+
+bool HkxObject::getIsMerged() const
+{
+    return isMerged;
+}
+
+void HkxObject::setIsMerged(bool value)
+{
+    isMerged = value;
 }
 
 QString HkxObject::getReferenceString() const{
@@ -70,7 +81,7 @@ bool HkxObject::isDataValid()const{
     return dataValid;
 }
 
-bool HkxObject::evaulateDataValidity(){
+bool HkxObject::evaluateDataValidity(){
     //isDataValid = true;
     return true;
 }
@@ -93,6 +104,10 @@ bool HkxObject::readData(const HkxXmlReader & , long ){
 
 bool HkxObject::merge(HkxObject *){
     return false;
+}
+
+void HkxObject::mergeEventIndex(int, int){
+    //
 }
 
 bool HkxObject::isEventReferenced(int) const{
@@ -408,15 +423,15 @@ bool HkxSharedPtr::operator==(const HkxSharedPtr & other) const{
     }
     return false;
 }
-void HkxSharedPtr::setReference(long ref){
+void HkxSharedPtr::setShdPtrReference(long ref){
     reference = ref;
 }
 
-long HkxSharedPtr::getReference() const{
+long HkxSharedPtr::getShdPtrReference() const{
     return reference;
 }
 
-bool HkxSharedPtr::readReference(long index, const HkxXmlReader & reader){
+bool HkxSharedPtr::readShdPtrReference(long index, const HkxXmlReader & reader){
     bool ok = true;
     //need to remove the '#' from the reference string
     QByteArray temp = reader.getElementValueAt(index);
@@ -424,9 +439,9 @@ bool HkxSharedPtr::readReference(long index, const HkxXmlReader & reader){
         temp.remove(0, 1);
     }
     if (temp == "null"){
-        setReference(-1);
+        setShdPtrReference(-1);
     }else{
-        setReference(temp.toLong(&ok));
+        setShdPtrReference(temp.toLong(&ok));
     }
     if (!ok){
         return false;
@@ -463,11 +478,27 @@ bool HkDynamicObject::isVariableReferenced(int variableindex) const{
     return false;
 }
 
+bool HkDynamicObject::merge(HkxObject *recessiveObject){
+    hkbVariableBindingSet *obj = nullptr;
+    if (recessiveObject && recessiveObject->getSignature() == HKB_VARIABLE_BINDING_SET){
+        obj = static_cast<hkbVariableBindingSet *>(recessiveObject);
+        if (variableBindingSet.data()){
+            variableBindingSet.data()->merge(obj);
+        }else if (obj){
+            variableBindingSet = HkxSharedPtr(obj);
+            getParentFile()->addObjectToFile(obj, -1);
+        }
+        return true;
+    }else{
+        return false;
+    }
+}
+
 bool HkDynamicObject::linkVar(){
     if (!getParentFile()){
         return false;
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variableBindingSet.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variableBindingSet.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_VARIABLE_BINDING_SET){
             getParentFile()->writeToLog("HkDynamicObject: linkVar()!\nThe linked object is not a HKB_VARIABLE_BINDING_SET!\nRemoving the link to the invalid object!");
@@ -483,7 +514,7 @@ void HkDynamicObject::unlink(){
     variableBindingSet = HkxSharedPtr();
 }
 
-bool HkDynamicObject::evaulateDataValidity(){
+bool HkDynamicObject::evaluateDataValidity(){
     if (variableBindingSet.data() && variableBindingSet.data()->getSignature() != HKB_VARIABLE_BINDING_SET){
         setDataValidity(false);
         return false;

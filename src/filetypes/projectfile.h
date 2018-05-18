@@ -35,6 +35,10 @@ public:
     QString findAnimationNameFromEncryptedData(const QString & encryptedname) const;
     bool isProjectNameTaken() const;
     QString getProjectName() const;
+    qreal getAnimationDurationFromAnimData(const QString & animationname) const;
+    bool appendAnimation(SkyrimAnimationMotionData *motiondata);
+    SkyrimAnimationMotionData getAnimationMotionData(int animationindex) const;
+private:
 protected:
     bool parse();
     bool link();
@@ -42,6 +46,7 @@ protected:
 private:
     void removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *gentoignore);
     bool merge(ProjectFile *recessiveproject);
+    bool mergeAnimationCaches(ProjectFile *recessiveproject);
     void addProjectToAnimData();
     bool removeClipGenFromAnimData(const QString & animationname, const QString &clipname, const QString &variablename = "");
     bool removeAnimationFromAnimData(const QString & name);

@@ -110,7 +110,7 @@ void DelayedModifierUI::connectToTables(GenericTableWidget *modifiers, GenericTa
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("DelayedModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("DelayedModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -143,10 +143,10 @@ void DelayedModifierUI::loadData(HkxObject *data){
                 table->item(SECONDS_ELAPSED_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR(QString("DelayedModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("DelayedModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("DelayedModifierUI::loadData(): The data passed to the UI is nullptr!!!");
+        CRITICAL_ERROR_MESSAGE("DelayedModifierUI::loadData(): The data passed to the UI is nullptr!!!");
     }
     connectSignals();
 }
@@ -167,7 +167,7 @@ void DelayedModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("DelayedModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("DelayedModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -178,7 +178,7 @@ void DelayedModifierUI::setDelaySeconds(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("DelayedModifierUI::setDelaySeconds(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("DelayedModifierUI::setDelaySeconds(): The data is nullptr!!");
     }
 }
 
@@ -189,7 +189,7 @@ void DelayedModifierUI::setDurationSeconds(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("DelayedModifierUI::setDurationSeconds(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("DelayedModifierUI::setDurationSeconds(): The data is nullptr!!");
     }
 }
 
@@ -200,7 +200,7 @@ void DelayedModifierUI::setSecondsElapsed(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("DelayedModifierUI::setSecondsElapsed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("DelayedModifierUI::setSecondsElapsed(): The data is nullptr!!");
     }
 }
 
@@ -213,7 +213,7 @@ void DelayedModifierUI::setModifier(int index, const QString & name){
             indexOfModifier = bsData->getIndexOfObj(static_cast<DataIconManager*>(bsData->modifier.data()));
             if (ptr){
                 if (name != ptr->getName()){
-                    FATAL_RUNTIME_ERROR("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
+                    CRITICAL_ERROR_MESSAGE("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
                     return;
                 }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->modifier.data()), 0, ptr, false)){
                     WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
@@ -223,7 +223,7 @@ void DelayedModifierUI::setModifier(int index, const QString & name){
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->modifier.data())), indexOfModifier);
                 }else{
-                    FATAL_RUNTIME_ERROR("DelayedModifierUI::setModifier(): The selected icon is nullptr!!");
+                    CRITICAL_ERROR_MESSAGE("DelayedModifierUI::setModifier(): The selected icon is nullptr!!");
                     return;
                 }
             }
@@ -231,10 +231,10 @@ void DelayedModifierUI::setModifier(int index, const QString & name){
             table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(name);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            FATAL_RUNTIME_ERROR("DelayedModifierUI::setModifier(): The 'behaviorView' pointer is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("DelayedModifierUI::setModifier(): The 'behaviorView' pointer is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("DelayedModifierUI::setModifier(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("DelayedModifierUI::setModifier(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -256,10 +256,10 @@ void DelayedModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *
                 table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
             }
         }else{
-            FATAL_RUNTIME_ERROR("DelayedModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("DelayedModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("DelayedModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("DelayedModifierUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -269,19 +269,19 @@ bool DelayedModifierUI::setBinding(int index, int row, const QString & variableN
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("DelayedModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("DelayedModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("DelayedModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("DelayedModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -290,7 +290,7 @@ bool DelayedModifierUI::setBinding(int index, int row, const QString & variableN
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("DelayedModifierUI::setBinding(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("DelayedModifierUI::setBinding(): The 'bsData' pointer is nullptr!!");
         return false;
     }
     return true;
@@ -330,7 +330,7 @@ void DelayedModifierUI::setBindingVariable(int index, const QString & name){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("DelayedModifierUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("DelayedModifierUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -350,7 +350,7 @@ void DelayedModifierUI::selectTableToView(bool viewproperties, const QString & p
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("DelayedModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("DelayedModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -388,7 +388,7 @@ void DelayedModifierUI::viewSelected(int row, int column){
             emit viewModifiers(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData->modifier) + 1, QString(), QStringList());
         }
     }else{
-        FATAL_RUNTIME_ERROR("DelayedModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("DelayedModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -415,7 +415,7 @@ void DelayedModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("DelayedModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("DelayedModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -426,7 +426,7 @@ void DelayedModifierUI::modifierRenamed(const QString &name, int index){
             table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        FATAL_RUNTIME_ERROR("DelayedModifierUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("DelayedModifierUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 

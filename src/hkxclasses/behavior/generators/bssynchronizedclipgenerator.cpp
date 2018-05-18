@@ -81,7 +81,7 @@ bool BSSynchronizedClipGenerator::readData(const HkxXmlReader &reader, long inde
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -95,7 +95,7 @@ bool BSSynchronizedClipGenerator::readData(const HkxXmlReader &reader, long inde
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pClipGenerator"){
-            if (!pClipGenerator.readReference(index, reader)){
+            if (!pClipGenerator.readShdPtrReference(index, reader)){
                 writeToLog("BSiStateTaggingGenerator: readData()!\nFailed to properly read 'pClipGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "SyncAnimPrefix"){
@@ -193,7 +193,7 @@ bool BSSynchronizedClipGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pClipGenerator.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pClipGenerator.getShdPtrReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pClipGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
@@ -212,8 +212,8 @@ void BSSynchronizedClipGenerator::unlink(){
     pClipGenerator = HkxSharedPtr();
 }
 
-bool BSSynchronizedClipGenerator::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool BSSynchronizedClipGenerator::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (!pClipGenerator.data() || pClipGenerator.data()->getSignature() != HKB_CLIP_GENERATOR){
     }else if (name == ""){

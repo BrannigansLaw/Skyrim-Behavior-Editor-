@@ -15,13 +15,14 @@ public:
     virtual ~hkbEventRangeDataArray();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     int getLastEventDataIndex() const;
     bool write(HkxXMLWriter *writer);
     int getNumberOfRanges() const;
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
+    void mergeEventIndex(int oldindex, int newindex);
 protected:
 private:
     struct hkbEventRangeData

@@ -17,7 +17,7 @@ public:
     bool link();
     void unlink();
     QString getName() const;
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     int getNumberOfChildren() const;
     int getIndexToInsertIcon() const;
@@ -25,6 +25,7 @@ public:
     bool hasChildren() const;
     int getIndexOfChild(hkbBlenderGeneratorChild *child) const;
     bool isParametricBlend() const;
+    bool merge(HkxObject *recessiveObject);
     enum BlenderFlag{
         FLAG_NONE = 0,
         FLAG_SYNC = 1,

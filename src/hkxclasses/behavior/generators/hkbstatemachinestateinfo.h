@@ -20,18 +20,20 @@ public:
     bool link();
     void unlink();
     QString getName() const;
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
+    void mergeEventIndex(int oldindex, int newindex);
+    bool merge(HkxObject *recessiveObject);
 private:
     QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int, DataIconManager *obj);
     bool removeObjectAt(int index);
-    bool setStateId(ushort id);
+    bool setStateId(ulong id);
     hkbStateMachine * getParentStateMachine() const;
     hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&);
     hkbStateMachineStateInfo(const hkbStateMachineStateInfo &);
@@ -44,7 +46,7 @@ private:
     HkxSharedPtr transitions;
     HkxSharedPtr generator;
     QString name;
-    ushort stateId;
+    ulong stateId;
     qreal probability;
     bool enable;
 };

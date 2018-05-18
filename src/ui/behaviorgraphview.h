@@ -60,6 +60,7 @@ signals:
     void removedGenerator(int index);
     void removedModifier(int index);
 private slots:
+    //void focusOnIcon(const QString & name);
     void appendStateMachine();
     void appendState();
     void appendManualSelectorGenerator();

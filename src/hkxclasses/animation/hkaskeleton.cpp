@@ -168,7 +168,7 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){
                 localFrames.append(hkLocalFrame());
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                     if (text == "localFrame"){
-                        if (!localFrames.last().localFrame.readReference(index, reader)){
+                        if (!localFrames.last().localFrame.readShdPtrReference(index, reader)){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'localFrame' reference!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "lockTranslation"){
@@ -292,7 +292,7 @@ bool hkaSkeleton::link(){
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < localFrames.size(); i++){
-        ptr = static_cast<SkeletonFile *>(getParentFile())->findLocalFrame(localFrames.at(i).localFrame.getReference());
+        ptr = static_cast<SkeletonFile *>(getParentFile())->findLocalFrame(localFrames.at(i).localFrame.getShdPtrReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'localFrames' data field!\nObject Name: "+name);
             setDataValidity(false);
@@ -313,7 +313,7 @@ void hkaSkeleton::unlink(){
     }
 }
 
-bool hkaSkeleton::evaulateDataValidity(){
+bool hkaSkeleton::evaluateDataValidity(){
     for (int i = 0; i < localFrames.size(); i++){
         if (!localFrames.at(i).localFrame.data() || localFrames.at(i).localFrame.data()->getSignature() != HK_SIMPLE_LOCAL_FRAME){
             setDataValidity(false);

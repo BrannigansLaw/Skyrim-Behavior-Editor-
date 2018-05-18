@@ -205,7 +205,7 @@ void FootIkControlsModifierUI::addLeg(){
         bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::addRange(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::addRange(): The data is nullptr!!");
     }
 }
 
@@ -225,7 +225,7 @@ void FootIkControlsModifierUI::removeLeg(int index){
             return;
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::removeExpression(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::removeExpression(): The data is nullptr!!");
     }
 }
 
@@ -288,10 +288,10 @@ void FootIkControlsModifierUI::loadData(HkxObject *data){
             }
             loadDynamicTableRows();
         }else{
-            FATAL_RUNTIME_ERROR(QString("FootIkControlsModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("FootIkControlsModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::loadData(): Attempting to load a null pointer!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::loadData(): Attempting to load a null pointer!!");
     }
     connectSignals();
 }
@@ -307,7 +307,7 @@ void FootIkControlsModifierUI::loadDynamicTableRows(){
             setRowItems(i, "Leg "+QString::number(j), "hkLeg", "Remove", "Edit", "Double click to remove this Leg", "Double click to edit this Leg");
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::loadDynamicTableRows(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::loadDynamicTableRows(): The data is nullptr!!");
     }
     //table->setSortingEnabled(true);
 }
@@ -341,19 +341,19 @@ bool FootIkControlsModifierUI::setBinding(int index, int row, const QString & va
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -362,7 +362,7 @@ bool FootIkControlsModifierUI::setBinding(int index, int row, const QString & va
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -467,7 +467,7 @@ void FootIkControlsModifierUI::setBindingVariable(int index, const QString & nam
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -485,7 +485,7 @@ void FootIkControlsModifierUI::setName(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -494,7 +494,7 @@ void FootIkControlsModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -505,7 +505,7 @@ void FootIkControlsModifierUI::setonOffGain(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setonOffGain(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setonOffGain(): The data is nullptr!!");
     }
 }
 
@@ -516,7 +516,7 @@ void FootIkControlsModifierUI::setfootPlantedGain(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setfootPlantedGain(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setfootPlantedGain(): The data is nullptr!!");
     }
 }
 
@@ -527,7 +527,7 @@ void FootIkControlsModifierUI::setfootRaisedGain(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setfootRaisedGain(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setfootRaisedGain(): The data is nullptr!!");
     }
 }
 
@@ -538,7 +538,7 @@ void FootIkControlsModifierUI::setfootUnlockGain(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setfootUnlockGain(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setfootUnlockGain(): The data is nullptr!!");
     }
 }
 
@@ -549,7 +549,7 @@ void FootIkControlsModifierUI::setgroundAscendingGain(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setgroundAscendingGain(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setgroundAscendingGain(): The data is nullptr!!");
     }
 }
 
@@ -560,7 +560,7 @@ void FootIkControlsModifierUI::setgroundDescendingGain(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setgroundDescendingGain(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setgroundDescendingGain(): The data is nullptr!!");
     }
 }
 
@@ -571,7 +571,7 @@ void FootIkControlsModifierUI::setworldFromModelFeedbackGain(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setworldFromModelFeedbackGain(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setworldFromModelFeedbackGain(): The data is nullptr!!");
     }
 }
 
@@ -582,7 +582,7 @@ void FootIkControlsModifierUI::seterrorUpDownBias(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::seterrorUpDownBias(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::seterrorUpDownBias(): The data is nullptr!!");
     }
 }
 
@@ -593,7 +593,7 @@ void FootIkControlsModifierUI::setalignWorldFromModelGain(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setalignWorldFromModelGain(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setalignWorldFromModelGain(): The data is nullptr!!");
     }
 }
 
@@ -604,7 +604,7 @@ void FootIkControlsModifierUI::sethipOrientationGain(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::sethipOrientationGain(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::sethipOrientationGain(): The data is nullptr!!");
     }
 }
 
@@ -615,7 +615,7 @@ void FootIkControlsModifierUI::setmaxKneeAngleDifference(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setmaxKneeAngleDifference(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setmaxKneeAngleDifference(): The data is nullptr!!");
     }
 }
 
@@ -626,7 +626,7 @@ void FootIkControlsModifierUI::setankleOrientationGain(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setankleOrientationGain(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setankleOrientationGain(): The data is nullptr!!");
     }
 }
 
@@ -637,7 +637,7 @@ void FootIkControlsModifierUI::seterrorOutTranslation(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::seterrorOutTranslation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::seterrorOutTranslation(): The data is nullptr!!");
     }
 }
 
@@ -648,7 +648,7 @@ void FootIkControlsModifierUI::setalignWithGroundRotation(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::setalignWithGroundRotation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::setalignWithGroundRotation(): The data is nullptr!!");
     }
 }
 
@@ -765,11 +765,11 @@ void FootIkControlsModifierUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::viewSelectedChild(): Invalid index of range to view!!");
+                CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::viewSelectedChild(): Invalid index of range to view!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::viewSelectedChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -798,7 +798,7 @@ void FootIkControlsModifierUI::connectToTables(GenericTableWidget *variables, Ge
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -820,10 +820,10 @@ void FootIkControlsModifierUI::loadBinding(int row, int colunm, hkbVariableBindi
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -843,7 +843,7 @@ void FootIkControlsModifierUI::selectTableToView(bool viewproperties, const QStr
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -923,7 +923,7 @@ void FootIkControlsModifierUI::variableRenamed(const QString & name, int index){
             legUI->variableRenamed(name, index);
         }
     }else{
-        FATAL_RUNTIME_ERROR("FootIkControlsModifierUI::variableRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("FootIkControlsModifierUI::variableRenamed(): The data is nullptr!!");
     }
 }
 

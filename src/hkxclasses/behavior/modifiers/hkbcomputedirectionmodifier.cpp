@@ -45,7 +45,7 @@ bool hkbComputeDirectionModifier::readData(const HkxXmlReader &reader, long inde
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -175,8 +175,8 @@ void hkbComputeDirectionModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool hkbComputeDirectionModifier::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbComputeDirectionModifier::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else{

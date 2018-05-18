@@ -45,7 +45,7 @@ bool hkbDampingModifier::readData(const HkxXmlReader &reader, long index){
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -187,8 +187,8 @@ void hkbDampingModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool hkbDampingModifier::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbDampingModifier::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else{

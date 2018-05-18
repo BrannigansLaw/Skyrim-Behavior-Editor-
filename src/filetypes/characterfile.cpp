@@ -49,7 +49,7 @@ HkxSharedPtr * CharacterFile::findCharacterData(long ref){
 
 HkxSharedPtr * CharacterFile::findCharacterPropertyValues(long ref){
     for (int i = 0; i < boneWeightArrays.size(); i++){
-        if (boneWeightArrays.at(i).data() && boneWeightArrays.at(i).getReference() == ref){
+        if (boneWeightArrays.at(i).data() && boneWeightArrays.at(i).getShdPtrReference() == ref){
             return &boneWeightArrays[i];
         }
     }
@@ -206,6 +206,17 @@ void CharacterFile::getCharacterPropertyBoneWeightArray(const QString &name, hkb
     }
 }
 
+bool CharacterFile::merge(CharacterFile *recessivefile){
+    if (recessivefile){
+        if (!static_cast<hkbCharacterData *>(characterData.data())->merge(recessivefile->characterData.data())){
+            WARNING_MESSAGE("CharacterFile: merge() failed!\hkbCharacterData failed to merge!");
+        }else{
+            return true;
+        }
+    }
+    return false;
+}
+
 void CharacterFile::setSkeletonFile(SkeletonFile *skel){
     skeleton = skel;
 }
@@ -355,7 +366,7 @@ void CharacterFile::write(){
         if (mirroredSkeletonInfo.data()){
             mirroredSkeletonInfo.data()->setIsWritten(false);
         }else{
-            FATAL_RUNTIME_ERROR("CharacterFile::write(): no mirroredSkeletonInfo!!");
+            CRITICAL_ERROR_MESSAGE("CharacterFile::write(): no mirroredSkeletonInfo!!");
         }
         if (handIkDriverInfo.data()){
             handIkDriverInfo.data()->setIsWritten(false);
@@ -386,10 +397,10 @@ void CharacterFile::write(){
         }
         getWriter().setFile(this);
         if (!getWriter().writeToXMLFile()){
-            FATAL_RUNTIME_ERROR("CharacterFile::write(): writeToXMLFile() failed!!");
+            CRITICAL_ERROR_MESSAGE("CharacterFile::write(): writeToXMLFile() failed!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("CharacterFile::write(): The root object is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CharacterFile::write(): The root object is nullptr!!");
     }
 }
 

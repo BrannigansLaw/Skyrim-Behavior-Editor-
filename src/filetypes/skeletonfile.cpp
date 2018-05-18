@@ -16,7 +16,7 @@ SkeletonFile::SkeletonFile(MainWindow *window, const QString & name)
 
 HkxSharedPtr * SkeletonFile::findSkeleton(long ref){
     for (int i = 0; i < skeletons.size(); i++){
-        if (skeletons.at(i).data() && skeletons.at(i).getReference() == ref){
+        if (skeletons.at(i).data() && skeletons.at(i).getShdPtrReference() == ref){
             return &skeletons[i];
         }
     }
@@ -25,7 +25,7 @@ HkxSharedPtr * SkeletonFile::findSkeleton(long ref){
 
 HkxSharedPtr * SkeletonFile::findLocalFrame(long ref){
     for (int i = 0; i < localFrames.size(); i++){
-        if (localFrames.at(i).data() && localFrames.at(i).getReference() == ref){
+        if (localFrames.at(i).data() && localFrames.at(i).getShdPtrReference() == ref){
             return &localFrames[i];
         }
     }

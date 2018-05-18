@@ -254,7 +254,7 @@ void hkbFootIkDriverInfo::unlink(){
     //
 }
 
-bool hkbFootIkDriverInfo::evaulateDataValidity(){
+bool hkbFootIkDriverInfo::evaluateDataValidity(){
     if (!legs.isEmpty()){
         setDataValidity(true);
         return true;

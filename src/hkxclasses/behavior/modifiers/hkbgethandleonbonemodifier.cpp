@@ -38,7 +38,7 @@ bool hkbGetHandleOnBoneModifier::readData(const HkxXmlReader &reader, long index
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -57,7 +57,7 @@ bool hkbGetHandleOnBoneModifier::readData(const HkxXmlReader &reader, long index
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "handleOut"){
-            if (!handleOut.readReference(index, reader)){
+            if (!handleOut.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'handleOut' reference!\nObject Reference: "+ref);
             }
         }else if (text == "localFrameName"){
@@ -130,8 +130,8 @@ void hkbGetHandleOnBoneModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool hkbGetHandleOnBoneModifier::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbGetHandleOnBoneModifier::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (handleOut.data()){

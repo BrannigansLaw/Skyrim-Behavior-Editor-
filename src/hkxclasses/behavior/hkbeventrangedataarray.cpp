@@ -68,7 +68,7 @@ bool hkbEventRangeDataArray::readData(const HkxXmlReader &reader, long index){
                             return false;
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "payload"){
-                        if (!eventData.last().event.payload.readReference(index, reader)){
+                        if (!eventData.last().event.payload.readShdPtrReference(index, reader)){
                             return false;
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "eventMode"){
@@ -154,13 +154,21 @@ void hkbEventRangeDataArray::updateEventIndices(int eventindex){
     }
 }
 
+void hkbEventRangeDataArray::mergeEventIndex(int oldindex, int newindex){
+    for (auto i = 0; i < eventData.size(); i++){
+        if (eventData.at(i).event.id == oldindex){
+            eventData[i].event.id = newindex;
+        }
+    }
+}
+
 bool hkbEventRangeDataArray::link(){
     if (!getParentFile()){
         return false;
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < eventData.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventData.at(i).event.payload.getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventData.at(i).event.payload.getShdPtrReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 return false;
@@ -171,7 +179,7 @@ bool hkbEventRangeDataArray::link(){
     return true;
 }
 
-bool hkbEventRangeDataArray::evaulateDataValidity(){
+bool hkbEventRangeDataArray::evaluateDataValidity(){
     for (int i = 0; i < eventData.size(); i++){
         if (eventData.at(i).event.payload.data() && eventData.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             setDataValidity(false);

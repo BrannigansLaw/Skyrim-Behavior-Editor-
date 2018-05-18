@@ -59,7 +59,7 @@ bool ProjectFile::readAnimationData(const QString & filename, const QStringList 
         delete animfile;
         animfile = new QFile(QDir::currentPath()+"/animationdatasinglefile.txt");
         if (!animfile->exists()){
-            FATAL_RUNTIME_ERROR("animationdatasinglefile.txt is missing from the application directory!");
+            CRITICAL_ERROR_MESSAGE("animationdatasinglefile.txt is missing from the application directory!");
         }
     }
     bool result = true;
@@ -70,7 +70,7 @@ bool ProjectFile::readAnimationData(const QString & filename, const QStringList 
     }
     if (!result){
         delete animfile;
-        FATAL_RUNTIME_ERROR("ProjectFile::readAnimationData(): The project animation data file could not be parsed!!!");
+        CRITICAL_ERROR_MESSAGE("ProjectFile::readAnimationData(): The project animation data file could not be parsed!!!");
     }
     delete animfile;
     projectIndex = skyrimAnimData->getProjectIndex(projectname);
@@ -83,12 +83,12 @@ bool ProjectFile::readAnimationSetData(const QString & filename){
         delete animsetfile;
         animsetfile = new QFile(QDir::currentPath()+"/animationsetdatasinglefile.txt");
         if (!animsetfile->exists()){
-            FATAL_RUNTIME_ERROR("animationsetdatasinglefile.txt is missing from the application directory!");
+            CRITICAL_ERROR_MESSAGE("animationsetdatasinglefile.txt is missing from the application directory!");
         }
     }
     if (!skyrimAnimSetData->parse(animsetfile)){
         delete animsetfile;
-        FATAL_RUNTIME_ERROR("ProjectFile::readAnimationSetData(): The project animation set data file could not be parsed!!!");
+        CRITICAL_ERROR_MESSAGE("ProjectFile::readAnimationSetData(): The project animation set data file could not be parsed!!!");
     }
     delete animsetfile;
     return true;
@@ -113,14 +113,14 @@ QString ProjectFile::getCharacterFilePathAt(int index) const{
 }
 
 HkxSharedPtr * ProjectFile::findProjectData(long ref){
-    if (projectData.getReference() == ref){
+    if (projectData.getShdPtrReference() == ref){
         return &projectData;
     }
     return nullptr;
 }
 
 HkxSharedPtr * ProjectFile::findProjectStringData(long ref){
-    if (stringData.getReference() == ref){
+    if (stringData.getShdPtrReference() == ref){
         return &stringData;
     }
     return nullptr;
@@ -250,23 +250,34 @@ void ProjectFile::removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *g
         }
     }
     ui->removeBehaviorGraphs(filestoremove);
+    for (auto i = filestoremove.size() - 1; i > -1; i--){
+        skyrimAnimData->removeBehaviorFromProject(projectName, filestoremove.at(i));
+    }
 }
 
 bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update event and variable indices when merging!!!
     bool value = false;
+    bool found;
     if (recessiveproject){
         QList <BehaviorFile *> dominantbehaviors(behaviorFiles);
         QList <BehaviorFile *> recessivebehaviors(recessiveproject->behaviorFiles);
         QVector <HkxObject *> objectsnotfound;
         QString objname;
+        //TO DO: Merge character file...
+        //recessiveproject->character->merge(character);  //Done for FNIS...
+        character = recessiveproject->character;
+        //std::vector <std::thread> threads;
         if (!QString::compare(projectName, recessiveproject->projectName, Qt::CaseInsensitive)){
-            for (auto i = 0; i < dominantbehaviors.size(); i++){
-                for (auto j = recessivebehaviors.size(); j < -1; j--){
+            for (auto i = 0; i < dominantbehaviors.size() - 1; i++){
+                for (auto j = recessivebehaviors.size() - 1; j > -1; j--){
                     if (!QString::compare(dominantbehaviors.at(i)->fileName().section("/", -1, -1), recessivebehaviors.at(j)->fileName().section("/", -1, -1), Qt::CaseInsensitive)){
+                        //threads.push_back(std::thread(&BehaviorFile::merge, dominantbehaviors.at(i), recessivebehaviors.at(j)));
                         objectsnotfound = dominantbehaviors.at(i)->merge(recessivebehaviors.at(j));
-                        recessivebehaviors.removeAt(j);
-                        for (auto k = 0; k < recessivebehaviors.size() && !objectsnotfound.isEmpty(); k++){
-                            recessivebehaviors.at(k)->merge(objectsnotfound);
+                        //recessivebehaviors.removeAt(j);
+                        for (auto k = 0; k < dominantbehaviors.size() && !objectsnotfound.isEmpty(); k++){
+                            if (k != i){
+                                dominantbehaviors.at(k)->mergeObjects(objectsnotfound);
+                            }
                         }
                         for (auto k = 0; k < objectsnotfound.size(); k++){
                             if (objectsnotfound.at(k)->getType() == HkxObject::TYPE_GENERATOR){
@@ -274,7 +285,7 @@ bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update ev
                             }else if (objectsnotfound.at(k)->getType() == HkxObject::TYPE_MODIFIER){
                                 objname = static_cast<hkbModifier *>(objectsnotfound.at(k))->getName();
                             }else{
-                                FATAL_RUNTIME_ERROR(QString("ProjectFile: merge(): Attempting to merge invalid object type!!!"));
+                                CRITICAL_ERROR_MESSAGE(QString("ProjectFile: merge(): Attempting to merge invalid object type!!!"));
                             }
                             writeToLog("ProjectFile: merge(): The object type \""+QString::number(objectsnotfound.at(k)->getSignature(), 16)
                                        +"\" named \""+objname+"\" was not found in the recessive behavior!!!");
@@ -282,7 +293,36 @@ bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update ev
                     }
                 }
             }
+            /*for (int k = 0; k < threads.size(); k++){
+                if (threads.at(k).joinable()){
+                    threads.at(k).join();
+                }else{
+                    CRITICAL_ERROR_MESSAGE(QString("ProjectFile::merge(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data());
+                }
+            }
+            threads.clear();*/
             value = true;
+            setIsChanged(true);
+            character->setIsChanged(true);
+            for (auto i = 0; i < recessivebehaviors.size(); i++){
+                found = false;
+                for (auto j = 0; j < behaviorFiles.size(); j++){
+                    if (!QString::compare(behaviorFiles.at(j)->fileName(), recessivebehaviors.at(i)->fileName(), Qt::CaseInsensitive)){
+                        found = true;
+                    }
+                }
+                if (!found){
+                    recessivebehaviors.at(i)->setFileName(fileName().section("/", 0, -2)+"/behaviors/"+recessivebehaviors.at(i)->fileName().section("/", -1, -1));
+                    behaviorFiles.append(recessivebehaviors.at(i));
+                }
+            }
+            for (auto j = 0; j < behaviorFiles.size(); j++){
+                behaviorFiles.at(j)->setIsChanged(true);
+            }
+            //return false;
+            /*if (!mergeAnimationCaches(recessiveproject)){
+                writeToLog("ProjectFile: merge() failed!\nmergeAnimationCaches() failed!\n");
+            }*/
         }else{
             writeToLog("ProjectFile: merge() failed!\nProject names are different!\n");
         }
@@ -290,6 +330,21 @@ bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update ev
         writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
     }
     return value;
+}
+
+bool ProjectFile::mergeAnimationCaches(ProjectFile *recessiveproject){
+    if (recessiveproject){
+        if (skyrimAnimSetData && recessiveproject->skyrimAnimSetData){
+            if (skyrimAnimSetData->mergeAnimationCaches(projectName, recessiveproject->projectName, recessiveproject->skyrimAnimSetData)){
+                return true;
+            }
+        }else{
+            writeToLog("ProjectFile: merge() failed!\n skyrimAnimSetData or recessiveproject->skyrimAnimSetData is nullptr!\n");
+        }
+    }else{
+        writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
+    }
+    return false;
 }
 
 void ProjectFile::addProjectToAnimData(){   //Unsafe...
@@ -323,7 +378,7 @@ void ProjectFile::setAnimationIndexDuration(int indexofanimationlist, int animat
             project->animationMotionData.at(indexofanimationlist)->duration = duration;
         }
     }else{
-        FATAL_RUNTIME_ERROR("ProjectFile::setAnimationIndexDuration(): skyrimAnimData->getProjectAnimData Failed!");
+        CRITICAL_ERROR_MESSAGE("ProjectFile::setAnimationIndexDuration(): skyrimAnimData->getProjectAnimData Failed!");
     }
 }
 
@@ -352,7 +407,13 @@ void ProjectFile::loadEncryptedAnimationNames(){
 }
 
 void ProjectFile::addEncryptedAnimationName(const QString &unencryptedname){
-    encryptedAnimationNames.append(HkCRC().compute(unencryptedname.section("\\", -1, -1).toLower().replace(".hkx", "").toLocal8Bit()));
+    bool ok;
+    QString animationhash = HkCRC().compute(unencryptedname.section("\\", -1, -1).toLower().replace(".hkx", "").toLocal8Bit());
+    animationhash = QString::number(animationhash.toInt(&ok));
+    if (!ok){
+        CRITICAL_ERROR_MESSAGE("AnimCacheAnimSetData::removeAnimationFromCache(): animation hash is invalid!!!");
+    }
+    encryptedAnimationNames.append(animationhash);
 }
 
 void ProjectFile::removeEncryptedAnimationName(int index){
@@ -411,17 +472,17 @@ QString ProjectFile::findAnimationNameFromEncryptedData(const QString &encrypted
     if (!ok){
         value2 = encryptedname.toULongLong(&ok, 16);
         if (!ok){
-            FATAL_RUNTIME_ERROR("ProjectFile::findAnimationNameFromEncryptedData(): encryptedname.toULong(&ok, 10) Failed!");
+            CRITICAL_ERROR_MESSAGE("ProjectFile::findAnimationNameFromEncryptedData(): encryptedname.toULong(&ok, 10) Failed!");
         }
     }
     for (int i = 0; i < encryptedAnimationNames.size(); i++){
         value1 = encryptedAnimationNames.at(i).toULongLong(&ok, 16);
         if (!ok){
-            FATAL_RUNTIME_ERROR("ProjectFile::findAnimationNameFromEncryptedData(): encryptedAnimationNames.at(i).toULong(&ok, 16) Failed!");
+            CRITICAL_ERROR_MESSAGE("ProjectFile::findAnimationNameFromEncryptedData(): encryptedAnimationNames.at(i).toULong(&ok, 16) Failed!");
         }
         if (value1 == value2){
             if (!character){
-                FATAL_RUNTIME_ERROR("ProjectFile::findAnimationNameFromEncryptedData(): character is nullptr!");
+                CRITICAL_ERROR_MESSAGE("ProjectFile::findAnimationNameFromEncryptedData(): character is nullptr!");
             }
             return character->getAnimationNameAt(i).toLower().section("\\", -1, -1).replace(".hkx", "");
         }
@@ -435,6 +496,24 @@ bool ProjectFile::isProjectNameTaken() const{
 
 QString ProjectFile::getProjectName() const{
     return projectName;
+}
+
+qreal ProjectFile::getAnimationDurationFromAnimData(const QString &animationname) const{
+    if (character){
+        return skyrimAnimData->getAnimationDurationFromAnimData(projectName, character->getAnimationIndex(animationname));
+    }
+    return 0;
+}
+
+bool ProjectFile::appendAnimation(SkyrimAnimationMotionData *motiondata){
+    if (!motiondata){
+        return false;
+    }
+    return skyrimAnimData->appendAnimation(projectName, motiondata);
+}
+
+SkyrimAnimationMotionData ProjectFile::getAnimationMotionData(int animationindex) const{
+    return skyrimAnimData->getAnimationMotionData(projectName, animationindex);
 }
 
 bool ProjectFile::appendClipGeneratorAnimData(const QString &name){
@@ -500,6 +579,11 @@ void ProjectFile::write(){
 }
 
 ProjectFile::~ProjectFile(){
+    for (int i = 0; i < behaviorFiles.size(); i++){
+        if (behaviorFiles.at(i)){
+            delete behaviorFiles.at(i);
+        }
+    }
     if (character){
         delete character;
     }
@@ -508,10 +592,5 @@ ProjectFile::~ProjectFile(){
     }
     if (skyrimAnimSetData){
         delete skyrimAnimSetData;
-    }
-    for (int i = 0; i < behaviorFiles.size(); i++){
-        if (behaviorFiles.at(i)){
-            delete behaviorFiles.at(i);
-        }
     }
 }

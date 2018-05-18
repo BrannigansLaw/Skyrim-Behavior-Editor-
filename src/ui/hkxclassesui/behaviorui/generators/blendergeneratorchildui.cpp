@@ -137,10 +137,10 @@ void BlenderGeneratorChildUI::loadData(HkxObject *data, int childindex){
                 weight->setMinimum(std::numeric_limits<int>::min());
             }
         }else{
-            FATAL_RUNTIME_ERROR(QString("BlenderGeneratorChildUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorChildUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::loadData(): The data passed to the UI is nullptr!!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::loadData(): The data passed to the UI is nullptr!!!");
     }
     connectSignals();
 }
@@ -163,10 +163,10 @@ void BlenderGeneratorChildUI::loadBinding(int row, int colunm, hkbVariableBindin
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -179,10 +179,10 @@ void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
             ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
             if (ptr){
                 if (name != ptr->getName()){
-                    FATAL_RUNTIME_ERROR("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
+                    CRITICAL_ERROR_MESSAGE("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
                     return;
                 }else if (!gen){
-                    FATAL_RUNTIME_ERROR("The currently loaded 'hkbBlenderGeneratorChild' has no parent 'hkbBlenderGenerator' or 'hkbPoseMatchingGenerator'!!!");
+                    CRITICAL_ERROR_MESSAGE("The currently loaded 'hkbBlenderGeneratorChild' has no parent 'hkbBlenderGenerator' or 'hkbPoseMatchingGenerator'!!!");
                     return;
                 }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generator.data()), 0, ptr, false)){
                     WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
@@ -192,7 +192,7 @@ void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->generator.data())), childIndex);
                 }else{
-                    FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::setGenerator(): The selected icon is nullptr!!");
+                    CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::setGenerator(): The selected icon is nullptr!!");
                     return;
                 }
             }
@@ -201,10 +201,10 @@ void BlenderGeneratorChildUI::setGenerator(int index, const QString & name){
             bsData->getParentFile()->setIsChanged(true);
             emit returnToParent(true);
         }else{
-            FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::setGenerator(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::setGenerator(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -214,8 +214,8 @@ void BlenderGeneratorChildUI::setBinding(int index, int row, const QString & var
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (type == VARIABLE_TYPE_POINTER){
                 if (varBind){
                     varBind->removeBinding(path);
@@ -241,7 +241,7 @@ void BlenderGeneratorChildUI::setBinding(int index, int row, const QString & var
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::setBinding(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::setBinding(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -273,7 +273,7 @@ void BlenderGeneratorChildUI::setBindingVariable(int index, const QString & name
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -284,7 +284,7 @@ void BlenderGeneratorChildUI::setWeight(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::setWeight(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::setWeight(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -295,7 +295,7 @@ void BlenderGeneratorChildUI::setWorldFromModelWeight(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::setWorldFromModelWeight(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::setWorldFromModelWeight(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -304,7 +304,7 @@ void BlenderGeneratorChildUI::viewBoneWeights(){
         boneWeightArrayUI->loadData(bsData->boneWeights.data());
         setCurrentIndex(BONE_WEIGHT_ARRAY_WIDGET);
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::viewBoneWeights(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::viewBoneWeights(): The data is nullptr!!");
     }
 }
 
@@ -317,7 +317,7 @@ void BlenderGeneratorChildUI::toggleBoneWeights(bool enable){
             bsData->boneWeights = HkxSharedPtr(new hkbBoneWeightArray(bsData->getParentFile(), -1, static_cast<BehaviorFile *>(bsData->getParentFile())->getNumberOfBones()));
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::toggleBoneWeights(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::toggleBoneWeights(): The data is nullptr!!");
     }
 }
 
@@ -337,7 +337,7 @@ void BlenderGeneratorChildUI::selectTableToView(bool viewproperties, const QStri
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -370,7 +370,7 @@ void BlenderGeneratorChildUI::viewSelected(int row, int column){
             emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1, QString(), list);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -417,7 +417,7 @@ void BlenderGeneratorChildUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -428,7 +428,7 @@ void BlenderGeneratorChildUI::generatorRenamed(const QString &name, int index){
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -448,6 +448,6 @@ void BlenderGeneratorChildUI::connectToTables(GenericTableWidget *generators, Ge
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }

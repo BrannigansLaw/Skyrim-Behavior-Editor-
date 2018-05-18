@@ -112,7 +112,7 @@ void BSRagdollContactListenerModifierUI::connectToTables(GenericTableWidget *var
         connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(boneIndexUI, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -150,10 +150,10 @@ void BSRagdollContactListenerModifierUI::loadData(HkxObject *data){
                 table->item(ENABLE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::loadData(): The data is an incorrect type!!");
+            CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -167,7 +167,7 @@ void BSRagdollContactListenerModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -176,7 +176,7 @@ void BSRagdollContactListenerModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -189,7 +189,7 @@ void BSRagdollContactListenerModifierUI::setContactEventId(int index, const QStr
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::setcontactEventId(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::setcontactEventId(): The data is nullptr!!");
     }
 }
 
@@ -210,7 +210,7 @@ void BSRagdollContactListenerModifierUI::setContactEventPayload(){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::setcontactEventPayload(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::setcontactEventPayload(): The data is nullptr!!");
     }
 }
 
@@ -227,7 +227,7 @@ void BSRagdollContactListenerModifierUI::toggleBones(bool enable){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::toggleBones(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::toggleBones(): The data is nullptr!!");
     }
 }
 
@@ -236,7 +236,7 @@ void BSRagdollContactListenerModifierUI::viewBones(){
         boneIndexUI->loadData(bsData->bones.data());
         setCurrentIndex(BONE_INDEX_WIDGET);
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::viewBones(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::viewBones(): The data is nullptr!!");
     }
 }
 
@@ -258,7 +258,7 @@ void BSRagdollContactListenerModifierUI::viewSelected(int row, int column){
             emit viewEvents(bsData->contactEvent.id + 1, QString(), QStringList());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -278,7 +278,7 @@ void BSRagdollContactListenerModifierUI::selectTableToView(bool viewisProperty, 
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -289,7 +289,7 @@ void BSRagdollContactListenerModifierUI::eventRenamed(const QString & name, int 
             table->item(CONTACT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::eventRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -304,7 +304,7 @@ void BSRagdollContactListenerModifierUI::variableRenamed(const QString & name, i
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -314,19 +314,19 @@ bool BSRagdollContactListenerModifierUI::setBinding(int index, int row, const QS
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -335,7 +335,7 @@ bool BSRagdollContactListenerModifierUI::setBinding(int index, int row, const QS
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -356,7 +356,7 @@ void BSRagdollContactListenerModifierUI::setBindingVariable(int index, const QSt
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -378,10 +378,10 @@ void BSRagdollContactListenerModifierUI::loadBinding(int row, int colunm, hkbVar
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSRagdollContactListenerModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSRagdollContactListenerModifierUI::loadBinding(): The data is nullptr!!");
     }
 }
 

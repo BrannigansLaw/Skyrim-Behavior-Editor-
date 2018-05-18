@@ -24,7 +24,7 @@ bool AnimationFile::parse(){
     bool ok = true;
     duration = value.toFloat(&ok);
     if (!ok){
-        FATAL_RUNTIME_ERROR("AnimationFile::parse(): The animation duration was not found!");
+        CRITICAL_ERROR_MESSAGE("AnimationFile::parse(): The animation duration was not found!");
     }
     return ok;
 }

@@ -56,7 +56,9 @@ TreeGraphicsItem::~TreeGraphicsItem(){
     itemData->removeIcon(this);
     if (scene()){
         scene()->removeItem(this);
-        //scene()->removeItem(path);
+        /*if (path->scene()){
+            scene()->removeItem(path);
+        }*/
     }
     delete path;
     setParentItem(nullptr);
@@ -271,7 +273,7 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
             children[i]->setParentItem(nullptr);
         }
         if (children.removeAll(this) != 1){
-            FATAL_RUNTIME_ERROR("TreeGraphicsItem::setParent(): Error!!!");
+            CRITICAL_ERROR_MESSAGE("TreeGraphicsItem::setParent(): Error!!!");
         }
         for (int i = 0; i < children.size(); i++){
             children[i]->setParentItem(oldParent);
@@ -302,7 +304,7 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
         }
         reposition();
     }else{
-        FATAL_RUNTIME_ERROR("TreeGraphicsItem::setParent(): Error!!!");
+        CRITICAL_ERROR_MESSAGE("TreeGraphicsItem::setParent(): Error!!!");
     }
     return (TreeGraphicsItem *)oldParent;
 }

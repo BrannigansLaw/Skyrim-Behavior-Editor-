@@ -67,7 +67,7 @@ void EventUI::loadData(BehaviorFile *parentFile, hkEventPayload * event){
             eventPayload->setText("");
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventUI::loadData(): Behavior file or event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("EventUI::loadData(): Behavior file or event data is null!!!");
     }
     connectSignals();
 }
@@ -86,7 +86,7 @@ void EventUI::setEvent(int index, const QString & name){
         selectEvent->setText(name);
         file->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("EventUI::setEvent(): Behavior file or event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("EventUI::setEvent(): Behavior file or event data is null!!!");
     }
 }
 
@@ -107,7 +107,7 @@ void EventUI::setEventPayload(){
         }
         file->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("EventUI::setEventPayload(): Behavior file or event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("EventUI::setEventPayload(): Behavior file or event data is null!!!");
     }
 }
 
@@ -115,7 +115,7 @@ void EventUI::emitViewEvent(){
     if (eventData){
         emit viewEvents(eventData->id + 1, QString(), QStringList());
     }else{
-        FATAL_RUNTIME_ERROR("EventUI::emitViewEvent(): Event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("EventUI::emitViewEvent(): Event data is null!!!");
     }
 }
 
@@ -125,6 +125,6 @@ void EventUI::eventRenamed(const QString & name, int index){
             selectEvent->setText(name);
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventUI::eventRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventUI::eventRenamed(): The data is nullptr!!");
     }
 }

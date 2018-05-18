@@ -126,7 +126,7 @@ void BSEventEveryNEventsModifierUI::connectToTables(GenericTableWidget *variable
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -177,10 +177,10 @@ void BSEventEveryNEventsModifierUI::loadData(HkxObject *data){
                 table->item(RANDOMIZE_NUMBER_OF_EVENTS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::loadData(): The data is an incorrect type!!");
+            CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -194,7 +194,7 @@ void BSEventEveryNEventsModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -203,7 +203,7 @@ void BSEventEveryNEventsModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -216,7 +216,7 @@ void BSEventEveryNEventsModifierUI::setEventToCheckForId(int index, const QStrin
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::seteventToCheckForId(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::seteventToCheckForId(): The data is nullptr!!");
     }
 }
 
@@ -237,7 +237,7 @@ void BSEventEveryNEventsModifierUI::setEventToCheckForPayload(){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::seteventToCheckForPayload(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::seteventToCheckForPayload(): The data is nullptr!!");
     }
 }
 
@@ -250,7 +250,7 @@ void BSEventEveryNEventsModifierUI::setEventToSendId(int index, const QString &n
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::setEventToSendId(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::setEventToSendId(): The data is nullptr!!");
     }
 }
 
@@ -271,7 +271,7 @@ void BSEventEveryNEventsModifierUI::setEventToSendPayload(){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::setEventToSendPayload(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::setEventToSendPayload(): The data is nullptr!!");
     }
 }
 
@@ -282,7 +282,7 @@ void BSEventEveryNEventsModifierUI::setNumberOfEventsBeforeSend(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::setnumberOfEventsBeforeSend(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::setnumberOfEventsBeforeSend(): The data is nullptr!!");
     }
 }
 
@@ -293,7 +293,7 @@ void BSEventEveryNEventsModifierUI::setMinimumNumberOfEventsBeforeSend(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::setminimumNumberOfEventsBeforeSend(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::setminimumNumberOfEventsBeforeSend(): The data is nullptr!!");
     }
 }
 
@@ -302,7 +302,7 @@ void BSEventEveryNEventsModifierUI::setRandomizeNumberOfEvents(){
         bsData->randomizeNumberOfEvents = randomizeNumberOfEvents->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::setrandomizeNumberOfEvents(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::setrandomizeNumberOfEvents(): The data is nullptr!!");
     }
 }
 
@@ -359,7 +359,7 @@ void BSEventEveryNEventsModifierUI::viewSelected(int row, int column){
             emit viewEvents(bsData->eventToSend.id + 1, QString(), QStringList());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -379,7 +379,7 @@ void BSEventEveryNEventsModifierUI::selectTableToView(bool viewisProperty, const
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -393,7 +393,7 @@ void BSEventEveryNEventsModifierUI::eventRenamed(const QString & name, int index
             table->item(EVENT_TO_SEND_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::eventRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -420,7 +420,7 @@ void BSEventEveryNEventsModifierUI::variableRenamed(const QString & name, int in
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -430,19 +430,19 @@ bool BSEventEveryNEventsModifierUI::setBinding(int index, int row, const QString
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -451,7 +451,7 @@ bool BSEventEveryNEventsModifierUI::setBinding(int index, int row, const QString
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -490,7 +490,7 @@ void BSEventEveryNEventsModifierUI::setBindingVariable(int index, const QString 
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -512,10 +512,10 @@ void BSEventEveryNEventsModifierUI::loadBinding(int row, int colunm, hkbVariable
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSEventEveryNEventsModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSEventEveryNEventsModifierUI::loadBinding(): The data is nullptr!!");
     }
 }
 

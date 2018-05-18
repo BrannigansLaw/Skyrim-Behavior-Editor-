@@ -95,7 +95,7 @@ bool hkbModifierGenerator::readData(const HkxXmlReader &reader, long index){
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -109,11 +109,11 @@ bool hkbModifierGenerator::readData(const HkxXmlReader &reader, long index){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "modifier"){
-            if (!modifier.readReference(index, reader)){
+            if (!modifier.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'modifier' reference!\nObject Reference: "+ref);
             }
         }else if (text == "generator"){
-            if (!generator.readReference(index, reader)){
+            if (!generator.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'generator' reference!\nObject Reference: "+ref);
             }
         }
@@ -173,7 +173,7 @@ bool hkbModifierGenerator::link(){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
-    ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifier.getReference());
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifier.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_MODIFIER){
             writeToLog(getClassname()+": link()!\n'modifier' data field is linked to invalid child!\nObject Name: "+name);
@@ -181,7 +181,7 @@ bool hkbModifierGenerator::link(){
         }
         modifier = *ptr;
     }
-    ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(generator.getReference());
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(generator.getShdPtrReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'generator' data field!\nObject Name: "+name);
         setDataValidity(false);
@@ -201,8 +201,8 @@ void hkbModifierGenerator::unlink(){
     generator = HkxSharedPtr();
 }
 
-bool hkbModifierGenerator::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbModifierGenerator::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (modifier.data() && modifier.data()->getType() != HkxObject::TYPE_MODIFIER){
     }else if (!generator.data() || generator.data()->getType() != HkxObject::TYPE_GENERATOR){

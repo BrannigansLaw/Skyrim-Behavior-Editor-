@@ -70,10 +70,10 @@ void BehaviorGraphUI::loadData(HkxObject *data){
                 table->item(ROOT_GENERATOR_ROW, VALUE_COLUMN)->setText("NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR("BehaviorGraphUI::loadData(): The data is an incorrect type!!");
+            CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BehaviorGraphUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::loadData(): The data is nullptr!!");
     }
     blockSignals(false);
 }
@@ -86,7 +86,7 @@ void BehaviorGraphUI::setName(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BehaviorGraphUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -95,7 +95,7 @@ void BehaviorGraphUI::setVariableMode(int index){
         bsData->variableMode = bsData->VariableMode.at(index);
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BehaviorGraphUI::setVariableMode(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::setVariableMode(): The data is nullptr!!");
     }
 }
 
@@ -105,11 +105,11 @@ void BehaviorGraphUI::viewSelectedChild(int row, int column){
             if (bsData->getParentFile()){
                 emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->rootGenerator) + 1, hkbStateMachine::getClassname(), QStringList());
             }else{
-                FATAL_RUNTIME_ERROR("BehaviorGraphUI::viewSelectedChild(): The parent file is nullptr!!");
+                CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::viewSelectedChild(): The parent file is nullptr!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("StateMachineUI::viewSelectedChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("StateMachineUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -121,7 +121,7 @@ void BehaviorGraphUI::setRootGenerator(int index, const QString &name){
             ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
             if (ptr){
                 if (name != ptr->getName()){
-                    FATAL_RUNTIME_ERROR("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
+                    CRITICAL_ERROR_MESSAGE("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
                     return;
                 }else if (ptr->getSignature() != HKB_STATE_MACHINE){
                     WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nThe selected object is not a hkbStateMachine!!!");
@@ -134,7 +134,7 @@ void BehaviorGraphUI::setRootGenerator(int index, const QString &name){
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->rootGenerator.data())), indexOfGenerator);
                 }else{
-                    FATAL_RUNTIME_ERROR("BehaviorGraphUI::setGenerator(): The selected icon is nullptr!!");
+                    CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::setGenerator(): The selected icon is nullptr!!");
                     return;
                 }
             }
@@ -142,10 +142,10 @@ void BehaviorGraphUI::setRootGenerator(int index, const QString &name){
             table->item(ROOT_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            FATAL_RUNTIME_ERROR("BehaviorGraphUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BehaviorGraphUI::setGenerator(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::setGenerator(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -159,6 +159,6 @@ void BehaviorGraphUI::connectToTables(GenericTableWidget *generators){
         connect(generators, SIGNAL(elementSelected(int,QString)), this, SLOT(setRootGenerator(int,QString)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewGenerators(int,QString,QStringList)), generators, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("BehaviorGraphUI::connectToTables(): The argument is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::connectToTables(): The argument is nullptr!!");
     }
 }

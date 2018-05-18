@@ -60,7 +60,7 @@ bool hkbStateMachineEventPropertyArray::readData(const HkxXmlReader &reader, lon
                             return false;
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "payload"){
-                        if (!events.last().payload.readReference(index, reader)){
+                        if (!events.last().payload.readShdPtrReference(index, reader)){
                             return false;
                         }
                         index++;
@@ -131,13 +131,43 @@ void hkbStateMachineEventPropertyArray::updateEventIndices(int eventindex){
     }
 }
 
+void hkbStateMachineEventPropertyArray::mergeEventIndex(int oldindex, int newindex){
+    for (auto i = 0; i < events.size(); i++){
+        if (events.at(i).id == oldindex){
+            events[i].id = newindex;
+        }
+    }
+}
+
+bool hkbStateMachineEventPropertyArray::merge(HkxObject *recessiveObject){
+    bool found;
+    hkbStateMachineEventPropertyArray *obj = nullptr;
+    if (recessiveObject && recessiveObject->getSignature() == HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
+        obj = static_cast<hkbStateMachineEventPropertyArray *>(recessiveObject);
+        for (auto i = 0; i < obj->events.size(); i++){
+            found = false;
+            for (auto j = 0; j < events.size(); j++){
+                if (events.at(j).id == obj->events.at(i).id){
+                    found = true;
+                }
+            }
+            if (!found){
+                events.append(obj->events.at(i));
+            }
+        }
+        return true;
+    }else{
+        return false;
+    }
+}
+
 bool hkbStateMachineEventPropertyArray::link(){
     if (!getParentFile()){
         return false;
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < events.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(events.at(i).payload.getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(events.at(i).payload.getShdPtrReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 return false;
@@ -154,7 +184,7 @@ void hkbStateMachineEventPropertyArray::unlink(){
     }
 }
 
-bool hkbStateMachineEventPropertyArray::evaulateDataValidity(){
+bool hkbStateMachineEventPropertyArray::evaluateDataValidity(){
     for (int i = 0; i < events.size(); i++){
         if (events.at(i).payload.data() && events.at(i).payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             setDataValidity(false);

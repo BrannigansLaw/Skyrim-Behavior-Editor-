@@ -20,7 +20,7 @@ public:
     virtual ~hkbExpressionDataArray();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     void addExpression(const QString & exp = "", ExpressionEventMode mode = EVENT_MODE_SEND_ONCE);
     void removeExpression(const QString & exp);

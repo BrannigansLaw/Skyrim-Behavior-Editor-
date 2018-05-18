@@ -42,7 +42,7 @@ bool hkbGeneratorTransitionEffect::readData(const HkxXmlReader &reader, long ind
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+":  readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -66,7 +66,7 @@ bool hkbGeneratorTransitionEffect::readData(const HkxXmlReader &reader, long ind
                 writeToLog(getClassname()+":  readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "transitionGenerator"){
-            if (!transitionGenerator.readReference(index, reader)){
+            if (!transitionGenerator.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+":  readData()!\nFailed to properly read 'transitionGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "blendInDuration"){
@@ -136,7 +136,7 @@ bool hkbGeneratorTransitionEffect::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+":  link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(transitionGenerator.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(transitionGenerator.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_GENERATOR){
             writeToLog(getClassname()+": linkVar()!\nThe linked object is not a TYPE_GENERATOR!");
@@ -152,8 +152,8 @@ void hkbGeneratorTransitionEffect::unlink(){
     transitionGenerator = HkxSharedPtr();
 }
 
-bool hkbGeneratorTransitionEffect::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbGeneratorTransitionEffect::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (!SelfTransitionMode.contains(selfTransitionMode)){
     }else if (!EventMode.contains(eventMode)){

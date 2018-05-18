@@ -126,7 +126,7 @@ void ClipTriggerUI::loadData(BehaviorFile *parentFile, hkbClipGenerator *parent,
         acyclic->setChecked(bsData->acyclic);
         isAnnotation->setChecked(bsData->isAnnotation);
     }else{
-        FATAL_RUNTIME_ERROR("ClipTriggerUI::loadData(): Behavior file, parent clip generator or event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::loadData(): Behavior file, parent clip generator or event data is null!!!");
     }
     connectSignals();
 }
@@ -149,7 +149,7 @@ void ClipTriggerUI::setEventId(int index, const QString & name){
             file->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("ClipTriggerUI::setEventId(): Behavior file or event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::setEventId(): Behavior file or event data is null!!!");
     }
 }
 
@@ -174,30 +174,43 @@ void ClipTriggerUI::setEventPayload(){
         }
         file->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("ClipTriggerUI::setEventPayload(): Behavior file or event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::setEventPayload(): Behavior file or event data is null!!!");
     }
 }
 
 void ClipTriggerUI::setLocalTime(){
+    qreal trigtime;
     if (bsData && file){
         if (bsData->localTime != localTime->value()){
             bsData->localTime = localTime->value();
-            file->setLocalTimeForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, localTime->value());
+            if (bsData->relativeToEndOfClip){
+                trigtime = localTime->value() + file->getAnimationDurationFromAnimData(parentClipGen->getAnimationName());
+            }else{
+                trigtime = localTime->value();
+            }
+            file->setLocalTimeForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, trigtime);
             file->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("ClipTriggerUI::setLocalTime(): Behavior file or event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::setLocalTime(): Behavior file or event data is null!!!");
     }
 }
 
 void ClipTriggerUI::setRelativeToEndOfClip(){
+    qreal trigtime;
     if (bsData && file){
         if (bsData->relativeToEndOfClip != relativeToEndOfClip->isChecked()){
             bsData->relativeToEndOfClip = relativeToEndOfClip->isChecked();
+            if (bsData->relativeToEndOfClip){
+                trigtime = localTime->value() + file->getAnimationDurationFromAnimData(parentClipGen->getAnimationName());
+            }else{
+                trigtime = localTime->value();
+            }
+            file->setLocalTimeForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, trigtime);
             file->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("ClipTriggerUI::setRelativeToEndOfClip(): Behavior file or event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::setRelativeToEndOfClip(): Behavior file or event data is null!!!");
     }
 }
 
@@ -208,7 +221,7 @@ void ClipTriggerUI::setAcyclic(){
             file->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("ClipTriggerUI::setAcyclic(): Behavior file or event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::setAcyclic(): Behavior file or event data is null!!!");
     }
 }
 
@@ -219,7 +232,7 @@ void ClipTriggerUI::setIsAnnotation(){
             file->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("ClipTriggerUI::setIsAnnotation(): Behavior file or event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::setIsAnnotation(): Behavior file or event data is null!!!");
     }
 }
 
@@ -229,7 +242,7 @@ void ClipTriggerUI::viewSelectedChild(int row, int column){
             emit viewEvents(bsData->event.id + 1, QString(), QStringList());
         }
     }else{
-        FATAL_RUNTIME_ERROR("ClipTriggerUI::viewSelectedChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -239,6 +252,6 @@ void ClipTriggerUI::eventRenamed(const QString & name, int index){
             table->item(EVENT_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        FATAL_RUNTIME_ERROR("ClipTriggerUI::eventRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ClipTriggerUI::eventRenamed(): The data is nullptr!!");
     }
 }

@@ -105,7 +105,7 @@ void ProjectUI::loadData(){
         characterProperties->loadData(project->character->getCharacterData());
         int index = project->skyrimAnimData->getProjectIndex(project->fileName().section("/", -1, -1));
         if (index == -1){
-            FATAL_RUNTIME_ERROR("ProjectUI::loadData(): getProjectIndex failed!");
+            CRITICAL_ERROR_MESSAGE("ProjectUI::loadData(): getProjectIndex failed!");
         }
         animations->loadData(project->character->stringData.data(), project->skyrimAnimData->animData.at(index));//UNSAFE....
         skeleton->loadData(project->character->skeleton->skeletons.first().data());

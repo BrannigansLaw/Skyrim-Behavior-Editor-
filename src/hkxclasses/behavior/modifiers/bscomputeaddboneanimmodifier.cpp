@@ -37,7 +37,7 @@ bool BSComputeAddBoneAnimModifier::readData(const HkxXmlReader &reader, long ind
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -125,8 +125,8 @@ void BSComputeAddBoneAnimModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool BSComputeAddBoneAnimModifier::evaulateDataValidity(){  //Check bone index???
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool BSComputeAddBoneAnimModifier::evaluateDataValidity(){  //Check bone index???
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else{

@@ -15,11 +15,10 @@ public:
     bool link();
     bool readData(const HkxXmlReader & reader, long index);
     void unlink();
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    bool merge(hkRootLevelContainer *other);
     void addVariant(const QString & name);
     void setVariantAt(int index, HkxObject *ptr);
     hkRootLevelContainer& operator=(const hkRootLevelContainer&);

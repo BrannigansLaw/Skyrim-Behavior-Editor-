@@ -34,13 +34,14 @@ public:
     void writeToLog(const QString & message, bool isError = false);
     HkxSignature getSignature() const;
     HkxType getType() const;
-    virtual bool evaulateDataValidity();
+    virtual bool evaluateDataValidity();
     bool isDataValid() const;
     virtual bool link() = 0;
     virtual void unlink();
     virtual bool write(HkxXMLWriter *);
     virtual bool readData(const HkxXmlReader &, long);
     virtual bool merge(HkxObject *);
+    virtual void mergeEventIndex(int, int);
     virtual bool isEventReferenced(int ) const;
     virtual bool isVariableReferenced(int ) const;
     virtual void updateEventIndices(int);
@@ -62,6 +63,8 @@ protected:
     bool getIsWritten() const;
     void setReference(int ref);
     long getReference() const;
+    bool getIsMerged() const;
+    void setIsMerged(bool value);
 private:
     HkxObject(const HkxObject &obj);
     HkxObject& operator=(const HkxObject&);
@@ -72,6 +75,7 @@ private:
     HkxType typeCheck;
     bool dataValid;
     bool isWritten;
+    bool isMerged;
 };
 
 class HkxSharedPtr: public QExplicitlySharedDataPointer <HkxObject>
@@ -79,9 +83,9 @@ class HkxSharedPtr: public QExplicitlySharedDataPointer <HkxObject>
 public:
     HkxSharedPtr(HkxObject *obj = nullptr, long ref = -1);
     bool operator==(const HkxSharedPtr & other) const;
-    void setReference(long ref);
-    long getReference() const;
-    bool readReference(long index, const HkxXmlReader & reader);
+    void setShdPtrReference(long ref);
+    long getShdPtrReference() const;
+    bool readShdPtrReference(long index, const HkxXmlReader & reader);
 private:
     long reference;
 };
@@ -98,11 +102,12 @@ public:
     virtual ~HkDynamicObject();
     bool linkVar();
     void unlink();
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     void addBinding(const QString & path, int varIndex, bool isProperty = false);
     void removeBinding(const QString & path);
     void removeBinding(int varIndex);
     bool isVariableReferenced(int variableindex) const;
+    bool merge(HkxObject *recessiveObject);
 protected:
     HkDynamicObject(HkxFile *parent, long ref = -1);
 public:

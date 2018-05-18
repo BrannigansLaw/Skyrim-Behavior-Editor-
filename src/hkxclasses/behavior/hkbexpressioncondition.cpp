@@ -59,7 +59,7 @@ bool hkbExpressionCondition::write(HkxXMLWriter *writer){
     return true;
 }
 
-bool hkbExpressionCondition::evaulateDataValidity(){
+bool hkbExpressionCondition::evaluateDataValidity(){
     if (expression == ""){
         setDataValidity(false);
         return false;

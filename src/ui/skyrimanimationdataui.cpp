@@ -97,7 +97,7 @@ void SkyrimAnimationDataUI::loadData(SkyrimAnimationMotionData *data){
         duration->setValue(bsData->duration);
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("SkyrimAnimationDataUI::loadData(): The data is nullptr or an incorrect type!!");
+        CRITICAL_ERROR_MESSAGE("SkyrimAnimationDataUI::loadData(): The data is nullptr or an incorrect type!!");
     }
     connectSignals();
 }
@@ -130,7 +130,7 @@ void SkyrimAnimationDataUI::loadDynamicTableRows(){
             setRowItems(i, "Rotation "+QString::number(j), "hkQuaternion", "Remove", "Edit", "Double click to remove this quaternion", "Double click to edit this quaternion");
         }
     }else{
-        FATAL_RUNTIME_ERROR("SkyrimAnimationDataUI::loadDynamicTableRows(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SkyrimAnimationDataUI::loadDynamicTableRows(): The data is nullptr!!");
     }
 }
 
@@ -164,7 +164,7 @@ void SkyrimAnimationDataUI::setDuration(){
             //bsData->getParentFile()->toggleChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("SkyrimAnimationDataUI::setduration(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SkyrimAnimationDataUI::setduration(): The data is nullptr!!");
     }
 }
 
@@ -173,7 +173,7 @@ void SkyrimAnimationDataUI::addTranslation(){
         bsData->addTranslation();
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("SkyrimAnimationDataUI::addEnterEvent(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SkyrimAnimationDataUI::addEnterEvent(): The data is nullptr!!");
     }
 }
 
@@ -182,7 +182,7 @@ void SkyrimAnimationDataUI::removeTranslation(int index){
         bsData->removeTranslation(index);
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("SkyrimAnimationDataUI::removeEnterEvent(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SkyrimAnimationDataUI::removeEnterEvent(): The data is nullptr!!");
     }
 }
 
@@ -191,7 +191,7 @@ void SkyrimAnimationDataUI::addRotation(){
         bsData->addRotation();
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("SkyrimAnimationDataUI::addExitEvent(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SkyrimAnimationDataUI::addExitEvent(): The data is nullptr!!");
     }
 }
 
@@ -200,7 +200,7 @@ void SkyrimAnimationDataUI::removeRotation(int index){
         bsData->removeRotation(index);
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("SkyrimAnimationDataUI::removeExitEvent(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SkyrimAnimationDataUI::removeExitEvent(): The data is nullptr!!");
     }
 }
 
@@ -223,7 +223,7 @@ void SkyrimAnimationDataUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                FATAL_RUNTIME_ERROR("SkyrimAnimationDataUI::viewSelectedChild(): Invalid index of child to view!!");
+                CRITICAL_ERROR_MESSAGE("SkyrimAnimationDataUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }else if (row > rotationsButtonRow && row < table->rowCount()){
             result = row - BASE_NUMBER_OF_ROWS - bsData->translations.size();
@@ -237,11 +237,11 @@ void SkyrimAnimationDataUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                FATAL_RUNTIME_ERROR("SkyrimAnimationDataUI::viewSelectedChild(): Invalid index of child to view!!");
+                CRITICAL_ERROR_MESSAGE("SkyrimAnimationDataUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("SkyrimAnimationDataUI::viewSelectedChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SkyrimAnimationDataUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 

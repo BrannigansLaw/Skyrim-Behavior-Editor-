@@ -40,7 +40,7 @@ bool hkbExtractRagdollPoseModifier::readData(const HkxXmlReader &reader, long in
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -128,8 +128,8 @@ void hkbExtractRagdollPoseModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool hkbExtractRagdollPoseModifier::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbExtractRagdollPoseModifier::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else{

@@ -25,6 +25,7 @@ signals:
 private slots:
     void setBoneWeight();
     void loadBoneWeight(int row, int);
+    void invert();
 private:
     static QStringList headerLabels;
     hkbBoneWeightArray *bsData;
@@ -34,6 +35,7 @@ private:
     QLabel *label;
     DoubleSpinBox *selectedBone;
     QCheckBox *setAllCB;
+    QPushButton *invertAllPB;
 };
 
 #endif // BONEWEIGHTARRAYUI_H

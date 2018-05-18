@@ -128,7 +128,7 @@ void ComputeRotationToTargetModifierUI::connectToTables(GenericTableWidget *vari
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -168,10 +168,10 @@ void ComputeRotationToTargetModifierUI::loadData(HkxObject *data){
                 table->item(RESULT_IS_DELTA_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::loadData(): The data is an incorrect type!!");
+            CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -185,7 +185,7 @@ void ComputeRotationToTargetModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -194,7 +194,7 @@ void ComputeRotationToTargetModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -205,7 +205,7 @@ void ComputeRotationToTargetModifierUI::setRotationOut(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::setrotationOut(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setrotationOut(): The data is nullptr!!");
     }
 }
 
@@ -216,7 +216,7 @@ void ComputeRotationToTargetModifierUI::setTargetPosition(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::settargetPosition(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::settargetPosition(): The data is nullptr!!");
     }
 }
 
@@ -227,7 +227,7 @@ void ComputeRotationToTargetModifierUI::setCurrentPosition(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::setcurrentPosition(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setcurrentPosition(): The data is nullptr!!");
     }
 }
 
@@ -238,7 +238,7 @@ void ComputeRotationToTargetModifierUI::setCurrentRotation(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::setcurrentRotation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setcurrentRotation(): The data is nullptr!!");
     }
 }
 
@@ -249,7 +249,7 @@ void ComputeRotationToTargetModifierUI::setLocalAxisOfRotation(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::setlocalAxisOfRotation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setlocalAxisOfRotation(): The data is nullptr!!");
     }
 }
 
@@ -260,7 +260,7 @@ void ComputeRotationToTargetModifierUI::setLocalFacingDirection(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::setlocalFacingDirection(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setlocalFacingDirection(): The data is nullptr!!");
     }
 }
 
@@ -269,7 +269,7 @@ void ComputeRotationToTargetModifierUI::setResultIsDelta(){
         bsData->resultIsDelta = resultIsDelta->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::setresultIsDelta(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setresultIsDelta(): The data is nullptr!!");
     }
 }
 
@@ -331,7 +331,7 @@ void ComputeRotationToTargetModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -351,7 +351,7 @@ void ComputeRotationToTargetModifierUI::selectTableToView(bool viewisProperty, c
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -394,7 +394,7 @@ void ComputeRotationToTargetModifierUI::variableRenamed(const QString & name, in
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -404,19 +404,19 @@ bool ComputeRotationToTargetModifierUI::setBinding(int index, int row, const QSt
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -425,7 +425,7 @@ bool ComputeRotationToTargetModifierUI::setBinding(int index, int row, const QSt
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -488,7 +488,7 @@ void ComputeRotationToTargetModifierUI::setBindingVariable(int index, const QStr
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -510,9 +510,9 @@ void ComputeRotationToTargetModifierUI::loadBinding(int row, int colunm, hkbVari
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("ComputeRotationToTargetModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

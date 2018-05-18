@@ -188,7 +188,7 @@ bool hkbProjectStringData::link(){
     return true;
 }
 
-bool hkbProjectStringData::evaulateDataValidity(){
+bool hkbProjectStringData::evaluateDataValidity(){
     for (int i = 0; i < animationFilenames.size(); i++){
         if (animationFilenames.at(i) == ""){
             setDataValidity(false);

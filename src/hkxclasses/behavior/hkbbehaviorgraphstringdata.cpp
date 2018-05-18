@@ -179,7 +179,7 @@ bool hkbBehaviorGraphStringData::link(){
     return true;
 }
 
-bool hkbBehaviorGraphStringData::evaulateDataValidity(){
+bool hkbBehaviorGraphStringData::evaluateDataValidity(){
     for (int i = 0; i < eventNames.size(); i++){
         if (eventNames.at(i) == ""){
             setDataValidity(false);

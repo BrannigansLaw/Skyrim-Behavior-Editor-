@@ -108,10 +108,10 @@ void BSBoneSwitchGeneratorBoneDataUI::loadData(HkxObject *data, int childindex){
                 table->item(BONE_WEIGHTS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR(QString("BSBoneSwitchGeneratorBoneDataUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorBoneDataUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneDataUI::loadData(): The data passed to the UI is nullptr!!!");
+        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::loadData(): The data passed to the UI is nullptr!!!");
     }
     connectSignals();
 }
@@ -123,7 +123,7 @@ void BSBoneSwitchGeneratorBoneDataUI::loadBinding(int row, int colunm, hkbVariab
             QString varName;
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, false);
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
                     table->item(row, colunm)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
@@ -134,10 +134,10 @@ void BSBoneSwitchGeneratorBoneDataUI::loadBinding(int row, int colunm, hkbVariab
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneDataUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneDataUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -150,10 +150,10 @@ void BSBoneSwitchGeneratorBoneDataUI::setGenerator(int index, const QString & na
             ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
             if (ptr){
                 if (name != ptr->getName()){
-                    FATAL_RUNTIME_ERROR("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
+                    CRITICAL_ERROR_MESSAGE("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
                     return;
                 }/*else if (!gen){
-                    FATAL_RUNTIME_ERROR("The currently loaded 'hkbBlenderGeneratorChild' has no parent 'hkbBlenderGenerator' or 'hkbPoseMatchingGenerator'!!!");
+                    CRITICAL_ERROR_MESSAGE("The currently loaded 'hkbBlenderGeneratorChild' has no parent 'hkbBlenderGenerator' or 'hkbPoseMatchingGenerator'!!!");
                     return;
                 }*/else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->pGenerator.data()), 0, ptr, false)){
                     WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
@@ -163,7 +163,7 @@ void BSBoneSwitchGeneratorBoneDataUI::setGenerator(int index, const QString & na
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->pGenerator.data())), childIndex);
                 }else{
-                    FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneDataUI::setGenerator(): The selected icon is nullptr!!");
+                    CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::setGenerator(): The selected icon is nullptr!!");
                     return;
                 }
             }
@@ -172,10 +172,10 @@ void BSBoneSwitchGeneratorBoneDataUI::setGenerator(int index, const QString & na
             bsData->getParentFile()->setIsChanged(true);
             emit returnToParent(true);
         }else{
-            FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneDataUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneDataUI::setGenerator(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::setGenerator(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -185,8 +185,8 @@ bool BSBoneSwitchGeneratorBoneDataUI::setBinding(int index, int row, const QStri
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (type == VARIABLE_TYPE_POINTER){
                 if (varBind){
                     varBind->removeBinding(path);
@@ -223,7 +223,7 @@ bool BSBoneSwitchGeneratorBoneDataUI::setBinding(int index, int row, const QStri
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneDataUI::setBinding(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::setBinding(): The 'bsData' pointer is nullptr!!");
         return false;
     }
     return true;
@@ -245,7 +245,7 @@ void BSBoneSwitchGeneratorBoneDataUI::setBindingVariable(int index, const QStrin
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneDataUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -254,7 +254,7 @@ void BSBoneSwitchGeneratorBoneDataUI::viewBoneWeights(){
         boneWeightArrayUI->loadData(bsData->spBoneWeight.data());
         setCurrentIndex(BONE_WEIGHT_ARRAY_WIDGET);
     }else{
-        FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneDataUI::viewBoneWeights(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::viewBoneWeights(): The data is nullptr!!");
     }
 }
 
@@ -267,7 +267,7 @@ void BSBoneSwitchGeneratorBoneDataUI::toggleBoneWeights(bool enable){
             bsData->spBoneWeight = HkxSharedPtr(new hkbBoneWeightArray(bsData->getParentFile(), -1, static_cast<BehaviorFile *>(bsData->getParentFile())->getNumberOfBones()));
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneDataUI::toggleBoneWeights(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::toggleBoneWeights(): The data is nullptr!!");
     }
 }
 
@@ -287,7 +287,7 @@ void BSBoneSwitchGeneratorBoneDataUI::selectTableToView(bool viewproperties, con
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneDataUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -308,7 +308,7 @@ void BSBoneSwitchGeneratorBoneDataUI::viewSelected(int row, int column){
             emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pGenerator) + 1, QString(), list);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneDataUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -327,7 +327,7 @@ void BSBoneSwitchGeneratorBoneDataUI::variableRenamed(const QString & name, int 
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneDataUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -338,7 +338,7 @@ void BSBoneSwitchGeneratorBoneDataUI::generatorRenamed(const QString &name, int 
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSBoneSwitchGeneratorBoneDataUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -378,6 +378,6 @@ void BSBoneSwitchGeneratorBoneDataUI::connectToTables(GenericTableWidget *genera
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }

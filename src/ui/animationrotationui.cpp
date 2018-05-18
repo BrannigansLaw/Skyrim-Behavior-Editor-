@@ -117,7 +117,7 @@ void AnimationRotationUI::loadData(SkyrimAnimationRotation *quaternion, qreal ma
         z->setValue(axisAngleRot.z);
         angle->setValue(axisAngleRot.w);
     }else{
-        FATAL_RUNTIME_ERROR("AnimationRotationUI::loadData(): Data is null!!!");
+        CRITICAL_ERROR_MESSAGE("AnimationRotationUI::loadData(): Data is null!!!");
     }
     connectSignals();
 }
@@ -129,7 +129,7 @@ void AnimationRotationUI::setLocalTime(){
             //file->toggleChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("AnimationRotationUI::setlocalTime(): Data is null!!!");
+        CRITICAL_ERROR_MESSAGE("AnimationRotationUI::setlocalTime(): Data is null!!!");
     }
 }
 
@@ -138,7 +138,7 @@ void AnimationRotationUI::setX(qreal xval){
         bsData->x = xval*sin(angle->value()/2);
         //file->toggleChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("AnimationRotationUI::setx(): Data is null!!!");
+        CRITICAL_ERROR_MESSAGE("AnimationRotationUI::setx(): Data is null!!!");
     }
 }
 
@@ -147,7 +147,7 @@ void AnimationRotationUI::setY(qreal yval){
         bsData->y = yval*sin(angle->value()/2);
         //file->toggleChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("AnimationRotationUI::sety(): Data is null!!!");
+        CRITICAL_ERROR_MESSAGE("AnimationRotationUI::sety(): Data is null!!!");
     }
 }
 
@@ -156,7 +156,7 @@ void AnimationRotationUI::setZ(qreal zval){
         bsData->z = zval*sin(angle->value()/2);
         //file->toggleChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("AnimationRotationUI::setz(): Data is null!!!");
+        CRITICAL_ERROR_MESSAGE("AnimationRotationUI::setz(): Data is null!!!");
     }
 }
 
@@ -165,6 +165,6 @@ void AnimationRotationUI::setAngle(qreal wval){
         bsData->w = cos(wval/2);
         //file->toggleChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("AnimationRotationUI::setz(): Data is null!!!");
+        CRITICAL_ERROR_MESSAGE("AnimationRotationUI::setz(): Data is null!!!");
     }
 }

@@ -55,10 +55,10 @@ void BoneIndexArrayUI::loadData(HkxObject *data){
             bsData = static_cast<hkbBoneIndexArray *>(data);
             loadDynamicTableRows();
         }else{
-            FATAL_RUNTIME_ERROR(QString("BoneIndexArrayUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("BoneIndexArrayUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BoneIndexArrayUI::loadData(): The data passed to the UI is nullptr!!!");
+        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::loadData(): The data passed to the UI is nullptr!!!");
     }
     connectSignals();
 }
@@ -80,7 +80,7 @@ void BoneIndexArrayUI::loadDynamicTableRows(){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BoneIndexArrayUI::loadDynamicTableRows(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::loadDynamicTableRows(): The data is nullptr!!");
     }
     //table->setSortingEnabled(true);
 }
@@ -109,7 +109,7 @@ void BoneIndexArrayUI::connectToTables(GenericTableWidget *ragdollBones){
         connect(ragdollBones, SIGNAL(elementSelected(int,QString)), this, SLOT(setRagdollBone(int,QString)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("BoneIndexArrayUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -129,11 +129,11 @@ void BoneIndexArrayUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                FATAL_RUNTIME_ERROR("BoneIndexArrayUI::viewSelectedChild(): Invalid index of bone to view!!");
+                CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::viewSelectedChild(): Invalid index of bone to view!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BoneIndexArrayUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -149,19 +149,19 @@ void BoneIndexArrayUI::setRagdollBone(int index, const QString &name){
                     if (table->item(table->currentRow(), NAME_COLUMN)){
                         table->item(table->currentRow(), NAME_COLUMN)->setText(name);
                     }else{
-                        FATAL_RUNTIME_ERROR("BoneIndexArrayUI::setRagdollBone(): Table row does not exist!!");
+                        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::setRagdollBone(): Table row does not exist!!");
                     }
                 }else{
                     removeRagdollBone(row);
                 }
             }else{
-                FATAL_RUNTIME_ERROR("BoneIndexArrayUI::setRagdollBone(): Invalid bone index!!");
+                CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::setRagdollBone(): Invalid bone index!!");
             }
         }else{
-            FATAL_RUNTIME_ERROR("BoneIndexArrayUI::setRagdollBone(): Bone name is an empty string!!");
+            CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::setRagdollBone(): Bone name is an empty string!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BoneIndexArrayUI::setRagdollBone(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::setRagdollBone(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -171,7 +171,7 @@ void BoneIndexArrayUI::addRagdollBone(){
         bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("BoneIndexArrayUI::addRagdollBone(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::addRagdollBone(): The data is nullptr!!");
     }
 }
 
@@ -185,6 +185,6 @@ void BoneIndexArrayUI::removeRagdollBone(int index){
         }
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("BoneIndexArrayUI::removeRagdollBone(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::removeRagdollBone(): The data is nullptr!!");
     }
 }

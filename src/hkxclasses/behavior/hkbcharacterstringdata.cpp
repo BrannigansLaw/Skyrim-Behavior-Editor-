@@ -319,7 +319,7 @@ bool hkbCharacterStringData::link(){
     return true;
 }
 
-bool hkbCharacterStringData::evaulateDataValidity(){
+bool hkbCharacterStringData::evaluateDataValidity(){
     for (int i = 0; i < deformableSkinNames.size(); i++){
         if (deformableSkinNames.at(i) == ""){
             setDataValidity(false);

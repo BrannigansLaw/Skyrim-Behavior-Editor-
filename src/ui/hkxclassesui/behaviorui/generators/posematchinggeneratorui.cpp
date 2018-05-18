@@ -310,7 +310,7 @@ void PoseMatchingGeneratorUI::loadTableValue(int row, const QString &value){
             table->item(row, VALUE_COLUMN)->setText("NONE");
         }
     }else{
-        FATAL_RUNTIME_ERROR("StateMachineUI::loadTableValue(): There is no table item here!!");
+        CRITICAL_ERROR_MESSAGE("StateMachineUI::loadTableValue(): There is no table item here!!");
     }
 }
 
@@ -431,13 +431,13 @@ void PoseMatchingGeneratorUI::loadData(HkxObject *data){
                 }
                 loadDynamicTableRows();
             }else{
-                FATAL_RUNTIME_ERROR(QString("PoseMatchingGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+                CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
             }
         }else{
-            FATAL_RUNTIME_ERROR(QString("PoseMatchingGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::loadData(): Attempting to load a null pointer!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::loadData(): Attempting to load a null pointer!!");
     }
     connectSignals();
 }
@@ -455,11 +455,11 @@ void PoseMatchingGeneratorUI::loadDynamicTableRows(){
             if (child){
                 setRowItems(i, "Child "+QString::number(j), child->getClassname(), "Remove", "Edit", "Double click to remove this child", "Double click to edit this child");
             }else{
-                FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::loadData(): Null child found!!!");
+                CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::loadData(): Null child found!!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::loadDynamicTableRows(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::loadDynamicTableRows(): The data is nullptr!!");
     }
     //table->setSortingEnabled(true);
 }
@@ -493,19 +493,19 @@ bool PoseMatchingGeneratorUI::setBinding(int index, int row, const QString & var
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -514,7 +514,7 @@ bool PoseMatchingGeneratorUI::setBinding(int index, int row, const QString & var
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -619,7 +619,7 @@ void PoseMatchingGeneratorUI::setBindingVariable(int index, const QString & name
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -632,14 +632,14 @@ void PoseMatchingGeneratorUI::setName(){
                 if (bsData->children.at(i).data()){
                     static_cast<DataIconManager*>(bsData->children.at(i).data())->updateIconNames();
                 }else{
-                    FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setName():\n Children contain nullptr's!!!");
+                    CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setName():\n Children contain nullptr's!!!");
                 }
             }
             emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -650,7 +650,7 @@ void PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(): The data is nullptr!!");
     }
 }
 
@@ -661,7 +661,7 @@ void PoseMatchingGeneratorUI::setBlendParameter(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setBlendParameter(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBlendParameter(): The data is nullptr!!");
     }
 }
 
@@ -672,7 +672,7 @@ void PoseMatchingGeneratorUI::setMinCyclicBlendParameter(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setMinCyclicBlendParameter(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMinCyclicBlendParameter(): The data is nullptr!!");
     }
 }
 
@@ -683,7 +683,7 @@ void PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(): The data is nullptr!!");
     }
 }
 
@@ -694,7 +694,7 @@ void PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(): The data is nullptr!!");
     }
 }
 
@@ -710,10 +710,10 @@ void PoseMatchingGeneratorUI::setFlagSync(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            FATAL_RUNTIME_ERROR(QString("PoseMatchingGeneratorUI::setFlagSync(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagSync(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setFlagSync(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setFlagSync(): The data is nullptr!!");
     }
 }
 
@@ -729,10 +729,10 @@ void PoseMatchingGeneratorUI::setFlagSmoothGeneratorWeights(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            FATAL_RUNTIME_ERROR(QString("PoseMatchingGeneratorUI::setFlagSmoothGeneratorWeights(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagSmoothGeneratorWeights(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setFlagSmoothGeneratorWeights(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setFlagSmoothGeneratorWeights(): The data is nullptr!!");
     }
 }
 
@@ -748,10 +748,10 @@ void PoseMatchingGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            FATAL_RUNTIME_ERROR(QString("PoseMatchingGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The data is nullptr!!");
     }
 }
 
@@ -767,10 +767,10 @@ void PoseMatchingGeneratorUI::setFlagParametricBlend(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            FATAL_RUNTIME_ERROR(QString("PoseMatchingGeneratorUI::setFlagParametricBlend(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagParametricBlend(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setFlagParametricBlend(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setFlagParametricBlend(): The data is nullptr!!");
     }
 }
 
@@ -786,10 +786,10 @@ void PoseMatchingGeneratorUI::setFlagIsParametricBlendCyclic(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            FATAL_RUNTIME_ERROR(QString("PoseMatchingGeneratorUI::setFlagIsParametricBlendCyclic(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagIsParametricBlendCyclic(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setFlagIsParametricBlendCyclic(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setFlagIsParametricBlendCyclic(): The data is nullptr!!");
     }
 }
 
@@ -805,10 +805,10 @@ void PoseMatchingGeneratorUI::setFlagForceDensePose(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            FATAL_RUNTIME_ERROR(QString("PoseMatchingGeneratorUI::setFlagForceDensePose(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("PoseMatchingGeneratorUI::setFlagForceDensePose(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setFlagForceDensePose(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setFlagForceDensePose(): The data is nullptr!!");
     }
 }
 
@@ -817,7 +817,7 @@ void PoseMatchingGeneratorUI::setSubtractLastChild(){
         bsData->subtractLastChild = subtractLastChild->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setSubtractLastChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setSubtractLastChild(): The data is nullptr!!");
     }
 }
 
@@ -828,7 +828,7 @@ void PoseMatchingGeneratorUI::setWorldFromModelRotation(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setWorldFromModelRotation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setWorldFromModelRotation(): The data is nullptr!!");
     }
 }
 
@@ -839,7 +839,7 @@ void PoseMatchingGeneratorUI::setBlendSpeed(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setBlendSpeed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBlendSpeed(): The data is nullptr!!");
     }
 }
 
@@ -850,7 +850,7 @@ void PoseMatchingGeneratorUI::setMinSpeedToSwitch(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setMinSpeedToSwitch(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMinSpeedToSwitch(): The data is nullptr!!");
     }
 }
 
@@ -861,7 +861,7 @@ void PoseMatchingGeneratorUI::setMinSwitchTimeNoError(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setMinSwitchTimeNoError(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMinSwitchTimeNoError(): The data is nullptr!!");
     }
 }
 
@@ -872,7 +872,7 @@ void PoseMatchingGeneratorUI::setMinSwitchTimeFullError(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setMinSwitchTimeFullError(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMinSwitchTimeFullError(): The data is nullptr!!");
     }
 }
 
@@ -882,7 +882,7 @@ void PoseMatchingGeneratorUI::setStartPlayingEventId(int index, const QString &n
         table->item(START_PLAYING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setStartPlayingEventId(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setStartPlayingEventId(): The data is nullptr!!");
     }
 }
 
@@ -892,7 +892,7 @@ void PoseMatchingGeneratorUI::setStartMatchingEventId(int index, const QString &
         table->item(START_MATCHING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setStartMatchingEventId(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setStartMatchingEventId(): The data is nullptr!!");
     }
 }
 
@@ -901,7 +901,7 @@ void PoseMatchingGeneratorUI::setRootBoneIndex(int index){
         bsData->rootBoneIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setRootBoneIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setRootBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -910,7 +910,7 @@ void PoseMatchingGeneratorUI::setOtherBoneIndex(int index){
         bsData->otherBoneIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setOtherBoneIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setOtherBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -919,7 +919,7 @@ void PoseMatchingGeneratorUI::setAnotherBoneIndex(int index){
         bsData->anotherBoneIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setAnotherBoneIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setAnotherBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -928,7 +928,7 @@ void PoseMatchingGeneratorUI::setPelvisIndex(int index){
         bsData->pelvisIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setPelvisIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setPelvisIndex(): The data is nullptr!!");
     }
 }
 
@@ -937,7 +937,7 @@ void PoseMatchingGeneratorUI::setMode(int index){
         bsData->mode = bsData->Mode.at(index);
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::setMode(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMode(): The data is nullptr!!");
     }
 }
 
@@ -950,14 +950,14 @@ void PoseMatchingGeneratorUI::swapGeneratorIndices(int index1, int index2){
             if (behaviorView->getSelectedItem()){
                 behaviorView->getSelectedItem()->reorderChildren();
             }else{
-                FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::swapGeneratorIndices(): No item selected!!");
+                CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::swapGeneratorIndices(): No item selected!!");
             }
             bsData->getParentFile()->setIsChanged(true);
         }else{
             WARNING_MESSAGE("PoseMatchingGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::swapGeneratorIndices(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::swapGeneratorIndices(): The data is nullptr!!");
     }
 }
 
@@ -1007,12 +1007,12 @@ void PoseMatchingGeneratorUI::addChildWithGenerator(){
             behaviorView->appendBGSGamebryoSequenceGenerator();
             break;
         default:
-            FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::addChild(): Invalid typeEnum!!");
+            CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::addChild(): Invalid typeEnum!!");
             return;
         }
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::addChild(): The data or behavior graph pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::addChild(): The data or behavior graph pointer is nullptr!!");
     }
 }
 
@@ -1028,7 +1028,7 @@ void PoseMatchingGeneratorUI::removeChild(int index){
         }
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::removeChild(): The data or behavior graph pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::removeChild(): The data or behavior graph pointer is nullptr!!");
     }
 }
 
@@ -1151,11 +1151,11 @@ void PoseMatchingGeneratorUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::viewSelectedChild(): Invalid index of child to view!!");
+                CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::viewSelectedChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -1175,7 +1175,7 @@ void PoseMatchingGeneratorUI::eventRenamed(const QString & name, int index){
             table->item(START_MATCHING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::eventRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -1237,7 +1237,7 @@ void PoseMatchingGeneratorUI::connectToTables(GenericTableWidget *generators, Ge
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -1259,10 +1259,10 @@ void PoseMatchingGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindin
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -1282,7 +1282,7 @@ void PoseMatchingGeneratorUI::selectTableToView(bool viewproperties, const QStri
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -1362,7 +1362,7 @@ void PoseMatchingGeneratorUI::variableRenamed(const QString & name, int index){
             childUI->variableRenamed(name, index);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoseMatchingGeneratorUI::variableRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::variableRenamed(): The data is nullptr!!");
     }
 }
 

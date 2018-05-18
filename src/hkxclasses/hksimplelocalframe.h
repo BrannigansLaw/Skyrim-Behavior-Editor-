@@ -11,7 +11,7 @@ public:
     hkSimpleLocalFrame(HkxFile *parent, const QString & string = "", long ref = -1);
     virtual ~hkSimpleLocalFrame();
     bool readData(const HkxXmlReader & reader, long index);
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     bool link(){return true;}
     bool write(HkxXMLWriter *writer);

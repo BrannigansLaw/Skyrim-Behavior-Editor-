@@ -118,7 +118,7 @@ void EventsFromRangeModifierUI::addRange(){
         bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::addExpression(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::addExpression(): The data is nullptr!!");
     }
 }
 
@@ -140,7 +140,7 @@ void EventsFromRangeModifierUI::removeRange(int index){
             return;
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::removeRange(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::removeRange(): The data is nullptr!!");
     }
 }
 
@@ -167,10 +167,10 @@ void EventsFromRangeModifierUI::loadData(HkxObject *data){
             }
             loadDynamicTableRows();
         }else{
-            FATAL_RUNTIME_ERROR(QString("EventsFromRangeModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("EventsFromRangeModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::loadData(): Attempting to load a null pointer!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::loadData(): Attempting to load a null pointer!!");
     }
     connectSignals();
 }
@@ -191,7 +191,7 @@ void EventsFromRangeModifierUI::loadDynamicTableRows(){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::loadDynamicTableRows(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::loadDynamicTableRows(): The data is nullptr!!");
     }
     //table->setSortingEnabled(true);
 }
@@ -225,19 +225,19 @@ bool EventsFromRangeModifierUI::setBinding(int index, int row, const QString & v
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -246,7 +246,7 @@ bool EventsFromRangeModifierUI::setBinding(int index, int row, const QString & v
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -279,7 +279,7 @@ void EventsFromRangeModifierUI::setBindingVariable(int index, const QString & na
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -297,7 +297,7 @@ void EventsFromRangeModifierUI::setName(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -306,7 +306,7 @@ void EventsFromRangeModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -317,7 +317,7 @@ void EventsFromRangeModifierUI::setInputValue(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::setInputValue(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setInputValue(): The data is nullptr!!");
     }
 }
 
@@ -328,7 +328,7 @@ void EventsFromRangeModifierUI::setLowerBound(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::setLowerBound(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::setLowerBound(): The data is nullptr!!");
     }
 }
 
@@ -374,11 +374,11 @@ void EventsFromRangeModifierUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::viewSelectedChild(): Invalid index of child to view!!");
+                CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::viewSelectedChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -407,7 +407,7 @@ void EventsFromRangeModifierUI::connectToTables(GenericTableWidget *variables, G
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -429,10 +429,10 @@ void EventsFromRangeModifierUI::loadBinding(int row, int colunm, hkbVariableBind
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -452,7 +452,7 @@ void EventsFromRangeModifierUI::selectTableToView(bool viewproperties, const QSt
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -462,7 +462,7 @@ void EventsFromRangeModifierUI::eventRenamed(const QString & name, int index){
             rangeUI->eventRenamed(name, index);
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::eventRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -494,7 +494,7 @@ void EventsFromRangeModifierUI::variableRenamed(const QString & name, int index)
             //rangeUI->variableRenamed(name, index);
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventsFromRangeModifierUI::variableRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventsFromRangeModifierUI::variableRenamed(): The data is nullptr!!");
     }
 }
 

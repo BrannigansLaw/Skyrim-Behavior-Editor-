@@ -4,8 +4,10 @@
 AnimCacheAnimationInfo::AnimCacheAnimationInfo(const QString & path, const QString & name, bool compute){
     if (compute){
         HkCRC crcGen;
-        crcPath = crcGen.compute(path.toLower().toLocal8Bit());
+        crcPath = crcGen.compute(QString(path).replace("/", "\\").toLower().toLocal8Bit());
+        crcPath = QString::number(crcPath.toULong(nullptr, 16));
         crcAnimationName = crcGen.compute(name.toLower().toLocal8Bit());
+        crcAnimationName = QString::number(crcAnimationName.toULong(nullptr, 16));
     }else{
         crcPath = path;
         crcAnimationName = name;
@@ -65,8 +67,10 @@ bool AnimCacheAnimationInfo::write(QFile *file, QTextStream &out) const{
 void AnimCacheAnimationInfo::setAnimationData(const QString &path, const QString &name, bool compute){
     if (compute){
         HkCRC crcGen;
-        crcPath = crcGen.compute(path.toLower().toLocal8Bit());
+        crcPath = crcGen.compute(QString(path).replace("/", "\\").toLower().toLocal8Bit());
+        crcPath = QString::number(crcPath.toULong(nullptr, 16));
         crcAnimationName = crcGen.compute(name.toLower().toLocal8Bit());
+        crcAnimationName = QString::number(crcAnimationName.toULong(nullptr, 16));
     }else{
         crcPath = path;
         crcAnimationName = name;

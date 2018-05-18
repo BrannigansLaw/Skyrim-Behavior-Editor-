@@ -152,7 +152,7 @@ void BSIsActiveModifierUI::connectToTables(GenericTableWidget *variables, Generi
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -201,10 +201,10 @@ void BSIsActiveModifierUI::loadData(HkxObject *data){
                 table->item(INVERT_ACTIVE_4_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::loadData(): The data is an incorrect type!!");
+            CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -218,7 +218,7 @@ void BSIsActiveModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -227,7 +227,7 @@ void BSIsActiveModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -236,7 +236,7 @@ void BSIsActiveModifierUI::setIsActive0(){
         bsData->bIsActive0 = bIsActive0->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setIsActive0(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setIsActive0(): The data is nullptr!!");
     }
 }
 
@@ -245,7 +245,7 @@ void BSIsActiveModifierUI::setInvertActive0(){
         bsData->bInvertActive0 = bInvertActive0->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setInvertActive0(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setInvertActive0(): The data is nullptr!!");
     }
 }
 
@@ -254,7 +254,7 @@ void BSIsActiveModifierUI::setIsActive1(){
         bsData->bIsActive1 = bIsActive1->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setIsActive1(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setIsActive1(): The data is nullptr!!");
     }
 }
 
@@ -263,7 +263,7 @@ void BSIsActiveModifierUI::setInvertActive1(){
         bsData->bInvertActive1 = bInvertActive1->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setInvertActive1(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setInvertActive1(): The data is nullptr!!");
     }
 }
 
@@ -272,7 +272,7 @@ void BSIsActiveModifierUI::setIsActive2(){
         bsData->bIsActive2 = bIsActive2->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setIsActive2(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setIsActive2(): The data is nullptr!!");
     }
 }
 
@@ -281,7 +281,7 @@ void BSIsActiveModifierUI::setInvertActive2(){
         bsData->bInvertActive2 = bInvertActive2->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setInvertActive2(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setInvertActive2(): The data is nullptr!!");
     }
 }
 
@@ -290,7 +290,7 @@ void BSIsActiveModifierUI::setIsActive3(){
         bsData->bIsActive3 = bIsActive3->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setIsActive3(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setIsActive3(): The data is nullptr!!");
     }
 }
 
@@ -299,7 +299,7 @@ void BSIsActiveModifierUI::setInvertActive3(){
         bsData->bInvertActive3 = bInvertActive3->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setInvertActive3(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setInvertActive3(): The data is nullptr!!");
     }
 }
 
@@ -308,7 +308,7 @@ void BSIsActiveModifierUI::setIsActive4(){
         bsData->bIsActive4 = bIsActive4->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setIsActive4(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setIsActive4(): The data is nullptr!!");
     }
 }
 
@@ -317,7 +317,7 @@ void BSIsActiveModifierUI::setInvertActive4(){
         bsData->bInvertActive4 = bInvertActive4->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setInvertActive4(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setInvertActive4(): The data is nullptr!!");
     }
 }
 
@@ -397,7 +397,7 @@ void BSIsActiveModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -417,7 +417,7 @@ void BSIsActiveModifierUI::selectTableToView(bool viewisProperty, const QString 
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -472,7 +472,7 @@ void BSIsActiveModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -482,19 +482,19 @@ bool BSIsActiveModifierUI::setBinding(int index, int row, const QString &variabl
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -503,7 +503,7 @@ bool BSIsActiveModifierUI::setBinding(int index, int row, const QString &variabl
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -584,7 +584,7 @@ void BSIsActiveModifierUI::setBindingVariable(int index, const QString &name){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -606,9 +606,9 @@ void BSIsActiveModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSe
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSIsActiveModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSIsActiveModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

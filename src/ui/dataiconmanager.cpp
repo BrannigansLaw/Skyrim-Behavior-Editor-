@@ -1,6 +1,8 @@
 #include "dataiconmanager.h"
 #include "treegraphicsitem.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/generators/hkbgenerator.h"
+#include "src/hkxclasses/behavior/modifiers/hkbmodifier.h"
 
 #include <QGraphicsScene>
 
@@ -18,7 +20,7 @@ bool DataIconManager::hasIcons() const{
             return true;
         }
     }else{
-        FATAL_RUNTIME_ERROR("DataIconManager::hasIcons(): 'icons' is empty!!!");
+        CRITICAL_ERROR_MESSAGE("DataIconManager::hasIcons(): 'icons' is empty!!!");
     }
     return false;
 }
@@ -61,6 +63,112 @@ DataIconManager::DataIconManager(HkxFile *parent, long ref)
     //
 }
 
+bool DataIconManager::merge(HkxObject *recessiveObject){
+    if (getType() == TYPE_GENERATOR){
+        injectWhileMerging(((hkbGenerator *)recessiveObject));
+    }/*else if (getType() == TYPE_MODIFIER){
+        injectWhileMerging(((hkbModifier *)recessiveObject));
+    }*/
+    return true;
+}
+
+void DataIconManager::injectWhileMerging(hkbGenerator *recessiveobj){
+    if (recessiveobj){
+        setIsMerged(true);
+        QList <DataIconManager *> domchildren = getChildren();
+        QList <DataIconManager *> recchildren = static_cast<DataIconManager *>(recessiveobj)->getChildren();
+        QList <DataIconManager *> tempchildren;
+        hkbGenerator *domchild;
+        hkbGenerator *recchild;
+        hkbGenerator *tempchild;
+        HkxSignature domsig;
+        HkxSignature recsig;
+        HkxSignature tempsig;
+        bool found;
+        for (auto i = 0; i < domchildren.size(); i++){
+            found = false;
+            domsig = domchildren.at(i)->getSignature();
+            domchild = static_cast<hkbGenerator *>(domchildren.at(i));
+            for (auto j = 0; j < recchildren.size(); j++){
+                recsig = recchildren.at(j)->getSignature();
+                recchild = static_cast<hkbGenerator *>(recchildren.at(j));
+                if (domsig == recsig && domchild->getName() == recchild->getName()){
+                    found = true;
+                    break;
+                }
+            }
+            if (!found){
+                for (auto j = 0; j < recchildren.size(); j++){
+                    tempchildren = recchildren.at(j)->getChildren();
+                    for (auto k = 0; k < tempchildren.size(); k++){
+                        tempsig = tempchildren.at(k)->getSignature();
+                        tempchild = static_cast<hkbGenerator *>(tempchildren.at(k));
+                        if (domsig == tempsig && domchild->getName() == tempchild->getName()){
+                            insertObjectAt(i, recchildren.at(j));
+                            found = true;
+                            k = tempchildren.size();
+                            j = recchildren.size();
+                        }
+                    }
+                    if (!found){
+                        //WARNING_MESSAGE("DataIconManager::injectWhileMerging() hkbGenerator: Cannot inject!");
+                    }
+                }
+            }
+        }
+    }else{
+        WARNING_MESSAGE("DataIconManager::injectWhileMerging() hkbGenerator: nullptr!");
+    }
+}
+
+void DataIconManager::injectWhileMerging(hkbModifier *recessiveobj){
+    if (recessiveobj){
+        QList <DataIconManager *> domchildren = getChildren();
+        QList <DataIconManager *> recchildren = static_cast<DataIconManager *>(recessiveobj)->getChildren();
+        QList <DataIconManager *> tempchildren;
+        hkbModifier *domchild;
+        hkbModifier *recchild;
+        hkbModifier *tempchild;
+        HkxSignature domsig;
+        HkxSignature recsig;
+        HkxSignature tempsig;
+        bool found;
+        for (auto i = 0; i < domchildren.size(); i++){
+            found = false;
+            domsig = domchildren.at(i)->getSignature();
+            domchild = static_cast<hkbModifier *>(domchildren.at(i));
+            for (auto j = 0; j < recchildren.size(); j++){
+                recsig = recchildren.at(j)->getSignature();
+                recchild = static_cast<hkbModifier *>(recchildren.at(j));
+                if (domsig == recsig && domchild->getName() == recchild->getName()){
+                    found = true;
+                    break;
+                }
+            }
+            if (!found){
+                for (auto j = 0; j < recchildren.size(); j++){
+                    tempchildren = recchildren.at(j)->getChildren();
+                    for (auto k = 0; k < tempchildren.size(); k++){
+                        tempsig = tempchildren.at(k)->getSignature();
+                        tempchild = static_cast<hkbModifier *>(tempchildren.at(k));
+                        if (domsig == tempsig && domchild->getName() == tempchild->getName()){
+                            insertObjectAt(i, recchildren.at(j));
+                            found = true;
+                            k = tempchildren.size();
+                            j = recchildren.size();
+                        }
+                    }
+                    if (!found){
+                        //WARNING_MESSAGE("DataIconManager::injectWhileMerging() hkbGenerator: Cannot inject!");
+                    }
+                }
+            }
+        }
+    }else{
+        WARNING_MESSAGE("DataIconManager::injectWhileMerging() hkbModifier: nullptr!");
+    }
+}
+
 TreeGraphicsItem * DataIconManager::reconnectToNext(){
     TreeGraphicsItem *iconToBeRemoved = nullptr;
     QList<QGraphicsItem *> children;
@@ -77,7 +185,7 @@ TreeGraphicsItem * DataIconManager::reconnectToNext(){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("DataIconManager::reconnectToNext(): 'icons' is empty!!!");
+        CRITICAL_ERROR_MESSAGE("DataIconManager::reconnectToNext(): 'icons' is empty!!!");
     }
     return nullptr;
 }
@@ -102,6 +210,6 @@ void DataIconManager::removeIcon(TreeGraphicsItem *icon){
     if (!icons.isEmpty()){
         icons.removeAll(icon);
     }else{
-        FATAL_RUNTIME_ERROR("DataIconManager::removeIcon(): 'icons' is empty!!!");
+        CRITICAL_ERROR_MESSAGE("DataIconManager::removeIcon(): 'icons' is empty!!!");
     }
 }

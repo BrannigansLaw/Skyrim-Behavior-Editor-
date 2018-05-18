@@ -13,10 +13,27 @@ public:
     bool link();
     bool readData(const HkxXmlReader & reader, long index);
     void unlink();
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     QString getName() const;
+    bool operator ==(const hkbBlendingTransitionEffect & other){
+        if (
+                userData != other.userData ||
+                name != other.name ||
+                selfTransitionMode != other.selfTransitionMode ||
+                eventMode != other.eventMode ||
+                duration != other.duration ||
+                toGeneratorStartTimeFraction != other.toGeneratorStartTimeFraction ||
+                flags != other.flags ||
+                endMode != other.endMode  ||
+                blendCurve != other.blendCurve
+                )
+        {
+            return false;
+        }
+        return true;
+    }
 private:
     hkbBlendingTransitionEffect& operator=(const hkbBlendingTransitionEffect&);
     hkbBlendingTransitionEffect(const hkbBlendingTransitionEffect &);

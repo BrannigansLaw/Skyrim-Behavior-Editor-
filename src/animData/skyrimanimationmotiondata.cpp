@@ -1,7 +1,7 @@
 #include "skyrimanimationmotiondata.h"
 #include "projectanimdata.h"
 
-bool SkyrimAnimationMotionData::chopLine(QFile * file, QByteArray & line, uint & linecount){
+bool SkyrimAnimationMotionData::chopLine(QFile * file, QByteArray & line, ulong & linecount){
     if (file){
         if (!file->atEnd()){
             line = file->readLine();
@@ -27,7 +27,7 @@ SkyrimAnimationMotionData::SkyrimAnimationMotionData(ProjectAnimData *par, uint 
     rotations = other.rotations;
 }*/
 
-bool SkyrimAnimationMotionData::read(QFile *file, uint &lineCount){
+bool SkyrimAnimationMotionData::read(QFile *file, ulong &lineCount){
     if (!file || !file->isOpen()){
         return false;
     }
@@ -129,26 +129,40 @@ bool SkyrimAnimationMotionData::read(QFile *file, uint &lineCount){
     return true;
 }
 
+QString SkyrimAnimationMotionData::trimFloat(QString & string) const{
+    for (auto i = string.size() - 1; i >= 0; i--){
+        if (string.at(i) == '0'){
+            string.remove(i, 1);
+        }else if (string.at(i) == '.'){
+            string.remove(i, 1);
+            break;
+        }else{
+            break;
+        }
+    }
+    return string;
+}
+
 bool SkyrimAnimationMotionData::write(QFile * file, QTextStream & out) const{
     if (!file || !file->isOpen()){
         return false;
     }
     out << QString::number(animationIndex) << "\n";
-    out << QString::number(duration, char('f'), 6) << "\n";
+    out << trimFloat(QString::number(duration, char('f'), 6)) << "\n";
     out << QString::number(translations.size()) << "\n";
     for (int i = 0; i < translations.size(); i++){
-        out << QString::number(translations.at(i).localTime, char('f'), 6);
-        out << " "+QString::number(translations.at(i).x, char('f'), 6);
-        out << " "+QString::number(translations.at(i).y, char('f'), 6);
-        out << " "+QString::number(translations.at(i).z, char('f'), 6) << "\n";
+        out << trimFloat(QString::number(translations.at(i).localTime, char('f'), 6));
+        out << " "+trimFloat(QString::number(translations.at(i).x, char('f'), 6));
+        out << " "+trimFloat(QString::number(translations.at(i).y, char('f'), 6));
+        out << " "+trimFloat(QString::number(translations.at(i).z, char('f'), 6)) << "\n";
     }
     out << QString::number(rotations.size()) << "\n";
     for (int i = 0; i < rotations.size(); i++){
-        out << QString::number(rotations.at(i).localTime, char('f'), 6);
-        out << " "+QString::number(rotations.at(i).x, char('f'), 6);
-        out << " "+QString::number(rotations.at(i).y, char('f'), 6);
-        out << " "+QString::number(rotations.at(i).z, char('f'), 6);
-        out << " "+QString::number(rotations.at(i).w, char('f'), 6) << "\n";
+        out << trimFloat(QString::number(rotations.at(i).localTime, char('f'), 6));
+        out << " "+trimFloat(QString::number(rotations.at(i).x, char('f'), 6));
+        out << " "+trimFloat(QString::number(rotations.at(i).y, char('f'), 6));
+        out << " "+trimFloat(QString::number(rotations.at(i).z, char('f'), 6));
+        out << " "+trimFloat(QString::number(rotations.at(i).w, char('f'), 6)) << "\n";
     }
     out << "\n";
     return true;

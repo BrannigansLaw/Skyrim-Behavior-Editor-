@@ -15,7 +15,7 @@ public:
     bool link();
     void removeData(){}
     QString getName() const;
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     QString getBehaviorName() const;

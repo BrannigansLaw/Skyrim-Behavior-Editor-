@@ -35,6 +35,8 @@ public:
     void removeClipTriggerToAnimDataAt(const QString & projectname, const QString & clipGenName, int index);
     bool isProjectNameTaken(const QString &name) const;
     bool removeBehaviorFromProject(const QString &projectname,  const QString & behaviorfilename);
+    qreal getAnimationDurationFromAnimData(const QString &projectname, int animationindex) const;
+    SkyrimAnimationMotionData getAnimationMotionData(const QString &projectname, int animationindex) const;
 private:
     QStringList projectNames;
     QVector <ProjectAnimData *> animData;

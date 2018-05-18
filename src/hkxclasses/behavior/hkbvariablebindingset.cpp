@@ -231,11 +231,41 @@ void hkbVariableBindingSet::updateVariableIndices(int index){
     }
 }
 
+void hkbVariableBindingSet::mergeVariableIndex(int oldindex, int newindex){
+    for (auto i = 0; i < bindings.size(); i++){
+        if (bindings.at(i).variableIndex == oldindex && bindings.at(i).bindingType == hkBinding::BINDING_TYPE_VARIABLE){
+            bindings[i].variableIndex = newindex;
+        }
+    }
+}
+
+bool hkbVariableBindingSet::merge(HkxObject *recessiveObject){
+    bool found;
+    hkbVariableBindingSet *obj = nullptr;
+    if (recessiveObject && recessiveObject->getSignature() == HKB_VARIABLE_BINDING_SET){
+        obj = static_cast<hkbVariableBindingSet *>(recessiveObject);
+        for (auto i = 0; i < obj->bindings.size(); i++){
+            found = false;
+            for (auto j = 0; j < bindings.size(); j++){
+                if (bindings.at(j).memberPath == obj->bindings.at(i).memberPath){
+                    found = true;
+                }
+                if (!found){
+                    bindings.append(obj->bindings.at(i));
+                }
+            }
+        }
+        return true;
+    }else{
+        return false;
+    }
+}
+
 bool hkbVariableBindingSet::link(){
     return true;
 }
 
-bool hkbVariableBindingSet::evaulateDataValidity(){
+bool hkbVariableBindingSet::evaluateDataValidity(){
     //Do later...
     return true;
 }

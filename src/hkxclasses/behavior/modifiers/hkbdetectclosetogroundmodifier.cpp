@@ -41,7 +41,7 @@ bool hkbDetectCloseToGroundModifier::readData(const HkxXmlReader &reader, long i
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -65,7 +65,7 @@ bool hkbDetectCloseToGroundModifier::readData(const HkxXmlReader &reader, long i
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
             }
         }else if (text == "payload"){
-            if (!closeToGroundEvent.payload.readReference(index, reader)){
+            if (!closeToGroundEvent.payload.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
             }
         }else if (text == "closeToGroundHeight"){
@@ -158,6 +158,12 @@ void hkbDetectCloseToGroundModifier::updateEventIndices(int eventindex){
     }
 }
 
+void hkbDetectCloseToGroundModifier::mergeEventIndex(int oldindex, int newindex){
+    if (closeToGroundEvent.id == oldindex){
+        closeToGroundEvent.id = newindex;
+    }
+}
+
 bool hkbDetectCloseToGroundModifier::link(){
     if (!getParentFile()){
         return false;
@@ -165,7 +171,7 @@ bool hkbDetectCloseToGroundModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(closeToGroundEvent.payload.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(closeToGroundEvent.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
@@ -181,8 +187,8 @@ void hkbDetectCloseToGroundModifier::unlink(){
     closeToGroundEvent.payload = HkxSharedPtr();
 }
 
-bool hkbDetectCloseToGroundModifier::evaulateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbDetectCloseToGroundModifier::evaluateDataValidity(){    //Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (closeToGroundEvent.payload.data() && closeToGroundEvent.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){

@@ -7,6 +7,7 @@
 #include "src/hkxclasses/hkxobject.h"
 
 class TreeGraphicsItem;
+class hkbModifier;
 
 class DataIconManager: public HkDynamicObject
 {
@@ -15,6 +16,8 @@ class DataIconManager: public HkDynamicObject
     friend class TreeGraphicsItem;
     friend class BehaviorGraphIcon;
     friend class BehaviorGraphView;
+    friend class BehaviorFile;
+    friend class BSBoneSwitchGenerator;
 public:
     virtual QString getName() const;
     virtual bool hasChildren() const;
@@ -26,6 +29,9 @@ protected:
     virtual bool insertObjectAt(int , DataIconManager *);
     virtual bool removeObjectAt(int );//If index is -1 remove all...
     DataIconManager(HkxFile *parent, long ref = -1);
+    void injectWhileMerging(hkbGenerator *recessiveobj);
+    void injectWhileMerging(hkbModifier *recessiveobj);
+    bool merge(HkxObject *recessiveObject);
 private:
     bool wrapObjectAt(int index, DataIconManager *obj, DataIconManager *parentObj);
     TreeGraphicsItem *reconnectToNext();

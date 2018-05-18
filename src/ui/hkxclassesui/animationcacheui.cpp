@@ -46,7 +46,7 @@ void CacheVariableWidget::loadData(AnimCacheVariable *data){
         maxValue->setValue(bsData->maxValue);
         connectSignals();
     }else{
-        FATAL_RUNTIME_ERROR("CacheVariableWidget::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheVariableWidget::loadData(): The data is nullptr!!");
     }
 }
 
@@ -54,7 +54,7 @@ void CacheVariableWidget::setName(const QString & newname){
     if (bsData){
         bsData->name = newname;
     }else{
-        FATAL_RUNTIME_ERROR("CacheVariableWidget::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheVariableWidget::setName(): The data is nullptr!!");
     }
 }
 
@@ -62,7 +62,7 @@ void CacheVariableWidget::setMinimumValue(int newvalue){
     if (bsData){
         bsData->minValue = newvalue;
     }else{
-        FATAL_RUNTIME_ERROR("CacheVariableWidget::setMinimumValue(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheVariableWidget::setMinimumValue(): The data is nullptr!!");
     }
 }
 
@@ -70,7 +70,7 @@ void CacheVariableWidget::setMaximumValue(int newvalue){
     if (bsData){
         bsData->maxValue = newvalue;
     }else{
-        FATAL_RUNTIME_ERROR("CacheVariableWidget::setMaximumValue(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheVariableWidget::setMaximumValue(): The data is nullptr!!");
     }
 }
 
@@ -159,7 +159,7 @@ void CacheClipWidget::loadData(AnimCacheClipInfo *data){
         }
         connectSignals();
     }else{
-        FATAL_RUNTIME_ERROR("CacheClipWidget::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheClipWidget::loadData(): The data is nullptr!!");
     }
 }
 
@@ -167,7 +167,7 @@ void CacheClipWidget::setEventName(const QString & name){
     if (bsData){
         bsData->eventName = name;
     }else{
-        FATAL_RUNTIME_ERROR("CacheClipWidget::setEventName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheClipWidget::setEventName(): The data is nullptr!!");
     }
 }
 
@@ -175,7 +175,7 @@ void CacheClipWidget::setUnknown(int newvalue){
     if (bsData){
         bsData->unknown = newvalue;
     }else{
-        FATAL_RUNTIME_ERROR("CacheClipWidget::setUnknown(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheClipWidget::setUnknown(): The data is nullptr!!");
     }
 }
 
@@ -190,7 +190,7 @@ void CacheClipWidget::addClipGenerator(){
             clipGenerators->setItem(index, 0, new TableWidgetItem("NEWCLIP"));
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheClipWidget::addClipGenerator(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheClipWidget::addClipGenerator(): The data is nullptr!!");
     }
 }
 
@@ -202,7 +202,7 @@ void CacheClipWidget::removeClipGenerator(){
             clipGenerators->removeRow(index);
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheClipWidget::removeClipGenerator(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheClipWidget::removeClipGenerator(): The data is nullptr!!");
     }
 }
 
@@ -211,10 +211,10 @@ void CacheClipWidget::setClipGeneratorAt(int row, int column){
         if (row > -1 && row < bsData->clipGenerators.size()){
             bsData->clipGenerators[row] = clipGenerators->item(row, column)->text();
         }else{
-            FATAL_RUNTIME_ERROR("CacheClipWidget::setClipGeneratorAt(): Mismatch between data and UI!!");
+            CRITICAL_ERROR_MESSAGE("CacheClipWidget::setClipGeneratorAt(): Mismatch between data and UI!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheClipWidget::setClipGeneratorAt(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheClipWidget::setClipGeneratorAt(): The data is nullptr!!");
     }
 }
 
@@ -345,32 +345,32 @@ void CacheWidget::loadData(AnimCacheAnimSetData *data, ProjectFile *project){
         behaviorVariables->setRowCount(bsData->behaviorVariables.size());
         for (int i = 0; i < bsData->behaviorVariables.size(); i++){
             if (behaviorVariables->item(i, 0)){
-                behaviorVariables->item(i, 0)->setText(bsData->behaviorVariables.at(i).name);
+                behaviorVariables->item(i, 0)->setText(bsData->behaviorVariables.at(i)->name);
             }else{
-                behaviorVariables->setItem(i, 0, new TableWidgetItem(bsData->behaviorVariables.at(i).name));
+                behaviorVariables->setItem(i, 0, new TableWidgetItem(bsData->behaviorVariables.at(i)->name));
                 behaviorVariables->setItem(i, 1, new TableWidgetItem("Double Click To Edit"));
             }
         }
         clipGenerators->setRowCount(bsData->clipGenerators.size());
         for (int i = 0; i < bsData->clipGenerators.size(); i++){
             if (clipGenerators->item(i, 0)){
-                clipGenerators->item(i, 0)->setText(bsData->clipGenerators.at(i).eventName);
+                clipGenerators->item(i, 0)->setText(bsData->clipGenerators.at(i)->eventName);
             }else{
-                clipGenerators->setItem(i, 0, new TableWidgetItem(bsData->clipGenerators.at(i).eventName));
+                clipGenerators->setItem(i, 0, new TableWidgetItem(bsData->clipGenerators.at(i)->eventName));
                 clipGenerators->setItem(i, 1, new TableWidgetItem("Double Click To Edit"));
             }
         }
         animations->setRowCount(bsData->animations.size());
         for (int i = 0; i < bsData->animations.size(); i++){
             if (animations->item(i, 0)){
-                animations->item(i, 0)->setText(projectData->findAnimationNameFromEncryptedData(bsData->animations.at(i).crcAnimationName));
+                animations->item(i, 0)->setText(projectData->findAnimationNameFromEncryptedData(bsData->animations.at(i)->crcAnimationName));
             }else{
-                animations->setItem(i, 0, new TableWidgetItem(projectData->findAnimationNameFromEncryptedData(bsData->animations.at(i).crcAnimationName)));
+                animations->setItem(i, 0, new TableWidgetItem(projectData->findAnimationNameFromEncryptedData(bsData->animations.at(i)->crcAnimationName)));
             }
         }
         connectSignals();
     }else{
-        FATAL_RUNTIME_ERROR("CacheWidget::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheWidget::loadData(): The data is nullptr!!");
     }
 }
 
@@ -379,10 +379,10 @@ void CacheWidget::setCacheEventNameAt(int row, int column){
         if (row > -1 && row < bsData->cacheEvents.size()){
             bsData->cacheEvents[row] = cacheEvents->item(row, column)->text();
         }else{
-            FATAL_RUNTIME_ERROR("CacheWidget::setEventNameAt(): Mismatch between data and UI!!");
+            CRITICAL_ERROR_MESSAGE("CacheWidget::setEventNameAt(): Mismatch between data and UI!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheWidget::setEventNameAt(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheWidget::setEventNameAt(): The data is nullptr!!");
     }
 }
 
@@ -397,7 +397,7 @@ void CacheWidget::addCacheEvent(){
             cacheEvents->setItem(index, 0, new TableWidgetItem("NEWEVENT"));
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheWidget::addCacheEvent(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheWidget::addCacheEvent(): The data is nullptr!!");
     }
 }
 
@@ -409,14 +409,14 @@ void CacheWidget::removeCacheEvent(){
             cacheEvents->removeRow(index);
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheWidget::removeCacheEvent(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheWidget::removeCacheEvent(): The data is nullptr!!");
     }
 }
 
 void CacheWidget::addBehaviorVariable(){
     if (bsData){
         int index = behaviorVariables->rowCount();
-        bsData->behaviorVariables.append(AnimCacheVariable("NEWVARIABLE"));
+        bsData->behaviorVariables.append(new AnimCacheVariable("NEWVARIABLE"));
         behaviorVariables->setRowCount(index + 1);
         if (behaviorVariables->item(index, 0)){
             behaviorVariables->item(index, 0)->setText("NEWVARIABLE");
@@ -425,7 +425,7 @@ void CacheWidget::addBehaviorVariable(){
             behaviorVariables->setItem(index, 1, new TableWidgetItem("Double Click To Edit"));
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheWidget::addBehaviorVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheWidget::addBehaviorVariable(): The data is nullptr!!");
     }
 }
 
@@ -437,14 +437,14 @@ void CacheWidget::removeBehaviorVariable(){
             behaviorVariables->removeRow(index);
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheWidget::removeBehaviorVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheWidget::removeBehaviorVariable(): The data is nullptr!!");
     }
 }
 
 void CacheWidget::addClipGenerator(){
     if (bsData){
         int index = clipGenerators->rowCount();
-        bsData->clipGenerators.append(AnimCacheClipInfo("NEWCLIPGENERATOR"));
+        bsData->clipGenerators.append(new AnimCacheClipInfo("NEWCLIPGENERATOR"));
         clipGenerators->setRowCount(index + 1);
         if (clipGenerators->item(index, 0)){
             clipGenerators->item(index, 0)->setText("NEWCLIPGENERATOR");
@@ -453,7 +453,7 @@ void CacheWidget::addClipGenerator(){
             clipGenerators->setItem(index, 1, new TableWidgetItem("Double Click To Edit"));
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheWidget::addClipGenerator(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheWidget::addClipGenerator(): The data is nullptr!!");
     }
 }
 
@@ -465,34 +465,41 @@ void CacheWidget::removeClipGenerator(){
             clipGenerators->removeRow(index);
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheWidget::removeClipGenerator(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheWidget::removeClipGenerator(): The data is nullptr!!");
     }
 }
 
 void CacheWidget::setAnimationNameAt(int row, int column){
     if (bsData && projectData){
         if (row > -1 && row < bsData->animations.size()){
-            bsData->animations[row].setAnimationData(projectData->projectAnimationsPath, animations->item(row, column)->text(), true);
+            QString name = animations->item(row, column)->text();
+            if (name.count("\\") > 0){
+                name = animations->item(row, column)->text().section("\\", -1, -1);
+                QString pathextension = animations->item(row, column)->text().remove("\\"+name);
+                bsData->animations[row]->setAnimationData(projectData->projectAnimationsPath+"/"+pathextension, name, true);
+            }else{
+                bsData->animations[row]->setAnimationData(projectData->projectAnimationsPath, name, true);
+            }
         }else{
-            FATAL_RUNTIME_ERROR("CacheWidget::setAnimationNameAt(): Mismatch between data and UI!!");
+            CRITICAL_ERROR_MESSAGE("CacheWidget::setAnimationNameAt(): Mismatch between data and UI!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheWidget::setAnimationNameAt(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheWidget::setAnimationNameAt(): The data is nullptr!!");
     }
 }
 
 void CacheWidget::addAnimation(){
     if (bsData && projectData){
         int index = animations->rowCount();
-        bsData->animations.append(AnimCacheAnimationInfo(projectData->projectAnimationsPath, "NEWANIMATION", true));
+        bsData->animations.append(new AnimCacheAnimationInfo(projectData->projectAnimationsPath, "NEWANIMATION", true));
         animations->setRowCount(index + 1);
         if (animations->item(index, 0)){
-            animations->item(index, 0)->setText(projectData->findAnimationNameFromEncryptedData(bsData->animations.back().crcAnimationName));
+            animations->item(index, 0)->setText(projectData->findAnimationNameFromEncryptedData(bsData->animations.back()->crcAnimationName));
         }else{
-            animations->setItem(index, 0, new TableWidgetItem(projectData->findAnimationNameFromEncryptedData(bsData->animations.back().crcAnimationName)));
+            animations->setItem(index, 0, new TableWidgetItem(projectData->findAnimationNameFromEncryptedData(bsData->animations.back()->crcAnimationName)));
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheWidget::addCacheEvent(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheWidget::addCacheEvent(): The data is nullptr!!");
     }
 }
 
@@ -504,7 +511,7 @@ void CacheWidget::removeAnimation(){
             animations->removeRow(index);
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheWidget::removeCacheEvent(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheWidget::removeCacheEvent(): The data is nullptr!!");
     }
 }
 
@@ -513,12 +520,12 @@ void CacheWidget::viewBehaviorVariable(int row, int column){
         if (column == 1){
             //int index = behaviorVariables->currentRow();
             if (row > -1 && row < bsData->behaviorVariables.size()){
-                variableUI->loadData(&bsData->behaviorVariables[row]);
+                variableUI->loadData(bsData->behaviorVariables[row]);
                 setCurrentIndex(VARIABLE_WIDGET);
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheWidget::viewBehaviorVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheWidget::viewBehaviorVariable(): The data is nullptr!!");
     }
 }
 
@@ -527,12 +534,12 @@ void CacheWidget::viewClipGenerator(int row, int column){
         if (column == 1){
             //int index = clipGenerators->currentRow();
             if (row > -1 && row < bsData->clipGenerators.size()){
-                clipUI->loadData(&bsData->clipGenerators[row]);
+                clipUI->loadData(bsData->clipGenerators[row]);
                 setCurrentIndex(CLIP_WIDGET);
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("CacheWidget::viewBehaviorVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CacheWidget::viewBehaviorVariable(): The data is nullptr!!");
     }
 }
 
@@ -602,7 +609,7 @@ void AnimationCacheUI::loadData(ProjectFile *project){
         }
         connectSignals();
     }else{
-        FATAL_RUNTIME_ERROR("AnimationCacheUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("AnimationCacheUI::loadData(): The data is nullptr!!");
     }
 }
 
@@ -616,7 +623,7 @@ void AnimationCacheUI::viewSelectedFile(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("AnimationCacheUI::viewSelectedFile(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("AnimationCacheUI::viewSelectedFile(): The data is nullptr!!");
     }
 }
 
@@ -633,7 +640,7 @@ void AnimationCacheUI::addCacheFile(){
             cacheFiles->setItem(index, 0, new TableWidgetItem("Double Click To Edit"));
         }
     }else{
-        FATAL_RUNTIME_ERROR("AnimationCacheUI::addCacheFile(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("AnimationCacheUI::addCacheFile(): The data is nullptr!!");
     }
 }
 
@@ -645,7 +652,7 @@ void AnimationCacheUI::removeCacheFile(){
             cacheFiles->removeRow(index);
         }
     }else{
-        FATAL_RUNTIME_ERROR("AnimationCacheUI::removeCacheFile(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("AnimationCacheUI::removeCacheFile(): The data is nullptr!!");
     }
 }
 

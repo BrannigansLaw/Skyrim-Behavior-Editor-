@@ -10,6 +10,7 @@ class ProjectFile;
 class SkyrimClipGeneratoData;
 class hkbBehaviorReferenceGenerator;
 class hkbBoneWeightArray;
+class hkbStateMachine;
 
 class BehaviorFile: public HkxFile
 {
@@ -85,12 +86,16 @@ public:
     QStringList getReferencedBehaviors(const hkbBehaviorReferenceGenerator *gentoignore) const;
     void removeAllData();
     void getCharacterPropertyBoneWeightArray(const QString &name, hkbBoneWeightArray *ptrtosetdata) const;
+    hkbStateMachine * findRootStateMachineFromBehavior(const QString behaviorname) const;
+    qreal getAnimationDurationFromAnimData(const QString & animationname) const;
+    void mergeEventIndices(int oldindex, int newindex);
+    void mergeVariableIndices(int oldindex, int newindex);
 protected:
     bool parse();
     bool link();
 private:
     QVector<HkxObject *> merge(BehaviorFile *recessivefile);
-    QVector <HkxObject *> merge(QVector <HkxObject *> dominantobjects);
+    void mergeObjects(QVector <HkxObject *> recessiveobjects);
     void generateDefaultCharacterData();
     void generateNewBehavior();
     HkxObject * getBehaviorGraphData() const;
@@ -107,7 +112,6 @@ private:
     HkxSharedPtr variableValues;
     HkxSharedPtr graphData;
     QList <HkxSharedPtr> generators;
-    //QList <HkxSharedPtr> generatorChildren;
     QList <HkxSharedPtr> modifiers;
     QList <HkxSharedPtr> otherTypes;
     QStringList referencedBehaviors;

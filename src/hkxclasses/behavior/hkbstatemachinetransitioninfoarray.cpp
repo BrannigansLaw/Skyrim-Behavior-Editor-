@@ -53,7 +53,7 @@ void hkbStateMachineTransitionInfoArray::addTransition(){
 }
 
 void hkbStateMachineTransitionInfoArray::removeTransition(int index){
-    if (transitions.size() > index){
+    if (transitions.size() > index && index > -1){
         transitions.removeAt(index);
     }
 }
@@ -145,11 +145,11 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'exitTime' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "transition"){
-                        if (!transitions.last().transition.readReference(index, reader)){
+                        if (!transitions.last().transition.readShdPtrReference(index, reader)){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'transition' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "condition"){
-                        if (!transitions.last().condition.readReference(index, reader)){
+                        if (!transitions.last().condition.readShdPtrReference(index, reader)){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'condition' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "eventId"){
@@ -300,20 +300,56 @@ void hkbStateMachineTransitionInfoArray::updateEventIndices(int eventindex){
     }
 }
 
+void hkbStateMachineTransitionInfoArray::mergeEventIndex(int oldindex, int newindex){
+    for (auto i = 0; i < transitions.size(); i++){
+        if (transitions.at(i).triggerInterval.enterEventId == oldindex){
+            transitions[i].triggerInterval.enterEventId = newindex;
+        }
+        if (transitions.at(i).triggerInterval.exitEventId == oldindex){
+            transitions[i].triggerInterval.exitEventId = newindex;
+        }
+        if (transitions.at(i).initiateInterval.enterEventId == oldindex){
+            transitions[i].initiateInterval.enterEventId = newindex;
+        }
+        if (transitions.at(i).initiateInterval.enterEventId == oldindex){
+            transitions[i].initiateInterval.enterEventId = newindex;
+        }
+        if (transitions.at(i).eventId == oldindex){
+            transitions[i].eventId = newindex;
+        }
+    }
+}
+
+bool hkbStateMachineTransitionInfoArray::merge(HkxObject *recessiveObject){
+    //TO DO: Make sure stateid's actually exist...
+    hkbStateMachineTransitionInfoArray *obj = nullptr;
+    if (recessiveObject && recessiveObject->getSignature() == HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
+        obj = static_cast<hkbStateMachineTransitionInfoArray *>(recessiveObject);
+        for (auto i = 0; i < obj->transitions.size(); i++){
+            if (!transitions.contains(obj->transitions.at(i))){
+                transitions.append(obj->transitions.at(i));
+            }
+        }
+        return true;
+    }else{
+        return false;
+    }
+}
+
 bool hkbStateMachineTransitionInfoArray::link(){
     if (!getParentFile()){
         return false;
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < transitions.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(transitions.at(i).transition.getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(transitions.at(i).transition.getShdPtrReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_BLENDING_TRANSITION_EFFECT && (*ptr)->getSignature() != HKB_GENERATOR_TRANSITION_EFFECT){
                 writeToLog(getClassname()+": link()!\n'transition' data field is linked to invalid child!");
             }
             transitions[i].transition = *ptr;
         }
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(transitions.at(i).condition.getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(transitions.at(i).condition.getShdPtrReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_EXPRESSION_CONDITION && (*ptr)->getSignature() != HKB_STRING_CONDITION){
                 writeToLog(getClassname()+": link()!\n'condition' data field is linked to invalid child!");
@@ -324,7 +360,7 @@ bool hkbStateMachineTransitionInfoArray::link(){
     return true;
 }
 
-bool hkbStateMachineTransitionInfoArray::evaulateDataValidity(){
+bool hkbStateMachineTransitionInfoArray::evaluateDataValidity(){
     for (int i = 0; i < transitions.size(); i++){
         if (transitions.at(i).condition.data() && transitions.at(i).condition.data()->getSignature() != HKB_EXPRESSION_CONDITION && transitions.at(i).condition.data()->getSignature() != HKB_STRING_CONDITION){
             setDataValidity(false);

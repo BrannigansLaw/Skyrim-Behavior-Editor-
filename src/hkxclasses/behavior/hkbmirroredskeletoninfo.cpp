@@ -100,7 +100,7 @@ void hkbMirroredSkeletonInfo::unlink(){
     //
 }
 
-bool hkbMirroredSkeletonInfo::evaulateDataValidity(){
+bool hkbMirroredSkeletonInfo::evaluateDataValidity(){
     setDataValidity(true);
     return true;
 }

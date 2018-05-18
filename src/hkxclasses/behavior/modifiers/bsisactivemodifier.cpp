@@ -46,7 +46,7 @@ bool BSIsActiveModifier::readData(const HkxXmlReader &reader, long index){
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -170,8 +170,8 @@ void BSIsActiveModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool BSIsActiveModifier::evaulateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool BSIsActiveModifier::evaluateDataValidity(){    //Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else{

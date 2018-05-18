@@ -51,16 +51,14 @@ bool BSBoneSwitchGenerator::insertObjectAt(int index, DataIconManager *obj){
         }else if (index == 1 || !ChildrenA.isEmpty()){
             ChildrenA.replace(index - 1, HkxSharedPtr(obj));
         }
-        return true;
     }else if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
         if (index == 0){
             pDefaultGenerator = HkxSharedPtr((HkxObject *)obj);
         }else{
             return false;
         }
-        return true;
     }
-    return false;
+    return true;
 }
 
 bool BSBoneSwitchGenerator::hasChildren() const{
@@ -124,6 +122,46 @@ bool BSBoneSwitchGenerator::removeObjectAt(int index){
     return true;
 }
 
+bool BSBoneSwitchGenerator::merge(HkxObject *recessiveObject){
+    BSBoneSwitchGenerator *recobj;
+    BSBoneSwitchGeneratorBoneData *domchild;
+    BSBoneSwitchGeneratorBoneData *recchild;
+    hkbGenerator *domgen;
+    hkbGenerator *recgen;
+    DataIconManager *temp;
+    QList <DataIconManager *> recchildren;
+    if (recessiveObject && recessiveObject->getSignature() == BS_BONE_SWITCH_GENERATOR){
+        recobj = static_cast<BSBoneSwitchGenerator *>(recessiveObject);
+        domgen = static_cast<hkbGenerator *>(pDefaultGenerator.data());
+        recgen = static_cast<hkbGenerator *>(recobj->pDefaultGenerator.data());
+        if (domgen){
+            if (recgen && (domgen->getName() != recgen->getName()) || (domgen->getSignature() != recgen->getSignature())){
+                recchildren = static_cast<DataIconManager *>(recgen)->getChildren();
+                for (auto i = 0; i < recchildren.size(); i++){
+                    temp = recchildren.at(i);
+                    if ((domgen->getName() == temp->getName()) && (domgen->getSignature() == temp->getSignature())){
+                        pDefaultGenerator = HkxSharedPtr(recgen);
+                        break;
+                    }
+                }
+            }
+        }else if (recgen){
+            pDefaultGenerator = HkxSharedPtr(recgen);
+        }
+        for (auto i = 0; i < ChildrenA.size(); i++){
+            domchild = static_cast<BSBoneSwitchGeneratorBoneData *>(ChildrenA.at(i).data());
+            for (auto j = 0; j < recobj->ChildrenA.size(); j++){
+                recchild = static_cast<BSBoneSwitchGeneratorBoneData *>(recobj->ChildrenA.at(j).data());
+                if (*recchild == *domchild){
+                    domchild->injectWhileMerging(recchild);
+                    break;
+                }
+            }
+        }
+    }
+    return true;
+}
+
 bool BSBoneSwitchGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
@@ -131,7 +169,7 @@ bool BSBoneSwitchGenerator::readData(const HkxXmlReader &reader, long index){
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -145,7 +183,7 @@ bool BSBoneSwitchGenerator::readData(const HkxXmlReader &reader, long index){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pDefaultGenerator"){
-            if (!pDefaultGenerator.readReference(index, reader)){
+            if (!pDefaultGenerator.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'pDefaultGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "ChildrenA"){
@@ -223,7 +261,7 @@ bool BSBoneSwitchGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getShdPtrReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pDefaultGenerator' data field!");
         setDataValidity(false);
@@ -236,7 +274,7 @@ bool BSBoneSwitchGenerator::link(){
     }
     for (int i = 0; i < ChildrenA.size(); i++){
         //ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(ChildrenA.at(i).getReference());
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(ChildrenA.at(i).getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(ChildrenA.at(i).getShdPtrReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'ChildrenA' data field!");
             setDataValidity(false);
@@ -263,14 +301,14 @@ void BSBoneSwitchGenerator::unlink(){
     }
 }
 
-bool BSBoneSwitchGenerator::evaulateDataValidity(){
+bool BSBoneSwitchGenerator::evaluateDataValidity(){
     bool valid = true;
     for (int i = 0; i < ChildrenA.size(); i++){
         if (!ChildrenA.at(i).data() || ChildrenA.at(i).data()->getSignature() != BS_BONE_SWITCH_GENERATOR_BONE_DATA){
             valid = false;
         }
     }
-    if (!HkDynamicObject::evaulateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (!pDefaultGenerator.data() || pDefaultGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){

@@ -127,7 +127,7 @@ void EventRangeDataUI::loadData(BehaviorFile *parentFile, hkbEventRangeDataArray
             table->item(EVENT_MODE_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }*/
     }else{
-        FATAL_RUNTIME_ERROR("EventRangeDataUI::loadData(): Behavior file, bind or event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::loadData(): Behavior file, bind or event data is null!!!");
     }
     connectSignals();
 }
@@ -150,10 +150,10 @@ void EventRangeDataUI::loadData(BehaviorFile *parentFile, hkbEventRangeDataArray
                 }
                 table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("EventRangeDataUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("EventRangeDataUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventRangeDataUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -171,11 +171,11 @@ bool EventRangeDataUI::setBinding(int index, int row, const QString & variableNa
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -184,7 +184,7 @@ bool EventRangeDataUI::setBinding(int index, int row, const QString & variableNa
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventRangeDataUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -205,7 +205,7 @@ void EventRangeDataUI::setBindingVariable(int index, const QString & name){
         }
         file->toggleChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("EventRangeDataUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::setBindingVariable(): The data is nullptr!!");
     }
 }*/
 
@@ -218,7 +218,7 @@ void EventRangeDataUI::setEventId(int index, const QString & name){
             file->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventRangeDataUI::setEvent(): Behavior file or event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::setEvent(): Behavior file or event data is null!!!");
     }
 }
 
@@ -243,7 +243,7 @@ void EventRangeDataUI::setEventPayload(){
         }
         file->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("EventRangeDataUI::setEventPayload(): Behavior file or event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::setEventPayload(): Behavior file or event data is null!!!");
     }
 }
 
@@ -254,7 +254,7 @@ void EventRangeDataUI::setUpperBound(){
             file->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventRangeDataUI::setupperBound(): Behavior file or event data is null!!!");
+        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::setupperBound(): Behavior file or event data is null!!!");
     }
 }
 
@@ -263,7 +263,7 @@ void EventRangeDataUI::setEventMode(int index){
         bsData->eventMode = bsData->EventRangeMode.at(index);
         file->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("EventRangeDataUI::setEventMode(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::setEventMode(): The data is nullptr!!");
     }
 }
 
@@ -283,7 +283,7 @@ void EventRangeDataUI::viewSelectedChild(int row, int column){
                 emit viewEvents(bsData->event.id + 1, QString(), QStringList());
             }
     }else{
-        FATAL_RUNTIME_ERROR("EventRangeDataUI::viewSelectedChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -303,7 +303,7 @@ void EventRangeDataUI::viewSelectedChild(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventRangeDataUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::selectTableToView(): The data is nullptr!!");
     }
 }*/
 
@@ -313,7 +313,7 @@ void EventRangeDataUI::eventRenamed(const QString & name, int index){
             table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventRangeDataUI::eventRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -333,6 +333,6 @@ void EventRangeDataUI::eventRenamed(const QString & name, int index){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("EventRangeDataUI::variableRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("EventRangeDataUI::variableRenamed(): The data is nullptr!!");
     }
 }*/

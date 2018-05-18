@@ -16,7 +16,7 @@
 
 #include <QHeaderView>
 
-#define BASE_NUMBER_OF_ROWS 20
+#define BASE_NUMBER_OF_ROWS 22
 
 #define TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW 0
 #define TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW 1
@@ -34,10 +34,12 @@
 #define TO_NESTED_STATE_ID_ROW 13
 #define PRIORITY_ROW 14
 #define FLAG_GLOBAL_WILDCARD_ROW 15
-#define FLAG_USE_NESTED_STATE_ROW 16
-#define FLAG_DISALLOW_RANDOM_TRANSITION_ROW 17
-#define FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE_ROW 18
-#define FLAG_ABUT_END_STATE_ROW 19
+#define FLAG_LOCAL_WILDCARD_ROW 16
+#define FLAG_USE_NESTED_STATE_ROW 17
+#define FLAG_ALLOW_SELF_TRANSITION_ROW 18
+#define FLAG_DISALLOW_RANDOM_TRANSITION_ROW 19
+#define FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE_ROW 20
+#define FLAG_ABUT_END_STATE_ROW 21
 
 #define NAME_COLUMN 0
 #define TYPE_COLUMN 1
@@ -69,7 +71,9 @@ TransitionsUI::TransitionsUI()
       toNestedStateId(new ComboBox),
       priority(new SpinBox),
       flagGlobalWildcard(new CheckBox),
+      flagLocalWildcard(new CheckBox),
       flagUseNestedState(new CheckBox),
+      flagAllowSelfTransition(new CheckBox),
       flagDisallowRandomTransition(new CheckBox),
       flagDisallowReturnToState(new CheckBox),
       flagAbutEndState(new CheckBox)
@@ -126,9 +130,15 @@ TransitionsUI::TransitionsUI()
     table->setItem(FLAG_GLOBAL_WILDCARD_ROW, NAME_COLUMN, new TableWidgetItem("flagGlobalWildcard"));
     table->setItem(FLAG_GLOBAL_WILDCARD_ROW, TYPE_COLUMN, new TableWidgetItem("TransitionFlag", Qt::AlignCenter));
     table->setCellWidget(FLAG_GLOBAL_WILDCARD_ROW, VALUE_COLUMN, flagGlobalWildcard);
+    table->setItem(FLAG_LOCAL_WILDCARD_ROW, NAME_COLUMN, new TableWidgetItem("flagLocalWildcard"));
+    table->setItem(FLAG_LOCAL_WILDCARD_ROW, TYPE_COLUMN, new TableWidgetItem("TransitionFlag", Qt::AlignCenter));
+    table->setCellWidget(FLAG_LOCAL_WILDCARD_ROW, VALUE_COLUMN, flagLocalWildcard);
     table->setItem(FLAG_USE_NESTED_STATE_ROW, NAME_COLUMN, new TableWidgetItem("flagUseNestedState"));
     table->setItem(FLAG_USE_NESTED_STATE_ROW, TYPE_COLUMN, new TableWidgetItem("TransitionFlag", Qt::AlignCenter));
     table->setCellWidget(FLAG_USE_NESTED_STATE_ROW, VALUE_COLUMN, flagUseNestedState);
+    table->setItem(FLAG_ALLOW_SELF_TRANSITION_ROW, NAME_COLUMN, new TableWidgetItem("flagAllowSelfTransition"));
+    table->setItem(FLAG_ALLOW_SELF_TRANSITION_ROW, TYPE_COLUMN, new TableWidgetItem("TransitionFlag", Qt::AlignCenter));
+    table->setCellWidget(FLAG_ALLOW_SELF_TRANSITION_ROW, VALUE_COLUMN, flagAllowSelfTransition);
     table->setItem(FLAG_DISALLOW_RANDOM_TRANSITION_ROW, NAME_COLUMN, new TableWidgetItem("flagDisallowRandomTransition"));
     table->setItem(FLAG_DISALLOW_RANDOM_TRANSITION_ROW, TYPE_COLUMN, new TableWidgetItem("TransitionFlag", Qt::AlignCenter));
     table->setCellWidget(FLAG_DISALLOW_RANDOM_TRANSITION_ROW, VALUE_COLUMN, flagDisallowRandomTransition);
@@ -163,7 +173,9 @@ void TransitionsUI::connectSignals(){
     connect(toNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToNestedStateId(QString)), Qt::UniqueConnection);
     connect(priority, SIGNAL(editingFinished()), this, SLOT(setPriority()), Qt::UniqueConnection);
     connect(flagGlobalWildcard, SIGNAL(released()), this, SLOT(toggleGlobalWildcardFlag()), Qt::UniqueConnection);
+    connect(flagLocalWildcard, SIGNAL(released()), this, SLOT(toggleLocalWildcardFlag()), Qt::UniqueConnection);
     connect(flagUseNestedState, SIGNAL(released()), this, SLOT(toggleUseNestedStateFlag()), Qt::UniqueConnection);
+    connect(flagAllowSelfTransition, SIGNAL(released()), this, SLOT(toggleAllowSelfTransition()), Qt::UniqueConnection);
     connect(flagDisallowRandomTransition, SIGNAL(released()), this, SLOT(toggleDisallowRandomTransitionFlag()), Qt::UniqueConnection);
     connect(flagDisallowReturnToState, SIGNAL(released()), this, SLOT(toggleDisallowReturnToStateFlag()), Qt::UniqueConnection);
     connect(flagAbutEndState, SIGNAL(released()), this, SLOT(toggleAbutEndStateFlag()), Qt::UniqueConnection);
@@ -188,7 +200,9 @@ void TransitionsUI::disconnectSignals(){
     disconnect(toNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToNestedStateId(QString)));
     disconnect(priority, SIGNAL(editingFinished()), this, SLOT(setPriority()));
     disconnect(flagGlobalWildcard, SIGNAL(released()), this, SLOT(toggleGlobalWildcardFlag()));
+    disconnect(flagLocalWildcard, SIGNAL(released()), this, SLOT(toggleLocalWildcardFlag()));
     disconnect(flagUseNestedState, SIGNAL(released()), this, SLOT(toggleUseNestedStateFlag()));
+    disconnect(flagAllowSelfTransition, SIGNAL(released()), this, SLOT(toggleAllowSelfTransition()));
     disconnect(flagDisallowRandomTransition, SIGNAL(released()), this, SLOT(toggleDisallowRandomTransitionFlag()));
     disconnect(flagDisallowReturnToState, SIGNAL(released()), this, SLOT(toggleDisallowReturnToStateFlag()));
     disconnect(flagAbutEndState, SIGNAL(released()), this, SLOT(toggleAbutEndStateFlag()));
@@ -251,9 +265,13 @@ void TransitionsUI::loadData(BehaviorFile *parentfile, hkbStateMachine *parent, 
         if (flags.isEmpty()){
             if (bsData->flags == "FLAG_IS_GLOBAL_WILDCARD"){
                 flagGlobalWildcard->setChecked(true);
+            }else if (bsData->flags == "FLAG_IS_LOCAL_WILDCARD"){
+                flagLocalWildcard->setChecked(true);
             }else if (bsData->flags == "FLAG_TO_NESTED_STATE_ID_IS_VALID"){
                 flagUseNestedState->setChecked(true);
                 toNestedStateId->setDisabled(false);
+            }else if (bsData->flags == "FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE"){
+                flagAllowSelfTransition->setChecked(true);
             }else if (bsData->flags == "FLAG_DISALLOW_RANDOM_TRANSITION"){
                 flagDisallowRandomTransition->setChecked(true);
             }else if (bsData->flags == "FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE"){
@@ -265,9 +283,13 @@ void TransitionsUI::loadData(BehaviorFile *parentfile, hkbStateMachine *parent, 
             for (int i = 0; i < flags.size(); i++){
                 if (flags.at(i) == "FLAG_IS_GLOBAL_WILDCARD"){
                     flagGlobalWildcard->setChecked(true);
+                }else if (flags.at(i) == "FLAG_IS_LOCAL_WILDCARD"){
+                    flagLocalWildcard->setChecked(true);
                 }else if (flags.at(i) == "FLAG_TO_NESTED_STATE_ID_IS_VALID"){
                     flagUseNestedState->setChecked(true);
                     toNestedStateId->setDisabled(false);
+                }else if (flags.at(i) == "FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE"){
+                    flagAllowSelfTransition->setChecked(true);
                 }else if (flags.at(i) == "FLAG_DISALLOW_RANDOM_TRANSITION"){
                     flagDisallowRandomTransition->setChecked(true);
                 }else if (flags.at(i) == "FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE"){
@@ -278,7 +300,7 @@ void TransitionsUI::loadData(BehaviorFile *parentfile, hkbStateMachine *parent, 
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::loadData(): The data, parent file or parent state machine is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::loadData(): The data, parent file or parent state machine is nullptr!!");
     }
     connectSignals();
 }
@@ -287,16 +309,24 @@ void TransitionsUI::setTriggerIntervalEnterEventId(int index, const QString &nam
     if (bsData){
         bsData->triggerInterval.enterEventId = index - 1;
         table->item(TRIGGER_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        if (bsData->triggerInterval.enterEventId < 0){
-            bsData->flags.remove("FLAG_USE_TRIGGER_INTERVAL");
-        }else{
+        if (bsData->usingTriggerInterval()){
             if (!bsData->flags.contains("FLAG_USE_TRIGGER_INTERVAL")){
-                bsData->flags.append("|FLAG_USE_TRIGGER_INTERVAL");
+                if (bsData->flags != "0"){
+                    bsData->flags.append("|FLAG_USE_TRIGGER_INTERVAL");
+                }else{
+                    bsData->flags = ("FLAG_USE_TRIGGER_INTERVAL");
+                }
+            }
+        }else{
+            bsData->flags.remove("FLAG_USE_TRIGGER_INTERVAL");
+            auto lastindex = bsData->flags.lastIndexOf("|");
+            if (lastindex > bsData->flags.size() - 1){
+                bsData->flags.remove(lastindex, lastindex + 1);
             }
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::setTriggerIntervalEnterEventId(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::setTriggerIntervalEnterEventId(): The data is nullptr!!");
     }
 }
 
@@ -304,34 +334,72 @@ void TransitionsUI::setTriggerIntervalExitEventId(int index, const QString &name
     if (bsData){
         bsData->triggerInterval.exitEventId = index - 1;
         table->item(TRIGGER_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        if (bsData->triggerInterval.exitEventId < 0){
-            bsData->flags.remove("FLAG_USE_TRIGGER_INTERVAL");
-        }else{
+        if (bsData->usingTriggerInterval()){
             if (!bsData->flags.contains("FLAG_USE_TRIGGER_INTERVAL")){
-                bsData->flags.append("|FLAG_USE_TRIGGER_INTERVAL");
+                if (bsData->flags != "0"){
+                    bsData->flags.append("|FLAG_USE_TRIGGER_INTERVAL");
+                }else{
+                    bsData->flags = ("FLAG_USE_TRIGGER_INTERVAL");
+                }
+            }
+        }else{
+            bsData->flags.remove("FLAG_USE_TRIGGER_INTERVAL");
+            auto lastindex = bsData->flags.lastIndexOf("|");
+            if (lastindex > bsData->flags.size() - 1){
+                bsData->flags.remove(lastindex, lastindex + 1);
             }
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::setTriggerIntervalExitEventId(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::setTriggerIntervalExitEventId(): The data is nullptr!!");
     }
 }
 
 void TransitionsUI::setTriggerIntervalEnterTime(){
     if (bsData){
         bsData->triggerInterval.enterTime = enterTimeTI->value();
+        if (bsData->usingTriggerInterval()){
+            if (!bsData->flags.contains("FLAG_USE_TRIGGER_INTERVAL")){
+                if (bsData->flags != "0"){
+                    bsData->flags.append("|FLAG_USE_TRIGGER_INTERVAL");
+                }else{
+                    bsData->flags = ("FLAG_USE_TRIGGER_INTERVAL");
+                }
+            }
+        }else{
+            bsData->flags.remove("FLAG_USE_TRIGGER_INTERVAL");
+            auto lastindex = bsData->flags.lastIndexOf("|");
+            if (lastindex > bsData->flags.size() - 1){
+                bsData->flags.remove(lastindex, lastindex + 1);
+            }
+        }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::setTriggerIntervalEnterTime(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::setTriggerIntervalEnterTime(): The data is nullptr!!");
     }
 }
 
 void TransitionsUI::setTriggerIntervalExitTime(){
     if (bsData){
         bsData->triggerInterval.exitTime = exitTimeTI->value();
+        if (bsData->usingTriggerInterval()){
+            if (!bsData->flags.contains("FLAG_USE_TRIGGER_INTERVAL")){
+                if (bsData->flags != "0"){
+                    bsData->flags.append("|FLAG_USE_TRIGGER_INTERVAL");
+                }else{
+                    bsData->flags = ("FLAG_USE_TRIGGER_INTERVAL");
+                }
+            }
+        }else{
+            bsData->flags.remove("FLAG_USE_TRIGGER_INTERVAL");
+            auto lastindex = bsData->flags.lastIndexOf("|");
+            if (lastindex > bsData->flags.size() - 1){
+                bsData->flags.remove(lastindex, lastindex + 1);
+            }
+        }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::setTriggerIntervalExitTime(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::setTriggerIntervalExitTime(): The data is nullptr!!");
     }
 }
 
@@ -339,16 +407,24 @@ void TransitionsUI::setInitiateIntervalEnterEventId(int index, const QString &na
     if (bsData){
         bsData->initiateInterval.enterEventId = index - 1;
         table->item(INITIATE_INTERVAL_ENTER_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        if (bsData->initiateInterval.enterEventId < 0){
-            bsData->flags.remove("FLAG_USE_INITIATE_INTERVAL");
-        }else{
+        if (bsData->usingTriggerInterval()){
             if (!bsData->flags.contains("FLAG_USE_INITIATE_INTERVAL")){
-                bsData->flags.append("|FLAG_USE_INITIATE_INTERVAL");
+                if (bsData->flags != "0"){
+                    bsData->flags.append("|FLAG_USE_INITIATE_INTERVAL");
+                }else{
+                    bsData->flags = ("FLAG_USE_INITIATE_INTERVAL");
+                }
+            }
+        }else{
+            bsData->flags.remove("FLAG_USE_INITIATE_INTERVAL");
+            auto lastindex = bsData->flags.lastIndexOf("|");
+            if (lastindex > bsData->flags.size() - 1){
+                bsData->flags.remove(lastindex, lastindex + 1);
             }
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::setInitiateIntervalEnterEventId(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::setInitiateIntervalEnterEventId(): The data is nullptr!!");
     }
 }
 
@@ -356,34 +432,72 @@ void TransitionsUI::setInitiateIntervalExitEventId(int index, const QString &nam
     if (bsData){
         bsData->initiateInterval.exitEventId = index - 1;
         table->item(INITIATE_INTERVAL_EXIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        if (bsData->initiateInterval.exitEventId < 0){
-            bsData->flags.remove("FLAG_USE_INITIATE_INTERVAL");
-        }else{
+        if (bsData->usingTriggerInterval()){
             if (!bsData->flags.contains("FLAG_USE_INITIATE_INTERVAL")){
-                bsData->flags.append("|FLAG_USE_INITIATE_INTERVAL");
+                if (bsData->flags != "0"){
+                    bsData->flags.append("|FLAG_USE_INITIATE_INTERVAL");
+                }else{
+                    bsData->flags = ("FLAG_USE_INITIATE_INTERVAL");
+                }
+            }
+        }else{
+            bsData->flags.remove("FLAG_USE_INITIATE_INTERVAL");
+            auto lastindex = bsData->flags.lastIndexOf("|");
+            if (lastindex > bsData->flags.size() - 1){
+                bsData->flags.remove(lastindex, lastindex + 1);
             }
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::setInitiateIntervalExitEventId(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::setInitiateIntervalExitEventId(): The data is nullptr!!");
     }
 }
 
 void TransitionsUI::setInitiateIntervalEnterTime(){
     if (bsData){
         bsData->initiateInterval.enterTime = enterTimeII->value();
+        if (bsData->usingTriggerInterval()){
+            if (!bsData->flags.contains("FLAG_USE_INITIATE_INTERVAL")){
+                if (bsData->flags != "0"){
+                    bsData->flags.append("|FLAG_USE_INITIATE_INTERVAL");
+                }else{
+                    bsData->flags = ("FLAG_USE_INITIATE_INTERVAL");
+                }
+            }
+        }else{
+            bsData->flags.remove("FLAG_USE_INITIATE_INTERVAL");
+            auto lastindex = bsData->flags.lastIndexOf("|");
+            if (lastindex > bsData->flags.size() - 1){
+                bsData->flags.remove(lastindex, lastindex + 1);
+            }
+        }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::setInitiateIntervalEnterTime(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::setInitiateIntervalEnterTime(): The data is nullptr!!");
     }
 }
 
 void TransitionsUI::setInitiateIntervalExitTime(){
     if (bsData){
         bsData->initiateInterval.exitTime = exitTimeII->value();
+        if (bsData->usingTriggerInterval()){
+            if (!bsData->flags.contains("FLAG_USE_INITIATE_INTERVAL")){
+                if (bsData->flags != "0"){
+                    bsData->flags.append("|FLAG_USE_INITIATE_INTERVAL");
+                }else{
+                    bsData->flags = ("FLAG_USE_INITIATE_INTERVAL");
+                }
+            }
+        }else{
+            bsData->flags.remove("FLAG_USE_INITIATE_INTERVAL");
+            auto lastindex = bsData->flags.lastIndexOf("|");
+            if (lastindex > bsData->flags.size() - 1){
+                bsData->flags.remove(lastindex, lastindex + 1);
+            }
+        }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::setInitiateIntervalExitTime(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::setInitiateIntervalExitTime(): The data is nullptr!!");
     }
 }
 
@@ -392,7 +506,7 @@ void TransitionsUI::viewTransitionEffect(){
         transitionUI->loadData(bsData->transition.data());
         setCurrentIndex(TRANSITION_EFFECT_WIDGET);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::viewTransitionEffect(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::viewTransitionEffect(): The data is nullptr!!");
     }
 }
 
@@ -408,7 +522,7 @@ void TransitionsUI::toggleTransitionEffect(bool enable){
             transition->setText(effect->getName());
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::toggleTransitionEffect(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleTransitionEffect(): The data is nullptr!!");
     }
 }
 
@@ -434,7 +548,7 @@ void TransitionsUI::setCondition(){
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::setCondition(): The data or parent object is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::setCondition(): The data or parent object is nullptr!!");
     }
 }
 
@@ -444,11 +558,11 @@ void TransitionsUI::setEventId(int index, const QString &name){
         if (name != ""){
             table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }else{
-            FATAL_RUNTIME_ERROR("TransitionsUI::setEventId(): The event name is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("TransitionsUI::setEventId(): The event name is nullptr!!");
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::setEventId(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::setEventId(): The data is nullptr!!");
     }
 }
 
@@ -467,11 +581,11 @@ void TransitionsUI::setToStateId(const QString &name){
                 emit transitionNamChanged("to_"+name, transitionIndex);
             }
         }else{
-            FATAL_RUNTIME_ERROR("TransitionsUI::setToStateId(): The event name is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("TransitionsUI::setToStateId(): The event name is nullptr!!");
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::setToStateId(): The data or parent object is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::setToStateId(): The data or parent object is nullptr!!");
     }
 }
 
@@ -480,11 +594,11 @@ void TransitionsUI::setFromNestedStateId(const QString &name){
         if (name != ""){
             bsData->fromNestedStateId = parentObj->getNestedStateId(name, bsData->toStateId);
         }else{
-            FATAL_RUNTIME_ERROR("TransitionsUI::setFromNestedStateId(): The event name is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("TransitionsUI::setFromNestedStateId(): The event name is nullptr!!");
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::setFromNestedStateId(): The data or parent object is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::setFromNestedStateId(): The data or parent object is nullptr!!");
     }
 }
 
@@ -494,11 +608,11 @@ void TransitionsUI::setToNestedStateId(const QString &name){
             bsData->toNestedStateId = parentObj->getNestedStateId(name, bsData->toStateId);
             emit transitionNamChanged("toNestedState_"+toNestedStateId->currentText(), transitionIndex);
         }else{
-            FATAL_RUNTIME_ERROR("TransitionsUI::setToNestedStateId(): The event name is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("TransitionsUI::setToNestedStateId(): The event name is nullptr!!");
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::setToNestedStateId(): The data or parent object is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::setToNestedStateId(): The data or parent object is nullptr!!");
     }
 }
 
@@ -507,7 +621,7 @@ void TransitionsUI::setPriority(){
         bsData->priority = priority->value();
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::setPriority(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::setPriority(): The data is nullptr!!");
     }
 }
 
@@ -528,7 +642,28 @@ void TransitionsUI::toggleGlobalWildcardFlag(){
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::toggleGlobalWildcardFlag(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleGlobalWildcardFlag(): The data is nullptr!!");
+    }
+}
+
+void TransitionsUI::toggleLocalWildcardFlag(){
+    if (bsData){
+        if (flagLocalWildcard->isChecked()){
+            if (bsData->flags == "0"){
+                bsData->flags = "FLAG_IS_LOCAL_WILDCARD";
+            }else if (!bsData->flags.contains("FLAG_IS_LOCAL_WILDCARD")){
+                bsData->flags.append("|FLAG_IS_LOCAL_WILDCARD");
+            }
+        }else{
+            if (bsData->flags == "FLAG_IS_LOCAL_WILDCARD"){
+                bsData->flags = "0";
+            }else{
+                bsData->flags.remove("|FLAG_IS_LOCAL_WILDCARD");
+            }
+        }
+        parentObj->getParentFile()->setIsChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleLocalWildcardFlag(): The data is nullptr!!");
     }
 }
 
@@ -551,7 +686,30 @@ void TransitionsUI::toggleUseNestedStateFlag(){
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::toggleUseNestedStateFlag(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleUseNestedStateFlag(): The data is nullptr!!");
+    }
+}
+
+void TransitionsUI::toggleAllowSelfTransition(){
+    if (bsData){
+        if (flagUseNestedState->isChecked()){
+            if (bsData->flags == "0"){
+                bsData->flags = "FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE";
+            }else if (!bsData->flags.contains("FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE")){
+                bsData->flags.append("|FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE");
+            }
+            toNestedStateId->setDisabled(false);
+        }else{
+            if (bsData->flags == "FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE"){
+                bsData->flags = "0";
+            }else{
+                bsData->flags.remove("|FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE");
+            }
+            toNestedStateId->setDisabled(true);
+        }
+        parentObj->getParentFile()->setIsChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleAllowSelfTransition(): The data is nullptr!!");
     }
 }
 
@@ -572,7 +730,7 @@ void TransitionsUI::toggleDisallowRandomTransitionFlag(){
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::toggleDisallowRandomTransitionFlag(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleDisallowRandomTransitionFlag(): The data is nullptr!!");
     }
 }
 
@@ -593,7 +751,7 @@ void TransitionsUI::toggleDisallowReturnToStateFlag(){
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::toggleDisallowReturnToStateFlag(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleDisallowReturnToStateFlag(): The data is nullptr!!");
     }
 }
 
@@ -614,7 +772,7 @@ void TransitionsUI::toggleAbutEndStateFlag(){
         }
         parentObj->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::toggleAbutEndStateFlag(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleAbutEndStateFlag(): The data is nullptr!!");
     }
 }
 
@@ -637,11 +795,11 @@ void TransitionsUI::eventTableElementSelected(int index, const QString &name){
             setEventId(index, name);
             break;
         default:
-            FATAL_RUNTIME_ERROR("TransitionsUI::eventTableElementSelected(): Event relayed to wrong table row!!");
+            CRITICAL_ERROR_MESSAGE("TransitionsUI::eventTableElementSelected(): Event relayed to wrong table row!!");
             return;
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::eventTableElementSelected(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::eventTableElementSelected(): The data is nullptr!!");
     }
 }
 
@@ -652,11 +810,11 @@ void TransitionsUI::variableTableElementSelected(int index, const QString &name)
             transitionUI->setBindingVariable(index, name);
             break;
         default:
-            FATAL_RUNTIME_ERROR("TransitionsUI::variableTableElementSelected(): Event relayed to wrong widget!!");
+            CRITICAL_ERROR_MESSAGE("TransitionsUI::variableTableElementSelected(): Event relayed to wrong widget!!");
             return;
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::variableTableElementSelected(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::variableTableElementSelected(): The data is nullptr!!");
     }
 }
 
@@ -692,7 +850,7 @@ void TransitionsUI::viewSelectedChild(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlendingTransitionEffectUI::viewSelectedChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlendingTransitionEffectUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -700,7 +858,7 @@ void TransitionsUI::transitionEffectRenamed(const QString &name){
     if (name != ""){
         transition->setText(name);
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::transitionEffectRenamed(): The name the empty string!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::transitionEffectRenamed(): The name the empty string!!");
     }
 }
 
@@ -712,7 +870,7 @@ void TransitionsUI::loadTableValue(int row, const QString &value){
             table->item(row, VALUE_COLUMN)->setText("NONE");
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::loadTableValue(): There is no table item here!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::loadTableValue(): There is no table item here!!");
     }
 }
 
@@ -734,6 +892,6 @@ void TransitionsUI::eventRenamed(const QString &name, int index){
             table->item(EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransitionsUI::eventRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransitionsUI::eventRenamed(): The data is nullptr!!");
     }
 }

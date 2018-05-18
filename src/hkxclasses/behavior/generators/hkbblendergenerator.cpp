@@ -113,6 +113,26 @@ bool hkbBlenderGenerator::isParametricBlend() const{
     return false;
 }
 
+bool hkbBlenderGenerator::merge(HkxObject *recessiveObject){
+    hkbBlenderGenerator *recobj;
+    hkbBlenderGeneratorChild *domchild;
+    hkbBlenderGeneratorChild *recchild;
+    if (recessiveObject && recessiveObject->getSignature() == HKB_BLENDER_GENERATOR){
+        recobj = static_cast<hkbBlenderGenerator *>(recessiveObject);
+        for (auto i = 0; i < children.size(); i++){
+            domchild = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
+            for (auto j = 0; j < recobj->children.size(); j++){
+                recchild = static_cast<hkbBlenderGeneratorChild *>(recobj->children.at(j).data());
+                if (*recchild == *domchild){
+                    domchild->injectWhileMerging(recchild);
+                    break;
+                }
+            }
+        }
+    }
+    return true;
+}
+
 QList<DataIconManager *> hkbBlenderGenerator::getChildren() const{
     QList<DataIconManager *> list;
     for (int i = 0; i < children.size(); i++){
@@ -142,7 +162,7 @@ bool hkbBlenderGenerator::readData(const HkxXmlReader &reader, long index){
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+":  readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -266,7 +286,7 @@ bool hkbBlenderGenerator::link(){
     HkxSharedPtr *ptr;
     for (int i = 0; i < children.size(); i++){
         //ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(children.at(i).getReference());
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(children.at(i).getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(children.at(i).getShdPtrReference());
         if (!ptr){
             writeToLog(getClassname()+":  link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
             setDataValidity(false);
@@ -292,14 +312,14 @@ void hkbBlenderGenerator::unlink(){
     }
 }
 
-bool hkbBlenderGenerator::evaulateDataValidity(){
+bool hkbBlenderGenerator::evaluateDataValidity(){
     bool valid = true;
     for (int i = 0; i < children.size(); i++){
         if (!children.at(i).data() || children.at(i).data()->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
             valid = false;
         }
     }
-    if (!HkDynamicObject::evaulateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){

@@ -38,7 +38,7 @@ bool BSDistTriggerModifier::readData(const HkxXmlReader &reader, long index){
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -77,7 +77,7 @@ bool BSDistTriggerModifier::readData(const HkxXmlReader &reader, long index){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
             }
         }else if (text == "payload"){
-            if (!triggerEvent.payload.readReference(index, reader)){
+            if (!triggerEvent.payload.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
             }
         }
@@ -142,6 +142,12 @@ void BSDistTriggerModifier::updateEventIndices(int eventindex){
     }
 }
 
+void BSDistTriggerModifier::mergeEventIndex(int oldindex, int newindex){
+    if (triggerEvent.id == oldindex){
+        triggerEvent.id = newindex;
+    }
+}
+
 bool BSDistTriggerModifier::link(){
     if (!getParentFile()){
         return false;
@@ -149,7 +155,7 @@ bool BSDistTriggerModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggerEvent.payload.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggerEvent.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
@@ -165,8 +171,8 @@ void BSDistTriggerModifier::unlink(){
     triggerEvent.payload = HkxSharedPtr();
 }
 
-bool BSDistTriggerModifier::evaulateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool BSDistTriggerModifier::evaluateDataValidity(){    //Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (triggerEvent.payload.data() && triggerEvent.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){

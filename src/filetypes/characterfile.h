@@ -41,6 +41,7 @@ public:
     bool isAnimationUsed(const QString & animationname) const;
     QString getRootBehaviorFilename() const;
     void getCharacterPropertyBoneWeightArray(const QString &name, hkbBoneWeightArray *ptrtosetdata) const;
+    bool merge(CharacterFile *recessivefile);
 protected:
     bool parse();
     bool link();

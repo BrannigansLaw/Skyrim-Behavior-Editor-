@@ -67,3 +67,21 @@ bool AnimCacheProjectData::write(QFile *file, QTextStream & out) const{
     }
     return true;
 }
+
+bool AnimCacheProjectData::merge(AnimCacheProjectData *recessiveproject){
+    int size = fileNames.size();
+    bool found;
+    if (recessiveproject){
+        for (auto i = 0; i < size; i++){
+            found = false;
+            for (auto j = 0; j < recessiveproject->fileNames.size(); j++){
+                if (!QString::compare(fileNames.at(i), recessiveproject->fileNames.at(j), Qt::CaseInsensitive)){
+                    if (i >= animSetData.size() && j >= recessiveproject->animSetData.size() && !animSetData.at(i)->merge(recessiveproject->animSetData.at(j))){
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}

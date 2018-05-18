@@ -36,7 +36,7 @@ bool BSRagdollContactListenerModifier::readData(const HkxXmlReader &reader, long
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -60,11 +60,11 @@ bool BSRagdollContactListenerModifier::readData(const HkxXmlReader &reader, long
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
             }
         }else if (text == "payload"){
-            if (!contactEvent.payload.readReference(index, reader)){
+            if (!contactEvent.payload.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
             }
         }else if (text == "bones"){
-            if (!bones.readReference(index, reader)){
+            if (!bones.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'bones' reference!\nObject Reference: "+ref);
             }
         }
@@ -135,6 +135,12 @@ void BSRagdollContactListenerModifier::updateEventIndices(int eventindex){
     }
 }
 
+void BSRagdollContactListenerModifier::mergeEventIndex(int oldindex, int newindex){
+    if (contactEvent.id == oldindex){
+        contactEvent.id = newindex;
+    }
+}
+
 bool BSRagdollContactListenerModifier::link(){
     if (!getParentFile()){
         return false;
@@ -142,7 +148,7 @@ bool BSRagdollContactListenerModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(contactEvent.payload.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(contactEvent.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
@@ -150,7 +156,7 @@ bool BSRagdollContactListenerModifier::link(){
         }
         contactEvent.payload = *ptr;
     }
-    ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(bones.getReference());
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(bones.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_INDEX_ARRAY){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'bones' is not a HKB_BONE_INDEX_ARRAY!");
@@ -167,8 +173,8 @@ void BSRagdollContactListenerModifier::unlink(){
     bones = HkxSharedPtr();
 }
 
-bool BSRagdollContactListenerModifier::evaulateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool BSRagdollContactListenerModifier::evaluateDataValidity(){    //Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (!bones.data()){

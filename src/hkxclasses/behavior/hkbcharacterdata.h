@@ -18,7 +18,7 @@ public:
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
     QStringList getVariableNames() const;
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     hkQuadVariable getQuadVariable(int index, bool *ok) const;
     HkxObject * getVariantVariable(int index) const;
@@ -30,6 +30,7 @@ private:
     hkbCharacterData& operator=(const hkbCharacterData&);
     hkbCharacterData(const hkbCharacterData &);
 private:
+    bool merge(HkxObject *recessiveobj);
     void addVariable(hkVariableType type, const QString & name);
     void addVariable(hkVariableType type);
     void removeVariable(int index);

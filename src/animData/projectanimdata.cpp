@@ -3,7 +3,7 @@
 
 #define MIN_NUM_LINES 3
 
-bool ProjectAnimData::chopLine(QFile * file, QByteArray & line, uint & linecount){
+bool ProjectAnimData::chopLine(QFile * file, QByteArray & line, ulong &linecount){
     if (file){
         if (!file->atEnd()){
             line = file->readLine();
@@ -27,13 +27,13 @@ bool ProjectAnimData::read(QFile *file){
     }
     QByteArray line;
     bool ok = false;
-    uint lineCount = 0;
-    uint numFiles = 0;
-    uint count = 0;
+    ulong lineCount = 0;
+    ulong numFiles = 0;
+    ulong count = 0;
     if (!chopLine(file, line, lineCount)){
         return false;
     }
-    uint blocksize = line.toUInt(&ok);
+    ulong blocksize = line.toULong(&ok);
     if (!ok){
         return false;
     }
@@ -45,15 +45,15 @@ bool ProjectAnimData::read(QFile *file){
         if (!chopLine(file, line, lineCount)){
             return false;
         }
-        count = line.toUInt(&ok);
+        count = line.toULong(&ok);
         if (!ok || !chopLine(file, line, lineCount)){
             return false;
         }
-        numFiles = line.toUInt(&ok);
+        numFiles = line.toULong(&ok);
         if (!ok || numFiles <= 2){
             return false;
         }
-        for (uint j = 0; j < numFiles; j++){
+        for (ulong j = 0; j < numFiles; j++){
             if (!chopLine(file, line, lineCount) || (!line.contains(".hkx") && !line.contains(".HKX"))){
                 return false;
             }
@@ -62,7 +62,7 @@ bool ProjectAnimData::read(QFile *file){
         if (!chopLine(file, line, lineCount)){
             return false;
         }
-        count = line.toUInt(&ok);
+        count = line.toULong(&ok);
         if (!ok){
             return false;
         }
@@ -77,7 +77,7 @@ bool ProjectAnimData::read(QFile *file){
             if (!chopLine(file, line, lineCount)){
                 return false;
             }
-            blocksize = line.toUInt(&ok);
+            blocksize = line.toULong(&ok);
             if (!ok){
                 return false;
             }
@@ -102,11 +102,11 @@ bool ProjectAnimData::readMotionOnly(QFile *file){
     }
     QByteArray line;
     bool ok = false;
-    uint lineCount = 0;
+    ulong lineCount = 0;
     if (!chopLine(file, line, lineCount)){
         return false;
     }
-    uint blocksize = line.toUInt(&ok);
+    ulong blocksize = line.toULong(&ok);
     if (!ok){
         return false;
     }
@@ -126,10 +126,11 @@ bool ProjectAnimData::readMotionOnly(QFile *file){
     return false;
 }
 
-bool ProjectAnimData::write(QFile & file, QTextStream & out) const{
+bool ProjectAnimData::write(QFile & file, QTextStream & out){
     if (out.status() != QTextStream::Ok || !file.isOpen()){
         return false;
     }
+    fixNumberAnimationLines();
     out << QString::number(animationDataLines) << "\n";
     out << "1" << "\n";
     out << QString::number(projectFiles.size()) << "\n";
@@ -215,7 +216,7 @@ void ProjectAnimData::setLocalTimeForClipGenAnimData(const QString &clipname, in
             return;
         }
     }
-    FATAL_RUNTIME_ERROR("ProjectAnimData::setLocalTimeForClipGenAnimData(): Failed to set data!");
+    CRITICAL_ERROR_MESSAGE("ProjectAnimData::setLocalTimeForClipGenAnimData(): Failed to set data!");
 }
 
 void ProjectAnimData::setEventNameForClipGenAnimData(const QString &clipname, int triggerindex, const QString &eventname){
@@ -225,7 +226,7 @@ void ProjectAnimData::setEventNameForClipGenAnimData(const QString &clipname, in
             return;
         }
     }
-    FATAL_RUNTIME_ERROR("ProjectAnimData::setEventNameForClipGenAnimData(): Failed to set data!");
+    CRITICAL_ERROR_MESSAGE("ProjectAnimData::setEventNameForClipGenAnimData(): Failed to set data!");
 }
 
 void ProjectAnimData::setClipNameAnimData(const QString &oldclipname, const QString &newclipname){
@@ -235,7 +236,7 @@ void ProjectAnimData::setClipNameAnimData(const QString &oldclipname, const QStr
             return;
         }
     }
-    FATAL_RUNTIME_ERROR("ProjectAnimData::setClipNameAnimData(): Failed to set data!");
+    CRITICAL_ERROR_MESSAGE("ProjectAnimData::setClipNameAnimData(): Failed to set data!");
 }
 
 void ProjectAnimData::setAnimationIndexForClipGen(const QString &clipGenName, int index){
@@ -245,7 +246,7 @@ void ProjectAnimData::setAnimationIndexForClipGen(const QString &clipGenName, in
             return;
         }
     }
-    FATAL_RUNTIME_ERROR("ProjectAnimData::setAnimationIndexForClipGen(): Failed to set data!");
+    CRITICAL_ERROR_MESSAGE("ProjectAnimData::setAnimationIndexForClipGen(): Failed to set data!");
 }
 
 void ProjectAnimData::setPlaybackSpeedForClipGen(const QString &clipGenName, qreal speed){
@@ -255,7 +256,7 @@ void ProjectAnimData::setPlaybackSpeedForClipGen(const QString &clipGenName, qre
             return;
         }
     }
-    FATAL_RUNTIME_ERROR("ProjectAnimData::setPlaybackSpeedForClipGen(): Failed to set data!");
+    CRITICAL_ERROR_MESSAGE("ProjectAnimData::setPlaybackSpeedForClipGen(): Failed to set data!");
 }
 
 void ProjectAnimData::setCropStartAmountLocalTimeForClipGen(const QString &clipGenName, qreal time){
@@ -265,7 +266,7 @@ void ProjectAnimData::setCropStartAmountLocalTimeForClipGen(const QString &clipG
             return;
         }
     }
-    FATAL_RUNTIME_ERROR("ProjectAnimData::setCropStartAmountLocalTimeForClipGen(): Failed to set data!");
+    CRITICAL_ERROR_MESSAGE("ProjectAnimData::setCropStartAmountLocalTimeForClipGen(): Failed to set data!");
 }
 
 void ProjectAnimData::setCropEndAmountLocalTimeForClipGen(const QString &clipGenName, qreal time){
@@ -275,7 +276,7 @@ void ProjectAnimData::setCropEndAmountLocalTimeForClipGen(const QString &clipGen
             return;
         }
     }
-    FATAL_RUNTIME_ERROR("ProjectAnimData::setCropEndAmountLocalTimeForClipGen(): Failed to set data!");
+    CRITICAL_ERROR_MESSAGE("ProjectAnimData::setCropEndAmountLocalTimeForClipGen(): Failed to set data!");
 }
 
 void ProjectAnimData::appendClipTriggerToAnimData(const QString &clipGenName, const QString & eventname){
@@ -285,7 +286,7 @@ void ProjectAnimData::appendClipTriggerToAnimData(const QString &clipGenName, co
             return;
         }
     }
-    FATAL_RUNTIME_ERROR("ProjectAnimData::appendClipTriggerToAnimData(): Failed to set data!");
+    CRITICAL_ERROR_MESSAGE("ProjectAnimData::appendClipTriggerToAnimData(): Failed to set data!");
 }
 
 void ProjectAnimData::removeClipTriggerToAnimDataAt(const QString &clipGenName, int index){
@@ -295,15 +296,43 @@ void ProjectAnimData::removeClipTriggerToAnimDataAt(const QString &clipGenName, 
             return;
         }
     }
-    FATAL_RUNTIME_ERROR("ProjectAnimData::removeClipTriggerToAnimDataAt(): Failed to set data!");
+    CRITICAL_ERROR_MESSAGE("ProjectAnimData::removeClipTriggerToAnimDataAt(): Failed to set data!");
 }
 
 bool ProjectAnimData::removeBehaviorFromProject(const QString &behaviorname){
     for (int i = 0; i < projectFiles.size(); i++){
         if (!QString::compare(projectFiles.at(i), behaviorname, Qt::CaseInsensitive)){
-            projectFiles.removeAt(i);animationDataLines--;
+            projectFiles.removeAt(i);
+            animationDataLines--;
             return true;
         }
     }
     return false;
+}
+
+qreal ProjectAnimData::getAnimationDuration(int animationindex) const{
+    for (int i = 0; i < animationMotionData.size(); i++){
+        if (animationMotionData.at(i)->animationIndex == animationindex){
+            return animationMotionData.at(i)->duration;
+        }
+    }
+    return 0;
+}
+
+SkyrimAnimationMotionData ProjectAnimData::getAnimationMotionData(int animationindex) const{
+    for (int i = 0; i < animationMotionData.size(); i++){
+        if (animationMotionData.at(i)->animationIndex == animationindex){
+            return *animationMotionData.at(i);
+        }
+    }
+    //WARNING_MESSAGE("ProjectAnimData::getAnimationMotionData(): Motion data was not found!");
+    return SkyrimAnimationMotionData(nullptr);
+}
+
+void ProjectAnimData::fixNumberAnimationLines(){
+    auto num = 2 + projectFiles.size() + 1;
+    for (auto i = 0; i < animationData.size(); i++){
+        num = num + animationData.at(i)->lineCount();
+    }
+    animationDataLines = num;
 }

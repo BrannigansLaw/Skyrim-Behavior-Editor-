@@ -15,13 +15,14 @@ public:
     bool link();
     void unlink();
     QString getName() const;
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfBones() const;
     int getNumberOfEyeBones() const;
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
+    void mergeEventIndex(int oldindex, int newindex);
 private:
     BSLookAtModifier& operator=(const BSLookAtModifier&);
     BSLookAtModifier(const BSLookAtModifier &);

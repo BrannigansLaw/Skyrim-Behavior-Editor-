@@ -158,7 +158,7 @@ bool hkbVariableValueSet::link(){
     for (int i = 0; i < variantVariableValues.size(); i++){
         file = dynamic_cast<BehaviorFile *>(getParentFile());
         if (file){
-            ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variantVariableValues.at(i).getReference());
+            ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variantVariableValues.at(i).getShdPtrReference());
             if (!ptr){
                 writeToLog(getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
                 setDataValidity(false);
@@ -172,7 +172,7 @@ bool hkbVariableValueSet::link(){
         }else{
             file = dynamic_cast<CharacterFile *>(getParentFile());
             if (file){
-                ptr = static_cast<CharacterFile *>(getParentFile())->findCharacterPropertyValues(variantVariableValues.at(i).getReference());
+                ptr = static_cast<CharacterFile *>(getParentFile())->findCharacterPropertyValues(variantVariableValues.at(i).getShdPtrReference());
                 if (!ptr){
                     writeToLog(getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
                     setDataValidity(false);
@@ -189,7 +189,7 @@ bool hkbVariableValueSet::link(){
     return true;
 }
 
-bool hkbVariableValueSet::evaulateDataValidity(){
+bool hkbVariableValueSet::evaluateDataValidity(){
     for (int i = 0; i < variantVariableValues.size(); i++){
         if (!variantVariableValues.at(i).data() || variantVariableValues.at(i).data()->getSignature() != HKB_BONE_WEIGHT_ARRAY){
             setDataValidity(false);

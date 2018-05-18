@@ -59,7 +59,7 @@ bool hkbStringCondition::write(HkxXMLWriter *writer){
     return true;
 }
 
-bool hkbStringCondition::evaulateDataValidity(){
+bool hkbStringCondition::evaluateDataValidity(){
     if (conditionString == ""){
         setDataValidity(false);
         return false;

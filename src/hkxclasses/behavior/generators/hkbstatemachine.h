@@ -17,7 +17,7 @@ public:
     bool link();
     void unlink();
     QString getName() const;
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     QString getStateName(int stateId) const;
     int getStateId(const QString & statename) const;
@@ -33,6 +33,8 @@ public:
     bool hasChildren() const;
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
+    void mergeEventIndex(int oldindex, int newindex);
+    bool merge(HkxObject *recessiveObject);
 private:
     QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;

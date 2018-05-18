@@ -43,7 +43,7 @@ bool hkRootLevelContainer::readData(const HkxXmlReader &reader, long index){
                     }else if (reader.getNthAttributeValueAt(index, 0) == "className"){
                         namedVariants.last().className = reader.getElementValueAt(index);
                     }else if (reader.getNthAttributeValueAt(index, 0) == "variant"){
-                        if (!namedVariants.last().variant.readReference(index, reader)){
+                        if (!namedVariants.last().variant.readShdPtrReference(index, reader)){
                             return false;
                         }
                         index++;
@@ -97,26 +97,6 @@ bool hkRootLevelContainer::write(HkxXMLWriter *writer){
     return true;
 }
 
-bool hkRootLevelContainer::merge(hkRootLevelContainer *other){
-    bool merged = true;
-    /*auto count = 0;
-    if (other){
-        for (auto i = 0; i < other->namedVariants.size(); i++){
-            for (auto j = 0; j < namedVariants.size(); j++){
-                if (other->namedVariants.at(i) == namedVariants.at(j)){
-                    count++;
-                }
-            }
-            if (count == 0){    //Order doesn't matter here...
-                namedVariants.append(hkRootLevelContainerNamedVariant(other->namedVariants.at(i)));
-            }else if (count > 1){
-                writeToLog(getClassname()+": merge()!\nDuplicates of hkRootLevelContainerNamedVariant found!!!", true);
-            }
-        }
-    }*/
-    return merged;
-}
-
 void hkRootLevelContainer::addVariant(const QString &name){
     namedVariants.append(hkRootLevelContainerNamedVariant(name, name));
 }
@@ -135,19 +115,19 @@ bool hkRootLevelContainer::link(){
         HkxSharedPtr *ptr = nullptr;
         HkxFile *file = dynamic_cast<BehaviorFile *>(getParentFile());
         if (file){
-            ptr = static_cast<BehaviorFile *>(getParentFile())->findBehaviorGraph(namedVariants.at(i).variant.getReference());
+            ptr = static_cast<BehaviorFile *>(getParentFile())->findBehaviorGraph(namedVariants.at(i).variant.getShdPtrReference());
         }else{
             file = dynamic_cast<ProjectFile *>(getParentFile());
             if (file){
-                ptr = static_cast<ProjectFile *>(getParentFile())->findProjectData(namedVariants.at(i).variant.getReference());
+                ptr = static_cast<ProjectFile *>(getParentFile())->findProjectData(namedVariants.at(i).variant.getShdPtrReference());
             }else{
                 file = dynamic_cast<CharacterFile *>(getParentFile());
                 if (file){
-                    ptr = static_cast<CharacterFile *>(getParentFile())->findCharacterData(namedVariants.at(i).variant.getReference());
+                    ptr = static_cast<CharacterFile *>(getParentFile())->findCharacterData(namedVariants.at(i).variant.getShdPtrReference());
                 }else{
                     file = dynamic_cast<SkeletonFile *>(getParentFile());
                     if (file){
-                        ptr = static_cast<SkeletonFile *>(getParentFile())->findSkeleton(namedVariants.at(i).variant.getReference());
+                        ptr = static_cast<SkeletonFile *>(getParentFile())->findSkeleton(namedVariants.at(i).variant.getShdPtrReference());
                     }else{
                         writeToLog(getClassname()+": link()!\nParent file type is invalid!!!", true);
                     }
@@ -155,7 +135,7 @@ bool hkRootLevelContainer::link(){
             }
         }
         if (!ptr){
-            writeToLog(getClassname()+": link()!\nUnable to link variant reference "+QString::number(namedVariants.at(i).variant.getReference())+"!");
+            writeToLog(getClassname()+": link()!\nUnable to link variant reference "+QString::number(namedVariants.at(i).variant.getShdPtrReference())+"!");
             setDataValidity(false);
         }else{
             namedVariants[i].variant = *ptr;
@@ -170,7 +150,7 @@ void hkRootLevelContainer::unlink(){
     }
 }
 
-bool hkRootLevelContainer::evaulateDataValidity(){
+bool hkRootLevelContainer::evaluateDataValidity(){
     for (int i = 0; i < namedVariants.size(); i++){
         if (!namedVariants.at(i).variant.data()){
             setDataValidity(false);

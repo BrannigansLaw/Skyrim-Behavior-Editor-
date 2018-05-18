@@ -139,7 +139,7 @@ bool hkbExpressionDataArray::link(){
     return true;
 }
 
-bool hkbExpressionDataArray::evaulateDataValidity(){
+bool hkbExpressionDataArray::evaluateDataValidity(){
     //Do later...
     return true;
 }

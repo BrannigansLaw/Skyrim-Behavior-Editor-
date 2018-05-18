@@ -191,7 +191,7 @@ void hkbHandIkDriverInfo::unlink(){
     //
 }
 
-bool hkbHandIkDriverInfo::evaulateDataValidity(){
+bool hkbHandIkDriverInfo::evaluateDataValidity(){
     if (!hands.isEmpty()){
         setDataValidity(true);
         return true;

@@ -1,7 +1,8 @@
 #include "animcacheanimsetdata.h"
 #include "hkcrc.h"
+#include "src/utility.h"
 
-AnimCacheAnimSetData::AnimCacheAnimSetData(const QStringList & events, const QVector <AnimCacheVariable> & vars, const QVector <AnimCacheClipInfo> & clips, const QVector <AnimCacheAnimationInfo> & anims)
+AnimCacheAnimSetData::AnimCacheAnimSetData(const QStringList & events, const QVector <AnimCacheVariable *> & vars, const QVector <AnimCacheClipInfo *> & clips, const QVector <AnimCacheAnimationInfo *> & anims)
     : cacheEvents(events), behaviorVariables(vars), clipGenerators(clips), animations(anims)
 {
     //
@@ -47,8 +48,8 @@ bool AnimCacheAnimSetData::read(QFile *file){
     }
     //Get attack animation data, if any...
     for (uint i = 0; i < numvars; i++){
-        behaviorVariables.append(AnimCacheVariable());
-        if (!behaviorVariables.last().read(file)){
+        behaviorVariables.append(new AnimCacheVariable());
+        if (!behaviorVariables.last()->read(file)){
             return false;
         }
     }
@@ -62,8 +63,8 @@ bool AnimCacheAnimSetData::read(QFile *file){
         return false;
     }
     for (uint i = 0; i < numclips; i++){
-        clipGenerators.append(AnimCacheClipInfo());
-        if (!clipGenerators.last().read(file)){
+        clipGenerators.append(new AnimCacheClipInfo());
+        if (!clipGenerators.last()->read(file)){
             return false;
         }
     }
@@ -78,8 +79,8 @@ bool AnimCacheAnimSetData::read(QFile *file){
         return false;
     }
     for (uint i = 0; i < numclips; i++){
-        animations.append(AnimCacheAnimationInfo());
-        if (!animations.last().read(file)){
+        animations.append(new AnimCacheAnimationInfo());
+        if (!animations.last()->read(file)){
             return false;
         }
     }
@@ -97,20 +98,20 @@ bool AnimCacheAnimSetData::write(QFile *file, QTextStream & out) const{
     }
     out << QString::number(behaviorVariables.size()) << "\n";
     for (int i = 0; i < behaviorVariables.size(); i++){
-        behaviorVariables.at(i).write(file, out);
+        behaviorVariables.at(i)->write(file, out);
     }
     out << QString::number(clipGenerators.size()) << "\n";
     for (int i = 0; i < clipGenerators.size(); i++){
-        clipGenerators.at(i).write(file, out);
+        clipGenerators.at(i)->write(file, out);
     }
     out << QString::number(animations.size()) << "\n";
     for (int i = 0; i < animations.size(); i++){
-        animations.at(i).write(file, out);
+        animations.at(i)->write(file, out);
     }
     return true;
 }
 
-bool AnimCacheAnimSetData::addAnimationToCache(const QString & event, const QVector<AnimCacheAnimationInfo> &anims, const QVector<AnimCacheVariable> &vars, const QVector <AnimCacheClipInfo> & clips){
+bool AnimCacheAnimSetData::addAnimationToCache(const QString & event, const QVector<AnimCacheAnimationInfo *> &anims, const QVector<AnimCacheVariable *> &vars, const QVector <AnimCacheClipInfo *> & clips){
     bool exists;
     if (!cacheEvents.contains(event)){
         cacheEvents.append(event);
@@ -164,23 +165,54 @@ void AnimCacheAnimSetData::removeAnimationFromCache(const QString &animationname
             int index = temp.indexOf(".");
             temp.remove(index, temp.size() - index);
         }
+        bool ok;
         QString animationhash = QString(HkCRC().compute(temp.toLocal8Bit().toLower()));
+        animationhash = QString::number(animationhash.toLong(&ok, 16));
+        if (!ok){
+            CRITICAL_ERROR_MESSAGE("AnimCacheAnimSetData::removeAnimationFromCache(): animation hash is invalid!!!");
+        }
         for (int i = animations.size() - 1; i >= 0; i--){
-            if (animations.at(i).crcAnimationName == animationhash){
+            if (animations.at(i)->crcAnimationName == animationhash){
                 animations.removeAt(i);
             }
         }
     }
     if (variablename != ""){
         for (int i = behaviorVariables.size() - 1; i >= 0; i--){
-            if (behaviorVariables.at(i).name == variablename){
+            if (behaviorVariables.at(i)->name == variablename){
                 behaviorVariables.removeAt(i);
             }
         }
     }
     if (clipname != ""){
         for (int i = clipGenerators.size() - 1; i >= 0; i--){
-            clipGenerators[i].clipGenerators.removeAll(clipname);
+            clipGenerators[i]->clipGenerators.removeAll(clipname);
         }
     }
+}
+
+bool AnimCacheAnimSetData::merge(AnimCacheAnimSetData *recessiveproject){
+    if (recessiveproject){
+        for (auto i = 0; i < recessiveproject->cacheEvents.size(); i++){
+            if (!cacheEvents.contains(recessiveproject->cacheEvents.at(i))){
+                cacheEvents.append(recessiveproject->cacheEvents.at(i));
+            }
+        }
+        for (auto i = 0; i < recessiveproject->behaviorVariables.size(); i++){
+            if (!behaviorVariables.contains(recessiveproject->behaviorVariables.at(i))){
+                behaviorVariables.append(recessiveproject->behaviorVariables.at(i));
+            }
+        }
+        for (auto i = 0; i < recessiveproject->clipGenerators.size(); i++){
+            if (!clipGenerators.contains(recessiveproject->clipGenerators.at(i))){
+                clipGenerators.append(recessiveproject->clipGenerators.at(i));
+            }
+        }
+        for (auto i = 0; i < recessiveproject->animations.size(); i++){
+            if (!animations.contains(recessiveproject->animations.at(i))){
+                animations.append(recessiveproject->animations.at(i));
+            }
+        }
+    }
+    return true;
 }

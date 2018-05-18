@@ -35,23 +35,23 @@ bool SkyrimAnimSetData::parse(QFile *file){
                     if (line.contains(".txt")){
                         projectNames.append(line);
                     }else{
-                        FATAL_RUNTIME_ERROR("SkyrimAnimSetData::parse(): Corrupted project filename does not have 'txt' extension!");
+                        CRITICAL_ERROR_MESSAGE("SkyrimAnimSetData::parse(): Corrupted project filename does not have 'txt' extension!");
                         return false;
                     }
                 }else{
-                    FATAL_RUNTIME_ERROR("SkyrimAnimSetData::parse(): Unexpected EOF!");
+                    CRITICAL_ERROR_MESSAGE("SkyrimAnimSetData::parse(): Unexpected EOF!");
                     return false;
                 }
             }
             for (int i = 0; i < projectNames.size(); i++){
                 projects.append(new AnimCacheProjectData());
                 if (!projects.last()->read(file)){
-                    FATAL_RUNTIME_ERROR("SkyrimAnimSetData::parse(): ProjectAnimSetData read failed!");
+                    CRITICAL_ERROR_MESSAGE("SkyrimAnimSetData::parse(): ProjectAnimSetData read failed!");
                     return false;
                 }
             }
         }else{
-            FATAL_RUNTIME_ERROR("SkyrimAnimSetData::parse(): Corrupted length of current block!");
+            CRITICAL_ERROR_MESSAGE("SkyrimAnimSetData::parse(): Corrupted length of current block!");
             return false;
         }
     }
@@ -87,7 +87,7 @@ bool SkyrimAnimSetData::addNewProject(const QString &projectname){
     return true;
 }
 
-bool SkyrimAnimSetData::addAnimationToCache(const QString &projectname, const QString & eventname, const QVector<AnimCacheAnimationInfo> &animations, const QVector<AnimCacheVariable> &vars, const QVector<AnimCacheClipInfo> &clips){
+bool SkyrimAnimSetData::addAnimationToCache(const QString &projectname, const QString & eventname, const QVector<AnimCacheAnimationInfo *> &animations, const QVector<AnimCacheVariable *> &vars, const QVector<AnimCacheClipInfo *> &clips){
     int count = 0;
     int index = projectNames.indexOf(projectname);
     if (index < 0 || index >= projects.size()){
@@ -121,11 +121,32 @@ bool SkyrimAnimSetData::removeAnimationFromCache(const QString & projectname, co
 AnimCacheProjectData *SkyrimAnimSetData::getProjectCacheData(const QString & name){
     for (int i = 0; i < projectNames.size(); i++){
         if (projectNames.at(i).contains(name, Qt::CaseInsensitive)){
-            return projects[i];
+            return projects.at(i);
         }
     }
-    FATAL_RUNTIME_ERROR("SkyrimAnimSetData::getProjectCacheData(): getProjectCacheData() failed!");
+    CRITICAL_ERROR_MESSAGE("SkyrimAnimSetData::getProjectCacheData(): getProjectCacheData() failed!");
     return nullptr;
+}
+
+bool SkyrimAnimSetData::mergeAnimationCaches(const QString &projectname, const QString &recessiveprojectname, SkyrimAnimSetData *recessiveprojectdata){
+    AnimCacheProjectData *thisdata = nullptr;
+    AnimCacheProjectData *recessivedata = nullptr;
+    if (recessiveprojectdata){
+        for (int i = 0; i < projectNames.size(); i++){
+            if (projectNames.at(i).contains(projectname, Qt::CaseInsensitive)){
+                thisdata = projects.at(i);
+            }
+        }
+        for (int i = 0; i < recessiveprojectdata->projectNames.size(); i++){
+            if (recessiveprojectdata->projectNames.at(i).contains(recessiveprojectname, Qt::CaseInsensitive)){
+                recessivedata = recessiveprojectdata->projects.at(i);
+            }
+        }
+        if (thisdata && recessivedata && thisdata->merge(recessivedata)){
+            return true;
+        }
+    }
+    return false;
 }
 
 /*bool SkyrimAnimSetData::extractProject(const QString &projectname){

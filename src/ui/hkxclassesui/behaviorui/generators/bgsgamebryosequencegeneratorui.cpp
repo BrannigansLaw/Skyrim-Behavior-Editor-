@@ -85,10 +85,10 @@ void BGSGamebryoSequenceGeneratorUI::loadData(HkxObject *data){
             eBlendModeFunction->setCurrentIndex(bsData->BlendModeFunction.indexOf(bsData->eBlendModeFunction));
             fPercent->setValue(bsData->fPercent);
         }else{
-            FATAL_RUNTIME_ERROR(QString("BGSGamebryoSequenceGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("BGSGamebryoSequenceGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BGSGamebryoSequenceGeneratorUI::loadData(): The data passed to the UI is nullptr!!!");
+        CRITICAL_ERROR_MESSAGE("BGSGamebryoSequenceGeneratorUI::loadData(): The data passed to the UI is nullptr!!!");
     }
     connectSignals();
 }
@@ -102,7 +102,7 @@ void BGSGamebryoSequenceGeneratorUI::setName(){
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("BGSGamebryoSequenceGeneratorUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BGSGamebryoSequenceGeneratorUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -113,7 +113,7 @@ void BGSGamebryoSequenceGeneratorUI::setSequence(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BGSGamebryoSequenceGeneratorUI::setSequence(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BGSGamebryoSequenceGeneratorUI::setSequence(): The data is nullptr!!");
     }
 }
 
@@ -122,7 +122,7 @@ void BGSGamebryoSequenceGeneratorUI::setBlendModeFunction(int index){
         bsData->eBlendModeFunction = bsData->BlendModeFunction.at(index);
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BGSGamebryoSequenceGeneratorUI::setBlendModeFunction(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BGSGamebryoSequenceGeneratorUI::setBlendModeFunction(): The data is nullptr!!");
     }
 }
 
@@ -133,7 +133,7 @@ void BGSGamebryoSequenceGeneratorUI::setPercent(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BGSGamebryoSequenceGeneratorUI::setPercent(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BGSGamebryoSequenceGeneratorUI::setPercent(): The data is nullptr!!");
     }
 }
 

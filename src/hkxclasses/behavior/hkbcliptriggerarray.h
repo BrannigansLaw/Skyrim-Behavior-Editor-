@@ -13,12 +13,14 @@ public:
     virtual ~hkbClipTriggerArray();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     int getLastTriggerIndex() const;
     bool write(HkxXMLWriter *writer);
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
+    void mergeEventIndex(int oldindex, int newindex);
+    bool merge(HkxObject *recessiveObject);
 protected:
 private:
     struct HkTrigger

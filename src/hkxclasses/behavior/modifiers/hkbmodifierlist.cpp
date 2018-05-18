@@ -71,6 +71,30 @@ bool hkbModifierList::hasChildren() const{
     return false;
 }
 
+bool hkbModifierList::merge(HkxObject *recessiveObject){
+    hkbModifierList *obj = nullptr;
+    bool found;
+    int size = modifiers.size();
+    if (recessiveObject && recessiveObject->getSignature() == HKB_MODIFIER_LIST){
+        obj = static_cast<hkbModifierList *>(recessiveObject);
+        for (auto i = 0; i < obj->modifiers.size(); i++){
+            found = false;
+            for (auto j = 0; j < size; j++){
+                if (modifiers.at(j).data()->getSignature() == obj->modifiers.at(i).data()->getSignature() && static_cast<hkbModifier *>(modifiers.at(j).data())->getName() == static_cast<hkbModifier *>(obj->modifiers.at(i).data())->getName()){
+                    found = true;
+                }
+            }
+            if (!found){
+                modifiers.append(obj->modifiers.at(i));
+                getParentFile()->addObjectToFile(obj->modifiers.at(i).data(), -1);
+            }
+        }
+        return true;
+    }else{
+        return false;
+    }
+}
+
 QList<DataIconManager *> hkbModifierList::getChildren() const{
     QList<DataIconManager *> list;
     for (int i = 0; i < modifiers.size(); i++){
@@ -97,7 +121,7 @@ bool hkbModifierList::readData(const HkxXmlReader &reader, long index){
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -184,7 +208,7 @@ bool hkbModifierList::link(){
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < modifiers.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifiers.at(i).getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifiers.at(i).getShdPtrReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'modifiers' data field!\nObject Name: "+name);
             setDataValidity(false);
@@ -206,14 +230,14 @@ void hkbModifierList::unlink(){
     }
 }
 
-bool hkbModifierList::evaulateDataValidity(){
+bool hkbModifierList::evaluateDataValidity(){
     bool valid = true;
     for (int i = 0; i < modifiers.size(); i++){
         if (!modifiers.at(i).data() || modifiers.at(i).data()->getType() != HkxObject::TYPE_MODIFIER){
             valid = false;
         }
     }
-    if (!HkDynamicObject::evaulateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (modifiers.isEmpty()){

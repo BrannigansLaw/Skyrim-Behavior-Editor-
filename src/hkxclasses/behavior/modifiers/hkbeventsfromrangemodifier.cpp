@@ -39,7 +39,7 @@ bool hkbEventsFromRangeModifier::readData(const HkxXmlReader &reader, long index
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -68,7 +68,7 @@ bool hkbEventsFromRangeModifier::readData(const HkxXmlReader &reader, long index
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'lowerBound' data field!\nObject Reference: "+ref);
             }
         }else if (text == "eventRanges"){
-            if (!eventRanges.readReference(index, reader)){
+            if (!eventRanges.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'eventRanges' reference!\nObject Reference: "+ref);
             }
         }
@@ -134,6 +134,12 @@ void hkbEventsFromRangeModifier::updateEventIndices(int eventindex){
     }
 }
 
+void hkbEventsFromRangeModifier::mergeEventIndex(int oldindex, int newindex){
+    if (eventRanges.data()){
+        eventRanges.data()->mergeEventIndex(oldindex, newindex);
+    }
+}
+
 bool hkbEventsFromRangeModifier::link(){
     if (!getParentFile()){
         return false;
@@ -141,7 +147,7 @@ bool hkbEventsFromRangeModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventRanges.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventRanges.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_EVENT_RANGE_DATA_ARRAY){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'HKB_EVENT_RANGE_DATA_ARRAY' is not a modifier!");
@@ -156,8 +162,8 @@ void hkbEventsFromRangeModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool hkbEventsFromRangeModifier::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbEventsFromRangeModifier::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (!eventRanges.data() || eventRanges.data()->getSignature() != HKB_EVENT_RANGE_DATA_ARRAY){

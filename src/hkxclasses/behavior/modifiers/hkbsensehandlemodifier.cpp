@@ -48,7 +48,7 @@ bool hkbSenseHandleModifier::readData(const HkxXmlReader &reader, long index){
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -85,7 +85,7 @@ bool hkbSenseHandleModifier::readData(const HkxXmlReader &reader, long index){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "payload"){
-                        if (!ranges.last().event.payload.readReference(index, reader)){
+                        if (!ranges.last().event.payload.readShdPtrReference(index, reader)){
                             writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                         }
                     }else if (text == "minDistance"){
@@ -110,11 +110,11 @@ bool hkbSenseHandleModifier::readData(const HkxXmlReader &reader, long index){
                 }
             }
         }else if (text == "handleOut"){
-            if (!handleOut.readReference(index, reader)){
+            if (!handleOut.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'handleOut' reference!\nObject Reference: "+ref);
             }
         }else if (text == "handleIn"){
-            if (!handleIn.readReference(index, reader)){
+            if (!handleIn.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'handleIn' reference!\nObject Reference: "+ref);
             }
         }else if (text == "localFrameName"){
@@ -280,6 +280,14 @@ void hkbSenseHandleModifier::updateEventIndices(int eventindex){
     }
 }
 
+void hkbSenseHandleModifier::mergeEventIndex(int oldindex, int newindex){
+    for (auto i = 0; i < ranges.size(); i++){
+        if (ranges.at(i).event.id == oldindex){
+            ranges[i].event.id = newindex;
+        }
+    }
+}
+
 bool hkbSenseHandleModifier::link(){
     if (!getParentFile()){
         return false;
@@ -289,7 +297,7 @@ bool hkbSenseHandleModifier::link(){
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < ranges.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(ranges.at(i).event.payload.getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(ranges.at(i).event.payload.getShdPtrReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 return false;
@@ -307,14 +315,14 @@ void hkbSenseHandleModifier::unlink(){
     }
 }
 
-bool hkbSenseHandleModifier::evaulateDataValidity(){  //Check for valid event id???
+bool hkbSenseHandleModifier::evaluateDataValidity(){  //Check for valid event id???
     for (int i = 0; i < ranges.size(); i++){
         if (ranges.at(i).event.payload.data() && ranges.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             setDataValidity(false);
             return false;
         }
     }
-    if (!HkDynamicObject::evaulateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (!SensingMode.contains(sensingMode)){

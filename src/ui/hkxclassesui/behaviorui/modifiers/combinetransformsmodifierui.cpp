@@ -144,7 +144,7 @@ void CombineTransformsModifierUI::connectToTables(GenericTableWidget *variables,
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -190,10 +190,10 @@ void CombineTransformsModifierUI::loadData(HkxObject *data){
                 table->item(INVERT_RESULT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::loadData(): The data is an incorrect type!!");
+            CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -207,7 +207,7 @@ void CombineTransformsModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -216,7 +216,7 @@ void CombineTransformsModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -227,7 +227,7 @@ void CombineTransformsModifierUI::setTranslationOut(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setTranslationOut(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setTranslationOut(): The data is nullptr!!");
     }
 }
 
@@ -238,7 +238,7 @@ void CombineTransformsModifierUI::setRotationOut(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setRotationOut(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setRotationOut(): The data is nullptr!!");
     }
 }
 
@@ -249,7 +249,7 @@ void CombineTransformsModifierUI::setLeftTranslation(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setLeftTranslation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setLeftTranslation(): The data is nullptr!!");
     }
 }
 
@@ -260,7 +260,7 @@ void CombineTransformsModifierUI::setLeftRotation(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setLeftRotation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setLeftRotation(): The data is nullptr!!");
     }
 }
 
@@ -271,7 +271,7 @@ void CombineTransformsModifierUI::setRightTranslation(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setRightTranslation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setRightTranslation(): The data is nullptr!!");
     }
 }
 
@@ -282,7 +282,7 @@ void CombineTransformsModifierUI::setRightRotation(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setRightRotation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setRightRotation(): The data is nullptr!!");
     }
 }
 
@@ -291,7 +291,7 @@ void CombineTransformsModifierUI::setInvertLeftTransform(){
         bsData->invertLeftTransform = invertLeftTransform->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setInvertLeftTransform(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setInvertLeftTransform(): The data is nullptr!!");
     }
 }
 
@@ -300,7 +300,7 @@ void CombineTransformsModifierUI::setInvertRightTransform(){
         bsData->invertRightTransform = invertRightTransform->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setInvertRightTransform(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setInvertRightTransform(): The data is nullptr!!");
     }
 }
 
@@ -309,7 +309,7 @@ void CombineTransformsModifierUI::setInvertResult(){
         bsData->invertResult = invertResult->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setInvertResult(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setInvertResult(): The data is nullptr!!");
     }
 }
 
@@ -383,7 +383,7 @@ void CombineTransformsModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -403,7 +403,7 @@ void CombineTransformsModifierUI::selectTableToView(bool viewisProperty, const Q
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -454,7 +454,7 @@ void CombineTransformsModifierUI::variableRenamed(const QString & name, int inde
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -464,19 +464,19 @@ bool CombineTransformsModifierUI::setBinding(int index, int row, const QString &
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -485,7 +485,7 @@ bool CombineTransformsModifierUI::setBinding(int index, int row, const QString &
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -560,7 +560,7 @@ void CombineTransformsModifierUI::setBindingVariable(int index, const QString &n
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -582,9 +582,9 @@ void CombineTransformsModifierUI::loadBinding(int row, int colunm, hkbVariableBi
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("CombineTransformsModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

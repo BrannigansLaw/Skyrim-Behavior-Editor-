@@ -47,7 +47,7 @@ hkbBlendingTransitionEffect::hkbBlendingTransitionEffect(HkxFile *parent, long r
       userData(0),
       selfTransitionMode(SelfTransitionMode.first()),
       eventMode(EventMode.first()),
-      duration(1),
+      duration(0.2),
       toGeneratorStartTimeFraction(0),
       flags(Flags.first()),
       endMode(EndMode.first()),
@@ -74,7 +74,7 @@ bool hkbBlendingTransitionEffect::readData(const HkxXmlReader &reader, long inde
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+":  readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -174,8 +174,8 @@ void hkbBlendingTransitionEffect::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool hkbBlendingTransitionEffect::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbBlendingTransitionEffect::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (!SelfTransitionMode.contains(selfTransitionMode)){
     }else if (!EventMode.contains(eventMode)){

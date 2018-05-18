@@ -14,12 +14,13 @@ public:
     bool link();
     void unlink();
     QString getName() const;
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfRanges() const;
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
+    void mergeEventIndex(int oldindex, int newindex);
 private:
     hkbEventsFromRangeModifier& operator=(const hkbEventsFromRangeModifier&);
     hkbEventsFromRangeModifier(const hkbEventsFromRangeModifier &);

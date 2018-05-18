@@ -13,6 +13,7 @@ public:
     ~AnimCacheProjectData();
     bool read(QFile * file);
     bool write(QFile *file, QTextStream &out) const;
+    bool merge(AnimCacheProjectData *recessiveproject);
 private:
     QStringList fileNames;
     QVector <AnimCacheAnimSetData *> animSetData;

@@ -28,7 +28,7 @@ hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, bool addToAnimData
     setType(HKB_CLIP_GENERATOR, TYPE_GENERATOR);
     BehaviorFile *par = static_cast<BehaviorFile *>(getParentFile());
     if (!getParentFile()){
-        FATAL_RUNTIME_ERROR("hkbClipGenerator(): Parent file is nullptr!");
+        CRITICAL_ERROR_MESSAGE("hkbClipGenerator(): Parent file is nullptr!");
     }
     par->addObjectToFile(this, ref);
     refCount++;
@@ -45,7 +45,7 @@ hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, bool addToAnimData
             count++;
         }
         if (!added){
-            FATAL_RUNTIME_ERROR("hkbClipGenerator::hkbClipGenerator(): The clip generator could not be added to the animation data!");
+            CRITICAL_ERROR_MESSAGE("hkbClipGenerator::hkbClipGenerator(): The clip generator could not be added to the animation data!");
         }
     }
 }
@@ -65,7 +65,7 @@ bool hkbClipGenerator::readData(const HkxXmlReader &reader, long index){
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -84,7 +84,7 @@ bool hkbClipGenerator::readData(const HkxXmlReader &reader, long index){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'animationName' data field!\nObject Reference: "+ref);
             }
         }else if (text == "triggers"){
-            if (!triggers.readReference(index, reader)){
+            if (!triggers.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'triggers' reference!\nObject Reference: "+ref);
             }
         }else if (text == "cropStartAmountLocalTime"){
@@ -206,12 +206,42 @@ void hkbClipGenerator::updateEventIndices(int eventindex){
     }
 }
 
+void hkbClipGenerator::mergeEventIndex(int oldindex, int newindex){
+    if (triggers.data()){
+        triggers.data()->mergeEventIndex(oldindex, newindex);
+    }
+}
+
+bool hkbClipGenerator::merge(HkxObject *recessiveObject){
+    hkbClipGenerator *obj = nullptr;
+    if (recessiveObject && recessiveObject->getSignature() == HKB_CLIP_GENERATOR){
+        obj = static_cast<hkbClipGenerator *>(recessiveObject);
+        if (triggers.data()){
+            if (obj->triggers.data()){
+                triggers.data()->merge(obj->triggers.data());
+            }
+        }else if (obj->triggers.data()){
+            triggers = obj->triggers;
+            getParentFile()->addObjectToFile(obj->triggers.data(), -1);
+        }
+        return true;
+    }else{
+        return false;
+    }
+}
+
 SkyrimClipGeneratoData hkbClipGenerator::getClipGeneratorAnimData(ProjectAnimData *parent, uint animationIndex) const{
     QVector <SkyrimClipTrigger> animTrigs;
+    qreal trigtime;
     hkbClipTriggerArray *trigs = static_cast<hkbClipTriggerArray *>(triggers.data());
     if (trigs){
         for (int i = 0; i < trigs->triggers.size(); i++){
-            animTrigs.append(SkyrimClipTrigger(trigs->triggers.at(i).localTime, static_cast<BehaviorFile *>(getParentFile())->getEventNameAt(trigs->triggers.at(i).event.id)));
+            if (trigs->triggers.at(i).relativeToEndOfClip){
+                trigtime = trigs->triggers.at(i).localTime + static_cast<BehaviorFile *>(getParentFile())->getAnimationDurationFromAnimData(animationName);
+            }else{
+                trigtime = trigs->triggers.at(i).localTime;
+            }
+            animTrigs.append(SkyrimClipTrigger(trigtime, static_cast<BehaviorFile *>(getParentFile())->getEventNameAt(trigs->triggers.at(i).event.id)));
         }
     }
     return SkyrimClipGeneratoData(parent, name, animationIndex, playbackSpeed, cropStartAmountLocalTime, cropEndAmountLocalTime, animTrigs);
@@ -246,7 +276,7 @@ bool hkbClipGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggers.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggers.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_CLIP_TRIGGER_ARRAY){
             writeToLog(getClassname()+": link()!\n'triggers' data field is linked to invalid child!\nObject Name: "+name);
@@ -262,9 +292,9 @@ void hkbClipGenerator::unlink(){
     triggers = HkxSharedPtr();
 }
 
-bool hkbClipGenerator::evaulateDataValidity(){
+bool hkbClipGenerator::evaluateDataValidity(){
     bool valid = true;
-    if (!HkDynamicObject::evaulateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (!PlaybackMode.contains(mode)){
     }else if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){

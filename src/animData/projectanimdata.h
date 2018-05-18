@@ -14,7 +14,7 @@ public:
     ProjectAnimData();
     bool read(QFile * file);
     bool readMotionOnly(QFile *file);
-    bool write(QFile &file, QTextStream &output) const;
+    bool write(QFile &file, QTextStream &output);
     bool appendClipGenerator(SkyrimClipGeneratoData *animData);
     bool removeClipGenerator(const QString & clipname);
     bool appendAnimation(SkyrimAnimationMotionData *motiondata);
@@ -30,13 +30,16 @@ public:
     void appendClipTriggerToAnimData(const QString & clipGenName, const QString & eventname);
     void removeClipTriggerToAnimDataAt(const QString & clipGenName, int index);
     bool removeBehaviorFromProject(const QString &behaviorname);
+    qreal getAnimationDuration(int animationindex) const;
+    SkyrimAnimationMotionData getAnimationMotionData(int animationindex) const;
 private:
-    uint animationDataLines;
-    uint animationMotionDataLines;
+    void fixNumberAnimationLines();
+    ulong animationDataLines;
+    ulong animationMotionDataLines;
     QStringList projectFiles;
     QVector <SkyrimClipGeneratoData *> animationData;
     QVector <SkyrimAnimationMotionData *> animationMotionData;
-    bool chopLine(QFile *file, QByteArray &line, uint &linecount);
+    bool chopLine(QFile *file, QByteArray &line, ulong &linecount);
 };
 
 #endif // PROJECTANIMDATA_H

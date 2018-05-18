@@ -1,6 +1,7 @@
 #include "hkbcharacterdata.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/characterfile.h"
+#include "src/filetypes/projectfile.h"
 #include "src/hkxclasses/behavior/hkbcharacterstringdata.h"
 #include "src/hkxclasses/behavior/hkbvariablevalueset.h"
 
@@ -289,7 +290,7 @@ bool hkbCharacterData::readData(const HkxXmlReader &reader, long index){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'collisionFilterInfo' data field!\nObject Reference: "+ref);
             }
         }else if (text == "characterControllerCinfo"){
-            if (!characterControllerInfo.characterControllerCinfo.readReference(index, reader)){
+            if (!characterControllerInfo.characterControllerCinfo.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'characterControllerCinfo' reference!\nObject Reference: "+ref);
             }
         }else if (text == "modelUpMS"){
@@ -364,23 +365,23 @@ bool hkbCharacterData::readData(const HkxXmlReader &reader, long index){
             }
             index--;
         }else if (text == "characterPropertyValues"){
-            if (!characterPropertyValues.readReference(index, reader)){
+            if (!characterPropertyValues.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'characterPropertyValues' reference!\nObject Reference: "+ref);
             }
         }else if (text == "footIkDriverInfo"){
-            if (!footIkDriverInfo.readReference(index, reader)){
+            if (!footIkDriverInfo.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'footIkDriverInfo' reference!\nObject Reference: "+ref);
             }
         }else if (text == "handIkDriverInfo"){
-            if (!handIkDriverInfo.readReference(index, reader)){
+            if (!handIkDriverInfo.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'handIkDriverInfo' reference!\nObject Reference: "+ref);
             }
         }else if (text == "stringData"){
-            if (!stringData.readReference(index, reader)){
+            if (!stringData.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'stringData' reference!\nObject Reference: "+ref);
             }
         }else if (text == "mirroredSkeletonInfo"){
-            if (!mirroredSkeletonInfo.readReference(index, reader)){
+            if (!mirroredSkeletonInfo.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'mirroredSkeletonInfo' reference!\nObject Reference: "+ref);
             }
         }
@@ -547,6 +548,71 @@ QStringList hkbCharacterData::getCharacterPropertyTypenames() const{
     return list;
 }
 
+bool hkbCharacterData::merge(HkxObject *recessiveobj){
+    hkbCharacterData *otherdata;
+    hkbCharacterStringData *otherstrings;
+    hkbVariableValueSet *othervalues;
+    hkbCharacterStringData *strings;
+    hkbVariableValueSet *values;
+    bool found;
+    int size;
+    if (recessiveobj && recessiveobj->getSignature() == HKB_CHARACTER_DATA){
+        otherdata = static_cast<hkbCharacterData *>(recessiveobj);
+        if (evaluateDataValidity() && recessiveobj->evaluateDataValidity()){
+            strings = static_cast<hkbCharacterStringData *>(stringData.data());
+            values = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
+            otherstrings = static_cast<hkbCharacterStringData *>(otherdata->stringData.data());
+            othervalues = static_cast<hkbVariableValueSet *>(otherdata->characterPropertyValues.data());
+            size = strings->animationNames.size() - 1;
+            for (auto i = otherstrings->animationNames.size() - 1; i >= 0; i--){
+                found = false;
+                for (auto j = size; j >= 0; j--){
+                    if (strings->animationNames.at(j) == otherstrings->animationNames.at(i)){
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found){
+                    strings->animationNames.append(otherstrings->animationNames.at(i));
+                    static_cast<CharacterFile *>(getParentFile())->project->appendAnimation(&static_cast<CharacterFile *>(recessiveobj->getParentFile())->project->getAnimationMotionData(i));
+                    //static_cast<BehaviorFile *>(otherdata->getParentFile())->mergeEventIndices(i, eventInfos.size() - 1);
+                }
+            }
+            size = strings->characterPropertyNames.size() - 1;
+            for (auto i = otherstrings->characterPropertyNames.size() - 1; i >= 0; i--){
+                found = false;
+                for (auto j = size; j >= 0; j--){
+                    if (strings->characterPropertyNames.at(j) == otherstrings->characterPropertyNames.at(i)){
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found){    //TO DO: Support quad and pointer variables...
+                    strings->characterPropertyNames.append(otherstrings->characterPropertyNames.at(i));
+                    if (othervalues->wordVariableValues.size() > i){
+                        values->wordVariableValues.append(othervalues->wordVariableValues.at(i));
+                    }else{
+                        WARNING_MESSAGE("hkbCharacterData: merge(): Mismatch in size between variableNames and wordVariableValues!!!");
+                    }
+                    if (otherdata->characterPropertyInfos.size() > i){
+                        characterPropertyInfos.append(otherdata->characterPropertyInfos.at(i));
+                    }else{
+                        WARNING_MESSAGE("hkbCharacterData: merge(): Mismatch in size between variableNames and variableInfos!!!");
+                    }
+                    //TO DO: Support character properties...
+                    //static_cast<BehaviorFile *>(otherdata->getParentFile())->mergeVariableIndices(i, variableInfos.size() - 1);
+                }
+            }
+            return true;
+        }else{
+            WARNING_MESSAGE("hkbCharacterData: merge(): Invalid data detected!!!");
+        }
+    }else{
+        WARNING_MESSAGE("hkbCharacterData: merge(): Attempting to merge invalid object type or nullptr!!!");
+    }
+    return false;
+}
+
 hkVariableType hkbCharacterData::getCharacterPropertyTypeAt(int index) const{
     if (index < characterPropertyInfos.size() && index >= 0){
         QString type = characterPropertyInfos.at(index).type;
@@ -571,14 +637,14 @@ hkVariableType hkbCharacterData::getCharacterPropertyTypeAt(int index) const{
     return VARIABLE_TYPE_INT8;
 }
 
-bool hkbCharacterData::evaulateDataValidity(){
+bool hkbCharacterData::evaluateDataValidity(){
     if (!characterPropertyValues.data() || characterPropertyValues.data()->getSignature() != HKB_VARIABLE_VALUE_SET){
         setDataValidity(false);
         return false;
-    }else if (!footIkDriverInfo.data() || footIkDriverInfo.data()->getSignature() != HKB_FOOT_IK_DRIVER_INFO){
+    }else if (footIkDriverInfo.data() && footIkDriverInfo.data()->getSignature() != HKB_FOOT_IK_DRIVER_INFO){
         setDataValidity(false);
         return false;
-    }else if (!handIkDriverInfo.data() || handIkDriverInfo.data()->getSignature() != HKB_HAND_IK_DRIVER_INFO){
+    }else if (handIkDriverInfo.data() && handIkDriverInfo.data()->getSignature() != HKB_HAND_IK_DRIVER_INFO){
         setDataValidity(false);
         return false;
     }else if (!stringData.data() || stringData.data()->getSignature() != HKB_CHARACTER_STRING_DATA){

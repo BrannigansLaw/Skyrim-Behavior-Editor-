@@ -19,13 +19,27 @@ public:
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
     void unlink();
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool isParametricBlend() const;
     bool hasChildren() const;
     QString getName() const;
     int getThisIndex() const;
+    bool operator==(const hkbBlenderGeneratorChild & other){
+        if (
+                weight != other.weight ||
+                worldFromModelWeight != other.worldFromModelWeight ||
+                !parentBG.data() ||
+                !other.parentBG.data() ||
+                static_cast<hkbGenerator *>(parentBG.data())->getName() != static_cast<hkbGenerator *>(other.parentBG.data())->getName()
+            )
+        {
+            return false;
+        }
+        //boneweights???
+        return true;
+    }
 private:
     QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;

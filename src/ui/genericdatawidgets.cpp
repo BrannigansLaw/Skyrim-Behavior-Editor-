@@ -5,6 +5,7 @@
 GenericTableWidget::GenericTableWidget(const QString & title)
     : lyt(new QGridLayout),
       table(new QTableWidget),
+      resetFilterPB(new QPushButton("Reset Filter")),
       filterPB(new QPushButton("Filter By String")),
       filterLE(new QLineEdit),
       selectPB(new QPushButton("Select")),
@@ -32,7 +33,8 @@ GenericTableWidget::GenericTableWidget(const QString & title)
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    lyt->addWidget(filterLE, 0, 1, 1, 2);
+    lyt->addWidget(filterLE, 0, 0, 1, 3);
+    lyt->addWidget(resetFilterPB, 0, 3, 1, 2);
     lyt->addWidget(filterPB, 0, 6, 1, 3);
     lyt->addWidget(table, 1, 0, 9, 10);
     lyt->addWidget(selectPB, 10, 2, 1, 2);
@@ -46,6 +48,7 @@ GenericTableWidget::GenericTableWidget(const QString & title)
     connect(cancelPB, SIGNAL(released()), this, SLOT(hide()), Qt::UniqueConnection);
     //connect(newPB, SIGNAL(released()), this, SLOT(itemAdded()), Qt::UniqueConnection);
     connect(filterPB, SIGNAL(released()), this, SLOT(filterItems()), Qt::UniqueConnection);
+    connect(resetFilterPB, SIGNAL(released()), this, SLOT(resetFilter()), Qt::UniqueConnection);
 }
 
 void GenericTableWidget::loadTable(const QStringList & names, const QStringList & types, const QString & firstElement){
@@ -223,7 +226,7 @@ void GenericTableWidget::filterItems(){
                     table->hideRow(i);
                 }
             }else{
-                FATAL_RUNTIME_ERROR(QString("GenericTableWidget::filterItems(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
+                CRITICAL_ERROR_MESSAGE(QString("GenericTableWidget::filterItems(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
             }
         }
     }else{
@@ -236,7 +239,7 @@ void GenericTableWidget::filterItems(){
                             table->setRowHidden(i, false);
                         }
                     }else{
-                        FATAL_RUNTIME_ERROR(QString("GenericTableWidget::filterItems(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
+                        CRITICAL_ERROR_MESSAGE(QString("GenericTableWidget::filterItems(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
                     }
                 }
             }
@@ -249,7 +252,7 @@ void GenericTableWidget::filterItems(){
                             table->setRowHidden(i, false);
                         }
                     }else{
-                        FATAL_RUNTIME_ERROR(QString("GenericTableWidget::filterItems(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
+                        CRITICAL_ERROR_MESSAGE(QString("GenericTableWidget::filterItems(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
                     }
                 }
             }
@@ -258,6 +261,47 @@ void GenericTableWidget::filterItems(){
                 if (table->isRowHidden(i)){
                     table->setRowHidden(i, false);
                 }
+            }
+        }
+    }
+}
+
+void GenericTableWidget::resetFilter(){
+    QTableWidgetItem *item = nullptr;
+    if (onlyTypeAllowed != ""){
+        if (table->columnCount() == 2 && !table->isColumnHidden(1)){
+            for (auto i = 1; i < table->rowCount(); i++){
+                item = table->item(i, 1);
+                if (item){
+                    if (item->text() != onlyTypeAllowed){
+                        table->hideRow(i);
+                    }else{
+                        table->setRowHidden(i, false);
+                    }
+                }else{
+                    CRITICAL_ERROR_MESSAGE(QString("GenericTableWidget::setTypeFilter(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
+                }
+            }
+        }
+    }else if (!typesDisallowed.isEmpty()){
+        if (table->columnCount() == 2 && !table->isColumnHidden(1)){
+            for (auto i = 1; i < table->rowCount(); i++){
+                item = table->item(i, 1);
+                if (item){
+                    if (typesDisallowed.contains(item->text())){
+                        table->hideRow(i);
+                    }else{
+                        table->setRowHidden(i, false);
+                    }
+                }else{
+                    CRITICAL_ERROR_MESSAGE(QString("GenericTableWidget::setTypeFilter(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
+                }
+            }
+        }
+    }else{
+        for (auto i = 1; i < table->rowCount(); i++){
+            if (table->isRowHidden(i)){
+                table->setRowHidden(i, false);
             }
         }
     }
@@ -278,7 +322,7 @@ void GenericTableWidget::setTypeFilter(const QString &typeallowed, const QString
                         table->setRowHidden(i, false);
                     }
                 }else{
-                    FATAL_RUNTIME_ERROR(QString("GenericTableWidget::setTypeFilter(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
+                    CRITICAL_ERROR_MESSAGE(QString("GenericTableWidget::setTypeFilter(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
                 }
             }
         }
@@ -296,7 +340,7 @@ void GenericTableWidget::setTypeFilter(const QString &typeallowed, const QString
                         table->setRowHidden(i, false);
                     }
                 }else{
-                    FATAL_RUNTIME_ERROR(QString("GenericTableWidget::setTypeFilter(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
+                    CRITICAL_ERROR_MESSAGE(QString("GenericTableWidget::setTypeFilter(): \nMissing table widget item for row "+QString::number(i)+"!!!"));
                 }
             }
         }

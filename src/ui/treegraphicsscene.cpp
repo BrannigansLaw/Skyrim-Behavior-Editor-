@@ -158,7 +158,7 @@ bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicate
         QRectF rect = ptr->sceneRect();
         ptr->setSceneRect(rect.marginsAdded(QMarginsF(rect.width(), rect.height(), rect.width(), rect.height())));
     }else{
-        FATAL_RUNTIME_ERROR("TreeGraphicsScene::drawGraph: No view!!!");
+        CRITICAL_ERROR_MESSAGE("TreeGraphicsScene::drawGraph: No view!!!");
     }
     return true;
 }
@@ -166,56 +166,62 @@ bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicate
 //Appends "data" to the 'itemData' of "selectedIcon" after creating a new icon representing "data" and appending it to "selectedIcon"...
 TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedIcon, DataIconManager *data, int indexToInsert, bool inject, bool allowDuplicates, bool isFirstDraw){
     TreeGraphicsItem *newIcon = nullptr;
-    TreeGraphicsItem *parent = ((TreeGraphicsItem *)selectedIcon->parentItem());
-    QList <QGraphicsItem *> children;
-    if (data){
-        if (selectedIcon){
-            if (!allowDuplicates){
-                children = selectedIcon->childItems();
-                for (int i = 0; i < children.size(); i++){
-                    if (((TreeGraphicsItem *)children.at(i))->itemData == data){
-                        if (!inject && !isFirstDraw){
-                            selectedIcon->itemData->insertObjectAt(indexToInsert, data);
-                        }else if (parent && inject){
-                            selectedIcon->itemData->wrapObjectAt(indexToInsert, data, parent->itemData);
-                            //selectedIcon->setParent(newIcon, newIcon->getIndexofIconWithData(selectedIcon->itemData));//Not sure...
+    if (selectedIcon){
+        TreeGraphicsItem *parent = ((TreeGraphicsItem *)selectedIcon->parentItem());
+        QList <QGraphicsItem *> children;
+        if (data){
+            if (selectedIcon){
+                if (!allowDuplicates){
+                    children = selectedIcon->childItems();
+                    for (int i = 0; i < children.size(); i++){
+                        if (((TreeGraphicsItem *)children.at(i))->itemData == data){
+                            if (!inject && !isFirstDraw){
+                                selectedIcon->itemData->insertObjectAt(indexToInsert, data);
+                            }else if (parent && inject){
+                                selectedIcon->itemData->wrapObjectAt(indexToInsert, data, parent->itemData);
+                                //selectedIcon->setParent(newIcon, newIcon->getIndexofIconWithData(selectedIcon->itemData));//Not sure...
+                            }
+                            return nullptr;
                         }
-                        return nullptr;
                     }
                 }
             }
-        }
-        if (!selectedIcon->isPrimaryIcon()){
-            if (selectedIcon->getPrimaryIcon()){
-                selectedIcon = selectedIcon->getPrimaryIcon();
+            if (!selectedIcon->isPrimaryIcon()){
+                if (selectedIcon->getPrimaryIcon()){
+                    selectedIcon = selectedIcon->getPrimaryIcon();
+                }else{
+                    return nullptr;    //Error...
+                }
+            }
+            if (!inject){
+                if (isFirstDraw){
+                    newIcon = new BehaviorGraphIcon(selectedIcon, data, selectedIcon->getIndexofIconWithData(data));
+                }else{
+                    newIcon = new BehaviorGraphIcon(selectedIcon, data, indexToInsert);
+                    selectedIcon->itemData->insertObjectAt(indexToInsert, data);
+                }
+            }else if (parent){
+                newIcon = new BehaviorGraphIcon(parent, data, parent->getIndexofIconWithData(selectedIcon->itemData));
+                selectedIcon->itemData->wrapObjectAt(indexToInsert, data, parent->itemData);
+                selectedIcon->setParent(newIcon, newIcon->getIndexofIconWithData(selectedIcon->itemData));
             }else{
-                return nullptr;    //Error...
+                delete newIcon;
+                return nullptr;
+            }
+            if (newIcon->isDataDescendant(newIcon)){
+                delete newIcon;
+                return nullptr;
+            }
+            if (!newIcon->scene()){
+                addItem(newIcon);  //newIcon is added to scene already???
+            }
+            //newIcon->reposition();
+            if (!newIcon->path->scene()){
+                addItem(newIcon->path);
             }
         }
-        if (!inject){
-            if (isFirstDraw){
-                newIcon = new BehaviorGraphIcon(selectedIcon, data, selectedIcon->getIndexofIconWithData(data));
-            }else{
-                newIcon = new BehaviorGraphIcon(selectedIcon, data, indexToInsert);
-                selectedIcon->itemData->insertObjectAt(indexToInsert, data);
-            }
-        }else if (parent){
-            newIcon = new BehaviorGraphIcon(parent, data, parent->getIndexofIconWithData(selectedIcon->itemData));
-            selectedIcon->itemData->wrapObjectAt(indexToInsert, data, parent->itemData);
-            selectedIcon->setParent(newIcon, newIcon->getIndexofIconWithData(selectedIcon->itemData));
-        }else{
-            delete newIcon;
-            return nullptr;
-        }
-        if (newIcon->isDataDescendant(newIcon)){
-            delete newIcon;
-            return nullptr;
-        }
-        if (!newIcon->scene()){
-            addItem(newIcon);  //newIcon is added to scene already???
-        }
-        //newIcon->reposition();
-        addItem(newIcon->path);
+    }else{
+        CRITICAL_ERROR_MESSAGE("TreeGraphicsScene::addItemToGraph(): selectedIcon is nullptr!!!");
     }
     return newIcon;
 }
@@ -247,6 +253,19 @@ bool TreeGraphicsScene::reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconM
                 if (!oldIconParent->reorderChildren()){
                     return false;
                 }
+                /*if (replacementIcon){
+                    oldParent = replacementIcon->setParent(oldIconParent, replaceindex);
+                    addItemToGraph(oldParent, replacementData, replaceindex);
+                    oldIconParent->itemData->insertObjectAt(replaceindex, replacementData);
+                    if (iconToReplace){
+                        removeItemFromGraph(iconToReplace, replaceindex, removeData, false, replacementData);
+                    }
+                }else{
+                    addItemToGraph(oldIconParent, replacementData, replaceindex);
+                }
+                if (!oldIconParent->reorderChildren()){
+                    return false;
+                }*/
             }
         }
     }
@@ -278,6 +297,10 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
                     iconChild = (TreeGraphicsItem *)children.first();
                     if (iconChild->hasSameData(dataToKeep)){
                         iconChild->setParent(itemToDeleteParent, itemToDeleteParent->getIndexofIconWithData(item->itemData));
+                        //
+                        itemToDelete = iconChild->reconnectToNextDuplicate();
+                        iconsToRemove.append(itemToDelete);
+                        //
                         tempList.clear();
                     }else{
                         tempList = iconChild->childItems();

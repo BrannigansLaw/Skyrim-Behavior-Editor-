@@ -54,7 +54,7 @@ bool hkbStringEventPayload::write(HkxXMLWriter *writer){
     return true;
 }
 
-bool hkbStringEventPayload::evaulateDataValidity(){
+bool hkbStringEventPayload::evaluateDataValidity(){
     if (data == ""){
         setDataValidity(false);
         return false;

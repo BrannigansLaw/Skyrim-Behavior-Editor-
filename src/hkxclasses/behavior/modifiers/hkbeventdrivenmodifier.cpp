@@ -56,6 +56,31 @@ bool hkbEventDrivenModifier::hasChildren() const{
     return false;
 }
 
+bool hkbEventDrivenModifier::isEventReferenced(int eventindex) const{
+    if (activateEventId == eventindex || deactivateEventId == eventindex){
+        return true;
+    }
+    return false;
+}
+
+void hkbEventDrivenModifier::updateEventIndices(int eventindex){
+    if (activateEventId > eventindex){
+        activateEventId--;
+    }
+    if (deactivateEventId > eventindex){
+        deactivateEventId--;
+    }
+}
+
+void hkbEventDrivenModifier::mergeEventIndex(int oldindex, int newindex){
+    if (activateEventId == oldindex){
+        activateEventId = newindex;
+    }
+    if (deactivateEventId == oldindex){
+        deactivateEventId = newindex;
+    }
+}
+
 QList<DataIconManager *> hkbEventDrivenModifier::getChildren() const{
     QList<DataIconManager *> list;
     if (modifier.data()){
@@ -78,7 +103,7 @@ bool hkbEventDrivenModifier::readData(const HkxXmlReader &reader, long index){
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -97,7 +122,7 @@ bool hkbEventDrivenModifier::readData(const HkxXmlReader &reader, long index){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "modifier"){
-            if (!modifier.readReference(index, reader)){
+            if (!modifier.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'modifier' reference!\nObject Reference: "+ref);
             }
         }else if (text == "activateEventId"){
@@ -166,7 +191,7 @@ bool hkbEventDrivenModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifier.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifier.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_MODIFIER){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'modifier' is not a modifier!");
@@ -182,8 +207,8 @@ void hkbEventDrivenModifier::unlink(){
     modifier = HkxSharedPtr();
 }
 
-bool hkbEventDrivenModifier::evaulateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbEventDrivenModifier::evaluateDataValidity(){    //Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (!modifier.data()){

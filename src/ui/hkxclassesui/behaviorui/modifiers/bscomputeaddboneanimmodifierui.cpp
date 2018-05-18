@@ -104,7 +104,7 @@ void BSComputeAddBoneAnimModifierUI::connectToTables(GenericTableWidget *variabl
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -141,10 +141,10 @@ void BSComputeAddBoneAnimModifierUI::loadData(HkxObject *data){
                 table->item(SCALE_LS_OUT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::loadData(): The data is an incorrect type!!");
+            CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -158,7 +158,7 @@ void BSComputeAddBoneAnimModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -167,7 +167,7 @@ void BSComputeAddBoneAnimModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -176,7 +176,7 @@ void BSComputeAddBoneAnimModifierUI::setBoneIndex(int index){
         bsData->boneIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::setboneIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::setboneIndex(): The data is nullptr!!");
     }
 }
 
@@ -187,7 +187,7 @@ void BSComputeAddBoneAnimModifierUI::setTranslationLSOut(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::settranslationLSOut(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::settranslationLSOut(): The data is nullptr!!");
     }
 }
 
@@ -198,7 +198,7 @@ void BSComputeAddBoneAnimModifierUI::setRotationLSOut(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::setrotationLSOut(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::setrotationLSOut(): The data is nullptr!!");
     }
 }
 
@@ -209,7 +209,7 @@ void BSComputeAddBoneAnimModifierUI::setScaleLSOut(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::setscaleLSOut(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::setscaleLSOut(): The data is nullptr!!");
     }
 }
 
@@ -253,7 +253,7 @@ void BSComputeAddBoneAnimModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -273,7 +273,7 @@ void BSComputeAddBoneAnimModifierUI::selectTableToView(bool viewisProperty, cons
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -304,7 +304,7 @@ void BSComputeAddBoneAnimModifierUI::variableRenamed(const QString & name, int i
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -314,19 +314,19 @@ bool BSComputeAddBoneAnimModifierUI::setBinding(int index, int row, const QStrin
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -335,7 +335,7 @@ bool BSComputeAddBoneAnimModifierUI::setBinding(int index, int row, const QStrin
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -380,7 +380,7 @@ void BSComputeAddBoneAnimModifierUI::setBindingVariable(int index, const QString
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -402,9 +402,9 @@ void BSComputeAddBoneAnimModifierUI::loadBinding(int row, int colunm, hkbVariabl
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSComputeAddBoneAnimModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSComputeAddBoneAnimModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

@@ -42,7 +42,7 @@ bool hkbProjectData::readData(const HkxXmlReader &reader, long index){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'worldUpWS' data field!\nObject Reference: "+ref);
             }
         }else if (text == "stringData"){
-            if (!stringData.readReference(index, reader)){
+            if (!stringData.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'stringData' reference!\nObject Reference: "+ref);
             }
         }else if (text == "defaultEventMode"){
@@ -88,7 +88,7 @@ bool hkbProjectData::link(){
     HkxSharedPtr *ptr;
     ProjectFile *file = dynamic_cast<ProjectFile *>(getParentFile());
     if (file){
-        ptr = file->findProjectStringData(stringData.getReference());
+        ptr = file->findProjectStringData(stringData.getShdPtrReference());
     }else{
         writeToLog(getClassname()+": link()!\nParent file type is invalid!!!", true);
     }
@@ -110,7 +110,7 @@ void hkbProjectData::unlink(){
     stringData = HkxSharedPtr();
 }
 
-bool hkbProjectData::evaulateDataValidity(){
+bool hkbProjectData::evaluateDataValidity(){
     if (!EventMode.contains(defaultEventMode)){
     }else if (!stringData.data() || stringData.data()->getSignature() != HKB_PROJECT_STRING_DATA){
     }else{

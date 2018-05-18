@@ -109,7 +109,7 @@ void AnimationsUI::addAnimation(){
     if (loadedData){
         QString filename = QFileDialog::getOpenFileName(this, tr("Open hkx animation file..."), loadedData->getParentFile()->fileName(), tr("hkx Files (*.hkx)"));
         if (filename != "" && (filename.contains(loadedData->getParentFile()->fileName().section("/", 0, -3)+"/"+"animations", Qt::CaseInsensitive) || filename.contains("SharedKillMoves", Qt::CaseInsensitive)) && loadedData->getAnimationIndex(filename) == -1){
-            loadedData->addAnimation(filename.section("/", -2, -1));
+            loadedData->addAnimation(filename.section("/", -2, -1).replace("/", "\\"));
             animData->appendAnimation(new SkyrimAnimationMotionData(animData, loadedData->animationNames.size() - 1));  //Need to set duration later...
             int row = table->rowCount();
             table->setRowCount(row + 1);
@@ -119,8 +119,8 @@ void AnimationsUI::addAnimation(){
                 stackLyt->setCurrentIndex(TABLE_WIDGET);
             }
             table->setCurrentCell(row, 0);
-            emit animationAdded(loadedData->animationNames.last());
             emit openAnimationFile(filename);
+            emit animationAdded(loadedData->animationNames.last());
         }
     }
 }
@@ -129,7 +129,7 @@ void AnimationsUI::removeAnimation(){
     if (loadedData && !static_cast<CharacterFile *>(loadedData->getParentFile())->isAnimationUsed(table->item(table->currentRow(), table->currentColumn())->text())){
         int index = table->currentRow();
         if (!animData->removeAnimation(index)){
-            FATAL_RUNTIME_ERROR("AnimationsUI::removeAnimation(): Failed!");
+            CRITICAL_ERROR_MESSAGE("AnimationsUI::removeAnimation(): Failed!");
         }
         loadedData->animationNames.removeAt(index);
         if (index < table->rowCount()){

@@ -53,7 +53,9 @@ private slots:
     void setToNestedStateId(const QString &name);
     void setPriority();
     void toggleGlobalWildcardFlag();
+    void toggleLocalWildcardFlag();
     void toggleUseNestedStateFlag();
+    void toggleAllowSelfTransition();
     void toggleDisallowRandomTransitionFlag();
     void toggleDisallowReturnToStateFlag();
     void toggleAbutEndStateFlag();
@@ -99,7 +101,9 @@ private:
     ComboBox *toNestedStateId;
     SpinBox *priority;
     CheckBox *flagGlobalWildcard;
+    CheckBox *flagLocalWildcard;
     CheckBox *flagUseNestedState;
+    CheckBox *flagAllowSelfTransition;
     CheckBox *flagDisallowRandomTransition;
     CheckBox *flagDisallowReturnToState;
     CheckBox *flagAbutEndState;

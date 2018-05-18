@@ -76,7 +76,7 @@ bool hkSimpleLocalFrame::write(HkxXMLWriter *writer){
     return true;
 }
 
-bool hkSimpleLocalFrame::evaulateDataValidity(){
+bool hkSimpleLocalFrame::evaluateDataValidity(){
     if (name == ""){
         setDataValidity(false);
         return false;

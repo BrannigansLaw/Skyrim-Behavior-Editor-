@@ -1,6 +1,7 @@
 #include "hkbmanualselectorgenerator.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+//#include "src/ui/dataiconmanager.h"
 /*
  * CLASS: hkbManualSelectorGenerator
 */
@@ -71,6 +72,21 @@ bool hkbManualSelectorGenerator::hasChildren() const{
     return false;
 }
 
+bool hkbManualSelectorGenerator::merge(HkxObject *recessiveObject){
+    hkbManualSelectorGenerator *obj = nullptr;
+    if (recessiveObject && recessiveObject->getSignature() == HKB_MANUAL_SELECTOR_GENERATOR){
+        obj = static_cast<hkbManualSelectorGenerator *>(recessiveObject);
+        for (auto i = generators.size(); i < obj->generators.size(); i++){
+            generators.append(obj->generators.at(i));
+            //getParentFile()->addObjectToFile(obj->generators.at(i).data(), -1);
+        }
+        injectWhileMerging(obj);
+        return true;
+    }else{
+        return false;
+    }
+}
+
 QList<DataIconManager *> hkbManualSelectorGenerator::getChildren() const{
     QList<DataIconManager *> list;
     for (int i = 0; i < generators.size(); i++){
@@ -97,7 +113,7 @@ bool hkbManualSelectorGenerator::readData(const HkxXmlReader &reader, long index
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -147,6 +163,11 @@ bool hkbManualSelectorGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
         refString = "";
         list1 = {writer->name, writer->numelements};
+        for (auto i = generators.size() - 1; i >= 0; i--){
+            if (!generators.at(i).data()){
+                generators.removeAt(i);
+            }
+        }
         list2 = {"generators", QString::number(generators.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
         for (int i = 0, j = 1; i < generators.size(); i++, j++){
@@ -190,7 +211,7 @@ bool hkbManualSelectorGenerator::link(){
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < generators.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(generators.at(i).getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(generators.at(i).getShdPtrReference());
         if (!ptr){
             writeToLog(getClassname()+": link()!\nFailed to properly link 'generators' data field!\nObject Name: "+name);
             setDataValidity(false);
@@ -212,14 +233,14 @@ void hkbManualSelectorGenerator::unlink(){
     }
 }
 
-bool hkbManualSelectorGenerator::evaulateDataValidity(){
+bool hkbManualSelectorGenerator::evaluateDataValidity(){
     bool valid = true;
     for (int i = 0; i < generators.size(); i++){
         if (!generators.at(i).data() || generators.at(i).data()->getType() != HkxObject::TYPE_GENERATOR){
             valid = false;
         }
     }
-    if (!HkDynamicObject::evaulateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (selectedGeneratorIndex < 0 || selectedGeneratorIndex > generators.size()){
     }else if (currentGeneratorIndex < 0 || currentGeneratorIndex > generators.size()){

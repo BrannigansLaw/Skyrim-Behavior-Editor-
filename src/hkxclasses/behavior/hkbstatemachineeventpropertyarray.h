@@ -12,12 +12,14 @@ public:
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
     void unlink();
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     int getLastEventIndex() const;
     bool write(HkxXMLWriter *writer);
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
+    void mergeEventIndex(int oldindex, int newindex);
+    bool merge(HkxObject *recessiveObject);
 protected:
 private:
     void addEvent(const hkEventPayload & event = hkEventPayload());

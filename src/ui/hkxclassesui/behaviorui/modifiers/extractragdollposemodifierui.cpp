@@ -103,7 +103,7 @@ void ExtractRagdollPoseModifierUI::connectToTables(GenericTableWidget *variables
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -147,10 +147,10 @@ void ExtractRagdollPoseModifierUI::loadData(HkxObject *data){
                 table->item(ENABLE_COMPUTE_WORLD_FROM_MODEL_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::loadData(): The data is an incorrect type!!");
+            CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -164,7 +164,7 @@ void ExtractRagdollPoseModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -173,7 +173,7 @@ void ExtractRagdollPoseModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -182,7 +182,7 @@ void ExtractRagdollPoseModifierUI::setPoseMatchingBone0(int index){
         bsData->poseMatchingBone0 = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::setposeMatchingBone0(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setposeMatchingBone0(): The data is nullptr!!");
     }
 }
 
@@ -191,7 +191,7 @@ void ExtractRagdollPoseModifierUI::setPoseMatchingBone1(int index){
         bsData->poseMatchingBone1 = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::setposeMatchingBone1(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setposeMatchingBone1(): The data is nullptr!!");
     }
 }
 
@@ -200,7 +200,7 @@ void ExtractRagdollPoseModifierUI::setPoseMatchingBone2(int index){
         bsData->poseMatchingBone2 = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::setposeMatchingBone2(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setposeMatchingBone2(): The data is nullptr!!");
     }
 }
 
@@ -209,7 +209,7 @@ void ExtractRagdollPoseModifierUI::setEnableComputeWorldFromModel(){
         bsData->enableComputeWorldFromModel = enableComputeWorldFromModel->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::setenableComputeWorldFromModel(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setenableComputeWorldFromModel(): The data is nullptr!!");
     }
 }
 
@@ -253,7 +253,7 @@ void ExtractRagdollPoseModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -273,7 +273,7 @@ void ExtractRagdollPoseModifierUI::selectTableToView(bool viewisProperty, const 
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -304,7 +304,7 @@ void ExtractRagdollPoseModifierUI::variableRenamed(const QString & name, int ind
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -314,19 +314,19 @@ bool ExtractRagdollPoseModifierUI::setBinding(int index, int row, const QString 
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -335,7 +335,7 @@ bool ExtractRagdollPoseModifierUI::setBinding(int index, int row, const QString 
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -380,7 +380,7 @@ void ExtractRagdollPoseModifierUI::setBindingVariable(int index, const QString &
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -402,9 +402,9 @@ void ExtractRagdollPoseModifierUI::loadBinding(int row, int colunm, hkbVariableB
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("ExtractRagdollPoseModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

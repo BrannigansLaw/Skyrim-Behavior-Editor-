@@ -64,9 +64,11 @@ MainWindow::MainWindow()
       logGB(new QGroupBox("Debug Log")),
       logGBLyt(new QVBoxLayout(this)),
       lastFileSelected("C:/"),
-      animationCacheUI(nullptr)
+      animationCacheUI(nullptr),
+      allowLogging(true)
       //animationCacheSA(new QScrollArea)
 {
+    debugLog->setMaximumBlockCount(10000);
     //setStyleSheet("QComboBox {background: yellow};QWidget {background: darkGray}");
     projectUI->setDisabled(true);
     hkxcmdPath = QDir::currentPath()+"/hkxcmd.exe";
@@ -175,7 +177,7 @@ MainWindow::MainWindow()
     connect(projectUI, SIGNAL(openAnimation(QString)), this, SLOT(openAnimationFile(QString)), Qt::UniqueConnection);
     connect(projectUI, SIGNAL(animationRemoved(int)), this, SLOT(removeAnimation(int)), Qt::UniqueConnection);
     connect(setGameModeA, SIGNAL(changed()), this, SLOT(setGameMode()), Qt::UniqueConnection);
-    connect(setPathToGameFolderA, SIGNAL(toggled(bool)), this, SLOT(setPathToGameDirectory()), Qt::UniqueConnection);
+    connect(setPathToGameFolderA, SIGNAL(triggered(bool)), this, SLOT(setPathToGameDirectory()), Qt::UniqueConnection);
     connect(mergeBehaviorsA, SIGNAL(triggered(bool)), this, SLOT(mergeBehaviors()), Qt::UniqueConnection);
     connect(mergeProjectsA, SIGNAL(triggered(bool)), this, SLOT(mergeProjects()), Qt::UniqueConnection);
 }
@@ -242,7 +244,7 @@ void MainWindow::changedTabs(int index){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("MainWindow::changedTabs(): No project opened!");
+        CRITICAL_ERROR_MESSAGE("MainWindow::changedTabs(): No project opened!");
     }
     //dialog.setValue(//dialog.maximum());
     //dialog.done(0);
@@ -338,8 +340,8 @@ void MainWindow::viewAnimationCache(){
 void MainWindow::saveFile(int index){
     if (projectFile){
         QString backupPath;
-        if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
-            if (projectFile->behaviorFiles.at(index)->getIsChanged()){
+        if (index >= 0 && index < projectFile->behaviorFiles.size()/* && index < behaviorGraphs.size()*/){
+            //if (projectFile->behaviorFiles.at(index)->getIsChanged()){
                 ProgressDialog dialog("Saving behavior: "+projectFile->behaviorFiles.at(index)->fileName()+"...", "", 0, 100, this);
                 backupPath = QDir::currentPath()+"/Backup";
                 QDir dir(backupPath);
@@ -366,7 +368,7 @@ void MainWindow::saveFile(int index){
                 projectFile->behaviorFiles.at(index)->write();
                 projectFile->behaviorFiles.at(index)->setIsChanged(false);
                 dialog.setProgress("Behavior file saved!!!", dialog.maximum());
-            }
+            //}
         }else{
             writeToLog("MainWindow::saveFile(): No behavior file is currently viewed!");
         }
@@ -378,10 +380,10 @@ void MainWindow::saveFile(int index){
 void MainWindow::saveProject(){
     if (projectFile){
         ProgressDialog dialog("Saving project "+projectFile->fileName().section("/", -1, -1)+"...", "", 0, 100, this);
-        if (projectFile->getIsChanged()){
+        //if (projectFile->getIsChanged()){
             projectFile->write();
             projectFile->setIsChanged(false);
-        }
+        //}
         dialog.setProgress(projectFile->fileName()+" saved...", 10);
         QFile animData(lastFileSelectedPath+"/animationdatasinglefile.txt");
         if (animData.exists()){
@@ -400,10 +402,10 @@ void MainWindow::saveProject(){
         }
         projectFile->skyrimAnimSetData->write(lastFileSelectedPath+"/animationsetdatasinglefile.txt");
         if (characterFile){
-            if (characterFile->getIsChanged()){
+            //if (characterFile->getIsChanged()){
                 characterFile->write();
                 characterFile->setIsChanged(false);
-            }
+            //}
             dialog.setProgress(characterFile->fileName().section("/", -1, -1)+" saved...", 20);
             if (skeletonFile){
                 /*if (skeletonFile->getIsChanged()){
@@ -413,20 +415,20 @@ void MainWindow::saveProject(){
                 dialog.setProgress("Saving all unsaved behavior files...", 30);
                 for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
                     if (projectFile->behaviorFiles.at(i)/* && i < behaviorGraphs.size() && behaviorGraphs.at(i)*/){
-                        if (projectFile->behaviorFiles.at(i)->getIsChanged()){
+                        //if (projectFile->behaviorFiles.at(i)->getIsChanged()){
                             saveFile(i);
-                        }
+                        //}
                     }else{
-                        FATAL_RUNTIME_ERROR("MainWindow::saveProject(): The tab index is out of sync with the behavior files or a nullptr pointer in either the behavior or behavior graph list was encountered!!");
+                        CRITICAL_ERROR_MESSAGE("MainWindow::saveProject(): The tab index is out of sync with the behavior files or a nullptr pointer in either the behavior or behavior graph list was encountered!!");
                         return;
                     }
                 }
                 dialog.setProgress("Project saved!!!", dialog.maximum());
             }else{
-                FATAL_RUNTIME_ERROR("Project is missing a skeleton file!");
+                CRITICAL_ERROR_MESSAGE("Project is missing a skeleton file!");
             }
         }else{
-            FATAL_RUNTIME_ERROR("Project is missing a character file!");
+            CRITICAL_ERROR_MESSAGE("Project is missing a character file!");
         }
     }else{
         writeToLog("No project open!");
@@ -537,30 +539,90 @@ void MainWindow::packAndExportFileToSkyrimDirectory(){
 }
 
 void MainWindow::mergeBehaviors(){
-    //
-    //
-    //
-    //
+    BehaviorFile *dominantBehavior;
+    BehaviorFile *recessiveBehavior;
+    QString dominantfilename;
+    QString recessivefilename = QFileDialog::getOpenFileName(this, tr("Select recessive behavior file..."), QDir::currentPath(), tr("hkx Files (*.hkx)"));
+    if (recessivefilename != ""){
+        recessiveBehavior = openBehaviorForMerger(recessivefilename);
+        dominantfilename = QFileDialog::getOpenFileName(this, tr("Select dominant behavior file..."), QDir::currentPath(), tr("hkx Files (*.hkx)"));
+        dominantBehavior = openBehaviorForMerger(dominantfilename);
+        if (!dominantBehavior || !recessiveBehavior){
+            WARNING_MESSAGE("The attempt to merge projects failed!");
+        }else{
+            dominantBehavior->merge(recessiveBehavior);
+            dominantBehavior->write();
+            delete dominantBehavior;
+            delete recessiveBehavior;
+        }
+    }
 }
 
 void MainWindow::mergeProjects(){
+    toggleLog(false);
     ProjectFile *dominantProject;
     ProjectFile *recessiveProject;
-    QString recessivefilename;
-    QString dominantfilename = QFileDialog::getOpenFileName(this, tr("Select dominant project file..."), QDir::currentPath(), tr("hkx Files (*.hkx)"));
-    if (dominantfilename != ""){
-        openProject(dominantfilename, false);
-        dominantProject = projectFile;
-        recessivefilename  = QFileDialog::getOpenFileName(this, tr("Select recessive project file..."), QDir::currentPath(), tr("hkx Files (*.hkx)"));
-        openProject(dominantfilename, false);
+    QString dominantfilename;
+    QString recessivefilename = QFileDialog::getOpenFileName(this, tr("Select recessive project file..."), QDir::currentPath(), tr("hkx Files (*.hkx)"));
+    if (recessivefilename != ""){
+        openProjectForMerger(recessivefilename);
         recessiveProject = projectFile;
+        dominantfilename = QFileDialog::getOpenFileName(this, tr("Select dominant project file..."), QDir::currentPath(), tr("hkx Files (*.hkx)"));
+        openProjectForMerger(dominantfilename);
+        dominantProject = projectFile;
         if (!dominantProject->merge(recessiveProject)){
             WARNING_MESSAGE("The attempt to merge projects failed!");
         }
+        saveProject();
+        //TO DO: Merge animdata...
+        //packAndExportProjectToSkyrimDirectory();
+        //delete recessiveProject;
+        //delete projectFile;
+        //projectFile = nullptr;
     }
-    //
-    //
-    //
+    toggleLog(true);
+}
+
+BehaviorFile * MainWindow::openBehaviorForMerger(QString & filepath){
+    if (hkxcmd(filepath, filepath, "-v:xml") != HKXCMD_SUCCESS){
+        writeToLog("Failed to convert the behavior file!");
+        return nullptr;
+    }
+    {
+        QDirIterator it(filepath.section("/", 0, -2), QDirIterator::Subdirectories);
+        QString temp;
+        while (it.hasNext()){
+            temp = it.next();
+            if (temp == filepath){
+                if (!QDir(temp).remove(temp)){
+                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openPackedProject(): The file "+temp+" could not be removed!!!").toLocal8Bit().data());
+                    return nullptr;
+                }else{
+                    break;
+                }
+            }
+        }
+    }
+    {
+        QDirIterator it(filepath.section("/", 0, -2), QDirIterator::Subdirectories);
+        QString temp;
+        while (it.hasNext()){
+            temp = it.next();
+            if (temp.contains(filepath.section("/", -1, -1).remove(".hkx")) && temp.contains("-out.hkx")){
+                if (!QDir(temp).rename(temp, QString(temp).replace("-out.hkx", ".hkx"))){
+                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openBehaviorForMerger(): The file "+temp+" could not be renamed!!!").toLocal8Bit().data());
+                    return nullptr;
+                }else{
+                    break;
+                }
+            }
+        }
+    }
+    BehaviorFile *ptr = new BehaviorFile(this, nullptr, nullptr, filepath);
+    if (!ptr->parse()){
+        CRITICAL_ERROR_MESSAGE("MainWindow::openBehaviorForMerger(): The selected behavior file was not parsed!");
+    }
+    return ptr;
 }
 
 void MainWindow::exit(){
@@ -581,7 +643,7 @@ void MainWindow::closeTab(int index){
                 tabs->removeTab(index + 1);
                 //behaviorGraphs.move(index, behaviorGraphs.size() - 1);
             }else{
-                FATAL_RUNTIME_ERROR("MainWindow::closeTab(): The tab index is out of sync with the behavior files or behavior graphs!");
+                CRITICAL_ERROR_MESSAGE("MainWindow::closeTab(): The tab index is out of sync with the behavior files or behavior graphs!");
             }
         }
     }else{
@@ -645,7 +707,7 @@ void MainWindow::addNewBehavior(bool initData){
                 behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.last()));
                 tabs->addTab(behaviorGraphs.last(), filename.section("/", -1, -1));
                 if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.last()->getBehaviorGraph()))){
-                    FATAL_RUNTIME_ERROR("MainWindow::addNewBehavior(): The behavior graph was drawn incorrectly!");
+                    CRITICAL_ERROR_MESSAGE("MainWindow::addNewBehavior(): The behavior graph was drawn incorrectly!");
                 }
                 tabs->setCurrentIndex(tabs->count() - 1);
                 //dialog.setProgress("Writing to file...", 50);
@@ -668,7 +730,14 @@ void MainWindow::addNewBehavior(bool initData){
     //dialog.setProgress("Behavior file creation failed!!", dialog.maximum());
 }
 
-void MainWindow::openProject(QString & filepath, bool loadUI){
+void MainWindow::toggleLog(bool toggle){
+    allowLogging = toggle;
+}
+
+void MainWindow::openProject(QString & filepath){
+#ifdef QT_DEBUG
+    //toggleLog(false);
+#endif
     if (tabs->count() > 0){
         closeAll();
     }
@@ -704,24 +773,22 @@ void MainWindow::openProject(QString & filepath, bool loadUI){
     {
         std::thread thread(&ProjectFile::readAnimationSetData, projectFile, lastFileSelectedPath+"/animationsetdatasinglefile.txt");
         if (!projectFile->readAnimationData(lastFileSelectedPath+"/animationdatasinglefile.txt", behaviornamesanimdata)){
-            FATAL_RUNTIME_ERROR("MainWindow::openProject(): The project animation data file could not be parsed!!!");
+            CRITICAL_ERROR_MESSAGE("MainWindow::openProject(): The project animation data file could not be parsed!!!");
         }
         thread.join();
     }
     ProgressDialog dialog("Opening project..."+projectFile->fileName().section("/", -1, -1), "", 0, 100, this);
     if (!projectFile->parse()){
-        FATAL_RUNTIME_ERROR(QString("MainWindow::openProject(): The project file "+lastFileSelected+" could not be parsed!!!\nYou have tried to open non-project file or the project file is corrupted!").toLocal8Bit().data());
+        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The project file "+lastFileSelected+" could not be parsed!!!\nYou have tried to open non-project file or the project file is corrupted!").toLocal8Bit().data());
     }
     writeToLog("\n-------------------------\nTime taken to open file \""+filepath+
                                "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
     dialog.setProgress("Loading character data...", 10);
-    if (loadUI){
-        projectUI->setFilePath(lastFileSelectedPath);
-    }
+    projectUI->setFilePath(lastFileSelectedPath);
     time = t.elapsed();
     characterFile = new CharacterFile(this, projectFile, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));
     if (!characterFile->parse()){
-        FATAL_RUNTIME_ERROR(QString("MainWindow::openProject(): The character file "+projectFile->getCharacterFilePathAt(0)+" could not be parsed!!!").toLocal8Bit().data());
+        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The character file "+projectFile->getCharacterFilePathAt(0)+" could not be parsed!!!").toLocal8Bit().data());
     }
     dialog.setProgress("Character data loaded sucessfully!!!", 40);
     projectFile->setCharacterFile(characterFile);
@@ -732,16 +799,154 @@ void MainWindow::openProject(QString & filepath, bool loadUI){
     dialog.setProgress("Loading skeleton data...", 50);
     skeletonFile = new SkeletonFile(this, lastFileSelectedPath+"/"+characterFile->getRigName());
     if (!skeletonFile->parse()){
-        FATAL_RUNTIME_ERROR(QString("MainWindow::openProject(): The skeleton file "+characterFile->getRigName()+" could not be parsed!!!").toLocal8Bit().data());
+        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The skeleton file "+characterFile->getRigName()+" could not be parsed!!!").toLocal8Bit().data());
     }
     dialog.setProgress("Skeleton data loaded sucessfully!!!", 90);
     characterFile->setSkeletonFile(skeletonFile);
-    if (loadUI){
-        tabs->addTab(projectUI, "Character Data");
-        projectUI->setProject(projectFile);
-        projectUI->loadData();
-        projectUI->setDisabled(false);
+    tabs->addTab(projectUI, "Character Data");
+    projectUI->setProject(projectFile);
+    projectUI->loadData();
+    projectUI->setDisabled(false);
+    writeToLog("\n-------------------------\nTime taken to open file \""+lastFileSelectedPath+"/"+characterFile->getRigName()+
+                               "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
+    //Start reading behavior files...
+    //This also reads files that may not belong to the current project! See dog!!
+    std::vector <std::thread> threads;
+    std::unique_lock<std::mutex> locker(mutex);
+    int taskCount = behaviornames.size();
+    int previousCount = taskCount;
+    int behaviorIndex = 0;
+    auto maxThreads = std::thread::hardware_concurrency() - 1;
+    //Read files...
+    for (uint i = 0; i < maxThreads, behaviorIndex < behaviornames.size(); i++, behaviorIndex++){
+        threads.push_back(std::thread(&MainWindow::openBehavior, this, behaviornames.at(behaviorIndex), std::ref(taskCount), false));
+        threads.back().detach();
     }
+    std::mutex localmutex;
+    auto taskdifference = 0;
+    while (taskCount > 0){
+        if (taskCount < previousCount || threads.size() < maxThreads){
+            localmutex.lock();
+            taskdifference = previousCount - taskCount;
+            previousCount = taskCount;
+            localmutex.unlock();
+            for (; taskdifference > 0; taskdifference--){
+                threads.pop_back();
+            }
+            if (behaviorIndex < behaviornames.size()){
+                threads.push_back(std::thread(&MainWindow::openBehavior, this, behaviornames.at(behaviorIndex), std::ref(taskCount), false));
+                threads.back().detach();
+                behaviorIndex++;
+            }
+        }
+        conditionVar.wait(locker);
+        //writeToLog("\n-------------------------\nBehavior file read!!\n-------------------------\n");
+    }
+    threads.clear();
+    for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
+        behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.at(i)));
+    }
+    for (int i = 0; i < behaviornames.size();){
+        for (uint j = 0; j < maxThreads; j++){
+            if (threads.size() < maxThreads){
+                if (i < behaviornames.size() && i < behaviorGraphs.size()){
+                    threads.push_back(std::thread(&TreeGraphicsView::drawGraph, behaviorGraphs[i], static_cast<DataIconManager *>(projectFile->behaviorFiles.at(i)->getBehaviorGraph()), false));
+                    i++;
+                }else{
+                    break;
+                }
+            }else{
+                for (int k = 0; k < threads.size(); k++){
+                    if (threads.at(k).joinable()){
+                        threads.at(k).join();
+                    }else{
+                        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data());
+                    }
+                }
+                threads.clear();
+            }
+        }
+    }
+    for (int k = 0; k < threads.size(); k++){
+        if (threads.at(k).joinable()){
+            threads.at(k).join();
+        }else{
+            CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data());
+        }
+    }
+    threads.clear();
+    projectFile->generateAnimClipDataForProject();
+    writeToLog("\n-------------------------\nTime taken to open project \""+filepath+
+                              "\" is approximately "+QString::number(t.elapsed())+" milliseconds\n-------------------------\n");
+    dialog.setProgress("Project loaded sucessfully!!!", dialog.maximum());
+    //changedTabs(0);
+#ifdef QT_DEBUG
+    //toggleLog(true);
+#endif
+}
+
+void MainWindow::openProjectForMerger(QString & filepath){
+    lastFileSelected = filepath;
+    QTime t;
+    t.start();
+    objectDataWid->changeCurrentDataWidget(nullptr);
+    int index = filepath.lastIndexOf("\\", -1);
+    if (index > -1){
+        lastFileSelectedPath = filepath.remove(index, filepath.size() - index);
+    }else{
+        index = filepath.lastIndexOf("/", -1);
+        if (index > -1){
+            lastFileSelectedPath = filepath.remove(index, filepath.size() - index);
+        }else{
+            lastFileSelectedPath = filepath;
+        }
+    }
+    int time = t.elapsed();
+    //Get behavior filenames...
+    QDirIterator it(lastFileSelectedPath+"/behaviors"); //Wont work for dogs, wolves!!!
+    QString behavior;
+    QStringList behaviornames;
+    QStringList behaviornamesanimdata;
+    while (it.hasNext()){
+        behavior = it.next();
+        if (behavior.contains(".hkx")){
+            behaviornames.append(behavior);
+            behaviornamesanimdata.append(behavior.section("/", -2, -1).replace("/", "\\"));
+        }
+    }
+    projectFile = new ProjectFile(this, lastFileSelected);
+    /*{
+        std::thread thread(&ProjectFile::readAnimationSetData, projectFile, lastFileSelectedPath+"/animationsetdatasinglefile.txt");
+        if (!projectFile->readAnimationData(lastFileSelectedPath+"/animationdatasinglefile.txt", behaviornamesanimdata)){
+            CRITICAL_ERROR_MESSAGE("MainWindow::openProject(): The project animation data file could not be parsed!!!");
+        }
+        thread.join();
+    }*/
+    ProgressDialog dialog("Opening project..."+projectFile->fileName().section("/", -1, -1), "", 0, 100, this);
+    if (!projectFile->parse()){
+        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The project file "+lastFileSelected+" could not be parsed!!!\nYou have tried to open non-project file or the project file is corrupted!").toLocal8Bit().data());
+    }
+    writeToLog("\n-------------------------\nTime taken to open file \""+filepath+
+                               "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
+    dialog.setProgress("Loading character data...", 10);
+    time = t.elapsed();
+    characterFile = new CharacterFile(this, projectFile, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));
+    if (!characterFile->parse()){
+        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The character file "+projectFile->getCharacterFilePathAt(0)+" could not be parsed!!!").toLocal8Bit().data());
+    }
+    dialog.setProgress("Character data loaded sucessfully!!!", 40);
+    projectFile->setCharacterFile(characterFile);
+    //projectFile->loadEncryptedAnimationNames();
+    writeToLog("\n-------------------------\nTime taken to open file \""+lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0)+
+                               "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
+    time = t.elapsed();
+    dialog.setProgress("Loading skeleton data...", 50);
+    skeletonFile = new SkeletonFile(this, lastFileSelectedPath+"/"+characterFile->getRigName());
+    if (!skeletonFile->parse()){
+        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The skeleton file "+characterFile->getRigName()+" could not be parsed!!!").toLocal8Bit().data());
+    }
+    dialog.setProgress("Skeleton data loaded sucessfully!!!", 90);
+    characterFile->setSkeletonFile(skeletonFile);
     writeToLog("\n-------------------------\nTime taken to open file \""+lastFileSelectedPath+"/"+characterFile->getRigName()+
                                "\" is approximately "+QString::number(t.elapsed() - time)+" milliseconds\n-------------------------\n");
     //Start reading behavior files...
@@ -752,7 +957,7 @@ void MainWindow::openProject(QString & filepath, bool loadUI){
     int previousCount = taskCount;
     int behaviorIndex = 0;
     //Read files...
-    for (uint i = 0; i < std::thread::hardware_concurrency(), behaviorIndex < behaviornames.size(); i++, behaviorIndex++){
+    for (uint i = 0; i < std::thread::hardware_concurrency() - 1, behaviorIndex < behaviornames.size(); i++, behaviorIndex++){
         threads.push_back(std::thread(&MainWindow::openBehavior, this, behaviornames.at(behaviorIndex), std::ref(taskCount), false));
         threads.back().detach();
     }
@@ -766,43 +971,10 @@ void MainWindow::openProject(QString & filepath, bool loadUI){
             }
         }
         conditionVar.wait(locker);
+        //writeToLog("\n-------------------------\nBehavior file read!!\n-------------------------\n");
     }
     threads.clear();
-    if (loadUI){
-        for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
-            behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.at(i)));
-        }
-        for (int i = 0; i < behaviornames.size();){
-            for (uint j = 0; j < std::thread::hardware_concurrency(); j++){
-                if (threads.size() < std::thread::hardware_concurrency()){
-                    if (i < behaviornames.size() && i < behaviorGraphs.size()){
-                        threads.push_back(std::thread(&TreeGraphicsView::drawGraph, behaviorGraphs[i], static_cast<DataIconManager *>(projectFile->behaviorFiles.at(i)->getBehaviorGraph()), false));
-                        i++;
-                    }else{
-                        break;
-                    }
-                }else{
-                    for (int k = 0; k < threads.size(); k++){
-                        if (threads.at(k).joinable()){
-                            threads.at(k).join();
-                        }else{
-                            FATAL_RUNTIME_ERROR(QString("MainWindow::openProject(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data());
-                        }
-                    }
-                    threads.clear();
-                }
-            }
-        }
-        for (int k = 0; k < threads.size(); k++){
-            if (threads.at(k).joinable()){
-                threads.at(k).join();
-            }else{
-                FATAL_RUNTIME_ERROR(QString("MainWindow::openProject(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data());
-            }
-        }
-        threads.clear();
-    }
-    projectFile->generateAnimClipDataForProject();
+    //projectFile->generateAnimClipDataForProject();
     writeToLog("\n-------------------------\nTime taken to open project \""+filepath+
                               "\" is approximately "+QString::number(t.elapsed())+" milliseconds\n-------------------------\n");
     dialog.setProgress("Project loaded sucessfully!!!", dialog.maximum());
@@ -836,10 +1008,11 @@ bool MainWindow::openBehavior(const QString & filename, int & taskCount, bool ch
             ptr = projectFile->behaviorFiles.last();
             lock.unlock();
             if (!ptr->parse()){
-                lock.lock();
+                /*lock.lock();
                 delete projectFile->behaviorFiles.last();
                 projectFile->behaviorFiles.removeLast();
-                lock.unlock();
+                lock.unlock();*/
+                result = false;
             }else{
                 result = true;
             }
@@ -912,19 +1085,24 @@ void MainWindow::removeBehaviorGraphs(const QStringList & filenames){
 }
 
 void MainWindow::writeToLog(const QString &message, bool isError){
-    QString str;
-    QString temp = "\n#########################################";
-    if (!isError){
-        //str = "WARNING!!!-->";
-    }else{
-        str = "ERROR!!!-->";
+    if (allowLogging && !message.contains("hkbStateMachineStateInfo: linkVar()!")){
+        QString str;
+        QString temp = "\n#########################################";
+        if (!isError){
+            //str = "WARNING!!!-->";
+        }else{
+            str = "ERROR!!!-->";
+        }
+        if (debugLog->blockCount() >= debugLog->maximumBlockCount()*0.8){
+            debugLog->clear();
+        }
+        //std::unique_lock<std::mutex> lock(std::mutex);
+        debugLog->appendPlainText(temp+"\n"+str+message);
+        QTextCursor tempTC(debugLog->document());
+        tempTC.movePosition(QTextCursor::End);
+        debugLog->setTextCursor(tempTC);
+        //lock.unlock();
     }
-    //std::unique_lock<std::mutex> lock(std::mutex);
-    debugLog->appendPlainText(temp+"\n"+str+message+temp);
-    QTextCursor tempTC(debugLog->document());
-    tempTC.movePosition(QTextCursor::End);
-    debugLog->setTextCursor(tempTC);
-    //lock.unlock();
 }
 
 void MainWindow::openPackedProject(){
@@ -944,7 +1122,7 @@ void MainWindow::openPackedProject(){
             temp = it.next();
             if (temp.contains(".hkx")){
                 if (!QDir(temp).remove(temp)){
-                    FATAL_RUNTIME_ERROR(QString("MainWindow::openPackedProject(): The file "+temp+" could not be removed!!!").toLocal8Bit().data());
+                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openPackedProject(): The file "+temp+" could not be removed!!!").toLocal8Bit().data());
                     return;
                 }
             }
@@ -957,12 +1135,12 @@ void MainWindow::openPackedProject(){
             temp = it.next();
             if (temp.contains("-out.xml")){
                 if (!QDir(temp).rename(temp, QString(temp).replace("-out.xml", ".hkx"))){
-                    FATAL_RUNTIME_ERROR(QString("MainWindow::openPackedProject(): The file "+temp+" could not be renamed!!!").toLocal8Bit().data());
+                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openPackedProject(): The file "+temp+" could not be renamed!!!").toLocal8Bit().data());
                     return;
                 }
             }else if (temp.contains(".xml")){
                 if (!QDir(temp).rename(temp, QString(temp).replace(".xml", ".hkx"))){
-                    FATAL_RUNTIME_ERROR(QString("MainWindow::openPackedProject(): The file "+temp+" could not be renamed!!!").toLocal8Bit().data());
+                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openPackedProject(): The file "+temp+" could not be renamed!!!").toLocal8Bit().data());
                     return;
                 }
             }
@@ -989,7 +1167,7 @@ void MainWindow::openBehaviorFile(const QModelIndex & index){
             return;
         }
     }
-    FATAL_RUNTIME_ERROR("MainWindow::openBehaviorFile(): The selected behavior file was not found!");
+    CRITICAL_ERROR_MESSAGE("MainWindow::openBehaviorFile(): The selected behavior file was not found!");
 }
 
 void MainWindow::openAnimationFile(const QString &animationname){
@@ -999,7 +1177,7 @@ void MainWindow::openAnimationFile(const QString &animationname){
     }
     AnimationFile *ptr = new AnimationFile(this, QString(animationname).replace(".hkx", "-out.hkx"));
     if (!ptr->parse()){
-        FATAL_RUNTIME_ERROR("MainWindow::openAnimationFile(): The selected animation file was not opened!");
+        CRITICAL_ERROR_MESSAGE("MainWindow::openAnimationFile(): The selected animation file was not opened!");
     }
     projectFile->setAnimationIndexDuration(-1, characterFile->getNumberOfAnimations() - 1, ptr->getDuration());
     projectFile->addEncryptedAnimationName(animationname);
@@ -1138,7 +1316,7 @@ void MainWindow::createNewProject(){
             lastFileSelectedPath = filename.section("/", 0, -2);
             skeletonFile = new SkeletonFile(this, filename);
             if (!skeletonFile->parse()){
-                FATAL_RUNTIME_ERROR(QString("MainWindow::createNewProject(): The skeleton file "+filename.section("/", -1, -1)+" could not be parsed!!!").toLocal8Bit().data());
+                CRITICAL_ERROR_MESSAGE(QString("MainWindow::createNewProject(): The skeleton file "+filename.section("/", -1, -1)+" could not be parsed!!!").toLocal8Bit().data());
             }
             bool ok;
             QString projectname = QInputDialog::getText(this, tr("Set project name!"), tr("Project name:"), QLineEdit::Normal, "", &ok);
@@ -1147,7 +1325,7 @@ void MainWindow::createNewProject(){
                 {
                     QDir projectDirectory(lastFileSelectedPath);
                     if (!projectDirectory.mkdir(projectDirectoryPath) && !QDir(projectDirectoryPath).exists()){
-                        FATAL_RUNTIME_ERROR(QString("MainWindow::createNewProject(): Attempt to create '"+projectDirectoryPath+"' directory failed!!!").toUtf8().data());
+                        CRITICAL_ERROR_MESSAGE(QString("MainWindow::createNewProject(): Attempt to create '"+projectDirectoryPath+"' directory failed!!!").toUtf8().data());
                     }
                 }
                 QString relativecharacterpath = "characters/"+projectname+"character.hkx";
@@ -1157,17 +1335,17 @@ void MainWindow::createNewProject(){
                     QStringList list = {"animations", "behaviors", "character assets", "characters"};
                     for (auto i = 0; i < list.size(); i++){
                         if (!projectDirectory.mkdir(list.at(i)) && !QDir(projectDirectoryPath+"/"+list.at(i)).exists()){
-                            FATAL_RUNTIME_ERROR(QString("MainWindow::createNewProject(): Attempt to create '"+list.at(i)+"' directory failed!!!").toUtf8().data());
+                            CRITICAL_ERROR_MESSAGE(QString("MainWindow::createNewProject(): Attempt to create '"+list.at(i)+"' directory failed!!!").toUtf8().data());
                         }
                     }
                     if (!projectDirectory.rename(lastFileSelected, projectDirectoryPath+"/character assets/"+skeletonFile->fileName().section("/", -1, -1))){
-                        FATAL_RUNTIME_ERROR("MainWindow::createNewProject(): Attempt to move skeleton file failed!!!");
+                        CRITICAL_ERROR_MESSAGE("MainWindow::createNewProject(): Attempt to move skeleton file failed!!!");
                     }
                     projectFile = new ProjectFile(this, projectDirectoryPath+"/"+projectname+".hkx", true, "characters\\"+projectname+"character.hkx");
                     {
                         std::thread thread(&ProjectFile::readAnimationSetData, projectFile, lastFileSelectedPath+"/animationsetdatasinglefile.txt");
                         if (!projectFile->readAnimationData(lastFileSelectedPath+"/animationdatasinglefile.txt", QStringList("Behaviors\\Master.hkx"))){
-                            FATAL_RUNTIME_ERROR("MainWindow::createNewProject(): The project animation data file could not be parsed!!!");
+                            CRITICAL_ERROR_MESSAGE("MainWindow::createNewProject(): The project animation data file could not be parsed!!!");
                         }
                         thread.join();
                     }
@@ -1187,7 +1365,7 @@ void MainWindow::createNewProject(){
                         tabs->addTab(projectUI, "Character Data");
                         tabs->addTab(behaviorGraphs.last(), projectFile->behaviorFiles.last()->fileName().section("/", -1, -1));
                         if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.last()->getBehaviorGraph()))){
-                            FATAL_RUNTIME_ERROR("MainWindow::createNewProject(): The behavior graph was drawn incorrectly!");
+                            CRITICAL_ERROR_MESSAGE("MainWindow::createNewProject(): The behavior graph was drawn incorrectly!");
                         }
                         tabs->setCurrentIndex(tabs->count() - 1);
                         saveProject();
@@ -1196,7 +1374,7 @@ void MainWindow::createNewProject(){
                         WARNING_MESSAGE(QString("MainWindow::createNewProject(): The chosen project name is taken! Choose another project name!"));
                     }
                 }else{
-                    FATAL_RUNTIME_ERROR("MainWindow::createNewProject(): Invalid 'lastFileSelectedPath'!!!");
+                    CRITICAL_ERROR_MESSAGE("MainWindow::createNewProject(): Invalid 'lastFileSelectedPath'!!!");
                 }
             }else{
                 closeAll();

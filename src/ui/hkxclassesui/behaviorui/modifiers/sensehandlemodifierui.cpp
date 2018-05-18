@@ -269,7 +269,7 @@ void SenseHandleModifierUI::addRange(){
         bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::addRange(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::addRange(): The data is nullptr!!");
     }
 }
 
@@ -289,7 +289,7 @@ void SenseHandleModifierUI::removeRange(int index){
             return;
         }
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::removeExpression(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::removeExpression(): The data is nullptr!!");
     }
 }
 
@@ -333,11 +333,11 @@ void SenseHandleModifierUI::loadData(HkxObject *data){
             if (bsData->collisionFilterInfo < collisionLayers.size() && bsData->collisionFilterInfo > -1){
                 index = collisionFilterInfo->findText(collisionLayers.at(bsData->collisionFilterInfo));
                 if (index < 0){
-                    FATAL_RUNTIME_ERROR("SenseHandleModifierUI::loadData(): Invalid collisionFilterInfo!!!");
+                    CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::loadData(): Invalid collisionFilterInfo!!!");
                 }
                 collisionFilterInfo->setCurrentIndex(index);
             }else{
-                FATAL_RUNTIME_ERROR("SenseHandleModifierUI::loadData(): Invalid collisionFilterInfo!!!");
+                CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::loadData(): Invalid collisionFilterInfo!!!");
             }
             if (sensorRagdollBoneIndex->count() == 0){
                 boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRagdollBoneNames();
@@ -390,10 +390,10 @@ void SenseHandleModifierUI::loadData(HkxObject *data){
             }
             loadDynamicTableRows();
         }else{
-            FATAL_RUNTIME_ERROR(QString("SenseHandleModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("SenseHandleModifierUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::loadData(): Attempting to load a null pointer!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::loadData(): Attempting to load a null pointer!!");
     }
     connectSignals();
 }
@@ -409,7 +409,7 @@ void SenseHandleModifierUI::loadDynamicTableRows(){
             setRowItems(i, "Range "+QString::number(j), "hkRange", "Remove", "Edit", "Double click to remove this range", "Double click to edit this range");
         }
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::loadDynamicTableRows(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::loadDynamicTableRows(): The data is nullptr!!");
     }
     //table->setSortingEnabled(true);
 }
@@ -443,19 +443,19 @@ bool SenseHandleModifierUI::setBinding(int index, int row, const QString & varia
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -464,7 +464,7 @@ bool SenseHandleModifierUI::setBinding(int index, int row, const QString & varia
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -557,7 +557,7 @@ void SenseHandleModifierUI::setBindingVariable(int index, const QString & name){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -575,7 +575,7 @@ void SenseHandleModifierUI::setName(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -584,7 +584,7 @@ void SenseHandleModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -595,7 +595,7 @@ void SenseHandleModifierUI::setSensorLocalOffset(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setSensorLocalOffset(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensorLocalOffset(): The data is nullptr!!");
     }
 }
 
@@ -606,7 +606,7 @@ void SenseHandleModifierUI::setMinDistance(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setMinDistance(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setMinDistance(): The data is nullptr!!");
     }
 }
 
@@ -617,7 +617,7 @@ void SenseHandleModifierUI::setMaxDistance(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setMaxDistance(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setMaxDistance(): The data is nullptr!!");
     }
 }
 
@@ -628,7 +628,7 @@ void SenseHandleModifierUI::setDistanceOut(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setDistanceOut(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setDistanceOut(): The data is nullptr!!");
     }
 }
 
@@ -637,7 +637,7 @@ void SenseHandleModifierUI::setLocalFrameName(const QString & text){
         bsData->localFrameName = text;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setLocalFrameName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setLocalFrameName(): The data is nullptr!!");
     }
 }
 
@@ -646,7 +646,7 @@ void SenseHandleModifierUI::setSensorLocalFrameName(const QString & text){
         bsData->sensorLocalFrameName = text;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setSensorLocalFrameName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensorLocalFrameName(): The data is nullptr!!");
     }
 }
 
@@ -655,7 +655,7 @@ void SenseHandleModifierUI::setCollisionFilterInfo(int index){
         bsData->collisionFilterInfo = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setCollisionFilterInfo(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setCollisionFilterInfo(): The data is nullptr!!");
     }
 }
 
@@ -667,7 +667,7 @@ void SenseHandleModifierUI::setSensorRagdollBoneIndex(int index){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setSensorRagdollBoneIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensorRagdollBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -679,7 +679,7 @@ void SenseHandleModifierUI::setSensorAnimationBoneIndex(int index){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setSensorAnimationBoneIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensorAnimationBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -688,7 +688,7 @@ void SenseHandleModifierUI::setSensingMode(int index){
         bsData->sensingMode = bsData->SensingMode.at(index);
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setSensingMode(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensingMode(): The data is nullptr!!");
     }
 }
 
@@ -697,7 +697,7 @@ void SenseHandleModifierUI::setExtrapolateSensorPosition(){
         bsData->extrapolateSensorPosition = extrapolateSensorPosition->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setExtrapolateSensorPosition(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setExtrapolateSensorPosition(): The data is nullptr!!");
     }
 }
 
@@ -706,7 +706,7 @@ void SenseHandleModifierUI::setKeepFirstSensedHandle(){
         bsData->keepFirstSensedHandle = keepFirstSensedHandle->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setKeepFirstSensedHandle(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setKeepFirstSensedHandle(): The data is nullptr!!");
     }
 }
 
@@ -715,7 +715,7 @@ void SenseHandleModifierUI::setFoundHandleOut(){
         bsData->foundHandleOut = foundHandleOut->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::setFoundHandleOut(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setFoundHandleOut(): The data is nullptr!!");
     }
 }
 
@@ -820,11 +820,11 @@ void SenseHandleModifierUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                FATAL_RUNTIME_ERROR("SenseHandleModifierUI::viewSelectedChild(): Invalid index of range to view!!");
+                CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::viewSelectedChild(): Invalid index of range to view!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::viewSelectedChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -853,7 +853,7 @@ void SenseHandleModifierUI::connectToTables(GenericTableWidget *variables, Gener
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -875,10 +875,10 @@ void SenseHandleModifierUI::loadBinding(int row, int colunm, hkbVariableBindingS
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("SenseHandleModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -898,7 +898,7 @@ void SenseHandleModifierUI::selectTableToView(bool viewproperties, const QString
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -908,7 +908,7 @@ void SenseHandleModifierUI::eventRenamed(const QString & name, int index){
             rangeUI->eventRenamed(name, index);
         }
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::eventRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -980,7 +980,7 @@ void SenseHandleModifierUI::variableRenamed(const QString & name, int index){
             rangeUI->variableRenamed(name, index);
         }
     }else{
-        FATAL_RUNTIME_ERROR("SenseHandleModifierUI::variableRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::variableRenamed(): The data is nullptr!!");
     }
 }
 

@@ -47,7 +47,7 @@ bool hkbPoweredRagdollControlsModifier::readData(const HkxXmlReader &reader, lon
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -111,7 +111,7 @@ bool hkbPoweredRagdollControlsModifier::readData(const HkxXmlReader &reader, lon
                 writeToLog(getClassname()+": readData()!\nInvalid 'mode' data!\nObject Reference: "+ref);
             }
         }else if (text == "boneWeights"){
-            if (!boneWeights.readReference(index, reader)){
+            if (!boneWeights.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'boneWeights' reference!\nObject Reference: "+ref);
             }
         }
@@ -189,14 +189,14 @@ bool hkbPoweredRagdollControlsModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(bones.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(bones.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_INDEX_ARRAY){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'bones' is not a HKB_BONE_INDEX_ARRAY!");
         }
         bones = *ptr;
     }
-    ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(boneWeights.getReference());
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(boneWeights.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'boneWeights' is not a HKB_BONE_WEIGHT_ARRAY!");
@@ -212,8 +212,8 @@ void hkbPoweredRagdollControlsModifier::unlink(){
     boneWeights = HkxSharedPtr();
 }
 
-bool hkbPoweredRagdollControlsModifier::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbPoweredRagdollControlsModifier::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (bones.data() && bones.data()->getSignature() != HKB_BONE_INDEX_ARRAY){

@@ -39,7 +39,7 @@ bool BSEventEveryNEventsModifier::readData(const HkxXmlReader &reader, long inde
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -67,7 +67,7 @@ bool BSEventEveryNEventsModifier::readData(const HkxXmlReader &reader, long inde
                         writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
-                    if (!eventToCheckFor.payload.readReference(index, reader)){
+                    if (!eventToCheckFor.payload.readShdPtrReference(index, reader)){
                         writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
@@ -84,7 +84,7 @@ bool BSEventEveryNEventsModifier::readData(const HkxXmlReader &reader, long inde
                         writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
-                    if (!eventToSend.payload.readReference(index, reader)){
+                    if (!eventToSend.payload.readShdPtrReference(index, reader)){
                         writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
@@ -178,6 +178,15 @@ void BSEventEveryNEventsModifier::updateEventIndices(int eventindex){
     }
 }
 
+void BSEventEveryNEventsModifier::mergeEventIndex(int oldindex, int newindex){
+    if (eventToCheckFor.id == oldindex){
+        eventToCheckFor.id = newindex;
+    }
+    if (eventToSend.id == oldindex){
+        eventToSend.id = newindex;
+    }
+}
+
 bool BSEventEveryNEventsModifier::link(){
     if (!getParentFile()){
         return false;
@@ -185,7 +194,7 @@ bool BSEventEveryNEventsModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToCheckFor.payload.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToCheckFor.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
@@ -193,7 +202,7 @@ bool BSEventEveryNEventsModifier::link(){
         }
         eventToCheckFor.payload = *ptr;
     }
-    ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToSend.payload.getReference());
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToSend.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
@@ -210,8 +219,8 @@ void BSEventEveryNEventsModifier::unlink(){
     eventToSend.payload = HkxSharedPtr();
 }
 
-bool BSEventEveryNEventsModifier::evaulateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool BSEventEveryNEventsModifier::evaluateDataValidity(){    //Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (eventToCheckFor.payload.data() && eventToCheckFor.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){

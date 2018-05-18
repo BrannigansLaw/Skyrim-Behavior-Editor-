@@ -96,7 +96,7 @@ void BSiStateTaggingGeneratorUI::connectToTables(GenericTableWidget *variables, 
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -123,10 +123,10 @@ void BSiStateTaggingGeneratorUI::loadData(HkxObject *data){
                 table->item(I_PRIORITY_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR(QString("BSiStateTaggingGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("BSiStateTaggingGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::loadData(): The data passed to the UI is nullptr!!!");
+        CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::loadData(): The data passed to the UI is nullptr!!!");
     }
     connectSignals();
 }
@@ -149,7 +149,7 @@ void BSiStateTaggingGeneratorUI::setIStateToSetAs(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::setIStateToSetAs(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::setIStateToSetAs(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -160,7 +160,7 @@ void BSiStateTaggingGeneratorUI::setIPriority(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::setIPriority(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::setIPriority(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -173,7 +173,7 @@ void BSiStateTaggingGeneratorUI::setDefaultGenerator(int index, const QString & 
             indexOfGenerator = bsData->getIndexOfObj(static_cast<DataIconManager*>(bsData->pDefaultGenerator.data()));
             if (ptr){
                 if (name != ptr->getName()){
-                    FATAL_RUNTIME_ERROR("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
+                    CRITICAL_ERROR_MESSAGE("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
                     return;
                 }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->pDefaultGenerator.data()), 0, ptr, false)){
                     WARNING_MESSAGE(QString("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!"));
@@ -183,7 +183,7 @@ void BSiStateTaggingGeneratorUI::setDefaultGenerator(int index, const QString & 
                 if (behaviorView->getSelectedItem()){
                     behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->pDefaultGenerator.data())), indexOfGenerator);
                 }else{
-                    FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::setDefaultGenerator(): The selected icon is nullptr!!");
+                    CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::setDefaultGenerator(): The selected icon is nullptr!!");
                     return;
                 }
             }
@@ -191,10 +191,10 @@ void BSiStateTaggingGeneratorUI::setDefaultGenerator(int index, const QString & 
             table->item(P_DEFAULT_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
             bsData->getParentFile()->setIsChanged(true);
         }else{
-            FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::setDefaultGenerator(): The 'behaviorView' pointer is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::setDefaultGenerator(): The 'behaviorView' pointer is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::setDefaultGenerator(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::setDefaultGenerator(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -216,10 +216,10 @@ void BSiStateTaggingGeneratorUI::loadBinding(int row, int colunm, hkbVariableBin
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -229,19 +229,19 @@ void BSiStateTaggingGeneratorUI::setBinding(int index, int row, const QString & 
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -250,7 +250,7 @@ void BSiStateTaggingGeneratorUI::setBinding(int index, int row, const QString & 
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::setBinding(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::setBinding(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -276,7 +276,7 @@ void BSiStateTaggingGeneratorUI::setBindingVariable(int index, const QString & n
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -296,7 +296,7 @@ void BSiStateTaggingGeneratorUI::selectTableToView(bool viewproperties, const QS
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -323,7 +323,7 @@ void BSiStateTaggingGeneratorUI::viewSelected(int row, int column){
             emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pDefaultGenerator) + 1, QString(), list);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -342,7 +342,7 @@ void BSiStateTaggingGeneratorUI::variableRenamed(const QString & name, int index
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -353,7 +353,7 @@ void BSiStateTaggingGeneratorUI::generatorRenamed(const QString &name, int index
             table->item(P_DEFAULT_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSiStateTaggingGeneratorUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 

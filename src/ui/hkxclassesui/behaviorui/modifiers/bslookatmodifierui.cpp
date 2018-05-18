@@ -285,7 +285,7 @@ void BSLookAtModifierUI::loadData(HkxObject *data){
         }
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::loadData(): The data is nullptr or an incorrect type!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::loadData(): The data is nullptr or an incorrect type!!");
     }
     connectSignals();
 }
@@ -310,7 +310,7 @@ void BSLookAtModifierUI::loadDynamicTableRows(){
             if (bsData->bones.at(j).index > -2 && bsData->bones.at(j).index < boneList.size()){
                 setRowItems(i, boneList.at(bsData->bones.at(j).index + 1), "BsBone", "Remove", "Edit", "Double click to remove this bone", "Double click to edit this bone");
             }else{
-                FATAL_RUNTIME_ERROR("BSLookAtModifierUI::loadDynamicTableRows(): Bone index out of range!!");
+                CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::loadDynamicTableRows(): Bone index out of range!!");
             }
         }
         table->setRowCount(eyeBoneButtonRow + bsData->getNumberOfEyeBones() + 1);
@@ -318,11 +318,11 @@ void BSLookAtModifierUI::loadDynamicTableRows(){
             if (bsData->eyeBones.at(j).index > -2 && bsData->eyeBones.at(j).index < boneList.size()){
                 setRowItems(i, boneList.at(bsData->eyeBones.at(j).index + 1), "BsBone", "Remove", "Edit", "Double click to remove this eye bone", "Double click to edit this eye bone");
             }else{
-                FATAL_RUNTIME_ERROR("BSLookAtModifierUI::loadDynamicTableRows(): Eye bone index out of range!!");
+                CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::loadDynamicTableRows(): Eye bone index out of range!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::loadDynamicTableRows(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::loadDynamicTableRows(): The data is nullptr!!");
     }
     //table->setSortingEnabled(true);
 }
@@ -359,7 +359,7 @@ void BSLookAtModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -368,7 +368,7 @@ void BSLookAtModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -377,7 +377,7 @@ void BSLookAtModifierUI::setLookAtTarget(){
         bsData->lookAtTarget = lookAtTarget->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setLookAtTarget(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setLookAtTarget(): The data is nullptr!!");
     }
 }
 
@@ -388,7 +388,7 @@ void BSLookAtModifierUI::setLimitAngleDegrees(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setLimitAngleDegrees(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setLimitAngleDegrees(): The data is nullptr!!");
     }
 }
 
@@ -399,7 +399,7 @@ void BSLookAtModifierUI::setLimitAngleThresholdDegrees(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setLimitAngleThresholdDegrees(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setLimitAngleThresholdDegrees(): The data is nullptr!!");
     }
 }
 
@@ -408,7 +408,7 @@ void BSLookAtModifierUI::setContinueLookOutsideOfLimit(){
         bsData->continueLookOutsideOfLimit = continueLookOutsideOfLimit->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setContinueLookOutsideOfLimit(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setContinueLookOutsideOfLimit(): The data is nullptr!!");
     }
 }
 
@@ -419,7 +419,7 @@ void BSLookAtModifierUI::setOnGain(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setOnGain(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setOnGain(): The data is nullptr!!");
     }
 }
 
@@ -430,7 +430,7 @@ void BSLookAtModifierUI::setOffGain(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setOffGain(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setOffGain(): The data is nullptr!!");
     }
 }
 
@@ -439,7 +439,7 @@ void BSLookAtModifierUI::setUseBoneGains(){
         bsData->useBoneGains = useBoneGains->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setUseBoneGains(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setUseBoneGains(): The data is nullptr!!");
     }
 }
 
@@ -450,7 +450,7 @@ void BSLookAtModifierUI::setTargetLocation(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setTargetLocation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setTargetLocation(): The data is nullptr!!");
     }
 }
 
@@ -459,7 +459,7 @@ void BSLookAtModifierUI::setTargetOutsideLimits(){
         bsData->targetOutsideLimits = targetOutsideLimits->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setTargetOutsideLimits(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setTargetOutsideLimits(): The data is nullptr!!");
     }
 }
 
@@ -469,7 +469,7 @@ void BSLookAtModifierUI::setTargetOutOfLimitEventId(int index, const QString &na
         table->item(TARGET_OUT_OF_LIMIT_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("StateMachineUI::setTargetOutOfLimitEventId(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("StateMachineUI::setTargetOutOfLimitEventId(): The data is nullptr!!");
     }
 }
 
@@ -490,7 +490,7 @@ void BSLookAtModifierUI::setTargetOutOfLimitEventPayload(){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setTargetOutOfLimitEventPayload(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setTargetOutOfLimitEventPayload(): The data is nullptr!!");
     }
 }
 
@@ -499,7 +499,7 @@ void BSLookAtModifierUI::setLookAtCamera(){
         bsData->lookAtCamera = lookAtCamera->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setLookAtCamera(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setLookAtCamera(): The data is nullptr!!");
     }
 }
 
@@ -510,7 +510,7 @@ void BSLookAtModifierUI::setLookAtCameraX(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setLookAtCameraX(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setLookAtCameraX(): The data is nullptr!!");
     }
 }
 
@@ -521,7 +521,7 @@ void BSLookAtModifierUI::setLookAtCameraY(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setLookAtCameraY(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setLookAtCameraY(): The data is nullptr!!");
     }
 }
 
@@ -532,7 +532,7 @@ void BSLookAtModifierUI::setLookAtCameraZ(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setLookAtCameraZ(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setLookAtCameraZ(): The data is nullptr!!");
     }
 }
 
@@ -542,19 +542,19 @@ bool BSLookAtModifierUI::setBinding(int index, int row, const QString & variable
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -563,7 +563,7 @@ bool BSLookAtModifierUI::setBinding(int index, int row, const QString & variable
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -662,7 +662,7 @@ void BSLookAtModifierUI::setBindingVariable(int index, const QString & name){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -682,7 +682,7 @@ void BSLookAtModifierUI::selectTableToView(bool viewproperties, const QString & 
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -797,7 +797,7 @@ void BSLookAtModifierUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                FATAL_RUNTIME_ERROR("BSLookAtModifierUI::viewSelectedChild(): Invalid index of child to view!!");
+                CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }else if (row > eyeBoneButtonRow && row < table->rowCount()){
             result = row - BASE_NUMBER_OF_ROWS - bsData->getNumberOfBones();
@@ -811,11 +811,11 @@ void BSLookAtModifierUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                FATAL_RUNTIME_ERROR("BSLookAtModifierUI::viewSelectedChild(): Invalid index of child to view!!");
+                CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::viewSelectedChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -837,7 +837,7 @@ void BSLookAtModifierUI::addBone(){
         bsData->bones.append(BSLookAtModifier::BsBone());
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::addBone(): The data or behavior graph pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::addBone(): The data or behavior graph pointer is nullptr!!");
     }
 }
 
@@ -848,7 +848,7 @@ void BSLookAtModifierUI::removeBone(int index){
         }
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::removeBone(): The data or behavior graph pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::removeBone(): The data or behavior graph pointer is nullptr!!");
     }
 }
 
@@ -859,7 +859,7 @@ void BSLookAtModifierUI::removeEyeBone(int index){
         }
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::removeEyeBone(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::removeEyeBone(): The data is nullptr!!");
     }
 }
 
@@ -868,7 +868,7 @@ void BSLookAtModifierUI::addEyeBone(){
         bsData->eyeBones.append(BSLookAtModifier::BsBone());
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::addEyeBone(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::addEyeBone(): The data is nullptr!!");
     }
 }
 
@@ -889,7 +889,7 @@ void BSLookAtModifierUI::connectToTables(GenericTableWidget *variables, GenericT
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewEvents(int,QString,QStringList)), events, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -961,7 +961,7 @@ void BSLookAtModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::variableRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::variableRenamed(): The data is nullptr!!");
     }
 }
 
@@ -974,7 +974,7 @@ void BSLookAtModifierUI::eventRenamed(const QString & name, int index){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::eventRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::eventRenamed(): The data is nullptr!!");
     }
 }
 
@@ -996,10 +996,10 @@ void BSLookAtModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet 
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("BSLookAtModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -1011,7 +1011,7 @@ void BSLookAtModifierUI::loadTableValue(int row, const QString &value){
             table->item(row, VALUE_COLUMN)->setText("NONE");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSLookAtModifierUI::loadTableValue(): There is no table item here!!");
+        CRITICAL_ERROR_MESSAGE("BSLookAtModifierUI::loadTableValue(): There is no table item here!!");
     }
 }
 

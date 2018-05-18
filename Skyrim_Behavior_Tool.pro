@@ -19,7 +19,6 @@ TEMPLATE = app
 # add the desired -O3 if not present
 #QMAKE_CXXFLAGS_DEBUG *= -O3
 
-
 VERSION = 0.90
 QMAKE_TARGET_COMPANY = WK Inc.
 #QMAKE_TARGET_PRODUCT = "Skyrim Behavior Editor"

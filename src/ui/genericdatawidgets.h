@@ -433,12 +433,14 @@ private slots:
     void showTable(int index, const QString &typeallowed = "", const QStringList &typesdisallowed = QStringList());
     void showTable(const QString & name, const QString &typeallowed = "", const QStringList &typesdisallowed = QStringList());
     void filterItems();
+    void resetFilter();
     void setTypeFilter(const QString & typeallowed, const QStringList &typesdisallowed = QStringList());
 private:
     QString onlyTypeAllowed;
     QStringList typesDisallowed;
     QGridLayout *lyt;
     QTableWidget *table;
+    QPushButton *resetFilterPB;
     QPushButton *filterPB;
     QLineEdit *filterLE;
     QPushButton *selectPB;

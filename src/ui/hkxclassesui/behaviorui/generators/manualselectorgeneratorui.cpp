@@ -131,10 +131,10 @@ void ManualSelectorGeneratorUI::loadData(HkxObject *data){
             }
             loadDynamicTableRows();
         }else{
-            FATAL_RUNTIME_ERROR(QString("ManualSelectorGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("ManualSelectorGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::loadData(): The data passed to the UI is nullptr!!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::loadData(): The data passed to the UI is nullptr!!!");
     }
     connectSignals();
 }
@@ -153,11 +153,11 @@ void ManualSelectorGeneratorUI::loadDynamicTableRows(){
                 setRowItems(i, child->getName(), child->getClassname(), "Remove", "Edit", "Double click to remove this generator", VIEW_GENERATORS_TABLE_TIP);
             }else{
                 setRowItems(i, "NONE", "NONE", "Remove", "Edit", "Double click to remove this generator", VIEW_GENERATORS_TABLE_TIP);
-                //FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::loadData(): Null state found!!!");
+                //CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::loadData(): Null state found!!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::loadDynamicTableRows(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::loadDynamicTableRows(): The data is nullptr!!");
     }
     //table->setSortingEnabled(true);
 }
@@ -197,7 +197,7 @@ void ManualSelectorGeneratorUI::connectToTables(GenericTableWidget *generators, 
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -207,19 +207,19 @@ void ManualSelectorGeneratorUI::setBinding(int index, int row, const QString & v
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -228,7 +228,7 @@ void ManualSelectorGeneratorUI::setBinding(int index, int row, const QString & v
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setBinding(): The data is nullptr!!");
     }
 }
 
@@ -254,7 +254,7 @@ void ManualSelectorGeneratorUI::setBindingVariable(int index, const QString & na
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -276,10 +276,10 @@ void ManualSelectorGeneratorUI::loadBinding(int row, int colunm, hkbVariableBind
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -303,7 +303,7 @@ void ManualSelectorGeneratorUI::variableRenamed(const QString &name, int index){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::variableRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::variableRenamed(): The data is nullptr!!");
     }
 }
 
@@ -319,7 +319,7 @@ void ManualSelectorGeneratorUI::generatorRenamed(const QString &name, int index)
             WARNING_MESSAGE("ManualSelectorGeneratorUI::generatorRenamed(): Invalid generator index selected!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -343,7 +343,7 @@ void ManualSelectorGeneratorUI::selectTableToView(bool viewproperties, const QSt
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -356,7 +356,7 @@ void ManualSelectorGeneratorUI::setName(){
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -367,7 +367,7 @@ void ManualSelectorGeneratorUI::setSelectedGeneratorIndex(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::setSelectedGeneratorIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setSelectedGeneratorIndex(): The data is nullptr!!");
     }
 }
 
@@ -378,7 +378,7 @@ void ManualSelectorGeneratorUI::setCurrentGeneratorIndex(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::setCurrentGeneratorIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setCurrentGeneratorIndex(): The data is nullptr!!");
     }
 }
 
@@ -417,11 +417,11 @@ void ManualSelectorGeneratorUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::viewSelectedChild(): Invalid index of child to view!!");
+                WARNING_MESSAGE("ManualSelectorGeneratorUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -434,7 +434,7 @@ void ManualSelectorGeneratorUI::swapGeneratorIndices(int index1, int index2){
             if (behaviorView->getSelectedItem()){
                 behaviorView->getSelectedItem()->reorderChildren();
             }else{
-                FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::swapGeneratorIndices(): No item selected!!");
+                CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::swapGeneratorIndices(): No item selected!!");
             }
             if (bsData->selectedGeneratorIndex == index1){
                 bsData->selectedGeneratorIndex = index2;
@@ -451,7 +451,7 @@ void ManualSelectorGeneratorUI::swapGeneratorIndices(int index1, int index2){
             WARNING_MESSAGE("ManualSelectorGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::swapGeneratorIndices(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::swapGeneratorIndices(): The data is nullptr!!");
     }
 }
 
@@ -464,7 +464,7 @@ void ManualSelectorGeneratorUI::setGenerator(int index, const QString &name){
                 ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
                 if (ptr){
                     if (name != ptr->getName()){
-                        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::setGenerator():The name of the selected object does not match it's name in the object selection table!!!");
+                        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setGenerator():The name of the selected object does not match it's name in the object selection table!!!");
                         return;
                     }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->generators.at(generatorIndex).data()), generatorIndex, ptr, false)){
                         WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
@@ -474,7 +474,7 @@ void ManualSelectorGeneratorUI::setGenerator(int index, const QString &name){
                     if (behaviorView->getSelectedItem()){
                         behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->generators.at(generatorIndex).data())), generatorIndex);
                     }else{
-                        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::setGenerator(): The selected icon is nullptr!!");
+                        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setGenerator(): The selected icon is nullptr!!");
                         return;
                     }
                 }
@@ -483,13 +483,13 @@ void ManualSelectorGeneratorUI::setGenerator(int index, const QString &name){
                 bsData->getParentFile()->setIsChanged(true);
                 loadDynamicTableRows();
             }else{
-                FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::setGenerator(): Invalid generator index selected!!");
+                CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setGenerator(): Invalid generator index selected!!");
             }
         }else{
-            FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::setGenerator(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setGenerator(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -541,25 +541,29 @@ void ManualSelectorGeneratorUI::addGenerator(){
             behaviorView->appendBGSGamebryoSequenceGenerator();
             break;
         default:
-            FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::addGenerator(): Invalid typeEnum!!");
+            CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::addGenerator(): Invalid typeEnum!!");
             return;
         }
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::addGenerator(): The data or behavior graph pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::addGenerator(): The data or behavior graph pointer is nullptr!!");
     }
 }
 
 void ManualSelectorGeneratorUI::removeGenerator(int index){
     if (bsData && behaviorView){
         if (index < bsData->generators.size() && index >= 0){
-            behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(bsData->generators.at(index).data()), index);//Reorderchildren?
-            behaviorView->removeObjects();
+            if (!bsData->generators.at(index).data()){
+                bsData->generators.removeAt(index);
+            }else{
+                behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(bsData->generators.at(index).data()), index);//Reorderchildren?
+                behaviorView->removeObjects();
+            }
         }else{
             WARNING_MESSAGE("ManualSelectorGeneratorUI::removeGenerator(): Invalid index of generator to remove!!");
         }
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("ManualSelectorGeneratorUI::removeGenerator(): The data or behavior graph pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::removeGenerator(): The data or behavior graph pointer is nullptr!!");
     }
 }

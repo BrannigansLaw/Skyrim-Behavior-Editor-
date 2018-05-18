@@ -181,7 +181,7 @@ void PoweredRagdollControlsModifierUI::connectToTables(GenericTableWidget *varia
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(boneIndexUI, SIGNAL(viewRagdollBones(int)), ragdollBones, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -258,10 +258,10 @@ void PoweredRagdollControlsModifierUI::loadData(HkxObject *data){
                 table->item(BONE_WEIGHTS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::loadData(): The data is an incorrect type!!");
+            CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -275,7 +275,7 @@ void PoweredRagdollControlsModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -284,7 +284,7 @@ void PoweredRagdollControlsModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -295,7 +295,7 @@ void PoweredRagdollControlsModifierUI::setMaxForce(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::setmaxForce(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setmaxForce(): The data is nullptr!!");
     }
 }
 
@@ -306,7 +306,7 @@ void PoweredRagdollControlsModifierUI::setTau(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::settau(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::settau(): The data is nullptr!!");
     }
 }
 
@@ -317,7 +317,7 @@ void PoweredRagdollControlsModifierUI::setDamping(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::setdamping(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setdamping(): The data is nullptr!!");
     }
 }
 
@@ -328,7 +328,7 @@ void PoweredRagdollControlsModifierUI::setProportionalRecoveryVelocity(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::setproportionalRecoveryVelocity(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setproportionalRecoveryVelocity(): The data is nullptr!!");
     }
 }
 
@@ -339,7 +339,7 @@ void PoweredRagdollControlsModifierUI::setConstantRecoveryVelocity(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::setconstantRecoveryVelocity(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setconstantRecoveryVelocity(): The data is nullptr!!");
     }
 }
 
@@ -348,7 +348,7 @@ void PoweredRagdollControlsModifierUI::setPoseMatchingBone0(int index){
         bsData->poseMatchingBone0 = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::setPoseMatchingBone0(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setPoseMatchingBone0(): The data is nullptr!!");
     }
 }
 
@@ -357,7 +357,7 @@ void PoweredRagdollControlsModifierUI::setPoseMatchingBone1(int index){
         bsData->poseMatchingBone1 = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::setPoseMatchingBone1(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setPoseMatchingBone1(): The data is nullptr!!");
     }
 }
 
@@ -366,7 +366,7 @@ void PoweredRagdollControlsModifierUI::setPoseMatchingBone2(int index){
         bsData->poseMatchingBone2 = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::setPoseMatchingBone2(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setPoseMatchingBone2(): The data is nullptr!!");
     }
 }
 
@@ -375,7 +375,7 @@ void PoweredRagdollControlsModifierUI::setMode(int index){
         bsData->mode = bsData->Mode.at(index);
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::setMode(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setMode(): The data is nullptr!!");
     }
 }
 
@@ -392,7 +392,7 @@ void PoweredRagdollControlsModifierUI::toggleBones(bool enable){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::toggleBones(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::toggleBones(): The data is nullptr!!");
     }
 }
 
@@ -401,7 +401,7 @@ void PoweredRagdollControlsModifierUI::viewBones(){
         boneIndexUI->loadData(bsData->bones.data());
         setCurrentIndex(BONE_INDEX_WIDGET);
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::viewBones(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::viewBones(): The data is nullptr!!");
     }
 }
 
@@ -416,7 +416,7 @@ void PoweredRagdollControlsModifierUI::toggleBoneWeights(bool enable){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::toggleBoneWeights(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::toggleBoneWeights(): The data is nullptr!!");
     }
 }
 
@@ -425,7 +425,7 @@ void PoweredRagdollControlsModifierUI::viewBoneWeights(){
         boneWeightsUI->loadData(bsData->boneWeights.data());
         setCurrentIndex(BONE_WEIGHT_WIDGET);
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorChildUI::viewBoneWeights(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::viewBoneWeights(): The data is nullptr!!");
     }
 }
 
@@ -499,7 +499,7 @@ void PoweredRagdollControlsModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -519,7 +519,7 @@ void PoweredRagdollControlsModifierUI::selectTableToView(bool viewisProperty, co
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -570,7 +570,7 @@ void PoweredRagdollControlsModifierUI::variableRenamed(const QString & name, int
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -580,19 +580,19 @@ bool PoweredRagdollControlsModifierUI::setBinding(int index, int row, const QStr
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -601,7 +601,7 @@ bool PoweredRagdollControlsModifierUI::setBinding(int index, int row, const QStr
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -676,7 +676,7 @@ void PoweredRagdollControlsModifierUI::setBindingVariable(int index, const QStri
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -702,9 +702,9 @@ void PoweredRagdollControlsModifierUI::loadBinding(int row, int colunm, hkbVaria
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("PoweredRagdollControlsModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("PoweredRagdollControlsModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

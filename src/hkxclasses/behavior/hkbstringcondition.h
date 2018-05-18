@@ -10,7 +10,7 @@ public:
     hkbStringCondition(BehaviorFile *parent, const QString & string = "", long ref = -1);
     virtual ~hkbStringCondition();
     bool readData(const HkxXmlReader & reader, long index);
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     bool link(){return true;}
     QString getExpression() const;

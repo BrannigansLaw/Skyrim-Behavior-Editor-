@@ -99,7 +99,7 @@ bool BSModifyOnceModifier::readData(const HkxXmlReader &reader, long index){
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -118,11 +118,11 @@ bool BSModifyOnceModifier::readData(const HkxXmlReader &reader, long index){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pOnActivateModifier"){
-            if (!pOnActivateModifier.readReference(index, reader)){
+            if (!pOnActivateModifier.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'pOnActivateModifier' reference!\nObject Reference: "+ref);
             }
         }else if (text == "pOnDeactivateModifier"){
-            if (!pOnDeactivateModifier.readReference(index, reader)){
+            if (!pOnDeactivateModifier.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'pOnDeactivateModifier' reference!\nObject Reference: "+ref);
             }
         }
@@ -182,7 +182,7 @@ bool BSModifyOnceModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(pOnActivateModifier.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(pOnActivateModifier.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_MODIFIER){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'pOnActivateModifier' is not a modifier!");
@@ -190,7 +190,7 @@ bool BSModifyOnceModifier::link(){
         }
         pOnActivateModifier = *ptr;
     }
-    ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(pOnDeactivateModifier.getReference());
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(pOnDeactivateModifier.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_MODIFIER){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'pOnDeactivateModifier' is not a modifier!");
@@ -207,8 +207,8 @@ void BSModifyOnceModifier::unlink(){
     pOnDeactivateModifier = HkxSharedPtr();
 }
 
-bool BSModifyOnceModifier::evaulateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool BSModifyOnceModifier::evaluateDataValidity(){    //Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (!pOnActivateModifier.data()){

@@ -322,6 +322,7 @@ void BehaviorVariablesUI::loadData(HkxObject *data){
 }
 
 void BehaviorVariablesUI::clear(){
+    returnToTable();
     for (int i = table->rowCount() - 1; i >= 0; i--){
         table->removeRow(i);
     }

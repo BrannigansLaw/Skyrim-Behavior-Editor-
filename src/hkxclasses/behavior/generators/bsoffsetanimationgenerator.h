@@ -14,7 +14,7 @@ public:
     bool link();
     void unlink();
     QString getName() const;
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     int getIndexToInsertIcon() const;
     bool write(HkxXMLWriter *writer);

@@ -120,7 +120,7 @@ void BSTweenerModifierUI::connectToTables(GenericTableWidget *variables, Generic
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -157,10 +157,10 @@ void BSTweenerModifierUI::loadData(HkxObject *data){
                 table->item(TARGET_ROTATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR("BSTweenerModifierUI::loadData(): The data is an incorrect type!!");
+            CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -174,7 +174,7 @@ void BSTweenerModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -183,7 +183,7 @@ void BSTweenerModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -192,7 +192,7 @@ void BSTweenerModifierUI::setTweenPosition(){
         bsData->tweenPosition = tweenPosition->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::settweenPosition(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::settweenPosition(): The data is nullptr!!");
     }
 }
 
@@ -201,7 +201,7 @@ void BSTweenerModifierUI::setTweenRotation(){
         bsData->tweenRotation = tweenRotation->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::settweenRotation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::settweenRotation(): The data is nullptr!!");
     }
 }
 
@@ -210,7 +210,7 @@ void BSTweenerModifierUI::setUseTweenDuration(){
         bsData->useTweenDuration = useTweenDuration->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::setuseTweenDuration(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::setuseTweenDuration(): The data is nullptr!!");
     }
 }
 
@@ -221,7 +221,7 @@ void BSTweenerModifierUI::setTweenDuration(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::settweenDuration(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::settweenDuration(): The data is nullptr!!");
     }
 }
 
@@ -232,7 +232,7 @@ void BSTweenerModifierUI::setTargetPosition(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::settargetPosition(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::settargetPosition(): The data is nullptr!!");
     }
 }
 
@@ -243,7 +243,7 @@ void BSTweenerModifierUI::setTargetRotation(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::settargetRotation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::settargetRotation(): The data is nullptr!!");
     }
 }
 
@@ -299,7 +299,7 @@ void BSTweenerModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -319,7 +319,7 @@ void BSTweenerModifierUI::selectTableToView(bool viewisProperty, const QString &
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -358,7 +358,7 @@ void BSTweenerModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -368,19 +368,19 @@ bool BSTweenerModifierUI::setBinding(int index, int row, const QString &variable
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("BSTweenerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("BSTweenerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -389,7 +389,7 @@ bool BSTweenerModifierUI::setBinding(int index, int row, const QString &variable
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -446,7 +446,7 @@ void BSTweenerModifierUI::setBindingVariable(int index, const QString &name){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -468,9 +468,9 @@ void BSTweenerModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("BSTweenerModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BSTweenerModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BSTweenerModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

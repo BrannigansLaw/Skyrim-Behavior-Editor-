@@ -109,6 +109,7 @@ private:
     std::mutex mutex;
     std::condition_variable conditionVar;
     AnimationCacheUI *animationCacheUI;
+    bool allowLogging;
     //QScrollArea *animationCacheSA;
 private slots:
     void createNewProject();
@@ -130,17 +131,20 @@ private slots:
     void packAndExportFileToSkyrimDirectory();
     void mergeBehaviors();
     void mergeProjects();
+    void openProjectForMerger(QString & filepath);
     //void saveAs();
     void exit();
     void changedTabs(int index);
     void closeTab(int index);
     void addNewBehavior(bool initData);
+    void toggleLog(bool toggle);
 private:
     enum HKXCMD_RETURN{
         HKXCMD_SUCCESS = 0
     };
     QString generateUniqueBehaviorName();
-    void openProject(QString &filepath, bool loadUI = true);
+    BehaviorFile *openBehaviorForMerger(QString & filepath);
+    void openProject(QString &filepath);
     void saveFile(int index);
     bool openBehavior(const QString & filename, int &taskCount, bool checkisopen = true);
     bool exitProgram();

@@ -19,7 +19,7 @@ public:
     virtual ~hkbVariableValueSet();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool merge(HkxObject *recessiveobj);

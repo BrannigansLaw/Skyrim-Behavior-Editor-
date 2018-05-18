@@ -1,7 +1,7 @@
 #include "skyrimclipgeneratodata.h"
 #include "projectanimdata.h"
 
-bool SkyrimClipGeneratoData::chopLine(QFile * file, QByteArray & line, uint & linecount){
+bool SkyrimClipGeneratoData::chopLine(QFile * file, QByteArray & line, ulong & linecount){
     if (file){
         if (!file->atEnd()){
             line = file->readLine();
@@ -47,7 +47,39 @@ QString SkyrimClipGeneratoData::getClipGeneratorName() const{
     return clipGeneratorName;
 }
 
-bool SkyrimClipGeneratoData::read(QFile *file, uint &lineCount){
+QString SkyrimClipGeneratoData::trimFloat(QString & string) const{
+    for (auto i = string.size() - 1; i >= 0; i--){
+        if (string.at(i) == '0'){
+            string.remove(i, 1);
+        }else if (string.at(i) == '.'){
+            string.remove(i, 1);
+            break;
+        }else{
+            break;
+        }
+    }
+    return string;
+}
+
+void SkyrimClipGeneratoData::rearrangeTriggers(){
+    qreal temp;
+    for (auto i = triggers.size() - 1; i > 0; i--){
+        if (triggers.at(i).time < triggers.at(i - 1).time){
+            temp = triggers.at(i).time;
+            triggers[i].time = triggers.at(i - 1).time;
+            triggers[i - 1].time = temp;
+            for (auto j = i + 1; j < triggers.size(); j++){
+                if (triggers.at(j).time < triggers.at(j - 1).time){
+                    temp = triggers.at(j).time;
+                    triggers[j].time = triggers.at(j - 1).time;
+                    triggers[j - 1].time = temp;
+                }
+            }
+        }
+    }
+}
+
+bool SkyrimClipGeneratoData::read(QFile *file, ulong &lineCount){
     if (!file || !file->isOpen()){
         return false;
     }
@@ -121,18 +153,19 @@ bool SkyrimClipGeneratoData::read(QFile *file, uint &lineCount){
     return true;
 }
 
-bool SkyrimClipGeneratoData::write(QFile *file, QTextStream & out) const{
+bool SkyrimClipGeneratoData::write(QFile *file, QTextStream & out){
     if (!file || !file->isOpen()){
         return false;
     }
     out << clipGeneratorName << "\n";
     out << QString::number(animationIndex) << "\n";
-    out << QString::number(playbackSpeed, char('f'), 6) << "\n";
-    out << QString::number(cropStartTime, char('f'), 6) << "\n";
-    out << QString::number(cropEndTime, char('f'), 6) << "\n";
+    out << trimFloat(QString::number(playbackSpeed, char('f'), 6)) << "\n";
+    out << trimFloat(QString::number(cropStartTime, char('f'), 6)) << "\n";
+    out << trimFloat(QString::number(cropEndTime, char('f'), 6)) << "\n";
     out << QString::number(triggers.size()) << "\n";
+    rearrangeTriggers();
     for (int i = 0; i < triggers.size(); i++){
-        out << triggers.at(i).name+":"+QString::number(triggers.at(i).time, char('f'), 6) << "\n";
+        out << triggers.at(i).name+":"+trimFloat(QString::number(triggers.at(i).time, char('f'), 6)) << "\n";
     }
     out << "\n";
     return true;

@@ -18,7 +18,7 @@ public:
     bool link();
     QStringList getVariableNames() const;
     QStringList getEventNames() const;
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     hkQuadVariable getQuadVariable(int index, bool *ok) const;
     HkxObject * getVariantVariable(int index) const;

@@ -136,7 +136,7 @@ void TransformVectorModifierUI::connectToTables(GenericTableWidget *variables, G
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -179,10 +179,10 @@ void TransformVectorModifierUI::loadData(HkxObject *data){
                 table->item(COMPUTE_ON_MODIFY_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR("TransformVectorModifierUI::loadData(): The data is an incorrect type!!");
+            CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -196,7 +196,7 @@ void TransformVectorModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -205,7 +205,7 @@ void TransformVectorModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -216,7 +216,7 @@ void TransformVectorModifierUI::setRotation(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::setrotation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setrotation(): The data is nullptr!!");
     }
 }
 
@@ -227,7 +227,7 @@ void TransformVectorModifierUI::setTranslation(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::settranslation(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::settranslation(): The data is nullptr!!");
     }
 }
 
@@ -238,7 +238,7 @@ void TransformVectorModifierUI::setVectorIn(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::setvectorIn(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setvectorIn(): The data is nullptr!!");
     }
 }
 
@@ -249,7 +249,7 @@ void TransformVectorModifierUI::setVectorOut(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::setvectorOut(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setvectorOut(): The data is nullptr!!");
     }
 }
 
@@ -258,7 +258,7 @@ void TransformVectorModifierUI::setRotateOnly(){
         bsData->rotateOnly = rotateOnly->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::setrotateOnly(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setrotateOnly(): The data is nullptr!!");
     }
 }
 
@@ -267,7 +267,7 @@ void TransformVectorModifierUI::setInverse(){
         bsData->inverse = inverse->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::setinverse(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setinverse(): The data is nullptr!!");
     }
 }
 
@@ -276,7 +276,7 @@ void TransformVectorModifierUI::setComputeOnActivate(){
         bsData->computeOnActivate = computeOnActivate->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::setcomputeOnActivate(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setcomputeOnActivate(): The data is nullptr!!");
     }
 }
 
@@ -285,7 +285,7 @@ void TransformVectorModifierUI::setComputeOnModify(){
         bsData->computeOnModify = computeOnModify->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::setcomputeOnModify(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setcomputeOnModify(): The data is nullptr!!");
     }
 }
 
@@ -353,7 +353,7 @@ void TransformVectorModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -373,7 +373,7 @@ void TransformVectorModifierUI::selectTableToView(bool viewisProperty, const QSt
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -420,7 +420,7 @@ void TransformVectorModifierUI::variableRenamed(const QString & name, int index)
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -430,19 +430,19 @@ bool TransformVectorModifierUI::setBinding(int index, int row, const QString &va
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("TransformVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("TransformVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -451,7 +451,7 @@ bool TransformVectorModifierUI::setBinding(int index, int row, const QString &va
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -520,7 +520,7 @@ void TransformVectorModifierUI::setBindingVariable(int index, const QString &nam
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -542,9 +542,9 @@ void TransformVectorModifierUI::loadBinding(int row, int colunm, hkbVariableBind
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("TransformVectorModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("TransformVectorModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("TransformVectorModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

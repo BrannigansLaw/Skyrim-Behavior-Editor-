@@ -19,17 +19,19 @@ BoneWeightArrayUI::BoneWeightArrayUI()
       bones(new TableWidget),
       selectedBone(new DoubleSpinBox),
       label(new QLabel("Selected Bone Weight:")),
-      setAllCB(new QCheckBox("Set All"))
+      setAllCB(new QCheckBox("Set All")),
+      invertAllPB(new QPushButton("Invert All"))
 {
     setTitle("hkbBoneWeightArray");
     bones->setSelectionBehavior(QAbstractItemView::SelectRows);
     bones->setColumnCount(2);
     bones->setHorizontalHeaderLabels(headerLabels);
     topLyt->addWidget(returnPB, 0, 1, 1, 1);
-    topLyt->addWidget(bones, 1, 0, 8, 3);
-    topLyt->addWidget(label, 10, 0, 2, 1);
-    topLyt->addWidget(setAllCB, 10, 1, 2, 1);
-    topLyt->addWidget(selectedBone, 10, 2, 2, 1);
+    topLyt->addWidget(bones, 1, 0, 8, 4);
+    topLyt->addWidget(setAllCB, 10, 0, 2, 1);
+    topLyt->addWidget(invertAllPB, 10, 1, 2, 1);
+    topLyt->addWidget(label, 10, 2, 2, 1);
+    topLyt->addWidget(selectedBone, 10, 3, 2, 1);
     setLayout(topLyt);
     //label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     //selectedBone->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -39,6 +41,7 @@ BoneWeightArrayUI::BoneWeightArrayUI()
     connect(selectedBone, SIGNAL(editingFinished()), this, SLOT(setBoneWeight()));
     connect(bones, SIGNAL(cellClicked(int,int)), this, SLOT(loadBoneWeight(int,int)));
     connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+    connect(invertAllPB, SIGNAL(released()), this, SLOT(invert()));
 }
 
 void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
@@ -63,7 +66,7 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
                     boneNames = static_cast<CharacterFile *>(file)->getRigBoneNames();
                 }
             }else{
-                FATAL_RUNTIME_ERROR("BoneWeightArrayUI::loadData(): Parent file type is unrecognized!!!");
+                CRITICAL_ERROR_MESSAGE("BoneWeightArrayUI::loadData(): Parent file type is unrecognized!!!");
             }
         }
         for (int i = 0; i < bsData->boneWeights.size() && i < boneNames.size(); i++){
@@ -90,7 +93,7 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
             bones->setRowHidden(j, true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BoneWeightArrayUI::loadData(): The data passed to the UI is nullptr!!!");
+        CRITICAL_ERROR_MESSAGE("BoneWeightArrayUI::loadData(): The data passed to the UI is nullptr!!!");
     }
     blockSignals(false);
 }
@@ -119,7 +122,7 @@ void BoneWeightArrayUI::setBoneWeight(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BoneWeightArrayUI::setBoneWeight(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BoneWeightArrayUI::setBoneWeight(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -129,6 +132,24 @@ void BoneWeightArrayUI::loadBoneWeight(int row, int){
             selectedBone->setValue(bsData->boneWeights.at(row));
         }
     }else{
-        FATAL_RUNTIME_ERROR("loadBoneWeight::setBoneWeight(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BoneWeightArrayUI::setBoneWeight(): The 'bsData' pointer is nullptr!!");
+    }
+}
+
+void BoneWeightArrayUI::invert(){
+    if (bsData){
+        for (auto i = 0; i < bsData->boneWeights.size(); i++){
+            bsData->boneWeights[i] = 1 - bsData->boneWeights.at(i);
+        }
+        for (auto i = 0; i < bones->rowCount() && i < bsData->boneWeights.size(); i++){
+            if (bones->item(i, VALUE_COLUMN)){
+                bones->item(i, VALUE_COLUMN)->setText(QString::number(bsData->boneWeights.at(i), char('f'), 6));
+            }else{
+                bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
+            }
+        }
+        bsData->getParentFile()->setIsChanged(true);
+    }else{
+        CRITICAL_ERROR_MESSAGE("BoneWeightArrayUI::invert(): The 'bsData' pointer is nullptr!!");
     }
 }

@@ -42,7 +42,7 @@ bool hkbEvaluateHandleModifier::readData(const HkxXmlReader &reader, long index)
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -61,7 +61,7 @@ bool hkbEvaluateHandleModifier::readData(const HkxXmlReader &reader, long index)
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "handle"){
-            if (!handle.readReference(index, reader)){
+            if (!handle.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'handle' reference!\nObject Reference: "+ref);
             }
         }else if (text == "handlePositionOut"){
@@ -152,8 +152,8 @@ void hkbEvaluateHandleModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool hkbEvaluateHandleModifier::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbEvaluateHandleModifier::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (handle.data()){   //Should be null???

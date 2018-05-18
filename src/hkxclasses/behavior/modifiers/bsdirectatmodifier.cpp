@@ -12,7 +12,7 @@ QString BSDirectAtModifier::classname = "BSDirectAtModifier";
 
 BSDirectAtModifier::BSDirectAtModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
-      userData(0),
+      userData(2),
       enable(true),
       directAtTarget(true),
       sourceBoneIndex(-1),
@@ -54,7 +54,7 @@ bool BSDirectAtModifier::readData(const HkxXmlReader &reader, long index){
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -232,8 +232,8 @@ void BSDirectAtModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool BSDirectAtModifier::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool BSDirectAtModifier::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else{

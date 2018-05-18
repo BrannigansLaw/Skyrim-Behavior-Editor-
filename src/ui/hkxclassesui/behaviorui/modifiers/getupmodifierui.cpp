@@ -91,11 +91,11 @@ void GetUpModifierUI::connectSignals(){
     connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
     connect(enable, SIGNAL(released()), this, SLOT(setEnable()), Qt::UniqueConnection);
     connect(groundNormal, SIGNAL(editingFinished()), this, SLOT(setGroundNormal()), Qt::UniqueConnection);
-    connect(duration, SIGNAL(currentIndexChanged(int)), this, SLOT(setDuration(int)), Qt::UniqueConnection);
-    connect(alignWithGroundDuration, SIGNAL(currentIndexChanged(int)), this, SLOT(setAlignWithGroundDuration(int)), Qt::UniqueConnection);
-    connect(rootBoneIndex, SIGNAL(editingFinished()), this, SLOT(setRootBoneIndex()), Qt::UniqueConnection);
-    connect(otherBoneIndex, SIGNAL(editingFinished()), this, SLOT(setOtherBoneIndex()), Qt::UniqueConnection);
-    connect(anotherBoneIndex, SIGNAL(editingFinished()), this, SLOT(setAnotherBoneIndex()), Qt::UniqueConnection);
+    connect(duration, SIGNAL(editingFinished()), this, SLOT(setDuration()), Qt::UniqueConnection);
+    connect(alignWithGroundDuration, SIGNAL(editingFinished()), this, SLOT(setAlignWithGroundDuration()), Qt::UniqueConnection);
+    connect(rootBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setRootBoneIndex(int)), Qt::UniqueConnection);
+    connect(otherBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setOtherBoneIndex(int)), Qt::UniqueConnection);
+    connect(anotherBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setAnotherBoneIndex(int)), Qt::UniqueConnection);
     connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)), Qt::UniqueConnection);
 }
 
@@ -103,11 +103,11 @@ void GetUpModifierUI::disconnectSignals(){
     disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
     disconnect(enable, SIGNAL(released()), this, SLOT(setEnable()));
     disconnect(groundNormal, SIGNAL(editingFinished()), this, SLOT(setGroundNormal()));
-    disconnect(duration, SIGNAL(currentIndexChanged(int)), this, SLOT(setDuration(int)));
-    disconnect(alignWithGroundDuration, SIGNAL(currentIndexChanged(int)), this, SLOT(setAlignWithGroundDuration(int)));
-    disconnect(rootBoneIndex, SIGNAL(editingFinished()), this, SLOT(setRootBoneIndex()));
-    disconnect(otherBoneIndex, SIGNAL(editingFinished()), this, SLOT(setOtherBoneIndex()));
-    disconnect(anotherBoneIndex, SIGNAL(editingFinished()), this, SLOT(setAnotherBoneIndex()));
+    disconnect(duration, SIGNAL(editingFinished()), this, SLOT(setDuration()));
+    disconnect(alignWithGroundDuration, SIGNAL(editingFinished()), this, SLOT(setAlignWithGroundDuration()));
+    disconnect(rootBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setRootBoneIndex()));
+    disconnect(otherBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setOtherBoneIndex()));
+    disconnect(anotherBoneIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setAnotherBoneIndex()));
     disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelected(int,int)));
 }
 
@@ -120,7 +120,7 @@ void GetUpModifierUI::connectToTables(GenericTableWidget *variables, GenericTabl
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -171,10 +171,10 @@ void GetUpModifierUI::loadData(HkxObject *data){
                 table->item(ANOTHER_BONE_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
             }
         }else{
-            FATAL_RUNTIME_ERROR("GetUpModifierUI::loadData(): The data is an incorrect type!!");
+            CRITICAL_ERROR_MESSAGE("GetUpModifierUI::loadData(): The data is an incorrect type!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::loadData(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::loadData(): The data is nullptr!!");
     }
     connectSignals();
 }
@@ -188,7 +188,7 @@ void GetUpModifierUI::setName(){
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -197,7 +197,7 @@ void GetUpModifierUI::setEnable(){
         bsData->enable = enable->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::setEnable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setEnable(): The data is nullptr!!");
     }
 }
 
@@ -208,7 +208,7 @@ void GetUpModifierUI::setGroundNormal(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::setgroundNormal(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setgroundNormal(): The data is nullptr!!");
     }
 }
 
@@ -219,7 +219,7 @@ void GetUpModifierUI::setDuration(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::setduration(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setduration(): The data is nullptr!!");
     }
 }
 
@@ -230,7 +230,7 @@ void GetUpModifierUI::setAlignWithGroundDuration(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::setalignWithGroundDuration(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setalignWithGroundDuration(): The data is nullptr!!");
     }
 }
 
@@ -239,7 +239,7 @@ void GetUpModifierUI::setRootBoneIndex(int index){
         bsData->rootBoneIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::setrootBoneIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setrootBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -248,7 +248,7 @@ void GetUpModifierUI::setOtherBoneIndex(int index){
         bsData->otherBoneIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::setotherBoneIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setotherBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -257,7 +257,7 @@ void GetUpModifierUI::setAnotherBoneIndex(int index){
         bsData->anotherBoneIndex = index - 1;
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::setanotherBoneIndex(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setanotherBoneIndex(): The data is nullptr!!");
     }
 }
 
@@ -313,7 +313,7 @@ void GetUpModifierUI::viewSelected(int row, int column){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -333,7 +333,7 @@ void GetUpModifierUI::selectTableToView(bool viewisProperty, const QString & pat
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -372,7 +372,7 @@ void GetUpModifierUI::variableRenamed(const QString & name, int index){
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -382,19 +382,19 @@ bool GetUpModifierUI::setBinding(int index, int row, const QString &variableName
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("GetUpModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("GetUpModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -403,7 +403,7 @@ bool GetUpModifierUI::setBinding(int index, int row, const QString &variableName
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setBinding(): The data is nullptr!!");
     }
     return true;
 }
@@ -460,7 +460,7 @@ void GetUpModifierUI::setBindingVariable(int index, const QString &name){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -482,9 +482,9 @@ void GetUpModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *va
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("GetUpModifierUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("GetUpModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("GetUpModifierUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("GetUpModifierUI::loadBinding(): The data is nullptr!!");
     }
 }

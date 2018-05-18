@@ -276,13 +276,13 @@ void BlenderGeneratorUI::loadData(HkxObject *data){
                 }
                 loadDynamicTableRows();
             }else{
-                FATAL_RUNTIME_ERROR(QString("BlenderGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+                CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
             }
         }else{
-            FATAL_RUNTIME_ERROR(QString("BlenderGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::loadData(): Attempting to load a null pointer!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::loadData(): Attempting to load a null pointer!!");
     }
     connectSignals();
 }
@@ -300,11 +300,11 @@ void BlenderGeneratorUI::loadDynamicTableRows(){
             if (child){
                 setRowItems(i, "Child "+QString::number(j), child->getClassname(), "Remove", "Edit", "Double click to remove this child", "Double click to edit this child");
             }else{
-                FATAL_RUNTIME_ERROR("BlenderGeneratorUI::loadData(): Null child found!!!");
+                CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::loadData(): Null child found!!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::loadDynamicTableRows(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::loadDynamicTableRows(): The data is nullptr!!");
     }
     //table->setSortingEnabled(true);
 }
@@ -338,19 +338,19 @@ void BlenderGeneratorUI::setBinding(int index, int row, const QString & variable
         if (index == 0){
             varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1) == type) ||
-                  (isProperty && static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1) == type)){
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
                 bsData->variableBindingSet = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }else{
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                    CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
@@ -359,7 +359,7 @@ void BlenderGeneratorUI::setBinding(int index, int row, const QString & variable
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setBinding(): The data is nullptr!!");
     }
 }
 
@@ -409,7 +409,7 @@ void BlenderGeneratorUI::setBindingVariable(int index, const QString & name){
         }
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setBindingVariable(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -422,14 +422,14 @@ void BlenderGeneratorUI::setName(){
                 if (bsData->children.at(i).data()){
                     static_cast<DataIconManager*>(bsData->children.at(i).data())->updateIconNames();
                 }else{
-                    FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setName():\n Children contain nullptr's!!!");
+                    CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setName():\n Children contain nullptr's!!!");
                 }
             }
             emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setName(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setName(): The data is nullptr!!");
     }
 }
 
@@ -440,7 +440,7 @@ void BlenderGeneratorUI::setReferencePoseWeightThreshold(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setReferencePoseWeightThreshold(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setReferencePoseWeightThreshold(): The data is nullptr!!");
     }
 }
 
@@ -451,7 +451,7 @@ void BlenderGeneratorUI::setBlendParameter(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setBlendParameter(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setBlendParameter(): The data is nullptr!!");
     }
 }
 
@@ -462,7 +462,7 @@ void BlenderGeneratorUI::setMinCyclicBlendParameter(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setMinCyclicBlendParameter(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setMinCyclicBlendParameter(): The data is nullptr!!");
     }
 }
 
@@ -473,7 +473,7 @@ void BlenderGeneratorUI::setMaxCyclicBlendParameter(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setMaxCyclicBlendParameter(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setMaxCyclicBlendParameter(): The data is nullptr!!");
     }
 }
 
@@ -484,7 +484,7 @@ void BlenderGeneratorUI::setIndexOfSyncMasterChild(){
             bsData->getParentFile()->setIsChanged(true);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setIndexOfSyncMasterChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setIndexOfSyncMasterChild(): The data is nullptr!!");
     }
 }
 
@@ -500,10 +500,10 @@ void BlenderGeneratorUI::setFlagSync(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            FATAL_RUNTIME_ERROR(QString("BlenderGeneratorUI::setFlagSync(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setFlagSync(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setFlagSync(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setFlagSync(): The data is nullptr!!");
     }
 }
 
@@ -519,10 +519,10 @@ void BlenderGeneratorUI::setFlagSmoothGeneratorWeights(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            FATAL_RUNTIME_ERROR(QString("BlenderGeneratorUI::setFlagSmoothGeneratorWeights(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setFlagSmoothGeneratorWeights(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setFlagSmoothGeneratorWeights(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setFlagSmoothGeneratorWeights(): The data is nullptr!!");
     }
 }
 
@@ -538,10 +538,10 @@ void BlenderGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            FATAL_RUNTIME_ERROR(QString("BlenderGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setFlagDontDeactivateChildrenWithZeroWeights(): The data is nullptr!!");
     }
 }
 
@@ -557,10 +557,10 @@ void BlenderGeneratorUI::setFlagParametricBlend(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            FATAL_RUNTIME_ERROR(QString("BlenderGeneratorUI::setFlagParametricBlend(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setFlagParametricBlend(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setFlagParametricBlend(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setFlagParametricBlend(): The data is nullptr!!");
     }
 }
 
@@ -576,10 +576,10 @@ void BlenderGeneratorUI::setFlagIsParametricBlendCyclic(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            FATAL_RUNTIME_ERROR(QString("BlenderGeneratorUI::setFlagIsParametricBlendCyclic(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setFlagIsParametricBlendCyclic(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setFlagIsParametricBlendCyclic(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setFlagIsParametricBlendCyclic(): The data is nullptr!!");
     }
 }
 
@@ -595,10 +595,10 @@ void BlenderGeneratorUI::setFlagForceDensePose(){
             }
             bsData->flags = QString::number(flags);
         }else{
-            FATAL_RUNTIME_ERROR(QString("BlenderGeneratorUI::setFlagForceDensePose(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setFlagForceDensePose(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setFlagForceDensePose(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setFlagForceDensePose(): The data is nullptr!!");
     }
 }
 
@@ -607,7 +607,7 @@ void BlenderGeneratorUI::setSubtractLastChild(){
         bsData->subtractLastChild = subtractLastChild->isChecked();
         bsData->getParentFile()->setIsChanged(true);
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::setSubtractLastChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setSubtractLastChild(): The data is nullptr!!");
     }
 }
 
@@ -620,14 +620,14 @@ void BlenderGeneratorUI::swapGeneratorIndices(int index1, int index2){
             if (behaviorView->getSelectedItem()){
                 behaviorView->getSelectedItem()->reorderChildren();
             }else{
-                FATAL_RUNTIME_ERROR("BlenderGeneratorUI::swapGeneratorIndices(): No item selected!!");
+                CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::swapGeneratorIndices(): No item selected!!");
             }
             bsData->getParentFile()->setIsChanged(true);
         }else{
             WARNING_MESSAGE("BlenderGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::swapGeneratorIndices(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::swapGeneratorIndices(): The data is nullptr!!");
     }
 }
 
@@ -677,12 +677,12 @@ void BlenderGeneratorUI::addChildWithGenerator(){
             behaviorView->appendBGSGamebryoSequenceGenerator();
             break;
         default:
-            FATAL_RUNTIME_ERROR("BlenderGeneratorUI::addChild(): Invalid typeEnum!!");
+            CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::addChild(): Invalid typeEnum!!");
             return;
         }
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::addChild(): The data or behavior graph pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::addChild(): The data or behavior graph pointer is nullptr!!");
     }
 }
 
@@ -698,7 +698,7 @@ void BlenderGeneratorUI::removeChild(int index){
         }
         loadDynamicTableRows();
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::removeChild(): The data or behavior graph pointer is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::removeChild(): The data or behavior graph pointer is nullptr!!");
     }
 }
 
@@ -759,11 +759,11 @@ void BlenderGeneratorUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                FATAL_RUNTIME_ERROR("BlenderGeneratorUI::viewSelectedChild(): Invalid index of child to view!!");
+                CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::viewSelectedChild(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -809,7 +809,7 @@ void BlenderGeneratorUI::connectToTables(GenericTableWidget *generators, Generic
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -831,10 +831,10 @@ void BlenderGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindingSet 
             }
             table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
         }else{
-            FATAL_RUNTIME_ERROR("BlenderGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
+            CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::loadBinding(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::loadBinding(): The data is nullptr!!");
     }
 }
 
@@ -854,7 +854,7 @@ void BlenderGeneratorUI::selectTableToView(bool viewproperties, const QString & 
             }
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::selectTableToView(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -897,7 +897,7 @@ void BlenderGeneratorUI::variableRenamed(const QString & name, int index){
             childUI->variableRenamed(name, index);
         }
     }else{
-        FATAL_RUNTIME_ERROR("BlenderGeneratorUI::variableRenamed(): The data is nullptr!!");
+        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::variableRenamed(): The data is nullptr!!");
     }
 }
 

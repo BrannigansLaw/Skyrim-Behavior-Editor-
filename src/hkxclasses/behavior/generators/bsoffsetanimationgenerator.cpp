@@ -98,7 +98,7 @@ bool BSOffsetAnimationGenerator::readData(const HkxXmlReader &reader, long index
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -112,11 +112,11 @@ bool BSOffsetAnimationGenerator::readData(const HkxXmlReader &reader, long index
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pDefaultGenerator"){
-            if (!pDefaultGenerator.readReference(index, reader)){
+            if (!pDefaultGenerator.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'pDefaultGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "pOffsetClipGenerator"){
-            if (!pOffsetClipGenerator.readReference(index, reader)){
+            if (!pOffsetClipGenerator.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'pOffsetClipGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "fOffsetVariable"){
@@ -168,8 +168,8 @@ bool BSOffsetAnimationGenerator::write(HkxXMLWriter *writer){
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pOffsetClipGenerator"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fOffsetVariable"), QString::number(fOffsetVariable, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fOffsetVariable"), QString::number(fOffsetRangeStart, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fOffsetVariable"), QString::number(fOffsetRangeEnd, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fOffsetRangeStart"), QString::number(fOffsetRangeStart, char('f'), 6));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fOffsetRangeEnd"), QString::number(fOffsetRangeEnd, char('f'), 6));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
@@ -193,7 +193,7 @@ bool BSOffsetAnimationGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getShdPtrReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pDefaultGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
@@ -204,7 +204,7 @@ bool BSOffsetAnimationGenerator::link(){
     }else{
         pDefaultGenerator = *ptr;
     }
-    ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pOffsetClipGenerator.getReference());
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pOffsetClipGenerator.getShdPtrReference());
     if (!ptr){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'pOffsetClipGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
@@ -224,8 +224,8 @@ void BSOffsetAnimationGenerator::unlink(){
     pOffsetClipGenerator = HkxSharedPtr();
 }
 
-bool BSOffsetAnimationGenerator::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool BSOffsetAnimationGenerator::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (!pDefaultGenerator.data() || pDefaultGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){
     }else if (!pOffsetClipGenerator.data() || pOffsetClipGenerator.data()->getSignature() != HKB_CLIP_GENERATOR){

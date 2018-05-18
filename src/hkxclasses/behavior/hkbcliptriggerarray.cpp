@@ -72,7 +72,7 @@ bool hkbClipTriggerArray::readData(const HkxXmlReader &reader, long index){
                             return false;
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "payload"){
-                        if (!triggers.last().event.payload.readReference(index, reader)){
+                        if (!triggers.last().event.payload.readShdPtrReference(index, reader)){
                             return false;
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "relativeToEndOfClip"){
@@ -166,13 +166,43 @@ void hkbClipTriggerArray::updateEventIndices(int eventindex){
     }
 }
 
+void hkbClipTriggerArray::mergeEventIndex(int oldindex, int newindex){
+    for (auto i = 0; i < triggers.size(); i++){
+        if (triggers.at(i).event.id == oldindex){
+            triggers[i].event.id = newindex;
+        }
+    }
+}
+
+bool hkbClipTriggerArray::merge(HkxObject *recessiveObject){
+    bool found;
+    hkbClipTriggerArray *obj = nullptr;
+    if (recessiveObject && recessiveObject->getSignature() == HKB_CLIP_TRIGGER_ARRAY){
+        obj = static_cast<hkbClipTriggerArray *>(recessiveObject);
+        for (auto i = 0; i < obj->triggers.size(); i++){
+            found = false;
+            for (auto j = 0; j < triggers.size(); j++){
+                if (triggers.at(j).event.id == obj->triggers.at(i).event.id){
+                    found = true;
+                }
+            }
+            if (!found){
+                triggers.append(obj->triggers.at(i));
+            }
+        }
+        return true;
+    }else{
+        return false;
+    }
+}
+
 bool hkbClipTriggerArray::link(){
     if (!getParentFile()){
         return false;
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < triggers.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggers.at(i).event.payload.getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggers.at(i).event.payload.getShdPtrReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 return false;
@@ -183,7 +213,7 @@ bool hkbClipTriggerArray::link(){
     return true;
 }
 
-bool hkbClipTriggerArray::evaulateDataValidity(){
+bool hkbClipTriggerArray::evaluateDataValidity(){
     for (int i = 0; i < triggers.size(); i++){
         if (triggers.at(i).event.payload.data() && triggers.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             setDataValidity(false);

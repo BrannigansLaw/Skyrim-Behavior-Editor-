@@ -2,6 +2,8 @@
 #define HKBSTATEMACHINETRANSITIONINFOARRAY_H
 
 #include "src/hkxclasses/hkxobject.h"
+#include "src/hkxclasses/behavior/hkbblendingtransitioneffect.h"
+#include "src/hkxclasses/behavior/hkbexpressioncondition.h"
 
 class hkbStateMachine;
 
@@ -16,7 +18,7 @@ public:
     virtual ~hkbStateMachineTransitionInfoArray();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
-    bool evaulateDataValidity();
+    bool evaluateDataValidity();
     static QString getClassname();
     QString getTransitionNameAt(int index);
     int getNumTransitions() const;
@@ -26,13 +28,96 @@ public:
     bool write(HkxXMLWriter *writer);
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
+    void mergeEventIndex(int oldindex, int newindex);
+    bool merge(HkxObject *recessiveObject);
     struct HkTransition
     {
-        HkTransition(): eventId(-1), toStateId(0), fromNestedStateId(0), toNestedStateId(0), priority(0), flags("0"){}
+        HkTransition()
+            : eventId(-1),
+              toStateId(0),
+              fromNestedStateId(0),
+              toNestedStateId(0),
+              priority(0),
+              flags("0")
+        {
+            //
+        }
+
+        bool operator==(const HkTransition & other){
+            if (
+                    triggerInterval != other.triggerInterval ||
+                    initiateInterval != other.initiateInterval ||
+                    eventId != other.eventId ||
+                    toStateId != other.toStateId ||
+                    fromNestedStateId != other.fromNestedStateId ||
+                    toNestedStateId != other.toNestedStateId ||
+                    priority != other.priority ||
+                    flags != other.flags
+                    )
+            {
+                return false;
+            }
+            hkbExpressionCondition *exp = static_cast<hkbExpressionCondition *>(condition.data());
+            hkbExpressionCondition *otherexp = static_cast<hkbExpressionCondition *>(other.condition.data());
+            if ((exp && otherexp) && *exp == *otherexp){
+                return true;
+            }
+            hkbBlendingTransitionEffect *effect = static_cast<hkbBlendingTransitionEffect *>(transition.data());
+            hkbBlendingTransitionEffect *othereffect = static_cast<hkbBlendingTransitionEffect *>(other.transition.data());
+            if ((effect && othereffect) && *effect == *othereffect){
+                return true;
+            }
+            return false;
+        }
+
+        bool usingTriggerInterval() const{
+            if (
+                    triggerInterval.enterEventId > -1 ||
+                    triggerInterval.exitEventId > -1 ||
+                    triggerInterval.enterTime > 0.000000 ||
+                    triggerInterval.exitTime > 0.000000
+                    )
+            {
+                return true;
+            }
+            return false;
+        }
+
+        bool usingInitiateInterval() const{
+            if (
+                    initiateInterval.enterEventId > -1 ||
+                    initiateInterval.exitEventId > -1 ||
+                    initiateInterval.enterTime > 0.000000 ||
+                    initiateInterval.exitTime > 0.000000
+                    )
+            {
+                return true;
+            }
+            return false;
+        }
 
         struct HkInterval
         {
-            HkInterval(): enterEventId(-1), exitEventId(-1), enterTime(0), exitTime(0){}
+            HkInterval()
+                : enterEventId(-1),
+                  exitEventId(-1),
+                  enterTime(0),
+                  exitTime(0)
+            {
+                //
+            }
+            bool operator!=(const HkInterval & other){
+                if (
+                        enterEventId == other.enterEventId ||
+                        exitEventId == other.exitEventId ||
+                        enterTime == other.enterTime ||
+                        exitTime == other.exitTime
+                   )
+                {
+                    return false;
+                }
+                return true;
+            }
             int enterEventId;
             int exitEventId;
             qreal enterTime;

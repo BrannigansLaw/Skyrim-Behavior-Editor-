@@ -37,7 +37,7 @@ bool hkbEvaluateExpressionModifier::readData(const HkxXmlReader &reader, long in
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readReference(index, reader)){
+            if (!variableBindingSet.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
@@ -56,7 +56,7 @@ bool hkbEvaluateExpressionModifier::readData(const HkxXmlReader &reader, long in
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "expressions"){
-            if (!expressions.readReference(index, reader)){
+            if (!expressions.readShdPtrReference(index, reader)){
                 writeToLog(getClassname()+": readData()!\nFailed to properly read 'expressions' reference!\nObject Reference: "+ref);
             }
         }
@@ -127,7 +127,7 @@ bool hkbEvaluateExpressionModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(expressions.getReference());
+    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(expressions.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_EXPRESSION_DATA_ARRAY){
             writeToLog(getClassname()+": linkVar()!\nThe linked object 'expressions' is not a HKB_EXPRESSION_DATA_ARRAY!");
@@ -143,8 +143,8 @@ void hkbEvaluateExpressionModifier::unlink(){
     expressions = HkxSharedPtr();
 }
 
-bool hkbEvaluateExpressionModifier::evaulateDataValidity(){
-    if (!HkDynamicObject::evaulateDataValidity()){
+bool hkbEvaluateExpressionModifier::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity()){
         return false;
     }else if (name == ""){
     }else if (!expressions.data()){
