@@ -1,6 +1,7 @@
 #include "bsragdollcontactlistenermodifier.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
 /*
  * CLASS: BSRagdollContactListenerModifier
@@ -138,6 +139,45 @@ void BSRagdollContactListenerModifier::updateEventIndices(int eventindex){
 void BSRagdollContactListenerModifier::mergeEventIndex(int oldindex, int newindex){
     if (contactEvent.id == oldindex){
         contactEvent.id = newindex;
+    }
+}
+
+void BSRagdollContactListenerModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thiseventname;
+    int eventindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            auto fixIndex = [&](int & id){
+                thiseventname = recdata->getEventNameAt(id);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                id = eventindex;
+            };
+            fixIndex(contactEvent.id);
+        }
+        setIsMerged(true);
+    }
+}
+
+void BSRagdollContactListenerModifier::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (contactEvent.payload.data()){
+        ref++;
+        contactEvent.payload.data()->updateReferences(ref);
+    }
+    if (bones.data()){
+        ref++;
+        bones.data()->updateReferences(ref);
     }
 }
 

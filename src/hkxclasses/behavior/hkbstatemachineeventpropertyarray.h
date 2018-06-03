@@ -19,7 +19,9 @@ public:
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
     void mergeEventIndex(int oldindex, int newindex);
+    void fixMergedEventIndices(BehaviorFile *dominantfile);
     bool merge(HkxObject *recessiveObject);
+    void updateReferences(long &ref);
 protected:
 private:
     void addEvent(const hkEventPayload & event = hkEventPayload());

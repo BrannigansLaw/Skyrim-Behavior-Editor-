@@ -20,6 +20,7 @@ class BehaviorFile: public HkxFile
     friend class MainWindow;
     friend class HkDataUI;
     friend class ProjectFile;
+    friend class hkbVariableBindingSet;
 public:
     BehaviorFile(MainWindow *window, ProjectFile *projectfile, CharacterFile *characterData, const QString & name);
     virtual ~BehaviorFile();
@@ -90,6 +91,9 @@ public:
     qreal getAnimationDurationFromAnimData(const QString & animationname) const;
     void mergeEventIndices(int oldindex, int newindex);
     void mergeVariableIndices(int oldindex, int newindex);
+    bool isNameUniqueInProject(HkxObject *object) const;
+    bool existsInBehavior(HkDynamicObject *object, int startindex = 0) const;
+    HkxObject * getBehaviorGraphData() const;
 protected:
     bool parse();
     bool link();
@@ -98,11 +102,11 @@ private:
     void mergeObjects(QVector <HkxObject *> recessiveobjects);
     void generateDefaultCharacterData();
     void generateNewBehavior();
-    HkxObject * getBehaviorGraphData() const;
     hkbBehaviorGraph * getBehaviorGraph() const;
     HkxObject * getRootStateMachine() const;
     //TreeGraphicsItem * getRootIcon() const;
     void write();
+    //void mergedWrite();
     void removeBindings(int varIndex);
 private:
     ProjectFile *project;

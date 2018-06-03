@@ -1,6 +1,7 @@
 #include "hkbeventrangedataarray.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 /**
  * hkbEventRangeDataArray
  */
@@ -158,6 +159,40 @@ void hkbEventRangeDataArray::mergeEventIndex(int oldindex, int newindex){
     for (auto i = 0; i < eventData.size(); i++){
         if (eventData.at(i).event.id == oldindex){
             eventData[i].event.id = newindex;
+        }
+    }
+}
+
+void hkbEventRangeDataArray::fixMergedEventIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thiseventname;
+    int eventindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            for (auto i = 0; i < eventData.size(); i++){
+                thiseventname = recdata->getEventNameAt(eventData.at(i).event.id);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                eventData[i].event.id = eventindex;
+            }
+        }
+        setIsMerged(true);
+    }
+}
+
+void hkbEventRangeDataArray::updateReferences(long &ref){
+    setReference(ref);
+    for (auto i = 0; i < eventData.size(); i++){
+        if (eventData.at(i).event.payload.data()){
+            ref++;
+            eventData[i].event.payload.data()->updateReferences(ref);
         }
     }
 }

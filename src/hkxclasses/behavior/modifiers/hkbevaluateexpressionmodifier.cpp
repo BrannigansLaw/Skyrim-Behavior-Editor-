@@ -120,6 +120,22 @@ void hkbEvaluateExpressionModifier::updateEventIndices(int eventindex){
     }
 }
 
+void hkbEvaluateExpressionModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    if (expressions.data()){
+        expressions.data()->fixMergedEventIndices(dominantfile);
+    }
+}
+
+void hkbEvaluateExpressionModifier::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (expressions.data()){
+        ref++;
+        expressions.data()->updateReferences(ref);
+    }
+}
+
 bool hkbEvaluateExpressionModifier::link(){
     if (!getParentFile()){
         return false;

@@ -21,7 +21,9 @@ public:
     bool hasChildren() const;
     QString getName() const;
     int getThisIndex() const;
-    bool operator ==(const BSBoneSwitchGeneratorBoneData & other){{
+    void updateReferences(long &ref);
+    bool operator==(const BSBoneSwitchGeneratorBoneData & other){
+    {
             if (
                     !parentBSG.data() ||
                     !other.parentBSG.data() ||

@@ -194,7 +194,7 @@ void TimerModifierUI::setAlarmEventPayload(){
                 payload->data = alarmEventPayload->text();
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), alarmEventPayload->text());
-                bsData->getParentFile()->addObjectToFile(payload, -1);
+                //bsData->getParentFile()->addObjectToFile(payload, -1);
                 bsData->alarmEvent.payload = HkxSharedPtr(payload);
             }
         }else{

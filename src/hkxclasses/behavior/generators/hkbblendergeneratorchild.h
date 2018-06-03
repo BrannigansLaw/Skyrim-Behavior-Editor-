@@ -26,6 +26,7 @@ public:
     bool hasChildren() const;
     QString getName() const;
     int getThisIndex() const;
+    void updateReferences(long &ref);
     bool operator==(const hkbBlenderGeneratorChild & other){
         if (
                 weight != other.weight ||

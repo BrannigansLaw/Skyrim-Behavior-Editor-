@@ -1,6 +1,7 @@
 #include "hkbexpressiondataarray.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
 /*
  * CLASS: hkbExpressionDataArray
@@ -125,6 +126,30 @@ bool hkbExpressionDataArray::isEventReferenced(int eventindex) const{
         }
     }
     return false;
+}
+
+void hkbExpressionDataArray::fixMergedEventIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thiseventname;
+    int eventindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            for (auto i = 0; i < expressionsData.size(); i++){
+                thiseventname = recdata->getEventNameAt(expressionsData.at(i).assignmentEventIndex);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                expressionsData[i].assignmentEventIndex = eventindex;
+            }
+        }
+        setIsMerged(true);
+    }
 }
 
 void hkbExpressionDataArray::updateEventIndices(int eventindex){

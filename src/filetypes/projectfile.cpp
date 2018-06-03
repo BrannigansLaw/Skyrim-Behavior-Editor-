@@ -35,7 +35,7 @@ ProjectFile::ProjectFile(MainWindow *window, const QString & name, bool autogene
         root->addVariant("hkbProjectData");
         root->setVariantAt(0, new hkbProjectData(this, 0, new hkbProjectStringData(this, 0, relativecharacterfilepath)));
         setRootObject(HkxSharedPtr(root));
-        setIsChanged(true);
+        //setIsChanged(true);
     }
 }
 
@@ -274,8 +274,8 @@ bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update ev
                         //threads.push_back(std::thread(&BehaviorFile::merge, dominantbehaviors.at(i), recessivebehaviors.at(j)));
                         objectsnotfound = dominantbehaviors.at(i)->merge(recessivebehaviors.at(j));
                         //recessivebehaviors.removeAt(j);
-                        for (auto k = 0; k < dominantbehaviors.size() && !objectsnotfound.isEmpty(); k++){
-                            if (k != i){
+                        /*for (auto k = 0; k < dominantbehaviors.size() && !objectsnotfound.isEmpty(); k++){
+                            if (QString::compare(dominantbehaviors.at(k)->fileName().section("/", -1, -1), dominantbehaviors.at(i)->fileName().section("/", -1, -1), Qt::CaseInsensitive)){
                                 dominantbehaviors.at(k)->mergeObjects(objectsnotfound);
                             }
                         }
@@ -289,7 +289,7 @@ bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update ev
                             }
                             writeToLog("ProjectFile: merge(): The object type \""+QString::number(objectsnotfound.at(k)->getSignature(), 16)
                                        +"\" named \""+objname+"\" was not found in the recessive behavior!!!");
-                        }
+                        }*/
                     }
                 }
             }
@@ -307,7 +307,7 @@ bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update ev
             for (auto i = 0; i < recessivebehaviors.size(); i++){
                 found = false;
                 for (auto j = 0; j < behaviorFiles.size(); j++){
-                    if (!QString::compare(behaviorFiles.at(j)->fileName(), recessivebehaviors.at(i)->fileName(), Qt::CaseInsensitive)){
+                    if (!QString::compare(behaviorFiles.at(j)->fileName().section("/", -1, -1), recessivebehaviors.at(i)->fileName().section("/", -1, -1), Qt::CaseInsensitive)){
                         found = true;
                     }
                 }
@@ -514,6 +514,33 @@ bool ProjectFile::appendAnimation(SkyrimAnimationMotionData *motiondata){
 
 SkyrimAnimationMotionData ProjectFile::getAnimationMotionData(int animationindex) const{
     return skyrimAnimData->getAnimationMotionData(projectName, animationindex);
+}
+
+bool ProjectFile::isNameUniqueInProject(HkxObject *object, const QString &filenametoignore) const{
+    if (object){
+        if (object->getType() == HkxObject::TYPE_GENERATOR){
+            for (auto i = 0; i < behaviorFiles.size(); i++){
+                if (QString::compare(behaviorFiles.at(i)->fileName(), filenametoignore, Qt::CaseInsensitive)){
+                    for (auto j = 0; j < behaviorFiles.at(i)->generators.size(); j++){
+                        if (object->getSignature() == behaviorFiles.at(i)->generators.at(j).data()->getSignature() && static_cast<hkbGenerator *>(object)->getName() == static_cast<hkbGenerator *>(behaviorFiles.at(i)->generators.at(j).data())->getName()){
+                            return false;
+                        }
+                    }
+                }
+            }
+        }else if (object->getType() == HkxObject::TYPE_MODIFIER){
+            for (auto i = 0; i < behaviorFiles.size(); i++){
+                if (QString::compare(behaviorFiles.at(i)->fileName(), filenametoignore, Qt::CaseInsensitive)){
+                    for (auto j = 0; j < behaviorFiles.at(i)->modifiers.size(); i++){
+                        if (object->getSignature() == behaviorFiles.at(i)->modifiers.at(j).data()->getSignature() && static_cast<hkbModifier *>(object)->getName() == static_cast<hkbModifier *>(behaviorFiles.at(i)->modifiers.at(j).data())->getName()){
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return true;
 }
 
 bool ProjectFile::appendClipGeneratorAnimData(const QString &name){

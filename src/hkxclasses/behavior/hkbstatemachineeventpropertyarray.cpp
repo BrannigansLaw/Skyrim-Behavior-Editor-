@@ -1,6 +1,7 @@
 #include "hkbstatemachineeventpropertyarray.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 /**
  * hkbStateMachineEventPropertyArray
  */
@@ -139,11 +140,42 @@ void hkbStateMachineEventPropertyArray::mergeEventIndex(int oldindex, int newind
     }
 }
 
+void hkbStateMachineEventPropertyArray::fixMergedEventIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thiseventname;
+    int eventindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            for (auto i = 0; i < events.size(); i++){
+                thiseventname = recdata->getEventNameAt(events.at(i).id);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                events[i].id = eventindex;
+            }
+        }
+        setIsMerged(true);
+    }
+}
+
 bool hkbStateMachineEventPropertyArray::merge(HkxObject *recessiveObject){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString othereventname;
+    int eventindex;
     bool found;
     hkbStateMachineEventPropertyArray *obj = nullptr;
     if (recessiveObject && recessiveObject->getSignature() == HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
         obj = static_cast<hkbStateMachineEventPropertyArray *>(recessiveObject);
+        //obj->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(obj->getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
         for (auto i = 0; i < obj->events.size(); i++){
             found = false;
             for (auto j = 0; j < events.size(); j++){
@@ -152,12 +184,29 @@ bool hkbStateMachineEventPropertyArray::merge(HkxObject *recessiveObject){
                 }
             }
             if (!found){
+                othereventname = recdata->getEventNameAt(obj->events.at(i).id);
+                eventindex = domdata->getIndexOfEvent(othereventname);
+                if (eventindex == -1 && othereventname != ""){
+                    domdata->addEvent(othereventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                obj->events[i].id = eventindex;
                 events.append(obj->events.at(i));
             }
         }
         return true;
     }else{
         return false;
+    }
+}
+
+void hkbStateMachineEventPropertyArray::updateReferences(long &ref){
+    setReference(ref);
+    for (auto i = 0; i < events.size(); i++){
+        if (events.at(i).payload.data()){
+            ref++;
+            events[i].payload.data()->updateReferences(ref);
+        }
     }
 }
 

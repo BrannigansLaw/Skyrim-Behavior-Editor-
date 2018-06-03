@@ -19,6 +19,7 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfKeyframeInfos() const;
+    void updateReferences(long &ref);
 private:
     hkbKeyframeBonesModifier& operator=(const hkbKeyframeBonesModifier&);
     hkbKeyframeBonesModifier(const hkbKeyframeBonesModifier &);

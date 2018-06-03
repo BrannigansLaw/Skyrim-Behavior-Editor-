@@ -50,9 +50,6 @@ bool hkaSkeleton::addLocalFrame(const QString & name){
     }
     localFrames.append(hkLocalFrame());
     localFrames.last().localFrame = HkxSharedPtr(new hkSimpleLocalFrame(getParentFile(), name));
-    if (!getParentFile()->addObjectToFile(localFrames.last().localFrame.data(), ref)){
-        return false;
-    }
     return true;
 }
 

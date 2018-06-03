@@ -1,6 +1,7 @@
 #include "bscyclicblendtransitiongenerator.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
 /*
  * CLASS: BSCyclicBlendTransitionGenerator
@@ -80,6 +81,46 @@ void BSCyclicBlendTransitionGenerator::mergeEventIndex(int oldindex, int newinde
     }
     if (eventToCrossBlend.id == oldindex){
         eventToCrossBlend.id = newindex;
+    }
+}
+
+void BSCyclicBlendTransitionGenerator::fixMergedEventIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thiseventname;
+    int eventindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            auto fixIndex = [&](int & id){
+                thiseventname = recdata->getEventNameAt(id);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                id = eventindex;
+            };
+            fixIndex(eventToFreezeBlendValue.id);
+            fixIndex(eventToCrossBlend.id);
+        }
+        setIsMerged(true);
+    }
+}
+
+void BSCyclicBlendTransitionGenerator::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (eventToFreezeBlendValue.payload.data()){
+        ref++;
+        eventToFreezeBlendValue.payload.data()->setReference(ref);
+    }
+    if (eventToCrossBlend.payload.data()){
+        ref++;
+        eventToCrossBlend.payload.data()->setReference(ref);
     }
 }
 

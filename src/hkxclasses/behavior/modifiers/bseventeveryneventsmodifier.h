@@ -20,6 +20,8 @@ public:
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
     void mergeEventIndex(int oldindex, int newindex);
+    void fixMergedEventIndices(BehaviorFile *dominantfile);
+    void updateReferences(long &ref);
 private:
     BSEventEveryNEventsModifier& operator=(const BSEventEveryNEventsModifier&);
     BSEventEveryNEventsModifier(const BSEventEveryNEventsModifier &);

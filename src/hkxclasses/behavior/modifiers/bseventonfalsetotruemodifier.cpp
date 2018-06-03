@@ -1,6 +1,7 @@
 #include "bseventonfalsetotruemodifier.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
 /*
  * CLASS: BSEventOnFalseToTrueModifier
@@ -240,6 +241,51 @@ void BSEventOnFalseToTrueModifier::mergeEventIndex(int oldindex, int newindex){
     }
     if (eventToSend3.id == oldindex){
         eventToSend3.id = newindex;
+    }
+}
+
+void BSEventOnFalseToTrueModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thiseventname;
+    int eventindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            auto fixIndex = [&](int & id){
+                thiseventname = recdata->getEventNameAt(id);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                id = eventindex;
+            };
+            fixIndex(eventToSend1.id);
+            fixIndex(eventToSend2.id);
+            fixIndex(eventToSend3.id);
+        }
+        setIsMerged(true);
+    }
+}
+
+void BSEventOnFalseToTrueModifier::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (eventToSend1.payload.data()){
+        ref++;
+        eventToSend1.payload.data()->updateReferences(ref);
+    }
+    if (eventToSend2.payload.data()){
+        ref++;
+        eventToSend2.payload.data()->updateReferences(ref);
+    }
+    if (eventToSend3.payload.data()){
+        ref++;
+        eventToSend3.payload.data()->updateReferences(ref);
     }
 }
 

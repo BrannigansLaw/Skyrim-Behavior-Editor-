@@ -238,7 +238,6 @@ void BSDistTriggerModifierUI::setTriggerEventPayload(){
                 payload->data = triggerEventPayload->text();
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), triggerEventPayload->text());
-                bsData->getParentFile()->addObjectToFile(payload, -1);
                 bsData->triggerEvent.payload = HkxSharedPtr(payload);
             }
         }else{

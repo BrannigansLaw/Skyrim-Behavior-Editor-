@@ -3,6 +3,8 @@
 
 #include "hkbgenerator.h"
 
+class hkbBlenderGeneratorChild;
+
 class hkbPoseMatchingGenerator: public hkbGenerator
 {
     friend class BehaviorGraphView;
@@ -23,6 +25,7 @@ public:
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
     bool merge(HkxObject *recessiveObject);
+    int getIndexOfChild(hkbBlenderGeneratorChild *child) const;
     enum BlenderFlag{
         FLAG_NONE = 0,
         FLAG_SYNC = 1,

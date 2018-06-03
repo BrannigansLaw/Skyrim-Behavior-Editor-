@@ -122,6 +122,14 @@ void HkxObject::updateEventIndices(int ){
     //
 }
 
+void HkxObject::updateReferences(long & ref){
+    reference = ref;
+}
+
+void HkxObject::fixMergedEventIndices(BehaviorFile *){
+    //
+}
+
 bool HkxObject::write(HkxXMLWriter *){
     return false;
 }
@@ -460,15 +468,25 @@ HkDynamicObject::HkDynamicObject(HkxFile *parent, long ref)
 }
 
 void HkDynamicObject::addBinding(const QString & path, int varIndex, bool isProperty){
-    static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->addBinding(path, varIndex,(hkbVariableBindingSet::hkBinding::BindingType)(isProperty));
+    if (variableBindingSet.data()){
+        static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->addBinding(path, varIndex,(hkbVariableBindingSet::hkBinding::BindingType)(isProperty));
+    }else{
+        hkbVariableBindingSet *bind = new hkbVariableBindingSet(getParentFile());
+        bind->addBinding(path, varIndex,(hkbVariableBindingSet::hkBinding::BindingType)(isProperty));
+        variableBindingSet = HkxSharedPtr(bind);
+    }
 }
 
 void HkDynamicObject::removeBinding(const QString & path){
-    static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->removeBinding(path);
+    if (variableBindingSet.data()){
+        static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->removeBinding(path);
+    }
 }
 
 void HkDynamicObject::removeBinding(int varIndex){
-    static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->removeBinding(varIndex);
+    if (variableBindingSet.data()){
+        static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->removeBinding(varIndex);
+    }
 }
 
 bool HkDynamicObject::isVariableReferenced(int variableindex) const{
@@ -491,6 +509,26 @@ bool HkDynamicObject::merge(HkxObject *recessiveObject){
         return true;
     }else{
         return false;
+    }
+}
+
+void HkDynamicObject::setBindingReference(int ref){
+    if (variableBindingSet.data()){
+        variableBindingSet.data()->setReference(ref);
+    }
+}
+
+void HkDynamicObject::updateReferences(long &ref){
+    setReference(ref);
+    if (variableBindingSet.data()){
+        ref++;
+        variableBindingSet.data()->setReference(ref);
+    }
+}
+
+void HkDynamicObject::mergeVariableIndices(int oldindex, int newindex){
+    if (variableBindingSet.data()){
+        static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->mergeVariableIndex(oldindex, newindex);
     }
 }
 

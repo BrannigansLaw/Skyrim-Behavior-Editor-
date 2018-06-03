@@ -137,7 +137,6 @@ QList<DataIconManager *> hkbPoseMatchingGenerator::getChildren() const{
     return list;
 }
 
-
 bool hkbPoseMatchingGenerator::merge(HkxObject *recessiveObject){
     hkbPoseMatchingGenerator *recobj;
     hkbBlenderGeneratorChild *domchild;
@@ -149,7 +148,7 @@ bool hkbPoseMatchingGenerator::merge(HkxObject *recessiveObject){
             for (auto j = 0; j < recobj->children.size(); j++){
                 recchild = static_cast<hkbBlenderGeneratorChild *>(recobj->children.at(j).data());
                 if (*recchild == *domchild){
-                    domchild->injectWhileMerging(recchild);
+                    domchild->injectWhileMerging((recchild));
                     break;
                 }
             }
@@ -158,6 +157,14 @@ bool hkbPoseMatchingGenerator::merge(HkxObject *recessiveObject){
     return true;
 }
 
+int hkbPoseMatchingGenerator::getIndexOfChild(hkbBlenderGeneratorChild *child) const{
+    for (int i = 0; i < children.size(); i++){
+        if (children.at(i).data() == child){
+            return i;
+        }
+    }
+    return -1;
+}
 
 bool hkbPoseMatchingGenerator::readData(const HkxXmlReader &reader, long index){
     bool ok;

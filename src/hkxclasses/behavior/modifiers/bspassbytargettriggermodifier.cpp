@@ -1,6 +1,7 @@
 #include "bspassbytargettriggermodifier.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
 /*
  * CLASS: BSPassByTargetTriggerModifier
@@ -144,6 +145,41 @@ void BSPassByTargetTriggerModifier::updateEventIndices(int eventindex){
 void BSPassByTargetTriggerModifier::mergeEventIndex(int oldindex, int newindex){
     if (triggerEvent.id == oldindex){
         triggerEvent.id = newindex;
+    }
+}
+
+void BSPassByTargetTriggerModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thiseventname;
+    int eventindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            auto fixIndex = [&](int & id){
+                thiseventname = recdata->getEventNameAt(id);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                id = eventindex;
+            };
+            fixIndex(triggerEvent.id);
+        }
+        setIsMerged(true);
+    }
+}
+
+void BSPassByTargetTriggerModifier::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (triggerEvent.payload.data()){
+        ref++;
+        triggerEvent.payload.data()->updateReferences(ref);
     }
 }
 

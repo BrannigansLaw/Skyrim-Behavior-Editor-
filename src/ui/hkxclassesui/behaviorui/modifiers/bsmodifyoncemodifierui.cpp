@@ -95,7 +95,7 @@ void BSModifyOnceModifierUI::connectToTables(GenericTableWidget *modifiers, Gene
 void BSModifyOnceModifierUI::loadData(HkxObject *data){
     disconnectSignals();
     if (data){
-        if (data->getSignature() == HKB_MODIFIER_GENERATOR){
+        if (data->getSignature() == BS_MODIFY_ONCE_MODIFIER){
             bsData = static_cast<BSModifyOnceModifier *>(data);
             name->setText(bsData->name);
             if (bsData->pOnActivateModifier.data()){

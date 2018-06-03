@@ -29,7 +29,9 @@ public:
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
     void mergeEventIndex(int oldindex, int newindex);
+    void fixMergedEventIndices(BehaviorFile *dominantfile);
     bool merge(HkxObject *recessiveObject);
+    void updateReferences(long &ref);
     struct HkTransition
     {
         HkTransition()
@@ -51,8 +53,8 @@ public:
                     toStateId != other.toStateId ||
                     fromNestedStateId != other.fromNestedStateId ||
                     toNestedStateId != other.toNestedStateId ||
-                    priority != other.priority ||
-                    flags != other.flags
+                    priority != other.priority/* ||
+                    flags != other.flags*/
                     )
             {
                 return false;
@@ -62,11 +64,11 @@ public:
             if ((exp && otherexp) && *exp == *otherexp){
                 return true;
             }
-            hkbBlendingTransitionEffect *effect = static_cast<hkbBlendingTransitionEffect *>(transition.data());
+            /*hkbBlendingTransitionEffect *effect = static_cast<hkbBlendingTransitionEffect *>(transition.data());
             hkbBlendingTransitionEffect *othereffect = static_cast<hkbBlendingTransitionEffect *>(other.transition.data());
             if ((effect && othereffect) && *effect == *othereffect){
                 return true;
-            }
+            }*/
             return false;
         }
 

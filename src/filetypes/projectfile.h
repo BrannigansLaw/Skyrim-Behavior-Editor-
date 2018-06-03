@@ -38,6 +38,7 @@ public:
     qreal getAnimationDurationFromAnimData(const QString & animationname) const;
     bool appendAnimation(SkyrimAnimationMotionData *motiondata);
     SkyrimAnimationMotionData getAnimationMotionData(int animationindex) const;
+    bool isNameUniqueInProject(HkxObject *object, const QString & filenametoignore) const;
 private:
 protected:
     bool parse();

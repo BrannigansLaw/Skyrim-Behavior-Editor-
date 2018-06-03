@@ -3,6 +3,8 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
+class BehaviorFile;
+
 class hkbVariableBindingSet: public HkxObject
 {
     friend class StateMachineUI;
@@ -40,6 +42,7 @@ public:
     void updateVariableIndices(int index);
     void mergeVariableIndex(int oldindex, int newindex);
     bool merge(HkxObject *recessiveObject);
+    bool fixMergedIndices(BehaviorFile *dominantfile);
 protected:
 private:
     hkbVariableBindingSet& operator=(const hkbVariableBindingSet&);

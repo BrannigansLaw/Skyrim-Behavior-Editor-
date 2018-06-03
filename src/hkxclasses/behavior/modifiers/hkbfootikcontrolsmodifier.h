@@ -22,6 +22,8 @@ public:
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
     void mergeEventIndex(int oldindex, int newindex);
+    void fixMergedEventIndices(BehaviorFile *dominantfile);
+    void updateReferences(long &ref);
 private:
     hkbFootIkControlsModifier& operator=(const hkbFootIkControlsModifier&);
     hkbFootIkControlsModifier(const hkbFootIkControlsModifier &);

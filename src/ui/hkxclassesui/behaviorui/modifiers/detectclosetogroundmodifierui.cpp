@@ -300,7 +300,7 @@ void DetectCloseToGroundModifierUI::setCloseToGroundEventPayload(){
                 payload->data = closeToGroundEventPayload->text();
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), closeToGroundEventPayload->text());
-                bsData->getParentFile()->addObjectToFile(payload, -1);
+                //bsData->getParentFile()->addObjectToFile(payload, -1);
                 bsData->closeToGroundEvent.payload = HkxSharedPtr(payload);
             }
         }else{

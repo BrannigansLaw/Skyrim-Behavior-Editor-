@@ -182,6 +182,20 @@ bool hkbPoweredRagdollControlsModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
+void hkbPoweredRagdollControlsModifier::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (bones.data()){
+        ref++;
+        bones.data()->updateReferences(ref);
+    }
+    if (boneWeights.data()){
+        ref++;
+        boneWeights.data()->updateReferences(ref);
+    }
+}
+
 bool hkbPoweredRagdollControlsModifier::link(){
     if (!getParentFile()){
         return false;

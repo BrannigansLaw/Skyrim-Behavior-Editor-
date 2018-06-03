@@ -153,7 +153,7 @@ bool BSBoneSwitchGenerator::merge(HkxObject *recessiveObject){
             for (auto j = 0; j < recobj->ChildrenA.size(); j++){
                 recchild = static_cast<BSBoneSwitchGeneratorBoneData *>(recobj->ChildrenA.at(j).data());
                 if (*recchild == *domchild){
-                    domchild->injectWhileMerging(recchild);
+                    domchild->injectWhileMerging((recchild));
                     break;
                 }
             }

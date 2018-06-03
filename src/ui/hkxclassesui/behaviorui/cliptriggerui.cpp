@@ -166,7 +166,6 @@ void ClipTriggerUI::setEventPayload(){
                 }
             }else{
                 payloadData = new hkbStringEventPayload(file, payload->text());
-                file->addObjectToFile(payloadData);
                 bsData->event.payload = HkxSharedPtr(payloadData);
             }
         }else{

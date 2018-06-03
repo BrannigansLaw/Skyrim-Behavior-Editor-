@@ -4,6 +4,7 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/hkxobject.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 /**
  * hkbStateMachineTransitionInfoArray
  */
@@ -320,19 +321,111 @@ void hkbStateMachineTransitionInfoArray::mergeEventIndex(int oldindex, int newin
     }
 }
 
+void hkbStateMachineTransitionInfoArray::fixMergedEventIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thiseventname;
+    int eventindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            for (auto i = 0; i < transitions.size(); i++){
+                thiseventname = recdata->getEventNameAt(transitions.at(i).eventId);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                transitions[i].eventId = eventindex;
+            }
+            for (auto i = 0; i < transitions.size(); i++){
+                thiseventname = recdata->getEventNameAt(transitions.at(i).triggerInterval.enterEventId);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                transitions[i].triggerInterval.enterEventId = eventindex;
+            }
+            for (auto i = 0; i < transitions.size(); i++){
+                thiseventname = recdata->getEventNameAt(transitions.at(i).triggerInterval.exitEventId);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                transitions[i].triggerInterval.exitEventId = eventindex;
+            }
+            for (auto i = 0; i < transitions.size(); i++){
+                thiseventname = recdata->getEventNameAt(transitions.at(i).initiateInterval.enterEventId);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                transitions[i].initiateInterval.enterEventId = eventindex;
+            }
+            for (auto i = 0; i < transitions.size(); i++){
+                thiseventname = recdata->getEventNameAt(transitions.at(i).initiateInterval.exitEventId);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                transitions[i].initiateInterval.exitEventId = eventindex;
+            }
+        }
+        setIsMerged(true);
+    }
+}
+
 bool hkbStateMachineTransitionInfoArray::merge(HkxObject *recessiveObject){
-    //TO DO: Make sure stateid's actually exist...
+    hkbStateMachine *statemachine;
+    hkbStateMachineStateInfo *state;
     hkbStateMachineTransitionInfoArray *obj = nullptr;
     if (recessiveObject && recessiveObject->getSignature() == HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
         obj = static_cast<hkbStateMachineTransitionInfoArray *>(recessiveObject);
-        for (auto i = 0; i < obj->transitions.size(); i++){
-            if (!transitions.contains(obj->transitions.at(i))){
-                transitions.append(obj->transitions.at(i));
+        obj->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
+        if (parent){
+            if (parent->getSignature() == HKB_STATE_MACHINE){
+                statemachine = static_cast<hkbStateMachine *>(parent);
+                for (auto i = 0; i < obj->transitions.size(); i++){
+                    if (!transitions.contains(obj->transitions.at(i)) && statemachine->getStateName(obj->transitions.at(i).toStateId) != "" &&
+                          (!obj->transitions.at(i).flags.contains(transitionFlags.at(14)) || statemachine->getNestedStateName(obj->transitions.at(i).toStateId, obj->transitions.at(i).toNestedStateId) != ""))
+                    {
+                        transitions.append(obj->transitions.at(i));
+                    }
+                }
+            }else if (parent->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
+                state = static_cast<hkbStateMachineStateInfo *>(parent);
+                for (auto i = 0; i < obj->transitions.size(); i++){
+                    if (!transitions.contains(obj->transitions.at(i)) && state->getStateName(obj->transitions.at(i).toStateId) != "" &&
+                          (!obj->transitions.at(i).flags.contains(transitionFlags.at(14)) || state->getNestedStateName(obj->transitions.at(i).toStateId, obj->transitions.at(i).toNestedStateId) != ""))
+                    {
+                        transitions.append(obj->transitions.at(i));
+                    }
+                }
             }
         }
         return true;
     }else{
         return false;
+    }
+}
+
+void hkbStateMachineTransitionInfoArray::updateReferences(long &ref){
+    setReference(ref);
+    for (auto i = 0; i < transitions.size(); i++){
+        if (transitions.at(i).transition.data()){
+            ref++;
+            transitions[i].transition.data()->updateReferences(ref);
+        }
+        if (transitions.at(i).condition.data()){
+            ref++;
+            transitions[i].condition.data()->updateReferences(ref);
+        }
     }
 }
 

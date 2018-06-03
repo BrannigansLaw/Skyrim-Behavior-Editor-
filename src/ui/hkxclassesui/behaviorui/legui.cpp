@@ -272,7 +272,6 @@ void LegUI::setEventPayload(){
                 }
             }else{
                 payloadData = new hkbStringEventPayload(file, payload->text());
-                file->addObjectToFile(payloadData);
                 bsData->payload = HkxSharedPtr(payloadData);
             }
         }else{

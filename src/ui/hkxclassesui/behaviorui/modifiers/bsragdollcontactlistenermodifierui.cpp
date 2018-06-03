@@ -202,7 +202,7 @@ void BSRagdollContactListenerModifierUI::setContactEventPayload(){
                 payload->data = contactEventPayload->text();
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), contactEventPayload->text());
-                bsData->getParentFile()->addObjectToFile(payload, -1);
+                //bsData->getParentFile()->addObjectToFile(payload, -1);
                 bsData->contactEvent.payload = HkxSharedPtr(payload);
             }
         }else{
@@ -221,7 +221,7 @@ void BSRagdollContactListenerModifierUI::toggleBones(bool enable){
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
         }else if (!bsData->bones.data()){
             hkbBoneIndexArray *indices = new hkbBoneIndexArray(bsData->getParentFile());
-            bsData->getParentFile()->addObjectToFile(indices, -1);
+            //bsData->getParentFile()->addObjectToFile(indices, -1);
             bsData->bones = HkxSharedPtr(indices);
             bones->setText("Edit");
         }

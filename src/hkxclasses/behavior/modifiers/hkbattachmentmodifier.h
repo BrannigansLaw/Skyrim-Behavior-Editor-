@@ -19,6 +19,8 @@ public:
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
     void mergeEventIndex(int oldindex, int newindex);
+    void fixMergedEventIndices(BehaviorFile *dominantfile);
+    void updateReferences(long &ref);
 private:
     /*QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;

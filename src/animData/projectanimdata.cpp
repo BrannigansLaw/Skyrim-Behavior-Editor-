@@ -206,7 +206,8 @@ SkyrimAnimationMotionData *ProjectAnimData::findMotionData(int animationindex){
             return animationMotionData.at(i);
         }
     }
-    return nullptr;
+    animationMotionData.append(new SkyrimAnimationMotionData(this, animationMotionData.size()));
+    return animationMotionData.last();
 }
 
 void ProjectAnimData::setLocalTimeForClipGenAnimData(const QString &clipname, int triggerindex, qreal time){

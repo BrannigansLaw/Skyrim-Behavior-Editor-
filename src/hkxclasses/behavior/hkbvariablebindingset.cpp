@@ -1,6 +1,9 @@
 #include "hkbvariablebindingset.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "hkbbehaviorgraphdata.h"
+#include "hkbbehaviorgraphstringdata.h"
+#include "hkbvariablevalueset.h"
 
 /*
  * CLASS: hkbVariableBindingSet
@@ -239,26 +242,76 @@ void hkbVariableBindingSet::mergeVariableIndex(int oldindex, int newindex){
     }
 }
 
-bool hkbVariableBindingSet::merge(HkxObject *recessiveObject){
-    bool found;
-    hkbVariableBindingSet *obj = nullptr;
-    if (recessiveObject && recessiveObject->getSignature() == HKB_VARIABLE_BINDING_SET){
-        obj = static_cast<hkbVariableBindingSet *>(recessiveObject);
-        for (auto i = 0; i < obj->bindings.size(); i++){
-            found = false;
-            for (auto j = 0; j < bindings.size(); j++){
-                if (bindings.at(j).memberPath == obj->bindings.at(i).memberPath){
-                    found = true;
+bool hkbVariableBindingSet::fixMergedIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thisvarname;
+    int varindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            for (auto i = 0; i < bindings.size(); i++){
+                thisvarname = recdata->getVariableNameAt(bindings.at(i).variableIndex);
+                varindex = domdata->getIndexOfVariable(thisvarname);
+                if (varindex == -1){
+                    domdata->addVariable(domdata->getVariableTypeAt(bindings.at(i).variableIndex), thisvarname);
+                    varindex = domdata->variableInfos.size() - 1;
                 }
-                if (!found){
-                    bindings.append(obj->bindings.at(i));
-                }
+                bindings[i].variableIndex = varindex;
             }
+        }else{
+            return false;
         }
-        return true;
     }else{
         return false;
     }
+    setIsMerged(true);
+    return true;
+}
+
+bool hkbVariableBindingSet::merge(HkxObject *recessiveObject){
+    bool found;
+    hkbVariableBindingSet *obj = nullptr;
+    hkbBehaviorGraphData *thisdata;
+    hkbBehaviorGraphData *otherdata;
+    //QString thisvarname;
+    QString othervarname;
+    int varindex;
+    //fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
+    //TO DO: Support character properties...
+    if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_VARIABLE_BINDING_SET){
+        obj = static_cast<hkbVariableBindingSet *>(recessiveObject);
+        thisdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->graphData.data());
+        otherdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(obj->getParentFile())->graphData.data());
+        if (thisdata && otherdata){
+            for (auto i = 0; i < obj->bindings.size(); i++){
+                found = false;
+                for (auto j = 0; j < bindings.size(); j++){
+                    if (bindings.at(j).memberPath == obj->bindings.at(i).memberPath){
+                        found = true;
+                    }
+                }
+                if (!found){
+                    othervarname = otherdata->getVariableNameAt(obj->bindings.at(i).variableIndex);
+                    varindex = thisdata->getIndexOfVariable(othervarname);
+                    if (varindex == -1){
+                        thisdata->addVariable(otherdata->getVariableTypeAt(obj->bindings.at(i).variableIndex), othervarname);
+                        varindex = thisdata->variableInfos.size() - 1;
+                    }
+                    obj->bindings[i].variableIndex = varindex;//not sure...
+                    bindings.append(obj->bindings.at(i));
+                }
+            }
+        }else{
+            return false;
+        }
+    }else{
+        return false;
+    }
+    setIsMerged(true);
+    return true;
 }
 
 bool hkbVariableBindingSet::link(){

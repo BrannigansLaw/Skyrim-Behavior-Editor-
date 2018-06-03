@@ -101,7 +101,8 @@ bool BSBoneSwitchGeneratorBoneData::hasChildren() const{
 
 QString BSBoneSwitchGeneratorBoneData::getName() const{
     if (parentBSG.constData()){
-        return static_cast<const BSBoneSwitchGenerator *>(parentBSG.constData())->getName()+"_CHILD";
+        const BSBoneSwitchGenerator *par = static_cast<const BSBoneSwitchGenerator *>(parentBSG.constData());
+        return par->getName()+"_CHILD"+QString::number(getThisIndex());
     }else{
         getParentFile()->writeToLog(getClassname()+": getName()!\nNo parent BSBoneSwitchGenerator'!!!", true);
     }
@@ -115,6 +116,16 @@ int BSBoneSwitchGeneratorBoneData::getThisIndex() const{
         CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneData:::getThisIndex() !\nNo parent BSBoneSwitchGenerator'!!!");
     }
     return -1;
+}
+
+void BSBoneSwitchGeneratorBoneData::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (spBoneWeight.data()){
+        ref++;
+        spBoneWeight.data()->setReference(ref);
+    }
 }
 
 QList<DataIconManager *> BSBoneSwitchGeneratorBoneData::getChildren() const{

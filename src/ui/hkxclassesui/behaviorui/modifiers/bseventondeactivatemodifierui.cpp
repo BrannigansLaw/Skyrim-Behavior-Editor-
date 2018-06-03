@@ -173,7 +173,7 @@ void BSEventOnDeactivateModifierUI::setEventPayload(){
                 payload->data = eventPayload->text();
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), eventPayload->text());
-                bsData->getParentFile()->addObjectToFile(payload, -1);
+                //bsData->getParentFile()->addObjectToFile(payload, -1);
                 bsData->event.payload = HkxSharedPtr(payload);
             }
         }else{

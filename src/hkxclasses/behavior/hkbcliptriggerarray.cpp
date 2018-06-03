@@ -1,6 +1,7 @@
 #include "hkbcliptriggerarray.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 /**
  * hkbClipTriggerArray
  */
@@ -174,11 +175,42 @@ void hkbClipTriggerArray::mergeEventIndex(int oldindex, int newindex){
     }
 }
 
+void hkbClipTriggerArray::fixMergedEventIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thiseventname;
+    int eventindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            for (auto i = 0; i < triggers.size(); i++){
+                thiseventname = recdata->getEventNameAt(triggers.at(i).event.id);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                triggers[i].event.id = eventindex;
+            }
+        }
+        setIsMerged(true);
+    }
+}
+
 bool hkbClipTriggerArray::merge(HkxObject *recessiveObject){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString othereventname;
+    int eventindex;
     bool found;
     hkbClipTriggerArray *obj = nullptr;
     if (recessiveObject && recessiveObject->getSignature() == HKB_CLIP_TRIGGER_ARRAY){
         obj = static_cast<hkbClipTriggerArray *>(recessiveObject);
+        //obj->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(obj->getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
         for (auto i = 0; i < obj->triggers.size(); i++){
             found = false;
             for (auto j = 0; j < triggers.size(); j++){
@@ -187,12 +219,29 @@ bool hkbClipTriggerArray::merge(HkxObject *recessiveObject){
                 }
             }
             if (!found){
+                othereventname = recdata->getEventNameAt(obj->triggers.at(i).event.id);
+                eventindex = domdata->getIndexOfEvent(othereventname);
+                if (eventindex == -1 && othereventname != ""){
+                    domdata->addEvent(othereventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                //obj->triggers[i].event.id = eventindex;
                 triggers.append(obj->triggers.at(i));
             }
         }
         return true;
     }else{
         return false;
+    }
+}
+
+void hkbClipTriggerArray::updateReferences(long &ref){
+    setReference(ref);
+    for (auto i = 0; i < triggers.size(); i++){
+        if (triggers.at(i).event.payload.data()){
+            ref++;
+            triggers[i].event.payload.data()->updateReferences(ref);
+        }
     }
 }
 

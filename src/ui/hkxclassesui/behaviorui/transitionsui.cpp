@@ -6,7 +6,7 @@
 #include "src/hkxclasses/behavior/generators/hkbstatemachinestateinfo.h"
 #include "src/hkxclasses/behavior/hkbstatemachinetransitioninfoarray.h"
 #include "src/hkxclasses/behavior/hkbstringeventpayload.h"
-#include "src/hkxclasses/behavior/hkbstringcondition.h"
+#include "src/hkxclasses/behavior/hkbExpressionCondition.h"
 #include "src/ui/genericdatawidgets.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/ui/behaviorgraphview.h"
@@ -110,7 +110,7 @@ TransitionsUI::TransitionsUI()
     table->setItem(TRANSITION_ROW, VALUE_COLUMN, new TableWidgetItem("", Qt::AlignCenter, QColor(Qt::gray)));
     table->setCellWidget(TRANSITION_ROW, VALUE_COLUMN, transition);
     table->setItem(CONDITION_ROW, NAME_COLUMN, new TableWidgetItem("condition"));
-    table->setItem(CONDITION_ROW, TYPE_COLUMN, new TableWidgetItem("hkbStringCondition", Qt::AlignCenter));
+    table->setItem(CONDITION_ROW, TYPE_COLUMN, new TableWidgetItem("hkbExpressionCondition", Qt::AlignCenter));
     table->setCellWidget(CONDITION_ROW, VALUE_COLUMN, condition);
     table->setItem(EVENT_ID_ROW, NAME_COLUMN, new TableWidgetItem("eventId"));
     table->setItem(EVENT_ID_ROW, TYPE_COLUMN, new TableWidgetItem("hkInt32", Qt::AlignCenter));
@@ -240,7 +240,7 @@ void TransitionsUI::loadData(BehaviorFile *parentfile, hkbStateMachine *parent, 
             transition->setText("nullptr");
         }
         if (bsData->condition.data()){
-            condition->setText(static_cast<hkbStringCondition *>(bsData->condition.data())->conditionString);
+            condition->setText(static_cast<hkbExpressionCondition *>(bsData->condition.data())->expression);
         }else{
             condition->setText("");
         }
@@ -530,10 +530,9 @@ void TransitionsUI::setCondition(){
     if (bsData && parentObj){
         if (condition->text() != ""){
             if (bsData->condition.data()){
-                static_cast<hkbStringCondition *>(bsData->condition.data())->conditionString = condition->text();
+                static_cast<hkbExpressionCondition *>(bsData->condition.data())->expression = condition->text();
             }else{
-                hkbStringCondition *con = new hkbStringCondition(static_cast<BehaviorFile *>(parentObj->getParentFile()), condition->text());
-                parentObj->getParentFile()->addObjectToFile(con, -1);
+                hkbExpressionCondition *con = new hkbExpressionCondition(static_cast<BehaviorFile *>(parentObj->getParentFile()), condition->text());
                 bsData->condition = HkxSharedPtr(con);
             }
         }else{

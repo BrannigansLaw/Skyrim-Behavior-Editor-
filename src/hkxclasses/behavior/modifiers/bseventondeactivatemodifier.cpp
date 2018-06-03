@@ -1,6 +1,7 @@
 #include "bseventondeactivatemodifier.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
 /*
  * CLASS: BSEventOnDeactivateModifier
@@ -125,6 +126,41 @@ void BSEventOnDeactivateModifier::updateEventIndices(int eventindex){
 void BSEventOnDeactivateModifier::mergeEventIndex(int oldindex, int newindex){
     if (event.id == oldindex){
         event.id = newindex;
+    }
+}
+
+void BSEventOnDeactivateModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thiseventname;
+    int eventindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            auto fixIndex = [&](int & id){
+                thiseventname = recdata->getEventNameAt(id);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                id = eventindex;
+            };
+            fixIndex(event.id);
+        }
+        setIsMerged(true);
+    }
+}
+
+void BSEventOnDeactivateModifier::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (event.payload.data()){
+        ref++;
+        event.payload.data()->updateReferences(ref);
     }
 }
 

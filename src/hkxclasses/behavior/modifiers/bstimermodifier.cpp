@@ -1,6 +1,7 @@
 #include "bstimermodifier.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
 /*
  * CLASS: BSTimerModifier
@@ -138,6 +139,41 @@ void BSTimerModifier::updateEventIndices(int eventindex){
 void BSTimerModifier::mergeEventIndex(int oldindex, int newindex){
     if (alarmEvent.id == oldindex){
         alarmEvent.id = newindex;
+    }
+}
+
+void BSTimerModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thiseventname;
+    int eventindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            auto fixIndex = [&](int & id){
+                thiseventname = recdata->getEventNameAt(id);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                id = eventindex;
+            };
+            fixIndex(alarmEvent.id);
+        }
+        setIsMerged(true);
+    }
+}
+
+void BSTimerModifier::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (alarmEvent.payload.data()){
+        ref++;
+        alarmEvent.payload.data()->updateReferences(ref);
     }
 }
 

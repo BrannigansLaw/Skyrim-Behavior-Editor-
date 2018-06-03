@@ -229,7 +229,7 @@ void BSEventEveryNEventsModifierUI::setEventToCheckForPayload(){
                 payload->data = eventToCheckForPayload->text();
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), eventToCheckForPayload->text());
-                bsData->getParentFile()->addObjectToFile(payload, -1);
+                //bsData->getParentFile()->addObjectToFile(payload, -1);
                 bsData->eventToCheckFor.payload = HkxSharedPtr(payload);
             }
         }else{
@@ -263,7 +263,7 @@ void BSEventEveryNEventsModifierUI::setEventToSendPayload(){
                 payload->data = eventToSendPayload->text();
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), eventToSendPayload->text());
-                bsData->getParentFile()->addObjectToFile(payload, -1);
+                //bsData->getParentFile()->addObjectToFile(payload, -1);
                 bsData->eventToSend.payload = HkxSharedPtr(payload);
             }
         }else{

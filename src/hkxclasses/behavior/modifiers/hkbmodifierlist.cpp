@@ -75,6 +75,9 @@ bool hkbModifierList::merge(HkxObject *recessiveObject){
     hkbModifierList *obj = nullptr;
     bool found;
     int size = modifiers.size();
+    QList <DataIconManager *> objects;
+    QList <DataIconManager *> children;
+    hkbModifier *modifier = nullptr;
     if (recessiveObject && recessiveObject->getSignature() == HKB_MODIFIER_LIST){
         obj = static_cast<hkbModifierList *>(recessiveObject);
         for (auto i = 0; i < obj->modifiers.size(); i++){
@@ -87,6 +90,19 @@ bool hkbModifierList::merge(HkxObject *recessiveObject){
             if (!found){
                 modifiers.append(obj->modifiers.at(i));
                 getParentFile()->addObjectToFile(obj->modifiers.at(i).data(), -1);
+                objects = static_cast<DataIconManager *>(obj->modifiers.at(i).data())->getChildren();
+                while (!objects.isEmpty()){
+                    if (objects.last()->getType() == HkxObject::TYPE_MODIFIER){
+                        modifier = static_cast<hkbModifier *>(objects.last());
+                        if (!static_cast<BehaviorFile *>(getParentFile())->existsInBehavior(modifier)){
+                            getParentFile()->addObjectToFile(modifier, -1);
+                            children = modifier->getChildren();
+                        }
+                    }
+                    objects.removeLast();
+                    objects = objects + children;
+                    children.clear();
+                }
             }
         }
         return true;

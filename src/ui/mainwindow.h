@@ -146,6 +146,7 @@ private:
     BehaviorFile *openBehaviorForMerger(QString & filepath);
     void openProject(QString &filepath);
     void saveFile(int index);
+    void saveMergedProject();
     bool openBehavior(const QString & filename, int &taskCount, bool checkisopen = true);
     bool exitProgram();
     bool findGameDirectory(const QString &gamename, QString &gamedirectory);

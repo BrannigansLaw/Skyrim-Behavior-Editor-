@@ -152,6 +152,16 @@ int hkbKeyframeBonesModifier::getNumberOfKeyframeInfos() const{
     return keyframeInfo.size();
 }
 
+void hkbKeyframeBonesModifier::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (keyframedBonesList.data()){
+        ref++;
+        keyframedBonesList.data()->updateReferences(ref);
+    }
+}
+
 bool hkbKeyframeBonesModifier::link(){
     if (!getParentFile()){
         return false;

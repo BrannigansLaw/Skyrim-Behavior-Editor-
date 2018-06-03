@@ -1,6 +1,7 @@
 #include "hkbattachmentmodifier.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
 /*
  * CLASS: hkbAttachmentModifier
@@ -318,6 +319,56 @@ void hkbAttachmentModifier::mergeEventIndex(int oldindex, int newindex){
     }
     if (sendToAttacheeOnDetach.id == oldindex){
         sendToAttacheeOnDetach.id = newindex;
+    }
+}
+
+void hkbAttachmentModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thiseventname;
+    int eventindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            auto fixIndex = [&](int & id){
+                thiseventname = recdata->getEventNameAt(id);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                id = eventindex;
+            };
+            fixIndex(sendToAttacherOnAttach.id);
+            fixIndex(sendToAttacheeOnAttach.id);
+            fixIndex(sendToAttacherOnDetach.id);
+            fixIndex(sendToAttacheeOnDetach.id);
+        }
+        setIsMerged(true);
+    }
+}
+
+void hkbAttachmentModifier::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (sendToAttacherOnAttach.payload.data()){
+        ref++;
+        sendToAttacherOnAttach.payload.data()->updateReferences(ref);
+    }
+    if (sendToAttacheeOnAttach.payload.data()){
+        ref++;
+        sendToAttacheeOnAttach.payload.data()->updateReferences(ref);
+    }
+    if (sendToAttacherOnDetach.payload.data()){
+        ref++;
+        sendToAttacherOnDetach.payload.data()->updateReferences(ref);
+    }
+    if (sendToAttacheeOnDetach.payload.data()){
+        ref++;
+        sendToAttacheeOnDetach.payload.data()->updateReferences(ref);
     }
 }
 

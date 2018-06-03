@@ -140,6 +140,22 @@ void hkbEventsFromRangeModifier::mergeEventIndex(int oldindex, int newindex){
     }
 }
 
+void hkbEventsFromRangeModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    if (eventRanges.data()){
+        eventRanges.data()->fixMergedEventIndices(dominantfile);
+    }
+}
+
+void hkbEventsFromRangeModifier::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (eventRanges.data()){
+        ref++;
+        eventRanges.data()->updateReferences(ref);
+    }
+}
+
 bool hkbEventsFromRangeModifier::link(){
     if (!getParentFile()){
         return false;

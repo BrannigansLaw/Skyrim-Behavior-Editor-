@@ -17,6 +17,7 @@ public:
     bool evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    void updateReferences(long &ref);
 private:
     hkbPoweredRagdollControlsModifier& operator=(const hkbPoweredRagdollControlsModifier&);
     hkbPoweredRagdollControlsModifier(const hkbPoweredRagdollControlsModifier &);

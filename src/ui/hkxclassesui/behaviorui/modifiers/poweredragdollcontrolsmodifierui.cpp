@@ -386,7 +386,7 @@ void PoweredRagdollControlsModifierUI::toggleBones(bool enable){
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
         }else if (!bsData->bones.data()){
             hkbBoneIndexArray *indices = new hkbBoneIndexArray(bsData->getParentFile());
-            bsData->getParentFile()->addObjectToFile(indices, -1);
+            //bsData->getParentFile()->addObjectToFile(indices, -1);
             bsData->bones = HkxSharedPtr(indices);
             //bones->setText(indices->getName());
         }

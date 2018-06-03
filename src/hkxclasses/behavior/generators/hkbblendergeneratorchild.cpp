@@ -1,5 +1,6 @@
 #include "hkbblendergeneratorchild.h"
 #include "hkbblendergenerator.h"
+#include "hkbposematchinggenerator.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 /*
@@ -113,7 +114,7 @@ bool hkbBlenderGeneratorChild::write(HkxXMLWriter *writer){
 }
 
 bool hkbBlenderGeneratorChild::isParametricBlend() const{
-    if (parentBG.constData()){
+    if (parentBG.constData() && parentBG.constData()->getSignature() == HKB_BLENDER_GENERATOR){
         return static_cast<const hkbBlenderGenerator *>(parentBG.constData())->isParametricBlend();
     }else{
         getParentFile()->writeToLog(getClassname()+": isParametricBlend()!\nNo parent blender generator'!!!", true);
@@ -130,7 +131,15 @@ bool hkbBlenderGeneratorChild::hasChildren() const{
 
 QString hkbBlenderGeneratorChild::getName() const{
     if (parentBG.constData()){
-        return static_cast<const hkbBlenderGenerator *>(parentBG.constData())->getName()+"_CHILD";
+        QString name;
+        if (parentBG.constData()->getSignature() == HKB_BLENDER_GENERATOR){
+            const hkbBlenderGenerator *par = static_cast<const hkbBlenderGenerator *>(parentBG.constData());
+            name = par->getName()+"_CHILD"+QString::number(getThisIndex());
+        }else if (parentBG.constData()->getSignature() == HKB_POSE_MATCHING_GENERATOR){
+            const hkbPoseMatchingGenerator *par = static_cast<const hkbPoseMatchingGenerator *>(parentBG.constData());
+            name = par->getName()+"_CHILD"+QString::number(getThisIndex());
+        }
+        return name;
     }else{
         getParentFile()->writeToLog(getClassname()+": getName()!\nNo parent blender generator'!!!", true);
     }
@@ -144,6 +153,16 @@ int hkbBlenderGeneratorChild::getThisIndex() const{
         CRITICAL_ERROR_MESSAGE("hkbBlenderGeneratorChild:::getThisIndex() !\nNo parent blender generator'!!!");
     }
     return -1;
+}
+
+void hkbBlenderGeneratorChild::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (boneWeights.data()){
+        ref++;
+        boneWeights.data()->setReference(ref);
+    }
 }
 
 QList<DataIconManager *> hkbBlenderGeneratorChild::getChildren() const{

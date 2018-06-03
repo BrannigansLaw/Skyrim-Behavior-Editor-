@@ -377,6 +377,64 @@ void MainWindow::saveFile(int index){
     }
 }
 
+void MainWindow::saveMergedProject(){
+    if (projectFile){
+        ProgressDialog dialog("Saving project "+projectFile->fileName().section("/", -1, -1)+"...", "", 0, 100, this);
+        //if (projectFile->getIsChanged()){
+            projectFile->write();
+            projectFile->setIsChanged(false);
+        //}
+        dialog.setProgress(projectFile->fileName()+" saved...", 10);
+        /*QFile animData(lastFileSelectedPath+"/animationdatasinglefile.txt");
+        if (animData.exists()){
+            if (!animData.remove()){
+                writeToLog("Failed to remove to old animData file!");
+            }
+        }
+        if (!projectFile->skyrimAnimData->write(lastFileSelectedPath+"/animationdatasinglefile.txt")){
+            writeToLog("Failed to write animationdatasinglefile.txt!");
+        }
+        QFile animSetData(lastFileSelectedPath+"/animationsetdatasinglefile.txt");
+        if (animSetData.exists()){
+            if (!animSetData.remove()){
+                writeToLog("Failed to remove to old animSetData file!");
+            }
+        }
+        projectFile->skyrimAnimSetData->write(lastFileSelectedPath+"/animationsetdatasinglefile.txt");*/
+        if (characterFile){
+            //if (characterFile->getIsChanged()){
+                characterFile->write();
+                characterFile->setIsChanged(false);
+            //}
+            dialog.setProgress(characterFile->fileName().section("/", -1, -1)+" saved...", 20);
+            if (skeletonFile){
+                /*if (skeletonFile->getIsChanged()){
+                    skeletonFile->write();
+                    skeletonFile->toggleChanged(false);
+                }*/
+                dialog.setProgress("Saving all unsaved behavior files...", 30);
+                for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
+                    if (projectFile->behaviorFiles.at(i)/* && i < behaviorGraphs.size() && behaviorGraphs.at(i)*/){
+                        //if (projectFile->behaviorFiles.at(i)->getIsChanged()){
+                            saveFile(i);
+                        //}
+                    }else{
+                        CRITICAL_ERROR_MESSAGE("MainWindow::saveProject(): The tab index is out of sync with the behavior files or a nullptr pointer in either the behavior or behavior graph list was encountered!!");
+                        return;
+                    }
+                }
+                dialog.setProgress("Project saved!!!", dialog.maximum());
+            }else{
+                CRITICAL_ERROR_MESSAGE("Project is missing a skeleton file!");
+            }
+        }else{
+            CRITICAL_ERROR_MESSAGE("Project is missing a character file!");
+        }
+    }else{
+        writeToLog("No project open!");
+    }
+}
+
 void MainWindow::saveProject(){
     if (projectFile){
         ProgressDialog dialog("Saving project "+projectFile->fileName().section("/", -1, -1)+"...", "", 0, 100, this);
@@ -573,12 +631,15 @@ void MainWindow::mergeProjects(){
         if (!dominantProject->merge(recessiveProject)){
             WARNING_MESSAGE("The attempt to merge projects failed!");
         }
-        saveProject();
+        saveMergedProject();
         //TO DO: Merge animdata...
         //packAndExportProjectToSkyrimDirectory();
         //delete recessiveProject;
         //delete projectFile;
         //projectFile = nullptr;
+        //std::terminate();
+        exit();
+        WARNING_MESSAGE("Projects merged!");
     }
     toggleLog(true);
 }
@@ -711,7 +772,7 @@ void MainWindow::addNewBehavior(bool initData){
                 }
                 tabs->setCurrentIndex(tabs->count() - 1);
                 //dialog.setProgress("Writing to file...", 50);
-                projectFile->behaviorFiles.last()->setIsChanged(true);
+                //projectFile->behaviorFiles.last()->setIsChanged(true);
                 save();
                 //???
                 //projectFile->behaviorFiles.last()->toggleChanged(true);
@@ -886,6 +947,42 @@ void MainWindow::openProject(QString & filepath){
 }
 
 void MainWindow::openProjectForMerger(QString & filepath){
+    if (hkxcmd(filepath.section("/", 0, -2), "", "-v:xml") != HKXCMD_SUCCESS){
+        writeToLog("Failed to convert and export the files to the correct folders in the Skyrim directory!");
+        return;
+    }
+    //remove all hkx files then rename the rest to hkx files...
+    {
+        QDirIterator it(filepath.section("/", 0, -2), QDirIterator::Subdirectories);
+        QString temp;
+        while (it.hasNext()){
+            temp = it.next();
+            if (temp.contains(".hkx")){
+                if (!QDir(temp).remove(temp)){
+                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openPackedProject(): The file "+temp+" could not be removed!!!").toLocal8Bit().data());
+                    return;
+                }
+            }
+        }
+    }
+    {
+        QDirIterator it(filepath.section("/", 0, -2), QDirIterator::Subdirectories);
+        QString temp;
+        while (it.hasNext()){
+            temp = it.next();
+            if (temp.contains("-out.xml")){
+                if (!QDir(temp).rename(temp, QString(temp).replace("-out.xml", ".hkx"))){
+                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openPackedProject(): The file "+temp+" could not be renamed!!!").toLocal8Bit().data());
+                    return;
+                }
+            }else if (temp.contains(".xml")){
+                if (!QDir(temp).rename(temp, QString(temp).replace(".xml", ".hkx"))){
+                    CRITICAL_ERROR_MESSAGE(QString("MainWindow::openPackedProject(): The file "+temp+" could not be renamed!!!").toLocal8Bit().data());
+                    return;
+                }
+            }
+        }
+    }
     lastFileSelected = filepath;
     QTime t;
     t.start();
@@ -1085,7 +1182,7 @@ void MainWindow::removeBehaviorGraphs(const QStringList & filenames){
 }
 
 void MainWindow::writeToLog(const QString &message, bool isError){
-    if (allowLogging && !message.contains("hkbStateMachineStateInfo: linkVar()!")){
+    /*if (allowLogging && !message.contains("hkbStateMachineStateInfo: linkVar()!")){
         QString str;
         QString temp = "\n#########################################";
         if (!isError){
@@ -1102,7 +1199,7 @@ void MainWindow::writeToLog(const QString &message, bool isError){
         tempTC.movePosition(QTextCursor::End);
         debugLog->setTextCursor(tempTC);
         //lock.unlock();
-    }
+    }*/
 }
 
 void MainWindow::openPackedProject(){

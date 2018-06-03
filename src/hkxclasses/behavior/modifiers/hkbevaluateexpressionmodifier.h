@@ -20,6 +20,8 @@ public:
     int getNumberOfExpressions() const;
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
+    void fixMergedEventIndices(BehaviorFile *dominantfile);
+    void updateReferences(long &ref);
 private:
     hkbEvaluateExpressionModifier& operator=(const hkbEvaluateExpressionModifier&);
     hkbEvaluateExpressionModifier(const hkbEvaluateExpressionModifier &);

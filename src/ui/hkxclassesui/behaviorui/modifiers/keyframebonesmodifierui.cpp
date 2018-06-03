@@ -288,7 +288,7 @@ void KeyframeBonesModifierUI::toggleKeyframedBonesList(bool enable){
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
         }else if (!bsData->keyframedBonesList.data()){
             hkbBoneIndexArray *indices = new hkbBoneIndexArray(bsData->getParentFile());
-            bsData->getParentFile()->addObjectToFile(indices, -1);
+            //bsData->getParentFile()->addObjectToFile(indices, -1);
             bsData->keyframedBonesList = HkxSharedPtr(indices);
             //bones->setText(indices->getName());
         }

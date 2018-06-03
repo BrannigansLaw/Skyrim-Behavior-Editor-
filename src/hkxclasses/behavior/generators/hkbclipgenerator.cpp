@@ -212,6 +212,12 @@ void hkbClipGenerator::mergeEventIndex(int oldindex, int newindex){
     }
 }
 
+void hkbClipGenerator::fixMergedEventIndices(BehaviorFile *dominantfile){
+    if (triggers.data()){
+        triggers.data()->fixMergedEventIndices(dominantfile);
+    }
+}
+
 bool hkbClipGenerator::merge(HkxObject *recessiveObject){
     hkbClipGenerator *obj = nullptr;
     if (recessiveObject && recessiveObject->getSignature() == HKB_CLIP_GENERATOR){
@@ -227,6 +233,16 @@ bool hkbClipGenerator::merge(HkxObject *recessiveObject){
         return true;
     }else{
         return false;
+    }
+}
+
+void hkbClipGenerator::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (triggers.data()){
+        ref++;
+        triggers.data()->setReference(ref);
     }
 }
 

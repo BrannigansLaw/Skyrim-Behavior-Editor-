@@ -32,12 +32,26 @@ QString hkbStateMachineStateInfo::getClassname(){
     return classname;
 }
 
+QString hkbStateMachineStateInfo::getStateName(int stateId) const{
+    if (parentSM){
+        return parentSM->getStateName(stateId);
+    }
+    return "";
+}
+
+QString hkbStateMachineStateInfo::getNestedStateName(int stateId, int nestedStateId) const{
+    if (parentSM){
+        return parentSM->getNestedStateName(stateId, nestedStateId);
+    }
+    return "";
+}
+
 QString hkbStateMachineStateInfo::getName() const{
     return name;
 }
 
 hkbStateMachine * hkbStateMachineStateInfo::getParentStateMachine() const{
-    if (parentSM && parentSM->getSignature() == HKB_STATE_MACHINE){
+    if (parentSM){
         return parentSM;
     }else{
         WARNING_MESSAGE(QString("The state "+getName()+" has no parent!!!"));
@@ -123,10 +137,23 @@ void hkbStateMachineStateInfo::mergeEventIndex(int oldindex, int newindex){
     }
 }
 
+void hkbStateMachineStateInfo::fixMergedEventIndices(BehaviorFile *dominantfile){
+    if (enterNotifyEvents.data()){
+        enterNotifyEvents.data()->fixMergedEventIndices(dominantfile);
+    }
+    if (exitNotifyEvents.data()){
+        exitNotifyEvents.data()->fixMergedEventIndices(dominantfile);
+    }
+    if (transitions.data()){
+        transitions.data()->fixMergedEventIndices(dominantfile);
+    }
+}
+
 bool hkbStateMachineStateInfo::merge(HkxObject *recessiveObject){
     hkbStateMachineStateInfo *obj = nullptr;
     if (recessiveObject && recessiveObject->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
         obj = static_cast<hkbStateMachineStateInfo *>(recessiveObject);
+        injectWhileMerging((obj));
         if (enterNotifyEvents.data()){
             if (obj->enterNotifyEvents.data()){
                 enterNotifyEvents.data()->merge(obj->enterNotifyEvents.data());
@@ -151,10 +178,27 @@ bool hkbStateMachineStateInfo::merge(HkxObject *recessiveObject){
             transitions = obj->transitions;
             getParentFile()->addObjectToFile(obj->transitions.data(), 0);
         }
-        injectWhileMerging(obj);
         return true;
     }else{
         return false;
+    }
+}
+
+void hkbStateMachineStateInfo::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (enterNotifyEvents.data()){
+        ref++;
+        enterNotifyEvents.data()->updateReferences(ref);
+    }
+    if (exitNotifyEvents.data()){
+        ref++;
+        exitNotifyEvents.data()->updateReferences(ref);
+    }
+    if (transitions.data()){
+        ref++;
+        transitions.data()->updateReferences(ref);
     }
 }
 

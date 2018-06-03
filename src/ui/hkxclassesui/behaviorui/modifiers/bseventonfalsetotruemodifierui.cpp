@@ -306,7 +306,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend1Payload(){
                 payload->data = eventToSend1Payload->text();
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), eventToSend1Payload->text());
-                bsData->getParentFile()->addObjectToFile(payload, -1);
+                //bsData->getParentFile()->addObjectToFile(payload, -1);
                 bsData->eventToSend1.payload = HkxSharedPtr(payload);
             }
         }else{
@@ -358,7 +358,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend2Payload(){
                 payload->data = eventToSend2Payload->text();
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), eventToSend2Payload->text());
-                bsData->getParentFile()->addObjectToFile(payload, -1);
+                //bsData->getParentFile()->addObjectToFile(payload, -1);
                 bsData->eventToSend2.payload = HkxSharedPtr(payload);
             }
         }else{
@@ -410,7 +410,7 @@ void BSEventOnFalseToTrueModifierUI::setEventToSend3Payload(){
                 payload->data = eventToSend3Payload->text();
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), eventToSend3Payload->text());
-                bsData->getParentFile()->addObjectToFile(payload, -1);
+                //bsData->getParentFile()->addObjectToFile(payload, -1);
                 bsData->eventToSend3.payload = HkxSharedPtr(payload);
             }
         }else{

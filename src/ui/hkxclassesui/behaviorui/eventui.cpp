@@ -99,7 +99,6 @@ void EventUI::setEventPayload(){
                 payload->data = eventPayload->text();
             }else{
                 payload = new hkbStringEventPayload(file, eventPayload->text());
-                file->addObjectToFile(payload);
                 eventData->payload = HkxSharedPtr(payload);
             }
         }else{

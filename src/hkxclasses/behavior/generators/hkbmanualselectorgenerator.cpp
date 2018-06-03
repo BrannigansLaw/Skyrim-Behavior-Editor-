@@ -76,11 +76,11 @@ bool hkbManualSelectorGenerator::merge(HkxObject *recessiveObject){
     hkbManualSelectorGenerator *obj = nullptr;
     if (recessiveObject && recessiveObject->getSignature() == HKB_MANUAL_SELECTOR_GENERATOR){
         obj = static_cast<hkbManualSelectorGenerator *>(recessiveObject);
-        for (auto i = generators.size(); i < obj->generators.size(); i++){
+        /*for (auto i = generators.size(); i < obj->generators.size(); i++){
             generators.append(obj->generators.at(i));
-            //getParentFile()->addObjectToFile(obj->generators.at(i).data(), -1);
-        }
-        injectWhileMerging(obj);
+            getParentFile()->addObjectToFile(obj->generators.at(i).data(), -1);
+        }*/
+        injectWhileMerging((obj));
         return true;
     }else{
         return false;

@@ -4,8 +4,11 @@
 #include "src/hkxclasses/behavior/generators/hkbmodifiergenerator.h"
 #include "src/hkxclasses/behavior/generators/bsistatetagginggenerator.h"
 #include "src/hkxclasses/behavior/generators/hkbbehaviorreferencegenerator.h"
+#include "src/hkxclasses/behavior/modifiers/hkbmodifier.h"
+#include "src/hkxclasses/behavior/hkbvariablebindingset.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 /*
  * CLASS: hkbStateMachine
 */
@@ -292,6 +295,38 @@ void hkbStateMachine::mergeEventIndex(int oldindex, int newindex){
     }
 }
 
+void hkbStateMachine::fixMergedEventIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thiseventname;
+    int eventindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            auto fixIndex = [&](int & id){
+                thiseventname = recdata->getEventNameAt(id);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                id = eventindex;
+            };
+            fixIndex(eventToSendWhenStateOrTransitionChanges.id);
+            fixIndex(returnToPreviousStateEventId);
+            fixIndex(randomTransitionEventId);
+            fixIndex(transitionToNextHigherStateEventId);
+            fixIndex(transitionToNextLowerStateEventId);
+            if (wildcardTransitions.data()){
+                wildcardTransitions.data()->fixMergedEventIndices(dominantfile);
+            }
+        }
+        setIsMerged(true);
+    }
+}
+
 bool hkbStateMachine::merge(HkxObject *recessiveObject){
     hkbStateMachine *obj = nullptr;
     hkbStateMachineStateInfo *thisobjstate = nullptr;
@@ -300,8 +335,12 @@ bool hkbStateMachine::merge(HkxObject *recessiveObject){
     ulong otherstateid = 0;
     ulong freeid = 0;
     bool add;
+    QList <DataIconManager *> objects;
+    QList <DataIconManager *> children;
+    DataIconManager *object = nullptr;
     if (recessiveObject && recessiveObject->getSignature() == HKB_STATE_MACHINE){
         obj = static_cast<hkbStateMachine *>(recessiveObject);
+        //obj->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
         for (auto i = 0; i < obj->states.size(); i++){
             add = true;
             otherobjstate = static_cast<hkbStateMachineStateInfo *>(obj->states.at(i).data());
@@ -329,10 +368,24 @@ bool hkbStateMachine::merge(HkxObject *recessiveObject){
                     }
                 }
             }
-            if (add){
-                //TO DO: Make sure state does not exist elsewhere, use rule variable???
+            if (add && (/* For FNIS*/otherobjstate->getName().contains("TK") || static_cast<BehaviorFile *>(getParentFile())->isNameUniqueInProject(otherobjstate))){
                 states.append(HkxSharedPtr(otherobjstate));
-                //getParentFile()->addObjectToFile(otherobjstate, 0);
+                getParentFile()->addObjectToFile(otherobjstate, -1);
+                objects = static_cast<DataIconManager *>(otherobjstate)->getChildren();
+                while (!objects.isEmpty()){
+                    object = objects.last();
+                    if (!static_cast<BehaviorFile *>(getParentFile())->existsInBehavior(object)){
+                        getParentFile()->addObjectToFile(object, -1);
+                        getParentFile()->addObjectToFile(object->variableBindingSet.data(), -1);
+                        children = object->getChildren();
+                    }
+                    if (object->variableBindingSet.data()){
+                        static_cast<hkbVariableBindingSet *>(object->variableBindingSet.data())->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
+                    }
+                    objects.removeLast();
+                    objects = objects + children;
+                    children.clear();
+                }
             }
         }
         if (wildcardTransitions.data()){
@@ -341,11 +394,25 @@ bool hkbStateMachine::merge(HkxObject *recessiveObject){
             }
         }else if (obj->wildcardTransitions.data()){
             wildcardTransitions = obj->wildcardTransitions;
-            getParentFile()->addObjectToFile(obj->wildcardTransitions.data(), 0);
+            getParentFile()->addObjectToFile(obj->wildcardTransitions.data(), -1);
         }
         return true;
     }else{
         return false;
+    }
+}
+
+void hkbStateMachine::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    if (eventToSendWhenStateOrTransitionChanges.payload.data()){
+        ref++;
+        eventToSendWhenStateOrTransitionChanges.payload.data()->setReference(ref);
+    }
+    if (wildcardTransitions.data()){
+        ref++;
+        wildcardTransitions.data()->updateReferences(ref);
     }
 }
 

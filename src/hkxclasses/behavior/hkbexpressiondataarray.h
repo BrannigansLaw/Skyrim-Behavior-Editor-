@@ -27,6 +27,7 @@ public:
     void removeExpression(int index);
     bool write(HkxXMLWriter *writer);
     bool isEventReferenced(int eventindex) const;
+    void fixMergedEventIndices(BehaviorFile *dominantfile);
     void updateEventIndices(int eventindex);
 protected:
 private:

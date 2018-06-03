@@ -124,7 +124,7 @@ bool hkbBlenderGenerator::merge(HkxObject *recessiveObject){
             for (auto j = 0; j < recobj->children.size(); j++){
                 recchild = static_cast<hkbBlenderGeneratorChild *>(recobj->children.at(j).data());
                 if (*recchild == *domchild){
-                    domchild->injectWhileMerging(recchild);
+                    domchild->injectWhileMerging((recchild));
                     break;
                 }
             }

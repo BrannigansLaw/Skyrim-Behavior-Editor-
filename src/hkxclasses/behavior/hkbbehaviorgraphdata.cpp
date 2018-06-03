@@ -100,6 +100,43 @@ int hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name,
     return index;
 }
 
+int hkbBehaviorGraphData::addVariable(const QString & type, const QString & name, bool isProperty){
+    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
+    int index = -1;
+    bool varAdded = false;
+    if (name != "" /* && (isProperty || !strData->variableNames.contains(name))*/){
+        hkVariableInfo varInfo;
+        varInfo.type = type;
+        if (isProperty){
+            index = strData->characterPropertyNames.indexOf(name);
+            if (index == -1){
+                strData->characterPropertyNames.append(name);
+                characterPropertyInfos.append(varInfo);
+                index = strData->characterPropertyNames.size() - 1;
+                varAdded = true;
+            }
+        }else{
+            index = strData->variableNames.indexOf(name);
+            if (index == -1){
+                strData->variableNames.append(name);
+                variableInfos.append(varInfo);
+                varData->wordVariableValues.append(0);
+                index = strData->variableNames.size() - 1;
+                varAdded = true;
+            }
+        }
+        if (varAdded){
+            if (type == "VARIABLE_TYPE_QUATERNION" || type == "VARIABLE_TYPE_VECTOR4"){
+                varData->quadVariableValues.append(hkQuadVariable());
+            }else if (type == "VARIABLE_TYPE_POINTER"){
+                //varData->variantVariableValues.append(HkxSharedPtr());
+            }
+        }
+    }
+    return index;
+}
+
 void hkbBehaviorGraphData::addVariable(hkVariableType type){
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
@@ -263,16 +300,32 @@ hkVariableType hkbBehaviorGraphData::getVariableTypeAt(int index) const{
     return VARIABLE_TYPE_INT8;
 }
 
+QString hkbBehaviorGraphData::getVariableNameAt(int index) const{
+    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    if (strData && strData->variableNames.size() > index && index > -1){
+        return strData->variableNames.at(index);
+    }
+    return "";
+}
+
+QString hkbBehaviorGraphData::getEventNameAt(int index) const{
+    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    if (strData && strData->eventNames.size() > index && index > -1){
+        return strData->eventNames.at(index);
+    }
+    return "";
+}
+
 void hkbBehaviorGraphData::setVariableNameAt(int index, const QString & name){
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
-    if (strData->variableNames.size() > index && index > -1){
+    if (strData && strData->variableNames.size() > index && index > -1){
         strData->variableNames.replace(index, name);
     }
 }
 
 void hkbBehaviorGraphData::setWordVariableValueAt(int index, int value){
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
-    if (varData->wordVariableValues.size() > index && index > -1){
+    if (varData && varData->wordVariableValues.size() > index && index > -1){
         varData->wordVariableValues.replace(index, value);
     }
 }
@@ -616,6 +669,22 @@ QStringList hkbBehaviorGraphData::getVariableTypeNames() const{
     return list;
 }
 
+int hkbBehaviorGraphData::getIndexOfVariable(const QString & name) const{
+    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    if (name != "" && strData){
+        return strData->variableNames.indexOf(name);
+    }
+    return -1;
+}
+
+int hkbBehaviorGraphData::getIndexOfEvent(const QString &name) const{
+    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    if (name != "" && strData){
+        return strData->eventNames.indexOf(name);
+    }
+    return -1;
+}
+
 bool hkbBehaviorGraphData::merge(HkxObject *recessiveobj){
     hkbBehaviorGraphData *otherdata;
     hkbBehaviorGraphStringData *otherstrings;
@@ -631,11 +700,14 @@ bool hkbBehaviorGraphData::merge(HkxObject *recessiveobj){
             values = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
             otherstrings = static_cast<hkbBehaviorGraphStringData *>(otherdata->stringData.data());
             othervalues = static_cast<hkbVariableValueSet *>(otherdata->variableInitialValues.data());
-            size = strings->eventNames.size() - 1;
-            for (auto i = otherstrings->eventNames.size() - 1; i >= 0; i--){
+            size = strings->eventNames.size();
+            for (auto i = 0; i < otherstrings->eventNames.size(); i++){
                 found = false;
-                for (auto j = size; j >= 0; j--){
+                for (auto j = 0; j < size; j++){
                     if (strings->eventNames.at(j) == otherstrings->eventNames.at(i)){
+                        if (i != j){
+                            static_cast<BehaviorFile *>(otherdata->getParentFile())->mergeEventIndices(i, j);
+                        }
                         found = true;
                         break;
                     }
@@ -650,27 +722,20 @@ bool hkbBehaviorGraphData::merge(HkxObject *recessiveobj){
                     static_cast<BehaviorFile *>(otherdata->getParentFile())->mergeEventIndices(i, eventInfos.size() - 1);
                 }
             }
-            size = strings->variableNames.size() - 1;
-            for (auto i = otherstrings->variableNames.size() - 1; i >= 0; i--){
+            size = strings->variableNames.size();
+            for (auto i = 0; i < otherstrings->variableNames.size(); i++){
                 found = false;
-                for (auto j = size; j >= 0; j--){
+                for (auto j = 0; j < size; j++){
                     if (strings->variableNames.at(j) == otherstrings->variableNames.at(i)){
+                        if (i != j){
+                            static_cast<BehaviorFile *>(otherdata->getParentFile())->mergeVariableIndices(i, j);
+                        }
                         found = true;
                         break;
                     }
                 }
-                if (!found){    //TO DO: Support quad and pointer variables...
-                    strings->variableNames.append(otherstrings->variableNames.at(i));
-                    if (othervalues->wordVariableValues.size() > i){
-                        values->wordVariableValues.append(othervalues->wordVariableValues.at(i));
-                    }else{
-                        WARNING_MESSAGE("hkbBehaviorGraphData: merge(): Mismatch in size between variableNames and wordVariableValues!!!");
-                    }
-                    if (otherdata->variableInfos.size() > i){
-                        variableInfos.append(otherdata->variableInfos.at(i));
-                    }else{
-                        WARNING_MESSAGE("hkbBehaviorGraphData: merge(): Mismatch in size between variableNames and variableInfos!!!");
-                    }
+                if (!found){
+                    addVariable(otherdata->variableInfos.at(i).type, otherstrings->variableNames.at(i));
                     static_cast<BehaviorFile *>(otherdata->getParentFile())->mergeVariableIndices(i, variableInfos.size() - 1);
                 }
             }
@@ -728,6 +793,14 @@ QStringList hkbBehaviorGraphData::getEventNames() const{
     }
     WARNING_MESSAGE("hkbBehaviorGraphData::getEventNames(): stringData is null!!!");
     return QStringList();
+}
+
+int hkbBehaviorGraphData::getNumberOfEvents() const{
+    return eventInfos.size();
+}
+
+int hkbBehaviorGraphData::getNumberOfVariables() const{
+    return variableInfos.size();
 }
 
 bool hkbBehaviorGraphData::evaluateDataValidity(){

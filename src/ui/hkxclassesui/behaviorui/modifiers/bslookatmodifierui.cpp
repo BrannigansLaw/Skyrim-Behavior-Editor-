@@ -482,7 +482,7 @@ void BSLookAtModifierUI::setTargetOutOfLimitEventPayload(){
                 payload->data = targetOutOfLimitEventPayload->text();
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), targetOutOfLimitEventPayload->text());
-                bsData->getParentFile()->addObjectToFile(payload, -1);
+                //bsData->getParentFile()->addObjectToFile(payload, -1);
                 bsData->payload = HkxSharedPtr(payload);
             }
         }else{

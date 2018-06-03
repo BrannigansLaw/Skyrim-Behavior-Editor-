@@ -1,6 +1,7 @@
 #include "hkbfootikcontrolsmodifier.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
 /*
  * CLASS: hkbFootIkControlsModifier
@@ -272,6 +273,43 @@ void hkbFootIkControlsModifier::mergeEventIndex(int oldindex, int newindex){
     for (auto i = 0; i < legs.size(); i++){
         if (legs.at(i).id == oldindex){
             legs[i].id = newindex;
+        }
+    }
+}
+
+void hkbFootIkControlsModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    hkbBehaviorGraphData *recdata;
+    hkbBehaviorGraphData *domdata;
+    QString thiseventname;
+    int eventindex;
+    if (!getIsMerged() && dominantfile){
+        //TO DO: Support character properties...
+        recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
+        if (recdata && domdata){
+            for (auto i = 0; i < legs.size(); i++){
+                thiseventname = recdata->getEventNameAt(legs.at(i).id);
+                eventindex = domdata->getIndexOfEvent(thiseventname);
+                if (eventindex == -1 && thiseventname != ""){
+                    domdata->addEvent(thiseventname);
+                    eventindex = domdata->getNumberOfEvents() - 1;
+                }
+                legs[i].id = eventindex;
+            }
+        }
+        setIsMerged(true);
+    }
+}
+
+
+void hkbFootIkControlsModifier::updateReferences(long &ref){
+    setReference(ref);
+    ref++;
+    setBindingReference(ref);
+    for (auto i = 0; i < legs.size(); i++){
+        if (legs.at(i).payload.data()){
+            ref++;
+            legs[i].payload.data()->updateReferences(ref);
         }
     }
 }

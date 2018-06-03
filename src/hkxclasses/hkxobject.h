@@ -11,6 +11,7 @@ class HkxSharedPtr;
 class HkxXMLWriter;
 class TreeGraphicsItem;
 class hkbGenerator;
+class BehaviorFile;
 
 class HkxObject: public QSharedData
 {
@@ -23,6 +24,7 @@ class HkxObject: public QSharedData
     friend class CharacterUI;
     friend class SkeletonUI;
     friend class BSIStateManagerModifier;
+    friend class HkDynamicObject;
 public:
     enum HkxType {
         TYPE_OTHER=0,
@@ -45,9 +47,13 @@ public:
     virtual bool isEventReferenced(int ) const;
     virtual bool isVariableReferenced(int ) const;
     virtual void updateEventIndices(int);
+    virtual void updateReferences(long &ref);
+    virtual void fixMergedEventIndices(BehaviorFile *);
     QString getReferenceString() const;
     QString getBoolAsString(bool b) const;
     HkxFile * getParentFile() const;
+    bool getIsMerged() const;
+    void setReference(int ref);
 protected:
     HkxObject(HkxFile *parent, long ref = -1);
     void setDataValidity(bool isValid);
@@ -61,9 +67,7 @@ protected:
     hkQuadVariable readVector4(const QByteArray &lineIn, bool *ok);
     void setIsWritten(bool written = true);
     bool getIsWritten() const;
-    void setReference(int ref);
     long getReference() const;
-    bool getIsMerged() const;
     void setIsMerged(bool value);
 private:
     HkxObject(const HkxObject &obj);
@@ -108,6 +112,9 @@ public:
     void removeBinding(int varIndex);
     bool isVariableReferenced(int variableindex) const;
     bool merge(HkxObject *recessiveObject);
+    void setBindingReference(int ref);
+    void updateReferences(long &ref);
+    void mergeVariableIndices(int oldindex, int newindex);
 protected:
     HkDynamicObject(HkxFile *parent, long ref = -1);
 public:
@@ -115,7 +122,6 @@ public:
 private:
     HkDynamicObject& operator=(const HkDynamicObject&);
     HkDynamicObject(const HkDynamicObject &);
-
 };
 
 #endif // HKXOBJECT_H
