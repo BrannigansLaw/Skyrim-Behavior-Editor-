@@ -17,10 +17,13 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     QString getName() const;
-    bool operator ==(const hkbBlendingTransitionEffect & other){
+    bool operator ==(const hkbBlendingTransitionEffect & other){//TO DO: check bound variable...
+        if (name == other.name){
+            return true;
+        }
         if (
                 userData != other.userData ||
-                name != other.name ||
+                //name != other.name ||
                 selfTransitionMode != other.selfTransitionMode ||
                 eventMode != other.eventMode ||
                 duration != other.duration ||

@@ -37,22 +37,22 @@ bool hkbKeyframeBonesModifier::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "keyframeInfo"){
             int numexp = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
@@ -66,22 +66,22 @@ bool hkbKeyframeBonesModifier::readData(const HkxXmlReader &reader, long index){
                     if (text == "keyframedPosition"){
                         keyframeInfo.last().keyframedPosition = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'keyframedPosition' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'keyframedPosition' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "keyframedRotation"){
                         keyframeInfo.last().keyframedRotation = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'keyframedRotation' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'keyframedRotation' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "boneIndex"){
                         keyframeInfo.last().boneIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'boneIndex' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'boneIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "isValid"){
                         keyframeInfo.last().isValid = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'isValid' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'isValid' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -91,7 +91,7 @@ bool hkbKeyframeBonesModifier::readData(const HkxXmlReader &reader, long index){
             }
         }else if (text == "keyframedBonesList"){
             if (!keyframedBonesList.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'keyframedBonesList' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'keyframedBonesList' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -139,10 +139,10 @@ bool hkbKeyframeBonesModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (keyframedBonesList.data() && !keyframedBonesList.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'keyframedBonesList'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'keyframedBonesList'!!!");
         }
     }
     return true;
@@ -167,12 +167,12 @@ bool hkbKeyframeBonesModifier::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(keyframedBonesList.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_INDEX_ARRAY){
-            writeToLog(getClassname()+": linkVar()!\nThe linked object 'keyframedBonesList' is not a HKB_BONE_INDEX_ARRAY!");
+            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'keyframedBonesList' is not a HKB_BONE_INDEX_ARRAY!");
             setDataValidity(false);
         }
         keyframedBonesList = *ptr;

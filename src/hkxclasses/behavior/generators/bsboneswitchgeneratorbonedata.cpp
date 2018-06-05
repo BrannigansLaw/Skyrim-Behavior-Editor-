@@ -35,15 +35,15 @@ bool BSBoneSwitchGeneratorBoneData::readData(const HkxXmlReader &reader, long in
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog("BSBoneSwitchGeneratorBoneData: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG("BSBoneSwitchGeneratorBoneData: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "pGenerator"){
             if (!pGenerator.readShdPtrReference(index, reader)){
-                writeToLog("BSBoneSwitchGeneratorBoneData: readData()!\nFailed to properly read 'pGenerator' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG("BSBoneSwitchGeneratorBoneData: readData()!\nFailed to properly read 'pGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "spBoneWeight"){
             if (!spBoneWeight.readShdPtrReference(index, reader)){
-                writeToLog("BSBoneSwitchGeneratorBoneData: readData()!\nFailed to properly read 'spBoneWeight' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG("BSBoneSwitchGeneratorBoneData: readData()!\nFailed to properly read 'spBoneWeight' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -80,13 +80,13 @@ bool BSBoneSwitchGeneratorBoneData::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (pGenerator.data() && !pGenerator.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'pGenerator'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'pGenerator'!!!");
         }
         if (spBoneWeight.data() && !spBoneWeight.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'spBoneWeight'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'spBoneWeight'!!!");
         }
     }
     return true;
@@ -104,7 +104,7 @@ QString BSBoneSwitchGeneratorBoneData::getName() const{
         const BSBoneSwitchGenerator *par = static_cast<const BSBoneSwitchGenerator *>(parentBSG.constData());
         return par->getName()+"_CHILD"+QString::number(getThisIndex());
     }else{
-        getParentFile()->writeToLog(getClassname()+": getName()!\nNo parent BSBoneSwitchGenerator'!!!", true);
+        WRITE_TO_LOG(getClassname()+": getName()!\nNo parent BSBoneSwitchGenerator'!!!");
     }
     return "";
 }
@@ -166,14 +166,14 @@ bool BSBoneSwitchGeneratorBoneData::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog("BSBoneSwitchGeneratorBoneData: link()!\nFailed to properly link 'variableBindingSet' data field!");
+        WRITE_TO_LOG("BSBoneSwitchGeneratorBoneData: link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pGenerator.getShdPtrReference());
     if (!ptr){
-        writeToLog("BSBoneSwitchGeneratorBoneData: link()!\nFailed to properly link 'pGenerator' data field!");
+        WRITE_TO_LOG("BSBoneSwitchGeneratorBoneData: link()!\nFailed to properly link 'pGenerator' data field!");
         setDataValidity(false);
     }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        writeToLog("BSBoneSwitchGeneratorBoneData: link()!\n'pGenerator' data field is linked to invalid child!");
+        WRITE_TO_LOG("BSBoneSwitchGeneratorBoneData: link()!\n'pGenerator' data field is linked to invalid child!");
         setDataValidity(false);
         pGenerator = *ptr;
     }else{
@@ -182,7 +182,7 @@ bool BSBoneSwitchGeneratorBoneData::link(){
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(spBoneWeight.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-            writeToLog("BSBoneSwitchGeneratorBoneData: link()!\n'spBoneWeight' data field is linked to invalid child!");
+            WRITE_TO_LOG("BSBoneSwitchGeneratorBoneData: link()!\n'spBoneWeight' data field is linked to invalid child!");
             setDataValidity(false);
         }
         spBoneWeight = *ptr;

@@ -89,16 +89,16 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){
         if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "parentIndices"){
             int numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'parentIndices' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'parentIndices' data!\nObject Reference: "+ref);
                 return false;
             }
             if (numElems > 0 && !readIntegers(reader.getElementValueAt(index), parentIndices)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'parentIndices' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'parentIndices' data!\nObject Reference: "+ref);
                 return false;
             }
         }else if (text == "bones"){
@@ -112,12 +112,12 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){
                     if (reader.getNthAttributeValueAt(index, 0) == "name"){
                         bones.last().name = reader.getElementValueAt(index);
                         if (bones.last().name == ""){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "lockTranslation"){
                         bones.last().lockTranslation = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'lockTranslation' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'lockTranslation' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -128,29 +128,29 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){
         }else if (text == "referencePose"){
             referencePose = reader.getElementValueAt(index);
             if (referencePose == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'referencePose' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'referencePose' data field!\nObject Reference: "+ref);
             }
         }else if (text == "referenceFloats"){
             int numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'referenceFloats' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'referenceFloats' data!\nObject Reference: "+ref);
                 return false;
             }
             if (numElems > 0 && !readDoubles(reader.getElementValueAt(index), referenceFloats)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'referenceFloats' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'referenceFloats' data!\nObject Reference: "+ref);
                 return false;
             }
         }else if (text == "floatSlots"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'floatSlots' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'floatSlots' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'eventNames' data!\nObject Reference: "+ref, true);
+                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'eventNames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 floatSlots.append(reader.getElementValueAt(index));
@@ -166,12 +166,12 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                     if (text == "localFrame"){
                         if (!localFrames.last().localFrame.readShdPtrReference(index, reader)){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'localFrame' reference!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'localFrame' reference!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "lockTranslation"){
                         localFrames.last().boneIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'boneIndex' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'boneIndex' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -276,7 +276,7 @@ bool hkaSkeleton::write(HkxXMLWriter *writer){
         writer->writeLine("\n");
         for (int i = 0; i < localFrames.size(); i++){
             if (localFrames.at(i).localFrame.data() && !localFrames.at(i).localFrame->write(writer)){
-                getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'localFrame' at: "+QString::number(i)+"!!!", true);
+                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'localFrame' at: "+QString::number(i)+"!!!");
             }
         }
     }
@@ -291,10 +291,10 @@ bool hkaSkeleton::link(){
     for (int i = 0; i < localFrames.size(); i++){
         ptr = static_cast<SkeletonFile *>(getParentFile())->findLocalFrame(localFrames.at(i).localFrame.getShdPtrReference());
         if (!ptr){
-            writeToLog(getClassname()+": link()!\nFailed to properly link 'localFrames' data field!\nObject Name: "+name);
+            WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'localFrames' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if (!(*ptr).data() || (*ptr)->getSignature() != HK_SIMPLE_LOCAL_FRAME){
-            writeToLog(getClassname()+": link()!\n'localFrames' data field is linked to invalid child!\nObject Name: "+name);
+            WRITE_TO_LOG(getClassname()+": link()!\n'localFrames' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             localFrames[i].localFrame = *ptr;
         }else{

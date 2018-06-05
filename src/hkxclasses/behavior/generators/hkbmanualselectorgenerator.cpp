@@ -114,31 +114,31 @@ bool hkbManualSelectorGenerator::readData(const HkxXmlReader &reader, long index
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "generators"){
             if (!readReferences(reader.getElementValueAt(index), generators)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'generators' references!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'generators' references!\nObject Reference: "+ref);
             }
         }else if (text == "selectedGeneratorIndex"){
             selectedGeneratorIndex = reader.getElementValueAt(index).toShort(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'selectedGeneratorIndex' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'selectedGeneratorIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "currentGeneratorIndex"){
             currentGeneratorIndex = reader.getElementValueAt(index).toShort(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'currentGeneratorIndex' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'currentGeneratorIndex' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -191,11 +191,11 @@ bool hkbManualSelectorGenerator::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         for (int i = 0; i < generators.size(); i++){
             if (generators.at(i).data() && !generators.at(i).data()->write(writer)){
-                getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'generators' at: "+QString::number(i)+"!!!", true);
+                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'generators' at: "+QString::number(i)+"!!!");
             }
         }
     }
@@ -207,16 +207,16 @@ bool hkbManualSelectorGenerator::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < generators.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(generators.at(i).getShdPtrReference());
         if (!ptr){
-            writeToLog(getClassname()+": link()!\nFailed to properly link 'generators' data field!\nObject Name: "+name);
+            WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'generators' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-            writeToLog(getClassname()+": link()!\n'generators' data field is linked to invalid child!\nObject Name: "+name);
+            WRITE_TO_LOG(getClassname()+": link()!\n'generators' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             generators[i] = *ptr;
         }else{

@@ -30,7 +30,7 @@ bool hkbStringEventPayload::readData(const HkxXmlReader & reader, long index){
         if (text == "data"){
             data = reader.getElementValueAt(index);
             if (data == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'data' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'data' data field!\nObject Reference: "+ref);
             }
         }
         index++;

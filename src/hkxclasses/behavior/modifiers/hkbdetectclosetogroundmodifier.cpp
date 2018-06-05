@@ -43,56 +43,56 @@ bool hkbDetectCloseToGroundModifier::readData(const HkxXmlReader &reader, long i
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "id"){
             closeToGroundEvent.id = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
             }
         }else if (text == "payload"){
             if (!closeToGroundEvent.payload.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
             }
         }else if (text == "closeToGroundHeight"){
             closeToGroundHeight = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'closeToGroundHeight' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'closeToGroundHeight' data field!\nObject Reference: "+ref);
             }
         }else if (text == "raycastDistanceDown"){
             raycastDistanceDown = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'raycastDistanceDown' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'raycastDistanceDown' data field!\nObject Reference: "+ref);
             }
         }else if (text == "collisionFilterInfo"){
             collisionFilterInfo = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'collisionFilterInfo' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'collisionFilterInfo' data field!\nObject Reference: "+ref);
             }
         }else if (text == "boneIndex"){
             boneIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'boneIndex' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'boneIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "animBoneIndex"){
             animBoneIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'animBoneIndex' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'animBoneIndex' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -137,10 +137,10 @@ bool hkbDetectCloseToGroundModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (closeToGroundEvent.payload.data() && !closeToGroundEvent.payload.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'payload'!!!");
         }
     }
     return true;
@@ -205,12 +205,12 @@ bool hkbDetectCloseToGroundModifier::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(closeToGroundEvent.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
         closeToGroundEvent.payload = *ptr;

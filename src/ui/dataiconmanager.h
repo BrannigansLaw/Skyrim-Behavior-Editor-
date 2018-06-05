@@ -26,6 +26,7 @@ public:
     virtual bool hasChildren() const;
     bool hasIcons() const;
     void updateIconNames();
+    bool hasSameSignatureAndName(const DataIconManager * other) const;
     virtual int getIndexOfObj(DataIconManager *) const;
 protected:
     virtual QList <DataIconManager *> getChildren() const;

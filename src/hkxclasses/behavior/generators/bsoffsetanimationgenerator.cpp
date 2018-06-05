@@ -99,40 +99,40 @@ bool BSOffsetAnimationGenerator::readData(const HkxXmlReader &reader, long index
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pDefaultGenerator"){
             if (!pDefaultGenerator.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'pDefaultGenerator' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'pDefaultGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "pOffsetClipGenerator"){
             if (!pOffsetClipGenerator.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'pOffsetClipGenerator' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'pOffsetClipGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "fOffsetVariable"){
             fOffsetVariable = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'fOffsetVariable' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'fOffsetVariable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "fOffsetRangeStart"){
             fOffsetRangeStart = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'fOffsetRangeStart' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'fOffsetRangeStart' data field!\nObject Reference: "+ref);
             }
         }else if (text == "fOffsetRangeEnd"){
             fOffsetRangeEnd = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'fOffsetRangeEnd' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'fOffsetRangeEnd' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -174,13 +174,13 @@ bool BSOffsetAnimationGenerator::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (pDefaultGenerator.data() && !pDefaultGenerator.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'pDefaultGenerator'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'pDefaultGenerator'!!!");
         }
         if (pOffsetClipGenerator.data() && !pOffsetClipGenerator.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'pOffsetClipGenerator'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'pOffsetClipGenerator'!!!");
         }
     }
     return true;
@@ -191,14 +191,14 @@ bool BSOffsetAnimationGenerator::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getShdPtrReference());
     if (!ptr){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'pDefaultGenerator' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'pDefaultGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
     }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        writeToLog(getClassname()+": link()!\n'pDefaultGenerator' data field is linked to invalid child!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\n'pDefaultGenerator' data field is linked to invalid child!\nObject Name: "+name);
         setDataValidity(false);
         pDefaultGenerator = *ptr;
     }else{
@@ -206,10 +206,10 @@ bool BSOffsetAnimationGenerator::link(){
     }
     ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pOffsetClipGenerator.getShdPtrReference());
     if (!ptr){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'pOffsetClipGenerator' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'pOffsetClipGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
     }else if ((*ptr)->getSignature() != HKB_CLIP_GENERATOR){
-        writeToLog(getClassname()+": link()!\n'pOffsetClipGenerator' data field is linked to invalid child!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\n'pOffsetClipGenerator' data field is linked to invalid child!\nObject Name: "+name);
         setDataValidity(false);
         pOffsetClipGenerator = *ptr;
     }else{

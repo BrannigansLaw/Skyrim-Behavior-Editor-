@@ -362,19 +362,20 @@ bool hkbStateMachine::merge(HkxObject *recessiveObject){
                         }
                         otherobjstate->parentSM = this;
                         otherobjstate->setStateId(freeid);
-                        break;
+                        i = obj->states.size();
+                        j = states.size();
                     }else{
                         add = false;
                     }
                 }
             }
-            if (add && (/* For FNIS*/otherobjstate->getName().contains("TK") || static_cast<BehaviorFile *>(getParentFile())->isNameUniqueInProject(otherobjstate))){
+            if (add && (/* For FNIS*/otherobjstate->getName().contains("TKDodge") || static_cast<BehaviorFile *>(getParentFile())->isNameUniqueInProject(otherobjstate))){
                 states.append(HkxSharedPtr(otherobjstate));
                 getParentFile()->addObjectToFile(otherobjstate, -1);
                 objects = static_cast<DataIconManager *>(otherobjstate)->getChildren();
                 while (!objects.isEmpty()){
                     object = objects.last();
-                    if (!static_cast<BehaviorFile *>(getParentFile())->existsInBehavior(object)){
+                    if (/* For FNIS*/object->getName() == "TKDodgeRightModifier" || !static_cast<BehaviorFile *>(getParentFile())->existsInBehavior(object)){
                         getParentFile()->addObjectToFile(object, -1);
                         getParentFile()->addObjectToFile(object->variableBindingSet.data(), -1);
                         children = object->getChildren();
@@ -427,7 +428,8 @@ int hkbStateMachine::getIndexOfObj(DataIconManager *obj) const{
 
 QList<DataIconManager *> hkbStateMachine::getChildren() const{
     QList<DataIconManager *> list;
-    for (int i = 0; i < states.size(); i++){if (states.at(i).data()){
+    for (int i = 0; i < states.size(); i++){
+        if (states.at(i).data()){
             list.append(static_cast<DataIconManager*>(states.at(i).data()));
         }
     }
@@ -474,26 +476,26 @@ bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                //writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                //writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                //writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "id"){
             eventToSendWhenStateOrTransitionChanges.id = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                //writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
             }
         }else if (text == "payload"){
             if (!eventToSendWhenStateOrTransitionChanges.payload.readShdPtrReference(index, reader)){
-                //writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
             }
         /*}*else if (text == "startStateChooser"){
             if (!generator.readReference(index, reader)){
@@ -502,55 +504,55 @@ bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){
         }else if (text == "startStateId"){
             startStateId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                //writeToLog(getClassname()+": readData()!\nFailed to properly read 'startStateId' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'startStateId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "returnToPreviousStateEventId"){
             returnToPreviousStateEventId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                //writeToLog(getClassname()+": readData()!\nFailed to properly read 'returnToPreviousStateEventId' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'returnToPreviousStateEventId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "transitionToNextHigherStateEventId"){
             transitionToNextHigherStateEventId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                //writeToLog(getClassname()+": readData()!\nFailed to properly read 'transitionToNextHigherStateEventId' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'transitionToNextHigherStateEventId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "transitionToNextLowerStateEventId"){
             transitionToNextLowerStateEventId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                //writeToLog(getClassname()+": readData()!\nFailed to properly read 'transitionToNextLowerStateEventId' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'transitionToNextLowerStateEventId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "syncVariableIndex"){
             syncVariableIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                //writeToLog(getClassname()+": readData()!\nFailed to properly read 'syncVariableIndex' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'syncVariableIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "wrapAroundStateId"){
             wrapAroundStateId = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                //writeToLog(getClassname()+": readData()!\nFailed to properly read 'wrapAroundStateId' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'wrapAroundStateId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "maxSimultaneousTransitions"){
             maxSimultaneousTransitions = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                //writeToLog(getClassname()+": readData()!\nFailed to properly read 'maxSimultaneousTransitions' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'maxSimultaneousTransitions' data field!\nObject Reference: "+ref);
             }
         }else if (text == "startStateMode"){
             startStateMode = reader.getElementValueAt(index);
             if (!SelfTransitionMode.contains(selfTransitionMode)){
-                //writeToLog(getClassname()+": readData()!\nInvalid 'startStateMode' data!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nInvalid 'startStateMode' data!\nObject Reference: "+ref);
             }
         }else if (text == "selfTransitionMode"){
             selfTransitionMode = reader.getElementValueAt(index);
             if (!SelfTransitionMode.contains(selfTransitionMode)){
-                //writeToLog(getClassname()+": readData()!\nInvalid 'selfTransitionMode' data!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nInvalid 'selfTransitionMode' data!\nObject Reference: "+ref);
             }
         }else if (text == "states"){
             if (!readReferences(reader.getElementValueAt(index), states)){
-                //writeToLog(getClassname()+": readData()!\nFailed to properly read 'states' references!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'states' references!\nObject Reference: "+ref);
             }
         }else if (text == "wildcardTransitions"){
             if (!wildcardTransitions.readShdPtrReference(index, reader)){
-                //writeToLog(getClassname()+": readData()!\nFailed to properly read 'wildcardTransitions' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'wildcardTransitions' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -624,17 +626,17 @@ bool hkbStateMachine::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            //getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (eventToSendWhenStateOrTransitionChanges.payload.data() && !eventToSendWhenStateOrTransitionChanges.payload.data()->write(writer)){
-            //getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'payload'!!!");
         }
         if (wildcardTransitions.data() && !wildcardTransitions.data()->write(writer)){
-            //getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'wildcardTransitions'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'wildcardTransitions'!!!");
         }
         for (int i = 0; i < states.size(); i++){
             if (states.at(i).data() && !states.at(i).data()->write(writer)){
-                //getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'states' at: "+QString::number(i)+"!!!", true);
+                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'states' at: "+QString::number(i)+"!!!");
             }
         }
     }
@@ -646,13 +648,13 @@ bool hkbStateMachine::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        //writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     hkbStateMachineTransitionInfoArray *trans = nullptr;
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToSendWhenStateOrTransitionChanges.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            //writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
         }
         eventToSendWhenStateOrTransitionChanges.payload = *ptr;
     }
@@ -660,10 +662,10 @@ bool hkbStateMachine::link(){
         //ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(states.at(i).getReference());
         ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(states.at(i).getShdPtrReference());
         if (!ptr){
-            //writeToLog(getClassname()+": link()!\nFailed to properly link 'states' data field!\nObject Name: "+name);
+            WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'states' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getSignature() != HKB_STATE_MACHINE_STATE_INFO){
-            //writeToLog(getClassname()+": link()!\n'generator' data field is linked to invalid child!\nObject Name: "+name);
+            WRITE_TO_LOG(getClassname()+": link()!\n'generator' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             states[i] = *ptr;
         }else{
@@ -678,7 +680,7 @@ bool hkbStateMachine::link(){
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(wildcardTransitions.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
-            //writeToLog(getClassname()+": linkVar()!\nThe linked object 'wildcardTransitions' is not a HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY!");
+            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'wildcardTransitions' is not a HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY!");
         }
         wildcardTransitions = *ptr;
         static_cast<hkbStateMachineTransitionInfoArray *>(wildcardTransitions.data())->parent = this;

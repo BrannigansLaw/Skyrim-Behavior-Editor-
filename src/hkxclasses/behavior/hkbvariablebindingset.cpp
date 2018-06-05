@@ -144,17 +144,17 @@ bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long index){
                     if (reader.getNthAttributeValueAt(index, 0) == "memberPath"){
                         bindings.last().memberPath = reader.getElementValueAt(index);
                         if (bindings.last().memberPath == ""){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'memberPath' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'memberPath' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "variableIndex"){
                         bindings.last().variableIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableIndex' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "bitIndex"){
                         bindings.last().bitIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'bitIndex' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'bitIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if(reader.getNthAttributeValueAt(index, 0) == "bindingType"){
                         if (reader.getElementValueAt(index) == "BINDING_TYPE_VARIABLE"){
@@ -162,7 +162,7 @@ bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long index){
                         }else if (reader.getElementValueAt(index) == "BINDING_TYPE_CHARACTER_PROPERTY"){
                             bindings.last().bindingType = hkBinding::BINDING_TYPE_CHARACTER_PROPERTY;
                         }else{
-                            writeToLog(getClassname()+": readData()!\n'bindingType' data field contains an invalid string!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\n'bindingType' data field contains an invalid string!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -173,7 +173,7 @@ bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long index){
         }else if (text == "indexOfBindingToEnable"){
             indexOfBindingToEnable = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'indexOfBindingToEnable' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'indexOfBindingToEnable' data field!\nObject Reference: "+ref);
             }
         }
         index++;

@@ -75,52 +75,52 @@ bool hkbBlendingTransitionEffect::readData(const HkxXmlReader &reader, long inde
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "selfTransitionMode"){
             selfTransitionMode = reader.getElementValueAt(index);
             if (!SelfTransitionMode.contains(selfTransitionMode)){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'selfTransitionMode' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'selfTransitionMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "eventMode"){
             eventMode = reader.getElementValueAt(index);
             if (!EventMode.contains(eventMode)){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "duration"){
             duration = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'duration' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'duration' data field!\nObject Reference: "+ref);
             }
         }else if (text == "toGeneratorStartTimeFraction"){
             toGeneratorStartTimeFraction = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'toGeneratorStartTimeFraction' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'toGeneratorStartTimeFraction' data field!\nObject Reference: "+ref);
             }
         }else if (text == "flags"){
             flags = reader.getElementValueAt(index);
             if (flags == ""){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
             }
         }else if (text == "endMode"){
             endMode = reader.getElementValueAt(index);
             if (endMode == ""){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'endMode' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'endMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "blendCurve"){
             blendCurve = reader.getElementValueAt(index);
             if (blendCurve == ""){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'blendCurve' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'blendCurve' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -154,7 +154,7 @@ bool hkbBlendingTransitionEffect::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+":  write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+":  write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
@@ -165,7 +165,7 @@ bool hkbBlendingTransitionEffect::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+":  link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+":  link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     return true;
 }

@@ -142,12 +142,6 @@ void HkxObject::setType(HkxSignature sig, HkxType type){
     signature = sig;typeCheck = type;
 }
 
-void HkxObject::writeToLog(const QString & message, bool isError){
-    if (getParentFile()){
-        getParentFile()->writeToLog(message, isError);
-    }
-}
-
 bool HkxObject::readReferences(const QByteArray &line, QList <HkxSharedPtr> & children){
     int size = 0;
     int start;
@@ -539,7 +533,7 @@ bool HkDynamicObject::linkVar(){
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variableBindingSet.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_VARIABLE_BINDING_SET){
-            getParentFile()->writeToLog("HkDynamicObject: linkVar()!\nThe linked object is not a HKB_VARIABLE_BINDING_SET!\nRemoving the link to the invalid object!");
+            WRITE_TO_LOG("HkDynamicObject: linkVar()!\nThe linked object is not a HKB_VARIABLE_BINDING_SET!\nRemoving the link to the invalid object!");
             variableBindingSet = nullptr;
             return false;
         }

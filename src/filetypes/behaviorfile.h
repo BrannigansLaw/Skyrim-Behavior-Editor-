@@ -11,6 +11,7 @@ class SkyrimClipGeneratoData;
 class hkbBehaviorReferenceGenerator;
 class hkbBoneWeightArray;
 class hkbStateMachine;
+class DataIconManager;
 
 class BehaviorFile: public HkxFile
 {
@@ -98,8 +99,8 @@ protected:
     bool parse();
     bool link();
 private:
-    QVector<HkxObject *> merge(BehaviorFile *recessivefile);
-    void mergeObjects(QVector <HkxObject *> recessiveobjects);
+    QVector<DataIconManager *> merge(BehaviorFile *recessivefile);
+    void mergeObjects(QVector<DataIconManager *> recessiveobjects);
     void generateDefaultCharacterData();
     void generateNewBehavior();
     hkbBehaviorGraph * getBehaviorGraph() const;

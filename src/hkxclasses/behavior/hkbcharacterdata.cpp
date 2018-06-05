@@ -277,112 +277,112 @@ bool hkbCharacterData::readData(const HkxXmlReader &reader, long index){
         if (text == "capsuleHeight"){
             characterControllerInfo.capsuleHeight = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'capsuleHeight' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'capsuleHeight' data field!\nObject Reference: "+ref);
             }
         }else if (text == "capsuleRadius"){
             characterControllerInfo.capsuleRadius = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'capsuleRadius' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'capsuleRadius' data field!\nObject Reference: "+ref);
             }
         }else if (text == "collisionFilterInfo"){
             characterControllerInfo.collisionFilterInfo = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'collisionFilterInfo' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'collisionFilterInfo' data field!\nObject Reference: "+ref);
             }
         }else if (text == "characterControllerCinfo"){
             if (!characterControllerInfo.characterControllerCinfo.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'characterControllerCinfo' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'characterControllerCinfo' reference!\nObject Reference: "+ref);
             }
         }else if (text == "modelUpMS"){
             modelUpMS = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'modelUpMS' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'modelUpMS' data field!\nObject Reference: "+ref);
             }
         }else if (text == "modelForwardMS"){
             modelForwardMS = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'modelForwardMS' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'modelForwardMS' data field!\nObject Reference: "+ref);
             }
         }else if (text == "modelRightMS"){
             modelRightMS = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'modelRightMS' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'modelRightMS' data field!\nObject Reference: "+ref);
             }
         }else if (text == "characterPropertyInfos"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
                 return false;
             }
             for (int i = 0; i < numElems; i++){
                 index += 4;
                 if (index >= reader.getNumElements()){
-                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref, true);
+                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
                     return false;
                 }
                 hkVariableInfo temp;
                 temp.role.role = reader.getElementValueAt(index);
                 index++;
                 if (index >= reader.getNumElements()){
-                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref, true);
+                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
                     return false;
                 }
                 temp.role.flags = reader.getElementValueAt(index);
                 index++;
                 if (index >= reader.getNumElements()){
-                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref, true);
+                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
                     return false;
                 }
                 temp.type = reader.getElementValueAt(index);
                 characterPropertyInfos.append(temp);
                 if (!Type.contains(temp.type)){
-                    writeToLog(getClassname()+": readData()!\nInvalid variable type read!\nObject Reference: "+ref, true);
+                    WRITE_TO_LOG(getClassname()+": readData()!\nInvalid variable type read!\nObject Reference: "+ref);
                     return false;
                 }
             }
         }else if (text == "numBonesPerLod"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'numBonesPerLod' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'numBonesPerLod' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             if (index >= reader.getNumElements()){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'numBonesPerLod' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'numBonesPerLod' data!\nObject Reference: "+ref);
                 return false;
             }
             for (int i = 0; i < numElems; i++){
                 index++;
                 if (index >= reader.getNumElements()){
-                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'numBonesPerLod' data!\nObject Reference: "+ref, true);
+                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'numBonesPerLod' data!\nObject Reference: "+ref);
                     return false;
                 }
                 numBonesPerLod.append(reader.getElementValueAt(index).toInt(&ok));
                 if (!ok){
-                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'numBonesPerLod' data!\nObject Reference: "+ref, true);
+                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'numBonesPerLod' data!\nObject Reference: "+ref);
                     return false;
                 }
             }
             index--;
         }else if (text == "characterPropertyValues"){
             if (!characterPropertyValues.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'characterPropertyValues' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'characterPropertyValues' reference!\nObject Reference: "+ref);
             }
         }else if (text == "footIkDriverInfo"){
             if (!footIkDriverInfo.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'footIkDriverInfo' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'footIkDriverInfo' reference!\nObject Reference: "+ref);
             }
         }else if (text == "handIkDriverInfo"){
             if (!handIkDriverInfo.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'handIkDriverInfo' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'handIkDriverInfo' reference!\nObject Reference: "+ref);
             }
         }else if (text == "stringData"){
             if (!stringData.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'stringData' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'stringData' reference!\nObject Reference: "+ref);
             }
         }else if (text == "mirroredSkeletonInfo"){
             if (!mirroredSkeletonInfo.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'mirroredSkeletonInfo' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'mirroredSkeletonInfo' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -471,19 +471,19 @@ bool hkbCharacterData::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (characterPropertyValues.data() && !characterPropertyValues.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'characterPropertyValues'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'characterPropertyValues'!!!");
         }
         if (footIkDriverInfo.data() && !footIkDriverInfo.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'footIkDriverInfo'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'footIkDriverInfo'!!!");
         }
         if (handIkDriverInfo.data() && !handIkDriverInfo.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'handIkDriverInfo'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'handIkDriverInfo'!!!");
         }
         if (stringData.data() && !stringData.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'stringData'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'stringData'!!!");
         }
         if (mirroredSkeletonInfo.data() && !mirroredSkeletonInfo.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'mirroredSkeletonInfo'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'mirroredSkeletonInfo'!!!");
         }
     }
     return true;
@@ -495,7 +495,7 @@ bool hkbCharacterData::link(){
     }
     HkxSharedPtr *ptr = &static_cast<CharacterFile *>(getParentFile())->characterPropertyValues;
     if ((*ptr).data() && (*ptr)->getSignature() != HKB_VARIABLE_VALUE_SET){
-        writeToLog(getClassname()+": link()!\n'characterPropertyValues' data field is linked to invalid child!\n");
+        WRITE_TO_LOG(getClassname()+": link()!\n'characterPropertyValues' data field is linked to invalid child!\n");
         setDataValidity(false);
         characterPropertyValues = *ptr;
     }else{
@@ -503,7 +503,7 @@ bool hkbCharacterData::link(){
     }
     ptr = &static_cast<CharacterFile *>(getParentFile())->footIkDriverInfo;
     if ((*ptr).data() && (*ptr)->getSignature() != HKB_FOOT_IK_DRIVER_INFO){
-        writeToLog(getClassname()+": link()!\n'footIkDriverInfo' data field is linked to invalid child!\n");
+        WRITE_TO_LOG(getClassname()+": link()!\n'footIkDriverInfo' data field is linked to invalid child!\n");
         setDataValidity(false);
         footIkDriverInfo = *ptr;
     }else{
@@ -511,7 +511,7 @@ bool hkbCharacterData::link(){
     }
     ptr = &static_cast<CharacterFile *>(getParentFile())->handIkDriverInfo;
     if ((*ptr).data() && (*ptr)->getSignature() != HKB_HAND_IK_DRIVER_INFO){
-        writeToLog(getClassname()+": link()!\n'handIkDriverInfo' data field is linked to invalid child!\n");
+        WRITE_TO_LOG(getClassname()+": link()!\n'handIkDriverInfo' data field is linked to invalid child!\n");
         setDataValidity(false);
         handIkDriverInfo = *ptr;
     }else{
@@ -519,7 +519,7 @@ bool hkbCharacterData::link(){
     }
     ptr = &static_cast<CharacterFile *>(getParentFile())->stringData;
     if ((*ptr).data() && (*ptr)->getSignature() != HKB_CHARACTER_STRING_DATA){
-        writeToLog(getClassname()+": link()!\n'stringData' data field is linked to invalid child!\n");
+        WRITE_TO_LOG(getClassname()+": link()!\n'stringData' data field is linked to invalid child!\n");
         setDataValidity(false);
         stringData = *ptr;
     }else{
@@ -527,7 +527,7 @@ bool hkbCharacterData::link(){
     }
     ptr = &static_cast<CharacterFile *>(getParentFile())->mirroredSkeletonInfo;
     if ((*ptr).data() && (*ptr)->getSignature() != HKB_MIRRORED_SKELETON_INFO){
-        writeToLog(getClassname()+": link()!\n'mirroredSkeletonInfo' data field is linked to invalid child!\n");
+        WRITE_TO_LOG(getClassname()+": link()!\n'mirroredSkeletonInfo' data field is linked to invalid child!\n");
         setDataValidity(false);
         mirroredSkeletonInfo = *ptr;
     }else{

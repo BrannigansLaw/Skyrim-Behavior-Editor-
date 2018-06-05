@@ -853,42 +853,34 @@ bool BehaviorFile::isNameUniqueInProject(HkxObject *object) const{
 bool BehaviorFile::existsInBehavior(HkDynamicObject *object, int startindex) const{
     bool found = false;
     HkxObject::HkxType type;
-    hkbGenerator *generator;
-    hkbModifier *modifier;
+    DataIconManager *obj;
+    auto search = [&](const QList <HkxSharedPtr> & list){
+        obj = static_cast<DataIconManager *>(object);
+        for (auto i = startindex; i < list.size(); i++){
+            if (obj->getSignature() == list.at(i).data()->getSignature() && ((obj->getSignature() == HKB_CLIP_GENERATOR && !QString::compare(static_cast<hkbClipGenerator *>(list.at(i).data())->getAnimationName(),
+                static_cast<hkbClipGenerator *>(obj)->getAnimationName(), Qt::CaseInsensitive)) || (obj->getName() == static_cast<hkbGenerator *>(list.at(i).data())->getName())))
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found){
+            for (auto i = 0; i < startindex; i++){
+                if (obj->getSignature() == list.at(i).data()->getSignature() && ((obj->getSignature() == HKB_CLIP_GENERATOR && !QString::compare(static_cast<hkbClipGenerator *>(list.at(i).data())->getAnimationName(),
+                    static_cast<hkbClipGenerator *>(obj)->getAnimationName(), Qt::CaseInsensitive)) || (obj->getName() == static_cast<hkbGenerator *>(list.at(i).data())->getName())))
+                {
+                    found = true;
+                    break;
+                }
+            }
+        }
+    };
     if (object && startindex > -1){
         type = object->getType();
         if (type == HkxObject::TYPE_GENERATOR){
-            generator = static_cast<hkbGenerator *>(object);
-            for (auto i = startindex; i < generators.size(); i++){
-                if (generator->getSignature() == generators.at(i).data()->getSignature() && generator->getName() == static_cast<hkbGenerator *>(generators.at(i).data())->getName()){
-                    found = true;
-                    break;
-                }
-            }
-            if (!found){
-                for (auto i = 0; i < startindex; i++){
-                    if (generator->getSignature() == generators.at(i).data()->getSignature() && generator->getName() == static_cast<hkbGenerator *>(generators.at(i).data())->getName()){
-                        found = true;
-                        break;
-                    }
-                }
-            }
+            search(generators);
         }else if (type == HkxObject::TYPE_MODIFIER){
-            modifier = static_cast<hkbModifier *>(object);
-            for (auto i = startindex; i < modifiers.size(); i++){
-                if (modifier->getSignature() == modifiers.at(i).data()->getSignature() && modifier->getName() == static_cast<hkbGenerator *>(modifiers.at(i).data())->getName()){
-                    found = true;
-                    break;
-                }
-            }
-            if (!found){
-                for (auto i = 0; i < startindex; i++){
-                    if (modifier->getSignature() == modifiers.at(i).data()->getSignature() && modifier->getName() == static_cast<hkbGenerator *>(modifiers.at(i).data())->getName()){
-                        found = true;
-                        break;
-                    }
-                }
-            }
+            search(modifiers);
         }
     }
     return found;
@@ -987,12 +979,12 @@ bool BehaviorFile::parse(){
             if (value != ""){
                 ref = getReader().getNthAttributeValueAt(index, 0).remove(0, 1).toLong(&ok);
                 if (!ok){
-                    writeToLog("BehaviorFile: parse() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!", true);
+                    WRITE_TO_LOG("BehaviorFile: parse() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!");
                     return false;
                 }
                 signature = (HkxSignature)value.toULongLong(&ok, 16);
                 if (!ok){
-                    writeToLog("BehaviorFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!", true);
+                    WRITE_TO_LOG("BehaviorFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!");
                     return false;
                 }
                 if (signature == HKB_STATE_MACHINE_STATE_INFO){
@@ -1356,7 +1348,7 @@ bool BehaviorFile::parse(){
     getReader().clear();
     //setProgressData("Linking HKX objects...", 80);
     if (!link()){
-        writeToLog("BehaviorFile: parse() failed because link() failed!", true);
+        WRITE_TO_LOG("BehaviorFile: parse() failed because link() failed!");
         return false;
     }
     return true;
@@ -1364,206 +1356,83 @@ bool BehaviorFile::parse(){
 
 bool BehaviorFile::link(){
     if (!getRootObject().constData()){
-        writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file is nullptr!", true);
+        WRITE_TO_LOG("BehaviorFile: link() failed!\nThe root object of this behavior file is nullptr!");
         return false;
     }else if (getRootObject()->getSignature() != HK_ROOT_LEVEL_CONTAINER){
-        writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16), true);
+        WRITE_TO_LOG("BehaviorFile: link() failed!\nThe root object of this behavior file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16));
         return false;
     }
     if (!getRootObject().data()->link()){
-        writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file failed to link to it's children!", true);
+        WRITE_TO_LOG("BehaviorFile: link() failed!\nThe root object of this behavior file failed to link to it's children!");
         return false;
     }
     for (int i = generators.size() - 1; i >= 0; i--){
         if (!generators.at(i).data()->link()){
-            writeToLog("BehaviorFile: link() failed!\nA generator failed to link to it's children!\nObject signature: "+QString::number(generators.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getShdPtrReference()), true);
+            WRITE_TO_LOG("BehaviorFile: link() failed!\nA generator failed to link to it's children!\nObject signature: "+QString::number(generators.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getShdPtrReference()));
             return false;
         }
     }
     for (int i = modifiers.size() - 1; i >= 0; i--){
         if (!modifiers.at(i).data()->link()){
-            writeToLog("BehaviorFile: link() failed!\nA modifier failed to link to it's children!\nObject signature: "+QString::number(modifiers.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getShdPtrReference()), true);
+            WRITE_TO_LOG("BehaviorFile: link() failed!\nA modifier failed to link to it's children!\nObject signature: "+QString::number(modifiers.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getShdPtrReference()));
             return false;
         }
     }
     for (int i = otherTypes.size() - 1; i >= 0; i--){
         if (!otherTypes.at(i).data()->link()){
-            writeToLog("BehaviorFile: link() failed!\nA generator child failed to link to it's children!\nObject signature: "+QString::number(otherTypes.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getShdPtrReference()), true);
+            WRITE_TO_LOG("BehaviorFile: link() failed!\nA generator child failed to link to it's children!\nObject signature: "+QString::number(otherTypes.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getShdPtrReference()));
             return false;
         }
     }
     if (!behaviorGraph.data()->link()){
-        writeToLog("BehaviorFile: link() failed!\nhkbBehaviorGraph failed to link to it's children!\n", true);
+        WRITE_TO_LOG("BehaviorFile: link() failed!\nhkbBehaviorGraph failed to link to it's children!\n");
         return false;
     }
     if (!variableValues.data()->link()){
-        writeToLog("BehaviorFile: link() failed!\nhkbVariableValueSet failed to link to it's children!\n", true);
+        WRITE_TO_LOG("BehaviorFile: link() failed!\nhkbVariableValueSet failed to link to it's children!\n");
         return false;
     }
     if (!graphData.data()->link()){
-        writeToLog("BehaviorFile: link() failed!\nhkbBehaviorGraphData failed to link to it's children!\n", true);
+        WRITE_TO_LOG("BehaviorFile: link() failed!\nhkbBehaviorGraphData failed to link to it's children!\n");
         return false;
     }
     return true;
 }
 
-QVector <HkxObject *> BehaviorFile::merge(BehaviorFile *recessivefile){ //may not need getIsMerged...
-    //QTime t;
-    //t.start();
-    //auto time = t.elapsed();
+QVector <DataIconManager *> BehaviorFile::merge(BehaviorFile *recessivefile){
     bool found;
-    /*HkxSignature signature;
-    HkxSignature objecttoinjectsignature;
-    hkbGenerator *object = nullptr;
-    hkbModifier *modifier = nullptr;
-    hkbGenerator *objecttoinject = nullptr;
-    hkbModifier *modifiertoinject = nullptr;*/
-    //HkxObject *other = nullptr;
-    QVector <HkxObject *> objectsnotfound;
+    QVector <DataIconManager *> objectsnotfound;
     auto gensize = generators.size();
     auto modsize = modifiers.size();
-    //std::vector <std::thread> threads;
+    auto searchMerge = [&](const QList <HkxSharedPtr> & domlist, int domsize, const QList <HkxSharedPtr> & reclist){
+        for (auto i = 0; i < reclist.size(); i++){
+            found = false;
+            for (auto j = i; j < domsize; j++){
+                if (static_cast<const DataIconManager *>(domlist.at(j).data())->hasSameSignatureAndName(static_cast<const DataIconManager *>(reclist.at(i).data()))){
+                    domlist.at(j).data()->merge(reclist.at(i).data());
+                    found = true;
+                    break;
+                }
+            }
+            if (!found){
+                for (auto j = 0; j < i && j < domsize; j++){
+                    if (static_cast<const DataIconManager *>(domlist.at(j).data())->hasSameSignatureAndName(static_cast<const DataIconManager *>(reclist.at(i).data()))){
+                        domlist.at(j).data()->merge(reclist.at(i).data());
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (!found){
+                objectsnotfound.append(static_cast<DataIconManager *>(reclist.at(i).data()));
+            }
+        }
+    };
     if (recessivefile){
-        /*for (auto j = 0; j < recessivefile->otherTypes.size(); j++){
-            other = recessivefile->otherTypes.at(j).data();
-            if (other){
-                addObjectToFile(other, -1);
-            }
-        }
-        if (!static_cast<hkbBehaviorGraphData *>(graphData.data())->merge(recessivefile->graphData.data())){
-            WARNING_MESSAGE("BehaviorFile: merge() failed!\nhkbBehaviorGraphData failed to merge!");
-        }*/
-        /*auto lambda_inject_generators = [&](){
-            //std::mutex mu;
-            for (auto i = 0; i < recessivefile->generators.size(); i++){
-                found = false;
-                objecttoinject = static_cast<hkbGenerator *>(recessivefile->generators.at(i).data());
-                objecttoinjectsignature = objecttoinject->getSignature();
-                for (auto j = gensize - 1; j >= 0; j--){
-                    object = static_cast<hkbGenerator *>(generators.at(j).data());
-                    signature = object->getSignature();
-                    /*if (objecttoinjectsignature == HKB_BLENDER_GENERATOR_CHILD || objecttoinjectsignature == BS_BONE_SWITCH_GENERATOR_BONE_DATA){
-                        found = true;
-                        break;
-                    }else if (signature == objecttoinjectsignature){
-                        if (object->getName() == objecttoinject->getName()){
-                            if (objecttoinjectsignature == HKB_CLIP_GENERATOR){
-                                if (!QString::compare(static_cast<hkbClipGenerator *>(object)->getAnimationName(), static_cast<hkbClipGenerator *>(objecttoinject)->getAnimationName(), Qt::CaseInsensitive)){
-                                    found = true;
-                                    break;
-                                }
-                            }else{
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (recessivefile->generators.size() > 0 && !found){
-                    //mu.lock();
-                    addObjectToFile(objecttoinject, 0);
-                    //mu.unlock();
-                }
-            }
-        };
-        auto lambda_inject_modifiers = [&](){
-            //std::mutex mu;
-            for (auto i = 0; i < recessivefile->modifiers.size(); i++){
-                found = false;
-                modifiertoinject = static_cast<hkbModifier *>(recessivefile->modifiers.at(i).data());
-                objecttoinjectsignature = modifiertoinject->getSignature();
-                for (auto j = modsize - 1; j >= 0; j--){
-                    modifier = static_cast<hkbModifier *>(modifiers.at(j).data());
-                    signature = modifier->getSignature();
-                    if (signature == objecttoinjectsignature && modifier->getName() == modifiertoinject->getName()){
-                        found = true;
-                        break;
-                    }
-                }
-                if (recessivefile->modifiers.size() > 0 && !found){
-                    //mu.lock();
-                    addObjectToFile(modifiertoinject, 0);
-                    //mu.unlock();
-                }
-            }
-        };*/
-        /*for (auto j = 0; j < recessivefile->generators.size(); j++){
-            other = recessivefile->generators.at(j).data();
-            if (other/* && other->getSignature() != HKB_BLENDER_GENERATOR_CHILD && other->getSignature() != BS_BONE_SWITCH_GENERATOR_BONE_DATA){
-                addObjectToFile(other, -1);
-            }
-        }
-        for (auto j = 0; j < recessivefile->modifiers.size(); j++){
-            other = recessivefile->modifiers.at(j).data();
-            if (other){
-                addObjectToFile(other, -1);
-            }
-        }*/
-        //threads.push_back(std::thread(lambda_inject_generators));
-        //threads.push_back(std::thread(lambda_inject_modifiers));
-        //lambda_inject_generators;
-        //lambda_inject_modifiers;
-        /*for (auto i = 0; i < threads.size(); i++){
-            threads.at(i).join();
-        }*/
-        for (auto i = 0; i < recessivefile->generators.size(); i++){
-            found = false;
-            for (auto j = i; j < gensize; j++){
-                if (generators.at(j).data()->getSignature() == recessivefile->generators.at(i).data()->getSignature()
-                        && static_cast<hkbGenerator *>(generators.at(j).data())->getName() == static_cast<hkbGenerator *>(recessivefile->generators.at(i).data())->getName()/* && !generators.at(j).data()->getIsMerged()*/)
-                {
-                    generators.at(j).data()->merge(recessivefile->generators.at(i).data());
-                    found = true;
-                    break;
-                }
-            }
-            if (!found){
-                for (auto j = 0; j < i && j < gensize; j++){
-                    if (generators.at(j).data()->getSignature() == recessivefile->generators.at(i).data()->getSignature()
-                            && static_cast<hkbGenerator *>(generators.at(j).data())->getName() == static_cast<hkbGenerator *>(recessivefile->generators.at(i).data())->getName()/* && !generators.at(j).data()->getIsMerged()*/)
-                    {
-                        generators.at(j).data()->merge(recessivefile->generators.at(i).data());
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            if (!found){
-                objectsnotfound.append(recessivefile->generators.at(i).data());
-                //writeToLog("ProjectFile: merge(): The object type \""+QString::number(generators.at(i).data()->getSignature(), 16)
-                //           +"\" named \""+static_cast<hkbGenerator *>(generators.at(i).data())->getName()+"\" was not found in the recessive behavior!!!");
-            }
-        }
-        for (auto i = 0; i < recessivefile->modifiers.size(); i++){
-            found = false;
-            for (auto j = i; j < modsize; j++){
-                if (modifiers.at(j).data()->getSignature() == recessivefile->modifiers.at(i).data()->getSignature()
-                        && static_cast<hkbModifier *>(modifiers.at(j).data())->getName() == static_cast<hkbModifier *>(recessivefile->modifiers.at(i).data())->getName()/* && !modifiers.at(j).data()->getIsMerged()*/)
-                {
-                    modifiers.at(j).data()->merge(recessivefile->modifiers.at(i).data());
-                    found = true;
-                    break;
-                }
-            }
-            if (!found){
-                for (auto j = 0; j < i && j < modsize; j++){
-                    if (modifiers.at(j).data()->getSignature() == recessivefile->modifiers.at(i).data()->getSignature()
-                            && static_cast<hkbModifier *>(modifiers.at(j).data())->getName() == static_cast<hkbModifier *>(recessivefile->modifiers.at(i).data())->getName()/* && !modifiers.at(j).data()->getIsMerged()*/)
-                    {
-                        modifiers.at(j).data()->merge(recessivefile->modifiers.at(i).data());
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            if (!found){
-                objectsnotfound.append(recessivefile->modifiers.at(i).data());
-                //writeToLog("ProjectFile: merge(): The object type \""+QString::number(generators.at(i).data()->getSignature(), 16)
-                //           +"\" named \""+static_cast<hkbGenerator *>(generators.at(i).data())->getName()+"\" was not found in the recessive behavior!!!");
-            }
-        }
+        searchMerge(generators, gensize, recessivefile->generators);
+        searchMerge(modifiers, modsize, recessivefile->modifiers);
     }else{
-        writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
+        WRITE_TO_LOG("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
     }
     //HkDynamicObject *obj;
     for (auto i = objectsnotfound.size() - 1; i >= 0; i--){
@@ -1581,13 +1450,10 @@ QVector <HkxObject *> BehaviorFile::merge(BehaviorFile *recessivefile){ //may no
             }
         }
     }
-    //time = t.elapsed() - time;
     QFile file("c:/users/wayne/desktop/time.txt");
     if (file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)){
         QTextStream out(&file);
-        //out << "\n\nCurrent time: " << t.toString() << "\n";
         out << "\n\nBehavior name: " << fileName().section("/", -1, -1) << "\n";
-        //out << "The time taken to merge is: " << QString::number(time) << "\n";
         out << "Number of objects not found: " << QString::number(objectsnotfound.size()) << "\n";
         for (auto i = 0; i < objectsnotfound.size(); i++){
             if (objectsnotfound.at(i)->getType() == HkxObject::TYPE_GENERATOR){
@@ -1600,119 +1466,45 @@ QVector <HkxObject *> BehaviorFile::merge(BehaviorFile *recessivefile){ //may no
     return objectsnotfound;
 }
 
-void BehaviorFile::mergeObjects(QVector <HkxObject *> recessiveobjects){    //TO DO: use recessive behavior file to merge variables and events IF any objects are merged by this function...
-    if (recessiveobjects.isEmpty()){
-        return;
-    }
-    //bool found;
-    //bool variablesmerged = false;
+void BehaviorFile::mergeObjects(QVector <DataIconManager *> recessiveobjects){    //TO DO: use recessive behavior file to merge variables and events IF any objects are merged by this function...
+    bool found;
     auto gensize = generators.size();
     auto modsize = modifiers.size();
-    //hkbBehaviorGraphData *otherdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(recessiveobjects.first()->getParentFile())->graphData.data());
-    //hkbBehaviorGraphData *thisdata = static_cast<hkbBehaviorGraphData *>(graphData.data());
-    for (auto i = recessiveobjects.size() - 1; i > -1; i--){
-        //found = false;
-        if (recessiveobjects.at(i)->getType() == HkxObject::TYPE_GENERATOR){
-            for (auto j = 0; j < gensize; j++){
-                if (recessiveobjects.at(i)->getSignature() == generators.at(j).data()->getSignature()
-                        && static_cast<hkbGenerator *>(recessiveobjects.at(i))->getName() == static_cast<hkbGenerator *>(generators.at(j).data())->getName()/* && !generators.at(j).data()->getIsMerged()*/)
-                {
-                    /*if (!variablesmerged && thisdata && otherdata){
-                        BehaviorFile *recbehavior = static_cast<BehaviorFile *>(otherdata->getParentFile());
-                        //HkxObject *other;
-                        if (recbehavior){
-                            /*for (auto k = 0; k < recbehavior->otherTypes.size(); k++){
-                                addObjectToFile(recbehavior->otherTypes.at(k).data());
-                            }*/
-                            /*for (auto k = 0; k < recbehavior->generators.size(); k++){
-                                other = recbehavior->generators.at(k).data();
-                                if (other/* && other->getSignature() != HKB_BLENDER_GENERATOR_CHILD && other->getSignature() != BS_BONE_SWITCH_GENERATOR_BONE_DATA){
-                                    addObjectToFile(other, -1);
-                                }
-                            }
-                            for (auto k = 0; k < recbehavior->modifiers.size(); k++){
-                                other = recbehavior->modifiers.at(k).data();
-                                if (other){
-                                    addObjectToFile(other, -1);
-                                }
-                            }
-                        }
-                        thisdata->merge(otherdata);
-                        variablesmerged = true;
-                    }*/
-                    //addObjectToFile(recessiveobjects.at(i));
-                    generators.at(j).data()->merge(recessiveobjects.at(i));
-                    recessiveobjects.removeAt(i);
-                    //found = true;
+    auto searchMerge = [&](const QList <HkxSharedPtr> & domlist, int domsize){
+        for (auto i = recessiveobjects.size() - 1; i >= 0; i--){
+            found = false;
+            for (auto j = i; j < domsize; j++){
+                if (static_cast<const DataIconManager *>(domlist.at(j).data())->hasSameSignatureAndName(static_cast<const DataIconManager *>(recessiveobjects.at(i)))){
+                    recessiveobjects.at(i)->fixMergedEventIndices(static_cast<BehaviorFile *>(domlist.at(j).data()->getParentFile()));
+                    domlist.at(j).data()->merge(recessiveobjects.at(i));
+                    if (recessiveobjects.at(i)->variableBindingSet.data()){
+                        static_cast<hkbVariableBindingSet *>(recessiveobjects.at(i)->variableBindingSet.data())->fixMergedIndices(static_cast<BehaviorFile *>(domlist.at(j).data()->getParentFile()));
+                    }
+                    found = true;
                     break;
                 }
-            }/*
+            }
             if (!found){
-                for (auto j = 0; j < i && j < generators.size(); j++){
-                    if (static_cast<hkbGenerator *>(recessiveobjects.at(i))->getName() == static_cast<hkbGenerator *>(generators.at(j).data())->getName()
-                            && recessiveobjects.at(i)->getSignature() == generators.at(j).data()->getSignature() && !generators.at(j).data()->getIsMerged())
-                    {
-                        if (!variablesmerged && thisdata && otherdata){
-                            thisdata->merge(otherdata);
-                            variablesmerged = true;
+                for (auto j = 0; j < i && j < domsize; j++){
+                    if (static_cast<const DataIconManager *>(domlist.at(j).data())->hasSameSignatureAndName(static_cast<const DataIconManager *>(recessiveobjects.at(i)))){
+                        recessiveobjects.at(i)->fixMergedEventIndices(static_cast<BehaviorFile *>(domlist.at(j).data()->getParentFile()));
+                        domlist.at(j).data()->merge(recessiveobjects.at(i));
+                        if (recessiveobjects.at(i)->variableBindingSet.data()){
+                            static_cast<hkbVariableBindingSet *>(recessiveobjects.at(i)->variableBindingSet.data())->fixMergedIndices(static_cast<BehaviorFile *>(domlist.at(j).data()->getParentFile()));
                         }
-                        generators.at(j).data()->merge(recessiveobjects.at(i));
-                        recessiveobjects.removeAt(i);
+                        found = true;
                         break;
                     }
                 }
-            }*/
-        }else if (recessiveobjects.at(i)->getType() == HkxObject::TYPE_MODIFIER){
-            for (auto j = 0; j < modsize; j++){
-                if (recessiveobjects.at(i)->getSignature() == modifiers.at(j).data()->getSignature()
-                        && static_cast<hkbModifier *>(recessiveobjects.at(i))->getName() == static_cast<hkbModifier *>(modifiers.at(j).data())->getName()/* && !modifiers.at(j).data()->getIsMerged()*/)
-                {
-                    /*if (!variablesmerged && thisdata && otherdata){
-                        BehaviorFile *recbehavior = static_cast<BehaviorFile *>(otherdata->getParentFile());
-                        //HkxObject *other;
-                        if (recbehavior){
-                            /*for (auto k = 0; k < recbehavior->otherTypes.size(); k++){
-                                addObjectToFile(recbehavior->otherTypes.at(k).data());
-                            }*/
-                            /*for (auto k = 0; k < recbehavior->generators.size(); k++){
-                                other = recbehavior->generators.at(k).data();
-                                if (other && other->getSignature() != HKB_BLENDER_GENERATOR_CHILD && other->getSignature() != BS_BONE_SWITCH_GENERATOR_BONE_DATA){
-                                    addObjectToFile(other, -1);
-                                }
-                            }
-                            for (auto k = 0; k < recbehavior->modifiers.size(); k++){
-                                other = recbehavior->modifiers.at(k).data();
-                                if (other){
-                                    addObjectToFile(other, -1);
-                                }
-                            }
-                        }
-                        variablesmerged = true;
-                        thisdata->merge(otherdata);
-                    }*/
-                    //addObjectToFile(recessiveobjects.at(i));
-                    modifiers.at(j).data()->merge(recessiveobjects.at(i));
-                    recessiveobjects.removeAt(i);
-                    //found = true;
-                    break;
-                }
-            }/*
-            if (!found){
-                for (auto j = 0; j < i && j < modifiers.size(); j++){
-                    if (static_cast<hkbModifier *>(recessiveobjects.at(i))->getName() == static_cast<hkbModifier *>(modifiers.at(j).data())->getName()
-                            && recessiveobjects.at(i)->getSignature() == modifiers.at(j).data()->getSignature() && !modifiers.at(j).data()->getIsMerged())
-                    {
-                        if (!variablesmerged && thisdata && otherdata){
-                            thisdata->merge(otherdata);
-                            variablesmerged = true;
-                        }
-                        modifiers.at(j).data()->merge(recessiveobjects.at(i));
-                        recessiveobjects.removeAt(i);
-                        break;
-                    }
-                }
-            }*/
+            }
+            if (found){
+                recessiveobjects.removeAt(i);
+            }
         }
+    };
+    if (!recessiveobjects.isEmpty()){
+        searchMerge(generators, gensize);
+        searchMerge(modifiers, modsize);
     }
 }
 

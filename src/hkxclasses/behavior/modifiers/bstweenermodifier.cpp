@@ -41,52 +41,52 @@ bool BSTweenerModifier::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "tweenPosition"){
             tweenPosition = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'tweenPosition' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'tweenPosition' data field!\nObject Reference: "+ref);
             }
         }else if (text == "tweenRotation"){
             tweenRotation = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'tweenRotation' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'tweenRotation' data field!\nObject Reference: "+ref);
             }
         }else if (text == "useTweenDuration"){
             useTweenDuration = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'useTweenDuration' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'useTweenDuration' data field!\nObject Reference: "+ref);
             }
         }else if (text == "tweenDuration"){
             tweenDuration = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'tweenDuration' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'tweenDuration' data field!\nObject Reference: "+ref);
             }
         }else if (text == "targetPosition"){
             targetPosition = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'targetPosition' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'targetPosition' data field!\nObject Reference: "+ref);
             }
         }else if (text == "targetRotation"){
             targetRotation = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'targetRotation' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'targetRotation' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -120,7 +120,7 @@ bool BSTweenerModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
@@ -131,7 +131,7 @@ bool BSTweenerModifier::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     return true;
 }

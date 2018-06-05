@@ -35,7 +35,7 @@ bool hkbStringCondition::readData(const HkxXmlReader & reader, long index){
         if (text == "conditionString"){
             conditionString = reader.getElementValueAt(index);
             if (conditionString == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'conditionString' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'conditionString' data field!\nObject Reference: "+ref);
             }
         }
         index++;

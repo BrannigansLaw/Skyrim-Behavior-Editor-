@@ -46,77 +46,77 @@ bool hkbComputeDirectionModifier::readData(const HkxXmlReader &reader, long inde
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pointIn"){
             pointIn = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'pointIn' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'pointIn' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pointOut"){
             pointOut = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'pointOut' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'pointOut' data field!\nObject Reference: "+ref);
             }
         }else if (text == "groundAngleOut"){
             groundAngleOut = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'groundAngleOut' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'groundAngleOut' data field!\nObject Reference: "+ref);
             }
         }else if (text == "upAngleOut"){
             upAngleOut = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'upAngleOut' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'upAngleOut' data field!\nObject Reference: "+ref);
             }
         }else if (text == "verticalOffset"){
             verticalOffset = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'verticalOffset' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'verticalOffset' data field!\nObject Reference: "+ref);
             }
         }else if (text == "reverseGroundAngle"){
             reverseGroundAngle = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'reverseGroundAngle' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'reverseGroundAngle' data field!\nObject Reference: "+ref);
             }
         }else if (text == "reverseUpAngle"){
             reverseUpAngle = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'reverseUpAngle' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'reverseUpAngle' data field!\nObject Reference: "+ref);
             }
         }else if (text == "projectPoint"){
             projectPoint = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'projectPoint' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'projectPoint' data field!\nObject Reference: "+ref);
             }
         }else if (text == "normalizePoint"){
             normalizePoint = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'normalizePoint' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'normalizePoint' data field!\nObject Reference: "+ref);
             }
         }else if (text == "computeOnlyOnce"){
             computeOnlyOnce = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'computeOnlyOnce' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'computeOnlyOnce' data field!\nObject Reference: "+ref);
             }
         }else if (text == "computedOutput"){
             computedOutput = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'computedOutput' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'computedOutput' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -155,7 +155,7 @@ bool hkbComputeDirectionModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
@@ -166,7 +166,7 @@ bool hkbComputeDirectionModifier::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     return true;
 }

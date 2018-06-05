@@ -140,7 +140,7 @@ bool ProjectFile::addObjectToFile(HkxObject *obj, long ref){
     }else if (obj->getSignature() == HK_ROOT_LEVEL_CONTAINER){
         setRootObject(HkxSharedPtr(obj, ref));
     }else{
-        writeToLog("ProjectFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16), true);
+        WRITE_TO_LOG("ProjectFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16));
         return false;
     }
     return true;
@@ -163,12 +163,12 @@ bool ProjectFile::parse(){
             if (value != ""){
                 ref = getReader().getNthAttributeValueAt(index, 0).remove(0, 1).toLong(&ok);
                 if (!ok){
-                    writeToLog("ProjectFile: parse() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!", true);
+                    WRITE_TO_LOG("ProjectFile: parse() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!");
                     return false;
                 }
                 signature = (HkxSignature)value.toULongLong(&ok, 16);
                 if (!ok){
-                    writeToLog("ProjectFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!", true);
+                    WRITE_TO_LOG("ProjectFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!");
                     return false;
                 }
                 if (signature == HKB_PROJECT_DATA){
@@ -184,7 +184,7 @@ bool ProjectFile::parse(){
                         return false;
                     }
                 }else{
-                    writeToLog("ProjectFile: parse()!\nUnknown signature detected!\nUnknown object class name is: "+getReader().getNthAttributeValueAt(index, 1)+"\nUnknown object signature is: "+QString::number(signature, 16));
+                    //WRITE_TO_LOG("ProjectFile: parse()!\nUnknown signature detected!\nUnknown object class name is: "+getReader().getNthAttributeValueAt(index, 1)+"\nUnknown object signature is: "+QString::number(signature, 16));
                     return false;
                 }
             }
@@ -195,7 +195,7 @@ bool ProjectFile::parse(){
     getReader().clear();
     //setProgressData("Linking HKX objects...", 80);
     if (!link()){
-        writeToLog("ProjectFile: parse() failed because link() failed!", true);
+        WRITE_TO_LOG("ProjectFile: parse() failed because link() failed!");
         return false;
     }
     return true;
@@ -203,18 +203,18 @@ bool ProjectFile::parse(){
 
 bool ProjectFile::link(){
     if (!getRootObject().constData()){
-        writeToLog("ProjectFile: link() failed!\nThe root object of this project file is nullptr!", true);
+        WRITE_TO_LOG("ProjectFile: link() failed!\nThe root object of this project file is nullptr!");
         return false;
     }else if (getRootObject()->getSignature() != HK_ROOT_LEVEL_CONTAINER){
-        writeToLog("ProjectFile: link() failed!\nThe root object of this project file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16), true);
+        WRITE_TO_LOG("ProjectFile: link() failed!\nThe root object of this project file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16));
         return false;
     }
     if (!getRootObject().data()->link()){
-        writeToLog("ProjectFile: link() failed!\nThe root object of this project file failed to link to it's children!", true);
+        WRITE_TO_LOG("ProjectFile: link() failed!\nThe root object of this project file failed to link to it's children!");
         return false;
     }
     if (!projectData.data()->link()){
-        writeToLog("ProjectFile: link() failed!\nprojectData failed to link to it's children!\n", true);
+        WRITE_TO_LOG("ProjectFile: link() failed!\nprojectData failed to link to it's children!\n");
         return false;
     }
     return true;
@@ -261,7 +261,7 @@ bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update ev
     if (recessiveproject){
         QList <BehaviorFile *> dominantbehaviors(behaviorFiles);
         QList <BehaviorFile *> recessivebehaviors(recessiveproject->behaviorFiles);
-        QVector <HkxObject *> objectsnotfound;
+        QVector <DataIconManager *> objectsnotfound;
         QString objname;
         //TO DO: Merge character file...
         //recessiveproject->character->merge(character);  //Done for FNIS...
@@ -274,7 +274,7 @@ bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update ev
                         //threads.push_back(std::thread(&BehaviorFile::merge, dominantbehaviors.at(i), recessivebehaviors.at(j)));
                         objectsnotfound = dominantbehaviors.at(i)->merge(recessivebehaviors.at(j));
                         //recessivebehaviors.removeAt(j);
-                        /*for (auto k = 0; k < dominantbehaviors.size() && !objectsnotfound.isEmpty(); k++){
+                        for (auto k = 0; k < dominantbehaviors.size() && !objectsnotfound.isEmpty(); k++){
                             if (QString::compare(dominantbehaviors.at(k)->fileName().section("/", -1, -1), dominantbehaviors.at(i)->fileName().section("/", -1, -1), Qt::CaseInsensitive)){
                                 dominantbehaviors.at(k)->mergeObjects(objectsnotfound);
                             }
@@ -287,9 +287,9 @@ bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update ev
                             }else{
                                 CRITICAL_ERROR_MESSAGE(QString("ProjectFile: merge(): Attempting to merge invalid object type!!!"));
                             }
-                            writeToLog("ProjectFile: merge(): The object type \""+QString::number(objectsnotfound.at(k)->getSignature(), 16)
+                            WRITE_TO_LOG("ProjectFile: merge(): The object type \""+QString::number(objectsnotfound.at(k)->getSignature(), 16)
                                        +"\" named \""+objname+"\" was not found in the recessive behavior!!!");
-                        }*/
+                        }
                     }
                 }
             }
@@ -321,13 +321,13 @@ bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update ev
             }
             //return false;
             /*if (!mergeAnimationCaches(recessiveproject)){
-                writeToLog("ProjectFile: merge() failed!\nmergeAnimationCaches() failed!\n");
+                WRITE_TO_LOG("ProjectFile: merge() failed!\nmergeAnimationCaches() failed!\n");
             }*/
         }else{
-            writeToLog("ProjectFile: merge() failed!\nProject names are different!\n");
+            WRITE_TO_LOG("ProjectFile: merge() failed!\nProject names are different!\n");
         }
     }else{
-        writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
+        WRITE_TO_LOG("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
     }
     return value;
 }
@@ -339,10 +339,10 @@ bool ProjectFile::mergeAnimationCaches(ProjectFile *recessiveproject){
                 return true;
             }
         }else{
-            writeToLog("ProjectFile: merge() failed!\n skyrimAnimSetData or recessiveproject->skyrimAnimSetData is nullptr!\n");
+            WRITE_TO_LOG("ProjectFile: merge() failed!\n skyrimAnimSetData or recessiveproject->skyrimAnimSetData is nullptr!\n");
         }
     }else{
-        writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
+        WRITE_TO_LOG("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
     }
     return false;
 }
@@ -391,7 +391,7 @@ void ProjectFile::generateAnimClipDataForProject(){
             if (generator->getSignature() == HKB_CLIP_GENERATOR){
                 clipGenDataPtr = new SkyrimClipGeneratoData(static_cast<hkbClipGenerator *>(generator)->getClipGeneratorAnimData(skyrimAnimData->getProjectAnimData(projectName), getAnimationIndex(static_cast<hkbClipGenerator *>(generator)->animationName)));
                 if (!skyrimAnimData->appendClipGenerator(projectName, clipGenDataPtr)){
-                    writeToLog((QString("ProjectFile::generateAnimDataForProject(): Duplicate clip generator \""+clipGenDataPtr->getClipGeneratorName()+"found in: "+behaviorFiles.at(i)->fileName().section("/", -1, -1))));
+                    //WRITE_TO_LOG((QString("ProjectFile::generateAnimDataForProject(): Duplicate clip generator \""+clipGenDataPtr->getClipGeneratorName()+"found in: "+behaviorFiles.at(i)->fileName().section("/", -1, -1))));
                 }
             }
         }
@@ -449,7 +449,7 @@ bool ProjectFile::isAnimationUsed(const QString &animationname){
             generator = behaviorFiles.at(i)->generators.at(j).data();
             if (generator->getSignature() == HKB_CLIP_GENERATOR){
                 if (!QString::compare(animationname, static_cast<hkbClipGenerator *>(generator)->getAnimationName(), Qt::CaseInsensitive)){
-                    writeToLog("ProjectFile: isAnimationUsed()!\nAnimation is used in the Clip Generator \""+static_cast<hkbClipGenerator *>(generator)->getName()+"\" in behavior: "+behaviorFiles.at(i)->fileName().section("/",-1,-1));
+                    WRITE_TO_LOG("ProjectFile: isAnimationUsed()!\nAnimation is used in the Clip Generator \""+static_cast<hkbClipGenerator *>(generator)->getName()+"\" in behavior: "+behaviorFiles.at(i)->fileName().section("/",-1,-1));
                     return true;
                 }
             }

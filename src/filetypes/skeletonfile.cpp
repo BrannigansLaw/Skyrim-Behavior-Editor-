@@ -80,7 +80,7 @@ bool SkeletonFile::addObjectToFile(HkxObject *obj, long ref){
     }else if (obj->getSignature() == HK_ROOT_LEVEL_CONTAINER){
         setRootObject(HkxSharedPtr(obj, ref));
     }else{
-        writeToLog("SkeletonFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16), true);
+        //WRITE_TO_LOG("SkeletonFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16));
         return false;
     }
     return true;
@@ -103,12 +103,12 @@ bool SkeletonFile::parse(){
             if (value != ""){
                 ref = getReader().getNthAttributeValueAt(index, 0).remove(0, 1).toLong(&ok);
                 if (!ok){
-                    writeToLog("SkeletonFile: parse() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!", true);
+                    //WRITE_TO_LOG("SkeletonFile: parse() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!");
                     return false;
                 }
                 signature = (HkxSignature)value.toULongLong(&ok, 16);
                 if (!ok){
-                    writeToLog("SkeletonFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!", true);
+                    //WRITE_TO_LOG("SkeletonFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!");
                     return false;
                 }
                 if (signature == HK_SIMPLE_LOCAL_FRAME){
@@ -128,7 +128,7 @@ bool SkeletonFile::parse(){
                         return false;
                     }
                 }else{
-                    writeToLog("SkeletonFile: parse()!\nUnknown signature detected!\nUnknown object class name is: "+getReader().getNthAttributeValueAt(index, 1)+"\nUnknown object signature is: "+QString::number(signature, 16));
+                    //WRITE_TO_LOG("SkeletonFile: parse()!\nUnknown signature detected!\nUnknown object class name is: "+getReader().getNthAttributeValueAt(index, 1)+"\nUnknown object signature is: "+QString::number(signature, 16));
                 }
             }
         }
@@ -138,7 +138,7 @@ bool SkeletonFile::parse(){
     getReader().clear();
     //setProgressData("Linking HKX objects...", 80);
     if (!link()){
-        writeToLog("SkeletonFile: parse() failed because link() failed!", true);
+        //WRITE_TO_LOG("SkeletonFile: parse() failed because link() failed!");
         return false;
     }
     return true;
@@ -146,14 +146,14 @@ bool SkeletonFile::parse(){
 
 bool SkeletonFile::link(){
     if (!getRootObject().constData()){
-        writeToLog("SkeletonFile: link() failed!\nThe root object of this character file is nullptr!", true);
+        //WRITE_TO_LOG("SkeletonFile: link() failed!\nThe root object of this character file is nullptr!");
         return false;
     }else if (getRootObject()->getSignature() != HK_ROOT_LEVEL_CONTAINER){
-        writeToLog("SkeletonFile: link() failed!\nThe root object of this character file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16), true);
+        //WRITE_TO_LOG("SkeletonFile: link() failed!\nThe root object of this character file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16));
         return false;
     }
     if (!getRootObject().data()->link()){
-        writeToLog("SkeletonFile: link() failed!\nThe root object of this character file failed to link to it's children!", true);
+        //WRITE_TO_LOG("SkeletonFile: link() failed!\nThe root object of this character file failed to link to it's children!");
         return false;
     }
     return true;

@@ -43,46 +43,46 @@ bool hkbGeneratorTransitionEffect::readData(const HkxXmlReader &reader, long ind
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "selfTransitionMode"){
             selfTransitionMode = reader.getElementValueAt(index);
             if (!SelfTransitionMode.contains(selfTransitionMode)){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'selfTransitionMode' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'selfTransitionMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "eventMode"){
             eventMode = reader.getElementValueAt(index);
             if (!EventMode.contains(eventMode)){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "transitionGenerator"){
             if (!transitionGenerator.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'transitionGenerator' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'transitionGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "blendInDuration"){
             blendInDuration = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'blendInDuration' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'blendInDuration' data field!\nObject Reference: "+ref);
             }
         }else if (text == "blendOutDuration"){
             blendOutDuration = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+":  readData()!\nFailed to properly read 'blendOutDuration' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'blendOutDuration' data field!\nObject Reference: "+ref);
             }
         }else if (text == "syncToGeneratorStartTime"){
             syncToGeneratorStartTime = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'syncToGeneratorStartTime' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'syncToGeneratorStartTime' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -120,10 +120,10 @@ bool hkbGeneratorTransitionEffect::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+":  write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+":  write()!\nUnable to write 'variableBindingSet'!!!");
         }
         /*if (transitionGenerator.data() && !transitionGenerator.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+":  write()!\nUnable to write 'transitionGenerator'!!!", true);
+            WRITE_TO_LOG(getClassname()+":  write()!\nUnable to write 'transitionGenerator'!!!");
         }*/
     }
     return true;
@@ -134,12 +134,12 @@ bool hkbGeneratorTransitionEffect::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+":  link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+":  link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(transitionGenerator.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_GENERATOR){
-            writeToLog(getClassname()+": linkVar()!\nThe linked object is not a TYPE_GENERATOR!");
+            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object is not a TYPE_GENERATOR!");
             setDataValidity(false);
         }
         transitionGenerator = *ptr;

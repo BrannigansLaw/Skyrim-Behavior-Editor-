@@ -45,32 +45,7 @@ public:
             //
         }
 
-        bool operator==(const HkTransition & other){
-            if (
-                    triggerInterval != other.triggerInterval ||
-                    initiateInterval != other.initiateInterval ||
-                    eventId != other.eventId ||
-                    toStateId != other.toStateId ||
-                    fromNestedStateId != other.fromNestedStateId ||
-                    toNestedStateId != other.toNestedStateId ||
-                    priority != other.priority/* ||
-                    flags != other.flags*/
-                    )
-            {
-                return false;
-            }
-            hkbExpressionCondition *exp = static_cast<hkbExpressionCondition *>(condition.data());
-            hkbExpressionCondition *otherexp = static_cast<hkbExpressionCondition *>(other.condition.data());
-            if ((exp && otherexp) && *exp == *otherexp){
-                return true;
-            }
-            /*hkbBlendingTransitionEffect *effect = static_cast<hkbBlendingTransitionEffect *>(transition.data());
-            hkbBlendingTransitionEffect *othereffect = static_cast<hkbBlendingTransitionEffect *>(other.transition.data());
-            if ((effect && othereffect) && *effect == *othereffect){
-                return true;
-            }*/
-            return false;
-        }
+        bool operator==(const HkTransition & other);
 
         bool usingTriggerInterval() const{
             if (

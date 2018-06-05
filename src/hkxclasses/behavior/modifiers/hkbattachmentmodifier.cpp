@@ -88,22 +88,22 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "sendToAttacherOnAttach"){
             index++;
@@ -112,11 +112,11 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
                 if (text == "id"){
                     sendToAttacherOnAttach.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!sendToAttacherOnAttach.payload.readShdPtrReference(index, reader)){
-                        writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -129,11 +129,11 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
                 if (text == "id"){
                     sendToAttacheeOnAttach.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!sendToAttacheeOnAttach.payload.readShdPtrReference(index, reader)){
-                        writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -146,11 +146,11 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
                 if (text == "id"){
                     sendToAttacherOnDetach.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!sendToAttacherOnDetach.payload.readShdPtrReference(index, reader)){
-                        writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -163,11 +163,11 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
                 if (text == "id"){
                     sendToAttacheeOnDetach.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!sendToAttacheeOnDetach.payload.readShdPtrReference(index, reader)){
-                        writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -175,20 +175,20 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
             }
         }else if (text == "attachmentSetup"){
             if (!attachmentSetup.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'attachmentSetup' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'attachmentSetup' reference!\nObject Reference: "+ref);
             }
         }else if (text == "attacherHandle"){
             if (!attacherHandle.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'attacherHandle' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'attacherHandle' reference!\nObject Reference: "+ref);
             }
         }else if (text == "attacheeHandle"){
             if (!attacheeHandle.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'attacheeHandle' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'attacheeHandle' reference!\nObject Reference: "+ref);
             }
         }else if (text == "attacheeLayer"){
             attacheeLayer = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'attacheeLayer' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'attacheeLayer' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -279,7 +279,7 @@ bool hkbAttachmentModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
@@ -377,12 +377,12 @@ bool hkbAttachmentModifier::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(sendToAttacherOnAttach.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
         sendToAttacherOnAttach.payload = *ptr;
@@ -390,7 +390,7 @@ bool hkbAttachmentModifier::link(){
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(sendToAttacheeOnAttach.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
         sendToAttacheeOnAttach.payload = *ptr;
@@ -398,7 +398,7 @@ bool hkbAttachmentModifier::link(){
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(sendToAttacherOnDetach.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
         sendToAttacherOnDetach.payload = *ptr;
@@ -406,7 +406,7 @@ bool hkbAttachmentModifier::link(){
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(sendToAttacheeOnDetach.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
         sendToAttacheeOnDetach.payload = *ptr;

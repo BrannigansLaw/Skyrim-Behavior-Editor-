@@ -41,6 +41,31 @@ hkbStateMachineTransitionInfoArray::hkbStateMachineTransitionInfoArray(HkxFile *
     refCount++;
 }
 
+bool hkbStateMachineTransitionInfoArray::HkTransition::operator ==(const HkTransition & other){
+    if (
+            triggerInterval != other.triggerInterval ||
+            initiateInterval != other.initiateInterval ||
+            eventId != other.eventId ||
+            toStateId != other.toStateId ||
+            fromNestedStateId != other.fromNestedStateId ||
+            toNestedStateId != other.toNestedStateId ||
+            priority != other.priority
+            )
+    {
+        return false;
+    }
+    QStringList domflags = flags.split("|");
+    QStringList recflags = other.flags.split("|");
+    hkbExpressionCondition *exp = static_cast<hkbExpressionCondition *>(condition.data());
+    hkbExpressionCondition *otherexp = static_cast<hkbExpressionCondition *>(other.condition.data());
+    hkbBlendingTransitionEffect *effect = static_cast<hkbBlendingTransitionEffect *>(transition.data());
+    hkbBlendingTransitionEffect *othereffect = static_cast<hkbBlendingTransitionEffect *>(other.transition.data());
+    if ((((exp && otherexp) && *exp == *otherexp) || (!exp && !otherexp)) && (((effect && othereffect) && *effect == *othereffect) || (!effect && !othereffect))){
+        return true;
+    }
+    return false;
+}
+
 QString hkbStateMachineTransitionInfoArray::getClassname(){
     return classname;
 }
@@ -116,7 +141,7 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
                             transitions.last().initiateInterval.enterEventId = reader.getElementValueAt(index).toInt(&ok);
                         }
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'enterEventId' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enterEventId' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "exitEventId"){
                         if (intervalType == TRIGGER){
@@ -125,7 +150,7 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
                             transitions.last().initiateInterval.exitEventId = reader.getElementValueAt(index).toInt(&ok);
                         }
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'exitEventId' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'exitEventId' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "enterTime"){
                         if (intervalType == TRIGGER){
@@ -134,7 +159,7 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
                             transitions.last().initiateInterval.enterTime = reader.getElementValueAt(index).toDouble(&ok);
                         }
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'enterTime' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enterTime' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "exitTime"){
                         if (intervalType == TRIGGER){
@@ -143,47 +168,47 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
                             transitions.last().initiateInterval.exitTime = reader.getElementValueAt(index).toDouble(&ok);
                         }
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'exitTime' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'exitTime' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "transition"){
                         if (!transitions.last().transition.readShdPtrReference(index, reader)){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'transition' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'transition' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "condition"){
                         if (!transitions.last().condition.readShdPtrReference(index, reader)){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'condition' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'condition' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "eventId"){
                         transitions.last().eventId = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'eventId' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'eventId' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "toStateId"){
                         transitions.last().toStateId = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'toStateId' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'toStateId' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "fromNestedStateId"){
                         transitions.last().fromNestedStateId = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'fromNestedStateId' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'fromNestedStateId' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "toNestedStateId"){
                         transitions.last().toNestedStateId = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'toNestedStateId' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'toNestedStateId' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "priority"){
                         transitions.last().priority = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'priority' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'priority' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "flags"){
                         transitions.last().flags = reader.getElementValueAt(index);
                         QStringList list = transitions.last().flags.split('|');
                         for (int k = 0; k < list.size(); k++){
                             if (!transitionFlags.contains(list.at(k))){
-                                writeToLog(getClassname()+": readData()!\n'flags' data field contains an invalid string!\nObject Reference: "+ref);
+                                WRITE_TO_LOG(getClassname()+": readData()!\n'flags' data field contains an invalid string!\nObject Reference: "+ref);
                             }
                         }
                         index++;
@@ -257,10 +282,10 @@ bool hkbStateMachineTransitionInfoArray::write(HkxXMLWriter *writer){
         writer->writeLine("\n");
         for (int i = 0; i < transitions.size(); i++){
             if (transitions.at(i).transition.data() && !transitions.at(i).transition.data()->write(writer)){
-                getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'transition'' at "+QString::number(i), true);
+                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'transition'' at "+QString::number(i));
             }
             if (transitions.at(i).condition.data() && !transitions.at(i).condition.data()->write(writer)){
-                getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'condition'' at "+QString::number(i), true);
+                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'condition'' at "+QString::number(i));
             }
         }
     }
@@ -438,14 +463,14 @@ bool hkbStateMachineTransitionInfoArray::link(){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(transitions.at(i).transition.getShdPtrReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_BLENDING_TRANSITION_EFFECT && (*ptr)->getSignature() != HKB_GENERATOR_TRANSITION_EFFECT){
-                writeToLog(getClassname()+": link()!\n'transition' data field is linked to invalid child!");
+                WRITE_TO_LOG(getClassname()+": link()!\n'transition' data field is linked to invalid child!");
             }
             transitions[i].transition = *ptr;
         }
         ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(transitions.at(i).condition.getShdPtrReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_EXPRESSION_CONDITION && (*ptr)->getSignature() != HKB_STRING_CONDITION){
-                writeToLog(getClassname()+": link()!\n'condition' data field is linked to invalid child!");
+                WRITE_TO_LOG(getClassname()+": link()!\n'condition' data field is linked to invalid child!");
             }
             transitions[i].condition = *ptr;
         }

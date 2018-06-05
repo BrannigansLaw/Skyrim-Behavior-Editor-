@@ -41,17 +41,17 @@ bool hkbBoneWeightArray::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "boneWeights"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'boneWeights' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'boneWeights' data!\nObject Reference: "+ref);
                 return false;
             }
             //index++;
             if (numElems > 0 && !readDoubles(reader.getElementValueAt(index), boneWeights)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'boneWeights' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'boneWeights' data!\nObject Reference: "+ref);
                 return false;
             }
             //continue;
@@ -97,7 +97,7 @@ bool hkbBoneWeightArray::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
@@ -108,7 +108,7 @@ bool hkbBoneWeightArray::link(){
         return false;
     }
     if (!this->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\n");
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\n");
     }
     return true;
 }

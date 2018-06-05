@@ -33,7 +33,6 @@ public:
     };
 public:
     virtual ~HkxObject();
-    void writeToLog(const QString & message, bool isError = false);
     HkxSignature getSignature() const;
     HkxType getType() const;
     virtual bool evaluateDataValidity();

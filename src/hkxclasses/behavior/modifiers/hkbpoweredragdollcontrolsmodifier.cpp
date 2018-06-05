@@ -48,71 +48,71 @@ bool hkbPoweredRagdollControlsModifier::readData(const HkxXmlReader &reader, lon
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "maxForce"){
             maxForce = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'maxForce' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'maxForce' data field!\nObject Reference: "+ref);
             }
         }else if (text == "tau"){
             tau = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'tau' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'tau' data field!\nObject Reference: "+ref);
             }
         }else if (text == "damping"){
             damping = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'damping' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'damping' data field!\nObject Reference: "+ref);
             }
         }else if (text == "proportionalRecoveryVelocity"){
             proportionalRecoveryVelocity = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'proportionalRecoveryVelocity' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'proportionalRecoveryVelocity' data field!\nObject Reference: "+ref);
             }
         }else if (text == "constantRecoveryVelocity"){
             constantRecoveryVelocity = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'constantRecoveryVelocity' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'constantRecoveryVelocity' data field!\nObject Reference: "+ref);
             }
         }else if (text == "poseMatchingBone0"){
             poseMatchingBone0 = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'poseMatchingBone0' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'poseMatchingBone0' data field!\nObject Reference: "+ref);
             }
         }else if (text == "poseMatchingBone1"){
             poseMatchingBone1 = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'poseMatchingBone1' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'poseMatchingBone1' data field!\nObject Reference: "+ref);
             }
         }else if (text == "poseMatchingBone2"){
             poseMatchingBone2 = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'poseMatchingBone2' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'poseMatchingBone2' data field!\nObject Reference: "+ref);
             }
         }else if (text == "mode"){
             mode = reader.getElementValueAt(index);
             if (!Mode.contains(mode)){
-                writeToLog(getClassname()+": readData()!\nInvalid 'mode' data!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nInvalid 'mode' data!\nObject Reference: "+ref);
             }
         }else if (text == "boneWeights"){
             if (!boneWeights.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'boneWeights' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'boneWeights' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -170,13 +170,13 @@ bool hkbPoweredRagdollControlsModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (bones.data() && !bones.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'bones'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'bones'!!!");
         }
         if (boneWeights.data() && !boneWeights.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'boneWeights'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'boneWeights'!!!");
         }
     }
     return true;
@@ -201,19 +201,19 @@ bool hkbPoweredRagdollControlsModifier::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(bones.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_INDEX_ARRAY){
-            writeToLog(getClassname()+": linkVar()!\nThe linked object 'bones' is not a HKB_BONE_INDEX_ARRAY!");
+            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'bones' is not a HKB_BONE_INDEX_ARRAY!");
         }
         bones = *ptr;
     }
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(boneWeights.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-            writeToLog(getClassname()+": linkVar()!\nThe linked object 'boneWeights' is not a HKB_BONE_WEIGHT_ARRAY!");
+            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'boneWeights' is not a HKB_BONE_WEIGHT_ARRAY!");
         }
         boneWeights = *ptr;
     }

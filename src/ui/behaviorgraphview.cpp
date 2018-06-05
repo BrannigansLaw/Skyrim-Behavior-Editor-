@@ -371,10 +371,6 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     }
 }
 
-void BehaviorGraphView::writeToLog(const QString &message, bool isError){
-    behavior->writeToLog(message, isError);
-}
-
 bool BehaviorGraphView::confirmationDialogue(const QString & message, QWidget *parent){
     QMessageBox::StandardButton ret;
     ret = QMessageBox::warning(parent, "Skyrim Behavior Tool", message, QMessageBox::Yes | QMessageBox::Cancel);

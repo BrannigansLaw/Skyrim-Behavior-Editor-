@@ -87,30 +87,30 @@ bool hkbBehaviorGraph::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG("hkbBehaviorGraph: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG("hkbBehaviorGraph: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG("hkbBehaviorGraph: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "variableMode"){
             variableMode = reader.getElementValueAt(index);
             if (variableMode == ""){
-                writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'variableMode' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG("hkbBehaviorGraph: readData()!\nFailed to properly read 'variableMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "rootGenerator"){
             if (!rootGenerator.readShdPtrReference(index, reader)){
-                writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'rootGenerator' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG("hkbBehaviorGraph: readData()!\nFailed to properly read 'rootGenerator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "data"){
             if (!data.readShdPtrReference(index, reader)){
-                writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'data' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG("hkbBehaviorGraph: readData()!\nFailed to properly read 'data' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -150,13 +150,13 @@ bool hkbBehaviorGraph::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog("hkbBehaviorGraph: write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG("hkbBehaviorGraph: write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (rootGenerator.data() && !rootGenerator.data()->write(writer)){
-            getParentFile()->writeToLog("hkbBehaviorGraph: write()!\nUnable to write 'rootGenerator'!!!", true);
+            WRITE_TO_LOG("hkbBehaviorGraph: write()!\nUnable to write 'rootGenerator'!!!");
         }
         if (data.data() && !data.data()->write(writer)){
-            getParentFile()->writeToLog("hkbBehaviorGraph: write()!\nUnable to write 'data'!!!", true);
+            WRITE_TO_LOG("hkbBehaviorGraph: write()!\nUnable to write 'data'!!!");
         }
     }
     return true;
@@ -167,14 +167,14 @@ bool hkbBehaviorGraph::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG("hkbBehaviorGraph: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(rootGenerator.getShdPtrReference());
     if (!ptr){
-        writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'rootGenerator' data field!\nObject Name: "+name);
+        WRITE_TO_LOG("hkbBehaviorGraph: link()!\nFailed to properly link 'rootGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
     }else if ((*ptr)->getSignature() != HKB_STATE_MACHINE){
-        writeToLog("hkbBehaviorGraph: link()!\n'rootGenerator' data field is linked to invalid child!\nObject Name: "+name);
+        WRITE_TO_LOG("hkbBehaviorGraph: link()!\n'rootGenerator' data field is linked to invalid child!\nObject Name: "+name);
         setDataValidity(false);
         rootGenerator = *ptr;
     }else{
@@ -182,10 +182,10 @@ bool hkbBehaviorGraph::link(){
     }
     ptr = &static_cast<BehaviorFile *>(getParentFile())->graphData;
     if (!ptr){
-        writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'data' data field!\nObject Name: "+name, true);
+        WRITE_TO_LOG("hkbBehaviorGraph: link()!\nFailed to properly link 'data' data field!\nObject Name: "+name);
         setDataValidity(false);
     }else if ((*ptr)->getSignature() != HKB_BEHAVIOR_GRAPH_DATA){
-        writeToLog("hkbBehaviorGraph: link()!\n'data' data field is linked to invalid child!\nObject Name: "+name, true);
+        WRITE_TO_LOG("hkbBehaviorGraph: link()!\n'data' data field is linked to invalid child!\nObject Name: "+name);
         setDataValidity(false);
         data = *ptr;
     }else{

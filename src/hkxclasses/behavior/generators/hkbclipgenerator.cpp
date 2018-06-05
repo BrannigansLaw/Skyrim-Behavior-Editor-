@@ -36,7 +36,7 @@ hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, bool addToAnimData
     if (animationname == ""){
         animationName = par->getAnimationNameAt(0);
     }
-    if (addToAnimData && !par->addClipGenToAnimationData(name)){
+    /*if (addToAnimData && !par->addClipGenToAnimationData(name)){
         int count = 0;
         bool added = par->addClipGenToAnimationData(name);
         while (!added && count < MAX_TRIES){
@@ -47,7 +47,7 @@ hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, bool addToAnimData
         if (!added){
             CRITICAL_ERROR_MESSAGE("hkbClipGenerator::hkbClipGenerator(): The clip generator could not be added to the animation data!");
         }
-    }
+    }*/
 }
 
 QString hkbClipGenerator::getClassname(){
@@ -66,71 +66,71 @@ bool hkbClipGenerator::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "animationName"){
             animationName = reader.getElementValueAt(index);
             if (animationName == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'animationName' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'animationName' data field!\nObject Reference: "+ref);
             }
         }else if (text == "triggers"){
             if (!triggers.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'triggers' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'triggers' reference!\nObject Reference: "+ref);
             }
         }else if (text == "cropStartAmountLocalTime"){
             cropStartAmountLocalTime = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'cropStartAmountLocalTime' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'cropStartAmountLocalTime' data field!\nObject Reference: "+ref);
             }
         }else if (text == "cropEndAmountLocalTime"){
             cropEndAmountLocalTime = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'cropEndAmountLocalTime' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'cropEndAmountLocalTime' data field!\nObject Reference: "+ref);
             }
         }else if (text == "startTime"){
             startTime = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'startTime' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'startTime' data field!\nObject Reference: "+ref);
             }
         }else if (text == "playbackSpeed"){
             playbackSpeed = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'playbackSpeed' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'playbackSpeed' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enforcedDuration"){
             enforcedDuration = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'enforcedDuration' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enforcedDuration' data field!\nObject Reference: "+ref);
             }
         }else if (text == "userControlledTimeFraction"){
             userControlledTimeFraction = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userControlledTimeFraction' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userControlledTimeFraction' data field!\nObject Reference: "+ref);
             }
         }else if (text == "animationBindingIndex"){
             animationBindingIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'animationBindingIndex' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'animationBindingIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "mode"){
             mode = reader.getElementValueAt(index);
             if (mode == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'mode' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'mode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "flags"){
             flags = reader.getElementValueAt(index);
             if (flags == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -173,10 +173,10 @@ bool hkbClipGenerator::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (triggers.data() && !triggers.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'triggers'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'triggers'!!!");
         }
     }
     return true;
@@ -264,38 +264,38 @@ SkyrimClipGeneratoData hkbClipGenerator::getClipGeneratorAnimData(ProjectAnimDat
 }
 
 void hkbClipGenerator::setName(const QString &oldclipname, const QString &newclipname){
-    static_cast<BehaviorFile *>(getParentFile())->setClipNameAnimData(oldclipname, newclipname);    //Unsafe...
+    //static_cast<BehaviorFile *>(getParentFile())->setClipNameAnimData(oldclipname, newclipname);    //Unsafe...
     name = newclipname;
 }
 
 void hkbClipGenerator::setAnimationName(int index, const QString &animationname){
     animationName = animationname;
-    static_cast<BehaviorFile *>(getParentFile())->setAnimationIndexAnimData(index, name);    //Unsafe...
+    //static_cast<BehaviorFile *>(getParentFile())->setAnimationIndexAnimData(index, name);    //Unsafe...
 }
 
 void hkbClipGenerator::setPlaybackSpeed(qreal speed){
     playbackSpeed = speed;
-    static_cast<BehaviorFile *>(getParentFile())->setPlaybackSpeedAnimData(name, speed);    //Unsafe...
+    //static_cast<BehaviorFile *>(getParentFile())->setPlaybackSpeedAnimData(name, speed);    //Unsafe...
 }
 
 void hkbClipGenerator::setCropStartAmountLocalTime(qreal time){
     cropStartAmountLocalTime = time;
-    static_cast<BehaviorFile *>(getParentFile())->setCropStartAmountLocalTimeAnimData(name, time);    //Unsafe...
+    //static_cast<BehaviorFile *>(getParentFile())->setCropStartAmountLocalTimeAnimData(name, time);    //Unsafe...
 }
 
 void hkbClipGenerator::setCropEndAmountLocalTime(qreal time){
     cropEndAmountLocalTime = time;
-    static_cast<BehaviorFile *>(getParentFile())->setCropEndAmountLocalTimeAnimData(name, time);    //Unsafe...
+    //static_cast<BehaviorFile *>(getParentFile())->setCropEndAmountLocalTimeAnimData(name, time);    //Unsafe...
 }
 
 bool hkbClipGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggers.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_CLIP_TRIGGER_ARRAY){
-            writeToLog(getClassname()+": link()!\n'triggers' data field is linked to invalid child!\nObject Name: "+name);
+            WRITE_TO_LOG(getClassname()+": link()!\n'triggers' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
         }
         triggers = *ptr;
@@ -326,6 +326,6 @@ bool hkbClipGenerator::evaluateDataValidity(){
 }
 
 hkbClipGenerator::~hkbClipGenerator(){
-    static_cast<BehaviorFile *>(getParentFile())->removeClipGenFromAnimData(animationName.section("\\", -1, -1), name);
+    //static_cast<BehaviorFile *>(getParentFile())->removeClipGenFromAnimData(animationName.section("\\", -1, -1), name);
     refCount--;
 }

@@ -61,22 +61,22 @@ bool hkbExpressionDataArray::readData(const HkxXmlReader &reader, long index){
                     if (text == "expression"){
                         expressionsData.last().expression = reader.getElementValueAt(index);
                         if (expressionsData.last().expression == ""){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'expression' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'expression' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "assignmentVariableIndex"){
                         expressionsData.last().assignmentVariableIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'assignmentVariableIndex' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'assignmentVariableIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "assignmentEventIndex"){
                         expressionsData.last().assignmentEventIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'assignmentEventIndex' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'assignmentEventIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "eventMode"){
                         expressionsData.last().eventMode = reader.getElementValueAt(index);
                         if (!EventMode.contains(expressionsData.last().eventMode)){
-                            writeToLog(getClassname()+": readData()!\nInvalid 'eventMode' data!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nInvalid 'eventMode' data!\nObject Reference: "+ref);
                         }
                         index++;
                         break;

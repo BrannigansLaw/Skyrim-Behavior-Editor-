@@ -33,11 +33,11 @@ bool hkaAnimationContainer::readData(const HkxXmlReader &reader, long index){
         if (text == "skeletons"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'skeletons' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'skeletons' data!\nObject Reference: "+ref);
                 return false;
             }
             if (numElems > 0 && !readReferences(reader.getElementValueAt(index), skeletons)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'skeletons' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'skeletons' data!\nObject Reference: "+ref);
                 return false;
             }
         }
@@ -96,10 +96,10 @@ bool hkaAnimationContainer::link(){
     for (int i = 0; i < skeletons.size(); i++){
         ptr = static_cast<SkeletonFile *>(getParentFile())->findSkeleton(skeletons.at(i).getShdPtrReference());
         if (!ptr){
-            writeToLog(getClassname()+": link()!\nFailed to properly link 'skeletons' data field!\n");
+            WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'skeletons' data field!\n");
             setDataValidity(false);
         }else if (!(*ptr).data() || (*ptr)->getSignature() != HKA_SKELETON){
-            writeToLog(getClassname()+": link()!\n'skeletons' data field is linked to invalid child!\n");
+            WRITE_TO_LOG(getClassname()+": link()!\n'skeletons' data field is linked to invalid child!\n");
             setDataValidity(false);
             skeletons[i] = *ptr;
         }else{

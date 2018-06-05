@@ -174,116 +174,116 @@ bool hkbPoseMatchingGenerator::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "referencePoseWeightThreshold"){
             referencePoseWeightThreshold = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'referencePoseWeightThreshold' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'referencePoseWeightThreshold' data field!\nObject Reference: "+ref);
             }
         }else if (text == "blendParameter"){
             blendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'blendParameter' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'blendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minCyclicBlendParameter"){
             minCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'minCyclicBlendParameter' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'minCyclicBlendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "maxCyclicBlendParameter"){
             maxCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'maxCyclicBlendParameter' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'maxCyclicBlendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "indexOfSyncMasterChild"){
             indexOfSyncMasterChild = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'indexOfSyncMasterChild' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'indexOfSyncMasterChild' data field!\nObject Reference: "+ref);
             }
         }else if (text == "flags"){
             flags = reader.getElementValueAt(index);
             if (flags == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
             }
         }else if (text == "subtractLastChild"){
             subtractLastChild = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'subtractLastChild' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'subtractLastChild' data field!\nObject Reference: "+ref);
             }
         }else if (text == "children"){
             if (!readReferences(reader.getElementValueAt(index), children)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'children' references!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'children' references!\nObject Reference: "+ref);
             }
         }else if (text == "worldFromModelRotation"){
             worldFromModelRotation = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'worldFromModelRotation' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'worldFromModelRotation' data field!\nObject Reference: "+ref);
             }
         }else if (text == "blendSpeed"){
             blendSpeed = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'blendSpeed' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'blendSpeed' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minSpeedToSwitch"){
             minSpeedToSwitch = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'minSpeedToSwitch' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'minSpeedToSwitch' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minSwitchTimeNoError"){
             minSwitchTimeNoError = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'minSwitchTimeNoError' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'minSwitchTimeNoError' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minSwitchTimeFullError"){
             minSwitchTimeFullError = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'minSwitchTimeFullError' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'minSwitchTimeFullError' data field!\nObject Reference: "+ref);
             }
         }else if (text == "startPlayingEventId"){
             startPlayingEventId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'startPlayingEventId' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'startPlayingEventId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "startMatchingEventId"){
             startMatchingEventId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'startMatchingEventId' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'startMatchingEventId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "rootBoneIndex"){
             rootBoneIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'rootBoneIndex' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'rootBoneIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "otherBoneIndex"){
             otherBoneIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'otherBoneIndex' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'otherBoneIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "anotherBoneIndex"){
             anotherBoneIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'anotherBoneIndex' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'anotherBoneIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pelvisIndex"){
             pelvisIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'pelvisIndex' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'pelvisIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "mode"){
             mode = reader.getElementValueAt(index);
             if (mode == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'mode' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'mode' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -348,11 +348,11 @@ bool hkbPoseMatchingGenerator::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         for (int i = 0; i < children.size(); i++){
             if (children.at(i).data() && !children.at(i).data()->write(writer)){
-                getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'children' at: "+QString::number(i)+"!!!", true);
+                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'children' at: "+QString::number(i)+"!!!");
             }
         }
     }
@@ -364,17 +364,17 @@ bool hkbPoseMatchingGenerator::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < children.size(); i++){
         //ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(children.at(i).getReference());
         ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(children.at(i).getShdPtrReference());
         if (!ptr){
-            writeToLog(getClassname()+": link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
+            WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
-            writeToLog(getClassname()+": link()!\n'children' data field is linked to invalid child!\nObject Name: "+name);
+            WRITE_TO_LOG(getClassname()+": link()!\n'children' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             children[i] = *ptr;
         }else{

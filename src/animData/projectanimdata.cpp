@@ -206,7 +206,7 @@ SkyrimAnimationMotionData *ProjectAnimData::findMotionData(int animationindex){
             return animationMotionData.at(i);
         }
     }
-    animationMotionData.append(new SkyrimAnimationMotionData(this, animationMotionData.size()));
+    animationMotionData.append(new SkyrimAnimationMotionData(this, animationindex));
     return animationMotionData.last();
 }
 

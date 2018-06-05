@@ -47,7 +47,6 @@ class BehaviorGraphView: public TreeGraphicsView
 public:
     BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file);
     virtual ~BehaviorGraphView();
-    void writeToLog(const QString & message, bool isError = false);
     QStringList getEventNames() const;
     void removeGeneratorData();
     void removeModifierData();

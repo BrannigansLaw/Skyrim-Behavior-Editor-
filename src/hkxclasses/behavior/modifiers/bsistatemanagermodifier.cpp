@@ -38,27 +38,27 @@ bool BSIStateManagerModifier::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "iStateVar"){
             iStateVar = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'iStateVar' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'iStateVar' data field!\nObject Reference: "+ref);
             }
         }if (text == "stateData"){
             int numtriggers = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
@@ -70,7 +70,7 @@ bool BSIStateManagerModifier::readData(const HkxXmlReader &reader, long index){
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                     if (reader.getNthAttributeValueAt(index, 0) == "pStateMachine"){
                         if (!stateData.last().pStateMachine.readShdPtrReference(index, reader)){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'pStateMachine' reference!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'pStateMachine' reference!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "stateID"){
                         stateData.last().stateID = reader.getElementValueAt(index).toInt(&ok);
@@ -133,7 +133,7 @@ bool BSIStateManagerModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
@@ -144,16 +144,16 @@ bool BSIStateManagerModifier::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < stateData.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(stateData.at(i).pStateMachine.data()->getReference());
         if (!ptr){
-            writeToLog(getClassname()+": link()!\nFailed to properly link 'stateData' data field!\nObject Name: "+name);
+            WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'stateData' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-            writeToLog(getClassname()+": link()!\n'stateData' data field is linked to invalid child!\nObject Name: "+name);
+            WRITE_TO_LOG(getClassname()+": link()!\n'stateData' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             stateData[i].pStateMachine = *ptr;
         }else{

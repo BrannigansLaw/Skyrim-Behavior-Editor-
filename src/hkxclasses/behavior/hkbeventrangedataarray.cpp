@@ -75,7 +75,7 @@ bool hkbEventRangeDataArray::readData(const HkxXmlReader &reader, long index){
                     }else if (reader.getNthAttributeValueAt(index, 0) == "eventMode"){
                         eventData.last().eventMode = reader.getElementValueAt(index);
                         if (!eventData.last().EventRangeMode.contains(eventData.last().eventMode)){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -127,7 +127,7 @@ bool hkbEventRangeDataArray::write(HkxXMLWriter *writer){
         writer->writeLine("\n");
         for (int i = 0; i < eventData.size(); i++){
             if (eventData.at(i).event.payload.data() && !eventData.at(i).event.payload.data()->write(writer)){
-                getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!", true);
+                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
             }
         }
     }

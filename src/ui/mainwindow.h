@@ -34,21 +34,6 @@ class SkeletonFile;
 class ProjectUI;
 class AnimationCacheUI;
 
-class PlainTextEdit: public QPlainTextEdit
-{
-    Q_OBJECT
-public:
-    PlainTextEdit(QWidget* parent = 0)
-        : QPlainTextEdit(parent)
-    {
-        //
-    }
-
-    QSize sizeHint() const{
-        return QSize(120, 40);
-    }
-};
-
 class MainWindow : public QWidget
 {
     Q_OBJECT
@@ -56,13 +41,11 @@ public:
     static QMessageBox::StandardButton yesNoDialogue(const QString & message);
     MainWindow();
     virtual ~MainWindow();
-    void writeToLog(const QString & message, bool isError = false);
     void removeBehaviorGraphs(const QStringList & filenames);
 protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
     void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
 private:
-    PlainTextEdit *debugLog;
     QString hkxcmdPath;
     QString skyrimDirectory;
     QString skyrimSpecialEdtionDirectory;
@@ -93,7 +76,6 @@ private:
     ProjectFile *projectFile;
     CharacterFile *characterFile;
     SkeletonFile *skeletonFile;
-    //QList <BehaviorFile *> behaviorFiles;
     QList <BehaviorGraphView *> behaviorGraphs;
     ProjectUI *projectUI;
     QGroupBox *behaviorGraphViewGB;
@@ -102,15 +84,11 @@ private:
     QScrollArea *objectDataSA;
     BehaviorVariablesUI *variablesWid;
     EventsUI *eventsWid;
-    QGroupBox *logGB;
-    QVBoxLayout *logGBLyt;
     QString lastFileSelected;
     QString lastFileSelectedPath;
     std::mutex mutex;
     std::condition_variable conditionVar;
     AnimationCacheUI *animationCacheUI;
-    bool allowLogging;
-    //QScrollArea *animationCacheSA;
 private slots:
     void createNewProject();
     void openPackedProject();
@@ -131,26 +109,23 @@ private slots:
     void packAndExportFileToSkyrimDirectory();
     void mergeBehaviors();
     void mergeProjects();
-    void openProjectForMerger(QString & filepath);
-    //void saveAs();
     void exit();
     void changedTabs(int index);
     void closeTab(int index);
     void addNewBehavior(bool initData);
-    void toggleLog(bool toggle);
 private:
     enum HKXCMD_RETURN{
         HKXCMD_SUCCESS = 0
     };
     QString generateUniqueBehaviorName();
     BehaviorFile *openBehaviorForMerger(QString & filepath);
-    void openProject(QString &filepath);
-    void saveFile(int index);
-    void saveMergedProject();
+    void openProject(QString &filepath, bool loadui = true, bool loadanimdata = true);
+    void saveFile(int index, int &taskCount);
     bool openBehavior(const QString & filename, int &taskCount, bool checkisopen = true);
     bool exitProgram();
     bool findGameDirectory(const QString &gamename, QString &gamedirectory);
-    MainWindow::HKXCMD_RETURN hkxcmd(const QString &filepath, const QString &outputDirectory, const QString &flags = "-f SAVE_CONCISE");
+    void convertProject(const QString &filepath, const QString &newpath = "", const QString &flags = "-v:xml");
+    HKXCMD_RETURN hkxcmd(const QString &filepath, const QString &outputDirectory, int &taskcount, const QString &flags = "-f SAVE_CONCISE");
     int getBehaviorGraphIndex(const QString & filename);
     void readSettings();
     void writeSettings();

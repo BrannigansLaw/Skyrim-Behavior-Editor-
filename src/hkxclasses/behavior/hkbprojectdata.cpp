@@ -39,16 +39,16 @@ bool hkbProjectData::readData(const HkxXmlReader &reader, long index){
         if (text == "worldUpWS"){
             worldUpWS = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'worldUpWS' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'worldUpWS' data field!\nObject Reference: "+ref);
             }
         }else if (text == "stringData"){
             if (!stringData.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'stringData' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'stringData' reference!\nObject Reference: "+ref);
             }
         }else if (text == "defaultEventMode"){
             defaultEventMode = reader.getElementValueAt(index);
             if (!EventMode.contains(defaultEventMode)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'defaultEventMode' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'defaultEventMode' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -75,7 +75,7 @@ bool hkbProjectData::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (stringData.data() && !stringData.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'stringData'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'stringData'!!!");
         }
     }
     return true;
@@ -90,13 +90,13 @@ bool hkbProjectData::link(){
     if (file){
         ptr = file->findProjectStringData(stringData.getShdPtrReference());
     }else{
-        writeToLog(getClassname()+": link()!\nParent file type is invalid!!!", true);
+        WRITE_TO_LOG(getClassname()+": link()!\nParent file type is invalid!!!");
     }
     if (!ptr->data()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'stringData' data field!\n");
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'stringData' data field!\n");
         setDataValidity(false);
     }else if ((*ptr)->getSignature() != HKB_PROJECT_STRING_DATA){
-        writeToLog(getClassname()+": link()!\n'stringData' data field is linked to invalid child!\n");
+        WRITE_TO_LOG(getClassname()+": link()!\n'stringData' data field is linked to invalid child!\n");
         setDataValidity(false);
         stringData = *ptr;
     }else{

@@ -21,14 +21,14 @@ bool HkxXmlReader::parse(){
     lineNumber = 0;
     if (!hkxXmlFile->open(QIODevice::ReadOnly)){
         isEOF = true;
-        //hkxXmlFile->writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" failed to open!", true);
+        //WRITE_TO_LOG("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" failed to open!");
         return false;
     }
     isEOF = false;
     QByteArray line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGTH);
     lineNumber++;
     if (line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\n" && line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\r\n"){
-        //hkxXmlFile->writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" is not in the correct XML format!", true);
+        //WRITE_TO_LOG("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" is not in the correct XML format!");
         return false;
     }
     HkxXmlParseLine result = NoError;
@@ -36,12 +36,12 @@ bool HkxXmlReader::parse(){
         //hkxXmlFile->//setProgressData("Parsing XML line number "+QString::number(lineNumber), 20);
         result = readNextLine();
         if (result != NoError && result != EmptyLine && result != EmptyLineEndFile){
-            //hkxXmlFile->writeToLog("HkxXmlReader: parse() failed because readNextLine() failed!", true);
+            //WRITE_TO_LOG("HkxXmlReader: parse() failed because readNextLine() failed!");
             return false;
         }
     }
     if (!indexOfElemTags.isEmpty()){
-        //hkxXmlFile->writeToLog("HkxXmlReader: parse() failed because there are orphaned element tags!!!", true);
+        //WRITE_TO_LOG("HkxXmlReader: parse() failed because there are orphaned element tags!!!");
         return false;
     }
     //hkxXmlFile->//setProgressData("XML parsed successfully!", 40);
@@ -244,7 +244,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
         return EmptyLineEndFile;
     }else if (line.size() == 1){
         if (line.at(0) != '\n'){
-            //hkxXmlFile->writeToLog("HkxXmlReader: readNextLine() failed because an orphaned character was found on line "+QString::number(lineNumber)+"!", true);
+            //WRITE_TO_LOG("HkxXmlReader: readNextLine() failed because an orphaned character was found on line "+QString::number(lineNumber)+"!");
             return OrphanedCharacter;
         }else{
             return EmptyLine;

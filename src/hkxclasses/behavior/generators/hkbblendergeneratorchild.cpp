@@ -44,25 +44,25 @@ bool hkbBlenderGeneratorChild::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "generator"){
             if (!generator.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'generator' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'generator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "boneWeights"){
             if (!boneWeights.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'boneWeights' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'boneWeights' reference!\nObject Reference: "+ref);
             }
         }else if (text == "weight"){
             weight = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'weight' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'weight' data field!\nObject Reference: "+ref);
             }
         }else if (text == "worldFromModelWeight"){
             worldFromModelWeight = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'worldFromModelWeight' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'worldFromModelWeight' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -101,13 +101,13 @@ bool hkbBlenderGeneratorChild::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (generator.data() && !generator.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'generator'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'generator'!!!");
         }
         if (boneWeights.data() && !boneWeights.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'boneWeights'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'boneWeights'!!!");
         }
     }
     return true;
@@ -117,7 +117,7 @@ bool hkbBlenderGeneratorChild::isParametricBlend() const{
     if (parentBG.constData() && parentBG.constData()->getSignature() == HKB_BLENDER_GENERATOR){
         return static_cast<const hkbBlenderGenerator *>(parentBG.constData())->isParametricBlend();
     }else{
-        getParentFile()->writeToLog(getClassname()+": isParametricBlend()!\nNo parent blender generator'!!!", true);
+        WRITE_TO_LOG(getClassname()+": isParametricBlend()!\nNo parent blender generator'!!!");
     }
     return false;
 }
@@ -141,7 +141,7 @@ QString hkbBlenderGeneratorChild::getName() const{
         }
         return name;
     }else{
-        getParentFile()->writeToLog(getClassname()+": getName()!\nNo parent blender generator'!!!", true);
+        WRITE_TO_LOG(getClassname()+": getName()!\nNo parent blender generator'!!!");
     }
     return "";
 }
@@ -203,22 +203,22 @@ bool hkbBlenderGeneratorChild::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!");
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(boneWeights.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-            writeToLog(getClassname()+": link()!\n'boneWeights' data field is linked to invalid child!");
+            WRITE_TO_LOG(getClassname()+": link()!\n'boneWeights' data field is linked to invalid child!");
             setDataValidity(false);
         }
         boneWeights = *ptr;
     }
     ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(generator.getShdPtrReference());
     if (!ptr){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'generator' data field!");
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'generator' data field!");
         setDataValidity(false);
     }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        writeToLog(getClassname()+": link()!\n'generator' data field is linked to invalid child!");
+        WRITE_TO_LOG(getClassname()+": link()!\n'generator' data field is linked to invalid child!");
         setDataValidity(false);
         generator = *ptr;
     }else{

@@ -34,6 +34,13 @@ void DataIconManager::updateIconNames(){
     }
 }
 
+bool DataIconManager::hasSameSignatureAndName(const DataIconManager *other) const{
+    if (!other || getSignature() != other->getSignature() || getName() != other->getName()){
+        return false;
+    }
+    return true;
+}
+
 QList<DataIconManager *> DataIconManager::getChildren() const{
     return QList<DataIconManager *> ();
 }

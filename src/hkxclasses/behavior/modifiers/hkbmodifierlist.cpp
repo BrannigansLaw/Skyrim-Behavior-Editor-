@@ -138,26 +138,26 @@ bool hkbModifierList::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "modifiers"){
             if (!readReferences(reader.getElementValueAt(index), modifiers)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'modifiers' references!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'modifiers' references!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -204,11 +204,11 @@ bool hkbModifierList::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         for (int i = 0; i < modifiers.size(); i++){
             if (modifiers.at(i).data() && !modifiers.at(i).data()->write(writer)){
-                getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'modifiers' at: "+QString::number(i)+"!!!", true);
+                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'modifiers' at: "+QString::number(i)+"!!!");
             }
         }
     }
@@ -220,16 +220,16 @@ bool hkbModifierList::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < modifiers.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifiers.at(i).getShdPtrReference());
         if (!ptr){
-            writeToLog(getClassname()+": link()!\nFailed to properly link 'modifiers' data field!\nObject Name: "+name);
+            WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'modifiers' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getType() != TYPE_MODIFIER){
-            writeToLog(getClassname()+": link()!\n'modifiers' data field is linked to invalid child!\nObject Name: "+name);
+            WRITE_TO_LOG(getClassname()+": link()!\n'modifiers' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             modifiers[i] = *ptr;
         }else{

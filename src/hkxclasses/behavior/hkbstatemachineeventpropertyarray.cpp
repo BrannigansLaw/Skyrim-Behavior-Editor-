@@ -108,7 +108,7 @@ bool hkbStateMachineEventPropertyArray::write(HkxXMLWriter *writer){
         writer->writeLine("\n");
         for (int i = 0; i < events.size(); i++){
             if (events.at(i).payload.data() && !events.at(i).payload.data()->write(writer)){
-                getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!", true);
+                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
             }
         }
     }

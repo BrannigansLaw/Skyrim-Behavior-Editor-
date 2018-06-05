@@ -33,19 +33,19 @@ bool hkbVariableValueSet::readData(const HkxXmlReader &reader, long index){
         if (text == "wordVariableValues"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
             index += 2;
             numElems = numElems*2 + index;
             for (; index < numElems; index += 2){
                 if (index >= reader.getNumElements()){
-                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref, true);
+                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
                     return false;
                 }
                 wordVariableValues.append(reader.getElementValueAt(index).toInt(&ok));
                 if (!ok){
-                    writeToLog(getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref, true);
+                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
                     return false;
                 }
             }
@@ -54,21 +54,21 @@ bool hkbVariableValueSet::readData(const HkxXmlReader &reader, long index){
         }else if (text == "quadVariableValues"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'quadVariableValues' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'quadVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
             if (numElems > 0 && !readMultipleVector4(reader.getElementValueAt(index), quadVariableValues)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'quadVariableValues' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'quadVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
         }else if (text == "variantVariableValues"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variantVariableValues' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variantVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
             if (numElems > 0 && !readReferences(reader.getElementValueAt(index), variantVariableValues)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variantVariableValues' data!\nObject Reference: "+ref, true);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variantVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
         }
@@ -141,10 +141,10 @@ bool hkbVariableValueSet::merge(HkxObject *recessiveobj){
         if (getSignature() == recessiveobj->getSignature()){
             //
         }else{
-            writeToLog(getClassname()+": merge()!\n'recessiveobj' is not the correct type!\n");
+            WRITE_TO_LOG(getClassname()+": merge()!\n'recessiveobj' is not the correct type!\n");
         }
     }else{
-        writeToLog(getClassname()+": merge()!\n'recessiveobj' is nullptr!\n");
+        WRITE_TO_LOG(getClassname()+": merge()!\n'recessiveobj' is nullptr!\n");
     }
     return true;
 }
@@ -160,10 +160,10 @@ bool hkbVariableValueSet::link(){
         if (file){
             ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variantVariableValues.at(i).getShdPtrReference());
             if (!ptr){
-                writeToLog(getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
+                WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
                 setDataValidity(false);
             }else if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-                writeToLog(getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
+                WRITE_TO_LOG(getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
                 setDataValidity(false);
                 variantVariableValues[i] = *ptr;
             }else{
@@ -174,10 +174,10 @@ bool hkbVariableValueSet::link(){
             if (file){
                 ptr = static_cast<CharacterFile *>(getParentFile())->findCharacterPropertyValues(variantVariableValues.at(i).getShdPtrReference());
                 if (!ptr){
-                    writeToLog(getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
+                    WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
                     setDataValidity(false);
                 }else if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-                    writeToLog(getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
+                    WRITE_TO_LOG(getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
                     setDataValidity(false);
                     variantVariableValues[i] = *ptr;
                 }else{

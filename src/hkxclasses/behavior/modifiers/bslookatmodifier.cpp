@@ -51,27 +51,27 @@ bool BSLookAtModifier::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "lookAtTarget"){
             lookAtTarget = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'lookAtTarget' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'lookAtTarget' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bones"){
             int numbones = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
@@ -84,32 +84,32 @@ bool BSLookAtModifier::readData(const HkxXmlReader &reader, long index){
                     if (reader.getNthAttributeValueAt(index, 0) == "index"){
                         bones.last().index = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'index' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'index' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "fwdAxisLS"){
                         bones.last().fwdAxisLS = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'fwdAxisLS' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'fwdAxisLS' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "limitAngleDegrees"){
                         bones.last().limitAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'limitAngleDegrees' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'limitAngleDegrees' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "onGain"){
                         bones.last().onGain = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'onGain' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'onGain' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "offGain"){
                         bones.last().offGain = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'offGain' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'offGain' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "enabled"){
                         bones.last().enabled = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'enabled' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enabled' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -129,32 +129,32 @@ bool BSLookAtModifier::readData(const HkxXmlReader &reader, long index){
                     if (reader.getNthAttributeValueAt(index, 0) == "index"){
                         eyeBones.last().index = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'index' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'index' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "fwdAxisLS"){
                         eyeBones.last().fwdAxisLS = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'fwdAxisLS' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'fwdAxisLS' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "limitAngleDegrees"){
                         eyeBones.last().limitAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'limitAngleDegrees' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'limitAngleDegrees' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "onGain"){
                         eyeBones.last().onGain = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'onGain' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'onGain' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "offGain"){
                         eyeBones.last().offGain = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'offGain' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'offGain' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "enabled"){
                         eyeBones.last().enabled = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'enabled' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enabled' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -168,71 +168,71 @@ bool BSLookAtModifier::readData(const HkxXmlReader &reader, long index){
         }else if (text == "limitAngleDegrees"){
             limitAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'limitAngleDegrees' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'limitAngleDegrees' data field!\nObject Reference: "+ref);
             }
         }else if (text == "limitAngleThresholdDegrees"){
             limitAngleThresholdDegrees = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'limitAngleThresholdDegrees' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'limitAngleThresholdDegrees' data field!\nObject Reference: "+ref);
             }
         }else if (text == "continueLookOutsideOfLimit"){
             continueLookOutsideOfLimit = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'continueLookOutsideOfLimit' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'continueLookOutsideOfLimit' data field!\nObject Reference: "+ref);
             }
         }else if (text == "onGain"){
             onGain = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'onGain' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'onGain' data field!\nObject Reference: "+ref);
             }
         }else if (text == "offGain"){
             offGain = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'offGain' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'offGain' data field!\nObject Reference: "+ref);
             }
         }else if (text == "useBoneGains"){
             useBoneGains = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'useBoneGains' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'useBoneGains' data field!\nObject Reference: "+ref);
             }
         }else if (text == "targetLocation"){
             targetLocation = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'targetLocation' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'targetLocation' data field!\nObject Reference: "+ref);
             }
         }else if (text == "targetOutsideLimits"){
             targetOutsideLimits = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'targetOutsideLimits' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'targetOutsideLimits' data field!\nObject Reference: "+ref);
             }
         }else if (text == "id"){
             id = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
             }
         }else if (text == "payload"){
             if (!payload.readShdPtrReference(index, reader)){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
             }
         }else if (text == "lookAtCamera"){
             lookAtCamera = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'lookAtCamera' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'lookAtCamera' data field!\nObject Reference: "+ref);
             }
         }else if (text == "lookAtCameraX"){
             lookAtCameraX = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'lookAtCameraX' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'lookAtCameraX' data field!\nObject Reference: "+ref);
             }
         }else if (text == "lookAtCameraY"){
             lookAtCameraY = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'lookAtCameraY' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'lookAtCameraY' data field!\nObject Reference: "+ref);
             }
         }else if (text == "lookAtCameraZ"){
             lookAtCameraZ = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                writeToLog(getClassname()+": readData()!\nFailed to properly read 'lookAtCameraZ' data field!\nObject Reference: "+ref);
+                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'lookAtCameraZ' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -315,10 +315,10 @@ bool BSLookAtModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (payload.data() && !payload.data()->write(writer)){
-            getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload'!!!", true);
+            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'payload'!!!");
         }
     }
     return true;
@@ -392,12 +392,12 @@ bool BSLookAtModifier::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        writeToLog(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            writeToLog(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
         }
         payload = *ptr;
     }

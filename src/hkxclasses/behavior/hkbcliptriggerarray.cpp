@@ -79,17 +79,17 @@ bool hkbClipTriggerArray::readData(const HkxXmlReader &reader, long index){
                     }else if (reader.getNthAttributeValueAt(index, 0) == "relativeToEndOfClip"){
                         triggers.last().relativeToEndOfClip = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'relativeToEndOfClip' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'relativeToEndOfClip' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "acyclic"){
                         triggers.last().acyclic = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'acyclic' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'acyclic' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "isAnnotation"){
                         triggers.last().isAnnotation = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            writeToLog(getClassname()+": readData()!\nFailed to properly read 'isAnnotation' data field!\nObject Reference: "+ref);
+                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'isAnnotation' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -143,7 +143,7 @@ bool hkbClipTriggerArray::write(HkxXMLWriter *writer){
         writer->writeLine("\n");
         for (int i = 0; i < triggers.size(); i++){
             if (triggers.at(i).event.payload.data() && !triggers.at(i).event.payload.data()->write(writer)){
-                getParentFile()->writeToLog(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!", true);
+                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
             }
         }
     }
