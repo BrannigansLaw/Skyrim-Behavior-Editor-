@@ -99,6 +99,7 @@ protected:
     bool parse();
     bool link();
 private:
+    bool detectErrors();
     QVector<DataIconManager *> merge(BehaviorFile *recessivefile);
     void mergeObjects(QVector<DataIconManager *> recessiveobjects);
     void generateDefaultCharacterData();

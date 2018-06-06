@@ -36,7 +36,7 @@ CharacterFile::CharacterFile(MainWindow *window, ProjectFile *projectfile, const
         root->addVariant("hkbCharacterData");
         root->setVariantAt(0, characterdata);
         setRootObject(HkxSharedPtr(root));
-        setIsChanged(true);
+        setIsChanged(false);
     }
 }
 

@@ -81,6 +81,13 @@ bool DataIconManager::merge(HkxObject *recessiveObject){
     return true;
 }
 
+void DataIconManager::setDataInvalid(){
+    for (int i = 0; i < icons.size(); i++){
+        icons.at(i)->setBrushColor(Qt::red);
+        icons.at(i)->update(/*QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size()))*/);
+    }
+}
+
 void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
     if (recessiveobj){
         //recessiveobj->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));

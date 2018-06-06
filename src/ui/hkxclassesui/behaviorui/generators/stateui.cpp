@@ -241,7 +241,7 @@ void StateUI::loadDynamicTableRows(){
             }
         }
         hkbStateMachineTransitionInfoArray *trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
-        if (trans){
+        if (trans && trans->getSignature() == HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
             table->setRowCount(transitionsButtonRow + trans->getNumTransitions() + 1);
             for (int i = transitionsButtonRow + 1, j = 0; i < table->rowCount(), j < trans->getNumTransitions(); i++, j++){
                 setRowItems(i, trans->getTransitionNameAt(j), trans->getClassname(), "Remove", "Edit", "Double click to remove this transition", "Double click to edit this transition");

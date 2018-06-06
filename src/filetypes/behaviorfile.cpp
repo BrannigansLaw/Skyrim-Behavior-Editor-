@@ -1399,6 +1399,27 @@ bool BehaviorFile::link(){
     return true;
 }
 
+bool BehaviorFile::detectErrors(){
+    bool errors = false;
+    if (behaviorGraph.data()){
+        QList <DataIconManager *> objects = static_cast<DataIconManager *>(behaviorGraph.data())->getChildren();
+        QList <DataIconManager *> children;
+        DataIconManager *dynamobj = nullptr;
+        while (!objects.isEmpty()){
+            dynamobj = static_cast<DataIconManager *>(objects.last());
+            if (!dynamobj->evaluateDataValidity()){
+                dynamobj->setDataInvalid();
+                errors = true;
+            }
+            children = dynamobj->getChildren();
+            objects.removeLast();
+            objects = objects + children;
+            children.clear();
+        }
+    }
+    return errors;
+}
+
 QVector <DataIconManager *> BehaviorFile::merge(BehaviorFile *recessivefile){
     bool found;
     QVector <DataIconManager *> objectsnotfound;
@@ -1585,42 +1606,32 @@ void BehaviorFile::write(){
         //
         QList <DataIconManager *> objects = static_cast<DataIconManager *>(behaviorGraph.data())->getChildren();
         QList <DataIconManager *> children;
-        hkbGenerator *generator = nullptr;
-        hkbModifier *modifier = nullptr;
+        DataIconManager *dynamobj = nullptr;
         while (!objects.isEmpty()){
-            if (objects.last()->getType() == HkxObject::TYPE_GENERATOR){
-                generator = static_cast<hkbGenerator *>(objects.last());
-                generator->updateReferences(ref);
-                generator->setIsWritten(false);
-                children = generator->getChildren();
-            }else if (objects.last()->getType() == HkxObject::TYPE_MODIFIER){
-                modifier = static_cast<hkbModifier *>(objects.last());
-                modifier->updateReferences(ref);
-                modifier->setIsWritten(false);
-                children = modifier->getChildren();
-            }
+            dynamobj = static_cast<DataIconManager *>(objects.last());
+            dynamobj->updateReferences(ref);
+            dynamobj->setIsWritten(false);
+            children = dynamobj->getChildren();
             objects.removeLast();
             objects = objects + children;
             children.clear();
             ref++;
         }
+        //
         /*for (int i = 0; i < generators.size(); i++, ref++){
             generators.at(i).data()->setIsWritten(false);
             generators.at(i).data()->setReference(ref);
-            //generators[i].setShdPtrReference(ref);
         }
         ref++;
         for (int i = 0; i < modifiers.size(); i++, ref++){
             modifiers.at(i).data()->setIsWritten(false);
             modifiers.at(i).data()->setReference(ref);
-            //modifiers[i].setShdPtrReference(ref);
         }
         ref++;
-        */for (int i = 0; i < otherTypes.size(); i++, ref++){
+        for (int i = 0; i < otherTypes.size(); i++, ref++){
             otherTypes.at(i).data()->setIsWritten(false);
             otherTypes.at(i).data()->setReference(ref);
-            //otherTypes[i].setShdPtrReference(ref);
-        }
+        }*/
         getWriter().setFile(this);
         if (!getWriter().writeToXMLFile()){
             CRITICAL_ERROR_MESSAGE("BehaviorFile::write(): writeToXMLFile() failed!!");

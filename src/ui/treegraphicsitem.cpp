@@ -102,7 +102,11 @@ void TreeGraphicsItem::setIconSelected(){
 }
 
 void TreeGraphicsItem::unselect(){
-    brushColor = Qt::gray;
+    if (!static_cast<HkxObject *>(itemData)->evaluateDataValidity()){
+        brushColor = Qt::red;
+    }else{
+        brushColor = Qt::gray;
+    }
     scene()->update(QRectF(scenePos(), scenePos() + QPointF(boundingRect().width(), boundingRect().height())));
 }
 

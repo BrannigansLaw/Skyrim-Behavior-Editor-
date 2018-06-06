@@ -36,6 +36,7 @@ protected:
     void injectWhileMerging(HkxObject *recessiveobj);
     bool merge(HkxObject *recessiveObject);
 private:
+    void setDataInvalid();
     bool wrapObjectAt(int index, DataIconManager *obj, DataIconManager *parentObj);
     TreeGraphicsItem *reconnectToNext();
     void appendIcon(TreeGraphicsItem *icon);

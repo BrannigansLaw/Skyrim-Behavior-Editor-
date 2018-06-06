@@ -45,6 +45,7 @@ protected:
     bool link();
     //SkyrimAnimData *getAnimData() const;
 private:
+    QString detectErrors();
     void removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *gentoignore);
     bool merge(ProjectFile *recessiveproject);
     bool mergeAnimationCaches(ProjectFile *recessiveproject);

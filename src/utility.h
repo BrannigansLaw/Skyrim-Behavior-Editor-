@@ -15,6 +15,7 @@
 //#define FATAL_ERROR_MESSAGE(message){QString str(message);QMessageBox msg;msg.setModal(true);msg.setText("WARNING: "+str);msg.exec();abort();}
 #define CRITICAL_ERROR_MESSAGE(message){QString str(message);QMessageBox msg;msg.setModal(true);msg.setText("CRITICAL ERROR: "+str+"\n\nWe advise that you save and then close the application and contact the author!!!");msg.exec();}
 #define WARNING_MESSAGE(message){QString str(message);QMessageBox msg;msg.setModal(true);msg.setText("WARNING: "+str);msg.exec();}
+#define USER_MESSAGE(message){QString str(message);QMessageBox msg;msg.setModal(true);msg.setText(str);msg.exec();}
 
 #define VIEW_GENERATORS_TABLE_TIP "Double click to view the table of generators"
 #define VIEW_MODIFIERS_TABLE_TIP "Double click to view the table of modifiers"

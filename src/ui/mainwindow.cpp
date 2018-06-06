@@ -389,9 +389,14 @@ void MainWindow::saveProject(){
         auto maxThreads = std::thread::hardware_concurrency() - 1;
         auto taskdifference = 0;
         auto numbehaviors = projectFile->behaviorFiles.size();
+        qreal difference = ((1.0)/((qreal)(numbehaviors)))*(100.0) - 20;
+        progress.setProgress("Saving project file...", 1);
         threads.push_back(std::thread(&ProjectFile::write, projectFile));
+        progress.setProgress("Saving character file...", 2);
         threads.push_back(std::thread(&CharacterFile::write, characterFile));
+        progress.setProgress("Saving animation translation and rotation data (animationdatasinglefile.txt)...", 10);
         threads.push_back(std::thread(&SkyrimAnimData::write, projectFile->skyrimAnimData, QString(lastFileSelectedPath+"/animationdatasinglefile.txt")));
+        progress.setProgress("Saving animation cache file (animationsetdatasinglefile.txt)...", 15);
         threads.push_back(std::thread(&SkyrimAnimSetData::write, projectFile->skyrimAnimSetData, QString(lastFileSelectedPath+"/animationsetdatasinglefile.txt")));
         for (auto i = 0; i < threads.size(); i++){
             if (threads.at(i).joinable()){
@@ -401,30 +406,27 @@ void MainWindow::saveProject(){
             }
         }
         threads.clear();
+        progress.setProgress("Saving behavior files...", 20);
         std::unique_lock<std::mutex> locker(mutex);
         for (uint i = 0; i < maxThreads, fileindex < numbehaviors; i++, fileindex++){
             threads.push_back(std::thread(&MainWindow::saveFile, this, fileindex, std::ref(taskCount)));
             threads.back().detach();
         }
-        while (true){
-            if (taskCount > 0){
-                if (taskCount < numbehaviors){
-                    percent = (1/numbehaviors)*(numbehaviors - taskCount);
-                    progress.setValue(percent);
-                }
-                taskdifference = previousCount - taskCount;
-                previousCount = taskCount;
-                for (; taskdifference > 0; taskdifference--){
-                    if (fileindex < numbehaviors){
-                        threads.push_back(std::thread(&MainWindow::saveFile, this, fileindex, std::ref(taskCount)));
-                        threads.back().detach();
-                        fileindex++;
-                    }
-                }
-                conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
-            }else{
-                break;
+        while (taskCount > 0){
+            if (taskCount < numbehaviors){
+                percent += difference;
+                progress.setValue(percent);
             }
+            taskdifference = previousCount - taskCount;
+            previousCount = taskCount;
+            for (; taskdifference > 0; taskdifference--){
+                if (fileindex < numbehaviors){
+                    threads.push_back(std::thread(&MainWindow::saveFile, this, fileindex, std::ref(taskCount)));
+                    threads.back().detach();
+                    fileindex++;
+                }
+            }
+            conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
         }
         threads.clear();
         projectFile->setIsChanged(false);
@@ -442,6 +444,7 @@ void MainWindow::packAndExportProjectToSkyrimDirectory(){
         QString path = skyrimDirectory+"/data/meshes/actors";
         QString projectFolder = path+"/"+lastFileSelectedPath.section("/", -1, -1);
         convertProject(lastFileSelectedPath, projectFolder, "-f SAVE_CONCISE");
+        exportAnimationData();
     }else{
         WRITE_TO_LOG("MainWindow::packAndExportProjectToSkyrimDirectory(): No project open!");
     }
@@ -551,6 +554,10 @@ void MainWindow::mergeBehaviors(){
 }
 
 void MainWindow::mergeProjects(){
+    QTime timer;
+    int timeelapsed;
+    timer.start();
+    timeelapsed = timer.elapsed();
     ProjectFile *dominantProject;
     ProjectFile *recessiveProject;
     QString dominantfilename;
@@ -572,6 +579,8 @@ void MainWindow::mergeProjects(){
         //delete recessiveProject;
         //delete projectFile;
         //projectFile = nullptr;
+        WRITE_TO_LOG("Time taken to merge project \""+recessivefilename+"\" with project \""+dominantfilename+"\" is "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
+        USER_MESSAGE("The project \""+recessivefilename+"\" was sucessfully merged with \""+dominantfilename+"\" project!");
     }
 }
 
@@ -732,14 +741,13 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
         }
         thread.join();
     }
-    progress.setProgress("Reading project file...", 4);
+    progress.setProgress("Loading project file...", 4);
     if (projectFile->parse()){
         WRITE_TO_LOG("Time taken to open file \""+filepath+"\" is approximately "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
         progress.setProgress("Loading character data...", 5);
         timeelapsed = timer.elapsed();
         characterFile = new CharacterFile(this, projectFile, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));
         if (characterFile->parse()){
-            progress.setProgress("Character data loaded sucessfully!!!", 8);
             projectFile->setCharacterFile(characterFile);
             projectFile->loadEncryptedAnimationNames();
             WRITE_TO_LOG("Time taken to open file \""+lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0)+"\" is approximately "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
@@ -747,7 +755,6 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
             progress.setProgress("Loading skeleton data...", 12);
             skeletonFile = new SkeletonFile(this, lastFileSelectedPath+"/"+characterFile->getRigName());
             if (skeletonFile->parse()){
-                progress.setProgress("Skeleton data loaded sucessfully!!!", 15);
                 characterFile->setSkeletonFile(skeletonFile);
                 if (loadui){
                     projectUI->setFilePath(lastFileSelectedPath);
@@ -765,6 +772,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
                         behaviornames.append(behavior);
                     }
                 }
+                progress.setProgress("Loading behavior files...", 15);
                 //This also reads files that may not belong to the current project! See dog!!
                 std::vector <std::thread> threads;
                 auto taskCount = behaviornames.size();
@@ -773,39 +781,35 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
                 auto maxThreads = std::thread::hardware_concurrency() - 1;
                 auto taskdifference = 0;
                 percent = 15;
+                qreal difference = ((1.0)/((qreal)(behaviornames.size())))*(100.0 - 10.0);
                 std::unique_lock<std::mutex> locker(mutex);
                 //Start reading behavior files...
                 for (uint i = 0; i < maxThreads, behaviorIndex < behaviornames.size(); i++, behaviorIndex++){
                     threads.push_back(std::thread(&MainWindow::openBehavior, this, behaviornames.at(behaviorIndex), std::ref(taskCount), false));
                     threads.back().detach();
                 }
-                while (true){
-                    if (taskCount > 0){
-                        if (taskCount < behaviornames.size()){
-                            percent = (1/behaviornames.size())*(behaviornames.size() - taskCount) - 35;
-                            progress.setValue(percent);
-                        }
-                        taskdifference = previousCount - taskCount;
-                        previousCount = taskCount;
-                        for (; taskdifference > 0; taskdifference--){
-                            if (behaviorIndex < behaviornames.size()){
-                                threads.push_back(std::thread(&MainWindow::openBehavior, this, behaviornames.at(behaviorIndex), std::ref(taskCount), false));
-                                threads.back().detach();
-                                behaviorIndex++;
-                            }
-                        }
-                        conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
-                    }else{
-                        break;
+                while (taskCount > 0){
+                    if (taskCount < behaviornames.size()){
+                        percent+=difference;
+                        progress.setValue(percent);
                     }
+                    taskdifference = previousCount - taskCount;
+                    previousCount = taskCount;
+                    for (; taskdifference > 0; taskdifference--){
+                        if (behaviorIndex < behaviornames.size()){
+                            threads.push_back(std::thread(&MainWindow::openBehavior, this, behaviornames.at(behaviorIndex), std::ref(taskCount), false));
+                            threads.back().detach();
+                            behaviorIndex++;
+                        }
+                    }
+                    conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
                 }
                 threads.clear();
-                progress.setProgress("Behavior files loaded sucessfully!!!", percent);
                 if (loadui){
+                    progress.setProgress("Loading behavior graphs...", percent);
                     for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
                         behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.at(i)));
                     }
-                    progress.setProgress("Loading behavior graphs...", percent);
                     for (int i = 0; i < behaviornames.size();){
                         for (uint j = 0; j < maxThreads; j++){
                             if (threads.size() < maxThreads){
@@ -838,7 +842,12 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
                 }
                 //projectFile->generateAnimClipDataForProject();
                 WRITE_TO_LOG("Time taken to open project \""+filepath+"\" is approximately "+QString::number(timer.elapsed())+" milliseconds");
+                progress.setProgress("Checking for errors...", 99);
+                QString errors = projectFile->detectErrors();
                 progress.setProgress("Project loaded sucessfully!!!", progress.maximum());
+                if (errors != ""){
+                    USER_MESSAGE(errors);
+                }
             }else{
                 CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The skeleton file "+characterFile->getRigName()+" could not be parsed!!!").toLocal8Bit().data());
                 cleanup();
@@ -1073,6 +1082,7 @@ bool MainWindow::findGameDirectory(const QString & gamename, QString & gamedirec
 }
 
 void MainWindow::convertProject(const QString &filepath, const QString &newpath, const QString &flags){
+    QStringList pathtoallfiles;
     QStringList filelist;
     {
         QDirIterator it(filepath.section("/", 0, -2), QDirIterator::Subdirectories);
@@ -1084,40 +1094,52 @@ void MainWindow::convertProject(const QString &filepath, const QString &newpath,
             }
         }
     }
+    if (newpath != ""){
+        for (auto i = 0; i < filelist.size(); i++){
+            if (filelist.at(i).contains("/behaviors", Qt::CaseInsensitive) || filelist.at(i).contains("/animations", Qt::CaseInsensitive) || filelist.at(i).contains("/character assets", Qt::CaseInsensitive)
+                    || (filelist.at(i).contains("/character", Qt::CaseInsensitive) && filelist.at(i).count("/character") == 2))
+            {
+                pathtoallfiles.append(newpath+"/"+filelist.at(i).section("/", -2, -1));
+            }else{
+                pathtoallfiles.append(newpath+"/"+filelist.at(i).section("/", -1, -1));
+            }
+        }
+    }else{
+        for (auto i = 0; i < filelist.size(); i++){
+            pathtoallfiles.append("");
+        }
+    }
     QProgressDialog progress("Converting packed hkx binaries to hkx xml...", "", 0, 100, this);
     progress.setWindowModality(Qt::WindowModal);
     std::vector <std::thread> threads;
-    int percent = 0;
-    int taskCount = filelist.size();
-    int previousCount = taskCount;
-    int fileIndex = 0;
+    auto percent = 0;
+    auto taskCount = filelist.size();
+    auto previousCount = taskCount;
+    auto fileIndex = 0;
     auto maxThreads = std::thread::hardware_concurrency() - 1;
     auto taskdifference = 0;
+    qreal difference = ((1.0)/((qreal)(filelist.size())))*(100.0);
     std::unique_lock<std::mutex> locker(mutex);
     //Read files...
     for (uint i = 0; i < maxThreads, fileIndex < filelist.size(); i++, fileIndex++){
-        threads.push_back(std::thread(&MainWindow::hkxcmd, this, filelist.at(fileIndex), newpath, std::ref(taskCount), flags));
+        threads.push_back(std::thread(&MainWindow::hkxcmd, this, filelist.at(fileIndex), pathtoallfiles.at(fileIndex), std::ref(taskCount), flags));
         threads.back().detach();
     }
-    while (true){
-        if (taskCount > 0){
-            if (taskCount < filelist.size()){
-                percent = (1/filelist.size())*(filelist.size() - taskCount);
-                progress.setValue(percent);
-            }
-            taskdifference = previousCount - taskCount;
-            previousCount = taskCount;
-            for (; taskdifference > 0; taskdifference--){
-                if (fileIndex < filelist.size()){
-                    threads.push_back(std::thread(&MainWindow::hkxcmd, this, filelist.at(fileIndex), newpath, std::ref(taskCount), flags));
-                    threads.back().detach();
-                    fileIndex++;
-                }
-            }
-            conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
-        }else{
-            break;
+    while (taskCount > 0){
+        if (taskCount < filelist.size()){
+            percent += difference;
+            progress.setValue(percent);
         }
+        taskdifference = previousCount - taskCount;
+        previousCount = taskCount;
+        for (; taskdifference > 0; taskdifference--){
+            if (fileIndex < filelist.size()){
+                threads.push_back(std::thread(&MainWindow::hkxcmd, this, filelist.at(fileIndex), pathtoallfiles.at(fileIndex), std::ref(taskCount), flags));
+                threads.back().detach();
+                fileIndex++;
+            }
+        }
+        conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
     }
     threads.clear();
     if (newpath == ""){
@@ -1159,18 +1181,19 @@ void MainWindow::convertProject(const QString &filepath, const QString &newpath,
 
 MainWindow::HKXCMD_RETURN MainWindow::hkxcmd(const QString &filepath, const QString &outputDirectory, int & taskcount, const QString &flags){
     QString command;
+    QProcess processHKXCMD;
+    HKXCMD_RETURN value;
     command = "\""+hkxcmdPath+"\" convert \""+filepath+"\" \""+outputDirectory+"\" "+flags;
     command.replace("/", "\\");
-    //command = "cmd /c "+command;
-    QProcess processHKXCMD;
-    HKXCMD_RETURN value = (HKXCMD_RETURN)processHKXCMD.execute(command);
-    if (value != HKXCMD_SUCCESS){
+    value = (HKXCMD_RETURN)processHKXCMD.execute(command);
+    if (value == HKXCMD_SUCCESS){
+        mutex.lock();
+        taskcount--;
+        conditionVar.notify_one();
+        mutex.unlock();
+    }else{
         WRITE_TO_LOG("MainWindow: packHKX() failed!\nThe command \""+command+"\" failed!");
     }
-    mutex.lock();
-    taskcount--;
-    conditionVar.notify_one();
-    mutex.unlock();
     return value;
 }
 

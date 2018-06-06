@@ -220,6 +220,16 @@ bool ProjectFile::link(){
     return true;
 }
 
+QString ProjectFile::detectErrors(){
+    QString errorstring;
+    for (auto i = 0; i < behaviorFiles.size(); i++){
+        if (behaviorFiles.at(i)->detectErrors()){
+            errorstring.append("WARNING: Errors found in \""+behaviorFiles.at(i)->fileName().section("/", -1, -1)+"\"!\n");
+        }
+    }
+    return errorstring;
+}
+
 void ProjectFile::removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *gentoignore){
     QStringList filestoremove;
     QStringList referencedbehaviors;
@@ -302,8 +312,6 @@ bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update ev
             }
             threads.clear();*/
             value = true;
-            setIsChanged(true);
-            character->setIsChanged(true);
             for (auto i = 0; i < recessivebehaviors.size(); i++){
                 found = false;
                 for (auto j = 0; j < behaviorFiles.size(); j++){
@@ -316,10 +324,6 @@ bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update ev
                     behaviorFiles.append(recessivebehaviors.at(i));
                 }
             }
-            for (auto j = 0; j < behaviorFiles.size(); j++){
-                behaviorFiles.at(j)->setIsChanged(true);
-            }
-            //return false;
             /*if (!mergeAnimationCaches(recessiveproject)){
                 WRITE_TO_LOG("ProjectFile: merge() failed!\nmergeAnimationCaches() failed!\n");
             }*/
