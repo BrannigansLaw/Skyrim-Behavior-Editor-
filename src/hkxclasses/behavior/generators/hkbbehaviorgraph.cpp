@@ -201,18 +201,13 @@ void hkbBehaviorGraph::unlink(){
 }
 
 bool hkbBehaviorGraph::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (!rootGenerator.data() || rootGenerator.data()->getSignature() != HKB_STATE_MACHINE) || (!data.data() || data.data()->getSignature() != HKB_BEHAVIOR_GRAPH_DATA) || (!VariableMode.contains(variableMode))){
+        setDataValidity(false);
         return false;
-    }else if (!rootGenerator.data() || rootGenerator.data()->getSignature() != HKB_STATE_MACHINE){
-    }else if (!data.data() || data.data()->getSignature() != HKB_BEHAVIOR_GRAPH_DATA){
-    }else if (!VariableMode.contains(variableMode)){
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbBehaviorGraph::~hkbBehaviorGraph(){

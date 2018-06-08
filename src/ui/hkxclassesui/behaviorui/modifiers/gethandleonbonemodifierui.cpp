@@ -194,6 +194,9 @@ void GetHandleOnBoneModifierUI::setLocalFrameName(const QString & name){
 void GetHandleOnBoneModifierUI::setRagdollBoneIndex(int index){
     if (bsData){
         bsData->ragdollBoneIndex = index - 1;
+        if (bsData->ragdollBoneIndex > -1){   //ragdollBoneIndex and animationBoneIndex cannot simultaneously have nonnegative values!!!
+            setAnimationBoneIndex(-1);
+        }
         bsData->getParentFile()->setIsChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("GetHandleOnBoneModifierUI::setRagdollBoneIndex(): The data is nullptr!!");
@@ -203,6 +206,9 @@ void GetHandleOnBoneModifierUI::setRagdollBoneIndex(int index){
 void GetHandleOnBoneModifierUI::setAnimationBoneIndex(int index){
     if (bsData){
         bsData->animationBoneIndex = index - 1;
+        if (bsData->animationBoneIndex > -1){   //ragdollBoneIndex and animationBoneIndex cannot simultaneously have nonnegative values!!!
+            setRagdollBoneIndex(-1);
+        }
         bsData->getParentFile()->setIsChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("GetHandleOnBoneModifierUI::setAnimationBoneIndex(): The data is nullptr!!");

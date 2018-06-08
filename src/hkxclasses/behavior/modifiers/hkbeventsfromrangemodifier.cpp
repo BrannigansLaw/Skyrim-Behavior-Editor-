@@ -179,16 +179,13 @@ void hkbEventsFromRangeModifier::unlink(){
 }
 
 bool hkbEventsFromRangeModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (!eventRanges.data() || !eventRanges.data()->evaluateDataValidity() || eventRanges.data()->getSignature() != HKB_EVENT_RANGE_DATA_ARRAY)){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (!eventRanges.data() || eventRanges.data()->getSignature() != HKB_EVENT_RANGE_DATA_ARRAY){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbEventsFromRangeModifier::~hkbEventsFromRangeModifier(){

@@ -153,15 +153,13 @@ void hkbTransformVectorModifier::unlink(){
 }
 
 bool hkbTransformVectorModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "")){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbTransformVectorModifier::~hkbTransformVectorModifier(){

@@ -126,6 +126,24 @@ void hkbEvaluateExpressionModifier::fixMergedEventIndices(BehaviorFile *dominant
     }
 }
 
+bool hkbEvaluateExpressionModifier::merge(HkxObject *recessiveObject){
+    hkbEvaluateExpressionModifier *obj = nullptr;
+    if (recessiveObject && recessiveObject->getSignature() == HKB_EVALUATE_EXPRESSION_MODIFIER){
+        obj = static_cast<hkbEvaluateExpressionModifier *>(recessiveObject);
+        if (expressions.data()){
+            if (obj->expressions.data()){
+                expressions.data()->merge(obj->expressions.data());
+            }
+        }else if (obj->expressions.data()){
+            expressions = obj->expressions;
+            getParentFile()->addObjectToFile(obj->expressions.data(), 0);
+        }
+        return true;
+    }else{
+        return false;
+    }
+}
+
 void hkbEvaluateExpressionModifier::updateReferences(long &ref){
     setReference(ref);
     ref++;
@@ -160,16 +178,13 @@ void hkbEvaluateExpressionModifier::unlink(){
 }
 
 bool hkbEvaluateExpressionModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (!expressions.data() || !expressions.data()->evaluateDataValidity() || expressions.data()->getSignature() != HKB_EXPRESSION_DATA_ARRAY)){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (!expressions.data()){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbEvaluateExpressionModifier::~hkbEvaluateExpressionModifier(){

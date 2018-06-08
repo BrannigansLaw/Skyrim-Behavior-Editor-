@@ -227,17 +227,13 @@ void hkbPoweredRagdollControlsModifier::unlink(){
 }
 
 bool hkbPoweredRagdollControlsModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (bones.data() && bones.data()->getSignature() != HKB_BONE_INDEX_ARRAY) || (boneWeights.data() && boneWeights.data()->getSignature() != HKB_BONE_WEIGHT_ARRAY)){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (bones.data() && bones.data()->getSignature() != HKB_BONE_INDEX_ARRAY){
-    }else if (boneWeights.data() && boneWeights.data()->getSignature() != HKB_BONE_WEIGHT_ARRAY){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbPoweredRagdollControlsModifier::~hkbPoweredRagdollControlsModifier(){

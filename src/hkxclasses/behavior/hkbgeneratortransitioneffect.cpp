@@ -153,17 +153,13 @@ void hkbGeneratorTransitionEffect::unlink(){
 }
 
 bool hkbGeneratorTransitionEffect::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (!SelfTransitionMode.contains(selfTransitionMode)) || (!EventMode.contains(eventMode)) || (!transitionGenerator.data() || transitionGenerator.data()->getType() != TYPE_GENERATOR) || (name == "")){
+        setDataValidity(false);
         return false;
-    }else if (!SelfTransitionMode.contains(selfTransitionMode)){
-    }else if (!EventMode.contains(eventMode)){
-    }else if (!transitionGenerator.data() || transitionGenerator.data()->getType() != TYPE_GENERATOR){
-    }else if (name == ""){
     }else{
+        setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbGeneratorTransitionEffect::~hkbGeneratorTransitionEffect(){

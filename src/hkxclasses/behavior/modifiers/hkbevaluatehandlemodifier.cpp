@@ -153,16 +153,13 @@ void hkbEvaluateHandleModifier::unlink(){
 }
 
 bool hkbEvaluateHandleModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (handle.data())){   //handle should be null???
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (handle.data()){   //Should be null???
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbEvaluateHandleModifier::~hkbEvaluateHandleModifier(){

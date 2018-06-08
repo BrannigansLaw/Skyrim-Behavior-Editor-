@@ -99,14 +99,13 @@ QString hkbBehaviorReferenceGenerator::getName() const{
 }
 
 bool hkbBehaviorReferenceGenerator::evaluateDataValidity(){
-    if (name == ""){
-    }else if (behaviorName == ""){
+    if (!HkDynamicObject::evaluateDataValidity() || name == "" || behaviorName == ""){
+        setDataValidity(false);
+        return false;
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbBehaviorReferenceGenerator::~hkbBehaviorReferenceGenerator(){

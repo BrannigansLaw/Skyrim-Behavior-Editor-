@@ -207,18 +207,14 @@ void BSModifyOnceModifier::unlink(){
     pOnDeactivateModifier = HkxSharedPtr();
 }
 
-bool BSModifyOnceModifier::evaluateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool BSModifyOnceModifier::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (!pOnActivateModifier.data()) || (!pOnDeactivateModifier.data())){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (!pOnActivateModifier.data()){
-    }else if (!pOnDeactivateModifier.data()){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSModifyOnceModifier::~BSModifyOnceModifier(){

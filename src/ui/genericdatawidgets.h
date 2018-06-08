@@ -61,7 +61,7 @@ public:
     ProgressDialog(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags())
         : QProgressDialog(labelText, cancelButtonText, minimum, maximum, parent, f)
     {
-        setMinimumSize(400, 50);
+        setMinimumSize(600, 50);
         setMinimumDuration(0);
         setWindowModality(Qt::WindowModal);
     }

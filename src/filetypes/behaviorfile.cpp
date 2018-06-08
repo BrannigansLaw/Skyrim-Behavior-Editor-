@@ -1399,25 +1399,42 @@ bool BehaviorFile::link(){
     return true;
 }
 
-bool BehaviorFile::detectErrors(){
+QString BehaviorFile::detectErrors(int & taskcount, std::mutex & mutex, std::condition_variable & conditionVar){
     bool errors = false;
-    if (behaviorGraph.data()){
-        QList <DataIconManager *> objects = static_cast<DataIconManager *>(behaviorGraph.data())->getChildren();
-        QList <DataIconManager *> children;
-        DataIconManager *dynamobj = nullptr;
-        while (!objects.isEmpty()){
-            dynamobj = static_cast<DataIconManager *>(objects.last());
-            if (!dynamobj->evaluateDataValidity()){
-                dynamobj->setDataInvalid();
-                errors = true;
-            }
-            children = dynamobj->getChildren();
-            objects.removeLast();
-            objects = objects + children;
-            children.clear();
+    DataIconManager *dynobj;
+    auto checkError = [&](QList <HkxSharedPtr> & objects, int index){
+        dynobj = static_cast<DataIconManager *>(objects.at(index).data());
+        if (dynobj && dynobj->isDataValid() && !dynobj->evaluateDataValidity()){
+            dynobj->setDataInvalid();
+            errors = true;
+            mutex.lock();
+            WRITE_TO_LOG(fileName().section("/", -1, -1)+": Object Name: "+dynobj->getName()+" : Object Type: "+QString::number(dynobj->getSignature(), 16)+"\n");
+            mutex.unlock();
         }
+    };
+    if ((behaviorGraph.data() && !behaviorGraph.data()->evaluateDataValidity()) || (stringData.data() && !stringData.data()->evaluateDataValidity()) ||
+            (variableValues.data() && !variableValues.data()->evaluateDataValidity()) || (graphData.data() && !graphData.data()->evaluateDataValidity()))
+    {
+        errors = true;
+        mutex.lock();
+        WRITE_TO_LOG(fileName().section("/", -1, -1)+": Root data is corrupted!"+"\n");
+        mutex.unlock();
     }
-    return errors;
+    for (auto i = 0; i < generators.size(); i++){
+        checkError(generators, i);
+    }
+    for (auto i = 0; i < modifiers.size(); i++){
+        checkError(modifiers, i);
+    }
+    mutex.lock();
+    taskcount--;
+    conditionVar.notify_one();
+    mutex.unlock();
+    if (errors){
+        return "WARNING: Errors found in \""+fileName().section("/", -1, -1)+"\"!\n";
+    }else{
+        return "";
+    }
 }
 
 QVector <DataIconManager *> BehaviorFile::merge(BehaviorFile *recessivefile){

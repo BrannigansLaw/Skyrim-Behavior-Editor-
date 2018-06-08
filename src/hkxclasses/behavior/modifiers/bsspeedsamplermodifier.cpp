@@ -128,16 +128,14 @@ void BSSpeedSamplerModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool BSSpeedSamplerModifier::evaluateDataValidity(){  //Check for valid state???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool BSSpeedSamplerModifier::evaluateDataValidity(){  //TO DO: Check for valid istate???
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "")){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSSpeedSamplerModifier::~BSSpeedSamplerModifier(){

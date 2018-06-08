@@ -213,17 +213,14 @@ void BSRagdollContactListenerModifier::unlink(){
     bones = HkxSharedPtr();
 }
 
-bool BSRagdollContactListenerModifier::evaluateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool BSRagdollContactListenerModifier::evaluateDataValidity(){    //TO DO: Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (contactEvent.payload.data() && contactEvent.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD) || (!bones.data())){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (!bones.data()){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSRagdollContactListenerModifier::~BSRagdollContactListenerModifier(){

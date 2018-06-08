@@ -170,16 +170,14 @@ void BSIsActiveModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool BSIsActiveModifier::evaluateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool BSIsActiveModifier::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "")){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSIsActiveModifier::~BSIsActiveModifier(){

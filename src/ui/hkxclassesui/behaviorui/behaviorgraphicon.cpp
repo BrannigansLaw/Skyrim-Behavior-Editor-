@@ -104,6 +104,7 @@ void BehaviorGraphIcon::setIconSelected(){
 void BehaviorGraphIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setFont(font);
+    pen.setColor(penColor);
     painter->setPen(pen);
     painter->setBrush(rGrad);
     painter->drawRoundedRect(boundingRect(), 4, 4);

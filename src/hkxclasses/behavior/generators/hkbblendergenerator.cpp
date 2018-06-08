@@ -319,17 +319,13 @@ bool hkbBlenderGenerator::evaluateDataValidity(){
             valid = false;
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (flags.toUInt(&valid) >= INVALID_FLAG || !valid) || (children.isEmpty())){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){
-    }else if (children.isEmpty()){
-    }else if (valid){
+    }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbBlenderGenerator::~hkbBlenderGenerator(){

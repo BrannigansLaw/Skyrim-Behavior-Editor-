@@ -186,16 +186,13 @@ void hkbKeyframeBonesModifier::unlink(){
 }
 
 bool hkbKeyframeBonesModifier::evaluateDataValidity(){    //Check if bone id is valid???
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (!keyframedBonesList.data())){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (!keyframedBonesList.data()){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbKeyframeBonesModifier::~hkbKeyframeBonesModifier(){

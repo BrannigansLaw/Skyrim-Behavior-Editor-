@@ -575,9 +575,9 @@ void TransitionsUI::setToStateId(const QString &name){
                 toNestedStateId->addItems(parentObj->getNestedStateNames(bsData->toStateId));
                 toNestedStateId->setCurrentIndex(parentObj->getNestedStateNames(bsData->toStateId).indexOf(parentObj->getNestedStateName(bsData->toStateId, bsData->toNestedStateId)));
                 connect(toNestedStateId, SIGNAL(currentIndexChanged(QString)), this, SLOT(setToNestedStateId(QString)), Qt::UniqueConnection);
-                emit transitionNamChanged("toNestedState_"+toNestedStateId->currentText(), transitionIndex);
+                emit transitionNameChanged("toNestedState_"+toNestedStateId->currentText(), transitionIndex);
             }else{
-                emit transitionNamChanged("to_"+name, transitionIndex);
+                emit transitionNameChanged("to_"+name, transitionIndex);
             }
         }else{
             CRITICAL_ERROR_MESSAGE("TransitionsUI::setToStateId(): The event name is nullptr!!");
@@ -605,7 +605,7 @@ void TransitionsUI::setToNestedStateId(const QString &name){
     if (bsData && parentObj){
         if (name != ""){
             bsData->toNestedStateId = parentObj->getNestedStateId(name, bsData->toStateId);
-            emit transitionNamChanged("toNestedState_"+toNestedStateId->currentText(), transitionIndex);
+            emit transitionNameChanged("toNestedState_"+toNestedStateId->currentText(), transitionIndex);
         }else{
             CRITICAL_ERROR_MESSAGE("TransitionsUI::setToNestedStateId(): The event name is nullptr!!");
         }

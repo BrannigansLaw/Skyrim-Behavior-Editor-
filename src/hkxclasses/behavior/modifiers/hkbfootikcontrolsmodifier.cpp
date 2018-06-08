@@ -341,16 +341,14 @@ void hkbFootIkControlsModifier::unlink(){
     }
 }
 
-bool hkbFootIkControlsModifier::evaluateDataValidity(){  //Check for valid event id???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool hkbFootIkControlsModifier::evaluateDataValidity(){  //TO DO: Check for valid event id???
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || legs.isEmpty()){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbFootIkControlsModifier::~hkbFootIkControlsModifier(){

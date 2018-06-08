@@ -57,6 +57,12 @@ struct hkVector3
     qreal z;
 };
 
+/*struct MultithreadHelper{
+    std::mutex *mutex;
+    std::condition_variable *conditionVariable;
+    unsigned long *taskCount;
+};*/
+
 struct hkQuadVariable
 {
     hkQuadVariable(qreal x = 0, qreal y = 0, qreal z = 0, qreal w = 0)

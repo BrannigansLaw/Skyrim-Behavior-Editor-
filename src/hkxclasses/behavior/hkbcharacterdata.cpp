@@ -638,25 +638,17 @@ hkVariableType hkbCharacterData::getCharacterPropertyTypeAt(int index) const{
 }
 
 bool hkbCharacterData::evaluateDataValidity(){
-    if (!characterPropertyValues.data() || characterPropertyValues.data()->getSignature() != HKB_VARIABLE_VALUE_SET){
+    if ((!characterPropertyValues.data() || characterPropertyValues.data()->getSignature() != HKB_VARIABLE_VALUE_SET) || (footIkDriverInfo.data() && footIkDriverInfo.data()->getSignature() != HKB_FOOT_IK_DRIVER_INFO) ||
+            (handIkDriverInfo.data() && handIkDriverInfo.data()->getSignature() != HKB_HAND_IK_DRIVER_INFO) || (!stringData.data() || stringData.data()->getSignature() != HKB_CHARACTER_STRING_DATA) ||
+            (!mirroredSkeletonInfo.data() || mirroredSkeletonInfo.data()->getSignature() != HKB_MIRRORED_SKELETON_INFO))
+    {
         setDataValidity(false);
         return false;
-    }else if (footIkDriverInfo.data() && footIkDriverInfo.data()->getSignature() != HKB_FOOT_IK_DRIVER_INFO){
-        setDataValidity(false);
-        return false;
-    }else if (handIkDriverInfo.data() && handIkDriverInfo.data()->getSignature() != HKB_HAND_IK_DRIVER_INFO){
-        setDataValidity(false);
-        return false;
-    }else if (!stringData.data() || stringData.data()->getSignature() != HKB_CHARACTER_STRING_DATA){
-        setDataValidity(false);
-        return false;
-    }else if (!mirroredSkeletonInfo.data() || mirroredSkeletonInfo.data()->getSignature() != HKB_MIRRORED_SKELETON_INFO){
-        setDataValidity(false);
-        return false;
+    }else {
+        //Check other data...
+        setDataValidity(true);
+        return true;
     }
-    //Check other data...
-    setDataValidity(true);
-    return true;
 }
 
 hkbCharacterData::~hkbCharacterData(){

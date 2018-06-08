@@ -426,20 +426,17 @@ void hkbAttachmentModifier::unlink(){
     attacheeHandle = HkxSharedPtr();
 }
 
-bool hkbAttachmentModifier::evaluateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool hkbAttachmentModifier::evaluateDataValidity(){    //TO DO: Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (sendToAttacherOnAttach.payload.data() && sendToAttacherOnAttach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD) ||
+            (sendToAttacheeOnAttach.payload.data() && sendToAttacheeOnAttach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD) || (sendToAttacherOnDetach.payload.data() && sendToAttacherOnDetach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD) ||
+            (sendToAttacheeOnDetach.payload.data() && sendToAttacheeOnDetach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD))
+    {
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (sendToAttacherOnAttach.payload.data() && sendToAttacherOnAttach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-    }else if (sendToAttacheeOnAttach.payload.data() && sendToAttacheeOnAttach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-    }else if (sendToAttacherOnDetach.payload.data() && sendToAttacherOnDetach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-    }else if (sendToAttacheeOnDetach.payload.data() && sendToAttacheeOnDetach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbAttachmentModifier::~hkbAttachmentModifier(){

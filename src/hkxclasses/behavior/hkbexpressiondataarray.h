@@ -28,6 +28,7 @@ public:
     bool write(HkxXMLWriter *writer);
     bool isEventReferenced(int eventindex) const;
     void fixMergedEventIndices(BehaviorFile *dominantfile);
+    bool merge(HkxObject *recessiveObject);
     void updateEventIndices(int eventindex);
 protected:
 private:
@@ -44,6 +45,8 @@ private:
         {
             //
         }
+
+        bool operator==(const hkExpression & other) const;
 
         QString expression;
         int assignmentVariableIndex;

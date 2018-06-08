@@ -235,16 +235,13 @@ void hkbBlenderGeneratorChild::unlink(){
 }
 
 bool hkbBlenderGeneratorChild::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (boneWeights.data() && boneWeights.data()->getSignature() != HKB_BONE_WEIGHT_ARRAY) || (!generator.data() || generator.data()->getType() != HkxObject::TYPE_GENERATOR)){
+        setDataValidity(false);
         return false;
-    }else if (boneWeights.data() && boneWeights.data()->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-    }else if (!generator.data() || generator.data()->getType() != HkxObject::TYPE_GENERATOR){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbBlenderGeneratorChild::~hkbBlenderGeneratorChild(){

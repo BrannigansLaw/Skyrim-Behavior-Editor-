@@ -24,11 +24,17 @@ QSize TreeGraphicsView::sizeHint() const{
     return QSize(500, 400);
 }
 
+bool TreeGraphicsView::drawGraphMT(DataIconManager *rootData, bool allowDuplicates, int &taskcount, std::mutex & mutex, std::condition_variable & conditionVar){
+    bool value = treeScene->drawGraph(rootData, allowDuplicates);
+    mutex.lock();
+    taskcount--;
+    conditionVar.notify_one();
+    mutex.unlock();
+    return value;
+}
+
 bool TreeGraphicsView::drawGraph(DataIconManager *rootData, bool allowDuplicates){
-    if (treeScene->drawGraph(rootData, allowDuplicates)){
-        return true;
-    }
-    return false;
+    return treeScene->drawGraph(rootData, allowDuplicates);
 }
 
 void TreeGraphicsView::wheelEvent(QWheelEvent *event){

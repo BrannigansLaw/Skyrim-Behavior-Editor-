@@ -308,17 +308,13 @@ bool BSBoneSwitchGenerator::evaluateDataValidity(){
             valid = false;
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || name == "" || (!pDefaultGenerator.data() || pDefaultGenerator.data()->getType() != HkxObject::TYPE_GENERATOR) || ChildrenA.isEmpty() || !valid){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (!pDefaultGenerator.data() || pDefaultGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){
-    }else if (ChildrenA.isEmpty()){
-    }else if (valid){
+    }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSBoneSwitchGenerator::~BSBoneSwitchGenerator(){

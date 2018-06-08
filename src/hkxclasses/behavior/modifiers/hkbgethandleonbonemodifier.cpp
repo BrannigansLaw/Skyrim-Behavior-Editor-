@@ -131,17 +131,13 @@ void hkbGetHandleOnBoneModifier::unlink(){
 }
 
 bool hkbGetHandleOnBoneModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (handleOut.data()) || (localFrameName == "") || (animationBoneIndex*ragdollBoneIndex >= 0)){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (handleOut.data()){
-    }else if (localFrameName == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbGetHandleOnBoneModifier::~hkbGetHandleOnBoneModifier(){

@@ -173,16 +173,13 @@ void BSiStateTaggingGenerator::unlink(){
 }
 
 bool BSiStateTaggingGenerator::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (!pDefaultGenerator.data() || pDefaultGenerator.data()->getType() != HkxObject::TYPE_GENERATOR) || (name == "")){
+        setDataValidity(false);
         return false;
-    }else if (!pDefaultGenerator.data() || pDefaultGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSiStateTaggingGenerator::~BSiStateTaggingGenerator(){

@@ -63,9 +63,10 @@ bool hkbExpressionCondition::evaluateDataValidity(){
     if (expression == ""){
         setDataValidity(false);
         return false;
+    }else{
+        setDataValidity(true);
+        return true;
     }
-    setDataValidity(true);
-    return true;
 }
 
 hkbExpressionCondition::~hkbExpressionCondition(){

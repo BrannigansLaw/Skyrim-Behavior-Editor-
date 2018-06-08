@@ -233,15 +233,13 @@ void BSDirectAtModifier::unlink(){
 }
 
 bool BSDirectAtModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "")){  //TO DO: check bone indices...
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSDirectAtModifier::~BSDirectAtModifier(){

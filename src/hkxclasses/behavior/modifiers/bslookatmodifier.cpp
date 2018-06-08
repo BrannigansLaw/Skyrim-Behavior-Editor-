@@ -409,17 +409,14 @@ void BSLookAtModifier::unlink(){
     payload = HkxSharedPtr();
 }
 
-bool BSLookAtModifier::evaluateDataValidity(){  //Check for valid bone indices???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool BSLookAtModifier::evaluateDataValidity(){  //TO DO: Check for valid bone indices???
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (payload.data() && payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD)){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (payload.data() && payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSLookAtModifier::~BSLookAtModifier(){

@@ -617,13 +617,12 @@ void MainWindow::exit(){
 void MainWindow::closeTab(int index){
     objectDataWid->unloadDataWidget();
     if (projectFile){
-        if (index == 0 && (projectFile->behaviorFiles.isEmpty() || (!projectFile->behaviorFiles.at(index)->getIsChanged() || closeAllDialogue() != QMessageBox::Cancel))){
+        if (index == 0 && projectFile->behaviorFiles.isEmpty()){
             closeAll();
         }else{
             index--;
-            if (index >= 0 && index < behaviorGraphs.size() && (!projectFile->behaviorFiles.at(index)->getIsChanged() || closeFileDialogue() != QMessageBox::Cancel)){
+            if (index >= 0 && index < behaviorGraphs.size()){
                 tabs->removeTab(index + 1);
-                //behaviorGraphs.move(index, behaviorGraphs.size() - 1);
             }else{
                 CRITICAL_ERROR_MESSAGE("MainWindow::closeTab(): The tab index is out of sync with the behavior files or behavior graphs!");
             }
@@ -688,7 +687,7 @@ void MainWindow::addNewBehavior(bool initData){
                 //dialog.setProgress("Drawing behavior graph...", 50);
                 behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.last()));
                 tabs->addTab(behaviorGraphs.last(), filename.section("/", -1, -1));
-                if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.last()->getBehaviorGraph()))){
+                if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.last()->getBehaviorGraph()), false)){
                     CRITICAL_ERROR_MESSAGE("MainWindow::addNewBehavior(): The behavior graph was drawn incorrectly!");
                 }
                 tabs->setCurrentIndex(tabs->count() - 1);
@@ -721,7 +720,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
     };
     QString behavior;
     QStringList behaviornames;
-    auto percent = 0;
+    auto percent = 20;
     QTime timer;
     int timeelapsed;
     if (tabs->count() > 0){
@@ -741,10 +740,10 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
         }
         thread.join();
     }
-    progress.setProgress("Loading project file...", 4);
+    progress.setProgress("Loading project file...", 50);
     if (projectFile->parse()){
         WRITE_TO_LOG("Time taken to open file \""+filepath+"\" is approximately "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
-        progress.setProgress("Loading character data...", 5);
+        progress.setProgress("Loading character data...", 50);
         timeelapsed = timer.elapsed();
         characterFile = new CharacterFile(this, projectFile, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));
         if (characterFile->parse()){
@@ -752,7 +751,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
             projectFile->loadEncryptedAnimationNames();
             WRITE_TO_LOG("Time taken to open file \""+lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0)+"\" is approximately "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
             timeelapsed = timer.elapsed();
-            progress.setProgress("Loading skeleton data...", 12);
+            progress.setProgress("Loading skeleton data...", 50);
             skeletonFile = new SkeletonFile(this, lastFileSelectedPath+"/"+characterFile->getRigName());
             if (skeletonFile->parse()){
                 characterFile->setSkeletonFile(skeletonFile);
@@ -772,16 +771,16 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
                         behaviornames.append(behavior);
                     }
                 }
-                progress.setProgress("Loading behavior files...", 15);
+                progress.setProgress("Loading behavior files...", 0);
                 //This also reads files that may not belong to the current project! See dog!!
                 std::vector <std::thread> threads;
+                auto maxThreads = std::thread::hardware_concurrency() - 1;
                 auto taskCount = behaviornames.size();
                 auto previousCount = taskCount;
                 auto behaviorIndex = 0;
-                auto maxThreads = std::thread::hardware_concurrency() - 1;
                 auto taskdifference = 0;
-                percent = 15;
-                qreal difference = ((1.0)/((qreal)(behaviornames.size())))*(100.0 - 10.0);
+                percent = 0;
+                qreal difference = ((1.0)/((qreal)(behaviornames.size())))*(100.0);
                 std::unique_lock<std::mutex> locker(mutex);
                 //Start reading behavior files...
                 for (uint i = 0; i < maxThreads, behaviorIndex < behaviornames.size(); i++, behaviorIndex++){
@@ -790,7 +789,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
                 }
                 while (taskCount > 0){
                     if (taskCount < behaviornames.size()){
-                        percent+=difference;
+                        percent += difference;
                         progress.setValue(percent);
                     }
                     taskdifference = previousCount - taskCount;
@@ -806,51 +805,49 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
                 }
                 threads.clear();
                 if (loadui){
+                    percent = 0;
                     progress.setProgress("Loading behavior graphs...", percent);
                     for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
                         behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.at(i)));
                     }
-                    for (int i = 0; i < behaviornames.size();){
-                        for (uint j = 0; j < maxThreads; j++){
-                            if (threads.size() < maxThreads){
-                                if (i < behaviornames.size() && i < behaviorGraphs.size()){
-                                    threads.push_back(std::thread(&TreeGraphicsView::drawGraph, behaviorGraphs[i], static_cast<DataIconManager *>(projectFile->behaviorFiles.at(i)->getBehaviorGraph()), false));
-                                    i++;
-                                }else{
-                                    break;
-                                }
-                            }else{
-                                for (int k = 0; k < threads.size(); k++){
-                                    if (threads.at(k).joinable()){
-                                        threads.at(k).join();
-                                    }else{
-                                        CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data());
-                                    }
-                                }
-                                threads.clear();
+                    taskCount = behaviornames.size();
+                    previousCount = taskCount;
+                    behaviorIndex = 0;
+                    taskdifference = 0;
+                    difference = ((1.0)/((qreal)(behaviornames.size())))*(100.0);
+                    //locker.lock();
+                    for (uint i = 0; i < maxThreads, behaviorIndex < behaviornames.size(); i++, behaviorIndex++){
+                        threads.push_back(std::thread(&TreeGraphicsView::drawGraphMT, behaviorGraphs[behaviorIndex], static_cast<DataIconManager *>(projectFile->behaviorFiles.at(behaviorIndex)->getBehaviorGraph()), false, std::ref(taskCount), std::ref(mutex), std::ref(conditionVar)));
+                        threads.back().detach();
+                    }
+                    while (taskCount > 0){
+                        if (taskCount < behaviornames.size()){
+                            percent += difference;
+                            progress.setValue(percent);
+                        }
+                        taskdifference = previousCount - taskCount;
+                        previousCount = taskCount;
+                        for (; taskdifference > 0; taskdifference--){
+                            if (behaviorIndex < behaviornames.size()){
+                                threads.push_back(std::thread(&TreeGraphicsView::drawGraphMT, behaviorGraphs[behaviorIndex], static_cast<DataIconManager *>(projectFile->behaviorFiles.at(behaviorIndex)->getBehaviorGraph()), false, std::ref(taskCount), std::ref(mutex), std::ref(conditionVar)));
+                                threads.back().detach();
+                                behaviorIndex++;
                             }
                         }
-                    }
-                    for (int k = 0; k < threads.size(); k++){
-                        if (threads.at(k).joinable()){
-                            threads.at(k).join();
-                        }else{
-                            CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data());
-                        }
+                        conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
                     }
                     threads.clear();
                 }
                 //projectFile->generateAnimClipDataForProject();
-                WRITE_TO_LOG("Time taken to open project \""+filepath+"\" is approximately "+QString::number(timer.elapsed())+" milliseconds");
-                progress.setProgress("Checking for errors...", 99);
-                QString errors = projectFile->detectErrors();
                 progress.setProgress("Project loaded sucessfully!!!", progress.maximum());
-                if (errors != ""){
-                    USER_MESSAGE(errors);
-                }
             }else{
                 CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The skeleton file "+characterFile->getRigName()+" could not be parsed!!!").toLocal8Bit().data());
                 cleanup();
+            }
+            QString errors = projectFile->detectErrors();
+            WRITE_TO_LOG("Time taken to open project \""+filepath+"\" is approximately "+QString::number(timer.elapsed())+" milliseconds");
+            if (errors != ""){
+                USER_MESSAGE(errors);
             }
         }else{
             CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The character file "+projectFile->getCharacterFilePathAt(0)+" could not be parsed!!!").toLocal8Bit().data());
@@ -1298,7 +1295,7 @@ void MainWindow::createNewProject(){
                         behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.last()));
                         tabs->addTab(projectUI, "Character Data");
                         tabs->addTab(behaviorGraphs.last(), projectFile->behaviorFiles.last()->fileName().section("/", -1, -1));
-                        if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.last()->getBehaviorGraph()))){
+                        if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.last()->getBehaviorGraph()), false)){
                             CRITICAL_ERROR_MESSAGE("MainWindow::createNewProject(): The behavior graph was drawn incorrectly!");
                         }
                         tabs->setCurrentIndex(tabs->count() - 1);

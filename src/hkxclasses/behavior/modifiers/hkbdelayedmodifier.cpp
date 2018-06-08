@@ -184,16 +184,13 @@ void hkbDelayedModifier::unlink(){
 }
 
 bool hkbDelayedModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (!modifier.data())){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (!modifier.data()){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbDelayedModifier::~hkbDelayedModifier(){

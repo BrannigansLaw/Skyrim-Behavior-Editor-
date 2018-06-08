@@ -352,23 +352,20 @@ void hkbSenseHandleModifier::unlink(){
     }
 }
 
-bool hkbSenseHandleModifier::evaluateDataValidity(){  //Check for valid event id???
+bool hkbSenseHandleModifier::evaluateDataValidity(){  //TO DO: Check for valid event id???
     for (int i = 0; i < ranges.size(); i++){
         if (ranges.at(i).event.payload.data() && ranges.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             setDataValidity(false);
             return false;
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (!SensingMode.contains(sensingMode))){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (!SensingMode.contains(sensingMode)){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbSenseHandleModifier::~hkbSenseHandleModifier(){

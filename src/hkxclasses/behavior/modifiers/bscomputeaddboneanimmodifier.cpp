@@ -125,16 +125,14 @@ void BSComputeAddBoneAnimModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool BSComputeAddBoneAnimModifier::evaluateDataValidity(){  //Check bone index???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool BSComputeAddBoneAnimModifier::evaluateDataValidity(){  //TO DO: Check bone index???
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "")){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSComputeAddBoneAnimModifier::~BSComputeAddBoneAnimModifier(){

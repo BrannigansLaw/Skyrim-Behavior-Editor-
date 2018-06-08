@@ -142,16 +142,14 @@ void BSLimbIKModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool BSLimbIKModifier::evaluateDataValidity(){  //Check for valid bone index???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool BSLimbIKModifier::evaluateDataValidity(){  //TO DO: Check for valid bone index???
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "")){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSLimbIKModifier::~BSLimbIKModifier(){

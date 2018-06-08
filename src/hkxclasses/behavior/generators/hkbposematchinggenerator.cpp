@@ -402,18 +402,13 @@ bool hkbPoseMatchingGenerator::evaluateDataValidity(){
             valid = false;
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (flags.toUInt(&valid) >= INVALID_FLAG || !valid) || (!Mode.contains(mode)) || (name == "") || (children.isEmpty())){
+        setDataValidity(false);
         return false;
-    }else if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){
-    }else if (!Mode.contains(mode)){
-    }else if (name == ""){
-    }else if (children.isEmpty()){
-    }else if (valid){
+    }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbPoseMatchingGenerator::~hkbPoseMatchingGenerator(){

@@ -151,6 +151,36 @@ void hkbExpressionDataArray::fixMergedEventIndices(BehaviorFile *dominantfile){
         setIsMerged(true);
     }
 }
+bool hkbExpressionDataArray::hkExpression::operator==(const hkExpression & other) const{
+    if (expression != other.expression || eventMode != other.eventMode){
+        return false;
+    }
+    return true;
+}
+
+bool hkbExpressionDataArray::merge(HkxObject *recessiveObject){
+    bool found;
+    hkbExpressionDataArray *obj = nullptr;
+    if (recessiveObject && recessiveObject->getSignature() == HKB_EXPRESSION_DATA_ARRAY){
+        obj = static_cast<hkbExpressionDataArray *>(recessiveObject);
+        for (auto i = 0; i < obj->expressionsData.size(); i++){
+            found = false;
+            for (auto j = 0; j < expressionsData.size(); j++){
+                found = false;
+                if (expressionsData.at(j) == obj->expressionsData.at(i)){
+                    found = true;
+                    break;
+                }
+            }
+            if (!found){
+                expressionsData.append(obj->expressionsData.at(i));
+            }
+        }
+        return true;
+    }else{
+        return false;
+    }
+}
 
 void hkbExpressionDataArray::updateEventIndices(int eventindex){
     for (auto i = 0; i < expressionsData.size(); i++){
@@ -164,8 +194,14 @@ bool hkbExpressionDataArray::link(){
     return true;
 }
 
-bool hkbExpressionDataArray::evaluateDataValidity(){
-    //Do later...
+bool hkbExpressionDataArray::evaluateDataValidity(){    //TO DO: parse expression??
+    for (auto i = 0; i < expressionsData.size(); i++){
+        if (expressionsData.at(i).expression == ""){
+            setDataValidity(false);
+            return false;
+        }
+    }
+    setDataValidity(true);
     return true;
 }
 

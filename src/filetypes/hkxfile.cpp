@@ -67,7 +67,7 @@ HkxXMLWriter & HkxFile::getWriter(){
     return writer;
 }
 
-MainWindow *HkxFile::getUi() const{
+MainWindow *HkxFile::getUI() const{
     return ui;
 }
 

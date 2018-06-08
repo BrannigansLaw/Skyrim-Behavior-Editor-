@@ -319,7 +319,7 @@ bool hkbVariableBindingSet::link(){
 }
 
 bool hkbVariableBindingSet::evaluateDataValidity(){
-    //Do later...
+    //TO DO...
     return true;
 }
 

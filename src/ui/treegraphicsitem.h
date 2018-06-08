@@ -30,6 +30,7 @@ public:
     virtual QRectF boundingRect() const;
     virtual QRectF branchExpandCollapseBox() const;
     void setBrushColor(Qt::GlobalColor color);
+    void setPenColor(Qt::GlobalColor color);
     bool reorderChildren();
     TreeGraphicsItem *getChildWithData(DataIconManager *data);
 protected:
@@ -63,6 +64,7 @@ private:
     QList <TreeGraphicsItem *> getAllIconsInBranch(TreeGraphicsItem *iconToFind = nullptr) const;
 protected:
     Qt::GlobalColor brushColor;
+    Qt::GlobalColor penColor;
     DataIconManager * itemData;
     bool isExpanded;
     qreal yCoordinate;

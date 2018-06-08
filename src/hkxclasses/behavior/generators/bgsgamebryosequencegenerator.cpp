@@ -103,15 +103,13 @@ QString BGSGamebryoSequenceGenerator::getName() const{
 }
 
 bool BGSGamebryoSequenceGenerator::evaluateDataValidity(){
-    if (name == ""){
-    }else if (pSequence == ""){
-    }else if (!BlendModeFunction.contains(eBlendModeFunction)){
+    if (!HkDynamicObject::evaluateDataValidity() || name == "" || pSequence == "" || !BlendModeFunction.contains(eBlendModeFunction)){
+        setDataValidity(false);
+        return false;
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BGSGamebryoSequenceGenerator::~BGSGamebryoSequenceGenerator(){

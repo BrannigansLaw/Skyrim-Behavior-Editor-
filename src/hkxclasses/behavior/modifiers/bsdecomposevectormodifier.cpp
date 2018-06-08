@@ -135,15 +135,13 @@ void BSDecomposeVectorModifier::unlink(){
 }
 
 bool BSDecomposeVectorModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "")){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSDecomposeVectorModifier::~BSDecomposeVectorModifier(){

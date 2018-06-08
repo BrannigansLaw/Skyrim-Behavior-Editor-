@@ -75,6 +75,9 @@ HkxObject::HkxType HkxObject::getType() const{
 
 void HkxObject::setDataValidity(bool isValid){
     dataValid = isValid;
+    if (!dataValid && (getType() == TYPE_GENERATOR || getType() == TYPE_MODIFIER)){
+        static_cast<DataIconManager *>(this)->setDataInvalid();
+    }
 }
 
 bool HkxObject::isDataValid()const{

@@ -223,17 +223,14 @@ void hkbDetectCloseToGroundModifier::unlink(){
     closeToGroundEvent.payload = HkxSharedPtr();
 }
 
-bool hkbDetectCloseToGroundModifier::evaluateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool hkbDetectCloseToGroundModifier::evaluateDataValidity(){    //TO DO: Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (closeToGroundEvent.payload.data() && closeToGroundEvent.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD)){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (closeToGroundEvent.payload.data() && closeToGroundEvent.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbDetectCloseToGroundModifier::~hkbDetectCloseToGroundModifier(){

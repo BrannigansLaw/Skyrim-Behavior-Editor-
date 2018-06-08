@@ -3,6 +3,7 @@
 #include "characterfile.h"
 #include "skeletonfile.h"
 
+#include "src/ui/genericdatawidgets.h"
 #include "src/animData/skyrimanimationmotiondata.h"
 #include "src/animData/skyrimanimdata.h"
 #include "src/animSetData/skyrimanimsetdata.h"
@@ -221,13 +222,41 @@ bool ProjectFile::link(){
 }
 
 QString ProjectFile::detectErrors(){
-    QString errorstring;
-    for (auto i = 0; i < behaviorFiles.size(); i++){
-        if (behaviorFiles.at(i)->detectErrors()){
-            errorstring.append("WARNING: Errors found in \""+behaviorFiles.at(i)->fileName().section("/", -1, -1)+"\"!\n");
-        }
+    ProgressDialog progress("Detecting errors...", "", 0, 100, getUI());
+    progress.setWindowModality(Qt::WindowModal);
+    std::vector <std::future<QString>> futures;
+    auto percent = 0;
+    auto numbehaviors = behaviorFiles.size();
+    auto taskCount = numbehaviors;
+    auto previousCount = taskCount;
+    auto fileIndex = 0;
+    auto maxThreads = std::thread::hardware_concurrency() - 1;
+    auto taskdifference = 0;
+    qreal difference = ((1.0)/((qreal)(numbehaviors)))*(100.0);
+    std::unique_lock<std::mutex> locker(mutex);
+    for (uint i = 0; i < maxThreads, fileIndex < numbehaviors; i++, fileIndex++){
+        futures.push_back(std::async(std::launch::async, &BehaviorFile::detectErrors, behaviorFiles.at(fileIndex), std::ref(taskCount), std::ref(mutex), std::ref(conditionVar)));
     }
-    return errorstring;
+    while (taskCount > 0){
+        if (taskCount < numbehaviors){
+            percent += difference;
+            progress.setValue(percent);
+        }
+        taskdifference = previousCount - taskCount;
+        previousCount = taskCount;
+        for (; taskdifference > 0; taskdifference--){
+            if (fileIndex < numbehaviors){
+                futures.push_back(std::async(std::launch::async, &BehaviorFile::detectErrors, behaviorFiles.at(fileIndex), std::ref(taskCount), std::ref(mutex), std::ref(conditionVar)));
+                fileIndex++;
+            }
+        }
+        conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
+    }
+    QString errorstring;
+    for (auto i = 0; i < futures.size(); i++){
+        errorstring = errorstring + futures.at(i).get();
+    }
+    return errorstring+"\nCheck 'DebugLog.txt' in the application directory for details...";
 }
 
 void ProjectFile::removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *gentoignore){

@@ -1,6 +1,9 @@
 #ifndef PROJECTFILE_H
 #define PROJECTFILE_H
 
+#include <mutex>
+#include <condition_variable>
+
 #include "src/filetypes/hkxfile.h"
 #include "src/animData/skyrimanimdata.h"
 #include "src/animSetData/skyrimanimsetdata.h"
@@ -73,6 +76,8 @@ private:
     HkxSharedPtr * findProjectData(long ref);
     HkxSharedPtr * findProjectStringData(long ref);
 private:
+    std::mutex mutex;
+    std::condition_variable conditionVar;
     CharacterFile *character;
     QList <BehaviorFile *> behaviorFiles;
     HkxSharedPtr stringData;

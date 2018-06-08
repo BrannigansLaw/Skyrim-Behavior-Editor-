@@ -21,6 +21,7 @@ public:
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
     void fixMergedEventIndices(BehaviorFile *dominantfile);
+    bool merge(HkxObject *recessiveObject);
     void updateReferences(long &ref);
 private:
     hkbEvaluateExpressionModifier& operator=(const hkbEvaluateExpressionModifier&);

@@ -1,6 +1,9 @@
 #ifndef BEHAVIORFILE_H
 #define BEHAVIORFILE_H
 
+#include <mutex>
+#include <condition_variable>
+
 #include "src/filetypes/hkxfile.h"
 
 class hkbBehaviorGraph;
@@ -99,7 +102,7 @@ protected:
     bool parse();
     bool link();
 private:
-    bool detectErrors();
+    QString detectErrors(int &taskcount, std::mutex &mutex, std::condition_variable &conditionVar);
     QVector<DataIconManager *> merge(BehaviorFile *recessivefile);
     void mergeObjects(QVector<DataIconManager *> recessiveobjects);
     void generateDefaultCharacterData();
@@ -111,6 +114,7 @@ private:
     //void mergedWrite();
     void removeBindings(int varIndex);
 private:
+    //std::mutex mutex;
     ProjectFile *project;
     CharacterFile *character;
     HkxSharedPtr behaviorGraph;

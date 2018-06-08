@@ -136,16 +136,14 @@ void hkbAttributeModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool hkbAttributeModifier::evaluateDataValidity(){  //Check for valid event id???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool hkbAttributeModifier::evaluateDataValidity(){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "")){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbAttributeModifier::~hkbAttributeModifier(){

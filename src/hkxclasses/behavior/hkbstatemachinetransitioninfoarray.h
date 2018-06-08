@@ -45,7 +45,7 @@ public:
             //
         }
 
-        bool operator==(const HkTransition & other);
+        bool operator==(const HkTransition & other) const;
 
         bool usingTriggerInterval() const{
             if (
@@ -83,7 +83,7 @@ public:
             {
                 //
             }
-            bool operator!=(const HkInterval & other){
+            bool operator!=(const HkInterval & other) const{
                 if (
                         enterEventId == other.enterEventId ||
                         exitEventId == other.exitEventId ||

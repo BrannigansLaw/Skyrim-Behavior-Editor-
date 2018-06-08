@@ -345,17 +345,13 @@ void hkbProxyModifier::unlink(){
 }
 
 bool hkbProxyModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (!PhantomType.contains(phantomType)) || (!LinearVelocityMode.contains(linearVelocityMode))){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (!PhantomType.contains(phantomType)){
-    }else if (!LinearVelocityMode.contains(linearVelocityMode)){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbProxyModifier::~hkbProxyModifier(){

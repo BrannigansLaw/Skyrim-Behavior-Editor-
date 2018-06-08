@@ -3,6 +3,9 @@
 
 #include <QGraphicsView>
 
+#include <mutex>
+#include <condition_variable>
+
 class QMenu;
 class TreeGraphicsScene;
 class DataIconManager;
@@ -15,7 +18,8 @@ class TreeGraphicsView: public QGraphicsView
 public:
     TreeGraphicsView(QMenu *menu);
     QSize sizeHint() const Q_DECL_OVERRIDE;
-    bool drawGraph(DataIconManager *rootData, bool allowDuplicates = false);
+    bool drawGraphMT(DataIconManager *rootData, bool allowDuplicates, int &taskcount, std::mutex &mutex, std::condition_variable &conditionVar);
+    bool drawGraph(DataIconManager *rootData, bool allowDuplicates);
     TreeGraphicsItem * getSelectedItem() const;
     DataIconManager * getSelectedData() const;
     bool reconnectIcon(TreeGraphicsItem *oldIconParent, DataIconManager *dataToReplace, int replaceindex, DataIconManager *replacementData, bool removeData = true);

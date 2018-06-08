@@ -222,15 +222,13 @@ void hkbHandIkControlsModifier::unlink(){
 }
 
 bool hkbHandIkControlsModifier::evaluateDataValidity(){  //Check for valid event id???
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || hands.isEmpty()){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbHandIkControlsModifier::~hkbHandIkControlsModifier(){

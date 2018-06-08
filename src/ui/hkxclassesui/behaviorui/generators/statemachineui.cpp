@@ -185,7 +185,7 @@ void StateMachineUI::connectSignals(){
     connect(stateUI, SIGNAL(viewGenerators(int,QString,QStringList)), this, SIGNAL(viewGenerators(int,QString,QStringList)), Qt::UniqueConnection);
     connect(stateUI, SIGNAL(stateNameChanged(QString,int)), this, SLOT(stateRenamed(QString,int)), Qt::UniqueConnection);
     connect(stateUI, SIGNAL(stateIdChanged(int,int,QString)), this, SLOT(setStateIDForRow(int,int,QString)), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(transitionNamChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(transitionNameChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)), Qt::UniqueConnection);
     connect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
     connect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
     connect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
@@ -216,7 +216,7 @@ void StateMachineUI::disconnectSignals(){
     disconnect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
     disconnect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
     disconnect(transitionUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
-    disconnect(transitionUI, SIGNAL(transitionNamChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)));
+    disconnect(transitionUI, SIGNAL(transitionNameChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)));
 }
 
 void StateMachineUI::loadData(HkxObject *data){

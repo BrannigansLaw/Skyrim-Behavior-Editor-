@@ -28,6 +28,7 @@ public:
     void updateIconNames();
     bool hasSameSignatureAndName(const DataIconManager * other) const;
     virtual int getIndexOfObj(DataIconManager *) const;
+    void setDataInvalid();
 protected:
     virtual QList <DataIconManager *> getChildren() const;
     virtual bool insertObjectAt(int , DataIconManager *);
@@ -36,7 +37,6 @@ protected:
     void injectWhileMerging(HkxObject *recessiveobj);
     bool merge(HkxObject *recessiveObject);
 private:
-    void setDataInvalid();
     bool wrapObjectAt(int index, DataIconManager *obj, DataIconManager *parentObj);
     TreeGraphicsItem *reconnectToNext();
     void appendIcon(TreeGraphicsItem *icon);

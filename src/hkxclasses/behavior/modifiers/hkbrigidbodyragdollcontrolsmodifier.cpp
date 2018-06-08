@@ -232,16 +232,13 @@ void hkbRigidBodyRagdollControlsModifier::unlink(){
 }
 
 bool hkbRigidBodyRagdollControlsModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (!bones.data() || !bones.data()->evaluateDataValidity() || bones.data()->getSignature() != HKB_BONE_INDEX_ARRAY)){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (!bones.data()){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbRigidBodyRagdollControlsModifier::~hkbRigidBodyRagdollControlsModifier(){

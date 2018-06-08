@@ -206,17 +206,14 @@ void BSPassByTargetTriggerModifier::unlink(){
     triggerEvent.payload = HkxSharedPtr();
 }
 
-bool BSPassByTargetTriggerModifier::evaluateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool BSPassByTargetTriggerModifier::evaluateDataValidity(){    //TO DO: Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (triggerEvent.payload.data() && triggerEvent.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD)){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (triggerEvent.payload.data() && triggerEvent.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSPassByTargetTriggerModifier::~BSPassByTargetTriggerModifier(){

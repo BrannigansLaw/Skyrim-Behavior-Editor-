@@ -804,16 +804,14 @@ int hkbBehaviorGraphData::getNumberOfVariables() const{
 }
 
 bool hkbBehaviorGraphData::evaluateDataValidity(){
-    if (!variableInitialValues.data() || variableInitialValues.data()->getSignature() != HKB_VARIABLE_VALUE_SET){
+    if (!variableInitialValues.data() || variableInitialValues.data()->getSignature() != HKB_VARIABLE_VALUE_SET || !stringData.data() || stringData.data()->getSignature() != HKB_BEHAVIOR_GRAPH_STRING_DATA){
         setDataValidity(false);
         return false;
-    }else if (!stringData.data() || stringData.data()->getSignature() != HKB_BEHAVIOR_GRAPH_STRING_DATA){
-        setDataValidity(false);
-        return false;
+    }else{
+        //Check other data...
+        setDataValidity(true);
+        return true;
     }
-    //Check other data...
-    setDataValidity(true);
-    return true;
 }
 
 hkbBehaviorGraphData::~hkbBehaviorGraphData(){

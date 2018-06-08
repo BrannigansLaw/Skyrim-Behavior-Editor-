@@ -1605,6 +1605,7 @@ BehaviorGraphView *HkDataUI::loadBehaviorView(BehaviorGraphView *view){
     delayedModUI->setBehaviorView(view);
     modifyOnceModUI->setBehaviorView(view);
     if (behaviorView){
+        connect(behaviorView, SIGNAL(iconSelected(TreeGraphicsItem *)), this, SLOT(changeCurrentDataWidget(TreeGraphicsItem *)), Qt::UniqueConnection);
         generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "nullptr");
         modifiersTable->loadTable(behaviorView->behavior->getModifierNames(), behaviorView->behavior->getModifierTypeNames(), "nullptr");
         variablesTable->loadTable(behaviorView->behavior->getVariableNames(), behaviorView->behavior->getVariableTypenames(), "NONE");

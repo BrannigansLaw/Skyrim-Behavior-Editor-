@@ -213,16 +213,13 @@ void BSSynchronizedClipGenerator::unlink(){
 }
 
 bool BSSynchronizedClipGenerator::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (!pClipGenerator.data() || pClipGenerator.data()->getSignature() != HKB_CLIP_GENERATOR) || (name == "")){
+        setDataValidity(false);
         return false;
-    }else if (!pClipGenerator.data() || pClipGenerator.data()->getSignature() != HKB_CLIP_GENERATOR){
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSSynchronizedClipGenerator::~BSSynchronizedClipGenerator(){

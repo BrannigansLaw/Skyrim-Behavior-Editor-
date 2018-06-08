@@ -234,17 +234,14 @@ void hkbEventDrivenModifier::unlink(){
     modifier = HkxSharedPtr();
 }
 
-bool hkbEventDrivenModifier::evaluateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool hkbEventDrivenModifier::evaluateDataValidity(){    //TO DO: Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (!modifier.data())){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (!modifier.data()){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbEventDrivenModifier::~hkbEventDrivenModifier(){

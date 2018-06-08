@@ -328,19 +328,15 @@ void BSCyclicBlendTransitionGenerator::unlink(){
 }
 
 bool BSCyclicBlendTransitionGenerator::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (!pBlenderGenerator.data() || pBlenderGenerator.data()->getSignature() != HKB_BLENDER_GENERATOR) ||
+            (eventToCrossBlend.payload.data() && eventToCrossBlend.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD) || (!BlendCurve.contains(eBlendCurve)) || (name == ""))
+    {
+        setDataValidity(false);
         return false;
-    }else if (!pBlenderGenerator.data() || pBlenderGenerator.data()->getSignature() != HKB_BLENDER_GENERATOR){
-    }else if (eventToFreezeBlendValue.payload.data() && eventToFreezeBlendValue.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-    }else if (eventToCrossBlend.payload.data() && eventToCrossBlend.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-    }else if (!BlendCurve.contains(eBlendCurve)){
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSCyclicBlendTransitionGenerator::~BSCyclicBlendTransitionGenerator(){

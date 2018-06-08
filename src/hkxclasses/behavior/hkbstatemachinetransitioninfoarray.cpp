@@ -41,7 +41,7 @@ hkbStateMachineTransitionInfoArray::hkbStateMachineTransitionInfoArray(HkxFile *
     refCount++;
 }
 
-bool hkbStateMachineTransitionInfoArray::HkTransition::operator ==(const HkTransition & other){
+bool hkbStateMachineTransitionInfoArray::HkTransition::operator ==(const HkTransition & other) const{
     if (
             triggerInterval != other.triggerInterval ||
             initiateInterval != other.initiateInterval ||
@@ -56,6 +56,7 @@ bool hkbStateMachineTransitionInfoArray::HkTransition::operator ==(const HkTrans
     }
     QStringList domflags = flags.split("|");
     QStringList recflags = other.flags.split("|");
+    //TO DO...
     hkbExpressionCondition *exp = static_cast<hkbExpressionCondition *>(condition.data());
     hkbExpressionCondition *otherexp = static_cast<hkbExpressionCondition *>(other.condition.data());
     hkbBlendingTransitionEffect *effect = static_cast<hkbBlendingTransitionEffect *>(transition.data());
@@ -478,15 +479,12 @@ bool hkbStateMachineTransitionInfoArray::link(){
     return true;
 }
 
-bool hkbStateMachineTransitionInfoArray::evaluateDataValidity(){
+bool hkbStateMachineTransitionInfoArray::evaluateDataValidity(){    //TO DO: Check flags...
     for (int i = 0; i < transitions.size(); i++){
-        if (transitions.at(i).condition.data() && transitions.at(i).condition.data()->getSignature() != HKB_EXPRESSION_CONDITION && transitions.at(i).condition.data()->getSignature() != HKB_STRING_CONDITION){
-            setDataValidity(false);
-            return false;
-        }else if (transitions.at(i).transition.data() && (transitions.at(i).transition.data()->getSignature() != HKB_BLENDING_TRANSITION_EFFECT || transitions.at(i).transition.data()->getSignature() != HKB_GENERATOR_TRANSITION_EFFECT)){
-            setDataValidity(false);
-            return false;
-        }else if (transitions.at(i).flags == ""){
+        if ((transitions.at(i).condition.data() && transitions.at(i).condition.data()->getSignature() != HKB_EXPRESSION_CONDITION) ||
+                (transitions.at(i).transition.data() && (transitions.at(i).transition.data()->getSignature() != HKB_BLENDING_TRANSITION_EFFECT || transitions.at(i).transition.data()->getSignature() != HKB_GENERATOR_TRANSITION_EFFECT)) ||
+                (transitions.at(i).flags == ""))
+        {
             setDataValidity(false);
             return false;
         }

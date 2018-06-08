@@ -310,19 +310,13 @@ void hkbClipGenerator::unlink(){
 
 bool hkbClipGenerator::evaluateDataValidity(){
     bool valid = true;
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (!PlaybackMode.contains(mode)) || (flags.toUInt(&valid) >= INVALID_FLAG || !valid) || (triggers.data() && !triggers.data()->evaluateDataValidity() && triggers.data()->getSignature() != HKB_CLIP_TRIGGER_ARRAY) || (name == "") || (animationName == "")){
+        setDataValidity(false);
         return false;
-    }else if (!PlaybackMode.contains(mode)){
-    }else if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){
-    }else if (triggers.data() && triggers.data()->getSignature() != HKB_CLIP_TRIGGER_ARRAY){
-    }else if (name == ""){
-    }else if (animationName == ""){
-    }else if (valid){
+    }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbClipGenerator::~hkbClipGenerator(){

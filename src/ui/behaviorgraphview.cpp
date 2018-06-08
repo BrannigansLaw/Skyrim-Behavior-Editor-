@@ -365,10 +365,10 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     connect(appendBSPassByTargetTriggerModifierAct, SIGNAL(triggered()), this, SLOT(appendBSPassByTargetTriggerModifier()));
     connect(removeObjBranchAct, SIGNAL(triggered()), this, SLOT(deleteSelectedObjectBranchSlot()));
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(popUpMenuRequested(QPoint)));
-    if (ui){
+    /*if (ui){
         ui->loadBehaviorView(this);
         connect(this, SIGNAL(iconSelected(TreeGraphicsItem *)), ui, SLOT(changeCurrentDataWidget(TreeGraphicsItem *)));
-    }
+    }*/
 }
 
 bool BehaviorGraphView::confirmationDialogue(const QString & message, QWidget *parent){

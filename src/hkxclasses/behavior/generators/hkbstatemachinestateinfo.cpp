@@ -409,19 +409,19 @@ void hkbStateMachineStateInfo::unlink(){
 }
 
 bool hkbStateMachineStateInfo::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (enterNotifyEvents.data() && !enterNotifyEvents.data()->evaluateDataValidity() && enterNotifyEvents.data()->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY) ||
+            (exitNotifyEvents.data() && !exitNotifyEvents.data()->evaluateDataValidity() && exitNotifyEvents.data()->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY) ||
+            (transitions.data() && !transitions.data()->evaluateDataValidity() && transitions.data()->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY) ||
+            (generator.data() && generator.data()->getType() != TYPE_GENERATOR) ||
+            (!parentSM)
+            )
+    {
+        setDataValidity(false);
         return false;
-    }else if (enterNotifyEvents.data() && enterNotifyEvents.data()->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
-    }else if (exitNotifyEvents.data() && exitNotifyEvents.data()->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
-    }else if (transitions.data() && transitions.data()->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
-    }else if (!generator.data() || generator.data()->getType() != HkxObject::TYPE_GENERATOR){
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbStateMachineStateInfo::~hkbStateMachineStateInfo(){

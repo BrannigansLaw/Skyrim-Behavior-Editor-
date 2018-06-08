@@ -83,7 +83,7 @@ bool DataIconManager::merge(HkxObject *recessiveObject){
 
 void DataIconManager::setDataInvalid(){
     for (int i = 0; i < icons.size(); i++){
-        icons.at(i)->setBrushColor(Qt::red);
+        icons.at(i)->setPenColor(Qt::red);
         icons.at(i)->update(/*QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size()))*/);
     }
 }

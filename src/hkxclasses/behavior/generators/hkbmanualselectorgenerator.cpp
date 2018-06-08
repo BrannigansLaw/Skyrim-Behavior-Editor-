@@ -240,18 +240,13 @@ bool hkbManualSelectorGenerator::evaluateDataValidity(){
             valid = false;
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (selectedGeneratorIndex < 0 || selectedGeneratorIndex > generators.size()) || (currentGeneratorIndex < 0 || currentGeneratorIndex > generators.size()) || (name == "") || (generators.isEmpty()) || !valid){
+        setDataValidity(false);
         return false;
-    }else if (selectedGeneratorIndex < 0 || selectedGeneratorIndex > generators.size()){
-    }else if (currentGeneratorIndex < 0 || currentGeneratorIndex > generators.size()){
-    }else if (name == ""){
-    }else if (generators.isEmpty()){
-    }else if (valid){
+    }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbManualSelectorGenerator::~hkbManualSelectorGenerator(){

@@ -122,7 +122,7 @@ void StateUI::connectSignals(){
     connect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)), Qt::UniqueConnection);
     connect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)), Qt::UniqueConnection);
     connect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-    connect(transitionUI, SIGNAL(transitionNamChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)), Qt::UniqueConnection);
+    connect(transitionUI, SIGNAL(transitionNameChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)), Qt::UniqueConnection);
 }
 
 void StateUI::disconnectSignals(){
@@ -138,7 +138,7 @@ void StateUI::disconnectSignals(){
     disconnect(transitionUI, SIGNAL(viewVariables(int,QString,QStringList)), this, SIGNAL(viewVariables(int,QString,QStringList)));
     disconnect(transitionUI, SIGNAL(viewProperties(int,QString,QStringList)), this, SIGNAL(viewProperties(int,QString,QStringList)));
     disconnect(transitionUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
-    disconnect(transitionUI, SIGNAL(transitionNamChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)));
+    disconnect(transitionUI, SIGNAL(transitionNameChanged(QString,int)), this, SLOT(transitionRenamed(QString,int)));
 }
 
 void StateUI::variableTableElementSelected(int index, const QString &name){

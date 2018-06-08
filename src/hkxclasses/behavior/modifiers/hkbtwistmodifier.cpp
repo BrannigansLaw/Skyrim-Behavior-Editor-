@@ -152,17 +152,13 @@ void hkbTwistModifier::unlink(){
 }
 
 bool hkbTwistModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (!SetAngleMethod.contains(setAngleMethod)) || (!RotationAxisCoordinates.contains(rotationAxisCoordinates))){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (!SetAngleMethod.contains(setAngleMethod)){
-    }else if (!RotationAxisCoordinates.contains(rotationAxisCoordinates)){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbTwistModifier::~hkbTwistModifier(){

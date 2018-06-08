@@ -16,6 +16,7 @@
 TreeGraphicsItem::TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *obj, int indexToInsert, Qt::GlobalColor color)
     : QGraphicsItem(parent),
       brushColor(color),
+      penColor(Qt::black),
       itemData(obj),
       isExpanded(true),
       yCoordinate(0),
@@ -77,9 +78,14 @@ void TreeGraphicsItem::setBrushColor(Qt::GlobalColor color){
     scene()->update(boundingRect());
 }
 
+void TreeGraphicsItem::setPenColor(Qt::GlobalColor color){
+    penColor = color;
+    scene()->update(boundingRect());
+}
+
 void TreeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
     painter->setRenderHint(QPainter::Antialiasing);
-    painter->setPen(Qt::black);
+    painter->setPen(penColor);
     painter->setBrush(brushColor);
     painter->drawRect(boundingRect());
     painter->setFont(itemFont);
@@ -103,10 +109,11 @@ void TreeGraphicsItem::setIconSelected(){
 
 void TreeGraphicsItem::unselect(){
     if (!static_cast<HkxObject *>(itemData)->evaluateDataValidity()){
-        brushColor = Qt::red;
+        penColor = Qt::red;
     }else{
-        brushColor = Qt::gray;
+        penColor = Qt::black;
     }
+    brushColor = Qt::gray;
     scene()->update(QRectF(scenePos(), scenePos() + QPointF(boundingRect().width(), boundingRect().height())));
 }
 

@@ -701,27 +701,22 @@ void hkbStateMachine::unlink(){
 }
 
 bool hkbStateMachine::evaluateDataValidity(){
-    bool valid = true;
     for (int i = 0; i < states.size(); i++){
         if (!states.at(i).data() || states.at(i).data()->getSignature() != HKB_STATE_MACHINE_STATE_INFO){
-            valid = false;
+            setDataValidity(false);
+            return false;
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (eventToSendWhenStateOrTransitionChanges.payload.data() && eventToSendWhenStateOrTransitionChanges.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD) ||
+            (maxSimultaneousTransitions > 32) || (!StartStateMode.contains(startStateMode)) || (!SelfTransitionMode.contains(selfTransitionMode)) || (name == "") ||
+            (wildcardTransitions.data() && (!wildcardTransitions.data()->evaluateDataValidity() || wildcardTransitions.data()->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY)) || (states.isEmpty()))
+    {
+        setDataValidity(false);
         return false;
-    }else if (eventToSendWhenStateOrTransitionChanges.payload.data() && eventToSendWhenStateOrTransitionChanges.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-    }else if (maxSimultaneousTransitions > 32){
-    }else if (!StartStateMode.contains(startStateMode)){
-    }else if (!SelfTransitionMode.contains(selfTransitionMode)){
-    }else if (name == ""){
-    }else if (wildcardTransitions.data() && wildcardTransitions.data()->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
-    }else if (states.isEmpty()){
-    }else if (valid){
+    }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbStateMachine::~hkbStateMachine(){

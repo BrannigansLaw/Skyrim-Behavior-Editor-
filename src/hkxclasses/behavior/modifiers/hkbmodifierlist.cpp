@@ -253,16 +253,13 @@ bool hkbModifierList::evaluateDataValidity(){
             valid = false;
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (modifiers.isEmpty()) || !valid){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (modifiers.isEmpty()){
-    }else if (valid){
+    }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbModifierList::~hkbModifierList(){

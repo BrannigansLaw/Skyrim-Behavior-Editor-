@@ -197,16 +197,13 @@ void BSBoneSwitchGeneratorBoneData::unlink(){
 }
 
 bool BSBoneSwitchGeneratorBoneData::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (spBoneWeight.data() && spBoneWeight.data()->getSignature() != HKB_BONE_WEIGHT_ARRAY) || (!pGenerator.data() || pGenerator.data()->getType() != HkxObject::TYPE_GENERATOR)){
+        setDataValidity(false);
         return false;
-    }else if (spBoneWeight.data() && spBoneWeight.data()->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-    }else if (!pGenerator.data() || pGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSBoneSwitchGeneratorBoneData::~BSBoneSwitchGeneratorBoneData(){

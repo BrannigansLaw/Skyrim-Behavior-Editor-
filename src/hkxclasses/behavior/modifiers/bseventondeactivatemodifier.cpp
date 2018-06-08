@@ -187,17 +187,14 @@ void BSEventOnDeactivateModifier::unlink(){
     event.payload = HkxSharedPtr();
 }
 
-bool BSEventOnDeactivateModifier::evaluateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool BSEventOnDeactivateModifier::evaluateDataValidity(){    //TO DO: Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (event.payload.data() && event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD)){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (event.payload.data() && event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSEventOnDeactivateModifier::~BSEventOnDeactivateModifier(){

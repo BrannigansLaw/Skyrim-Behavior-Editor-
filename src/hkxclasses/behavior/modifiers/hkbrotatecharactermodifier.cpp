@@ -121,15 +121,13 @@ void hkbRotateCharacterModifier::unlink(){
 }
 
 bool hkbRotateCharacterModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "")){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbRotateCharacterModifier::~hkbRotateCharacterModifier(){

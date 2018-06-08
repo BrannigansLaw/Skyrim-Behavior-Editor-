@@ -260,18 +260,14 @@ void BSEventEveryNEventsModifier::unlink(){
     eventToSend.payload = HkxSharedPtr();
 }
 
-bool BSEventEveryNEventsModifier::evaluateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool BSEventEveryNEventsModifier::evaluateDataValidity(){    //TO DO: Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (eventToCheckFor.payload.data() && eventToCheckFor.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD) || (eventToSend.payload.data() && eventToSend.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD)){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (eventToCheckFor.payload.data() && eventToCheckFor.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-    }else if (eventToSend.payload.data() && eventToSend.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSEventEveryNEventsModifier::~BSEventEveryNEventsModifier(){

@@ -177,15 +177,13 @@ bool BSIStateManagerModifier::evaluateDataValidity(){
             valid = false;
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || !valid){
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (valid){
+    }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSIStateManagerModifier::~BSIStateManagerModifier(){

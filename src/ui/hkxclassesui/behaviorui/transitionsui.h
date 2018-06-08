@@ -35,7 +35,7 @@ public:
     virtual ~TransitionsUI(){}
     void loadData(BehaviorFile *parentfile, hkbStateMachine *parent, hkbStateMachineTransitionInfoArray::HkTransition *data, int index);
 signals:
-    void transitionNamChanged(const QString & newName, int index);
+    void transitionNameChanged(const QString & newName, int index);
     void viewEvents(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);

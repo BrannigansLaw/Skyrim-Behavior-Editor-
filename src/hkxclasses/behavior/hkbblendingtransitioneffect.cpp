@@ -175,19 +175,13 @@ void hkbBlendingTransitionEffect::unlink(){
 }
 
 bool hkbBlendingTransitionEffect::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (!SelfTransitionMode.contains(selfTransitionMode)) || (!EventMode.contains(eventMode)) || (!Flags.contains(flags)) || (!EndMode.contains(endMode)) || (!BlendCurve.contains(blendCurve)) || (name == "")){
+        setDataValidity(false);
         return false;
-    }else if (!SelfTransitionMode.contains(selfTransitionMode)){
-    }else if (!EventMode.contains(eventMode)){
-    }else if (!Flags.contains(flags)){
-    }else if (!EndMode.contains(endMode)){
-    }else if (!BlendCurve.contains(blendCurve)){
-    }else if (name == ""){
     }else{
+        setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbBlendingTransitionEffect::~hkbBlendingTransitionEffect(){

@@ -330,19 +330,16 @@ void BSEventOnFalseToTrueModifier::unlink(){
     eventToSend3.payload = HkxSharedPtr();
 }
 
-bool BSEventOnFalseToTrueModifier::evaluateDataValidity(){    //Check if event id is valid???
-    if (!HkDynamicObject::evaluateDataValidity()){
+bool BSEventOnFalseToTrueModifier::evaluateDataValidity(){    //TO DO: Check if event id is valid???
+    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (eventToSend1.payload.data() && eventToSend1.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD) ||
+            (eventToSend2.payload.data() && eventToSend2.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD) || (eventToSend3.payload.data() && eventToSend3.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD))
+    {
+        setDataValidity(false);
         return false;
-    }else if (name == ""){
-    }else if (eventToSend1.payload.data() && eventToSend1.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-    }else if (eventToSend2.payload.data() && eventToSend2.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-    }else if (eventToSend3.payload.data() && eventToSend3.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 BSEventOnFalseToTrueModifier::~BSEventOnFalseToTrueModifier(){

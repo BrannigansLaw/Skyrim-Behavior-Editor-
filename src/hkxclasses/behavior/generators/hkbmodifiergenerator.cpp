@@ -202,17 +202,13 @@ void hkbModifierGenerator::unlink(){
 }
 
 bool hkbModifierGenerator::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity()){
+    if (!HkDynamicObject::evaluateDataValidity() || (modifier.data() && modifier.data()->getType() != HkxObject::TYPE_MODIFIER) || (!generator.data() || generator.data()->getType() != HkxObject::TYPE_GENERATOR) || (name == "")){
+        setDataValidity(false);
         return false;
-    }else if (modifier.data() && modifier.data()->getType() != HkxObject::TYPE_MODIFIER){
-    }else if (!generator.data() || generator.data()->getType() != HkxObject::TYPE_GENERATOR){
-    }else if (name == ""){
     }else{
         setDataValidity(true);
         return true;
     }
-    setDataValidity(false);
-    return false;
 }
 
 hkbModifierGenerator::~hkbModifierGenerator(){
