@@ -17,7 +17,6 @@
 #include "src/hkxclasses/behavior/generators/hkbbehaviorgraph.h"
 #include "src/ui/genericdatawidgets.h"
 #include "src/ui/hkxclassesui/behaviorui/animationsui.h"
-#include "src/ui/hkxclassesui/animationcacheui.h"
 
 #include <QtWidgets>
 
@@ -41,7 +40,8 @@ MainWindow::MainWindow()
       viewM(new QMenu("View", this)),
       expandA(new QAction("Expand All", this)),
       collapseA(new QAction("Collapse All", this)),
-      viewAnimationCacheA(new QAction("View Animation Cache", this)),
+      findGeneratorA(new QAction("Find Generator", this)),
+      findModifierA(new QAction("Find Modifier", this)),
       refocusA(new QAction("Refocus On Selected Item", this)),
       settingsM(new QMenu("Settings", this)),
       mergeM(new QMenu("Merge", this)),
@@ -60,8 +60,7 @@ MainWindow::MainWindow()
       eventsWid(new EventsUI("Events")),
       variablesWid(new BehaviorVariablesUI("Behavior Variables")),
       objectDataWid(new HkDataUI("Object Data")),
-      lastFileSelected("C:/"),
-      animationCacheUI(nullptr)
+      lastFileSelected("C:/")
 {
     //setStyleSheet("QComboBox {background: yellow};QWidget {background: darkGray}");
     projectUI->setDisabled(true);
@@ -70,10 +69,6 @@ MainWindow::MainWindow()
 #ifdef QT_DEBUG
     hkxcmdPath = "c:/users/wayne/desktop/hkxcmd.exe";
 #endif
-    animationCacheUI = new AnimationCacheUI();
-    animationCacheUI->setWindowTitle("Project Animation Cache Data!");
-    animationCacheUI->setVisible(false);
-
     openPackedProjectA->setStatusTip("Open a hkx project file!");
     //openPackedProjectA->setShortcut(QKeySequence::Open);
     openUnpackedProjectA->setStatusTip("Open a hkx xml project file!");
@@ -110,7 +105,8 @@ MainWindow::MainWindow()
     viewM->addAction(expandA);
     viewM->addAction(collapseA);
     viewM->addAction(refocusA);
-    viewM->addAction(viewAnimationCacheA);
+    viewM->addAction(findGeneratorA);
+    viewM->addAction(findModifierA);
     topMB->setMaximumHeight(50);
     topMB->addMenu(fileM);
     topMB->addMenu(viewM);
@@ -152,7 +148,8 @@ MainWindow::MainWindow()
     connect(saveProjectA, SIGNAL(triggered(bool)), this, SLOT(saveProject()), Qt::UniqueConnection);
     connect(expandA, SIGNAL(triggered(bool)), this, SLOT(expandBranches()), Qt::UniqueConnection);
     connect(collapseA, SIGNAL(triggered(bool)), this, SLOT(collapseBranches()), Qt::UniqueConnection);
-    connect(viewAnimationCacheA, SIGNAL(triggered(bool)), this, SLOT(viewAnimationCache()), Qt::UniqueConnection);
+    //connect(findGeneratorA, SIGNAL(triggered(bool)), ui, SLOT(viewGeneratorTable()), Qt::UniqueConnection);
+    //connect(findModifierA, SIGNAL(triggered(bool)), ui, SLOT(viewModifierTable()), Qt::UniqueConnection);
     connect(refocusA, SIGNAL(triggered(bool)), this, SLOT(refocus()), Qt::UniqueConnection);
     connect(exitA, SIGNAL(triggered(bool)), this, SLOT(exit()), Qt::UniqueConnection);
     connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(changedTabs(int)), Qt::UniqueConnection);
@@ -308,15 +305,6 @@ void MainWindow::setPathToGameDirectory(){
 void MainWindow::save(){
     auto count = 1;
     saveFile(getBehaviorGraphIndex(tabs->tabText(tabs->currentIndex())), count);
-}
-
-void MainWindow::viewAnimationCache(){
-    if (projectFile){
-        animationCacheUI->loadData(projectFile);
-        animationCacheUI->setVisible(true);
-    }else{
-        WRITE_TO_LOG("MainWindow::viewAnimationCache(): No project opened!");
-    }
 }
 
 void MainWindow::saveFile(int index, int & taskCount){
@@ -839,6 +827,9 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
                     threads.clear();
                 }
                 //projectFile->generateAnimClipDataForProject();
+                if (!behaviornames.isEmpty()){
+                    openBehaviorFile(behaviornames.first());
+                }
                 progress.setProgress("Project loaded sucessfully!!!", progress.maximum());
             }else{
                 CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The skeleton file "+characterFile->getRigName()+" could not be parsed!!!").toLocal8Bit().data());
@@ -980,9 +971,22 @@ void MainWindow::openUnpackedProject(){
 void MainWindow::openBehaviorFile(const QModelIndex & index){
     QString fileName = index.data().toString();
     for (int j = 0; j < behaviorGraphs.size(); j++){
-        if (fileName.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive) == 0){
+        if (!fileName.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive)){
             objectDataWid->loadBehaviorView(behaviorGraphs.at(j));
-            tabs->addTab(behaviorGraphs.at(j), fileName.section("/", -1, -1));
+            tabs->addTab(behaviorGraphs.at(j), fileName);
+            tabs->setCurrentIndex(tabs->count() - 1);
+            return;
+        }
+    }
+    CRITICAL_ERROR_MESSAGE("MainWindow::openBehaviorFile(): The selected behavior file was not found!");
+}
+
+void MainWindow::openBehaviorFile(const QString & fileName){
+    QString name = fileName.section("/", -1, -1);
+    for (int j = 0; j < behaviorGraphs.size(); j++){
+        if (!name.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive)){
+            objectDataWid->loadBehaviorView(behaviorGraphs.at(j));
+            tabs->addTab(behaviorGraphs.at(j), name);
             tabs->setCurrentIndex(tabs->count() - 1);
             return;
         }
@@ -1086,7 +1090,7 @@ void MainWindow::convertProject(const QString &filepath, const QString &newpath,
         QString temp;
         while (it.hasNext()){
             temp = it.next();
-            if (temp.contains(".hkx")){
+            if (temp.contains(".hkx") && !temp.contains("/animations/", Qt::CaseInsensitive) && !temp.contains("/_1stperson/", Qt::CaseInsensitive)){
                 filelist.append(temp);
             }
         }
@@ -1148,7 +1152,7 @@ void MainWindow::convertProject(const QString &filepath, const QString &newpath,
             QString temp;
             while (it.hasNext()){
                 temp = it.next();
-                if (temp.contains(".hkx")){
+                if (temp.contains(".hkx") && !temp.contains("/animations/", Qt::CaseInsensitive) && !temp.contains("/_1stperson/", Qt::CaseInsensitive)){
                     if (!QDir(temp).remove(temp)){
                         CRITICAL_ERROR_MESSAGE(QString("MainWindow::convertProject(): The file "+temp+" could not be removed!!!").toLocal8Bit().data());
                     }

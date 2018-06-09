@@ -2,6 +2,7 @@
 
 #include <QVBoxLayout>
 #include <QFormLayout>
+#include <QFileDialog>
 
 #include "src/utility.h"
 #include "src/filetypes/projectfile.h"
@@ -489,17 +490,25 @@ void CacheWidget::setAnimationNameAt(int row, int column){
 }
 
 void CacheWidget::addAnimation(){
-    if (bsData && projectData){
-        int index = animations->rowCount();
-        bsData->animations.append(new AnimCacheAnimationInfo(projectData->projectAnimationsPath, "NEWANIMATION", true));
-        animations->setRowCount(index + 1);
-        if (animations->item(index, 0)){
-            animations->item(index, 0)->setText(projectData->findAnimationNameFromEncryptedData(bsData->animations.back()->crcAnimationName));
+    QString filename = QFileDialog::getOpenFileName(this, tr("Select an animation file to add to the current animation cache..."), projectData->fileName().section("/", 0, -2), tr("hkx Files (*.hkx)"));
+    if (filename != ""){
+        if (bsData && projectData){
+            int index = animations->rowCount();
+            QString path = filename.section("/animations/", -1, -1).section("/", 0, -2);
+            QString name = filename.section("/", -1, -1).remove(".hkx");
+            if (path != ""){
+                path = "/"+path;
+            }
+            bsData->animations.append(new AnimCacheAnimationInfo(projectData->projectAnimationsPath+path, name, true));
+            animations->setRowCount(index + 1);
+            if (animations->item(index, 0)){
+                animations->item(index, 0)->setText(projectData->findAnimationNameFromEncryptedData(bsData->animations.back()->crcAnimationName));
+            }else{
+                animations->setItem(index, 0, new TableWidgetItem(projectData->findAnimationNameFromEncryptedData(bsData->animations.back()->crcAnimationName)));
+            }
         }else{
-            animations->setItem(index, 0, new TableWidgetItem(projectData->findAnimationNameFromEncryptedData(bsData->animations.back()->crcAnimationName)));
+            CRITICAL_ERROR_MESSAGE("CacheWidget::addCacheEvent(): The data is nullptr!!");
         }
-    }else{
-        CRITICAL_ERROR_MESSAGE("CacheWidget::addCacheEvent(): The data is nullptr!!");
     }
 }
 

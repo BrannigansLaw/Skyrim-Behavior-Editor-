@@ -14,6 +14,7 @@ class HandIkDriverInfoUI;
 class CheckBox;
 class AnimationsUI;
 class QPushButton;
+class AnimationCacheUI;
 
 class ProjectUI: public QGroupBox
 {
@@ -39,6 +40,7 @@ private slots:
 private:
     ProjectFile *project;
     QGridLayout *lyt;
+    AnimationCacheUI *animationCacheUI;
     CharacterPropertiesUI *characterProperties;
     AnimationsUI *animations;
     SkeletonUI *skeleton;

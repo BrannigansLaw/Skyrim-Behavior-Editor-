@@ -4,6 +4,7 @@
 #include "src/ui/hkxclassesui/behaviorui/animationsui.h"
 #include "src/ui/hkxclassesui/behaviorui/footikdriverinfoui.h"
 #include "src/ui/hkxclassesui/behaviorui/handikdriverinfoui.h"
+#include "src/ui/hkxclassesui/animationcacheui.h"
 #include "src/filetypes/projectfile.h"
 #include "src/filetypes/characterfile.h"
 #include "src/filetypes/skeletonfile.h"
@@ -20,6 +21,7 @@
 ProjectUI::ProjectUI(ProjectFile *file)
     : project(file),
       lyt(new QGridLayout),
+      animationCacheUI(new AnimationCacheUI()),
       characterProperties(new CharacterPropertiesUI("Character Properties")),
       skeleton(new SkeletonUI("Skeleton")),
       animations(new AnimationsUI("Animations")),
@@ -32,6 +34,7 @@ ProjectUI::ProjectUI(ProjectFile *file)
       addBehaviorFile(new QPushButton("Add New Behavior")),
       initializeWithCharacterData(new CheckBox("Use Character Events/Variables"))
 {
+    animationCacheUI->setWindowTitle("Project Animation Cache Data!");
     if (file){
         fileView->setRootIndex(fileSys->setRootPath(lastFileSelectedPath));
     }else{
@@ -49,10 +52,14 @@ ProjectUI::ProjectUI(ProjectFile *file)
     lyt->addWidget(addBehaviorFile, 0, 0, 1, 1);
     //lyt->addWidget(initializeWithCharacterData, 0, 1, 1, 1);
     lyt->addWidget(fileView, 1, 0, 2, 1);
-    lyt->addWidget(characterProperties, 0, 2, 2, 1);
-    lyt->addWidget(skeleton, 0, 4, 2, 1);
-    lyt->addWidget(enableFootIKCB, 3, 0, 1, 1);
-    lyt->addWidget(enableHandIKCB, 3, 2, 1, 1);
+    lyt->addWidget(characterProperties, 0, 2, 4, 1);
+    lyt->addWidget(skeleton, 0, 4, 4, 1);
+    lyt->addWidget(animationCacheUI, 0, 6, 6, 2);
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->addWidget(enableFootIKCB);
+    layout->addWidget(enableHandIKCB);
+    lyt->addLayout(layout, 3, 0, 1, 1);
+    //lyt->addWidget(enableHandIKCB, 3, 1, 1, 1);
     lyt->addWidget(footIK, 4, 0, 2, 1);
     lyt->addWidget(handIK, 4, 2, 2, 1);
     lyt->addWidget(animations, 4, 4, 2, 1);
@@ -123,6 +130,7 @@ void ProjectUI::loadData(){
             handIK->setDisabled(true);
         }
         handIK->loadBoneList(static_cast<hkaSkeleton *>(project->character->skeleton->skeletons.first().data())->getBoneNames());
+        animationCacheUI->loadData(project);
     }
 }
 

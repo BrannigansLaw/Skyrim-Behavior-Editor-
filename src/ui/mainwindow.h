@@ -32,7 +32,6 @@ class CharacterFile;
 class ProjectFile;
 class SkeletonFile;
 class ProjectUI;
-class AnimationCacheUI;
 
 class MainWindow : public QWidget
 {
@@ -65,7 +64,8 @@ private:
     QAction *expandA;
     QAction *collapseA;
     QAction *refocusA;
-    QAction *viewAnimationCacheA;
+    QAction *findGeneratorA;
+    QAction *findModifierA;
     QMenu *mergeM;
     QAction *mergeBehaviorsA;
     QAction *mergeProjectsA;
@@ -88,12 +88,12 @@ private:
     QString lastFileSelectedPath;
     std::mutex mutex;
     std::condition_variable conditionVar;
-    AnimationCacheUI *animationCacheUI;
 private slots:
     void createNewProject();
     void openPackedProject();
     void openUnpackedProject();
     void openBehaviorFile(const QModelIndex & index);
+    void openBehaviorFile(const QString & fileName);
     void openAnimationFile(const QString &animationname);
     void removeAnimation(int index);
     void expandBranches();
@@ -102,7 +102,6 @@ private slots:
     void setGameMode();
     void setPathToGameDirectory();
     void save();
-    void viewAnimationCache();
     void saveProject();
     void packAndExportProjectToSkyrimDirectory();
     void exportAnimationData() ;
