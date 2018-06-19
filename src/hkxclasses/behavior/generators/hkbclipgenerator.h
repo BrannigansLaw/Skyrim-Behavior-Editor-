@@ -28,6 +28,7 @@ public:
     void fixMergedEventIndices(BehaviorFile *dominantfile);
     bool merge(HkxObject *recessiveObject);
     void updateReferences(long &ref);
+    QVector <HkxObject *> getChildrenOtherTypes() const;
     enum ClipFlag{
         FLAG_NONE = 0,
         FLAG_CONTINUE_MOTION_AT_END = 1,

@@ -27,6 +27,7 @@ public:
     QString getName() const;
     int getThisIndex() const;
     void updateReferences(long &ref);
+    QVector <HkxObject *> getChildrenOtherTypes() const;
     bool operator==(const hkbBlenderGeneratorChild & other){
         if (
                 weight != other.weight ||
@@ -52,7 +53,7 @@ private:
 private:
     static uint refCount;
     static QString classname;
-    HkxSharedPtr parentBG;
+    HkxSharedPtr parentBG;  //TO DO: Change to raw ptr...
     HkxSharedPtr generator;
     HkxSharedPtr boneWeights;
     qreal weight;

@@ -24,6 +24,7 @@ public:
     void mergeEventIndex(int oldindex, int newindex);
     void fixMergedEventIndices(BehaviorFile *dominantfile);
     void updateReferences(long &ref);
+    QVector <HkxObject *> getChildrenOtherTypes() const;
 private:
     hkbSenseHandleModifier& operator=(const hkbSenseHandleModifier&);
     hkbSenseHandleModifier(const hkbSenseHandleModifier &);

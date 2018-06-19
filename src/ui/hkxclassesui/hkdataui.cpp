@@ -1,5 +1,6 @@
 #include "hkdataui.h"
 
+#include "src/ui/mainwindow.h"
 #include "src/ui/treegraphicsitem.h"
 #include "src/ui/genericdatawidgets.h"
 #include "src/hkxclasses/behavior/generators/bsboneswitchgeneratorbonedata.h"
@@ -388,8 +389,6 @@ HkDataUI::HkDataUI(const QString &title)
     //connect(animationsUI, SIGNAL(animationNameChanged(QString,int)), this, SLOT(animationNameChanged(QString,int)), Qt::UniqueConnection);
     //connect(animationsUI, SIGNAL(animationAdded(QString)), this, SLOT(animationAdded(QString)), Qt::UniqueConnection);
     //connect(animationsUI, SIGNAL(animationRemoved(int)), this, SLOT(animationRemoved(int)), Qt::UniqueConnection);
-
-    connect(behaviorView, SIGNAL(iconSelected(TreeGraphicsItem*)), this, SLOT(changeCurrentDataWidget(TreeGraphicsItem*)), Qt::UniqueConnection);
 }
 
 void HkDataUI::setEventsVariablesAnimationsUI(EventsUI *events, BehaviorVariablesUI *variables, AnimationsUI *animations){
@@ -420,6 +419,27 @@ void HkDataUI::unloadDataWidget(){
     disconnect(ragdollBonesTable, SIGNAL(elementSelected(int,QString)), 0, 0);
     loadedData = nullptr;
     stack->setCurrentIndex(DATA_TYPE_LOADED::NO_DATA_SELECTED);
+}
+
+void HkDataUI::connectToGeneratorTable(){
+    if (generatorsTable && behaviorView){
+        unloadDataWidget();
+        connect(generatorsTable, SIGNAL(elementSelected(int,QString)), behaviorView, SLOT(focusOnGeneratorIcon(int,QString)), Qt::UniqueConnection);
+        generatorsTable->showTable(0);
+    }
+}
+
+void HkDataUI::connectToModifierTable(){
+    if (modifiersTable && behaviorView){
+        unloadDataWidget();
+        connect(modifiersTable, SIGNAL(elementSelected(int,QString)), behaviorView, SLOT(focusOnModifierIcon(int,QString)), Qt::UniqueConnection);
+        modifiersTable->showTable(0);
+    }
+}
+
+void HkDataUI::disconnectTables(){
+    disconnect(generatorsTable, SIGNAL(elementSelected(int,QString)), behaviorView, SLOT(focusOnGeneratorIcon(int,QString)));
+    disconnect(modifiersTable, SIGNAL(elementSelected(int,QString)), behaviorView, SLOT(focusOnModifierIcon(int,QString)));
 }
 
 void HkDataUI::modifierAdded(const QString & name, const QString & type){
@@ -1606,6 +1626,7 @@ BehaviorGraphView *HkDataUI::loadBehaviorView(BehaviorGraphView *view){
     modifyOnceModUI->setBehaviorView(view);
     if (behaviorView){
         connect(behaviorView, SIGNAL(iconSelected(TreeGraphicsItem *)), this, SLOT(changeCurrentDataWidget(TreeGraphicsItem *)), Qt::UniqueConnection);
+        connect(behaviorView, SIGNAL(disconnectTablesFromHkDataUI()), this, SLOT(disconnectTables()), Qt::UniqueConnection);
         generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "nullptr");
         modifiersTable->loadTable(behaviorView->behavior->getModifierNames(), behaviorView->behavior->getModifierTypeNames(), "nullptr");
         variablesTable->loadTable(behaviorView->behavior->getVariableNames(), behaviorView->behavior->getVariableTypenames(), "NONE");

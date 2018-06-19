@@ -23,6 +23,7 @@ public:
     void fixMergedEventIndices(BehaviorFile *dominantfile);
     bool merge(HkxObject *recessiveObject);
     void updateReferences(long &ref);
+    QVector <HkxObject *> getChildrenOtherTypes() const;
 private:
     hkbEvaluateExpressionModifier& operator=(const hkbEvaluateExpressionModifier&);
     hkbEvaluateExpressionModifier(const hkbEvaluateExpressionModifier &);

@@ -18,7 +18,8 @@ public:
     //bool evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
-    hkbBoneWeightArray * clone() const;
+    hkbBoneWeightArray * clone() const;   //TO DO: implement getChildrenOtherTypes()??
+    QVector <HkxObject *> getChildrenOtherTypes() const;
 private:
     hkbBoneWeightArray& operator=(const hkbBoneWeightArray&);
     hkbBoneWeightArray(const hkbBoneWeightArray &other);

@@ -35,7 +35,7 @@ bool hkbExpressionCondition::readData(const HkxXmlReader & reader, long index){
         if (text == "expression"){
             expression = reader.getElementValueAt(index);
             if (expression == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'expression' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'expression' data field!\nObject Reference: "+ref);
             }
         }
         index++;

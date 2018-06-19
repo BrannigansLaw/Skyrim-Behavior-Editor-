@@ -29,6 +29,7 @@ public:
     bool hasSameSignatureAndName(const DataIconManager * other) const;
     virtual int getIndexOfObj(DataIconManager *) const;
     void setDataInvalid();
+    void setFocusOnTopIcon();
 protected:
     virtual QList <DataIconManager *> getChildren() const;
     virtual bool insertObjectAt(int , DataIconManager *);

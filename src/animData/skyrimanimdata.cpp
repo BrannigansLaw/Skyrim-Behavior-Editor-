@@ -10,6 +10,15 @@ SkyrimAnimData::SkyrimAnimData()
     //
 }
 
+SkyrimAnimData::~SkyrimAnimData()
+{
+    for (auto i = 0; i < animData.size(); i++){
+        if (animData.at(i)){
+            delete animData.at(i);
+        }
+    }
+}
+
 bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore, const QStringList & behaviorfilenames){
     if (!file || (!file->isOpen() && !file->open(QIODevice::ReadOnly | QIODevice::Text))){
         return false;
@@ -34,20 +43,20 @@ bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore, const Q
                         if (line.contains(".txt")){
                             projectNames.append(line);
                         }else{
-                            CRITICAL_ERROR_MESSAGE("SkyrimAnimData::parse(): Corrupted project filename does not have 'txt' extension!");
+                            LogFile::writeToLog("SkyrimAnimData::parse(): Corrupted project filename does not have 'txt' extension!");
                             return false;
                         }
                     }else{
-                        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::parse(): Unexpected EOF!");
+                        LogFile::writeToLog("SkyrimAnimData::parse(): Unexpected EOF!");
                         return false;
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE("SkyrimAnimData::parse(): Corrupted length of current block!");
+                LogFile::writeToLog("SkyrimAnimData::parse(): Corrupted length of current block!");
                 return false;
             }
         }else{
-            CRITICAL_ERROR_MESSAGE("SkyrimAnimData::parse(): Unexpected EOF!");
+            LogFile::writeToLog("SkyrimAnimData::parse(): Unexpected EOF!");
             return false;
         }
     }
@@ -73,7 +82,7 @@ bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore, const Q
     for (int i = 0; i < size && i < indexToIgnore; i++){
         animData.append(new ProjectAnimData());
         if (!animData.last()->read(file)){
-            CRITICAL_ERROR_MESSAGE("SkyrimAnimData::parse(): ProjectAnimData read failed!");
+            LogFile::writeToLog("SkyrimAnimData::parse(): ProjectAnimData read failed!");
             return false;
         }
     }
@@ -121,14 +130,14 @@ bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore, const Q
         }
         if (line != "0\n"){
             if (!animData.last()->readMotionOnly(file)){
-                CRITICAL_ERROR_MESSAGE("SkyrimAnimData::parse(): readMotionOnly read failed!");
+                LogFile::writeToLog("SkyrimAnimData::parse(): readMotionOnly read failed!");
                 return false;
             }
         }
         for (int i = indexToIgnore; i < size; i++){
             animData.append(new ProjectAnimData());
             if (!animData.last()->read(file)){
-                CRITICAL_ERROR_MESSAGE("SkyrimAnimData::parse(): ProjectAnimData read failed!");
+                LogFile::writeToLog("SkyrimAnimData::parse(): ProjectAnimData read failed!");
                 return false;
             }
         }
@@ -206,7 +215,7 @@ int SkyrimAnimData::addNewProject(const QString &projectname, const QStringList 
 bool SkyrimAnimData::appendClipGenerator(const QString & projectname, SkyrimClipGeneratoData * animdata){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::appendClipGenerator(): The project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::appendClipGenerator(): The project was not found!");
         return false;
     }
     return animData.at(index)->appendClipGenerator(animdata);
@@ -215,7 +224,7 @@ bool SkyrimAnimData::appendClipGenerator(const QString & projectname, SkyrimClip
 bool SkyrimAnimData::removeClipGenerator(const QString &projectname, const QString &name){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        //CRITICAL_ERROR_MESSAGE("SkyrimAnimData::removeClipGenerator(): The project was not found!");
+        //LogFile::writeToLog("SkyrimAnimData::removeClipGenerator(): The project was not found!");
         return false;
     }
     return animData.at(index)->removeClipGenerator(name);
@@ -224,7 +233,7 @@ bool SkyrimAnimData::removeClipGenerator(const QString &projectname, const QStri
 bool SkyrimAnimData::appendAnimation(const QString &projectname, SkyrimAnimationMotionData * motiondata){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::appendAnimation(): The project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::appendAnimation(): The project was not found!");
         return false;
     }
     return animData.at(index)->appendAnimation(motiondata);
@@ -233,7 +242,7 @@ bool SkyrimAnimData::appendAnimation(const QString &projectname, SkyrimAnimation
 bool SkyrimAnimData::removeAnimation(const QString &projectname, int animationindex){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::removeAnimation(): The project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::removeAnimation(): The project was not found!");
         return false;
     }
     return animData.at(index)->removeAnimation(animationindex);
@@ -242,7 +251,7 @@ bool SkyrimAnimData::removeAnimation(const QString &projectname, int animationin
 void SkyrimAnimData::setLocalTimeForClipGenAnimData(const QString &projectname, const QString &clipname, int triggerindex, qreal time){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::setLocalTimeForClipGenAnimData(): The project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::setLocalTimeForClipGenAnimData(): The project was not found!");
         return;
     }
     animData.at(index)->setLocalTimeForClipGenAnimData(clipname, triggerindex, time);
@@ -251,7 +260,7 @@ void SkyrimAnimData::setLocalTimeForClipGenAnimData(const QString &projectname, 
 void SkyrimAnimData::setEventNameForClipGenAnimData(const QString &projectname, const QString &clipname, int triggerindex, const QString &eventname){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::setEventNameForClipGenAnimData(): The project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::setEventNameForClipGenAnimData(): The project was not found!");
         return;
     }
     animData.at(index)->setEventNameForClipGenAnimData(clipname, triggerindex, eventname);
@@ -260,7 +269,7 @@ void SkyrimAnimData::setEventNameForClipGenAnimData(const QString &projectname, 
 void SkyrimAnimData::setClipNameAnimData(const QString &projectname, const QString &oldclipname, const QString &newclipname){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::setClipNameAnimData(): The project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::setClipNameAnimData(): The project was not found!");
         return;
     }
     animData.at(index)->setClipNameAnimData(oldclipname, newclipname);
@@ -270,7 +279,7 @@ void SkyrimAnimData::setClipNameAnimData(const QString &projectname, const QStri
 void SkyrimAnimData::setAnimationIndexForClipGen(const QString &projectname, const QString &clipGenName, int animationindex){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::setAnimationIndexForClipGen(): The project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::setAnimationIndexForClipGen(): The project was not found!");
         return;
     }
     animData.at(index)->setAnimationIndexForClipGen(clipGenName, animationindex);
@@ -279,7 +288,7 @@ void SkyrimAnimData::setAnimationIndexForClipGen(const QString &projectname, con
 void SkyrimAnimData::setPlaybackSpeedAnimData(const QString &projectname, const QString &clipGenName, qreal speed){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::setPlaybackSpeedAnimData(): Project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::setPlaybackSpeedAnimData(): Project was not found!");
         return;
     }
     animData.at(index)->setPlaybackSpeedForClipGen(clipGenName, speed);
@@ -288,7 +297,7 @@ void SkyrimAnimData::setPlaybackSpeedAnimData(const QString &projectname, const 
 void SkyrimAnimData::setCropStartAmountLocalTimeAnimData(const QString &projectname, const QString &clipGenName, qreal time){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::setCropStartAmountLocalTimeAnimData(): Project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::setCropStartAmountLocalTimeAnimData(): Project was not found!");
         return;
     }
     animData.at(index)->setCropStartAmountLocalTimeForClipGen(clipGenName, time);
@@ -297,7 +306,7 @@ void SkyrimAnimData::setCropStartAmountLocalTimeAnimData(const QString &projectn
 void SkyrimAnimData::setCropEndAmountLocalTimeAnimData(const QString &projectname, const QString &clipGenName, qreal time){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::setCropEndAmountLocalTimeAnimData(): Project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::setCropEndAmountLocalTimeAnimData(): Project was not found!");
         return;
     }
     animData.at(index)->setCropEndAmountLocalTimeForClipGen(clipGenName, time);
@@ -306,7 +315,7 @@ void SkyrimAnimData::setCropEndAmountLocalTimeAnimData(const QString &projectnam
 void SkyrimAnimData::appendClipTriggerToAnimData(const QString &projectname, const QString &clipGenName, const QString & eventname){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::appendClipTriggerToAnimData(): Project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::appendClipTriggerToAnimData(): Project was not found!");
         return;
     }
     animData.at(index)->appendClipTriggerToAnimData(clipGenName, eventname);
@@ -315,7 +324,7 @@ void SkyrimAnimData::appendClipTriggerToAnimData(const QString &projectname, con
 void SkyrimAnimData::removeClipTriggerToAnimDataAt(const QString &projectname, const QString &clipGenName, int index){
     int indexi = getProjectIndex(projectname);
     if (indexi < 0 || indexi >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::removeClipTriggerToAnimDataAt(): Project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::removeClipTriggerToAnimDataAt(): Project was not found!");
         return;
     }
     animData.at(indexi)->removeClipTriggerToAnimDataAt(clipGenName, index);
@@ -333,7 +342,7 @@ bool SkyrimAnimData::isProjectNameTaken(const QString & name) const{
 bool SkyrimAnimData::removeBehaviorFromProject(const QString &projectname, const QString &behaviorfilename){
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::removeBehaviorFromProject(): Project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::removeBehaviorFromProject(): Project was not found!");
         return false;
     }
     animData.at(index)->removeBehaviorFromProject(behaviorfilename);
@@ -343,7 +352,7 @@ bool SkyrimAnimData::removeBehaviorFromProject(const QString &projectname, const
 qreal SkyrimAnimData::getAnimationDurationFromAnimData(const QString &projectname, int animationindex) const{
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::getAnimationDurationFromAnimData(): Project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::getAnimationDurationFromAnimData(): Project was not found!");
         return 0;
     }
     return animData.at(index)->getAnimationDuration(animationindex);
@@ -352,9 +361,40 @@ qreal SkyrimAnimData::getAnimationDurationFromAnimData(const QString &projectnam
 SkyrimAnimationMotionData SkyrimAnimData::getAnimationMotionData(const QString &projectname, int animationindex) const{
     int index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        CRITICAL_ERROR_MESSAGE("SkyrimAnimData::getAnimationMotionData(): Project was not found!");
-        return SkyrimAnimationMotionData(animData.first());
+        LogFile::writeToLog("SkyrimAnimData::getAnimationMotionData(): Project was not found!");
+        return SkyrimAnimationMotionData(nullptr);
     }
     return animData.at(index)->getAnimationMotionData(animationindex);
+}
+
+void SkyrimAnimData::merge(SkyrimAnimData *recessiveanimdata, const QString & projecttomerge){
+    int domindex;
+    int recindex;
+    if (recessiveanimdata){
+        if (projecttomerge == ""){
+            for (auto i = 0; i < recessiveanimdata->projectNames.size(); i++){
+                if (!projectNames.contains(recessiveanimdata->projectNames.at(i), Qt::CaseInsensitive)){
+                    projectNames.append(recessiveanimdata->projectNames.at(i));
+                    if (recessiveanimdata->animData.size() < i){
+                        animData.append(recessiveanimdata->animData.at(i));
+                    }else{
+                        LogFile::writeToLog("SkyrimAnimData::merge(): recessiveanimdata is corrupt! Mismatch between project names and animdata!");
+                    }
+                }
+            }
+        }else{
+            domindex = projectNames.indexOf(projecttomerge, Qt::CaseInsensitive);
+            recindex = recessiveanimdata->projectNames.indexOf(projecttomerge, Qt::CaseInsensitive);
+            if (domindex > -1 && recindex > -1){
+                if (domindex < animData.size() && recindex < recessiveanimdata->animData.size()){
+                    animData.at(domindex)->merge(recessiveanimdata->animData.at(recindex));
+                }
+            }else{
+                LogFile::writeToLog("SkyrimAnimData::merge(): Project does not exist in either the dominant or recessive objects!");
+            }
+        }
+    }else{
+        LogFile::writeToLog("SkyrimAnimData::merge(): recessiveanimdata is nullptr!");
+    }
 }
 

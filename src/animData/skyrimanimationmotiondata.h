@@ -25,6 +25,7 @@ public:
     void addRotation(const SkyrimAnimationRotation & rot = SkyrimAnimationRotation());
     bool removeRotation(int index);
     QString trimFloat(QString & string) const;
+    bool operator==(const SkyrimAnimationMotionData & other) const;
 private:
     ProjectAnimData *parent;
     uint animationIndex;

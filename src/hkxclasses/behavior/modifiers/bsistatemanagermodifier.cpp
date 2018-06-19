@@ -38,27 +38,27 @@ bool BSIStateManagerModifier::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "iStateVar"){
             iStateVar = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'iStateVar' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'iStateVar' data field!\nObject Reference: "+ref);
             }
         }if (text == "stateData"){
             int numtriggers = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
@@ -70,7 +70,7 @@ bool BSIStateManagerModifier::readData(const HkxXmlReader &reader, long index){
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                     if (reader.getNthAttributeValueAt(index, 0) == "pStateMachine"){
                         if (!stateData.last().pStateMachine.readShdPtrReference(index, reader)){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'pStateMachine' reference!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'pStateMachine' reference!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "stateID"){
                         stateData.last().stateID = reader.getElementValueAt(index).toInt(&ok);
@@ -133,7 +133,7 @@ bool BSIStateManagerModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
@@ -144,16 +144,16 @@ bool BSIStateManagerModifier::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < stateData.size(); i++){
-        ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(stateData.at(i).pStateMachine.data()->getReference());
+        ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(stateData.at(i).pStateMachine.getShdPtrReference());
         if (!ptr){
-            WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'stateData' data field!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'stateData' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-            WRITE_TO_LOG(getClassname()+": link()!\n'stateData' data field is linked to invalid child!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\n'stateData' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             stateData[i].pStateMachine = *ptr;
         }else{
@@ -171,19 +171,35 @@ void BSIStateManagerModifier::unlink(){
 }
 
 bool BSIStateManagerModifier::evaluateDataValidity(){
-    bool valid = true;
-    for (int i = 0; i < stateData.size(); i++){
-        if (!stateData.at(i).pStateMachine.data() || stateData.at(i).pStateMachine.data()->getType() != HkxObject::TYPE_GENERATOR){
-            valid = false;
+    QString errors;
+    bool isvalid = true;
+    if (stateData.isEmpty()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": stateData is empty!\n");
+    }else{
+        for (int i = 0; i < stateData.size(); i++){
+            if (!stateData.at(i).pStateMachine.data()){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": stateData at index '"+QString::number(i)+"' is null!\n");
+            }else if (stateData.at(i).pStateMachine.data()->getSignature() != HKB_STATE_MACHINE){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid stateData! Signature: "+QString::number(stateData.at(i).pStateMachine.data()->getSignature(), 16)+"\n");
+            }
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || !valid){
-        setDataValidity(false);
-        return false;
-    }else{
-        setDataValidity(true);
-        return true;
+    if (!HkDynamicObject::evaluateDataValidity()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
     }
+    if (name == ""){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+    }
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 BSIStateManagerModifier::~BSIStateManagerModifier(){

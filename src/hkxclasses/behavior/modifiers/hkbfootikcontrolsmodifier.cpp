@@ -38,82 +38,82 @@ bool hkbFootIkControlsModifier::readData(const HkxXmlReader &reader, long index)
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "onOffGain"){
             gains.onOffGain = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'onOffGain' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'onOffGain' data field!\nObject Reference: "+ref);
             }
         }else if (text == "groundAscendingGain"){
             gains.groundAscendingGain = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'groundAscendingGain' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'groundAscendingGain' data field!\nObject Reference: "+ref);
             }
         }else if (text == "groundDescendingGain"){
             gains.groundDescendingGain = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'groundDescendingGain' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'groundDescendingGain' data field!\nObject Reference: "+ref);
             }
         }else if (text == "footPlantedGain"){
             gains.footPlantedGain = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'footPlantedGain' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'footPlantedGain' data field!\nObject Reference: "+ref);
             }
         }else if (text == "footRaisedGain"){
             gains.footRaisedGain = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'footRaisedGain' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'footRaisedGain' data field!\nObject Reference: "+ref);
             }
         }else if (text == "footUnlockGain"){
             gains.footUnlockGain = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'footUnlockGain' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'footUnlockGain' data field!\nObject Reference: "+ref);
             }
         }else if (text == "worldFromModelFeedbackGain"){
             gains.worldFromModelFeedbackGain = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'worldFromModelFeedbackGain' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'worldFromModelFeedbackGain' data field!\nObject Reference: "+ref);
             }
         }else if (text == "errorUpDownBias"){
             gains.errorUpDownBias = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'errorUpDownBias' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'errorUpDownBias' data field!\nObject Reference: "+ref);
             }
         }else if (text == "alignWorldFromModelGain"){
             gains.alignWorldFromModelGain = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'alignWorldFromModelGain' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'alignWorldFromModelGain' data field!\nObject Reference: "+ref);
             }
         }else if (text == "hipOrientationGain"){
             gains.hipOrientationGain = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'hipOrientationGain' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'hipOrientationGain' data field!\nObject Reference: "+ref);
             }
         }else if (text == "maxKneeAngleDifference"){
             gains.maxKneeAngleDifference = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'maxKneeAngleDifference' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'maxKneeAngleDifference' data field!\nObject Reference: "+ref);
             }
         }else if (text == "ankleOrientationGain"){
             gains.ankleOrientationGain = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'ankleOrientationGain' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'ankleOrientationGain' data field!\nObject Reference: "+ref);
             }
         }else if (text == "legs"){
             int numlegs = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
@@ -126,31 +126,31 @@ bool hkbFootIkControlsModifier::readData(const HkxXmlReader &reader, long index)
                     if (text == "groundPosition"){
                         legs.last().groundPosition = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'groundPosition' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'groundPosition' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "id"){
                         legs.last().id = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "payload"){
                         if (!legs.last().payload.readShdPtrReference(index, reader)){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                         }
                     }else if (text == "verticalError"){
                         legs.last().verticalError = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'verticalError' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'verticalError' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "hitSomething"){
                         legs.last().hitSomething = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'hitSomething' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'hitSomething' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "isPlantedMS"){
                         legs.last().isPlantedMS = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'isPlantedMS' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'isPlantedMS' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -161,12 +161,12 @@ bool hkbFootIkControlsModifier::readData(const HkxXmlReader &reader, long index)
         }else if (text == "errorOutTranslation"){
             errorOutTranslation = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'errorOutTranslation' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'errorOutTranslation' data field!\nObject Reference: "+ref);
             }
         }else if (text == "alignWithGroundRotation"){
             alignWithGroundRotation = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'alignWithGroundRotation' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'alignWithGroundRotation' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -237,11 +237,11 @@ bool hkbFootIkControlsModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         for (int i = 0; i < legs.size(); i++){
             if (legs.at(i).payload.data() && !legs.at(i).payload.data()->write(writer)){
-                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
             }
         }
     }
@@ -314,12 +314,22 @@ void hkbFootIkControlsModifier::updateReferences(long &ref){
     }
 }
 
+QVector<HkxObject *> hkbFootIkControlsModifier::getChildrenOtherTypes() const{
+    QVector<HkxObject *> list;
+    for (auto i = 0; i < legs.size(); i++){
+        if (legs.at(i).payload.data()){
+            list.append(legs.at(i).payload.data());
+        }
+    }
+    return list;
+}
+
 bool hkbFootIkControlsModifier::link(){
     if (!getParentFile()){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < legs.size(); i++){
@@ -341,14 +351,37 @@ void hkbFootIkControlsModifier::unlink(){
     }
 }
 
-bool hkbFootIkControlsModifier::evaluateDataValidity(){  //TO DO: Check for valid event id???
-    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || legs.isEmpty()){
-        setDataValidity(false);
-        return false;
+bool hkbFootIkControlsModifier::evaluateDataValidity(){
+    QString errors;
+    bool isvalid = true;
+    if (legs.isEmpty()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": legs is empty!\n");
     }else{
-        setDataValidity(true);
-        return true;
+        for (auto i = 0; i < legs.size(); i++){
+            if (legs.at(i).id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": id in legs at "+QString::number(i)+" out of range!\n");
+            }
+            if (legs.at(i).payload.data() && legs.at(i).payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid payload type! Signature: "+QString::number(legs.at(i).payload.data()->getSignature(), 16)+"\n");
+            }
+        }
     }
+    if (!HkDynamicObject::evaluateDataValidity()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
+    if (name == ""){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+    }
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 hkbFootIkControlsModifier::~hkbFootIkControlsModifier(){

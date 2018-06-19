@@ -330,6 +330,37 @@ SkyrimAnimationMotionData ProjectAnimData::getAnimationMotionData(int animationi
     return SkyrimAnimationMotionData(nullptr);
 }
 
+void ProjectAnimData::merge(ProjectAnimData *recessiveanimdata){
+    bool found;
+    if (recessiveanimdata){
+        for (auto i = 0; i < recessiveanimdata->projectFiles.size(); i++){
+            if (!projectFiles.contains(recessiveanimdata->projectFiles.at(i), Qt::CaseInsensitive)){
+                projectFiles.append(recessiveanimdata->projectFiles.at(i));
+                animationDataLines++;
+            }
+        }
+        for (auto i = 0; i < recessiveanimdata->animationMotionData.size(); i++){
+            found = false;
+            for (auto j = 0; j < animationMotionData.size(); j++){
+                if (animationMotionData.at(j) && recessiveanimdata->animationMotionData.at(i)){
+                    if (*animationMotionData.at(j) == *recessiveanimdata->animationMotionData.at(i)){
+                        found = true;
+                        break;
+                    }
+                }else{
+                    LogFile::writeToLog("ProjectAnimData::merge(): nullptr found in either dominant or recessive animationMotionData!");
+                }
+            }
+            if (!found){
+                animationMotionData.append(recessiveanimdata->animationMotionData.at(i));
+                animationMotionDataLines += recessiveanimdata->animationMotionData.at(i)->lineCount();
+            }
+        }
+    }else{
+        LogFile::writeToLog("ProjectAnimData::merge(): recessiveanimdata is nullptr!");
+    }
+}
+
 void ProjectAnimData::fixNumberAnimationLines(){
     auto num = 2 + projectFiles.size() + 1;
     for (auto i = 0; i < animationData.size(); i++){

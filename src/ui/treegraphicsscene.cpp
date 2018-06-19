@@ -95,7 +95,7 @@ void TreeGraphicsScene::contractBranch(TreeGraphicsItem *icon, bool contractAll)
             }
         }
     }
-    update();
+    //update();
 }
 
 void TreeGraphicsScene::expandBranch(TreeGraphicsItem *icon, bool expandAll){
@@ -113,6 +113,7 @@ void TreeGraphicsScene::expandBranch(TreeGraphicsItem *icon, bool expandAll){
             }
         }
     }
+    //update();
 }
 
 bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicates){

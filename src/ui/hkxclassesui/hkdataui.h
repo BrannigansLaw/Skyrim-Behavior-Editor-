@@ -102,9 +102,10 @@ public:
     BehaviorGraphView * loadBehaviorView(BehaviorGraphView *view);
     void setEventsVariablesAnimationsUI(EventsUI *events, BehaviorVariablesUI *variables, AnimationsUI *animations);
     void unloadDataWidget();
-signals:
-    //void newAnimationAdded(const QString & name);
 public slots:
+    void connectToGeneratorTable();
+    void connectToModifierTable();
+    void disconnectTables();
     void changeCurrentDataWidget(TreeGraphicsItem *icon);
     void modifierAdded(const QString & name, const QString & type);
     void modifierNameChanged(const QString & newName, int index);

@@ -108,7 +108,7 @@ bool hkbStateMachineEventPropertyArray::write(HkxXMLWriter *writer){
         writer->writeLine("\n");
         for (int i = 0; i < events.size(); i++){
             if (events.at(i).payload.data() && !events.at(i).payload.data()->write(writer)){
-                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
             }
         }
     }
@@ -210,6 +210,16 @@ void hkbStateMachineEventPropertyArray::updateReferences(long &ref){
     }
 }
 
+QVector<HkxObject *> hkbStateMachineEventPropertyArray::getChildrenOtherTypes() const{
+    QVector<HkxObject *> list;
+    for (auto i = 0; i < events.size(); i++){
+        if (events.at(i).payload.data()){
+            list.append(events.at(i).payload.data());
+        }
+    }
+    return list;
+}
+
 bool hkbStateMachineEventPropertyArray::link(){
     if (!getParentFile()){
         return false;
@@ -234,14 +244,28 @@ void hkbStateMachineEventPropertyArray::unlink(){
 }
 
 bool hkbStateMachineEventPropertyArray::evaluateDataValidity(){
-    for (int i = 0; i < events.size(); i++){
-        if (events.at(i).payload.data() && events.at(i).payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            setDataValidity(false);
-            return false;
+    QString errors;
+    bool isvalid = true;
+    if (events.isEmpty()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": events is empty!\n");
+    }else{
+        for (auto i = 0; i < events.size(); i++){
+            if (events.at(i).id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": id in events at "+QString::number(i)+" out of range!\n");
+            }
+            if (events.at(i).payload.data() && events.at(i).payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(events.at(i).payload.data()->getSignature(), 16)+"\n");
+            }
         }
     }
-    setDataValidity(true);
-    return true;
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 hkbStateMachineEventPropertyArray::~hkbStateMachineEventPropertyArray(){

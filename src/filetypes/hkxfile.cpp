@@ -28,6 +28,10 @@ void HkxFile::setIsChanged(bool wasEdited){
     changed = wasEdited;
 }
 
+std::unique_lock <std::mutex> HkxFile::lockNGuard() const{
+    return std::unique_lock <std::mutex> (mutex);
+}
+
 HkxSharedPtr & HkxFile::getRootObject(){
     return rootObject;
 }
@@ -48,7 +52,7 @@ QString HkxFile::getRootObjectReferenceString(){
     if (rootObject.data()){
         return rootObject.data()->getReferenceString();
     }
-    return "";
+    return true;
 }
 
 bool HkxFile::appendAndReadData(int index, HkxObject *obj){

@@ -42,14 +42,14 @@ bool hkbProjectStringData::readData(const HkxXmlReader &reader, long index){
         if (text == "animationFilenames"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'animationFilenames' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'animationFilenames' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'animationFilenames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'animationFilenames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 animationFilenames.append(reader.getElementValueAt(index));
@@ -58,14 +58,14 @@ bool hkbProjectStringData::readData(const HkxXmlReader &reader, long index){
         }else if (text == "behaviorFilenames"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'behaviorFilenames' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'behaviorFilenames' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'behaviorFilenames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'behaviorFilenames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 behaviorFilenames.append(reader.getElementValueAt(index));
@@ -74,14 +74,14 @@ bool hkbProjectStringData::readData(const HkxXmlReader &reader, long index){
         }else if (text == "characterFilenames"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'characterFilenames' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'characterFilenames' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'characterFilenames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'characterFilenames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 characterFilenames.append(reader.getElementValueAt(index));
@@ -90,14 +90,14 @@ bool hkbProjectStringData::readData(const HkxXmlReader &reader, long index){
         }else if (text == "eventNames"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'eventNames' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'eventNames' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'eventNames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'eventNames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 eventNames.append(reader.getElementValueAt(index));
@@ -106,22 +106,22 @@ bool hkbProjectStringData::readData(const HkxXmlReader &reader, long index){
         }else if (text == "animationPath"){
             animationPath = reader.getElementValueAt(index);
             if (animationPath == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'animationPath' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'animationPath' data field!\nObject Reference: "+ref);
             }
         }else if (text == "behaviorPath"){
             behaviorPath = reader.getElementValueAt(index);
             if (behaviorPath == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'behaviorPath' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'behaviorPath' data field!\nObject Reference: "+ref);
             }
         }else if (text == "characterPath"){
             characterPath = reader.getElementValueAt(index);
             if (characterPath == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'characterPath' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'characterPath' data field!\nObject Reference: "+ref);
             }
         }else if (text == "fullPathToSource"){
             fullPathToSource = reader.getElementValueAt(index);
             if (fullPathToSource == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'fullPathToSource' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'fullPathToSource' data field!\nObject Reference: "+ref);
             }
         }
         index++;

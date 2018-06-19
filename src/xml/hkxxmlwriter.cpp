@@ -42,7 +42,7 @@ bool HkxXMLWriter::writeToXMLFile(){
         newfile = new QFile(hkxXmlFile->fileName());
         stream = new QTextStream(newfile);
         if (!newfile->open(QIODevice::WriteOnly | QIODevice::Text)){
-            WRITE_TO_LOG("HkxXMLWriter: writeToXMLFile()!\nUnable to open a new file!!!");
+            LogFile::writeToLog("HkxXMLWriter: writeToXMLFile()!\nUnable to open a new file!!!");
             result = false;
         }else{
             writeHeader(version, encoding);
@@ -60,7 +60,7 @@ bool HkxXMLWriter::writeToXMLFile(){
             writeLine(filetype, false);
         }
     }else{
-        //WRITE_TO_LOG("HkxXMLWriter: writeToXMLFile()!\nUnable to open a new file!!!");
+        //LogFile::writeToLog("HkxXMLWriter: writeToXMLFile()!\nUnable to open a new file!!!");
         result = false;
     }
     newfile->close();
@@ -77,7 +77,7 @@ void HkxXMLWriter::writeHeader(const QString & version, const QString & encoding
 
 bool HkxXMLWriter::writeLine(const QString & tag, const QStringList & attribs, const QStringList & attribValues, const QString & value, bool nullValueAllowed){
     if (tag == "" || attribs.size() != attribValues.size()){
-        WRITE_TO_LOG("HkxXMLWriter: writeLine()!\nXML tag is null or the number of attributes does not match the number of attribute values!!!");
+        LogFile::writeToLog("HkxXMLWriter: writeLine()!\nXML tag is null or the number of attributes does not match the number of attribute values!!!");
         return false;
     }
     QString text;
@@ -109,7 +109,7 @@ bool HkxXMLWriter::writeLine(const QString & tag, const QStringList & attribs, c
 
 bool HkxXMLWriter::writeLine(const QString & tag, bool opening){
     if (tag == ""){
-        WRITE_TO_LOG("HkxXMLWriter: writeLine()!\nXML tag is null!!!");
+        LogFile::writeToLog("HkxXMLWriter: writeLine()!\nXML tag is null!!!");
         return false;
     }
     QString text;

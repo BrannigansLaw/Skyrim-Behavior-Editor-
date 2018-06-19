@@ -40,36 +40,36 @@ bool hkbEventsFromRangeModifier::readData(const HkxXmlReader &reader, long index
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "inputValue"){
             inputValue = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'inputValue' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'inputValue' data field!\nObject Reference: "+ref);
             }
         }else if (text == "lowerBound"){
             lowerBound = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'lowerBound' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'lowerBound' data field!\nObject Reference: "+ref);
             }
         }else if (text == "eventRanges"){
             if (!eventRanges.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'eventRanges' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'eventRanges' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -105,10 +105,10 @@ bool hkbEventsFromRangeModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (eventRanges.data() && !eventRanges.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+":  write()!\nUnable to write 'eventRanges'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  write()!\nUnable to write 'eventRanges'!!!");
         }
     }
     return true;
@@ -156,17 +156,25 @@ void hkbEventsFromRangeModifier::updateReferences(long &ref){
     }
 }
 
+QVector<HkxObject *> hkbEventsFromRangeModifier::getChildrenOtherTypes() const{
+    QVector<HkxObject *> list;
+    if (eventRanges.data()){
+        list.append(eventRanges.data());
+    }
+    return list;
+}
+
 bool hkbEventsFromRangeModifier::link(){
     if (!getParentFile()){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventRanges.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_EVENT_RANGE_DATA_ARRAY){
-            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'HKB_EVENT_RANGE_DATA_ARRAY' is not a modifier!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'HKB_EVENT_RANGE_DATA_ARRAY' is not a modifier!");
             setDataValidity(false);
         }
         eventRanges = *ptr;
@@ -176,16 +184,37 @@ bool hkbEventsFromRangeModifier::link(){
 
 void hkbEventsFromRangeModifier::unlink(){
     HkDynamicObject::unlink();
+    eventRanges = HkxSharedPtr();
 }
 
 bool hkbEventsFromRangeModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (!eventRanges.data() || !eventRanges.data()->evaluateDataValidity() || eventRanges.data()->getSignature() != HKB_EVENT_RANGE_DATA_ARRAY)){
-        setDataValidity(false);
-        return false;
-    }else{
-        setDataValidity(true);
-        return true;
+    QString errors;
+    bool isvalid = true;
+    if (!HkDynamicObject::evaluateDataValidity()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
     }
+    if (name == ""){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+    }
+    if (eventRanges.data()){
+        if (eventRanges.data()->getSignature() != HKB_EVENT_RANGE_DATA_ARRAY){
+            isvalid = false;
+            errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventRanges type! Signature: "+QString::number(eventRanges.data()->getSignature(), 16)+"\n");
+        }else if (eventRanges.data()->isDataValid() && !eventRanges.data()->evaluateDataValidity()){
+            isvalid = false;
+            //errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventRanges data!\n");
+        }
+    }else if (!eventRanges.data()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null eventRanges!\n");
+    }
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 hkbEventsFromRangeModifier::~hkbEventsFromRangeModifier(){

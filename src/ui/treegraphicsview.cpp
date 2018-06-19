@@ -17,6 +17,7 @@ TreeGraphicsView::TreeGraphicsView(QMenu *menu)
       scaleDownFactor(0.8)
 {
     setScene(treeScene);
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     connect(treeScene, SIGNAL(iconSelected(TreeGraphicsItem*)), this, SIGNAL(iconSelected(TreeGraphicsItem*)));
 }
 
@@ -38,8 +39,11 @@ bool TreeGraphicsView::drawGraph(DataIconManager *rootData, bool allowDuplicates
 }
 
 void TreeGraphicsView::wheelEvent(QWheelEvent *event){
-    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-    if (event->delta() > 0/* && currentScale < maxScale*/){
+    zoom(event->delta());
+}
+
+void TreeGraphicsView::zoom(int delta){
+    if (delta > 0/* && currentScale < maxScale*/){
         scale(scaleUpFactor, scaleUpFactor);
         currentScale = currentScale*scaleUpFactor;
     }else/* if (currentScale > minScale)*/{
@@ -62,14 +66,19 @@ void TreeGraphicsView::mouseReleaseEvent(QMouseEvent *event){
     QGraphicsView::mouseReleaseEvent(event);
 }
 
-void TreeGraphicsView::contractAllBranches(){
-    treeScene->rootIcon->setIsExpanded(false);
-    treeScene->contractBranch(treeScene->rootIcon, true);
+void TreeGraphicsView::contractBranch(){
+    if (getSelectedItem()){
+        //getSelectedItem()->setIsExpanded(false);
+        treeScene->contractBranch(getSelectedItem(), true);
+        getSelectedItem()->reposition();
+    }
 }
 
-void TreeGraphicsView::expandAllBranches(){
-    treeScene->expandBranch(treeScene->rootIcon, true);
-    treeScene->rootIcon->reposition();
+void TreeGraphicsView::expandBranch(){
+    if (getSelectedItem()){
+        treeScene->expandBranch(getSelectedItem(), true);
+        getSelectedItem()->reposition();
+    }
 }
 
 void TreeGraphicsView::selectRoot(){

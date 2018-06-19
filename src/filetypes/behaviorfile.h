@@ -28,6 +28,9 @@ class BehaviorFile: public HkxFile
 public:
     BehaviorFile(MainWindow *window, ProjectFile *projectfile, CharacterFile *characterData, const QString & name);
     virtual ~BehaviorFile();
+    bool doesBehaviorExist(const QString &behaviorname) const;
+    void setFocusGeneratorIcon(int index);
+    void setFocusModifierIcon(int index);
     HkxSharedPtr * findHkxObject(long ref);
     HkxSharedPtr * findGenerator(long ref);
     //HkxSharedPtr * findGeneratorChild(long ref);
@@ -45,7 +48,9 @@ public:
     hkbModifier * getModifierDataAt(int index);
     QStringList getVariableTypenames() const;
     QStringList getEventNames() const;
+    int getNumberOfEvents() const;
     QStringList getVariableNames() const;
+    int getNumberOfVariables() const;
     QStringList getGeneratorNames() const;
     QStringList getGeneratorTypeNames() const;
     QStringList getModifierNames() const;
@@ -102,8 +107,9 @@ protected:
     bool parse();
     bool link();
 private:
-    QString detectErrors(int &taskcount, std::mutex &mutex, std::condition_variable &conditionVar);
-    QVector<DataIconManager *> merge(BehaviorFile *recessivefile);
+    QString detectErrorsMT(int &taskcount, std::mutex &mutex, std::condition_variable &conditionVar);
+    QString detectErrors();
+    QVector<DataIconManager *> merge(BehaviorFile *recessivefile, int &taskCount, std::mutex &mutex, std::condition_variable &conditionVar);
     void mergeObjects(QVector<DataIconManager *> recessiveobjects);
     void generateDefaultCharacterData();
     void generateNewBehavior();
@@ -111,8 +117,9 @@ private:
     HkxObject * getRootStateMachine() const;
     //TreeGraphicsItem * getRootIcon() const;
     void write();
-    //void mergedWrite();
+    void mergedWrite();
     void removeBindings(int varIndex);
+    bool checkForDuplicateReferencesNumbers() const;
 private:
     //std::mutex mutex;
     ProjectFile *project;
@@ -126,6 +133,7 @@ private:
     QList <HkxSharedPtr> otherTypes;
     QStringList referencedBehaviors;
     long largestRef;
+    //QStringList errors;
 };
 
 #endif // BEHAVIORFILE_H

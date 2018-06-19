@@ -33,32 +33,32 @@ bool BGSGamebryoSequenceGenerator::readData(const HkxXmlReader &reader, long ind
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pSequence"){
             pSequence = reader.getElementValueAt(index);
             if (pSequence == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'pSequence' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'pSequence' data field!\nObject Reference: "+ref);
             }
         }else if (text == "eBlendModeFunction"){
             eBlendModeFunction = reader.getElementValueAt(index);
             if (!BlendModeFunction.contains(eBlendModeFunction)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'eBlendModeFunction' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'eBlendModeFunction' data field!\nObject Reference: "+ref);
             }
         }else if (text == "fPercent"){
             fPercent = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'fPercent' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'fPercent' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -88,7 +88,7 @@ bool BGSGamebryoSequenceGenerator::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
@@ -103,13 +103,29 @@ QString BGSGamebryoSequenceGenerator::getName() const{
 }
 
 bool BGSGamebryoSequenceGenerator::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity() || name == "" || pSequence == "" || !BlendModeFunction.contains(eBlendModeFunction)){
-        setDataValidity(false);
-        return false;
-    }else{
-        setDataValidity(true);
-        return true;
+    QString errors;
+    bool isvalid = true;
+    if (!HkDynamicObject::evaluateDataValidity()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
     }
+    if (name == ""){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+    }
+    if (pSequence == ""){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pSequence!\n");
+    }
+    if (!BlendModeFunction.contains(eBlendModeFunction)){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eBlendModeFunction!\n");
+    }
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 BGSGamebryoSequenceGenerator::~BGSGamebryoSequenceGenerator(){

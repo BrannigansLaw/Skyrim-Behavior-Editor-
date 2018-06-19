@@ -7,10 +7,12 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QDir>
-#include <QDir>
+#include <QFile>
+#include <QTextStream>
+#include <mutex>
 
 #define MAX_HKXXML_LINE_LENGTH 512
-#define WRITE_TO_LOG(message){QFile file(QDir::currentPath()+"/DebugLog.txt");if (file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)){QTextStream out(&file);out << message << "\n";}}
+//#define WRITE_TO_LOG(message){QFile file(QDir::currentPath()+"/DebugLog.txt");if (file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)){QTextStream out(&file);out << message << "\n";}}
 //#define CRITICAL_ERROR_MESSAGE(message){QFile log(QDir::currentPath()+"/DebugLog.txt");if (log.open(QIODevice::WriteOnly | QIODevice::Text)){QTextStream stream(&log);stream << message << "\n\n";abort();}}
 //#define FATAL_ERROR_MESSAGE(message){QString str(message);QMessageBox msg;msg.setModal(true);msg.setText("WARNING: "+str);msg.exec();abort();}
 #define CRITICAL_ERROR_MESSAGE(message){QString str(message);QMessageBox msg;msg.setModal(true);msg.setText("CRITICAL ERROR: "+str+"\n\nWe advise that you save and then close the application and contact the author!!!");msg.exec();}
@@ -48,6 +50,37 @@ bool areVariableTypesCompatible(hkVariableType type1, hkVariableType type2){
 }
 
 }
+namespace{
+class LogFile{
+private:
+    static QFile logFile;
+    static QTextStream stream;
+    static std::mutex mutex;
+private:
+    static void init(){
+        logFile.setFileName(QDir::currentPath()+"/DebugLog.txt");
+        logFile.remove();
+        if (logFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)){
+            stream.setDevice(&logFile);
+        }else{
+            WARNING_MESSAGE("Log file failed to open!");
+        }
+    }
+public:
+    LogFile(){
+        init();
+    }
+
+    static void writeToLog(const QString & message){
+        std::lock_guard <std::mutex> guard(mutex);
+        stream << message << "\n";
+    }
+};
+
+QFile LogFile::logFile;
+QTextStream LogFile::stream;
+std::mutex LogFile::mutex;
+}
 
 struct hkVector3
 {
@@ -56,12 +89,6 @@ struct hkVector3
     qreal y;
     qreal z;
 };
-
-/*struct MultithreadHelper{
-    std::mutex *mutex;
-    std::condition_variable *conditionVariable;
-    unsigned long *taskCount;
-};*/
 
 struct hkQuadVariable
 {

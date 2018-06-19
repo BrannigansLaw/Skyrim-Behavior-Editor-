@@ -365,10 +365,6 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     connect(appendBSPassByTargetTriggerModifierAct, SIGNAL(triggered()), this, SLOT(appendBSPassByTargetTriggerModifier()));
     connect(removeObjBranchAct, SIGNAL(triggered()), this, SLOT(deleteSelectedObjectBranchSlot()));
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(popUpMenuRequested(QPoint)));
-    /*if (ui){
-        ui->loadBehaviorView(this);
-        connect(this, SIGNAL(iconSelected(TreeGraphicsItem *)), ui, SLOT(changeCurrentDataWidget(TreeGraphicsItem *)));
-    }*/
 }
 
 bool BehaviorGraphView::confirmationDialogue(const QString & message, QWidget *parent){
@@ -423,6 +419,13 @@ bool BehaviorGraphView::refocus(){
     }
 }
 
+void BehaviorGraphView::setSelectedItem(TreeGraphicsItem *item){
+    if (/*ui && */scene()){
+        static_cast<TreeGraphicsScene *>(scene())->selectIcon(item, TreeGraphicsScene::EXPAND_CONTRACT_ONE);
+        //ui->changeCurrentDataWidget(item);
+    }
+}
+
 QString BehaviorGraphView::getBehaviorFilename() const{
     if (behavior){
         return behavior->fileName();
@@ -430,9 +433,23 @@ QString BehaviorGraphView::getBehaviorFilename() const{
     return "";
 }
 
-/*void BehaviorGraphView::focusOnIcon(const QString &name){
-    QVector
-}*/
+void BehaviorGraphView::focusOnGeneratorIcon(int index, const QString &name){
+    if (behavior){
+        behavior->setFocusGeneratorIcon(index);
+    }else{
+        LogFile::writeToLog("BehaviorGraphView::focusOnGeneratorIcon(): No behavior file!");
+    }
+    emit disconnectTablesFromHkDataUI();
+}
+
+void BehaviorGraphView::focusOnModifierIcon(int index, const QString &name){
+    if (behavior){
+        behavior->setFocusModifierIcon(index);
+    }else{
+        LogFile::writeToLog("BehaviorGraphView::focusOnModifierIcon(): No behavior file!");
+    }
+    emit disconnectTablesFromHkDataUI();
+}
 
 void BehaviorGraphView::deleteSelectedObjectBranchSlot(){
     if (getSelectedItem()){

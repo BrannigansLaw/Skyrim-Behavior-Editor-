@@ -143,6 +143,15 @@ QString SkyrimAnimationMotionData::trimFloat(QString & string) const{
     return string;
 }
 
+bool SkyrimAnimationMotionData::operator==(const SkyrimAnimationMotionData &other) const{
+    if (animationIndex != other.animationIndex/* || duration != other.duration || translations.size() != other.translations.size() ||
+            rotations.size() != other.rotations.size()*/)
+    {
+        return false;
+    }
+    return true;
+}
+
 bool SkyrimAnimationMotionData::write(QFile * file, QTextStream & out) const{
     if (!file || !file->isOpen()){
         return false;

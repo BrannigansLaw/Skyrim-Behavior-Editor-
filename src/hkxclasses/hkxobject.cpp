@@ -16,6 +16,7 @@ HkxObject::HkxObject(HkxFile *parent, long ref)
       dataValid(true),
       isWritten(false),
       isMerged(false),
+      refsUpdated(false),
       reference(ref)
 {
     //
@@ -43,18 +44,23 @@ void HkxObject::setIsMerged(bool value)
     isMerged = value;
 }
 
+std::lock_guard <std::mutex> HkxObject::lockNGuard() const{
+    return std::lock_guard <std::mutex> (mutex);
+}
+
+bool HkxObject::getRefsUpdated() const{
+    return refsUpdated;
+}
+
+void HkxObject::setRefsUpdated(bool value){
+    refsUpdated = value;
+}
+
+QVector<HkxObject *> HkxObject::getChildrenOtherTypes() const{
+    return QVector<HkxObject *>();
+}
+
 QString HkxObject::getReferenceString() const{
-    /*QString referenceString;
-    if (reference > 999){
-        referenceString = "#";
-    }else if (reference > 99){
-        referenceString = "#0";
-    }else if (reference > 9){
-        referenceString = "#00";
-    }else{
-        referenceString = "#000";
-    }
-    return referenceString+QString::number(reference);*/
     if (reference < 0){
         return "null";
     }
@@ -85,7 +91,6 @@ bool HkxObject::isDataValid()const{
 }
 
 bool HkxObject::evaluateDataValidity(){
-    //isDataValid = true;
     return true;
 }
 
@@ -428,6 +433,7 @@ bool HkxSharedPtr::operator==(const HkxSharedPtr & other) const{
     }
     return false;
 }
+
 void HkxSharedPtr::setShdPtrReference(long ref){
     reference = ref;
 }
@@ -438,7 +444,6 @@ long HkxSharedPtr::getShdPtrReference() const{
 
 bool HkxSharedPtr::readShdPtrReference(long index, const HkxXmlReader & reader){
     bool ok = true;
-    //need to remove the '#' from the reference string
     QByteArray temp = reader.getElementValueAt(index);
     if (temp.at(0) == '#'){
         temp.remove(0, 1);
@@ -448,10 +453,7 @@ bool HkxSharedPtr::readShdPtrReference(long index, const HkxXmlReader & reader){
     }else{
         setShdPtrReference(temp.toLong(&ok));
     }
-    if (!ok){
-        return false;
-    }
-    return true;
+    return ok;
 }
 
 /**
@@ -536,7 +538,7 @@ bool HkDynamicObject::linkVar(){
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variableBindingSet.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_VARIABLE_BINDING_SET){
-            WRITE_TO_LOG("HkDynamicObject: linkVar()!\nThe linked object is not a HKB_VARIABLE_BINDING_SET!\nRemoving the link to the invalid object!");
+            LogFile::writeToLog("HkDynamicObject: linkVar()!\nThe linked object is not a HKB_VARIABLE_BINDING_SET!\nRemoving the link to the invalid object!");
             variableBindingSet = nullptr;
             return false;
         }

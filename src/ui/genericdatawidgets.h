@@ -413,6 +413,7 @@ private:
 class GenericTableWidget: public QWidget
 {
     Q_OBJECT
+    friend class HkDataUI;
 public:
     GenericTableWidget(const QString & title);
     void loadTable(const QStringList & names, const QStringList & types, const QString & firstElement = "");

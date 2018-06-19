@@ -14,6 +14,7 @@ class SkyrimAnimData
     friend class ProjectUI;
 public:
     SkyrimAnimData();
+    virtual ~SkyrimAnimData();
     bool parse(QFile * file, const QString &projectToIgnore = "", const QStringList & behaviorfilenames = QStringList());
     //bool extract(const QString & projectname);
     bool write(const QString & filename);
@@ -37,6 +38,7 @@ public:
     bool removeBehaviorFromProject(const QString &projectname,  const QString & behaviorfilename);
     qreal getAnimationDurationFromAnimData(const QString &projectname, int animationindex) const;
     SkyrimAnimationMotionData getAnimationMotionData(const QString &projectname, int animationindex) const;
+    void merge(SkyrimAnimData *recessiveanimdata, const QString &projecttomerge);
 private:
     QStringList projectNames;
     QVector <ProjectAnimData *> animData;

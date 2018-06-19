@@ -18,6 +18,7 @@ class TreeGraphicsView: public QGraphicsView
 public:
     TreeGraphicsView(QMenu *menu);
     QSize sizeHint() const Q_DECL_OVERRIDE;
+    void zoom(int delta);
     bool drawGraphMT(DataIconManager *rootData, bool allowDuplicates, int &taskcount, std::mutex &mutex, std::condition_variable &conditionVar);
     bool drawGraph(DataIconManager *rootData, bool allowDuplicates);
     TreeGraphicsItem * getSelectedItem() const;
@@ -31,8 +32,8 @@ protected:
     void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    void contractAllBranches();
-    void expandAllBranches();
+    void contractBranch();
+    void expandBranch();
     void selectRoot();
 private:
     QMenu *popUpMenu;

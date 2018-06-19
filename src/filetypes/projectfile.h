@@ -26,6 +26,7 @@ public:
     virtual ~ProjectFile();
     bool addObjectToFile(HkxObject *obj, long ref = -1);
     void write();
+    bool doesBehaviorExist(const QString &behaviorname) const;
     //QString getRootObjectReferenceString();
     QString getCharacterFilePathAt(int index) const;
     void setCharacterFile(CharacterFile *file);
@@ -48,9 +49,10 @@ protected:
     bool link();
     //SkyrimAnimData *getAnimData() const;
 private:
-    QString detectErrors();
+    QString detectErrorsInProject();
+    QString detectErrorsInBehavior(const QString & filename);
     void removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *gentoignore);
-    bool merge(ProjectFile *recessiveproject);
+    bool merge(ProjectFile *recessiveproject, bool isFNIS = false);
     bool mergeAnimationCaches(ProjectFile *recessiveproject);
     void addProjectToAnimData();
     bool removeClipGenFromAnimData(const QString & animationname, const QString &clipname, const QString &variablename = "");

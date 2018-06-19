@@ -52,14 +52,17 @@ public:
     void removeModifierData();
     void removeOtherData();
     bool refocus();
+    void setSelectedItem(TreeGraphicsItem *item);
     QString getBehaviorFilename() const;
 signals:
     void addedGenerator(const QString & name, const QString & type);
     void addedModifier(const QString & name, const QString & type);
     void removedGenerator(int index);
     void removedModifier(int index);
+    void disconnectTablesFromHkDataUI();
 private slots:
-    //void focusOnIcon(const QString & name);
+    void focusOnGeneratorIcon(int index, const QString & name);
+    void focusOnModifierIcon(int index, const QString & name);
     void appendStateMachine();
     void appendState();
     void appendManualSelectorGenerator();

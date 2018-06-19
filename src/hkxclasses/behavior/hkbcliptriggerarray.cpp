@@ -79,17 +79,17 @@ bool hkbClipTriggerArray::readData(const HkxXmlReader &reader, long index){
                     }else if (reader.getNthAttributeValueAt(index, 0) == "relativeToEndOfClip"){
                         triggers.last().relativeToEndOfClip = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'relativeToEndOfClip' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'relativeToEndOfClip' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "acyclic"){
                         triggers.last().acyclic = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'acyclic' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'acyclic' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "isAnnotation"){
                         triggers.last().isAnnotation = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'isAnnotation' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'isAnnotation' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -143,7 +143,7 @@ bool hkbClipTriggerArray::write(HkxXMLWriter *writer){
         writer->writeLine("\n");
         for (int i = 0; i < triggers.size(); i++){
             if (triggers.at(i).event.payload.data() && !triggers.at(i).event.payload.data()->write(writer)){
-                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
             }
         }
     }
@@ -245,6 +245,16 @@ void hkbClipTriggerArray::updateReferences(long &ref){
     }
 }
 
+QVector<HkxObject *> hkbClipTriggerArray::getChildrenOtherTypes() const{
+    QVector<HkxObject *> list;
+    for (auto i = 0; i < triggers.size(); i++){
+        if (triggers.at(i).event.payload.data()){
+            list.append(triggers.at(i).event.payload.data());
+        }
+    }
+    return list;
+}
+
 bool hkbClipTriggerArray::link(){
     if (!getParentFile()){
         return false;
@@ -263,14 +273,28 @@ bool hkbClipTriggerArray::link(){
 }
 
 bool hkbClipTriggerArray::evaluateDataValidity(){
-    for (int i = 0; i < triggers.size(); i++){
-        if (triggers.at(i).event.payload.data() && triggers.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            setDataValidity(false);
-            return false;
+    QString errors;
+    bool isvalid = true;
+    if (triggers.isEmpty()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": triggers is empty!\n");
+    }else{
+        for (auto i = 0; i < triggers.size(); i++){
+            if (triggers.at(i).event.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": id in triggers at "+QString::number(i)+" out of range!\n");
+            }
+            if (triggers.at(i).event.payload.data() && triggers.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(triggers.at(i).event.payload.data()->getSignature(), 16)+"\n");
+            }
         }
     }
-    setDataValidity(true);
-    return true;
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 hkbClipTriggerArray::~hkbClipTriggerArray(){

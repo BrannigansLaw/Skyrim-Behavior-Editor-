@@ -59,72 +59,72 @@ bool hkbHandIkDriverInfo::readData(const HkxXmlReader &reader, long index){
                     if (text == "elbowAxisLS"){
                         hands.last().elbowAxisLS = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'elbowAxisLS' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'elbowAxisLS' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "backHandNormalLS"){
                         hands.last().backHandNormalLS = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'backHandNormalLS' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'backHandNormalLS' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "handOffsetLS"){
                         hands.last().handOffsetLS = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'handOffsetLS' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'handOffsetLS' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "handOrienationOffsetLS"){
                         hands.last().handOrienationOffsetLS = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'handOrienationOffsetLS' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'handOrienationOffsetLS' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "maxElbowAngleDegrees"){
                         hands.last().maxElbowAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'maxElbowAngleDegrees' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'maxElbowAngleDegrees' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "minElbowAngleDegrees"){
                         hands.last().minElbowAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'minElbowAngleDegrees' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'minElbowAngleDegrees' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "shoulderIndex"){
                         hands.last().shoulderIndex = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'shoulderIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'shoulderIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "shoulderSiblingIndex"){
                         hands.last().shoulderSiblingIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'shoulderSiblingIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'shoulderSiblingIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "elbowIndex"){
                         hands.last().elbowIndex = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'elbowIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'elbowIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "elbowSiblingIndex"){
                         hands.last().elbowSiblingIndex = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'elbowSiblingIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'elbowSiblingIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "wristIndex"){
                         hands.last().wristIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'wristIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'wristIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "enforceEndPosition"){
                         hands.last().enforceEndPosition = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enforceEndPosition' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enforceEndPosition' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "enforceEndRotation"){
                         hands.last().enforceEndRotation = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enforceEndRotation' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enforceEndRotation' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "localFrameName"){
                         hands.last().localFrameName = reader.getElementValueAt(index);
                         /*if (hands.last().localFrameName == ""){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'localFrameName' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'localFrameName' data field!\nObject Reference: "+ref);
                         }*/
                         index++;
                         break;
@@ -135,7 +135,7 @@ bool hkbHandIkDriverInfo::readData(const HkxXmlReader &reader, long index){
         }else if (text == "fadeInOutCurve"){
             fadeInOutCurve = reader.getElementValueAt(index);
             if (!BlendCurve.contains(fadeInOutCurve)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'fadeInOutCurve' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'fadeInOutCurve' data field!\nObject Reference: "+ref);
             }
         }
         index++;

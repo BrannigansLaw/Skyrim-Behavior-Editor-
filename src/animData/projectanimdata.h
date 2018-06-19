@@ -32,6 +32,7 @@ public:
     bool removeBehaviorFromProject(const QString &behaviorname);
     qreal getAnimationDuration(int animationindex) const;
     SkyrimAnimationMotionData getAnimationMotionData(int animationindex) const;
+    void merge(ProjectAnimData *recessiveanimdata);
 private:
     void fixNumberAnimationLines();
     ulong animationDataLines;

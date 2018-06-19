@@ -5,6 +5,7 @@
 #include "src/hkxclasses/behavior/generators/hkbclipgenerator.h"
 #include "src/hkxclasses/behavior/modifiers/hkbmodifier.h"
 #include "src/hkxclasses/behavior/hkbvariablebindingset.h"
+#include "behaviorgraphview.h"
 
 #include <QGraphicsScene>
 
@@ -88,6 +89,22 @@ void DataIconManager::setDataInvalid(){
     }
 }
 
+void DataIconManager::setFocusOnTopIcon(){
+    TreeGraphicsItem *icon;
+    if (!icons.isEmpty()){
+        icon = icons.first();
+        if (icon && icon->scene() && !icon->scene()->views().isEmpty()){
+            icon = icons.first();
+            static_cast<BehaviorGraphView *>(icon->scene()->views().first())->centerOn(icon);
+            static_cast<BehaviorGraphView *>(icon->scene()->views().first())->setSelectedItem(icon);
+        }else{
+            LogFile::writeToLog(getName()+": icons is missing scene or view!!");
+        }
+    }else{
+        LogFile::writeToLog(getName()+": icons is empty!!");
+    }
+}
+
 void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
     if (recessiveobj){
         //recessiveobj->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
@@ -105,11 +122,15 @@ void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
         bool found;
         QList <DataIconManager *> objects;
         QList <DataIconManager *> children;
+        QVector <HkxObject *> othertypes = getChildrenOtherTypes();
         if (variableBindingSet.data()){
             variableBindingSet.data()->merge(recobj->variableBindingSet.data());
         }else if (recobj->variableBindingSet.data()){
             variableBindingSet = HkxSharedPtr(new hkbVariableBindingSet(getParentFile()));
             variableBindingSet.data()->merge(recobj->variableBindingSet.data());
+        }
+        for (auto i = 0; i < othertypes.size(); i++){
+            getParentFile()->addObjectToFile(othertypes.at(i), -1);
         }
         for (auto i = 0; i < domchildren.size(); i++){
             found = false;
@@ -137,30 +158,51 @@ void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
                             if (!static_cast<BehaviorFile *>(getParentFile())->existsInBehavior(recchildren.at(j))){
                                 getParentFile()->addObjectToFile(recchildren.at(j), -1);
                                 getParentFile()->addObjectToFile(recchildren.at(j)->variableBindingSet.data(), -1);
+                                othertypes = recchildren.at(j)->getChildrenOtherTypes();
+                                for (auto n = 0; n < othertypes.size(); n++){
+                                    getParentFile()->addObjectToFile(othertypes.at(n), -1);
+                                }
+                                if (recchildren.at(j)->variableBindingSet.data()){
+                                    static_cast<hkbVariableBindingSet *>(recchildren.at(j)->variableBindingSet.data())->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
+                                }
                             }
-                            if (recchildren.at(j)->variableBindingSet.data()){
+                            /*if (recchildren.at(j)->variableBindingSet.data()){
                                 static_cast<hkbVariableBindingSet *>(recchildren.at(j)->variableBindingSet.data())->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
-                            }
+                            }*/
                             recchildren.removeAt(j);
                             found = true;
                             for (auto m = 0; m < tempchildren.size(); m++){
                                 if (!static_cast<BehaviorFile *>(getParentFile())->existsInBehavior(tempchildren.at(m))){
                                     getParentFile()->addObjectToFile(tempchildren.at(m), -1);
                                     getParentFile()->addObjectToFile(tempchildren.at(m)->variableBindingSet.data(), -1);
+                                    othertypes = tempchildren.at(m)->getChildrenOtherTypes();
+                                    for (auto n = 0; n < othertypes.size(); n++){
+                                        getParentFile()->addObjectToFile(othertypes.at(n), -1);
+                                    }
+                                    if (tempchildren.at(m)->variableBindingSet.data()){
+                                        static_cast<hkbVariableBindingSet *>(tempchildren.at(m)->variableBindingSet.data())->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
+                                    }
                                 }
-                                if (tempchildren.at(m)->variableBindingSet.data()){
+                                /*if (tempchildren.at(m)->variableBindingSet.data()){
                                     static_cast<hkbVariableBindingSet *>(tempchildren.at(m)->variableBindingSet.data())->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
-                                }
+                                }*/
                                 objects = static_cast<DataIconManager *>(tempchildren.at(m))->getChildren();
                                 while (!objects.isEmpty()){
                                     if (!static_cast<BehaviorFile *>(getParentFile())->existsInBehavior(objects.last())){
                                         getParentFile()->addObjectToFile(objects.last(), -1);
                                         getParentFile()->addObjectToFile(objects.last()->variableBindingSet.data(), -1);
+                                        othertypes = objects.last()->getChildrenOtherTypes();
+                                        for (auto n = 0; n < othertypes.size(); n++){
+                                            getParentFile()->addObjectToFile(othertypes.at(n), -1);
+                                        }
                                         children = objects.last()->getChildren();
+                                        if (objects.last()->variableBindingSet.data()){
+                                            static_cast<hkbVariableBindingSet *>(objects.last()->variableBindingSet.data())->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
+                                        }
                                     }
-                                    if (objects.last()->variableBindingSet.data()){
+                                    /*if (objects.last()->variableBindingSet.data()){
                                         static_cast<hkbVariableBindingSet *>(objects.last()->variableBindingSet.data())->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
-                                    }
+                                    }*/
                                     objects.removeLast();
                                     objects = objects + children;
                                     children.clear();

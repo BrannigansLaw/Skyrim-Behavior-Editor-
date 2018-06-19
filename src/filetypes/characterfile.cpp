@@ -247,7 +247,7 @@ bool CharacterFile::addObjectToFile(HkxObject *obj, long ref){
     }else if (obj->getSignature() == HK_ROOT_LEVEL_CONTAINER){
         setRootObject(HkxSharedPtr(obj, ref));
     }else{
-        WRITE_TO_LOG("CharacterFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16));
+        LogFile::writeToLog("CharacterFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16));
         return false;
     }
     return true;
@@ -270,12 +270,12 @@ bool CharacterFile::parse(){
             if (value != ""){
                 ref = getReader().getNthAttributeValueAt(index, 0).remove(0, 1).toLong(&ok);
                 if (!ok){
-                    WRITE_TO_LOG("CharacterFile: parse() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!");
+                    LogFile::writeToLog("CharacterFile: parse() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!");
                     return false;
                 }
                 signature = (HkxSignature)value.toULongLong(&ok, 16);
                 if (!ok){
-                    WRITE_TO_LOG("CharacterFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!");
+                    LogFile::writeToLog("CharacterFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!");
                     return false;
                 }
                 if (signature == HKB_BONE_WEIGHT_ARRAY){
@@ -311,7 +311,7 @@ bool CharacterFile::parse(){
                         return false;
                     }
                 }else{
-                    WRITE_TO_LOG("CharacterFile: parse()!\nUnknown signature detected!\nUnknown object class name is: "+getReader().getNthAttributeValueAt(index, 1)+"\nUnknown object signature is: "+QString::number(signature, 16));
+                    LogFile::writeToLog("CharacterFile: parse()!\nUnknown signature detected!\nUnknown object class name is: "+getReader().getNthAttributeValueAt(index, 1)+"\nUnknown object signature is: "+QString::number(signature, 16));
                 }
             }
         }
@@ -321,7 +321,7 @@ bool CharacterFile::parse(){
     getReader().clear();
     //setProgressData("Linking HKX objects...", 80);
     if (!link()){
-        WRITE_TO_LOG("CharacterFile: parse() failed because link() failed!");
+        LogFile::writeToLog("CharacterFile: parse() failed because link() failed!");
         return false;
     }
     return true;
@@ -329,22 +329,22 @@ bool CharacterFile::parse(){
 
 bool CharacterFile::link(){
     if (!getRootObject().constData()){
-        WRITE_TO_LOG("CharacterFile: link() failed!\nThe root object of this character file is nullptr!");
+        LogFile::writeToLog("CharacterFile: link() failed!\nThe root object of this character file is nullptr!");
         return false;
     }else if (getRootObject()->getSignature() != HK_ROOT_LEVEL_CONTAINER){
-        WRITE_TO_LOG("CharacterFile: link() failed!\nThe root object of this character file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16));
+        LogFile::writeToLog("CharacterFile: link() failed!\nThe root object of this character file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16));
         return false;
     }
     if (!getRootObject().data()->link()){
-        WRITE_TO_LOG("CharacterFile: link() failed!\nThe root object of this character file failed to link to it's children!");
+        LogFile::writeToLog("CharacterFile: link() failed!\nThe root object of this character file failed to link to it's children!");
         return false;
     }
     if (!characterData.data() || !characterData.data()->link()){
-        WRITE_TO_LOG("CharacterFile: link() failed!\ncharacterData failed to link to it's children!\n");
+        LogFile::writeToLog("CharacterFile: link() failed!\ncharacterData failed to link to it's children!\n");
         return false;
     }
     if (!characterPropertyValues.data() || !characterPropertyValues.data()->link()){
-        WRITE_TO_LOG("CharacterFile: link() failed!\ncharacterPropertyValues failed to link to it's children!\n");
+        LogFile::writeToLog("CharacterFile: link() failed!\ncharacterPropertyValues failed to link to it's children!\n");
         return false;
     }
     return true;
@@ -358,7 +358,7 @@ hkbBoneWeightArray *CharacterFile::addNewBoneWeightArray(){
 
 void CharacterFile::write(){
     if (getRootObject().data()){
-        ulong ref = getRootObject().data()->getReference();
+        ulong ref = getRootObject().getShdPtrReference();
         getRootObject().data()->setIsWritten(false);
         stringData.data()->setIsWritten(false);
         characterData.data()->setIsWritten(false);

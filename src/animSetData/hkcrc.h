@@ -3,7 +3,7 @@
 
 #include <QByteArray>
 
-//Not my code...
+//Courtesy of Aerisarn...
 class HkCRC
 {
 public:

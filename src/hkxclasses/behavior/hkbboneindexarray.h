@@ -16,7 +16,8 @@ public:
     bool link();
     //bool evaluateDataValidity();
     static QString getClassname();
-    bool write(HkxXMLWriter *writer);
+    bool write(HkxXMLWriter *writer);   //TO DO: implement getChildrenOtherTypes()??
+    QVector <HkxObject *> getChildrenOtherTypes() const;
 private:
     hkbBoneIndexArray& operator=(const hkbBoneIndexArray&);
     hkbBoneIndexArray(const hkbBoneIndexArray &);

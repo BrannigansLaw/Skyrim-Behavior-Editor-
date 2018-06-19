@@ -144,17 +144,17 @@ bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long index){
                     if (reader.getNthAttributeValueAt(index, 0) == "memberPath"){
                         bindings.last().memberPath = reader.getElementValueAt(index);
                         if (bindings.last().memberPath == ""){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'memberPath' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'memberPath' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "variableIndex"){
                         bindings.last().variableIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "bitIndex"){
                         bindings.last().bitIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'bitIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'bitIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if(reader.getNthAttributeValueAt(index, 0) == "bindingType"){
                         if (reader.getElementValueAt(index) == "BINDING_TYPE_VARIABLE"){
@@ -162,7 +162,7 @@ bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long index){
                         }else if (reader.getElementValueAt(index) == "BINDING_TYPE_CHARACTER_PROPERTY"){
                             bindings.last().bindingType = hkBinding::BINDING_TYPE_CHARACTER_PROPERTY;
                         }else{
-                            WRITE_TO_LOG(getClassname()+": readData()!\n'bindingType' data field contains an invalid string!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\n'bindingType' data field contains an invalid string!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -173,7 +173,7 @@ bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long index){
         }else if (text == "indexOfBindingToEnable"){
             indexOfBindingToEnable = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'indexOfBindingToEnable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'indexOfBindingToEnable' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -319,8 +319,32 @@ bool hkbVariableBindingSet::link(){
 }
 
 bool hkbVariableBindingSet::evaluateDataValidity(){
-    //TO DO...
-    return true;
+    QString errors;
+    bool isvalid = true;
+    if (bindings.isEmpty()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": bindings is empty!\n");
+    }else{
+        for (auto i = 0; i < bindings.size(); i++){
+            if (bindings.at(i).memberPath == ""){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": memberPath is null string!\n");
+            }
+            if (bindings.at(i).bindingType == hkBinding::BINDING_TYPE_VARIABLE && bindings.at(i).variableIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfVariables()){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": variableIndex at "+QString::number(i)+" out of range!\n");
+            }
+            /*if (bindings.at(i).bindingType == hkBinding::BINDING_TYPE_CHARACTER_PROPERTY && bindings.at(i).variableIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfCharacterProperties()){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": variableIndex at "+QString::number(i)+" out of range!\n");
+            }*/
+        }
+    }
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 hkbVariableBindingSet::~hkbVariableBindingSet(){

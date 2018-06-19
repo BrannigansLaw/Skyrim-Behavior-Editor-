@@ -13,7 +13,7 @@ class SkyrimAnimSetData
 {
 public:
     SkyrimAnimSetData();
-    ~SkyrimAnimSetData();
+    virtual ~SkyrimAnimSetData();
     bool parse(QFile * file);
     bool write(const QString & filename);
     bool addNewProject(const QString & projectname);

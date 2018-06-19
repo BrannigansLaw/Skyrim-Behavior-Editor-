@@ -41,17 +41,17 @@ bool hkbBoneWeightArray::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "boneWeights"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'boneWeights' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'boneWeights' data!\nObject Reference: "+ref);
                 return false;
             }
             //index++;
             if (numElems > 0 && !readDoubles(reader.getElementValueAt(index), boneWeights)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'boneWeights' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'boneWeights' data!\nObject Reference: "+ref);
                 return false;
             }
             //continue;
@@ -97,10 +97,18 @@ bool hkbBoneWeightArray::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
+}
+
+QVector<HkxObject *> hkbBoneWeightArray::getChildrenOtherTypes() const{
+    QVector <HkxObject *> list;
+    if (variableBindingSet.data()){
+        list.append(variableBindingSet.data());
+    }
+    return list;
 }
 
 bool hkbBoneWeightArray::link(){
@@ -108,7 +116,7 @@ bool hkbBoneWeightArray::link(){
         return false;
     }
     if (!this->linkVar()){
-        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\n");
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\n");
     }
     return true;
 }

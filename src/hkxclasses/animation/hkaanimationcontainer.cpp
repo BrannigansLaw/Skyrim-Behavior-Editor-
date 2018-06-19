@@ -33,11 +33,11 @@ bool hkaAnimationContainer::readData(const HkxXmlReader &reader, long index){
         if (text == "skeletons"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'skeletons' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'skeletons' data!\nObject Reference: "+ref);
                 return false;
             }
             if (numElems > 0 && !readReferences(reader.getElementValueAt(index), skeletons)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'skeletons' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'skeletons' data!\nObject Reference: "+ref);
                 return false;
             }
         }
@@ -96,10 +96,10 @@ bool hkaAnimationContainer::link(){
     for (int i = 0; i < skeletons.size(); i++){
         ptr = static_cast<SkeletonFile *>(getParentFile())->findSkeleton(skeletons.at(i).getShdPtrReference());
         if (!ptr){
-            WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'skeletons' data field!\n");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'skeletons' data field!\n");
             setDataValidity(false);
         }else if (!(*ptr).data() || (*ptr)->getSignature() != HKA_SKELETON){
-            WRITE_TO_LOG(getClassname()+": link()!\n'skeletons' data field is linked to invalid child!\n");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\n'skeletons' data field is linked to invalid child!\n");
             setDataValidity(false);
             skeletons[i] = *ptr;
         }else{

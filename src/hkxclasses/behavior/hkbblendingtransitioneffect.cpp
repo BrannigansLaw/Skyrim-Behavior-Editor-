@@ -23,6 +23,7 @@ QStringList hkbBlendingTransitionEffect::EventMode = {
 };
 
 QStringList hkbBlendingTransitionEffect::Flags = {
+    "0",
     "FLAG_NONE",
     "FLAG_IGNORE_FROM_WORLD_FROM_MODEL",
     "FLAG_SYNC",
@@ -67,6 +68,14 @@ QString hkbBlendingTransitionEffect::getName() const{
     return name;
 }
 
+QVector<HkxObject *> hkbBlendingTransitionEffect::getChildrenOtherTypes() const{
+    QVector <HkxObject *> list;
+    if (variableBindingSet.data()){
+        list.append(variableBindingSet.data());
+    }
+    return list;
+}
+
 bool hkbBlendingTransitionEffect::readData(const HkxXmlReader &reader, long index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
@@ -75,52 +84,52 @@ bool hkbBlendingTransitionEffect::readData(const HkxXmlReader &reader, long inde
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "selfTransitionMode"){
             selfTransitionMode = reader.getElementValueAt(index);
             if (!SelfTransitionMode.contains(selfTransitionMode)){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'selfTransitionMode' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'selfTransitionMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "eventMode"){
             eventMode = reader.getElementValueAt(index);
             if (!EventMode.contains(eventMode)){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "duration"){
             duration = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'duration' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'duration' data field!\nObject Reference: "+ref);
             }
         }else if (text == "toGeneratorStartTimeFraction"){
             toGeneratorStartTimeFraction = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'toGeneratorStartTimeFraction' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'toGeneratorStartTimeFraction' data field!\nObject Reference: "+ref);
             }
         }else if (text == "flags"){
             flags = reader.getElementValueAt(index);
             if (flags == ""){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
             }
         }else if (text == "endMode"){
             endMode = reader.getElementValueAt(index);
             if (endMode == ""){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'endMode' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'endMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "blendCurve"){
             blendCurve = reader.getElementValueAt(index);
             if (blendCurve == ""){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'blendCurve' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'blendCurve' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -154,7 +163,7 @@ bool hkbBlendingTransitionEffect::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+":  write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
@@ -165,7 +174,7 @@ bool hkbBlendingTransitionEffect::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        WRITE_TO_LOG(getClassname()+":  link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     return true;
 }
@@ -175,13 +184,41 @@ void hkbBlendingTransitionEffect::unlink(){
 }
 
 bool hkbBlendingTransitionEffect::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity() || (!SelfTransitionMode.contains(selfTransitionMode)) || (!EventMode.contains(eventMode)) || (!Flags.contains(flags)) || (!EndMode.contains(endMode)) || (!BlendCurve.contains(blendCurve)) || (name == "")){
-        setDataValidity(false);
-        return false;
-    }else{
-        setDataValidity(true);
-        return true;
+    QString errors;
+    bool isvalid = true;
+    if (!HkDynamicObject::evaluateDataValidity()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
     }
+    if (name == ""){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+    }
+    if (!SelfTransitionMode.contains(selfTransitionMode)){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid selfTransitionMode!\n");
+    }
+    if (!EventMode.contains(eventMode)){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventMode!\n");
+    }
+    if (!Flags.contains(flags)){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid flags!\n");
+    }
+    if (!EndMode.contains(endMode)){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid endMode!\n");
+    }
+    if (!BlendCurve.contains(blendCurve)){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid blendCurve!\n");
+    }
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 hkbBlendingTransitionEffect::~hkbBlendingTransitionEffect(){

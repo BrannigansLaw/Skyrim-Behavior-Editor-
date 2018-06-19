@@ -202,6 +202,20 @@ void hkbStateMachineStateInfo::updateReferences(long &ref){
     }
 }
 
+QVector<HkxObject *> hkbStateMachineStateInfo::getChildrenOtherTypes() const{
+    QVector<HkxObject *> list;
+    if (enterNotifyEvents.data()){
+        list.append(enterNotifyEvents.data());
+    }
+    if (exitNotifyEvents.data()){
+        list.append(exitNotifyEvents.data());
+    }
+    if (transitions.data()){
+        list.append(transitions.data());
+    }
+    return list;
+}
+
 QList<DataIconManager *> hkbStateMachineStateInfo::getChildren() const{
     QList<DataIconManager *> list;
     if (generator.data()){
@@ -243,43 +257,43 @@ bool hkbStateMachineStateInfo::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "enterNotifyEvents"){
             if (!enterNotifyEvents.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enterNotifyEvents' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enterNotifyEvents' reference!\nObject Reference: "+ref);
             }
         }else if (text == "exitNotifyEvents"){
             if (!exitNotifyEvents.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'exitNotifyEvents' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'exitNotifyEvents' reference!\nObject Reference: "+ref);
             }
         }else if (text == "transitions"){
             if (!transitions.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'transitions' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'transitions' reference!\nObject Reference: "+ref);
             }
         }else if (text == "generator"){
             if (!generator.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'generator' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'generator' reference!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "stateId"){
             stateId = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'stateId' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'stateId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "probability"){
             probability = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'probability' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'probability' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -335,19 +349,19 @@ bool hkbStateMachineStateInfo::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (enterNotifyEvents.data() && !enterNotifyEvents.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'enterNotifyEvents'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'enterNotifyEvents'!!!");
         }
         if (exitNotifyEvents.data() && !exitNotifyEvents.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'exitNotifyEvents'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'exitNotifyEvents'!!!");
         }
         if (transitions.data() && !transitions.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'transitions'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'transitions'!!!");
         }
         if (generator.data() && !generator.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'generator'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'generator'!!!");
         }
     }
     return true;
@@ -358,12 +372,12 @@ bool hkbStateMachineStateInfo::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(enterNotifyEvents.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
-            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'enterNotifyEvents' is not a HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'enterNotifyEvents' is not a HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY!");
             setDataValidity(false);
         }
         enterNotifyEvents = *ptr;
@@ -371,7 +385,7 @@ bool hkbStateMachineStateInfo::link(){
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(exitNotifyEvents.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
-            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'exitNotifyEvents' is not a HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'exitNotifyEvents' is not a HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY!");
             setDataValidity(false);
         }
         exitNotifyEvents = *ptr;
@@ -379,7 +393,7 @@ bool hkbStateMachineStateInfo::link(){
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(transitions.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
-            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'transitions' is not a HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'transitions' is not a HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY!");
             setDataValidity(false);
         }
         transitions = *ptr;
@@ -387,10 +401,10 @@ bool hkbStateMachineStateInfo::link(){
     }
     ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(generator.getShdPtrReference());
     if (!ptr){
-        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'generator' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'generator' data field!\nObject Name: "+name);
         setDataValidity(false);
     }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        WRITE_TO_LOG(getClassname()+": link()!\n'generator' data field is linked to invalid child!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\n'generator' data field is linked to invalid child!\nObject Name: "+name);
         setDataValidity(false);
         generator = *ptr;
     }else{
@@ -409,19 +423,51 @@ void hkbStateMachineStateInfo::unlink(){
 }
 
 bool hkbStateMachineStateInfo::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity() || (enterNotifyEvents.data() && !enterNotifyEvents.data()->evaluateDataValidity() && enterNotifyEvents.data()->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY) ||
-            (exitNotifyEvents.data() && !exitNotifyEvents.data()->evaluateDataValidity() && exitNotifyEvents.data()->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY) ||
-            (transitions.data() && !transitions.data()->evaluateDataValidity() && transitions.data()->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY) ||
-            (generator.data() && generator.data()->getType() != TYPE_GENERATOR) ||
-            (!parentSM)
-            )
-    {
-        setDataValidity(false);
-        return false;
-    }else{
-        setDataValidity(true);
-        return true;
+    QString errors;
+    bool isvalid = true;
+    if (!HkDynamicObject::evaluateDataValidity()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
     }
+    if (enterNotifyEvents.data()){
+        if (enterNotifyEvents.data()->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
+            isvalid = false;
+            errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid enterNotifyEvents type! Signature: "+QString::number(enterNotifyEvents.data()->getSignature(), 16)+"\n");
+        }else if (enterNotifyEvents.data()->isDataValid() && !enterNotifyEvents.data()->evaluateDataValidity()){
+            isvalid = false;
+            //errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid enterNotifyEvents data!\n");
+        }
+    }
+    if (exitNotifyEvents.data()){
+        if (exitNotifyEvents.data()->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
+            isvalid = false;
+            errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid exitNotifyEvents type! Signature: "+QString::number(exitNotifyEvents.data()->getSignature(), 16)+"\n");
+        }else if (exitNotifyEvents.data()->isDataValid() && !exitNotifyEvents.data()->evaluateDataValidity()){
+            isvalid = false;
+            //errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid exitNotifyEvents data!\n");
+        }
+    }
+    if (transitions.data()){
+        if (transitions.data()->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
+            isvalid = false;
+            errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid transitions type! Signature: "+QString::number(transitions.data()->getSignature(), 16)+"\n");
+        }else if (transitions.data()->isDataValid() && !transitions.data()->evaluateDataValidity()){
+            isvalid = false;
+            //errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid transitions data!\n");
+        }
+    }
+    if (!generator.data()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null generator!\n");
+    }else if (generator.data()->getType() != HkxObject::TYPE_GENERATOR){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid generator type! Signature: "+QString::number(generator.data()->getSignature(), 16)+"\n");
+    }
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 hkbStateMachineStateInfo::~hkbStateMachineStateInfo(){

@@ -163,56 +163,56 @@ bool hkbBlenderGenerator::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "referencePoseWeightThreshold"){
             referencePoseWeightThreshold = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'referencePoseWeightThreshold' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'referencePoseWeightThreshold' data field!\nObject Reference: "+ref);
             }
         }else if (text == "blendParameter"){
             blendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'blendParameter' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'blendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minCyclicBlendParameter"){
             minCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'minCyclicBlendParameter' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'minCyclicBlendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "maxCyclicBlendParameter"){
             maxCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'maxCyclicBlendParameter' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'maxCyclicBlendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "indexOfSyncMasterChild"){
             indexOfSyncMasterChild = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'indexOfSyncMasterChild' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'indexOfSyncMasterChild' data field!\nObject Reference: "+ref);
             }
         }else if (text == "flags"){
             flags = reader.getElementValueAt(index);
             if (flags == ""){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
             }
         }else if (text == "subtractLastChild"){
             subtractLastChild = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'subtractLastChild' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'subtractLastChild' data field!\nObject Reference: "+ref);
             }
         }else if (text == "children"){
             if (!readReferences(reader.getElementValueAt(index), children)){
-                WRITE_TO_LOG(getClassname()+":  readData()!\nFailed to properly read 'children' references!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  readData()!\nFailed to properly read 'children' references!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -265,11 +265,11 @@ bool hkbBlenderGenerator::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+":  write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  write()!\nUnable to write 'variableBindingSet'!!!");
         }
         for (int i = 0; i < children.size(); i++){
             if (children.at(i).data() && !children.at(i).data()->write(writer)){
-                WRITE_TO_LOG(getClassname()+":  write()!\nUnable to write 'children' at: "+QString::number(i)+"!!!");
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  write()!\nUnable to write 'children' at: "+QString::number(i)+"!!!");
             }
         }
     }
@@ -281,17 +281,17 @@ bool hkbBlenderGenerator::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        WRITE_TO_LOG(getClassname()+":  link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < children.size(); i++){
-        //ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(children.at(i).getReference());
+        //ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(children.at(i).getShdPtrReference());
         ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(children.at(i).getShdPtrReference());
         if (!ptr){
-            WRITE_TO_LOG(getClassname()+":  link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
-            WRITE_TO_LOG(getClassname()+":  link()!\n'children' data field is linked to invalid child!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+":  link()!\n'children' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             children[i] = *ptr;
         }else{
@@ -313,19 +313,44 @@ void hkbBlenderGenerator::unlink(){
 }
 
 bool hkbBlenderGenerator::evaluateDataValidity(){
+    QString errors;
+    bool isvalid = true;
     bool valid = true;
-    for (int i = 0; i < children.size(); i++){
-        if (!children.at(i).data() || children.at(i).data()->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
-            valid = false;
+    if (children.isEmpty()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": children is empty!\n");
+    }else{
+        for (int i = 0; i < children.size(); i++){
+            if (!children.at(i).data()){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": children at index '"+QString::number(i)+"' is null!\n");
+            }else if (children.at(i).data()->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid child! Signature: "+QString::number(children.at(i).data()->getSignature(), 16)+"\n");
+            }
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (flags.toUInt(&valid) >= INVALID_FLAG || !valid) || (children.isEmpty())){
-        setDataValidity(false);
-        return false;
-    }else{
-        setDataValidity(true);
-        return true;
+    if (!HkDynamicObject::evaluateDataValidity()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
     }
+    if (name == ""){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+    }
+    if (indexOfSyncMasterChild >= children.size()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": indexOfSyncMasterChild is out of range!\n");
+    }
+    if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid flags!\n");
+    }
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 hkbBlenderGenerator::~hkbBlenderGenerator(){

@@ -23,6 +23,7 @@ public:
     void mergeEventIndex(int oldindex, int newindex);
     void fixMergedEventIndices(BehaviorFile *dominantfile);
     void updateReferences(long &ref);
+    QVector <HkxObject *> getChildrenOtherTypes() const;
 private:
     hkbEventsFromRangeModifier& operator=(const hkbEventsFromRangeModifier&);
     hkbEventsFromRangeModifier(const hkbEventsFromRangeModifier &);

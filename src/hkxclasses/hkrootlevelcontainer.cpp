@@ -32,7 +32,7 @@ bool hkRootLevelContainer::readData(const HkxXmlReader &reader, long index){
         if (reader.getNthAttributeValueAt(index, 0) == "namedVariants"){
             int numVariants = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nAttempt to read the number of variants failed!");
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nAttempt to read the number of variants failed!");
                 //return false;
             }
             for (int j = 0; j < numVariants; j++){
@@ -90,7 +90,7 @@ bool hkRootLevelContainer::write(HkxXMLWriter *writer){
         writer->writeLine("\n");
         for (int i = 0; i < namedVariants.size(); i++){
             if (namedVariants.at(i).variant.data() && !namedVariants.at(i).variant.data()->write(writer)){
-                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write variant at "+QString::number(i));
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write variant at "+QString::number(i));
             }
         }
     }
@@ -129,13 +129,13 @@ bool hkRootLevelContainer::link(){
                     if (file){
                         ptr = static_cast<SkeletonFile *>(getParentFile())->findSkeleton(namedVariants.at(i).variant.getShdPtrReference());
                     }else{
-                        WRITE_TO_LOG(getClassname()+": link()!\nParent file type is invalid!!!");
+                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nParent file type is invalid!!!");
                     }
                 }
             }
         }
         if (!ptr){
-            //WRITE_TO_LOG(getClassname()+": link()!\nUnable to link variant reference "+QString::number(namedVariants.at(i).variant.getShdPtrReference())+"!");
+            //LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nUnable to link variant reference "+QString::number(namedVariants.at(i).variant.getShdPtrReference())+"!");
             setDataValidity(false);
         }else{
             namedVariants[i].variant = *ptr;

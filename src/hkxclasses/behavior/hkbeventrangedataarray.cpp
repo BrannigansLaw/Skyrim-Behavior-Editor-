@@ -75,7 +75,7 @@ bool hkbEventRangeDataArray::readData(const HkxXmlReader &reader, long index){
                     }else if (reader.getNthAttributeValueAt(index, 0) == "eventMode"){
                         eventData.last().eventMode = reader.getElementValueAt(index);
                         if (!eventData.last().EventRangeMode.contains(eventData.last().eventMode)){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -127,7 +127,7 @@ bool hkbEventRangeDataArray::write(HkxXMLWriter *writer){
         writer->writeLine("\n");
         for (int i = 0; i < eventData.size(); i++){
             if (eventData.at(i).event.payload.data() && !eventData.at(i).event.payload.data()->write(writer)){
-                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
             }
         }
     }
@@ -197,6 +197,16 @@ void hkbEventRangeDataArray::updateReferences(long &ref){
     }
 }
 
+QVector<HkxObject *> hkbEventRangeDataArray::getChildrenOtherTypes() const{
+    QVector<HkxObject *> list;
+    for (auto i = 0; i < eventData.size(); i++){
+        if (eventData.at(i).event.payload.data()){
+            list.append(eventData.at(i).event.payload.data());
+        }
+    }
+    return list;
+}
+
 bool hkbEventRangeDataArray::link(){
     if (!getParentFile()){
         return false;
@@ -215,14 +225,32 @@ bool hkbEventRangeDataArray::link(){
 }
 
 bool hkbEventRangeDataArray::evaluateDataValidity(){
-    for (int i = 0; i < eventData.size(); i++){
-        if (eventData.at(i).event.payload.data() && eventData.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            setDataValidity(false);
-            return false;
+    QString errors;
+    bool isvalid = true;
+    if (eventData.isEmpty()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": eventData is empty!\n");
+    }else{
+        for (auto i = 0; i < eventData.size(); i++){
+            if (eventData.at(i).event.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": id in eventData at "+QString::number(i)+" out of range!\n");
+            }
+            if (eventData.at(i).event.payload.data() && eventData.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(eventData.at(i).event.payload.data()->getSignature(), 16)+"\n");
+            }
+            if (!hkbEventRangeData::EventRangeMode.contains(eventData.at(i).eventMode)){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid eventMode!\n");
+            }
         }
     }
-    setDataValidity(true);
-    return true;
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 hkbEventRangeDataArray::~hkbEventRangeDataArray(){

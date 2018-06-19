@@ -100,30 +100,30 @@ bool BSModifyOnceModifier::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pOnActivateModifier"){
             if (!pOnActivateModifier.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'pOnActivateModifier' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'pOnActivateModifier' reference!\nObject Reference: "+ref);
             }
         }else if (text == "pOnDeactivateModifier"){
             if (!pOnDeactivateModifier.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'pOnDeactivateModifier' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'pOnDeactivateModifier' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -163,13 +163,13 @@ bool BSModifyOnceModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (pOnActivateModifier.data() && !pOnActivateModifier.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'pOnActivateModifier'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'pOnActivateModifier'!!!");
         }
         if (pOnDeactivateModifier.data() && !pOnDeactivateModifier.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'pOnDeactivateModifier'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'pOnDeactivateModifier'!!!");
         }
     }
     return true;
@@ -180,12 +180,12 @@ bool BSModifyOnceModifier::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(pOnActivateModifier.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_MODIFIER){
-            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'pOnActivateModifier' is not a modifier!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'pOnActivateModifier' is not a modifier!");
             setDataValidity(false);
         }
         pOnActivateModifier = *ptr;
@@ -193,7 +193,7 @@ bool BSModifyOnceModifier::link(){
     ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(pOnDeactivateModifier.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_MODIFIER){
-            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'pOnDeactivateModifier' is not a modifier!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'pOnDeactivateModifier' is not a modifier!");
             setDataValidity(false);
         }
         pOnDeactivateModifier = *ptr;
@@ -208,13 +208,39 @@ void BSModifyOnceModifier::unlink(){
 }
 
 bool BSModifyOnceModifier::evaluateDataValidity(){
-    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (!pOnActivateModifier.data()) || (!pOnDeactivateModifier.data())){
-        setDataValidity(false);
-        return false;
-    }else{
-        setDataValidity(true);
-        return true;
+    QString errors;
+    bool isvalid = true;
+    if (!HkDynamicObject::evaluateDataValidity()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
     }
+    if (name == ""){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+    }
+    if (!pOnActivateModifier.data()){
+        if (!pOnDeactivateModifier.data()){
+            isvalid = false;
+            errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": pOnActivateModifier and pOnDeactivateModifier are both nullptr!\n");
+        }else if (pOnDeactivateModifier.data()->getType() != HkxObject::TYPE_MODIFIER){
+            isvalid = false;
+            errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOnDeactivateModifier type! Signature: "+QString::number(pOnDeactivateModifier.data()->getSignature(), 16)+"\n");
+        }
+    }else{
+        if (pOnActivateModifier.data()->getType() != HkxObject::TYPE_MODIFIER){
+            isvalid = false;
+            errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOnActivateModifier type! Signature: "+QString::number(pOnActivateModifier.data()->getSignature(), 16)+"\n");
+        }
+        if (pOnDeactivateModifier.data() && pOnDeactivateModifier.data()->getType() != HkxObject::TYPE_MODIFIER){
+            isvalid = false;
+            errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOnDeactivateModifier type! Signature: "+QString::number(pOnDeactivateModifier.data()->getSignature(), 16)+"\n");
+        }
+    }
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 BSModifyOnceModifier::~BSModifyOnceModifier(){

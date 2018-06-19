@@ -114,31 +114,31 @@ bool hkbManualSelectorGenerator::readData(const HkxXmlReader &reader, long index
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "generators"){
             if (!readReferences(reader.getElementValueAt(index), generators)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'generators' references!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'generators' references!\nObject Reference: "+ref);
             }
         }else if (text == "selectedGeneratorIndex"){
             selectedGeneratorIndex = reader.getElementValueAt(index).toShort(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'selectedGeneratorIndex' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'selectedGeneratorIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "currentGeneratorIndex"){
             currentGeneratorIndex = reader.getElementValueAt(index).toShort(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'currentGeneratorIndex' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'currentGeneratorIndex' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -191,11 +191,11 @@ bool hkbManualSelectorGenerator::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         for (int i = 0; i < generators.size(); i++){
             if (generators.at(i).data() && !generators.at(i).data()->write(writer)){
-                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'generators' at: "+QString::number(i)+"!!!");
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'generators' at: "+QString::number(i)+"!!!");
             }
         }
     }
@@ -207,16 +207,16 @@ bool hkbManualSelectorGenerator::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < generators.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(generators.at(i).getShdPtrReference());
         if (!ptr){
-            WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'generators' data field!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'generators' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-            WRITE_TO_LOG(getClassname()+": link()!\n'generators' data field is linked to invalid child!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\n'generators' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             generators[i] = *ptr;
         }else{
@@ -234,19 +234,43 @@ void hkbManualSelectorGenerator::unlink(){
 }
 
 bool hkbManualSelectorGenerator::evaluateDataValidity(){
-    bool valid = true;
-    for (int i = 0; i < generators.size(); i++){
-        if (!generators.at(i).data() || generators.at(i).data()->getType() != HkxObject::TYPE_GENERATOR){
-            valid = false;
+    QString errors;
+    bool isvalid = true;
+    if (generators.isEmpty()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": generators is empty!\n");
+    }else{
+        for (int i = 0; i < generators.size(); i++){
+            if (!generators.at(i).data()){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": generators at index '"+QString::number(i)+"' is null!\n");
+            }else if (generators.at(i).data()->getType() != HkxObject::TYPE_GENERATOR){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid generator! Signature: "+QString::number(generators.at(i).data()->getSignature(), 16)+"\n");
+            }
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity() || (selectedGeneratorIndex < 0 || selectedGeneratorIndex > generators.size()) || (currentGeneratorIndex < 0 || currentGeneratorIndex > generators.size()) || (name == "") || (generators.isEmpty()) || !valid){
-        setDataValidity(false);
-        return false;
-    }else{
-        setDataValidity(true);
-        return true;
+    if (!HkDynamicObject::evaluateDataValidity()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
     }
+    if (name == ""){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+    }
+    if (selectedGeneratorIndex >= generators.size()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": selectedGeneratorIndex is out of range!\n");
+    }
+    if (currentGeneratorIndex >= generators.size()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": currentGeneratorIndex is out of range!\n");
+    }
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 hkbManualSelectorGenerator::~hkbManualSelectorGenerator(){

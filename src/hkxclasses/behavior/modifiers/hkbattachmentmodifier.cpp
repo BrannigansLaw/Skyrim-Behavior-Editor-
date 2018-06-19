@@ -88,22 +88,22 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "sendToAttacherOnAttach"){
             index++;
@@ -112,11 +112,11 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
                 if (text == "id"){
                     sendToAttacherOnAttach.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!sendToAttacherOnAttach.payload.readShdPtrReference(index, reader)){
-                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -129,11 +129,11 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
                 if (text == "id"){
                     sendToAttacheeOnAttach.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!sendToAttacheeOnAttach.payload.readShdPtrReference(index, reader)){
-                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -146,11 +146,11 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
                 if (text == "id"){
                     sendToAttacherOnDetach.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!sendToAttacherOnDetach.payload.readShdPtrReference(index, reader)){
-                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -163,11 +163,11 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
                 if (text == "id"){
                     sendToAttacheeOnDetach.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!sendToAttacheeOnDetach.payload.readShdPtrReference(index, reader)){
-                        WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -175,20 +175,20 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
             }
         }else if (text == "attachmentSetup"){
             if (!attachmentSetup.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'attachmentSetup' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'attachmentSetup' reference!\nObject Reference: "+ref);
             }
         }else if (text == "attacherHandle"){
             if (!attacherHandle.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'attacherHandle' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'attacherHandle' reference!\nObject Reference: "+ref);
             }
         }else if (text == "attacheeHandle"){
             if (!attacheeHandle.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'attacheeHandle' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'attacheeHandle' reference!\nObject Reference: "+ref);
             }
         }else if (text == "attacheeLayer"){
             attacheeLayer = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'attacheeLayer' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'attacheeLayer' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -279,7 +279,7 @@ bool hkbAttachmentModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
@@ -372,17 +372,34 @@ void hkbAttachmentModifier::updateReferences(long &ref){
     }
 }
 
+QVector<HkxObject *> hkbAttachmentModifier::getChildrenOtherTypes() const{
+    QVector<HkxObject *> list;
+    if (sendToAttacherOnAttach.payload.data()){
+        list.append(sendToAttacherOnAttach.payload.data());
+    }
+    if (sendToAttacheeOnAttach.payload.data()){
+        list.append(sendToAttacheeOnAttach.payload.data());
+    }
+    if (sendToAttacherOnDetach.payload.data()){
+        list.append(sendToAttacherOnDetach.payload.data());
+    }
+    if (sendToAttacheeOnDetach.payload.data()){
+        list.append(sendToAttacheeOnDetach.payload.data());
+    }
+    return list;
+}
+
 bool hkbAttachmentModifier::link(){
     if (!getParentFile()){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(sendToAttacherOnAttach.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
         sendToAttacherOnAttach.payload = *ptr;
@@ -390,7 +407,7 @@ bool hkbAttachmentModifier::link(){
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(sendToAttacheeOnAttach.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
         sendToAttacheeOnAttach.payload = *ptr;
@@ -398,7 +415,7 @@ bool hkbAttachmentModifier::link(){
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(sendToAttacherOnDetach.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
         sendToAttacherOnDetach.payload = *ptr;
@@ -406,7 +423,7 @@ bool hkbAttachmentModifier::link(){
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(sendToAttacheeOnDetach.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            WRITE_TO_LOG(getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
         sendToAttacheeOnDetach.payload = *ptr;
@@ -426,17 +443,54 @@ void hkbAttachmentModifier::unlink(){
     attacheeHandle = HkxSharedPtr();
 }
 
-bool hkbAttachmentModifier::evaluateDataValidity(){    //TO DO: Check if event id is valid???
-    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (sendToAttacherOnAttach.payload.data() && sendToAttacherOnAttach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD) ||
-            (sendToAttacheeOnAttach.payload.data() && sendToAttacheeOnAttach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD) || (sendToAttacherOnDetach.payload.data() && sendToAttacherOnDetach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD) ||
-            (sendToAttacheeOnDetach.payload.data() && sendToAttacheeOnDetach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD))
-    {
-        setDataValidity(false);
-        return false;
-    }else{
-        setDataValidity(true);
-        return true;
+bool hkbAttachmentModifier::evaluateDataValidity(){
+    QString errors;
+    bool isvalid = true;
+    if (!HkDynamicObject::evaluateDataValidity()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
     }
+    if (name == ""){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+    }
+    if (sendToAttacherOnAttach.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacherOnAttach event id out of range!\n");
+    }
+    if (sendToAttacherOnAttach.payload.data() && sendToAttacherOnAttach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacherOnAttach.payload type! Signature: "+QString::number(sendToAttacherOnAttach.payload.data()->getSignature(), 16)+"\n");
+    }
+    if (sendToAttacheeOnAttach.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacheeOnAttach event id out of range!\n");
+    }
+    if (sendToAttacheeOnAttach.payload.data() && sendToAttacheeOnAttach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacheeOnAttach.payload type! Signature: "+QString::number(sendToAttacheeOnAttach.payload.data()->getSignature(), 16)+"\n");
+    }
+    if (sendToAttacherOnDetach.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacherOnDetach event id out of range!\n");
+    }
+    if (sendToAttacherOnDetach.payload.data() && sendToAttacherOnDetach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacherOnDetach.payload type! Signature: "+QString::number(sendToAttacherOnDetach.payload.data()->getSignature(), 16)+"\n");
+    }
+    if (sendToAttacheeOnDetach.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacheeOnDetach event id out of range!\n");
+    }
+    if (sendToAttacheeOnDetach.payload.data() && sendToAttacheeOnDetach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacheeOnDetach.payload type! Signature: "+QString::number(sendToAttacheeOnDetach.payload.data()->getSignature(), 16)+"\n");
+    }
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 hkbAttachmentModifier::~hkbAttachmentModifier(){

@@ -14,6 +14,7 @@
 #include "src/hkxclasses/behavior/modifiers/hkbmodifier.h"
 #include "src/hkxclasses/behavior/hkbprojectdata.h"
 #include "src/hkxclasses/behavior/hkbprojectstringdata.h"
+#include "src/hkxclasses/behavior/hkbcharacterstringdata.h"
 #include "src/hkxclasses/hkrootlevelcontainer.h"
 #include "src/hkxclasses/behavior/generators/hkbclipgenerator.h"
 #include "src/hkxclasses/behavior/generators/hkbbehaviorreferencegenerator.h"
@@ -24,6 +25,7 @@ ProjectFile::ProjectFile(MainWindow *window, const QString & name, bool autogene
     : HkxFile(window, name),
       largestRef(0),
       projectIndex(-1),
+      character(nullptr),
       skyrimAnimData(new SkyrimAnimData),
       skyrimAnimSetData(new SkyrimAnimSetData)
 {
@@ -141,7 +143,7 @@ bool ProjectFile::addObjectToFile(HkxObject *obj, long ref){
     }else if (obj->getSignature() == HK_ROOT_LEVEL_CONTAINER){
         setRootObject(HkxSharedPtr(obj, ref));
     }else{
-        WRITE_TO_LOG("ProjectFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16));
+        LogFile::writeToLog("ProjectFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16));
         return false;
     }
     return true;
@@ -164,12 +166,12 @@ bool ProjectFile::parse(){
             if (value != ""){
                 ref = getReader().getNthAttributeValueAt(index, 0).remove(0, 1).toLong(&ok);
                 if (!ok){
-                    WRITE_TO_LOG("ProjectFile: parse() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!");
+                    LogFile::writeToLog("ProjectFile: parse() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!");
                     return false;
                 }
                 signature = (HkxSignature)value.toULongLong(&ok, 16);
                 if (!ok){
-                    WRITE_TO_LOG("ProjectFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!");
+                    LogFile::writeToLog("ProjectFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!");
                     return false;
                 }
                 if (signature == HKB_PROJECT_DATA){
@@ -185,7 +187,7 @@ bool ProjectFile::parse(){
                         return false;
                     }
                 }else{
-                    //WRITE_TO_LOG("ProjectFile: parse()!\nUnknown signature detected!\nUnknown object class name is: "+getReader().getNthAttributeValueAt(index, 1)+"\nUnknown object signature is: "+QString::number(signature, 16));
+                    //LogFile::writeToLog("ProjectFile: parse()!\nUnknown signature detected!\nUnknown object class name is: "+getReader().getNthAttributeValueAt(index, 1)+"\nUnknown object signature is: "+QString::number(signature, 16));
                     return false;
                 }
             }
@@ -196,7 +198,7 @@ bool ProjectFile::parse(){
     getReader().clear();
     //setProgressData("Linking HKX objects...", 80);
     if (!link()){
-        WRITE_TO_LOG("ProjectFile: parse() failed because link() failed!");
+        LogFile::writeToLog("ProjectFile: parse() failed because link() failed!");
         return false;
     }
     return true;
@@ -204,24 +206,24 @@ bool ProjectFile::parse(){
 
 bool ProjectFile::link(){
     if (!getRootObject().constData()){
-        WRITE_TO_LOG("ProjectFile: link() failed!\nThe root object of this project file is nullptr!");
+        LogFile::writeToLog("ProjectFile: link() failed!\nThe root object of this project file is nullptr!");
         return false;
     }else if (getRootObject()->getSignature() != HK_ROOT_LEVEL_CONTAINER){
-        WRITE_TO_LOG("ProjectFile: link() failed!\nThe root object of this project file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16));
+        LogFile::writeToLog("ProjectFile: link() failed!\nThe root object of this project file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16));
         return false;
     }
     if (!getRootObject().data()->link()){
-        WRITE_TO_LOG("ProjectFile: link() failed!\nThe root object of this project file failed to link to it's children!");
+        LogFile::writeToLog("ProjectFile: link() failed!\nThe root object of this project file failed to link to it's children!");
         return false;
     }
     if (!projectData.data()->link()){
-        WRITE_TO_LOG("ProjectFile: link() failed!\nprojectData failed to link to it's children!\n");
+        LogFile::writeToLog("ProjectFile: link() failed!\nprojectData failed to link to it's children!\n");
         return false;
     }
     return true;
 }
 
-QString ProjectFile::detectErrors(){
+QString ProjectFile::detectErrorsInProject(){
     ProgressDialog progress("Detecting errors...", "", 0, 100, getUI());
     progress.setWindowModality(Qt::WindowModal);
     std::vector <std::future<QString>> futures;
@@ -235,7 +237,7 @@ QString ProjectFile::detectErrors(){
     qreal difference = ((1.0)/((qreal)(numbehaviors)))*(100.0);
     std::unique_lock<std::mutex> locker(mutex);
     for (uint i = 0; i < maxThreads, fileIndex < numbehaviors; i++, fileIndex++){
-        futures.push_back(std::async(std::launch::async, &BehaviorFile::detectErrors, behaviorFiles.at(fileIndex), std::ref(taskCount), std::ref(mutex), std::ref(conditionVar)));
+        futures.push_back(std::async(std::launch::async, &BehaviorFile::detectErrorsMT, behaviorFiles.at(fileIndex), std::ref(taskCount), std::ref(mutex), std::ref(conditionVar)));
     }
     while (taskCount > 0){
         if (taskCount < numbehaviors){
@@ -246,17 +248,27 @@ QString ProjectFile::detectErrors(){
         previousCount = taskCount;
         for (; taskdifference > 0; taskdifference--){
             if (fileIndex < numbehaviors){
-                futures.push_back(std::async(std::launch::async, &BehaviorFile::detectErrors, behaviorFiles.at(fileIndex), std::ref(taskCount), std::ref(mutex), std::ref(conditionVar)));
+                futures.push_back(std::async(std::launch::async, &BehaviorFile::detectErrorsMT, behaviorFiles.at(fileIndex), std::ref(taskCount), std::ref(mutex), std::ref(conditionVar)));
                 fileIndex++;
             }
         }
         conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
     }
-    QString errorstring;
+    QString errorstring("\n\n");
     for (auto i = 0; i < futures.size(); i++){
         errorstring = errorstring + futures.at(i).get();
     }
     return errorstring+"\nCheck 'DebugLog.txt' in the application directory for details...";
+}
+
+QString ProjectFile::detectErrorsInBehavior(const QString &filename){
+    for (auto i = 0; i < behaviorFiles.size(); i++){
+        if (!behaviorFiles.at(i)->fileName().compare(filename, Qt::CaseInsensitive)){
+            return behaviorFiles.at(i)->detectErrors();
+        }
+    }
+    LogFile::writeToLog("ProjectFile::detectErrorsInBehavior(): Project not found!");
+    return "";
 }
 
 void ProjectFile::removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *gentoignore){
@@ -294,73 +306,121 @@ void ProjectFile::removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *g
     }
 }
 
-bool ProjectFile::merge(ProjectFile *recessiveproject){ //Make sure to update event and variable indices when merging!!!
+bool ProjectFile::merge(ProjectFile *recessiveproject, bool isFNIS){ //Make sure to update event and variable indices when merging!!!
     bool value = false;
     bool found;
     if (recessiveproject){
         QList <BehaviorFile *> dominantbehaviors(behaviorFiles);
         QList <BehaviorFile *> recessivebehaviors(recessiveproject->behaviorFiles);
         QVector <DataIconManager *> objectsnotfound;
-        QString objname;
-        //TO DO: Merge character file...
-        //recessiveproject->character->merge(character);  //Done for FNIS...
-        character = recessiveproject->character;
-        //std::vector <std::thread> threads;
-        if (!QString::compare(projectName, recessiveproject->projectName, Qt::CaseInsensitive)){
-            for (auto i = 0; i < dominantbehaviors.size() - 1; i++){
-                for (auto j = recessivebehaviors.size() - 1; j > -1; j--){
-                    if (!QString::compare(dominantbehaviors.at(i)->fileName().section("/", -1, -1), recessivebehaviors.at(j)->fileName().section("/", -1, -1), Qt::CaseInsensitive)){
-                        //threads.push_back(std::thread(&BehaviorFile::merge, dominantbehaviors.at(i), recessivebehaviors.at(j)));
-                        objectsnotfound = dominantbehaviors.at(i)->merge(recessivebehaviors.at(j));
-                        //recessivebehaviors.removeAt(j);
-                        for (auto k = 0; k < dominantbehaviors.size() && !objectsnotfound.isEmpty(); k++){
-                            if (QString::compare(dominantbehaviors.at(k)->fileName().section("/", -1, -1), dominantbehaviors.at(i)->fileName().section("/", -1, -1), Qt::CaseInsensitive)){
-                                dominantbehaviors.at(k)->mergeObjects(objectsnotfound);
-                            }
-                        }
-                        for (auto k = 0; k < objectsnotfound.size(); k++){
-                            if (objectsnotfound.at(k)->getType() == HkxObject::TYPE_GENERATOR){
-                                objname = static_cast<hkbGenerator *>(objectsnotfound.at(k))->getName();
-                            }else if (objectsnotfound.at(k)->getType() == HkxObject::TYPE_MODIFIER){
-                                objname = static_cast<hkbModifier *>(objectsnotfound.at(k))->getName();
-                            }else{
-                                CRITICAL_ERROR_MESSAGE(QString("ProjectFile: merge(): Attempting to merge invalid object type!!!"));
-                            }
-                            WRITE_TO_LOG("ProjectFile: merge(): The object type \""+QString::number(objectsnotfound.at(k)->getSignature(), 16)
-                                       +"\" named \""+objname+"\" was not found in the recessive behavior!!!");
-                        }
-                    }
-                }
+        if (isFNIS){
+            recessiveproject->character->merge(character);
+            QString name = character->fileName();
+            if (!character->remove()){
+                LogFile::writeToLog("failed to remove character file");
             }
-            /*for (int k = 0; k < threads.size(); k++){
-                if (threads.at(k).joinable()){
-                    threads.at(k).join();
-                }else{
-                    CRITICAL_ERROR_MESSAGE(QString("ProjectFile::merge(): Thread "+QString::number(k)+" failed to join!!!").toLocal8Bit().data());
-                }
-            }
-            threads.clear();*/
-            value = true;
-            for (auto i = 0; i < recessivebehaviors.size(); i++){
-                found = false;
-                for (auto j = 0; j < behaviorFiles.size(); j++){
-                    if (!QString::compare(behaviorFiles.at(j)->fileName().section("/", -1, -1), recessivebehaviors.at(i)->fileName().section("/", -1, -1), Qt::CaseInsensitive)){
-                        found = true;
-                    }
-                }
-                if (!found){
-                    recessivebehaviors.at(i)->setFileName(fileName().section("/", 0, -2)+"/behaviors/"+recessivebehaviors.at(i)->fileName().section("/", -1, -1));
-                    behaviorFiles.append(recessivebehaviors.at(i));
-                }
-            }
-            /*if (!mergeAnimationCaches(recessiveproject)){
-                WRITE_TO_LOG("ProjectFile: merge() failed!\nmergeAnimationCaches() failed!\n");
-            }*/
+            character = recessiveproject->character;
+            character->setFileName(name);
         }else{
-            WRITE_TO_LOG("ProjectFile: merge() failed!\nProject names are different!\n");
+            character->merge(recessiveproject->character);
+        }
+        for (auto i = 0; i < dominantbehaviors.size(); i++){
+            for (auto j = 0; j < recessivebehaviors.size(); j++){
+                if (!QString::compare(dominantbehaviors.at(i)->fileName().section("/", -1, -1), recessivebehaviors.at(j)->fileName().section("/", -1, -1), Qt::CaseInsensitive)){
+                    if (i != j){
+                        if (i < recessivebehaviors.size()){
+                            recessivebehaviors.swap(j, i);
+                        }else{
+                            dominantbehaviors.swap(i, j);
+                        }
+                    }
+                }
+            }
+        }
+        if (dominantbehaviors.size() < recessivebehaviors.size()){
+            for (auto i = recessivebehaviors.size(); i >= dominantbehaviors.size(); i--){
+                recessivebehaviors.removeAt(i);
+            }
+        }else if (dominantbehaviors.size() > recessivebehaviors.size()){
+            for (auto i = dominantbehaviors.size(); i >= recessivebehaviors.size(); i--){
+                dominantbehaviors.removeAt(i);
+            }
+        }
+        if (recessivebehaviors.size() == dominantbehaviors.size()){
+            ProgressDialog progress("Merging projects...", "", 0, 100, getUI(), Qt::Dialog);
+            progress.setWindowModality(Qt::WindowModal);
+            int percent = 0;
+            std::vector <std::future <QVector <DataIconManager *>>> futures;
+            auto taskCount = dominantbehaviors.size();
+            auto previousCount = taskCount;
+            auto fileIndex = 0;
+            auto maxThreads = std::thread::hardware_concurrency() - 1;
+            auto taskdifference = 0;
+            auto numbehaviors = taskCount;
+            qreal difference = ((1.0)/((qreal)(numbehaviors)))*(100.0);
+            std::unique_lock<std::mutex> locker(mutex);
+            if (!QString::compare(projectName, recessiveproject->projectName, Qt::CaseInsensitive)){
+                for (uint i = 0; i < maxThreads, fileIndex < numbehaviors; i++, fileIndex++){
+                    futures.push_back(std::async(std::launch::async, &BehaviorFile::merge, dominantbehaviors.at(fileIndex), recessivebehaviors.at(fileIndex), std::ref(taskCount), std::ref(mutex), std::ref(conditionVar)));
+                }
+                while (taskCount > 0){
+                    if (taskCount < numbehaviors){
+                        percent += difference;
+                        progress.setValue(percent);
+                    }
+                    taskdifference = previousCount - taskCount;
+                    previousCount = taskCount;
+                    for (; taskdifference > 0; taskdifference--){
+                        if (fileIndex < numbehaviors){
+                            futures.push_back(std::async(std::launch::async, &BehaviorFile::merge, dominantbehaviors.at(fileIndex), recessivebehaviors.at(fileIndex), std::ref(taskCount), std::ref(mutex), std::ref(conditionVar)));
+                            fileIndex++;
+                        }
+                    }
+                    conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
+                }
+                for (auto i = 0; i < futures.size(); i++){
+                    objectsnotfound = objectsnotfound + futures.at(i).get();
+                }
+                percent = 0;
+                progress.setProgress("Merging loose objects...", percent);
+                difference = ((1.0)/((qreal)(dominantbehaviors.size())))*(100.0);
+                for (auto k = 0; k < dominantbehaviors.size() && !objectsnotfound.isEmpty(); k++){
+                    dominantbehaviors.at(k)->mergeObjects(objectsnotfound);
+                    percent += difference;
+                    progress.setValue(percent);
+                }
+                percent = 0;
+                progress.setProgress("Adding surplus files to the dominant project...", percent);
+                difference = ((1.0)/((qreal)(recessivebehaviors.size())))*(100.0);
+                value = true;
+                for (auto i = 0; i < recessivebehaviors.size(); i++){
+                    found = false;
+                    for (auto j = 0; j < behaviorFiles.size(); j++){
+                        if (!QString::compare(behaviorFiles.at(j)->fileName().section("/", -1, -1), recessivebehaviors.at(i)->fileName().section("/", -1, -1), Qt::CaseInsensitive)){
+                            found = true;
+                        }
+                    }
+                    if (!found){
+                        recessivebehaviors.at(i)->setFileName(fileName().section("/", 0, -2)+"/behaviors/"+recessivebehaviors.at(i)->fileName().section("/", -1, -1));
+                        behaviorFiles.append(recessivebehaviors.at(i));
+                        percent += difference;
+                        progress.setValue(percent);
+                    }
+                }
+                percent = 0;
+                progress.setProgress("Merging animation caches...", percent);
+                /*if (!mergeAnimationCaches(recessiveproject)){
+                    LogFile::writeToLog("ProjectFile: merge() failed!\nmergeAnimationCaches() failed!\n");
+                }*/
+                progress.setProgress("Done!!!", progress.maximum());
+            }else{
+                LogFile::writeToLog("ProjectFile: merge() failed!\nProject names are different!\n");
+            }
+        }else{
+            LogFile::writeToLog("ProjectFile: merge() failed!\nProject behaviors are different!\n");
         }
     }else{
-        WRITE_TO_LOG("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
+        LogFile::writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
     }
     return value;
 }
@@ -372,10 +432,10 @@ bool ProjectFile::mergeAnimationCaches(ProjectFile *recessiveproject){
                 return true;
             }
         }else{
-            WRITE_TO_LOG("ProjectFile: merge() failed!\n skyrimAnimSetData or recessiveproject->skyrimAnimSetData is nullptr!\n");
+            LogFile::writeToLog("ProjectFile: merge() failed!\n skyrimAnimSetData or recessiveproject->skyrimAnimSetData is nullptr!\n");
         }
     }else{
-        WRITE_TO_LOG("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
+        LogFile::writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
     }
     return false;
 }
@@ -424,7 +484,7 @@ void ProjectFile::generateAnimClipDataForProject(){
             if (generator->getSignature() == HKB_CLIP_GENERATOR){
                 clipGenDataPtr = new SkyrimClipGeneratoData(static_cast<hkbClipGenerator *>(generator)->getClipGeneratorAnimData(skyrimAnimData->getProjectAnimData(projectName), getAnimationIndex(static_cast<hkbClipGenerator *>(generator)->animationName)));
                 if (!skyrimAnimData->appendClipGenerator(projectName, clipGenDataPtr)){
-                    //WRITE_TO_LOG((QString("ProjectFile::generateAnimDataForProject(): Duplicate clip generator \""+clipGenDataPtr->getClipGeneratorName()+"found in: "+behaviorFiles.at(i)->fileName().section("/", -1, -1))));
+                    //LogFile::writeToLog((QString("ProjectFile::generateAnimDataForProject(): Duplicate clip generator \""+clipGenDataPtr->getClipGeneratorName()+"found in: "+behaviorFiles.at(i)->fileName().section("/", -1, -1))));
                 }
             }
         }
@@ -482,7 +542,7 @@ bool ProjectFile::isAnimationUsed(const QString &animationname){
             generator = behaviorFiles.at(i)->generators.at(j).data();
             if (generator->getSignature() == HKB_CLIP_GENERATOR){
                 if (!QString::compare(animationname, static_cast<hkbClipGenerator *>(generator)->getAnimationName(), Qt::CaseInsensitive)){
-                    WRITE_TO_LOG("ProjectFile: isAnimationUsed()!\nAnimation is used in the Clip Generator \""+static_cast<hkbClipGenerator *>(generator)->getName()+"\" in behavior: "+behaviorFiles.at(i)->fileName().section("/",-1,-1));
+                    LogFile::writeToLog("ProjectFile: isAnimationUsed()!\nAnimation is used in the Clip Generator \""+static_cast<hkbClipGenerator *>(generator)->getName()+"\" in behavior: "+behaviorFiles.at(i)->fileName().section("/",-1,-1));
                     return true;
                 }
             }
@@ -636,6 +696,15 @@ void ProjectFile::write(){
     ref++;
     getWriter().setFile(this);
     getWriter().writeToXMLFile();
+}
+
+bool ProjectFile::doesBehaviorExist(const QString &behaviorname) const{
+    for (int i = 0; i < behaviorFiles.size(); i++){
+        if (behaviorFiles.at(i)->fileName().contains(behaviorname, Qt::CaseInsensitive)){
+            return true;
+        }
+    }
+    return false;
 }
 
 ProjectFile::~ProjectFile(){

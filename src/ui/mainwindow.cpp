@@ -26,6 +26,7 @@
 
 MainWindow::MainWindow()
     :
+      projectExportPath("data/meshes/actors"),
       topLyt(new QGridLayout(this)),
       topMB(new QMenuBar(this)),
       openPackedProjectA(new QAction("Open Packed Project", this)),
@@ -38,8 +39,10 @@ MainWindow::MainWindow()
       saveProjectA(new QAction("Save Project", this)),
       exitA(new QAction("Exit", this)),
       viewM(new QMenu("View", this)),
-      expandA(new QAction("Expand All", this)),
-      collapseA(new QAction("Collapse All", this)),
+      expandA(new QAction("Expand Branch", this)),
+      collapseA(new QAction("Retract Branch", this)),
+      zoomInA(new QAction("Zoom In", this)),
+      zoomOutA(new QAction("Zoom Out", this)),
       findGeneratorA(new QAction("Find Generator", this)),
       findModifierA(new QAction("Find Modifier", this)),
       refocusA(new QAction("Refocus On Selected Item", this)),
@@ -47,11 +50,17 @@ MainWindow::MainWindow()
       mergeM(new QMenu("Merge", this)),
       mergeBehaviorsA(new QAction("Merge Two Behavior Files", this)),
       mergeProjectsA(new QAction("Merge Two Projects", this)),
+      generateFNISPatchA(new QAction("Generate FNIS Patch", this)),
+      documentationM(new QMenu("Documentation", this)),
+      classReferenceHubA(new QAction("UI And Class Reference", this)),
+      donateM(new QMenu("Donate", this)),
+      sendGibsA(new QAction("Send GIBS", this)),
       setPathToGameFolderA(new QAction("Set Path To Game Directory", this)),
+      setProjectExportPathA(new QAction("Set Project Export Path", this)),
       setGameModeA(new QAction("Set Game Mode", this)),
       tabs(new QTabWidget),
       projectFile(nullptr),
-      characterFile(nullptr),
+      //characterFile(nullptr),
       skeletonFile(nullptr),
       projectUI(new ProjectUI(nullptr)),
       iconGBLyt(new QVBoxLayout(this)),
@@ -64,13 +73,14 @@ MainWindow::MainWindow()
 {
     //setStyleSheet("QComboBox {background: yellow};QWidget {background: darkGray}");
     projectUI->setDisabled(true);
-    QFile(QDir::currentPath()+"/DebugLog.txt").remove();
     hkxcmdPath = QDir::currentPath()+"/hkxcmd.exe";
 #ifdef QT_DEBUG
     hkxcmdPath = "c:/users/wayne/desktop/hkxcmd.exe";
 #endif
+    newProjectA->setStatusTip("Create a new character project!");
+    newProjectA->setShortcut(QKeySequence::New);
     openPackedProjectA->setStatusTip("Open a hkx project file!");
-    //openPackedProjectA->setShortcut(QKeySequence::Open);
+    openPackedProjectA->setShortcut(QKeySequence::Open);
     openUnpackedProjectA->setStatusTip("Open a hkx xml project file!");
     //openUnpackedProjectA->setShortcut(QKeySequence::Open);
     exportToSkyrimDirA->setStatusTip("Pack and export the current project to the working Skyrim directory!");
@@ -80,9 +90,9 @@ MainWindow::MainWindow()
     saveA->setStatusTip("Save file!");
     saveA->setShortcut(QKeySequence::Save);
     saveProjectA->setStatusTip("Save project!");
-    //saveProjectA->setShortcut(QKeySequence::SaveAs);
+    saveProjectA->setShortcut(QKeySequence("Ctrl+S+A"));
     exitA->setStatusTip("Exit!");
-    //exitA->setShortcut(QKeySequence::Close);
+    exitA->setShortcut(QKeySequence::Close);
     fileM->addAction(newProjectA);
     fileM->addAction(openPackedProjectA);
     fileM->addAction(openUnpackedProjectA);
@@ -91,27 +101,57 @@ MainWindow::MainWindow()
     fileM->addAction(saveA);
     fileM->addAction(saveProjectA);
     fileM->addAction(exitA);
-    expandA->setStatusTip("Expand all branches!");
-    //expandA->setShortcut(QKeySequence::ZoomIn);
-    collapseA->setStatusTip("Collapse all branches!");
-    //collapseA->setShortcut(QKeySequence::ZoomOut);
+    zoomInA->setStatusTip("Zoom In!");
+    zoomInA->setShortcut(QKeySequence::ZoomIn);
+    zoomOutA->setStatusTip("Zoom Out!");
+    zoomOutA->setShortcut(QKeySequence::ZoomOut);
+    expandA->setStatusTip("Expand All Children Of The Currently Selected Object!");
+    expandA->setShortcut(QKeySequence("Ctrl+E"));
+    collapseA->setStatusTip("Retract All Children Of The Currently Selected Object!");
+    collapseA->setShortcut(QKeySequence("Ctrl+R"));
     refocusA->setStatusTip("Centers the behavior view on the selected item!");
-    //refocusA->setShortcut(QKeySequence::Back);
+    refocusA->setShortcut(QKeySequence::Refresh);
     setGameModeA->setCheckable(true);
     settingsM->addAction(setPathToGameFolderA);
-    settingsM->addAction(setGameModeA);
+    setPathToGameFolderA->setStatusTip("Set The Path To The Game Directory!");
+    setPathToGameFolderA->setShortcut(QKeySequence("Ctrl+F"));
+    settingsM->addAction(setProjectExportPathA);
+    setProjectExportPathA->setStatusTip("Set The Project Export Path!");
+    setProjectExportPathA->setShortcut(QKeySequence("Ctrl+X"));
+    //settingsM->addAction(setGameModeA);
     mergeM->addAction(mergeBehaviorsA);
     mergeM->addAction(mergeProjectsA);
+    mergeM->addAction(generateFNISPatchA);
+    mergeBehaviorsA->setStatusTip("Merge Two Behavior Files Together!");
+    mergeBehaviorsA->setShortcut(QKeySequence("Ctrl+I"));
+    mergeProjectsA->setStatusTip("Merge Two Projects Together!");
+    //mergeProjectsA->setShortcut(QKeySequence("Ctrl+P"));
+    generateFNISPatchA->setStatusTip("Merge Project With FNIS!");
+    generateFNISPatchA->setShortcut(QKeySequence("Ctrl+P"));
+    findGeneratorA->setStatusTip("Find Generator In Current Behavior!");
+    findGeneratorA->setShortcut(QKeySequence("Ctrl+G"));
+    findModifierA->setStatusTip("Find Modifier In Current Behavior!");
+    findModifierA->setShortcut(QKeySequence("Ctrl+M"));
+    viewM->addAction(zoomInA);
+    viewM->addAction(zoomOutA);
     viewM->addAction(expandA);
     viewM->addAction(collapseA);
     viewM->addAction(refocusA);
     viewM->addAction(findGeneratorA);
     viewM->addAction(findModifierA);
+    classReferenceHubA->setStatusTip("View Help!");
+    classReferenceHubA->setShortcut(QKeySequence("Ctrl+H"));
+    documentationM->addAction(classReferenceHubA);
+    donateM->addAction(sendGibsA);
+    sendGibsA->setStatusTip("Donate To The Author!");
+    sendGibsA->setShortcut(QKeySequence("Ctrl+D"));
     topMB->setMaximumHeight(50);
     topMB->addMenu(fileM);
     topMB->addMenu(viewM);
     topMB->addMenu(settingsM);
     topMB->addMenu(mergeM);
+    topMB->addMenu(documentationM);
+    topMB->addMenu(donateM);
     eventsWid->setHkDataUI(objectDataWid);
     variablesWid->setHkDataUI(objectDataWid);
     objectDataWid->setEventsVariablesAnimationsUI(eventsWid, variablesWid, projectUI->animations);
@@ -129,10 +169,10 @@ MainWindow::MainWindow()
     objectDataSA->setWidget(objectDataWid);
     objectDataSA->setVisible(false);
     if (!findGameDirectory(QString("Skyrim"), skyrimDirectory)){
-        WRITE_TO_LOG("The TESV executable was not found!");
+        WARNING_MESSAGE("The TESV executable was not found!");
     }
     if (!findGameDirectory(QString("Skyrim Special Edition"), skyrimSpecialEdtionDirectory)){
-        WRITE_TO_LOG("The SSE executable was not found!");
+        LogFile::writeToLog("The SSE executable was not found!");
     }else{
         skyrimBehaviorUpdateToolFullPath = skyrimSpecialEdtionDirectory+"/Tools/HavokBehaviorPostProcess/HavokBehaviorPostProcess.exe";
         if (!QFile(skyrimBehaviorUpdateToolFullPath).exists()){
@@ -145,11 +185,13 @@ MainWindow::MainWindow()
     connect(saveA, SIGNAL(triggered(bool)), this, SLOT(save()), Qt::UniqueConnection);
     connect(exportToSkyrimDirA, SIGNAL(triggered(bool)), this, SLOT(packAndExportProjectToSkyrimDirectory()), Qt::UniqueConnection);
     connect(exportCurrentFileA, SIGNAL(triggered(bool)), this, SLOT(packAndExportFileToSkyrimDirectory()), Qt::UniqueConnection);
-    connect(saveProjectA, SIGNAL(triggered(bool)), this, SLOT(saveProject()), Qt::UniqueConnection);
+    connect(saveProjectA, SIGNAL(triggered(bool)), this, SLOT(saveProject(bool)), Qt::UniqueConnection);
+    connect(zoomInA, SIGNAL(triggered(bool)), this, SLOT(zoomIn()), Qt::UniqueConnection);
+    connect(zoomOutA, SIGNAL(triggered(bool)), this, SLOT(zoomOut()), Qt::UniqueConnection);
     connect(expandA, SIGNAL(triggered(bool)), this, SLOT(expandBranches()), Qt::UniqueConnection);
     connect(collapseA, SIGNAL(triggered(bool)), this, SLOT(collapseBranches()), Qt::UniqueConnection);
-    //connect(findGeneratorA, SIGNAL(triggered(bool)), ui, SLOT(viewGeneratorTable()), Qt::UniqueConnection);
-    //connect(findModifierA, SIGNAL(triggered(bool)), ui, SLOT(viewModifierTable()), Qt::UniqueConnection);
+    connect(findGeneratorA, SIGNAL(triggered(bool)), this, SLOT(findGenerator()), Qt::UniqueConnection);
+    connect(findModifierA, SIGNAL(triggered(bool)), this, SLOT(findModifier()), Qt::UniqueConnection);
     connect(refocusA, SIGNAL(triggered(bool)), this, SLOT(refocus()), Qt::UniqueConnection);
     connect(exitA, SIGNAL(triggered(bool)), this, SLOT(exit()), Qt::UniqueConnection);
     connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(changedTabs(int)), Qt::UniqueConnection);
@@ -160,8 +202,12 @@ MainWindow::MainWindow()
     connect(projectUI, SIGNAL(animationRemoved(int)), this, SLOT(removeAnimation(int)), Qt::UniqueConnection);
     connect(setGameModeA, SIGNAL(changed()), this, SLOT(setGameMode()), Qt::UniqueConnection);
     connect(setPathToGameFolderA, SIGNAL(triggered(bool)), this, SLOT(setPathToGameDirectory()), Qt::UniqueConnection);
+    connect(setProjectExportPathA, SIGNAL(triggered(bool)), this, SLOT(setProjectExportPath()), Qt::UniqueConnection);
     connect(mergeBehaviorsA, SIGNAL(triggered(bool)), this, SLOT(mergeBehaviors()), Qt::UniqueConnection);
     connect(mergeProjectsA, SIGNAL(triggered(bool)), this, SLOT(mergeProjects()), Qt::UniqueConnection);
+    connect(generateFNISPatchA, SIGNAL(triggered(bool)), this, SLOT(mergeFNIS()), Qt::UniqueConnection);
+    connect(classReferenceHubA, SIGNAL(triggered(bool)), this, SLOT(viewDocumentation()), Qt::UniqueConnection);
+    connect(sendGibsA, SIGNAL(triggered(bool)), this, SLOT(sendGIBS()), Qt::UniqueConnection);
 }
 
 MainWindow::~MainWindow(){
@@ -176,7 +222,7 @@ QMessageBox::StandardButton MainWindow::closeAllDialogue(){
     QMessageBox::StandardButton ret;
     ret = QMessageBox::warning(this, "Skyrim Behavior Tool", CONFIRM_CLOSE_PROJECT_WITHOUT_SAVING, QMessageBox::Yes | QMessageBox::SaveAll | QMessageBox::Cancel);
     if (ret == QMessageBox::SaveAll){
-        saveProject();
+        saveProject(true);
     }
     return ret;
 }
@@ -233,7 +279,7 @@ void MainWindow::expandBranches(){
     if (projectFile){
         int index = tabs->currentIndex() - 1;
         if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
-            behaviorGraphs.at(index)->expandAllBranches();
+            behaviorGraphs.at(index)->expandBranch();
         }else{
             if (tabs->count() < 2){
                 WARNING_MESSAGE("No behavior file is currently being viewed!!!")
@@ -242,7 +288,7 @@ void MainWindow::expandBranches(){
             }
         }
     }else{
-        WRITE_TO_LOG("MainWindow::expandBranches(): No project opened!");
+        LogFile::writeToLog("MainWindow::expandBranches(): No project opened!");
     }
 }
 
@@ -250,8 +296,8 @@ void MainWindow::collapseBranches(){
     if (projectFile){
         int index = tabs->currentIndex() - 1;
         if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
-            behaviorGraphs.at(index)->contractAllBranches();
-            behaviorGraphs.at(index)->selectRoot();
+            behaviorGraphs.at(index)->contractBranch();
+            //behaviorGraphs.at(index)->selectRoot();
         }else{
             if (tabs->count() < 2){
                 WARNING_MESSAGE("No behavior file is currently being viewed!!!")
@@ -260,7 +306,7 @@ void MainWindow::collapseBranches(){
             }
         }
     }else{
-        WRITE_TO_LOG("MainWindow::collapseBranches(): No project opened!");
+        LogFile::writeToLog("MainWindow::collapseBranches(): No project opened!");
     }
 }
 
@@ -270,7 +316,7 @@ void MainWindow::refocus(){
         if (index != -1){
             if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
                 if (!behaviorGraphs.at(index)->refocus()){
-                    WRITE_TO_LOG("MainWindow::refocus(): No behavior graph item is currently selected!");
+                    LogFile::writeToLog("MainWindow::refocus(): No behavior graph item is currently selected!");
                 }
             }else{
                 if (tabs->count() < 2){
@@ -280,10 +326,10 @@ void MainWindow::refocus(){
                 }
             }
         }else{
-            WRITE_TO_LOG("MainWindow::refocus(): No behavior graph is currently viewed!");
+            LogFile::writeToLog("MainWindow::refocus(): No behavior graph is currently viewed!");
         }
     }else{
-        WRITE_TO_LOG("MainWindow::refocus(): No project opened!");
+        LogFile::writeToLog("MainWindow::refocus(): No project opened!");
     }
 }
 
@@ -302,12 +348,20 @@ void MainWindow::setPathToGameDirectory(){
     }
 }
 
+void MainWindow::setProjectExportPath(){
+    bool ok;
+    QString path = QInputDialog::getText(this, tr("Set project export path!"), tr("Path:"), QLineEdit::Normal, projectExportPath, &ok);
+    if (ok && path != ""){
+        projectExportPath = path;
+    }
+}
+
 void MainWindow::save(){
     auto count = 1;
     saveFile(getBehaviorGraphIndex(tabs->tabText(tabs->currentIndex())), count);
 }
 
-void MainWindow::saveFile(int index, int & taskCount){
+void MainWindow::saveFile(int index, int & taskCount, bool usenormalsave){
     QString backupPath;
     BehaviorFile *behavior;
     if (projectFile){
@@ -325,46 +379,50 @@ void MainWindow::saveFile(int index, int & taskCount){
                 QFile backup(filename);
                 if (backup.exists()){
                     if (!backup.remove()){
-                        WRITE_TO_LOG(QString("Failed to remove to old backup file "+backupPath.section("/",-1,-1)+"!").toLocal8Bit().data());
+                        LogFile::writeToLog(QString("Failed to remove to old backup file "+backupPath.section("/",-1,-1)+"!").toLocal8Bit().data());
                     }
                 }
                 if (!behavior->copy(behavior->fileName(), filename)){
-                    WRITE_TO_LOG("Backup failed!");
+                    LogFile::writeToLog("Backup failed!");
                 }else{
                     if (!behavior->remove()){
-                        WRITE_TO_LOG(QString("Failed to remove to old file "+backupPath.section("/",-1,-1)+"!").toLocal8Bit().data());
+                        LogFile::writeToLog(QString("Failed to remove to old file "+backupPath.section("/",-1,-1)+"!").toLocal8Bit().data());
                     }
                 }
-                behavior->write();
+                if (usenormalsave){
+                    behavior->write();
+                }else{
+                    behavior->mergedWrite();
+                }
                 behavior->setIsChanged(false);
                 mutex.lock();
                 taskCount--;
                 conditionVar.notify_one();
                 mutex.unlock();
             }else{
-                WRITE_TO_LOG("MainWindow::saveFile(): behavior is nullptr!");
+                LogFile::writeToLog("MainWindow::saveFile(): behavior is nullptr!");
             }
         }else{
-            WRITE_TO_LOG("MainWindow::saveFile(): No behavior file is currently viewed!");
+            LogFile::writeToLog("MainWindow::saveFile(): No behavior file is currently viewed!");
             mutex.unlock();
         }
     }else{
-        WRITE_TO_LOG("MainWindow::saveFile(): No project opened!");
+        LogFile::writeToLog("MainWindow::saveFile(): No project opened!");
     }
 }
 
-void MainWindow::saveProject(){
-    if (projectFile && characterFile && skeletonFile && projectFile->skyrimAnimData && projectFile->skyrimAnimSetData){
+void MainWindow::saveProject(bool usenormalsave){
+    if (projectFile && projectFile->character && skeletonFile && projectFile->skyrimAnimData && projectFile->skyrimAnimSetData){
         QFile animData(lastFileSelectedPath+"/animationdatasinglefile.txt");
         if (animData.exists()){
             if (!animData.remove()){
-                WRITE_TO_LOG("Failed to remove to old animData file!");
+                LogFile::writeToLog("Failed to remove to old animData file!");
             }
         }
         QFile animSetData(lastFileSelectedPath+"/animationsetdatasinglefile.txt");
         if (animSetData.exists()){
             if (!animSetData.remove()){
-                WRITE_TO_LOG("Failed to remove to old animSetData file!");
+                LogFile::writeToLog("Failed to remove to old animSetData file!");
             }
         }
         ProgressDialog progress("Saving project...", "", 0, 100, this, Qt::Dialog);
@@ -381,7 +439,7 @@ void MainWindow::saveProject(){
         progress.setProgress("Saving project file...", 1);
         threads.push_back(std::thread(&ProjectFile::write, projectFile));
         progress.setProgress("Saving character file...", 2);
-        threads.push_back(std::thread(&CharacterFile::write, characterFile));
+        threads.push_back(std::thread(&CharacterFile::write, projectFile->character));
         progress.setProgress("Saving animation translation and rotation data (animationdatasinglefile.txt)...", 10);
         threads.push_back(std::thread(&SkyrimAnimData::write, projectFile->skyrimAnimData, QString(lastFileSelectedPath+"/animationdatasinglefile.txt")));
         progress.setProgress("Saving animation cache file (animationsetdatasinglefile.txt)...", 15);
@@ -397,7 +455,7 @@ void MainWindow::saveProject(){
         progress.setProgress("Saving behavior files...", 20);
         std::unique_lock<std::mutex> locker(mutex);
         for (uint i = 0; i < maxThreads, fileindex < numbehaviors; i++, fileindex++){
-            threads.push_back(std::thread(&MainWindow::saveFile, this, fileindex, std::ref(taskCount)));
+            threads.push_back(std::thread(&MainWindow::saveFile, this, fileindex, std::ref(taskCount), usenormalsave));
             threads.back().detach();
         }
         while (taskCount > 0){
@@ -409,7 +467,7 @@ void MainWindow::saveProject(){
             previousCount = taskCount;
             for (; taskdifference > 0; taskdifference--){
                 if (fileindex < numbehaviors){
-                    threads.push_back(std::thread(&MainWindow::saveFile, this, fileindex, std::ref(taskCount)));
+                    threads.push_back(std::thread(&MainWindow::saveFile, this, fileindex, std::ref(taskCount), usenormalsave));
                     threads.back().detach();
                     fileindex++;
                 }
@@ -418,23 +476,25 @@ void MainWindow::saveProject(){
         }
         threads.clear();
         projectFile->setIsChanged(false);
-        characterFile->setIsChanged(false);
+        projectFile->character->setIsChanged(false);
     }else{
-        WRITE_TO_LOG("No project open or corrupt project missing essential data!");
+        WARNING_MESSAGE("No project open or corrupt project missing essential data!");
     }
 }
 
 void MainWindow::packAndExportProjectToSkyrimDirectory(){
     if (projectFile){
-        QTime t;
-        t.start();
-        WRITE_TO_LOG("Exporting the current project to the Skyrim game directory...");
-        QString path = skyrimDirectory+"/data/meshes/actors";
+        LogFile::writeToLog("Exporting the current project to the Skyrim game directory...");
+        QString path = skyrimDirectory+"/"+projectExportPath;
         QString projectFolder = path+"/"+lastFileSelectedPath.section("/", -1, -1);
         convertProject(lastFileSelectedPath, projectFolder, "-f SAVE_CONCISE");
         exportAnimationData();
+        /*QString errors = projectFile->detectErrorsInProject();
+        if (errors != ""){
+            USER_MESSAGE(errors);
+        }*/
     }else{
-        WRITE_TO_LOG("MainWindow::packAndExportProjectToSkyrimDirectory(): No project open!");
+        WARNING_MESSAGE("MainWindow::packAndExportProjectToSkyrimDirectory(): No project open!");
     }
 }
 
@@ -448,7 +508,7 @@ void MainWindow::exportAnimationData(){
                 file.remove();
             }
             if (!animData.copy(skyrimDirectory+"/data/meshes/animationdatasinglefile.txt")){
-                WRITE_TO_LOG("Failed to export animationdatasinglefile.txt to the game directory!");
+                LogFile::writeToLog("Failed to export animationdatasinglefile.txt to the game directory!");
             }
         }else{
             if (QDir().mkdir(skyrimDirectory+"/data/meshes")){
@@ -457,14 +517,14 @@ void MainWindow::exportAnimationData(){
                     file.remove();
                 }
                 if (!animData.copy(skyrimDirectory+"/data/meshes/animationdatasinglefile.txt")){
-                    WRITE_TO_LOG("Failed to export animationdatasinglefile.txt to the game directory!");
+                    LogFile::writeToLog("Failed to export animationdatasinglefile.txt to the game directory!");
                 }
             }else{
-                WRITE_TO_LOG(QString("Failed to create directory: "+skyrimDirectory+"/data/meshes"+"!").toLocal8Bit().data());
+                LogFile::writeToLog(QString("Failed to create directory: "+skyrimDirectory+"/data/meshes"+"!").toLocal8Bit().data());
             }
         }
     }else{
-        WRITE_TO_LOG("animationdatasinglefile.txt was not found in the project directory!");
+        LogFile::writeToLog("animationdatasinglefile.txt was not found in the project directory!");
     }
     QFile animSetData(lastFileSelectedPath+"/animationsetdatasinglefile.txt");
     if (animSetData.exists()){
@@ -475,7 +535,7 @@ void MainWindow::exportAnimationData(){
                 file.remove();
             }
             if (!animSetData.copy(skyrimDirectory+"/data/meshes/animationsetdatasinglefile.txt")){
-                WRITE_TO_LOG("Failed to export animationsetdatasinglefile.txt to the game directory!");
+                LogFile::writeToLog("Failed to export animationsetdatasinglefile.txt to the game directory!");
             }
         }else{
             if (QDir().mkdir(skyrimDirectory+"/data/meshes")){
@@ -484,44 +544,49 @@ void MainWindow::exportAnimationData(){
                     file.remove();
                 }
                 if (!animSetData.copy(skyrimDirectory+"/data/meshes/animationsetdatasinglefile.txt")){
-                    WRITE_TO_LOG("Failed to export animationsetdatasinglefile.txt to the game directory!");
+                    LogFile::writeToLog("Failed to export animationsetdatasinglefile.txt to the game directory!");
                 }
             }else{
-                WRITE_TO_LOG(QString("Failed to create directory: "+skyrimDirectory+"/data/meshes"+"!").toLocal8Bit().data());
+                LogFile::writeToLog(QString("Failed to create directory: "+skyrimDirectory+"/data/meshes"+"!").toLocal8Bit().data());
             }
         }
     }else{
-        WRITE_TO_LOG("animationsetdatasinglefile.txt was not found in the project directory!");
+        LogFile::writeToLog("animationsetdatasinglefile.txt was not found in the project directory!");
     }
 }
 
 void MainWindow::packAndExportFileToSkyrimDirectory(){
     QTime timer;
     auto count = 1;
-    if (projectFile){
-        if (characterFile){
+    if (projectFile && projectFile->character){
+        if (projectFile->character){
             timer.start();
-            WRITE_TO_LOG("Exporting the current file to the Skyrim game directory...");
+            LogFile::writeToLog("Exporting the current file to the Skyrim game directory...");
             ProgressDialog dialog("Exporting the current file to the Skyrim game directory...", "", 0, 100, this);
             QString path = skyrimDirectory+"/data/meshes/actors";
             QString projectFolder = path+"/"+lastFileSelectedPath.section("/", -1, -1);
             QString filename = tabs->tabText(tabs->currentIndex());
-            QString temppath = projectFolder+"/"+characterFile->getBehaviorDirectoryName()+"/"+filename;
-            if (hkxcmd(lastFileSelectedPath+"/"+characterFile->getBehaviorDirectoryName()+"/"+filename, temppath, count) == HKXCMD_SUCCESS){
+            QString temppath = projectFolder+"/"+projectFile->character->getBehaviorDirectoryName()+"/"+filename;
+            if (hkxcmd(lastFileSelectedPath+"/"+projectFile->character->getBehaviorDirectoryName()+"/"+filename, temppath, count) == HKXCMD_SUCCESS){
                 exportAnimationData();
                 dialog.setProgress("Behavior file exported sucessfully!", dialog.maximum());
-                WRITE_TO_LOG("Time taken to export the file is approximately "+QString::number(timer.elapsed())+" milliseconds");
+                LogFile::writeToLog("Time taken to export the file is approximately "+QString::number(timer.elapsed())+" milliseconds");
+                QString errors = projectFile->detectErrorsInBehavior(temppath);
+                if (errors != ""){
+                    USER_MESSAGE(errors);
+                }
             }else{
                 dialog.setProgress("Behavior file export failed!", dialog.maximum());
-                WRITE_TO_LOG("MainWindow::packAndExportFileToSkyrimDirectory(): Failed to convert and export the behavior directory to the correct folder in the Skyrim directory!");
+                LogFile::writeToLog("MainWindow::packAndExportFileToSkyrimDirectory(): Failed to convert and export the behavior directory to the correct folder in the Skyrim directory!");
             }
         }
     }else{
-        WRITE_TO_LOG("MainWindow::packAndExportFileToSkyrimDirectory(): No project open!");
+        LogFile::writeToLog("MainWindow::packAndExportFileToSkyrimDirectory(): No project open!");
     }
 }
 
 void MainWindow::mergeBehaviors(){
+    auto taskcount = 1;
     BehaviorFile *dominantBehavior;
     BehaviorFile *recessiveBehavior;
     QString dominantfilename;
@@ -533,7 +598,7 @@ void MainWindow::mergeBehaviors(){
         if (!dominantBehavior || !recessiveBehavior){
             WARNING_MESSAGE("The attempt to merge projects failed!");
         }else{
-            dominantBehavior->merge(recessiveBehavior);
+            dominantBehavior->merge(recessiveBehavior, taskcount, std::ref(mutex), std::ref(conditionVar));
             dominantBehavior->write();
             delete dominantBehavior;
             delete recessiveBehavior;
@@ -552,23 +617,111 @@ void MainWindow::mergeProjects(){
     QString recessivefilename = QFileDialog::getOpenFileName(this, tr("Select recessive project file..."), QDir::currentPath(), tr("hkx Files (*.hkx)"));
     if (recessivefilename != ""){
         convertProject(recessivefilename, "");
-        openProject(recessivefilename, false, false);
+        openProject(recessivefilename, false, true);
         recessiveProject = projectFile;
         dominantfilename = QFileDialog::getOpenFileName(this, tr("Select dominant project file..."), QDir::currentPath(), tr("hkx Files (*.hkx)"));
         convertProject(dominantfilename, "");
-        openProject(dominantfilename, false, false);
+        openProject(dominantfilename, false, true);
         dominantProject = projectFile;
         if (!dominantProject->merge(recessiveProject)){
             WARNING_MESSAGE("The attempt to merge projects failed!");
         }
-        saveProject();
+        saveProject(false);
         //TO DO: Merge animdata...
         //packAndExportProjectToSkyrimDirectory();
         //delete recessiveProject;
         //delete projectFile;
         //projectFile = nullptr;
-        WRITE_TO_LOG("Time taken to merge project \""+recessivefilename+"\" with project \""+dominantfilename+"\" is "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
-        USER_MESSAGE("The project \""+recessivefilename+"\" was sucessfully merged with \""+dominantfilename+"\" project!");
+        LogFile::writeToLog("Time taken to merge project \""+recessivefilename+"\" with project \""+dominantfilename+"\" is "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
+        USER_MESSAGE("The project \""+recessivefilename+"\" was sucessfully merged with \""+dominantfilename+"\" project! This program will now close!");
+        QApplication::exit(0);
+    }
+}
+
+void MainWindow::mergeFNIS(){
+    QTime timer;
+    int timeelapsed;
+    timer.start();
+    timeelapsed = timer.elapsed();
+    ProjectFile *dominantProject;
+    ProjectFile *recessiveProject;
+    QString dominantfilename;
+    dominantfilename = QFileDialog::getOpenFileName(this, tr("Select project to merge with FNIS..."), QDir::currentPath(), tr("hkx Files (*.hkx)"));
+    if (dominantfilename != ""){
+        QString recessivefilename = skyrimDirectory+"/data/meshes/actors/character/"+dominantfilename.section("/", -1, -1);
+        ProjectFile *tempproject = new ProjectFile(this, recessivefilename, true, "Characters\\"+dominantfilename.section("/", -1, -1));
+        tempproject->write();
+        delete tempproject;
+        convertProject(recessivefilename, "");
+        openProject(recessivefilename, false, false, true);
+        recessiveProject = projectFile;
+        convertProject(dominantfilename, "");
+        openProject(dominantfilename, false, false);
+        dominantProject = projectFile;
+        if (!dominantProject->merge(recessiveProject, true)){
+            WARNING_MESSAGE("The attempt to merge projects failed!");
+        }
+        saveProject(false);
+        //TO DO: Merge animdata...
+        //NEED TO FIX ANIMTION INDICES IN ANIMDATA FILES BEFORE MERGING!!!
+        //packAndExportProjectToSkyrimDirectory();
+        //delete recessiveProject;
+        //delete projectFile;
+        //projectFile = nullptr;
+        LogFile::writeToLog("Time taken to merge project \""+recessivefilename+"\" with project \""+dominantfilename+"\" is "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
+        USER_MESSAGE("FNIS patch was sucessful! This program will now close!");
+        QApplication::exit(0);
+    }
+}
+
+void MainWindow::viewDocumentation(){
+    QUrl url("file:///"+QDir::currentPath()+"/docs/Skyrim_Behavior_Tool_Documentation.html");
+    if (!QDesktopServices::openUrl(url)){
+        WARNING_MESSAGE("MainWindow::viewDocumentation(): Documentation not found!");
+    }
+}
+
+void MainWindow::sendGIBS(){
+    if (!QDesktopServices::openUrl(QUrl("https://www.nexusmods.com/Core/Libs/Common/Widgets/PayPalPopUp?user=4959835"))){
+        WARNING_MESSAGE("MainWindow::sendGIBS(): Cannot send GIBS!");
+    }
+}
+
+void MainWindow::findGenerator(){
+    if (projectFile){
+        int index = tabs->currentIndex() - 1;
+        if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
+            if (objectDataWid){
+                objectDataWid->connectToGeneratorTable();
+            }
+        }else{
+            if (tabs->count() < 2){
+                WARNING_MESSAGE("No behavior file is currently being viewed!!!")
+            }else{
+                WARNING_MESSAGE("MainWindow::findGenerator() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
+            }
+        }
+    }else{
+        LogFile::writeToLog("MainWindow::findGenerator(): No project opened!");
+    }
+}
+
+void MainWindow::findModifier(){
+    if (projectFile){
+        int index = tabs->currentIndex() - 1;
+        if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
+            if (objectDataWid){
+                objectDataWid->connectToModifierTable();
+            }
+        }else{
+            if (tabs->count() < 2){
+                WARNING_MESSAGE("No behavior file is currently being viewed!!!")
+            }else{
+                WARNING_MESSAGE("MainWindow::findModifier() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
+            }
+        }
+    }else{
+        LogFile::writeToLog("MainWindow::findModifier(): No project opened!");
     }
 }
 
@@ -587,10 +740,10 @@ BehaviorFile * MainWindow::openBehaviorForMerger(QString & filepath){
                 CRITICAL_ERROR_MESSAGE("MainWindow::openBehaviorForMerger(): The selected behavior file \""+filepath+"\" was not parsed!");
             }
         }else{
-            WRITE_TO_LOG("MainWindow::openBehaviorForMerger(): Failed to remove the behavior file \""+filepath+"!");
+            LogFile::writeToLog("MainWindow::openBehaviorForMerger(): Failed to remove the behavior file \""+filepath+"!");
         }
     }else{
-        WRITE_TO_LOG("MainWindow::openBehaviorForMerger(): Failed to convert the behavior file \""+filepath+"!");
+        LogFile::writeToLog("MainWindow::openBehaviorForMerger(): Failed to convert the behavior file \""+filepath+"!");
     }
     return ptr;
 }
@@ -616,17 +769,17 @@ void MainWindow::closeTab(int index){
             }
         }
     }else{
-        WRITE_TO_LOG("No project open!");
+        LogFile::writeToLog("No project open!");
     }
 }
 
 QString MainWindow::generateUniqueBehaviorName(){
-    if (characterFile){
+    if (projectFile->character){
         QString name = "Behavior_0.hkx";
         int num = 1;
         int index;
         QStringList behaviornames;
-        QDirIterator it(lastFileSelectedPath+"/"+characterFile->getBehaviorDirectoryName());
+        QDirIterator it(lastFileSelectedPath+"/"+projectFile->character->getBehaviorDirectoryName());
         while (it.hasNext()){
             if (QFileInfo(it.next()).fileName().contains(".hkx")){
                 behaviornames.append(it.fileInfo().fileName());
@@ -645,9 +798,9 @@ QString MainWindow::generateUniqueBehaviorName(){
                 }
             }
         }
-        return lastFileSelectedPath+"/"+characterFile->getBehaviorDirectoryName()+"/"+name;
+        return lastFileSelectedPath+"/"+projectFile->character->getBehaviorDirectoryName()+"/"+name;
     }else{
-        WRITE_TO_LOG("MainWindow::generateUniqueBehaviorName(): Null characterFile!");
+        LogFile::writeToLog("MainWindow::generateUniqueBehaviorName(): Null projectFile->character!");
     }
     return "";
 }
@@ -656,7 +809,7 @@ void MainWindow::addNewBehavior(bool initData){
     //ProgressDialog dialog("Creating new behavior file in the current project...", "", 0, 100, this);
     objectDataWid->unloadDataWidget();
     if (projectFile){
-        if (characterFile){
+        if (projectFile->character){
             bool ok;
             QString filename = QInputDialog::getText(this, "Add A New Behavior File To The Current Project!", "Behavior Name:", QLineEdit::Normal, "NEW_BEHAVIOR", &ok);
             if (!ok && filename.isEmpty()){
@@ -666,7 +819,7 @@ void MainWindow::addNewBehavior(bool initData){
                 return;
             }
             if (filename != ""){
-                projectFile->behaviorFiles.append(new BehaviorFile(this, projectFile, characterFile, filename));
+                projectFile->behaviorFiles.append(new BehaviorFile(this, projectFile, projectFile->character, filename));
                 if (initData){
                     projectFile->behaviorFiles.last()->generateDefaultCharacterData();
                 }else{
@@ -688,18 +841,18 @@ void MainWindow::addNewBehavior(bool initData){
                 //dialog.setProgress("Behavior file creation sucessful!!", dialog.maximum());
                 return;
             }else{
-                WRITE_TO_LOG("Name generation failed!");
+                LogFile::writeToLog("Name generation failed!");
             }
         }else{
-            WRITE_TO_LOG("No character file open!");
+            LogFile::writeToLog("No character file open!");
         }
     }else{
-        WRITE_TO_LOG("No project open!");
+        LogFile::writeToLog("No project open!");
     }
     //dialog.setProgress("Behavior file creation failed!!", dialog.maximum());
 }
 
-void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata){
+void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata, bool isFNIS){
     auto cleanup = [&](){
         if (projectFile){
             delete projectFile;
@@ -722,27 +875,36 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
     projectFile = new ProjectFile(this, lastFileSelected);
     ProgressDialog progress("Reading animation data..."+projectFile->fileName().section("/", -1, -1), "", percent, 100, this);
     if (loadanimdata){
-        std::thread thread(&ProjectFile::readAnimationSetData, projectFile, lastFileSelectedPath+"/animationsetdatasinglefile.txt");
-        if (!projectFile->readAnimationData(lastFileSelectedPath+"/animationdatasinglefile.txt")){
+        QString path1;
+        QString path2;
+        if (isFNIS){
+            path1 = lastFileSelectedPath.section("/", 0, -3)+"/animationdatasinglefile.txt";
+            path2 = lastFileSelectedPath.section("/", 0, -3)+"/animationsetdatasinglefile.txt";
+        }else{
+            path1 = lastFileSelectedPath+"/animationdatasinglefile.txt";
+            path2 = lastFileSelectedPath+"/animationsetdatasinglefile.txt";
+        }
+        std::thread thread(&ProjectFile::readAnimationSetData, projectFile, path2);
+        if (!projectFile->readAnimationData(path1)){
             CRITICAL_ERROR_MESSAGE("MainWindow::openProject(): The project animation data file could not be parsed!!!");
         }
         thread.join();
     }
     progress.setProgress("Loading project file...", 50);
     if (projectFile->parse()){
-        WRITE_TO_LOG("Time taken to open file \""+filepath+"\" is approximately "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
+        LogFile::writeToLog("Time taken to open file \""+filepath+"\" is approximately "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds\n");
         progress.setProgress("Loading character data...", 50);
         timeelapsed = timer.elapsed();
-        characterFile = new CharacterFile(this, projectFile, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));
-        if (characterFile->parse()){
-            projectFile->setCharacterFile(characterFile);
+        projectFile->character = new CharacterFile(this, projectFile, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));
+        if (projectFile->character->parse()){
+            projectFile->setCharacterFile(projectFile->character);
             projectFile->loadEncryptedAnimationNames();
-            WRITE_TO_LOG("Time taken to open file \""+lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0)+"\" is approximately "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
+            LogFile::writeToLog("Time taken to open file \""+lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0)+"\" is approximately "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds\n");
             timeelapsed = timer.elapsed();
             progress.setProgress("Loading skeleton data...", 50);
-            skeletonFile = new SkeletonFile(this, lastFileSelectedPath+"/"+characterFile->getRigName());
-            if (skeletonFile->parse()){
-                characterFile->setSkeletonFile(skeletonFile);
+            skeletonFile = new SkeletonFile(this, lastFileSelectedPath+"/"+projectFile->character->getRigName());
+            if (skeletonFile->parse() || isFNIS){
+                projectFile->character->setSkeletonFile(skeletonFile);
                 if (loadui){
                     projectUI->setFilePath(lastFileSelectedPath);
                     tabs->addTab(projectUI, "Character Data");
@@ -750,7 +912,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
                     projectUI->loadData();
                     projectUI->setDisabled(false);
                 }
-                WRITE_TO_LOG("Time taken to open file \""+lastFileSelectedPath+"/"+characterFile->getRigName()+"\" is approximately "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
+                LogFile::writeToLog("Time taken to open file \""+lastFileSelectedPath+"/"+projectFile->character->getRigName()+"\" is approximately "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds\n");
                 //Get behavior filenames...
                 QDirIterator it(lastFileSelectedPath+"/behaviors"); //Wont work for dogs, wolves!!!
                 while (it.hasNext()){
@@ -827,18 +989,20 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata)
                     threads.clear();
                 }
                 //projectFile->generateAnimClipDataForProject();
-                if (!behaviornames.isEmpty()){
+                if (loadui && !behaviornames.isEmpty()){
                     openBehaviorFile(behaviornames.first());
                 }
                 progress.setProgress("Project loaded sucessfully!!!", progress.maximum());
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The skeleton file "+characterFile->getRigName()+" could not be parsed!!!").toLocal8Bit().data());
+                CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The skeleton file "+projectFile->character->getRigName()+" could not be parsed!!!").toLocal8Bit().data());
                 cleanup();
             }
-            QString errors = projectFile->detectErrors();
-            WRITE_TO_LOG("Time taken to open project \""+filepath+"\" is approximately "+QString::number(timer.elapsed())+" milliseconds");
-            if (errors != ""){
-                USER_MESSAGE(errors);
+            if (loadui){
+                QString errors = projectFile->detectErrorsInProject();
+                LogFile::writeToLog("Time taken to open project \""+filepath+"\" is approximately "+QString::number(timer.elapsed())+" milliseconds");
+                if (errors != ""){
+                    USER_MESSAGE(errors);
+                }
             }
         }else{
             CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The character file "+projectFile->getCharacterFilePathAt(0)+" could not be parsed!!!").toLocal8Bit().data());
@@ -857,7 +1021,7 @@ bool MainWindow::openBehavior(const QString & filename, int & taskCount, bool ch
             if (checkisopen){
                 for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
                     if (projectFile->behaviorFiles.at(i)->fileName() == filename){
-                        WRITE_TO_LOG("MainWindow::openBehavior(): The selected behavior file \""+filename+"\" is already open!");
+                        LogFile::writeToLog("MainWindow::openBehavior(): The selected behavior file \""+filename+"\" is already open!");
                         mutex.lock();
                         taskCount--;
                         conditionVar.notify_one();
@@ -870,22 +1034,22 @@ bool MainWindow::openBehavior(const QString & filename, int & taskCount, bool ch
                 objectDataWid->changeCurrentDataWidget(nullptr);
                 mutex.unlock();
             }
-            newbehavior = new BehaviorFile(this, projectFile, characterFile, filename);
+            newbehavior = new BehaviorFile(this, projectFile, projectFile->character, filename);
             mutex.lock();
             projectFile->behaviorFiles.append(newbehavior);
             newbehavior = projectFile->behaviorFiles.last();
             mutex.unlock();
             if (!newbehavior->parse()){
-                WRITE_TO_LOG("MainWindow::openBehavior(): The selected behavior file \""+filename+"\" failed to parse!");
+                LogFile::writeToLog("MainWindow::openBehavior(): The selected behavior file \""+filename+"\" failed to parse!");
                 result = false;
             }else{
                 result = true;
             }
         }else{
-            WRITE_TO_LOG("MainWindow::openBehavior(): No project is opened!");
+            LogFile::writeToLog("MainWindow::openBehavior(): No project is opened!");
         }
     }else{
-        WRITE_TO_LOG("MainWindow::openBehavior(): Filename is null string!");
+        LogFile::writeToLog("MainWindow::openBehavior(): Filename is null string!");
     }
     mutex.lock();
     taskCount--;
@@ -902,7 +1066,7 @@ bool MainWindow::closeAll(){
                 unsavedChanges = true;
             }
         }
-        if (characterFile->getIsChanged()){
+        if (projectFile->character->getIsChanged()){
             unsavedChanges = true;
         }
         if (!unsavedChanges || closeAllDialogue() != QMessageBox::Cancel){
@@ -955,7 +1119,7 @@ void MainWindow::openPackedProject(){
         convertProject(filename);
         openProject(filename);
     }else{
-        WRITE_TO_LOG("MainWindow::openPackedProject(): Null string filename!!!");
+        LogFile::writeToLog("MainWindow::openPackedProject(): Null string filename!!!");
     }
 }
 
@@ -964,7 +1128,7 @@ void MainWindow::openUnpackedProject(){
     if (filename != ""){
         openProject(filename);
     }else{
-        WRITE_TO_LOG("MainWindow::openUnpackedProject(): Null string filename!!!");
+        LogFile::writeToLog("MainWindow::openUnpackedProject(): Null string filename!!!");
     }
 }
 
@@ -999,17 +1163,17 @@ void MainWindow::openAnimationFile(const QString &animationname){
     if (hkxcmd(animationname, animationname, count, "-v:xml") == HKXCMD_SUCCESS){
         AnimationFile *ptr = new AnimationFile(this, QString(animationname).replace(".hkx", "-out.hkx"));
         if (ptr->parse()){
-            projectFile->setAnimationIndexDuration(-1, characterFile->getNumberOfAnimations() - 1, ptr->getDuration());
+            projectFile->setAnimationIndexDuration(-1, projectFile->character->getNumberOfAnimations() - 1, ptr->getDuration());
             projectFile->addEncryptedAnimationName(animationname);
             if (!ptr->remove()){
-                WRITE_TO_LOG("MainWindow::openAnimationFile: Failed to remove the duplicate animation file!");
+                LogFile::writeToLog("MainWindow::openAnimationFile: Failed to remove the duplicate animation file!");
             }
             delete ptr;
         }else{
             CRITICAL_ERROR_MESSAGE("MainWindow::openAnimationFile(): The selected animation file was not opened!");
         }
     }else{
-        WRITE_TO_LOG("MainWindow::openAnimationFile: Failed to convert the animation file!");
+        LogFile::writeToLog("MainWindow::openAnimationFile: Failed to convert the animation file!");
     }
 }
 
@@ -1017,7 +1181,41 @@ void MainWindow::removeAnimation(int index){
     if (projectFile){
         projectFile->removeEncryptedAnimationName(index);
     }else{
-        WRITE_TO_LOG("MainWindow::removeAnimation: projectFile is null!");
+        LogFile::writeToLog("MainWindow::removeAnimation: projectFile is null!");
+    }
+}
+
+void MainWindow::zoomIn(){
+    if (projectFile){
+        auto index = tabs->currentIndex() - 1;
+        if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
+            behaviorGraphs.at(index)->zoom(zoomFactor);
+        }else{
+            if (tabs->count() < 2){
+                LogFile::writeToLog("No behavior file is currently being viewed!!!");
+            }else{
+                WARNING_MESSAGE("MainWindow::zoomIn() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
+            }
+        }
+    }else{
+        LogFile::writeToLog("MainWindow::zoomIn(): No project opened!");
+    }
+}
+
+void MainWindow::zoomOut(){
+    if (projectFile){
+        auto index = tabs->currentIndex() - 1;
+        if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
+            behaviorGraphs.at(index)->zoom(-zoomFactor);
+        }else{
+            if (tabs->count() < 2){
+                LogFile::writeToLog("No behavior file is currently being viewed!!!");
+            }else{
+                WARNING_MESSAGE("MainWindow::zoomIn() failed!\nThe tab index is out of sync with the behavior files or behavior graphs!");
+            }
+        }
+    }else{
+        LogFile::writeToLog("MainWindow::zoomIn(): No project opened!");
     }
 }
 
@@ -1025,7 +1223,7 @@ int MainWindow::getBehaviorGraphIndex(const QString & filename){
     for (int j = 0; j < behaviorGraphs.size(); j++){
         if (filename.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive) == 0){
             if (j >= projectFile->behaviorFiles.size() || filename.compare(projectFile->behaviorFiles.at(j)->fileName().section("/", -1, -1), Qt::CaseInsensitive) != 0){
-                WRITE_TO_LOG("MainWindow::getBehaviorGraphIndex(): The index is invalid!");
+                LogFile::writeToLog("MainWindow::getBehaviorGraphIndex(): The index is invalid!");
                 return -1;
             }
             return j;
@@ -1193,7 +1391,7 @@ MainWindow::HKXCMD_RETURN MainWindow::hkxcmd(const QString &filepath, const QStr
         conditionVar.notify_one();
         mutex.unlock();
     }else{
-        WRITE_TO_LOG("MainWindow: packHKX() failed!\nThe command \""+command+"\" failed!");
+        LogFile::writeToLog("MainWindow: packHKX() failed!\nThe command \""+command+"\" failed!");
     }
     return value;
 }
@@ -1287,10 +1485,10 @@ void MainWindow::createNewProject(){
                     if (!projectFile->isProjectNameTaken()){
                         lastFileSelected = projectFile->fileName();
                         lastFileSelectedPath = projectFile->fileName().section("/", 0, -2);
-                        characterFile = new CharacterFile(this, projectFile, projectDirectoryPath+"/"+relativecharacterpath, true, "character assets\\"+skeletonFile->fileName().section("/", -1, -1));
-                        projectFile->setCharacterFile(characterFile);
-                        characterFile->setSkeletonFile(skeletonFile);
-                        projectFile->behaviorFiles.append(new BehaviorFile(this, projectFile, characterFile, projectDirectoryPath+"/behaviors/Master.hkx"));
+                        projectFile->character = new CharacterFile(this, projectFile, projectDirectoryPath+"/"+relativecharacterpath, true, "character assets\\"+skeletonFile->fileName().section("/", -1, -1));
+                        projectFile->setCharacterFile(projectFile->character);
+                        projectFile->character->setSkeletonFile(skeletonFile);
+                        projectFile->behaviorFiles.append(new BehaviorFile(this, projectFile, projectFile->character, projectDirectoryPath+"/behaviors/Master.hkx"));
                         projectFile->behaviorFiles.last()->generateDefaultCharacterData();
                         projectFile->addProjectToAnimData();
                         projectUI->setProject(projectFile);
@@ -1303,7 +1501,7 @@ void MainWindow::createNewProject(){
                             CRITICAL_ERROR_MESSAGE("MainWindow::createNewProject(): The behavior graph was drawn incorrectly!");
                         }
                         tabs->setCurrentIndex(tabs->count() - 1);
-                        saveProject();
+                        saveProject(true);
                     }else{
                         closeAll();
                         WARNING_MESSAGE(QString("MainWindow::createNewProject(): The chosen project name is taken! Choose another project name!"));

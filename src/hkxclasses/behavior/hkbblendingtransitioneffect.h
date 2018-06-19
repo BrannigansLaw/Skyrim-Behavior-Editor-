@@ -17,6 +17,7 @@ public:
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     QString getName() const;
+    QVector <HkxObject *> getChildrenOtherTypes() const;
     bool operator ==(const hkbBlendingTransitionEffect & other){//TO DO: check bound variable...
         if (name == other.name){
             return true;

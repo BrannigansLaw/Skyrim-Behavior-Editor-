@@ -50,59 +50,59 @@ bool hkbSenseHandleModifier::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "sensorLocalOffset"){
             sensorLocalOffset = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'sensorLocalOffset' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'sensorLocalOffset' data field!\nObject Reference: "+ref);
             }
         }else if (text == "ranges"){
-            int numlegs = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            int numranges = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
                 return false;
             }
-            for (int j = 0; j < numlegs; j++){
+            for (int j = 0; j < numranges; j++){
                 ranges.append(hkRanges());
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                     if (text == "id"){
                         ranges.last().event.id = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "payload"){
                         if (!ranges.last().event.payload.readShdPtrReference(index, reader)){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                         }
                     }else if (text == "minDistance"){
                         ranges.last().minDistance = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'minDistance' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'minDistance' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "maxDistance"){
                         ranges.last().maxDistance = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'maxDistance' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'maxDistance' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "ignoreHandle"){
                         ranges.last().ignoreHandle = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'ignoreHandle' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'ignoreHandle' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -112,71 +112,71 @@ bool hkbSenseHandleModifier::readData(const HkxXmlReader &reader, long index){
             }
         }else if (text == "handleOut"){
             if (!handleOut.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'handleOut' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'handleOut' reference!\nObject Reference: "+ref);
             }
         }else if (text == "handleIn"){
             if (!handleIn.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'handleIn' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'handleIn' reference!\nObject Reference: "+ref);
             }
         }else if (text == "localFrameName"){
             localFrameName = reader.getElementValueAt(index);
             if (localFrameName == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'localFrameName' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'localFrameName' data field!\nObject Reference: "+ref);
             }
         }else if (text == "sensorLocalFrameName"){
             sensorLocalFrameName = reader.getElementValueAt(index);
             if (sensorLocalFrameName == ""){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'sensorLocalFrameName' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'sensorLocalFrameName' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minDistance"){
             minDistance = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'minDistance' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'minDistance' data field!\nObject Reference: "+ref);
             }
         }else if (text == "maxDistance"){
             maxDistance = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'maxDistance' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'maxDistance' data field!\nObject Reference: "+ref);
             }
         }else if (text == "distanceOut"){
             distanceOut = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'distanceOut' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'distanceOut' data field!\nObject Reference: "+ref);
             }
         }else if (text == "collisionFilterInfo"){
             collisionFilterInfo = reader.getElementValueAt(index).toLong(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'collisionFilterInfo' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'collisionFilterInfo' data field!\nObject Reference: "+ref);
             }
         }else if (text == "sensorRagdollBoneIndex"){
             sensorRagdollBoneIndex = reader.getElementValueAt(index).toLong(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'sensorRagdollBoneIndex' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'sensorRagdollBoneIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "sensorAnimationBoneIndex"){
             sensorAnimationBoneIndex = reader.getElementValueAt(index).toLong(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'sensorAnimationBoneIndex' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'sensorAnimationBoneIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "sensingMode"){
             sensingMode = reader.getElementValueAt(index);
             if (!SensingMode.contains(sensingMode)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'sensingMode' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'sensingMode' data field!\nObject Reference: "+ref);
             }
         }else if (text == "extrapolateSensorPosition"){
             extrapolateSensorPosition = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'extrapolateSensorPosition' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'extrapolateSensorPosition' data field!\nObject Reference: "+ref);
             }
         }else if (text == "keepFirstSensedHandle"){
             keepFirstSensedHandle = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'keepFirstSensedHandle' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'keepFirstSensedHandle' data field!\nObject Reference: "+ref);
             }
         }else if (text == "foundHandleOut"){
             foundHandleOut = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'foundHandleOut' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'foundHandleOut' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -249,11 +249,11 @@ bool hkbSenseHandleModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         for (int i = 0; i < ranges.size(); i++){
             if (ranges.at(i).event.payload.data() && !ranges.at(i).event.payload.data()->write(writer)){
-                WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
             }
         }
     }
@@ -325,12 +325,22 @@ void hkbSenseHandleModifier::updateReferences(long &ref){
     }
 }
 
+QVector<HkxObject *> hkbSenseHandleModifier::getChildrenOtherTypes() const{
+    QVector<HkxObject *> list;
+    for (auto i = 0; i < ranges.size(); i++){
+        if (ranges.at(i).event.payload.data()){
+            list.append(ranges.at(i).event.payload.data());
+        }
+    }
+    return list;
+}
+
 bool hkbSenseHandleModifier::link(){
     if (!getParentFile()){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < ranges.size(); i++){
@@ -352,20 +362,57 @@ void hkbSenseHandleModifier::unlink(){
     }
 }
 
-bool hkbSenseHandleModifier::evaluateDataValidity(){  //TO DO: Check for valid event id???
-    for (int i = 0; i < ranges.size(); i++){
-        if (ranges.at(i).event.payload.data() && ranges.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            setDataValidity(false);
-            return false;
+bool hkbSenseHandleModifier::evaluateDataValidity(){
+    QString errors;
+    bool isvalid = true;
+    if (ranges.isEmpty()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": ranges is empty!\n");
+    }else{
+        for (auto i = 0; i < ranges.size(); i++){
+            if (ranges.at(i).event.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": id in ranges at "+QString::number(i)+" out of range!\n");
+            }
+            if (ranges.at(i).event.payload.data() && ranges.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+                isvalid = false;
+                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid payload type! Signature: "+QString::number(ranges.at(i).event.payload.data()->getSignature(), 16)+"\n");
+            }
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity() || (name == "") || (!SensingMode.contains(sensingMode))){
-        setDataValidity(false);
-        return false;
-    }else{
-        setDataValidity(true);
-        return true;
+    if (!HkDynamicObject::evaluateDataValidity()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
     }
+    if (name == ""){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+    }
+    if (!SensingMode.contains(sensingMode)){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sensingMode!\n");
+    }
+    if (sensorRagdollBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sensorRagdollBoneIndex out of range!\n");
+    }
+    if (sensorAnimationBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sensorAnimationBoneIndex out of range!\n");
+    }
+    if (sensorRagdollBoneIndex > -1 && sensorAnimationBoneIndex > -1){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sensorRagdollBoneIndex and sensorAnimationBoneIndex are both in use at the same time! This will crash the game!\n");
+    }
+    if (sensorRagdollBoneIndex < 0 && sensorAnimationBoneIndex < 0 ){
+        isvalid = false;
+        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Neither sensorRagdollBoneIndex and sensorAnimationBoneIndex are in use!\n");
+    }
+    if (errors != ""){
+        LogFile::writeToLog(errors);
+    }
+    setDataValidity(isvalid);
+    return isvalid;
 }
 
 hkbSenseHandleModifier::~hkbSenseHandleModifier(){

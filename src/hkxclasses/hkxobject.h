@@ -53,6 +53,8 @@ public:
     HkxFile * getParentFile() const;
     bool getIsMerged() const;
     void setReference(int ref);
+    virtual QVector <HkxObject *> getChildrenOtherTypes() const;
+    long getReference() const;
 protected:
     HkxObject(HkxFile *parent, long ref = -1);
     void setDataValidity(bool isValid);
@@ -66,8 +68,10 @@ protected:
     hkQuadVariable readVector4(const QByteArray &lineIn, bool *ok);
     void setIsWritten(bool written = true);
     bool getIsWritten() const;
-    long getReference() const;
     void setIsMerged(bool value);
+    std::lock_guard <std::mutex> lockNGuard() const;
+    bool getRefsUpdated() const;
+    void setRefsUpdated(bool value);
 private:
     HkxObject(const HkxObject &obj);
     HkxObject& operator=(const HkxObject&);
@@ -79,6 +83,8 @@ private:
     bool dataValid;
     bool isWritten;
     bool isMerged;
+    bool refsUpdated;
+    mutable std::mutex mutex;
 };
 
 class HkxSharedPtr: public QExplicitlySharedDataPointer <HkxObject>

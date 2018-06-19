@@ -20,6 +20,7 @@ public:
     bool write(HkxXMLWriter *writer);
     int getNumberOfKeyframeInfos() const;
     void updateReferences(long &ref);
+    QVector <HkxObject *> getChildrenOtherTypes() const;
 private:
     hkbKeyframeBonesModifier& operator=(const hkbKeyframeBonesModifier&);
     hkbKeyframeBonesModifier(const hkbKeyframeBonesModifier &);

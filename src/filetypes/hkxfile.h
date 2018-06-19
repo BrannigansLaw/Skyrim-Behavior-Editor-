@@ -25,6 +25,7 @@ public:
     bool getIsChanged() const;
     void setIsChanged(bool wasEdited);
 protected:
+    std::unique_lock <std::mutex> lockNGuard() const;
     MainWindow *getUI() const;
     HkxSharedPtr & getRootObject();
     virtual bool parse();
@@ -39,6 +40,7 @@ private:
     HkxXmlReader reader;
     HkxXMLWriter writer;
     bool changed;
+    mutable std::mutex mutex;
 };
 
 #endif // HKXFILE_H

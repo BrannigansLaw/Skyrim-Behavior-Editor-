@@ -37,6 +37,7 @@ QString hkbBehaviorGraphData::getClassname(){
 }
 
 int hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name, bool isProperty){
+    std::lock_guard <std::mutex> guard = lockNGuard();
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
     int index = -1;
@@ -101,6 +102,7 @@ int hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name,
 }
 
 int hkbBehaviorGraphData::addVariable(const QString & type, const QString & name, bool isProperty){
+    std::lock_guard <std::mutex> guard = lockNGuard();
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
     int index = -1;
@@ -138,6 +140,7 @@ int hkbBehaviorGraphData::addVariable(const QString & type, const QString & name
 }
 
 void hkbBehaviorGraphData::addVariable(hkVariableType type){
+    std::lock_guard <std::mutex> guard = lockNGuard();
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
     hkVariableInfo varInfo;
@@ -224,12 +227,14 @@ void hkbBehaviorGraphData::removeVariable(int index){
 }
 
 void hkbBehaviorGraphData::addEvent(const QString &name){
+    std::lock_guard <std::mutex> guard = lockNGuard();
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     strData->eventNames.append(name);
     eventInfos.append("0");
 }
 
 void hkbBehaviorGraphData::addEvent(){
+    std::lock_guard <std::mutex> guard = lockNGuard();
     QString name = "NEW_Event_";
     int num = 1;
     int index;
@@ -301,6 +306,7 @@ hkVariableType hkbBehaviorGraphData::getVariableTypeAt(int index) const{
 }
 
 QString hkbBehaviorGraphData::getVariableNameAt(int index) const{
+    std::lock_guard <std::mutex> guard = lockNGuard();
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (strData && strData->variableNames.size() > index && index > -1){
         return strData->variableNames.at(index);
@@ -309,6 +315,7 @@ QString hkbBehaviorGraphData::getVariableNameAt(int index) const{
 }
 
 QString hkbBehaviorGraphData::getEventNameAt(int index) const{
+    std::lock_guard <std::mutex> guard = lockNGuard();
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (strData && strData->eventNames.size() > index && index > -1){
         return strData->eventNames.at(index);
@@ -428,143 +435,143 @@ bool hkbBehaviorGraphData::readData(const HkxXmlReader &reader, long index){
         if (text == "variableInfos"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref);
                 return false;
             }
             for (int i = 0; i < numElems; i++){
                 index += 4;
                 if (index >= reader.getNumElements()){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref);
                     return false;
                 }
                 hkVariableInfo temp;
                 temp.role.role = reader.getElementValueAt(index);
                 index++;
                 if (index >= reader.getNumElements()){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref);
                     return false;
                 }
                 temp.role.flags = reader.getElementValueAt(index);
                 index++;
                 if (index >= reader.getNumElements()){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableInfos' data!\nObject Reference: "+ref);
                     return false;
                 }
                 temp.type = reader.getElementValueAt(index);
                 variableInfos.append(temp);
                 if (!Type.contains(temp.type)){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nInvalid variable type read!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nInvalid variable type read!\nObject Reference: "+ref);
                     return false;
                 }
             }
         }else if (text == "characterPropertyInfos"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
                 return false;
             }
             for (int i = 0; i < numElems; i++){
                 index += 4;
                 if (index >= reader.getNumElements()){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
                     return false;
                 }
                 hkVariableInfo temp;
                 temp.role.role = reader.getElementValueAt(index);
                 index++;
                 if (index >= reader.getNumElements()){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
                     return false;
                 }
                 temp.role.flags = reader.getElementValueAt(index);
                 index++;
                 if (index >= reader.getNumElements()){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
                     return false;
                 }
                 temp.type = reader.getElementValueAt(index);
                 characterPropertyInfos.append(temp);
                 if (!Type.contains(temp.type)){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nInvalid variable type read!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nInvalid variable type read!\nObject Reference: "+ref);
                     return false;
                 }
             }
         }else if (text == "eventInfos"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref);
                 return false;
             }
             /*index++;
             if (index >= reader.getNumElements()){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref);
                 return false;
             }*/
             for (int i = 0; i < numElems; i++){
                 index += 2;
                 if (index >= reader.getNumElements()){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref);
                     return false;
                 }
                 eventInfos.append(reader.getElementValueAt(index));
                 if (eventInfos.last() == ""){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref);
                     return false;
                 }
             }
         }else if (text == "wordMinVariableValues"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'wordMinVariableValues' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'wordMinVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             if (index >= reader.getNumElements()){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref);
                 return false;
             }
             for (int i = 0; i < numElems; i++){
                 index++;
                 if (index >= reader.getNumElements()){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'wordMinVariableValues' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'wordMinVariableValues' data!\nObject Reference: "+ref);
                     return false;
                 }
                 wordMinVariableValues.append(reader.getElementValueAt(index).toInt(&ok));
                 if (!ok){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'wordMinVariableValues' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'wordMinVariableValues' data!\nObject Reference: "+ref);
                     return false;
                 }
             }
         }else if (text == "wordMaxVariableValues"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'wordMaxVariableValues' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'wordMaxVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             if (index >= reader.getNumElements()){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'eventInfos' data!\nObject Reference: "+ref);
                 return false;
             }
             for (int i = 0; i < numElems; i++){
                 index++;
                 if (index >= reader.getNumElements()){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'wordMaxVariableValues' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'wordMaxVariableValues' data!\nObject Reference: "+ref);
                     return false;
                 }
                 wordMaxVariableValues.append(reader.getElementValueAt(index).toInt(&ok));
                 if (!ok){
-                    WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'wordMaxVariableValues' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'wordMaxVariableValues' data!\nObject Reference: "+ref);
                     return false;
                 }
             }
         }else if (text == "variableInitialValues"){
             if (!variableInitialValues.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'variableInitialValues' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableInitialValues' reference!\nObject Reference: "+ref);
             }
         }else if (text == "stringData"){
             if (!stringData.readShdPtrReference(index, reader)){
-                WRITE_TO_LOG(getClassname()+": readData()!\nFailed to properly read 'stringData' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'stringData' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -652,10 +659,10 @@ bool hkbBehaviorGraphData::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (!variableInitialValues.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'variableInitialValues'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableInitialValues'!!!");
         }
         if (!stringData.data()->write(writer)){
-            WRITE_TO_LOG(getClassname()+": write()!\nUnable to write 'stringData'!!!");
+            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'stringData'!!!");
         }
     }
     return true;
@@ -670,6 +677,7 @@ QStringList hkbBehaviorGraphData::getVariableTypeNames() const{
 }
 
 int hkbBehaviorGraphData::getIndexOfVariable(const QString & name) const{
+    std::lock_guard <std::mutex> guard = lockNGuard();
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (name != "" && strData){
         return strData->variableNames.indexOf(name);
@@ -678,6 +686,7 @@ int hkbBehaviorGraphData::getIndexOfVariable(const QString & name) const{
 }
 
 int hkbBehaviorGraphData::getIndexOfEvent(const QString &name) const{
+    std::lock_guard <std::mutex> guard = lockNGuard();
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (name != "" && strData){
         return strData->eventNames.indexOf(name);
@@ -695,7 +704,7 @@ bool hkbBehaviorGraphData::merge(HkxObject *recessiveobj){
     int size;
     if (recessiveobj && recessiveobj->getSignature() == HKB_BEHAVIOR_GRAPH_DATA){
         otherdata = static_cast<hkbBehaviorGraphData *>(recessiveobj);
-        if (evaluateDataValidity() && recessiveobj->evaluateDataValidity()){
+        //if (evaluateDataValidity() && recessiveobj->evaluateDataValidity()){
             strings = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
             values = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
             otherstrings = static_cast<hkbBehaviorGraphStringData *>(otherdata->stringData.data());
@@ -741,9 +750,9 @@ bool hkbBehaviorGraphData::merge(HkxObject *recessiveobj){
             }
             //TO DO: Support character properties...
             return true;
-        }else{
+        /*}else{
             WARNING_MESSAGE("hkbBehaviorGraphData: merge(): Invalid data detected!!!");
-        }
+        }*/
     }else{
         WARNING_MESSAGE("hkbBehaviorGraphData: merge(): Attempting to merge invalid object type or nullptr!!!");
     }
@@ -756,10 +765,10 @@ bool hkbBehaviorGraphData::link(){
     }
     HkxSharedPtr *ptr = &static_cast<BehaviorFile *>(getParentFile())->variableValues;
     if (!ptr){
-        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'variableInitialValues' data field!\n");
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableInitialValues' data field!\n");
         setDataValidity(false);
     }else if ((*ptr)->getSignature() != HKB_VARIABLE_VALUE_SET){
-        WRITE_TO_LOG(getClassname()+": link()!\n'variableInitialValues' data field is linked to invalid child!\n");
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\n'variableInitialValues' data field is linked to invalid child!\n");
         setDataValidity(false);
         variableInitialValues = *ptr;
     }else{
@@ -767,10 +776,10 @@ bool hkbBehaviorGraphData::link(){
     }
     ptr = &static_cast<BehaviorFile *>(getParentFile())->stringData;
     if (!ptr){
-        WRITE_TO_LOG(getClassname()+": link()!\nFailed to properly link 'stringData' data field!\n");
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'stringData' data field!\n");
         setDataValidity(false);
     }else if ((*ptr)->getSignature() != HKB_BEHAVIOR_GRAPH_STRING_DATA){
-        WRITE_TO_LOG(getClassname()+": link()!\n'stringData' data field is linked to invalid child!\n");
+        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\n'stringData' data field is linked to invalid child!\n");
         setDataValidity(false);
         stringData = *ptr;
     }else{
@@ -796,11 +805,15 @@ QStringList hkbBehaviorGraphData::getEventNames() const{
 }
 
 int hkbBehaviorGraphData::getNumberOfEvents() const{
-    return eventInfos.size();
+    std::lock_guard <std::mutex> guard = lockNGuard();
+    auto num = eventInfos.size();
+    return num;
 }
 
 int hkbBehaviorGraphData::getNumberOfVariables() const{
-    return variableInfos.size();
+    std::lock_guard <std::mutex> guard = lockNGuard();
+    auto num = variableInfos.size();
+    return num;
 }
 
 bool hkbBehaviorGraphData::evaluateDataValidity(){
