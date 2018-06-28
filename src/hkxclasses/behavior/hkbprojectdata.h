@@ -15,7 +15,7 @@ public:
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
     void unlink();
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:

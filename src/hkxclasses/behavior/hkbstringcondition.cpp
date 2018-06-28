@@ -35,7 +35,7 @@ bool hkbStringCondition::readData(const HkxXmlReader & reader, long index){
         if (text == "conditionString"){
             conditionString = reader.getElementValueAt(index);
             if (conditionString == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'conditionString' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'conditionString' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -59,13 +59,13 @@ bool hkbStringCondition::write(HkxXMLWriter *writer){
     return true;
 }
 
-bool hkbStringCondition::evaluateDataValidity(){
+QString hkbStringCondition::evaluateDataValidity(){
     if (conditionString == ""){
         setDataValidity(false);
-        return false;
+        return QString();
     }
     setDataValidity(true);
-    return true;
+    return QString();
 }
 
 hkbStringCondition::~hkbStringCondition(){

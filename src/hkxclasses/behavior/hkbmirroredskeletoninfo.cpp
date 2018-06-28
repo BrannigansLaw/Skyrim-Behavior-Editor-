@@ -36,16 +36,16 @@ bool hkbMirroredSkeletonInfo::readData(const HkxXmlReader &reader, long index){
         if (text == "mirrorAxis"){
             mirrorAxis = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'mirrorAxis' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'mirrorAxis' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bonePairMap"){
             int numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'bonePairMap' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bonePairMap' data!\nObject Reference: "+ref);
                 return false;
             }
             if (numElems > 0 && !readIntegers(reader.getElementValueAt(index), bonePairMap)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'bonePairMap' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bonePairMap' data!\nObject Reference: "+ref);
                 return false;
             }
         }
@@ -100,9 +100,9 @@ void hkbMirroredSkeletonInfo::unlink(){
     //
 }
 
-bool hkbMirroredSkeletonInfo::evaluateDataValidity(){
+QString hkbMirroredSkeletonInfo::evaluateDataValidity(){
     setDataValidity(true);
-    return true;
+    return QString();
 }
 
 hkbMirroredSkeletonInfo::~hkbMirroredSkeletonInfo(){

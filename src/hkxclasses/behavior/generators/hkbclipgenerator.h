@@ -17,7 +17,7 @@ public:
     void unlink();
     void removeData(){}
     QString getName() const;
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfTriggers() const;

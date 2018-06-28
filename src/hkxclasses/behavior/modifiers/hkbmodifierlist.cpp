@@ -72,30 +72,37 @@ bool hkbModifierList::hasChildren() const{
 }
 
 bool hkbModifierList::merge(HkxObject *recessiveObject){
-    hkbModifierList *obj = nullptr;
+    hkbModifierList *recobj = nullptr;
     bool found;
     int size = modifiers.size();
     QList <DataIconManager *> objects;
     QList <DataIconManager *> children;
     QVector <HkxObject *> othertypes;
     hkbModifier *modifier = nullptr;
-    if (recessiveObject && recessiveObject->getSignature() == HKB_MODIFIER_LIST){
-        obj = static_cast<hkbModifierList *>(recessiveObject);
-        for (auto i = 0; i < obj->modifiers.size(); i++){
+    if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_MODIFIER_LIST){
+        recobj = static_cast<hkbModifierList *>(recessiveObject);
+        if (variableBindingSet.data()){
+            variableBindingSet.data()->merge(recobj->variableBindingSet.data());
+        }else if (recobj->variableBindingSet.data()){
+            variableBindingSet = HkxSharedPtr(recobj->variableBindingSet.data());
+            recobj->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
+            getParentFile()->addObjectToFile(recobj->variableBindingSet.data(), -1);
+        }
+        for (auto i = 0; i < recobj->modifiers.size(); i++){
             found = false;
             for (auto j = 0; j < size; j++){
-                if (modifiers.at(j).data()->getSignature() == obj->modifiers.at(i).data()->getSignature() && static_cast<hkbModifier *>(modifiers.at(j).data())->getName() == static_cast<hkbModifier *>(obj->modifiers.at(i).data())->getName()){
+                if (static_cast<DataIconManager *>(modifiers.at(j).data())->hasSameSignatureAndName(static_cast<DataIconManager *>(recobj->modifiers.at(i).data()))){
                     found = true;
                 }
             }
             if (!found){
-                modifiers.append(obj->modifiers.at(i));
-                getParentFile()->addObjectToFile(obj->modifiers.at(i).data(), -1);
-                othertypes = obj->modifiers.at(i).data()->getChildrenOtherTypes();
+                modifiers.append(recobj->modifiers.at(i));
+                getParentFile()->addObjectToFile(recobj->modifiers.at(i).data(), -1);
+                othertypes = recobj->modifiers.at(i).data()->getChildrenOtherTypes();
                 for (auto k = 0; k < othertypes.size(); k++){
                     getParentFile()->addObjectToFile(othertypes.at(k), -1);
                 }
-                objects = static_cast<DataIconManager *>(obj->modifiers.at(i).data())->getChildren();
+                objects = static_cast<DataIconManager *>(recobj->modifiers.at(i).data())->getChildren();
                 while (!objects.isEmpty()){
                     if (objects.last()->getType() == HkxObject::TYPE_MODIFIER){
                         modifier = static_cast<hkbModifier *>(objects.last());
@@ -147,26 +154,26 @@ bool hkbModifierList::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "modifiers"){
             if (!readReferences(reader.getElementValueAt(index), modifiers)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'modifiers' references!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'modifiers' references!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -213,11 +220,11 @@ bool hkbModifierList::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         for (int i = 0; i < modifiers.size(); i++){
             if (modifiers.at(i).data() && !modifiers.at(i).data()->write(writer)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'modifiers' at: "+QString::number(i)+"!!!");
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'modifiers' at: "+QString::number(i)+"!!!");
             }
         }
     }
@@ -229,16 +236,16 @@ bool hkbModifierList::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < modifiers.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifiers.at(i).getShdPtrReference());
         if (!ptr){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'modifiers' data field!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'modifiers' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getType() != TYPE_MODIFIER){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\n'modifiers' data field is linked to invalid child!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'modifiers' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             modifiers[i] = *ptr;
         }else{
@@ -255,36 +262,30 @@ void hkbModifierList::unlink(){
     }
 }
 
-bool hkbModifierList::evaluateDataValidity(){
+QString hkbModifierList::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
     if (modifiers.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": modifiers is empty!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": modifiers is empty!\n");
     }else{
         for (int i = 0; i < modifiers.size(); i++){
             if (!modifiers.at(i).data()){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": modifiers at index '"+QString::number(i)+"' is null!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": modifiers at index '"+QString::number(i)+"' is null!\n");
             }else if (modifiers.at(i).data()->getType() != HkxObject::TYPE_MODIFIER){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid state! Signature: "+QString::number(modifiers.at(i).data()->getSignature(), 16)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid state! Signature: "+QString::number(modifiers.at(i).data()->getSignature(), 16)+"\n");
             }
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity()){
-        isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
-    }
+    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
-    }
-    if (errors != ""){
-        LogFile::writeToLog(errors);
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
     setDataValidity(isvalid);
-    return isvalid;
+    return errors;
 }
 
 hkbModifierList::~hkbModifierList(){

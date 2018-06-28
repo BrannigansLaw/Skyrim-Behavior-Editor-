@@ -14,7 +14,7 @@ public:
     bool link();
     void unlink();
     QString getName() const;
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
@@ -23,6 +23,7 @@ public:
     void mergeEventIndex(int oldindex, int newindex);
     void fixMergedEventIndices(BehaviorFile *dominantfile);
     void updateReferences(long &ref);
+    bool merge(HkxObject *recessiveObject);
     QVector <HkxObject *> getChildrenOtherTypes() const;
 private:
     QList <DataIconManager *> getChildren() const;

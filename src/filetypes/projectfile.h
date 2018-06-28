@@ -52,6 +52,7 @@ private:
     QString detectErrorsInProject();
     QString detectErrorsInBehavior(const QString & filename);
     void removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *gentoignore);
+    void ensureAllRefedAnimationsExist();
     bool merge(ProjectFile *recessiveproject, bool isFNIS = false);
     bool mergeAnimationCaches(ProjectFile *recessiveproject);
     void addProjectToAnimData();

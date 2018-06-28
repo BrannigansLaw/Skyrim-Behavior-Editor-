@@ -33,19 +33,19 @@ bool hkbVariableValueSet::readData(const HkxXmlReader &reader, long index){
         if (text == "wordVariableValues"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
             index += 2;
             numElems = numElems*2 + index;
             for (; index < numElems; index += 2){
                 if (index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
                     return false;
                 }
                 wordVariableValues.append(reader.getElementValueAt(index).toInt(&ok));
                 if (!ok){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
                     return false;
                 }
             }
@@ -54,21 +54,21 @@ bool hkbVariableValueSet::readData(const HkxXmlReader &reader, long index){
         }else if (text == "quadVariableValues"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'quadVariableValues' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'quadVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
             if (numElems > 0 && !readMultipleVector4(reader.getElementValueAt(index), quadVariableValues)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'quadVariableValues' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'quadVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
         }else if (text == "variantVariableValues"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variantVariableValues' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variantVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
             if (numElems > 0 && !readReferences(reader.getElementValueAt(index), variantVariableValues)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variantVariableValues' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variantVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
         }
@@ -141,10 +141,10 @@ bool hkbVariableValueSet::merge(HkxObject *recessiveobj){
         if (getSignature() == recessiveobj->getSignature()){
             //
         }else{
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": merge()!\n'recessiveobj' is not the correct type!\n");
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": merge()!\n'recessiveobj' is not the correct type!\n");
         }
     }else{
-        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": merge()!\n'recessiveobj' is nullptr!\n");
+        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": merge()!\n'recessiveobj' is nullptr!\n");
     }
     return true;
 }
@@ -160,10 +160,10 @@ bool hkbVariableValueSet::link(){
         if (file){
             ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variantVariableValues.at(i).getShdPtrReference());
             if (!ptr){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
                 setDataValidity(false);
             }else if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
                 setDataValidity(false);
                 variantVariableValues[i] = *ptr;
             }else{
@@ -174,10 +174,10 @@ bool hkbVariableValueSet::link(){
             if (file){
                 ptr = static_cast<CharacterFile *>(getParentFile())->findCharacterPropertyValues(variantVariableValues.at(i).getShdPtrReference());
                 if (!ptr){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
                     setDataValidity(false);
                 }else if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
                     setDataValidity(false);
                     variantVariableValues[i] = *ptr;
                 }else{
@@ -189,15 +189,15 @@ bool hkbVariableValueSet::link(){
     return true;
 }
 
-bool hkbVariableValueSet::evaluateDataValidity(){
+QString hkbVariableValueSet::evaluateDataValidity(){
     for (int i = 0; i < variantVariableValues.size(); i++){
         if (!variantVariableValues.at(i).data() || variantVariableValues.at(i).data()->getSignature() != HKB_BONE_WEIGHT_ARRAY){
             setDataValidity(false);
-            return false;
+            return QString();
         }
     }
     setDataValidity(true);
-    return true;
+    return QString();
 }
 
 hkbVariableValueSet::~hkbVariableValueSet(){

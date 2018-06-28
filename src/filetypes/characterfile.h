@@ -46,6 +46,7 @@ protected:
     bool parse();
     bool link();
 private:
+    void addAnimation(const QString & name);
     hkbBoneWeightArray * addNewBoneWeightArray();
     void write();
     void setSkeletonFile(SkeletonFile *skel);

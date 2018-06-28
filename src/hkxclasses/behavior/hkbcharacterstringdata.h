@@ -20,7 +20,7 @@ public:
     virtual ~hkbCharacterStringData();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     QStringList getAnimationNames() const;

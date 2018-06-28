@@ -15,7 +15,7 @@ public:
     virtual ~hkbBoneWeightArray();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
-    //bool evaluateDataValidity();
+    //QString evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     hkbBoneWeightArray * clone() const;   //TO DO: implement getChildrenOtherTypes()??

@@ -141,18 +141,26 @@ bool hkbPoseMatchingGenerator::merge(HkxObject *recessiveObject){
     hkbPoseMatchingGenerator *recobj;
     hkbBlenderGeneratorChild *domchild;
     hkbBlenderGeneratorChild *recchild;
-    if (recessiveObject && recessiveObject->getSignature() == HKB_POSE_MATCHING_GENERATOR){
+    if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_POSE_MATCHING_GENERATOR){
         recobj = static_cast<hkbPoseMatchingGenerator *>(recessiveObject);
+        if (variableBindingSet.data()){
+            variableBindingSet.data()->merge(recobj->variableBindingSet.data());
+        }else if (recobj->variableBindingSet.data()){
+            variableBindingSet = HkxSharedPtr(recobj->variableBindingSet.data());
+            recobj->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
+            getParentFile()->addObjectToFile(recobj->variableBindingSet.data(), -1);
+        }
         for (auto i = 0; i < children.size(); i++){
             domchild = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
             for (auto j = 0; j < recobj->children.size(); j++){
                 recchild = static_cast<hkbBlenderGeneratorChild *>(recobj->children.at(j).data());
                 if (*recchild == *domchild){
-                    domchild->injectWhileMerging((recchild));
+                    domchild->merge(recchild);
                     break;
                 }
             }
         }
+        setIsMerged(true);
     }
     return true;
 }
@@ -174,116 +182,116 @@ bool hkbPoseMatchingGenerator::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "referencePoseWeightThreshold"){
             referencePoseWeightThreshold = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'referencePoseWeightThreshold' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'referencePoseWeightThreshold' data field!\nObject Reference: "+ref);
             }
         }else if (text == "blendParameter"){
             blendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'blendParameter' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'blendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minCyclicBlendParameter"){
             minCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'minCyclicBlendParameter' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'minCyclicBlendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "maxCyclicBlendParameter"){
             maxCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'maxCyclicBlendParameter' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'maxCyclicBlendParameter' data field!\nObject Reference: "+ref);
             }
         }else if (text == "indexOfSyncMasterChild"){
             indexOfSyncMasterChild = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'indexOfSyncMasterChild' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'indexOfSyncMasterChild' data field!\nObject Reference: "+ref);
             }
         }else if (text == "flags"){
             flags = reader.getElementValueAt(index);
             if (flags == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
             }
         }else if (text == "subtractLastChild"){
             subtractLastChild = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'subtractLastChild' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'subtractLastChild' data field!\nObject Reference: "+ref);
             }
         }else if (text == "children"){
             if (!readReferences(reader.getElementValueAt(index), children)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'children' references!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'children' references!\nObject Reference: "+ref);
             }
         }else if (text == "worldFromModelRotation"){
             worldFromModelRotation = readVector4(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'worldFromModelRotation' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'worldFromModelRotation' data field!\nObject Reference: "+ref);
             }
         }else if (text == "blendSpeed"){
             blendSpeed = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'blendSpeed' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'blendSpeed' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minSpeedToSwitch"){
             minSpeedToSwitch = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'minSpeedToSwitch' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'minSpeedToSwitch' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minSwitchTimeNoError"){
             minSwitchTimeNoError = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'minSwitchTimeNoError' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'minSwitchTimeNoError' data field!\nObject Reference: "+ref);
             }
         }else if (text == "minSwitchTimeFullError"){
             minSwitchTimeFullError = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'minSwitchTimeFullError' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'minSwitchTimeFullError' data field!\nObject Reference: "+ref);
             }
         }else if (text == "startPlayingEventId"){
             startPlayingEventId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'startPlayingEventId' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'startPlayingEventId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "startMatchingEventId"){
             startMatchingEventId = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'startMatchingEventId' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'startMatchingEventId' data field!\nObject Reference: "+ref);
             }
         }else if (text == "rootBoneIndex"){
             rootBoneIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'rootBoneIndex' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'rootBoneIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "otherBoneIndex"){
             otherBoneIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'otherBoneIndex' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'otherBoneIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "anotherBoneIndex"){
             anotherBoneIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'anotherBoneIndex' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'anotherBoneIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "pelvisIndex"){
             pelvisIndex = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'pelvisIndex' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'pelvisIndex' data field!\nObject Reference: "+ref);
             }
         }else if (text == "mode"){
             mode = reader.getElementValueAt(index);
             if (mode == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'mode' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'mode' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -348,11 +356,11 @@ bool hkbPoseMatchingGenerator::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         for (int i = 0; i < children.size(); i++){
             if (children.at(i).data() && !children.at(i).data()->write(writer)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'children' at: "+QString::number(i)+"!!!");
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'children' at: "+QString::number(i)+"!!!");
             }
         }
     }
@@ -364,17 +372,17 @@ bool hkbPoseMatchingGenerator::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
     for (int i = 0; i < children.size(); i++){
         //ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(children.at(i).getShdPtrReference());
         ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(children.at(i).getShdPtrReference());
         if (!ptr){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\n'children' data field is linked to invalid child!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'children' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             children[i] = *ptr;
         }else{
@@ -395,73 +403,67 @@ void hkbPoseMatchingGenerator::unlink(){
     }
 }
 
-bool hkbPoseMatchingGenerator::evaluateDataValidity(){
+QString hkbPoseMatchingGenerator::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
     bool valid = true;
     if (children.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": children is empty!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": children is empty!\n");
     }else{
         for (int i = 0; i < children.size(); i++){
             if (!children.at(i).data()){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": children at index '"+QString::number(i)+"' is null!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": children at index '"+QString::number(i)+"' is null!\n");
             }else if (children.at(i).data()->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid child! Signature: "+QString::number(children.at(i).data()->getSignature(), 16)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid child! Signature: "+QString::number(children.at(i).data()->getSignature(), 16)+"\n");
             }
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity()){
-        isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
-    }
+    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
     if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid flags!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid flags!\n");
     }
     if (indexOfSyncMasterChild >= children.size()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": indexOfSyncMasterChild is out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": indexOfSyncMasterChild is out of range!\n");
     }
     if (!Mode.contains(mode)){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid mode!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid mode!\n");
     }
     if (startPlayingEventId >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": startPlayingEventId event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": startPlayingEventId event id out of range!\n");
     }
     if (startMatchingEventId >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": startMatchingEventId event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": startMatchingEventId event id out of range!\n");
     }
     if (rootBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": rootBoneIndex out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": rootBoneIndex out of range!\n");
     }
     if (otherBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": otherBoneIndex out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": otherBoneIndex out of range!\n");
     }
     if (anotherBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": anotherBoneIndex out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": anotherBoneIndex out of range!\n");
     }
     if (pelvisIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": pelvisIndex out of range!\n");
-    }
-    if (errors != ""){
-        LogFile::writeToLog(errors);
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": pelvisIndex out of range!\n");
     }
     setDataValidity(isvalid);
-    return isvalid;
+    return errors;
 }
 
 hkbPoseMatchingGenerator::~hkbPoseMatchingGenerator(){

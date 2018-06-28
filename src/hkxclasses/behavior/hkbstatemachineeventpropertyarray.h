@@ -12,7 +12,7 @@ public:
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
     void unlink();
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     int getLastEventIndex() const;
     bool write(HkxXMLWriter *writer);

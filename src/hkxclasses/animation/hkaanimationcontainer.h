@@ -10,7 +10,7 @@ public:
     virtual ~hkaAnimationContainer();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:

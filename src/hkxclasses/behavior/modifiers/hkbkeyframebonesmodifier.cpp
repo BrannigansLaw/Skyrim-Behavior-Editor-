@@ -37,22 +37,22 @@ bool hkbKeyframeBonesModifier::readData(const HkxXmlReader &reader, long index){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "keyframeInfo"){
             int numexp = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
@@ -66,22 +66,22 @@ bool hkbKeyframeBonesModifier::readData(const HkxXmlReader &reader, long index){
                     if (text == "keyframedPosition"){
                         keyframeInfo.last().keyframedPosition = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'keyframedPosition' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'keyframedPosition' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "keyframedRotation"){
                         keyframeInfo.last().keyframedRotation = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'keyframedRotation' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'keyframedRotation' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "boneIndex"){
                         keyframeInfo.last().boneIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'boneIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'boneIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "isValid"){
                         keyframeInfo.last().isValid = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'isValid' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'isValid' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -91,7 +91,7 @@ bool hkbKeyframeBonesModifier::readData(const HkxXmlReader &reader, long index){
             }
         }else if (text == "keyframedBonesList"){
             if (!keyframedBonesList.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'keyframedBonesList' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'keyframedBonesList' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -139,10 +139,10 @@ bool hkbKeyframeBonesModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (keyframedBonesList.data() && !keyframedBonesList.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'keyframedBonesList'!!!");
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'keyframedBonesList'!!!");
         }
     }
     return true;
@@ -170,17 +170,36 @@ QVector<HkxObject *> hkbKeyframeBonesModifier::getChildrenOtherTypes() const{
     return list;
 }
 
+bool hkbKeyframeBonesModifier::merge(HkxObject *recessiveObject){
+    hkbKeyframeBonesModifier *obj = nullptr;
+    if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_KEY_FRAME_BONES_MODIFIER){
+        obj = static_cast<hkbKeyframeBonesModifier *>(recessiveObject);
+        if (keyframedBonesList.data()){
+            if (obj->keyframedBonesList.data()){
+                keyframedBonesList.data()->merge(obj->keyframedBonesList.data());
+            }
+        }else if (obj->keyframedBonesList.data()){
+            keyframedBonesList = obj->keyframedBonesList;
+            getParentFile()->addObjectToFile(obj->keyframedBonesList.data(), 0);
+        }
+        injectWhileMerging(obj);
+        return true;
+    }else{
+        return false;
+    }
+}
+
 bool hkbKeyframeBonesModifier::link(){
     if (!getParentFile()){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(keyframedBonesList.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_INDEX_ARRAY){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'keyframedBonesList' is not a HKB_BONE_INDEX_ARRAY!");
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'keyframedBonesList' is not a HKB_BONE_INDEX_ARRAY!");
             setDataValidity(false);
         }
         keyframedBonesList = *ptr;
@@ -193,45 +212,39 @@ void hkbKeyframeBonesModifier::unlink(){
     keyframedBonesList = HkxSharedPtr();
 }
 
-bool hkbKeyframeBonesModifier::evaluateDataValidity(){
+QString hkbKeyframeBonesModifier::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
     if (keyframeInfo.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": keyframeInfo is empty!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": keyframeInfo is empty!\n");
     }else{
         for (auto i = 0; i < keyframeInfo.size(); i++){
             if (keyframeInfo.at(i).boneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": boneIndex at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": boneIndex at "+QString::number(i)+" out of range!\n");
             }
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity()){
-        isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
-    }
+    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
     if (keyframedBonesList.data()){
         if (keyframedBonesList.data()->getSignature() != HKB_BONE_INDEX_ARRAY){
             isvalid = false;
-            errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid keyframedBonesList type! Signature: "+QString::number(keyframedBonesList.data()->getSignature(), 16)+"\n");
-        }else if (keyframedBonesList.data()->isDataValid() && !keyframedBonesList.data()->evaluateDataValidity()){
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid keyframedBonesList type! Signature: "+QString::number(keyframedBonesList.data()->getSignature(), 16)+"\n");
+        }else if (keyframedBonesList.data()->isDataValid() && keyframedBonesList.data()->evaluateDataValidity() != ""){
             isvalid = false;
-            //errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid keyframedBonesList data!\n");
+            //errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid keyframedBonesList data!\n");
         }
     }else if (!keyframedBonesList.data()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null expressions!\n");
-    }
-    if (errors != ""){
-        LogFile::writeToLog(errors);
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null expressions!\n");
     }
     setDataValidity(isvalid);
-    return isvalid;
+    return errors;
 }
 
 hkbKeyframeBonesModifier::~hkbKeyframeBonesModifier(){

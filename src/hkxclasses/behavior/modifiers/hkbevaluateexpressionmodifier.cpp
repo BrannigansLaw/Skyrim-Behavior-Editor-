@@ -38,26 +38,26 @@ bool hkbEvaluateExpressionModifier::readData(const HkxXmlReader &reader, long in
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "expressions"){
             if (!expressions.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'expressions' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'expressions' reference!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -91,10 +91,10 @@ bool hkbEvaluateExpressionModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
         if (expressions.data() && !expressions.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'expressions'!!!");
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'expressions'!!!");
         }
     }
     return true;
@@ -128,7 +128,7 @@ void hkbEvaluateExpressionModifier::fixMergedEventIndices(BehaviorFile *dominant
 
 bool hkbEvaluateExpressionModifier::merge(HkxObject *recessiveObject){
     hkbEvaluateExpressionModifier *obj = nullptr;
-    if (recessiveObject && recessiveObject->getSignature() == HKB_EVALUATE_EXPRESSION_MODIFIER){
+    if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_EVALUATE_EXPRESSION_MODIFIER){
         obj = static_cast<hkbEvaluateExpressionModifier *>(recessiveObject);
         if (expressions.data()){
             if (obj->expressions.data()){
@@ -136,8 +136,9 @@ bool hkbEvaluateExpressionModifier::merge(HkxObject *recessiveObject){
             }
         }else if (obj->expressions.data()){
             expressions = obj->expressions;
-            getParentFile()->addObjectToFile(obj->expressions.data(), 0);
+            getParentFile()->addObjectToFile(obj->expressions.data(), 0);   //TO DO: fix merged event indices???
         }
+        injectWhileMerging(obj);
         return true;
     }else{
         return false;
@@ -167,12 +168,12 @@ bool hkbEvaluateExpressionModifier::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(expressions.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_EXPRESSION_DATA_ARRAY){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'expressions' is not a HKB_EXPRESSION_DATA_ARRAY!");
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'expressions' is not a HKB_EXPRESSION_DATA_ARRAY!");
             setDataValidity(false);
         }
         expressions = *ptr;
@@ -185,34 +186,28 @@ void hkbEvaluateExpressionModifier::unlink(){
     expressions = HkxSharedPtr();
 }
 
-bool hkbEvaluateExpressionModifier::evaluateDataValidity(){
+QString hkbEvaluateExpressionModifier::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    if (!HkDynamicObject::evaluateDataValidity()){
-        isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
-    }
+    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
     if (expressions.data()){
         if (expressions.data()->getSignature() != HKB_EXPRESSION_DATA_ARRAY){
             isvalid = false;
-            errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid expressions type! Signature: "+QString::number(expressions.data()->getSignature(), 16)+"\n");
-        }else if (expressions.data()->isDataValid() && !expressions.data()->evaluateDataValidity()){
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid expressions type! Signature: "+QString::number(expressions.data()->getSignature(), 16)+"\n");
+        }else if (expressions.data()->isDataValid() && expressions.data()->evaluateDataValidity() != ""){
             isvalid = false;
-            //errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid expressions data!\n");
+            //errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid expressions data!\n");
         }
     }else if (!expressions.data()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null expressions!\n");
-    }
-    if (errors != ""){
-        LogFile::writeToLog(errors);
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null expressions!\n");
     }
     setDataValidity(isvalid);
-    return isvalid;
+    return errors;
 }
 
 hkbEvaluateExpressionModifier::~hkbEvaluateExpressionModifier(){

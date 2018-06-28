@@ -110,7 +110,7 @@ void ProjectUI::loadData(){
     if (project && project->character && project->character->skeleton && !project->character->skeleton->skeletons.isEmpty()){
         setTitle(project->fileName());
         characterProperties->loadData(project->character->getCharacterData());
-        int index = project->skyrimAnimData->getProjectIndex(project->fileName().section("/", -1, -1));
+        int index = project->skyrimAnimData->getProjectIndex(project->getFileName());
         if (index == -1){
             CRITICAL_ERROR_MESSAGE("ProjectUI::loadData(): getProjectIndex failed!");
         }

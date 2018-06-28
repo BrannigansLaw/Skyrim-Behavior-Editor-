@@ -19,7 +19,7 @@ public:
     virtual ~hkbBehaviorGraphStringData();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     QString getVariableNameAt(int index) const;

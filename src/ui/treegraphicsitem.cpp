@@ -108,7 +108,7 @@ void TreeGraphicsItem::setIconSelected(){
 }
 
 void TreeGraphicsItem::unselect(){
-    if (!static_cast<HkxObject *>(itemData)->evaluateDataValidity()){
+    if (static_cast<HkxObject *>(itemData)->evaluateDataValidity() != ""){
         penColor = Qt::red;
     }else{
         penColor = Qt::black;

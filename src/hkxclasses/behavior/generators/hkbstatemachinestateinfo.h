@@ -20,7 +20,7 @@ public:
     bool link();
     void unlink();
     QString getName() const;
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     QString getStateName(int stateId) const;
     QString getNestedStateName(int stateId, int nestedStateId) const;

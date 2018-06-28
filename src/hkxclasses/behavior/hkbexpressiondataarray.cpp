@@ -61,22 +61,22 @@ bool hkbExpressionDataArray::readData(const HkxXmlReader &reader, long index){
                     if (text == "expression"){
                         expressionsData.last().expression = reader.getElementValueAt(index);
                         if (expressionsData.last().expression == ""){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'expression' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'expression' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "assignmentVariableIndex"){
                         expressionsData.last().assignmentVariableIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'assignmentVariableIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'assignmentVariableIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "assignmentEventIndex"){
                         expressionsData.last().assignmentEventIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'assignmentEventIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'assignmentEventIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "eventMode"){
                         expressionsData.last().eventMode = reader.getElementValueAt(index);
                         if (!EventMode.contains(expressionsData.last().eventMode)){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nInvalid 'eventMode' data!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nInvalid 'eventMode' data!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -147,8 +147,8 @@ void hkbExpressionDataArray::fixMergedEventIndices(BehaviorFile *dominantfile){
                 }
                 expressionsData[i].assignmentEventIndex = eventindex;
             }
+            setIsMerged(true);
         }
-        setIsMerged(true);
     }
 }
 bool hkbExpressionDataArray::hkExpression::operator==(const hkExpression & other) const{
@@ -161,7 +161,7 @@ bool hkbExpressionDataArray::hkExpression::operator==(const hkExpression & other
 bool hkbExpressionDataArray::merge(HkxObject *recessiveObject){
     bool found;
     hkbExpressionDataArray *obj = nullptr;
-    if (recessiveObject && recessiveObject->getSignature() == HKB_EXPRESSION_DATA_ARRAY){
+    if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_EXPRESSION_DATA_ARRAY){
         obj = static_cast<hkbExpressionDataArray *>(recessiveObject);
         for (auto i = 0; i < obj->expressionsData.size(); i++){
             found = false;
@@ -176,6 +176,7 @@ bool hkbExpressionDataArray::merge(HkxObject *recessiveObject){
                 expressionsData.append(obj->expressionsData.at(i));
             }
         }
+        setIsMerged(true);
         return true;
     }else{
         return false;
@@ -194,37 +195,34 @@ bool hkbExpressionDataArray::link(){
     return true;
 }
 
-bool hkbExpressionDataArray::evaluateDataValidity(){
+QString hkbExpressionDataArray::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
     if (expressionsData.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": expression is empty!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": expression is empty!\n");
     }else{
         for (auto i = 0; i < expressionsData.size(); i++){
             if (expressionsData.at(i).expression == ""){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": expression is null string!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": expression is null string!\n");
             }
             if (expressionsData.at(i).assignmentVariableIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfVariables()){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": assignmentVariableIndex at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": assignmentVariableIndex at "+QString::number(i)+" out of range!\n");
             }
             if (expressionsData.at(i).assignmentEventIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": assignmentEventIndex at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": assignmentEventIndex at "+QString::number(i)+" out of range!\n");
             }
             if (!EventMode.contains(expressionsData.at(i).eventMode)){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid eventMode!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid eventMode!\n");
             }
         }
     }
-    if (errors != ""){
-        LogFile::writeToLog(errors);
-    }
     setDataValidity(isvalid);
-    return isvalid;
+    return errors;
 }
 
 hkbExpressionDataArray::~hkbExpressionDataArray(){

@@ -21,7 +21,7 @@ public:
     QStringList getEventNames() const;
     int getNumberOfEvents() const;
     int getNumberOfVariables() const;
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     hkQuadVariable getQuadVariable(int index, bool *ok) const;
     HkxObject * getVariantVariable(int index) const;

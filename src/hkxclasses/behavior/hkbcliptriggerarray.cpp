@@ -79,17 +79,17 @@ bool hkbClipTriggerArray::readData(const HkxXmlReader &reader, long index){
                     }else if (reader.getNthAttributeValueAt(index, 0) == "relativeToEndOfClip"){
                         triggers.last().relativeToEndOfClip = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'relativeToEndOfClip' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'relativeToEndOfClip' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "acyclic"){
                         triggers.last().acyclic = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'acyclic' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'acyclic' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "isAnnotation"){
                         triggers.last().isAnnotation = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'isAnnotation' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'isAnnotation' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -143,7 +143,7 @@ bool hkbClipTriggerArray::write(HkxXMLWriter *writer){
         writer->writeLine("\n");
         for (int i = 0; i < triggers.size(); i++){
             if (triggers.at(i).event.payload.data() && !triggers.at(i).event.payload.data()->write(writer)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
             }
         }
     }
@@ -194,8 +194,8 @@ void hkbClipTriggerArray::fixMergedEventIndices(BehaviorFile *dominantfile){
                 }
                 triggers[i].event.id = eventindex;
             }
+            setIsMerged(true);
         }
-        setIsMerged(true);
     }
 }
 
@@ -206,7 +206,7 @@ bool hkbClipTriggerArray::merge(HkxObject *recessiveObject){
     int eventindex;
     bool found;
     hkbClipTriggerArray *obj = nullptr;
-    if (recessiveObject && recessiveObject->getSignature() == HKB_CLIP_TRIGGER_ARRAY){
+    if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_CLIP_TRIGGER_ARRAY){
         obj = static_cast<hkbClipTriggerArray *>(recessiveObject);
         //obj->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
         recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(obj->getParentFile())->getBehaviorGraphData());
@@ -224,11 +224,12 @@ bool hkbClipTriggerArray::merge(HkxObject *recessiveObject){
                 if (eventindex == -1 && othereventname != ""){
                     domdata->addEvent(othereventname);
                     eventindex = domdata->getNumberOfEvents() - 1;
+                    obj->triggers[i].event.id = eventindex;
+                    triggers.append(obj->triggers.at(i));
                 }
-                //obj->triggers[i].event.id = eventindex;
-                triggers.append(obj->triggers.at(i));
             }
         }
+        setIsMerged(true);
         return true;
     }else{
         return false;
@@ -272,29 +273,26 @@ bool hkbClipTriggerArray::link(){
     return true;
 }
 
-bool hkbClipTriggerArray::evaluateDataValidity(){
+QString hkbClipTriggerArray::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
     if (triggers.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": triggers is empty!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": triggers is empty!\n");
     }else{
         for (auto i = 0; i < triggers.size(); i++){
             if (triggers.at(i).event.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": id in triggers at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": id in triggers at "+QString::number(i)+" out of range!\n");
             }
             if (triggers.at(i).event.payload.data() && triggers.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(triggers.at(i).event.payload.data()->getSignature(), 16)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(triggers.at(i).event.payload.data()->getSignature(), 16)+"\n");
             }
         }
     }
-    if (errors != ""){
-        LogFile::writeToLog(errors);
-    }
     setDataValidity(isvalid);
-    return isvalid;
+    return errors;
 }
 
 hkbClipTriggerArray::~hkbClipTriggerArray(){

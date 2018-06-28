@@ -18,7 +18,7 @@ public:
     virtual ~hkbStateMachineTransitionInfoArray();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     QString getTransitionNameAt(int index);
     int getNumTransitions() const;

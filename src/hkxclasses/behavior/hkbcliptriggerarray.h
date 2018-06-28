@@ -15,7 +15,7 @@ public:
     virtual ~hkbClipTriggerArray();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     int getLastTriggerIndex() const;
     bool write(HkxXMLWriter *writer);

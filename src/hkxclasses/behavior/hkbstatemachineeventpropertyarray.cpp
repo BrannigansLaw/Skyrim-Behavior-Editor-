@@ -108,7 +108,7 @@ bool hkbStateMachineEventPropertyArray::write(HkxXMLWriter *writer){
         writer->writeLine("\n");
         for (int i = 0; i < events.size(); i++){
             if (events.at(i).payload.data() && !events.at(i).payload.data()->write(writer)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
             }
         }
     }
@@ -159,8 +159,8 @@ void hkbStateMachineEventPropertyArray::fixMergedEventIndices(BehaviorFile *domi
                 }
                 events[i].id = eventindex;
             }
+            setIsMerged(true);
         }
-        setIsMerged(true);
     }
 }
 
@@ -171,7 +171,7 @@ bool hkbStateMachineEventPropertyArray::merge(HkxObject *recessiveObject){
     int eventindex;
     bool found;
     hkbStateMachineEventPropertyArray *obj = nullptr;
-    if (recessiveObject && recessiveObject->getSignature() == HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
+    if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
         obj = static_cast<hkbStateMachineEventPropertyArray *>(recessiveObject);
         //obj->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
         recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(obj->getParentFile())->getBehaviorGraphData());
@@ -189,11 +189,12 @@ bool hkbStateMachineEventPropertyArray::merge(HkxObject *recessiveObject){
                 if (eventindex == -1 && othereventname != ""){
                     domdata->addEvent(othereventname);
                     eventindex = domdata->getNumberOfEvents() - 1;
+                    obj->events[i].id = eventindex;
+                    events.append(obj->events.at(i));
                 }
-                obj->events[i].id = eventindex;
-                events.append(obj->events.at(i));
             }
         }
+        setIsMerged(true);
         return true;
     }else{
         return false;
@@ -243,29 +244,26 @@ void hkbStateMachineEventPropertyArray::unlink(){
     }
 }
 
-bool hkbStateMachineEventPropertyArray::evaluateDataValidity(){
+QString hkbStateMachineEventPropertyArray::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
     if (events.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": events is empty!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": events is empty!\n");
     }else{
         for (auto i = 0; i < events.size(); i++){
             if (events.at(i).id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": id in events at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": id in events at "+QString::number(i)+" out of range!\n");
             }
             if (events.at(i).payload.data() && events.at(i).payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(events.at(i).payload.data()->getSignature(), 16)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(events.at(i).payload.data()->getSignature(), 16)+"\n");
             }
         }
     }
-    if (errors != ""){
-        LogFile::writeToLog(errors);
-    }
     setDataValidity(isvalid);
-    return isvalid;
+    return errors;
 }
 
 hkbStateMachineEventPropertyArray::~hkbStateMachineEventPropertyArray(){

@@ -75,7 +75,7 @@ bool hkbEventRangeDataArray::readData(const HkxXmlReader &reader, long index){
                     }else if (reader.getNthAttributeValueAt(index, 0) == "eventMode"){
                         eventData.last().eventMode = reader.getElementValueAt(index);
                         if (!eventData.last().EventRangeMode.contains(eventData.last().eventMode)){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -127,7 +127,7 @@ bool hkbEventRangeDataArray::write(HkxXMLWriter *writer){
         writer->writeLine("\n");
         for (int i = 0; i < eventData.size(); i++){
             if (eventData.at(i).event.payload.data() && !eventData.at(i).event.payload.data()->write(writer)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
             }
         }
     }
@@ -182,8 +182,8 @@ void hkbEventRangeDataArray::fixMergedEventIndices(BehaviorFile *dominantfile){
                 }
                 eventData[i].event.id = eventindex;
             }
+            setIsMerged(true);
         }
-        setIsMerged(true);
     }
 }
 
@@ -224,33 +224,30 @@ bool hkbEventRangeDataArray::link(){
     return true;
 }
 
-bool hkbEventRangeDataArray::evaluateDataValidity(){
+QString hkbEventRangeDataArray::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
     if (eventData.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": eventData is empty!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": eventData is empty!\n");
     }else{
         for (auto i = 0; i < eventData.size(); i++){
             if (eventData.at(i).event.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": id in eventData at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": id in eventData at "+QString::number(i)+" out of range!\n");
             }
             if (eventData.at(i).event.payload.data() && eventData.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(eventData.at(i).event.payload.data()->getSignature(), 16)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(eventData.at(i).event.payload.data()->getSignature(), 16)+"\n");
             }
             if (!hkbEventRangeData::EventRangeMode.contains(eventData.at(i).eventMode)){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid eventMode!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid eventMode!\n");
             }
         }
     }
-    if (errors != ""){
-        LogFile::writeToLog(errors);
-    }
     setDataValidity(isvalid);
-    return isvalid;
+    return errors;
 }
 
 hkbEventRangeDataArray::~hkbEventRangeDataArray(){

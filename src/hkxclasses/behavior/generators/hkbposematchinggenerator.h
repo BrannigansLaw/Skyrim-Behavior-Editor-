@@ -16,7 +16,7 @@ public:
     bool link();
     void unlink();
     QString getName() const;
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     int getNumberOfChildren() const;
     int getIndexToInsertIcon(HkxObject *child) const;

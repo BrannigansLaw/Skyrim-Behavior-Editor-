@@ -51,7 +51,7 @@ bool areVariableTypesCompatible(hkVariableType type1, hkVariableType type2){
 
 }
 namespace{
-class LogFile{
+class LogFile final{
 private:
     static QFile logFile;
     static QTextStream stream;
@@ -74,6 +74,13 @@ public:
     static void writeToLog(const QString & message){
         std::lock_guard <std::mutex> guard(mutex);
         stream << message << "\n";
+    }
+
+    static void writeToLog(const QStringList & messages){
+        std::lock_guard <std::mutex> guard(mutex);
+        for (auto i = 0; i < messages.size(); i++){
+            stream << messages.at(i) << "\n";
+        }
     }
 };
 

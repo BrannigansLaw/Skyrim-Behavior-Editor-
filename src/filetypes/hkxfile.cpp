@@ -11,6 +11,7 @@ HkxFile::HkxFile(MainWindow *window, const QString & name)
       ui(window),
       changed(false)
 {
+    fileNameWithoutPath = name.section("/", -1, -1);
     parse();
 }
 
@@ -26,6 +27,15 @@ bool HkxFile::getIsChanged() const{
 
 void HkxFile::setIsChanged(bool wasEdited){
     changed = wasEdited;
+}
+
+QString HkxFile::getFileName() const{
+    return fileNameWithoutPath;
+}
+
+void HkxFile::setHKXFileName(const QString &name){
+    QFile::setFileName(name);
+    fileNameWithoutPath = name.section("/", -1, -1);
 }
 
 std::unique_lock <std::mutex> HkxFile::lockNGuard() const{

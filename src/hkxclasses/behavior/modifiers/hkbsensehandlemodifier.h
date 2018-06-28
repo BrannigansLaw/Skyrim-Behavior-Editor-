@@ -15,7 +15,7 @@ public:
     bool link();
     void unlink();
     QString getName() const;
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfRanges() const;
@@ -25,6 +25,7 @@ public:
     void fixMergedEventIndices(BehaviorFile *dominantfile);
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
+    bool merge(HkxObject *recessiveObject);
 private:
     hkbSenseHandleModifier& operator=(const hkbSenseHandleModifier&);
     hkbSenseHandleModifier(const hkbSenseHandleModifier &);

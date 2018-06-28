@@ -103,14 +103,17 @@ public:
     bool isNameUniqueInProject(HkxObject *object) const;
     bool existsInBehavior(HkDynamicObject *object, int startindex = 0) const;
     HkxObject * getBehaviorGraphData() const;
+    QStringList getErrors() const;
 protected:
     bool parse();
     bool link();
 private:
+    QStringList getRefedAnimations() const;
     QString detectErrorsMT(int &taskcount, std::mutex &mutex, std::condition_variable &conditionVar);
     QString detectErrors();
     QVector<DataIconManager *> merge(BehaviorFile *recessivefile, int &taskCount, std::mutex &mutex, std::condition_variable &conditionVar);
-    void mergeObjects(QVector<DataIconManager *> recessiveobjects);
+    QVector<DataIconManager *> merge(BehaviorFile *recessivefile);
+    void mergeObjects(QVector<DataIconManager *> &recessiveobjects);
     void generateDefaultCharacterData();
     void generateNewBehavior();
     hkbBehaviorGraph * getBehaviorGraph() const;
@@ -133,7 +136,7 @@ private:
     QList <HkxSharedPtr> otherTypes;
     QStringList referencedBehaviors;
     long largestRef;
-    //QStringList errors;
+    QStringList errorList;
 };
 
 #endif // BEHAVIORFILE_H

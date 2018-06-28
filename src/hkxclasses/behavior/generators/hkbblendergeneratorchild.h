@@ -19,7 +19,7 @@ public:
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
     void unlink();
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool isParametricBlend() const;
@@ -28,20 +28,8 @@ public:
     int getThisIndex() const;
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
-    bool operator==(const hkbBlenderGeneratorChild & other){
-        if (
-                weight != other.weight ||
-                worldFromModelWeight != other.worldFromModelWeight ||
-                !parentBG.data() ||
-                !other.parentBG.data() ||
-                static_cast<hkbGenerator *>(parentBG.data())->getName() != static_cast<hkbGenerator *>(other.parentBG.data())->getName()
-            )
-        {
-            return false;
-        }
-        //boneweights???
-        return true;
-    }
+    bool merge(HkxObject *recessiveObject);
+    bool operator==(const hkbBlenderGeneratorChild & other);
 private:
     QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;

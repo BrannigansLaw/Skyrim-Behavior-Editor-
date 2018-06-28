@@ -56,6 +56,12 @@ void HkxObject::setRefsUpdated(bool value){
     refsUpdated = value;
 }
 
+void HkxObject::setParentFile(BehaviorFile *parent){
+    if (parent){
+        parentFile = parent;
+    }
+}
+
 QVector<HkxObject *> HkxObject::getChildrenOtherTypes() const{
     return QVector<HkxObject *>();
 }
@@ -90,8 +96,8 @@ bool HkxObject::isDataValid()const{
     return dataValid;
 }
 
-bool HkxObject::evaluateDataValidity(){
-    return true;
+QString HkxObject::evaluateDataValidity(){
+    return "";
 }
 
 void HkxObject::setIsWritten(bool written){
@@ -136,6 +142,10 @@ void HkxObject::updateReferences(long & ref){
 
 void HkxObject::fixMergedEventIndices(BehaviorFile *){
     //
+}
+
+bool HkxObject::fixMergedIndices(BehaviorFile *){
+    return true;
 }
 
 bool HkxObject::write(HkxXMLWriter *){
@@ -422,7 +432,7 @@ HkxObject::~HkxObject(){
  */
 
 HkxSharedPtr::HkxSharedPtr(HkxObject *obj, long ref)
-    :QExplicitlySharedDataPointer(obj), reference(ref)
+    :QExplicitlySharedDataPointer(obj), smtreference(ref)
 {
     //
 }
@@ -435,11 +445,11 @@ bool HkxSharedPtr::operator==(const HkxSharedPtr & other) const{
 }
 
 void HkxSharedPtr::setShdPtrReference(long ref){
-    reference = ref;
+    smtreference = ref;
 }
 
 long HkxSharedPtr::getShdPtrReference() const{
-    return reference;
+    return smtreference;
 }
 
 bool HkxSharedPtr::readShdPtrReference(long index, const HkxXmlReader & reader){
@@ -497,7 +507,7 @@ bool HkDynamicObject::isVariableReferenced(int variableindex) const{
 
 bool HkDynamicObject::merge(HkxObject *recessiveObject){
     hkbVariableBindingSet *obj = nullptr;
-    if (recessiveObject && recessiveObject->getSignature() == HKB_VARIABLE_BINDING_SET){
+    if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_VARIABLE_BINDING_SET){
         obj = static_cast<hkbVariableBindingSet *>(recessiveObject);
         if (variableBindingSet.data()){
             variableBindingSet.data()->merge(obj);
@@ -531,6 +541,13 @@ void HkDynamicObject::mergeVariableIndices(int oldindex, int newindex){
     }
 }
 
+bool HkDynamicObject::fixMergedIndices(BehaviorFile *dominantfile){
+    if (variableBindingSet.data()){
+        return variableBindingSet.data()->fixMergedIndices(dominantfile);
+    }
+    return true;
+}
+
 bool HkDynamicObject::linkVar(){
     if (!getParentFile()){
         return false;
@@ -551,13 +568,13 @@ void HkDynamicObject::unlink(){
     variableBindingSet = HkxSharedPtr();
 }
 
-bool HkDynamicObject::evaluateDataValidity(){
+QString HkDynamicObject::evaluateDataValidity(){
     if (variableBindingSet.data() && variableBindingSet.data()->getSignature() != HKB_VARIABLE_BINDING_SET){
         setDataValidity(false);
-        return false;
+        return QString(getParentFile()->getFileName()+": HkDynamicObject: Ref: "+getReferenceString()+": variableBindingSet is invalid type! Signature: "+QString::number(variableBindingSet.data()->getSignature(), 16)+"\n");
     }
     setDataValidity(true);
-    return true;
+    return QString();
 }
 
 HkDynamicObject::~HkDynamicObject(){

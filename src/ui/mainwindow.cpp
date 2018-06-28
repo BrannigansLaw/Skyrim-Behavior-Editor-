@@ -661,9 +661,11 @@ void MainWindow::mergeFNIS(){
         if (!dominantProject->merge(recessiveProject, true)){
             WARNING_MESSAGE("The attempt to merge projects failed!");
         }
-        saveProject(false);
         //TO DO: Merge animdata...
         //NEED TO FIX ANIMTION INDICES IN ANIMDATA FILES BEFORE MERGING!!!
+        dominantProject->mergeAnimationCaches(recessiveProject);
+        dominantProject->ensureAllRefedAnimationsExist();
+        saveProject(false);
         //packAndExportProjectToSkyrimDirectory();
         //delete recessiveProject;
         //delete projectFile;
@@ -729,13 +731,11 @@ BehaviorFile * MainWindow::openBehaviorForMerger(QString & filepath){
     BehaviorFile *ptr = nullptr;
     auto count = 1;
     if (filepath != "" && hkxcmd(filepath, filepath, count, "-v:xml") == HKXCMD_SUCCESS){
-        QFile *file = new QFile(filepath);
-        QString path;
+        QFile *file = new QFile(QString(filepath).replace(".hkx", "-out.hkx"));
         if (file->exists() && file->remove()){
-            file->setFileName(QString(filepath).replace("-out.hkx", ".hkx"));
-            path = file->fileName();
+            file->setFileName(filepath);
             delete file;
-            ptr = new BehaviorFile(this, nullptr, nullptr, path);
+            ptr = new BehaviorFile(this, nullptr, nullptr, filepath);
             if (!ptr->parse()){
                 CRITICAL_ERROR_MESSAGE("MainWindow::openBehaviorForMerger(): The selected behavior file \""+filepath+"\" was not parsed!");
             }
@@ -873,7 +873,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata,
     objectDataWid->changeCurrentDataWidget(nullptr);
     lastFileSelectedPath = filepath.section("/", 0, -2);
     projectFile = new ProjectFile(this, lastFileSelected);
-    ProgressDialog progress("Reading animation data..."+projectFile->fileName().section("/", -1, -1), "", percent, 100, this);
+    ProgressDialog progress("Reading animation data..."+projectFile->getFileName(), "", percent, 100, this);
     if (loadanimdata){
         QString path1;
         QString path2;
@@ -965,8 +965,13 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata,
                     behaviorIndex = 0;
                     taskdifference = 0;
                     difference = ((1.0)/((qreal)(behaviornames.size())))*(100.0);
+                    for (auto i = 0; i < projectFile->behaviorFiles.size(); i++){
+                        behaviorGraphs.at(i)->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.at(i)->getBehaviorGraph()), false);
+                        percent += difference;
+                        progress.setValue(percent);
+                    }
                     //locker.lock();
-                    for (uint i = 0; i < maxThreads, behaviorIndex < behaviornames.size(); i++, behaviorIndex++){
+                    /*for (uint i = 0; i < maxThreads, behaviorIndex < behaviornames.size(); i++, behaviorIndex++){
                         threads.push_back(std::thread(&TreeGraphicsView::drawGraphMT, behaviorGraphs[behaviorIndex], static_cast<DataIconManager *>(projectFile->behaviorFiles.at(behaviorIndex)->getBehaviorGraph()), false, std::ref(taskCount), std::ref(mutex), std::ref(conditionVar)));
                         threads.back().detach();
                     }
@@ -985,7 +990,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata,
                             }
                         }
                         conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
-                    }
+                    }*/
                     threads.clear();
                 }
                 //projectFile->generateAnimClipDataForProject();
@@ -1000,6 +1005,9 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata,
             if (loadui){
                 QString errors = projectFile->detectErrorsInProject();
                 LogFile::writeToLog("Time taken to open project \""+filepath+"\" is approximately "+QString::number(timer.elapsed())+" milliseconds");
+                for (auto i = 0; i < projectFile->behaviorFiles.size(); i++){
+                    LogFile::writeToLog(projectFile->behaviorFiles.at(i)->getErrors());
+                }
                 if (errors != ""){
                     USER_MESSAGE(errors);
                 }
@@ -1222,7 +1230,7 @@ void MainWindow::zoomOut(){
 int MainWindow::getBehaviorGraphIndex(const QString & filename){
     for (int j = 0; j < behaviorGraphs.size(); j++){
         if (filename.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive) == 0){
-            if (j >= projectFile->behaviorFiles.size() || filename.compare(projectFile->behaviorFiles.at(j)->fileName().section("/", -1, -1), Qt::CaseInsensitive) != 0){
+            if (j >= projectFile->behaviorFiles.size() || filename.compare(projectFile->behaviorFiles.at(j)->getFileName(), Qt::CaseInsensitive) != 0){
                 LogFile::writeToLog("MainWindow::getBehaviorGraphIndex(): The index is invalid!");
                 return -1;
             }
@@ -1391,7 +1399,7 @@ MainWindow::HKXCMD_RETURN MainWindow::hkxcmd(const QString &filepath, const QStr
         conditionVar.notify_one();
         mutex.unlock();
     }else{
-        LogFile::writeToLog("MainWindow: packHKX() failed!\nThe command \""+command+"\" failed!");
+        LogFile::writeToLog("MainWindow: hkxcmd() failed!\nThe command \""+command+"\" failed!");
     }
     return value;
 }
@@ -1471,7 +1479,7 @@ void MainWindow::createNewProject(){
                             CRITICAL_ERROR_MESSAGE(QString("MainWindow::createNewProject(): Attempt to create '"+list.at(i)+"' directory failed!!!").toUtf8().data());
                         }
                     }
-                    if (!projectDirectory.rename(lastFileSelected, projectDirectoryPath+"/character assets/"+skeletonFile->fileName().section("/", -1, -1))){
+                    if (!projectDirectory.rename(lastFileSelected, projectDirectoryPath+"/character assets/"+skeletonFile->getFileName())){
                         CRITICAL_ERROR_MESSAGE("MainWindow::createNewProject(): Attempt to move skeleton file failed!!!");
                     }
                     projectFile = new ProjectFile(this, projectDirectoryPath+"/"+projectname+".hkx", true, "characters\\"+projectname+"character.hkx");
@@ -1485,7 +1493,7 @@ void MainWindow::createNewProject(){
                     if (!projectFile->isProjectNameTaken()){
                         lastFileSelected = projectFile->fileName();
                         lastFileSelectedPath = projectFile->fileName().section("/", 0, -2);
-                        projectFile->character = new CharacterFile(this, projectFile, projectDirectoryPath+"/"+relativecharacterpath, true, "character assets\\"+skeletonFile->fileName().section("/", -1, -1));
+                        projectFile->character = new CharacterFile(this, projectFile, projectDirectoryPath+"/"+relativecharacterpath, true, "character assets\\"+skeletonFile->getFileName());
                         projectFile->setCharacterFile(projectFile->character);
                         projectFile->character->setSkeletonFile(skeletonFile);
                         projectFile->behaviorFiles.append(new BehaviorFile(this, projectFile, projectFile->character, projectDirectoryPath+"/behaviors/Master.hkx"));
@@ -1496,7 +1504,7 @@ void MainWindow::createNewProject(){
                         projectUI->setDisabled(false);
                         behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.last()));
                         tabs->addTab(projectUI, "Character Data");
-                        tabs->addTab(behaviorGraphs.last(), projectFile->behaviorFiles.last()->fileName().section("/", -1, -1));
+                        tabs->addTab(behaviorGraphs.last(), projectFile->behaviorFiles.last()->getFileName());
                         if (!behaviorGraphs.last()->drawGraph(static_cast<DataIconManager *>(projectFile->behaviorFiles.last()->getBehaviorGraph()), false)){
                             CRITICAL_ERROR_MESSAGE("MainWindow::createNewProject(): The behavior graph was drawn incorrectly!");
                         }

@@ -30,7 +30,7 @@ bool hkbStringEventPayload::readData(const HkxXmlReader & reader, long index){
         if (text == "data"){
             data = reader.getElementValueAt(index);
             if (data == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'data' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'data' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -54,13 +54,13 @@ bool hkbStringEventPayload::write(HkxXMLWriter *writer){
     return true;
 }
 
-bool hkbStringEventPayload::evaluateDataValidity(){
+QString hkbStringEventPayload::evaluateDataValidity(){
     if (data == ""){
         setDataValidity(false);
-        return false;
+        return QString();
     }
     setDataValidity(true);
-    return true;
+    return QString();
 }
 
 hkbStringEventPayload::~hkbStringEventPayload(){

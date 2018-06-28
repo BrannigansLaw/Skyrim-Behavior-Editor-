@@ -29,7 +29,7 @@ ProjectFile::ProjectFile(MainWindow *window, const QString & name, bool autogene
       skyrimAnimData(new SkyrimAnimData),
       skyrimAnimSetData(new SkyrimAnimSetData)
 {
-    projectName = fileName().section("/", -1, -1).remove(".hkx");
+    projectName = getFileName().remove(".hkx");
     projectFolderName = fileName().section("/", -2, -2);
     projectAnimationsPath = "meshes/actors/"+projectFolderName+"/animations";
     getReader().setFile(this);
@@ -57,7 +57,7 @@ bool ProjectFile::isClipGenNameTaken(const QString &name) const{
 
 bool ProjectFile::readAnimationData(const QString & filename, const QStringList & behaviorfilenames){
     QFile *animfile = new QFile(filename);
-    QString projectname = fileName().section("/", -1, -1);
+    QString projectname = getFileName();
     if (!animfile->exists()){
         delete animfile;
         animfile = new QFile(QDir::currentPath()+"/animationdatasinglefile.txt");
@@ -235,7 +235,7 @@ QString ProjectFile::detectErrorsInProject(){
     auto maxThreads = std::thread::hardware_concurrency() - 1;
     auto taskdifference = 0;
     qreal difference = ((1.0)/((qreal)(numbehaviors)))*(100.0);
-    std::unique_lock<std::mutex> locker(mutex);
+    /*std::unique_lock<std::mutex> locker(mutex);
     for (uint i = 0; i < maxThreads, fileIndex < numbehaviors; i++, fileIndex++){
         futures.push_back(std::async(std::launch::async, &BehaviorFile::detectErrorsMT, behaviorFiles.at(fileIndex), std::ref(taskCount), std::ref(mutex), std::ref(conditionVar)));
     }
@@ -257,6 +257,10 @@ QString ProjectFile::detectErrorsInProject(){
     QString errorstring("\n\n");
     for (auto i = 0; i < futures.size(); i++){
         errorstring = errorstring + futures.at(i).get();
+    }*/
+    QString errorstring("\n\n");
+    for (auto i = 0; i < behaviorFiles.size(); i++){
+        errorstring = errorstring + behaviorFiles.at(i)->detectErrors();
     }
     return errorstring+"\nCheck 'DebugLog.txt' in the application directory for details...";
 }
@@ -306,6 +310,21 @@ void ProjectFile::removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *g
     }
 }
 
+void ProjectFile::ensureAllRefedAnimationsExist(){
+    if (character && !behaviorFiles.isEmpty()){
+        QStringList animations = character->getAnimationNames();
+        QStringList refedAnimations;
+        for (auto i = 0; i < behaviorFiles.size(); i++){
+            refedAnimations = refedAnimations + behaviorFiles.at(i)->getRefedAnimations();
+        }
+        for (auto i = 0; i < refedAnimations.size(); i++){
+            if (!animations.contains(refedAnimations.at(i), Qt::CaseInsensitive)){
+                character->addAnimation(refedAnimations.at(i));
+            }
+        }
+    }
+}
+
 bool ProjectFile::merge(ProjectFile *recessiveproject, bool isFNIS){ //Make sure to update event and variable indices when merging!!!
     bool value = false;
     bool found;
@@ -320,104 +339,58 @@ bool ProjectFile::merge(ProjectFile *recessiveproject, bool isFNIS){ //Make sure
                 LogFile::writeToLog("failed to remove character file");
             }
             character = recessiveproject->character;
-            character->setFileName(name);
+            character->setHKXFileName(name);
         }else{
             character->merge(recessiveproject->character);
         }
-        for (auto i = 0; i < dominantbehaviors.size(); i++){
-            for (auto j = 0; j < recessivebehaviors.size(); j++){
-                if (!QString::compare(dominantbehaviors.at(i)->fileName().section("/", -1, -1), recessivebehaviors.at(j)->fileName().section("/", -1, -1), Qt::CaseInsensitive)){
-                    if (i != j){
-                        if (i < recessivebehaviors.size()){
-                            recessivebehaviors.swap(j, i);
-                        }else{
-                            dominantbehaviors.swap(i, j);
-                        }
-                    }
-                }
-            }
-        }
-        if (dominantbehaviors.size() < recessivebehaviors.size()){
-            for (auto i = recessivebehaviors.size(); i >= dominantbehaviors.size(); i--){
-                recessivebehaviors.removeAt(i);
-            }
-        }else if (dominantbehaviors.size() > recessivebehaviors.size()){
-            for (auto i = dominantbehaviors.size(); i >= recessivebehaviors.size(); i--){
-                dominantbehaviors.removeAt(i);
-            }
-        }
-        if (recessivebehaviors.size() == dominantbehaviors.size()){
+        if (!QString::compare(projectName, recessiveproject->projectName, Qt::CaseInsensitive)){
             ProgressDialog progress("Merging projects...", "", 0, 100, getUI(), Qt::Dialog);
             progress.setWindowModality(Qt::WindowModal);
             int percent = 0;
-            std::vector <std::future <QVector <DataIconManager *>>> futures;
-            auto taskCount = dominantbehaviors.size();
-            auto previousCount = taskCount;
-            auto fileIndex = 0;
-            auto maxThreads = std::thread::hardware_concurrency() - 1;
-            auto taskdifference = 0;
-            auto numbehaviors = taskCount;
-            qreal difference = ((1.0)/((qreal)(numbehaviors)))*(100.0);
-            std::unique_lock<std::mutex> locker(mutex);
-            if (!QString::compare(projectName, recessiveproject->projectName, Qt::CaseInsensitive)){
-                for (uint i = 0; i < maxThreads, fileIndex < numbehaviors; i++, fileIndex++){
-                    futures.push_back(std::async(std::launch::async, &BehaviorFile::merge, dominantbehaviors.at(fileIndex), recessivebehaviors.at(fileIndex), std::ref(taskCount), std::ref(mutex), std::ref(conditionVar)));
-                }
-                while (taskCount > 0){
-                    if (taskCount < numbehaviors){
+            qreal difference = ((1.0)/((qreal)(dominantbehaviors.size())))*(100.0);
+            for (auto i = 0; i < dominantbehaviors.size(); i++){
+                for (auto j = 0; j < recessivebehaviors.size(); j++){
+                    if (!QString::compare(dominantbehaviors.at(i)->getFileName(), recessivebehaviors.at(j)->getFileName(), Qt::CaseInsensitive)){
+                        objectsnotfound = objectsnotfound + dominantbehaviors.at(i)->merge(recessivebehaviors.at(j));
                         percent += difference;
                         progress.setValue(percent);
                     }
-                    taskdifference = previousCount - taskCount;
-                    previousCount = taskCount;
-                    for (; taskdifference > 0; taskdifference--){
-                        if (fileIndex < numbehaviors){
-                            futures.push_back(std::async(std::launch::async, &BehaviorFile::merge, dominantbehaviors.at(fileIndex), recessivebehaviors.at(fileIndex), std::ref(taskCount), std::ref(mutex), std::ref(conditionVar)));
-                            fileIndex++;
-                        }
+                }
+            }
+            percent = 0;
+            progress.setProgress("Merging loose objects...", percent);
+            difference = ((1.0)/((qreal)(dominantbehaviors.size())))*(100.0);
+            for (auto k = 0; k < dominantbehaviors.size() && !objectsnotfound.isEmpty(); k++){
+                dominantbehaviors.at(k)->mergeObjects(objectsnotfound);
+                percent += difference;
+                progress.setValue(percent);
+            }
+            percent = 0;
+            progress.setProgress("Adding surplus files to the dominant project...", percent);
+            difference = ((1.0)/((qreal)(recessivebehaviors.size())))*(100.0);
+            value = true;
+            for (auto i = 0; i < recessivebehaviors.size(); i++){
+                found = false;
+                for (auto j = 0; j < behaviorFiles.size(); j++){
+                    if (!QString::compare(behaviorFiles.at(j)->getFileName(), recessivebehaviors.at(i)->getFileName(), Qt::CaseInsensitive)){
+                        found = true;
                     }
-                    conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
                 }
-                for (auto i = 0; i < futures.size(); i++){
-                    objectsnotfound = objectsnotfound + futures.at(i).get();
-                }
-                percent = 0;
-                progress.setProgress("Merging loose objects...", percent);
-                difference = ((1.0)/((qreal)(dominantbehaviors.size())))*(100.0);
-                for (auto k = 0; k < dominantbehaviors.size() && !objectsnotfound.isEmpty(); k++){
-                    dominantbehaviors.at(k)->mergeObjects(objectsnotfound);
+                if (!found){
+                    recessivebehaviors.at(i)->setHKXFileName(fileName().section("/", 0, -2)+"/behaviors/"+recessivebehaviors.at(i)->getFileName());
+                    behaviorFiles.append(recessivebehaviors.at(i));
                     percent += difference;
                     progress.setValue(percent);
                 }
-                percent = 0;
-                progress.setProgress("Adding surplus files to the dominant project...", percent);
-                difference = ((1.0)/((qreal)(recessivebehaviors.size())))*(100.0);
-                value = true;
-                for (auto i = 0; i < recessivebehaviors.size(); i++){
-                    found = false;
-                    for (auto j = 0; j < behaviorFiles.size(); j++){
-                        if (!QString::compare(behaviorFiles.at(j)->fileName().section("/", -1, -1), recessivebehaviors.at(i)->fileName().section("/", -1, -1), Qt::CaseInsensitive)){
-                            found = true;
-                        }
-                    }
-                    if (!found){
-                        recessivebehaviors.at(i)->setFileName(fileName().section("/", 0, -2)+"/behaviors/"+recessivebehaviors.at(i)->fileName().section("/", -1, -1));
-                        behaviorFiles.append(recessivebehaviors.at(i));
-                        percent += difference;
-                        progress.setValue(percent);
-                    }
-                }
-                percent = 0;
-                progress.setProgress("Merging animation caches...", percent);
-                /*if (!mergeAnimationCaches(recessiveproject)){
-                    LogFile::writeToLog("ProjectFile: merge() failed!\nmergeAnimationCaches() failed!\n");
-                }*/
-                progress.setProgress("Done!!!", progress.maximum());
-            }else{
-                LogFile::writeToLog("ProjectFile: merge() failed!\nProject names are different!\n");
             }
+            percent = 0;
+            progress.setProgress("Merging animation caches...", percent);
+            /*if (!mergeAnimationCaches(recessiveproject)){
+                LogFile::writeToLog("ProjectFile: merge() failed!\nmergeAnimationCaches() failed!\n");
+            }*/
+            progress.setProgress("Done!!!", progress.maximum());
         }else{
-            LogFile::writeToLog("ProjectFile: merge() failed!\nProject behaviors are different!\n");
+            LogFile::writeToLog("ProjectFile: merge() failed!\nProject names are different!\n");
         }
     }else{
         LogFile::writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
@@ -425,7 +398,7 @@ bool ProjectFile::merge(ProjectFile *recessiveproject, bool isFNIS){ //Make sure
     return value;
 }
 
-bool ProjectFile::mergeAnimationCaches(ProjectFile *recessiveproject){
+bool ProjectFile::mergeAnimationCaches(ProjectFile *recessiveproject){  //TO DO: Need to check each animation index with animation name and inject if not found???
     if (recessiveproject){
         if (skyrimAnimSetData && recessiveproject->skyrimAnimSetData){
             if (skyrimAnimSetData->mergeAnimationCaches(projectName, recessiveproject->projectName, recessiveproject->skyrimAnimSetData)){
@@ -444,7 +417,7 @@ void ProjectFile::addProjectToAnimData(){   //Unsafe...
     QStringList projectfiles;
     projectfiles.append(behaviorFiles.first()->fileName().section("/", -2, -1).replace("/", "\\"));
     projectfiles.append(character->fileName().section("/", -2, -1).replace("/", "\\"));
-    projectfiles.append("character assets\\"+character->skeleton->fileName().section("/", -1, -1).replace("/", "\\"));
+    projectfiles.append("character assets\\"+character->skeleton->getFileName().replace("/", "\\"));
     auto index = skyrimAnimData->addNewProject(projectName+".txt", projectfiles);
     if (index == -1){
         WARNING_MESSAGE(QString("ProjectFile::addProjectToAnimData(): Project: "+projectName+".txt"+" already exists in the animation data!!!"));
@@ -484,7 +457,7 @@ void ProjectFile::generateAnimClipDataForProject(){
             if (generator->getSignature() == HKB_CLIP_GENERATOR){
                 clipGenDataPtr = new SkyrimClipGeneratoData(static_cast<hkbClipGenerator *>(generator)->getClipGeneratorAnimData(skyrimAnimData->getProjectAnimData(projectName), getAnimationIndex(static_cast<hkbClipGenerator *>(generator)->animationName)));
                 if (!skyrimAnimData->appendClipGenerator(projectName, clipGenDataPtr)){
-                    //LogFile::writeToLog((QString("ProjectFile::generateAnimDataForProject(): Duplicate clip generator \""+clipGenDataPtr->getClipGeneratorName()+"found in: "+behaviorFiles.at(i)->fileName().section("/", -1, -1))));
+                    //LogFile::writeToLog((QString("ProjectFile::generateAnimDataForProject(): Duplicate clip generator \""+clipGenDataPtr->getClipGeneratorName()+"found in: "+behaviorFiles.at(i)->getFileName())));
                 }
             }
         }

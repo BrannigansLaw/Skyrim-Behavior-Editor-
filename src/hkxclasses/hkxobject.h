@@ -35,7 +35,7 @@ public:
     virtual ~HkxObject();
     HkxSignature getSignature() const;
     HkxType getType() const;
-    virtual bool evaluateDataValidity();
+    virtual QString evaluateDataValidity();
     bool isDataValid() const;
     virtual bool link() = 0;
     virtual void unlink();
@@ -48,6 +48,7 @@ public:
     virtual void updateEventIndices(int);
     virtual void updateReferences(long &ref);
     virtual void fixMergedEventIndices(BehaviorFile *);
+    virtual bool fixMergedIndices(BehaviorFile *);
     QString getReferenceString() const;
     QString getBoolAsString(bool b) const;
     HkxFile * getParentFile() const;
@@ -72,6 +73,7 @@ protected:
     std::lock_guard <std::mutex> lockNGuard() const;
     bool getRefsUpdated() const;
     void setRefsUpdated(bool value);
+    void setParentFile(BehaviorFile *parent);
 private:
     HkxObject(const HkxObject &obj);
     HkxObject& operator=(const HkxObject&);
@@ -96,7 +98,7 @@ public:
     long getShdPtrReference() const;
     bool readShdPtrReference(long index, const HkxXmlReader & reader);
 private:
-    long reference;
+    long smtreference;
 };
 
 struct hkEventPayload{
@@ -111,7 +113,7 @@ public:
     virtual ~HkDynamicObject();
     bool linkVar();
     void unlink();
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     void addBinding(const QString & path, int varIndex, bool isProperty = false);
     void removeBinding(const QString & path);
     void removeBinding(int varIndex);
@@ -120,6 +122,7 @@ public:
     void setBindingReference(int ref);
     void updateReferences(long &ref);
     void mergeVariableIndices(int oldindex, int newindex);
+    bool fixMergedIndices(BehaviorFile *dominantfile);
 protected:
     HkDynamicObject(HkxFile *parent, long ref = -1);
 public:

@@ -64,14 +64,14 @@ bool hkbCharacterStringData::readData(const HkxXmlReader &reader, long index){
         if (text == "deformableSkinNames"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'deformableSkinNames' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'deformableSkinNames' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'deformableSkinNames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'deformableSkinNames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 deformableSkinNames.append(reader.getElementValueAt(index));
@@ -80,14 +80,14 @@ bool hkbCharacterStringData::readData(const HkxXmlReader &reader, long index){
         }else if (text == "rigidSkinNames"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'rigidSkinNames' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'rigidSkinNames' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'rigidSkinNames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'rigidSkinNames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 rigidSkinNames.append(reader.getElementValueAt(index));
@@ -96,14 +96,14 @@ bool hkbCharacterStringData::readData(const HkxXmlReader &reader, long index){
         }else if (text == "animationNames"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'animationNames' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'animationNames' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'animationNames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'animationNames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 animationNames.append(reader.getElementValueAt(index));
@@ -112,14 +112,14 @@ bool hkbCharacterStringData::readData(const HkxXmlReader &reader, long index){
         }else if (text == "characterPropertyNames"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyNames' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyNames' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyNames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyNames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 characterPropertyNames.append(reader.getElementValueAt(index));
@@ -128,14 +128,14 @@ bool hkbCharacterStringData::readData(const HkxXmlReader &reader, long index){
         }else if (text == "retargetingSkeletonMapperFilenames"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'retargetingSkeletonMapperFilenames' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'retargetingSkeletonMapperFilenames' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'retargetingSkeletonMapperFilenames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'retargetingSkeletonMapperFilenames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 retargetingSkeletonMapperFilenames.append(reader.getElementValueAt(index));
@@ -144,14 +144,14 @@ bool hkbCharacterStringData::readData(const HkxXmlReader &reader, long index){
         }else if (text == "lodNames"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'lodNames' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'lodNames' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'lodNames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'lodNames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 lodNames.append(reader.getElementValueAt(index));
@@ -160,14 +160,14 @@ bool hkbCharacterStringData::readData(const HkxXmlReader &reader, long index){
         }else if (text == "mirroredSyncPointSubstringsA"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'mirroredSyncPointSubstringsA' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'mirroredSyncPointSubstringsA' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'mirroredSyncPointSubstringsA' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'mirroredSyncPointSubstringsA' data!\nObject Reference: "+ref);
                     return false;
                 }
                 mirroredSyncPointSubstringsA.append(reader.getElementValueAt(index));
@@ -176,14 +176,14 @@ bool hkbCharacterStringData::readData(const HkxXmlReader &reader, long index){
         }else if (text == "mirroredSyncPointSubstringsB"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'mirroredSyncPointSubstringsB' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'mirroredSyncPointSubstringsB' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'mirroredSyncPointSubstringsB' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'mirroredSyncPointSubstringsB' data!\nObject Reference: "+ref);
                     return false;
                 }
                 mirroredSyncPointSubstringsB.append(reader.getElementValueAt(index));
@@ -192,22 +192,22 @@ bool hkbCharacterStringData::readData(const HkxXmlReader &reader, long index){
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "rigName"){
             rigName = reader.getElementValueAt(index);
             if (rigName == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'rigName' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'rigName' data field!\nObject Reference: "+ref);
             }
         }else if (text == "ragdollName"){
             ragdollName = reader.getElementValueAt(index);
             if (ragdollName == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'ragdollName' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'ragdollName' data field!\nObject Reference: "+ref);
             }
         }else if (text == "behaviorFilename"){
             behaviorFilename = reader.getElementValueAt(index);
             if (behaviorFilename == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'behaviorFilename' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'behaviorFilename' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -319,67 +319,67 @@ bool hkbCharacterStringData::link(){
     return true;
 }
 
-bool hkbCharacterStringData::evaluateDataValidity(){
+QString hkbCharacterStringData::evaluateDataValidity(){
     for (int i = 0; i < deformableSkinNames.size(); i++){
         if (deformableSkinNames.at(i) == ""){
             setDataValidity(false);
-            return false;
+            return QString();
         }
     }
     for (int i = 0; i < rigidSkinNames.size(); i++){
         if (rigidSkinNames.at(i) == ""){
             setDataValidity(false);
-            return false;
+            return QString();
         }
     }
     for (int i = 0; i < animationNames.size(); i++){
         if (animationNames.at(i) == ""){
             setDataValidity(false);
-            return false;
+            return QString();
         }
     }
     for (int i = 0; i < animationFilenames.size(); i++){
         if (animationFilenames.at(i) == ""){
             setDataValidity(false);
-            return false;
+            return QString();
         }
     }
     for (int i = 0; i < characterPropertyNames.size(); i++){
         if (characterPropertyNames.at(i) == ""){
             setDataValidity(false);
-            return false;
+            return QString();
         }
     }
     for (int i = 0; i < retargetingSkeletonMapperFilenames.size(); i++){
         if (retargetingSkeletonMapperFilenames.at(i) == ""){
             setDataValidity(false);
-            return false;
+            return QString();
         }
     }
     for (int i = 0; i < lodNames.size(); i++){
         if (lodNames.at(i) == ""){
             setDataValidity(false);
-            return false;
+            return QString();
         }
     }
     for (int i = 0; i < mirroredSyncPointSubstringsA.size(); i++){
         if (mirroredSyncPointSubstringsA.at(i) == ""){
             setDataValidity(false);
-            return false;
+            return QString();
         }
     }
     for (int i = 0; i < mirroredSyncPointSubstringsB.size(); i++){
         if (mirroredSyncPointSubstringsB.at(i) == ""){
             setDataValidity(false);
-            return false;
+            return QString();
         }
     }
     if (name == "" || rigName == "" || ragdollName == "" || behaviorFilename == ""){
         setDataValidity(false);
-        return false;
+        return QString();
     }
     setDataValidity(true);
-    return true;
+    return QString();
 }
 
 hkbCharacterStringData::~hkbCharacterStringData(){

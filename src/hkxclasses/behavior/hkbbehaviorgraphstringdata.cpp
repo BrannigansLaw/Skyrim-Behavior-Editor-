@@ -32,14 +32,14 @@ bool hkbBehaviorGraphStringData::readData(const HkxXmlReader &reader, long index
         if (text == "eventNames"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'eventNames' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'eventNames' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'eventNames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'eventNames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 eventNames.append(reader.getElementValueAt(index));
@@ -48,14 +48,14 @@ bool hkbBehaviorGraphStringData::readData(const HkxXmlReader &reader, long index
         }else if (text == "attributeNames"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'attributeNames' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'attributeNames' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'attributeNames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'attributeNames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 attributeNames.append(reader.getElementValueAt(index));
@@ -64,14 +64,14 @@ bool hkbBehaviorGraphStringData::readData(const HkxXmlReader &reader, long index
         }else if (text == "variableNames"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableNames' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableNames' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableNames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableNames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 variableNames.append(reader.getElementValueAt(index));
@@ -80,14 +80,14 @@ bool hkbBehaviorGraphStringData::readData(const HkxXmlReader &reader, long index
         }else if (text == "characterPropertyNames"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyNames' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyNames' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyNames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyNames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 characterPropertyNames.append(reader.getElementValueAt(index));
@@ -179,33 +179,33 @@ bool hkbBehaviorGraphStringData::link(){
     return true;
 }
 
-bool hkbBehaviorGraphStringData::evaluateDataValidity(){
+QString hkbBehaviorGraphStringData::evaluateDataValidity(){
     for (int i = 0; i < eventNames.size(); i++){
         if (eventNames.at(i) == ""){
             setDataValidity(false);
-            return false;
+            return QString();
         }
     }
     for (int i = 0; i < attributeNames.size(); i++){
         if (attributeNames.at(i) == ""){
             setDataValidity(false);
-            return false;
+            return QString();
         }
     }
     for (int i = 0; i < variableNames.size(); i++){
         if (variableNames.at(i) == ""){
             setDataValidity(false);
-            return false;
+            return QString();
         }
     }
     for (int i = 0; i < characterPropertyNames.size(); i++){
         if (characterPropertyNames.at(i) == ""){
             setDataValidity(false);
-            return false;
+            return QString();
         }
     }
     setDataValidity(true);
-    return true;
+    return QString();
 }
 
 hkbBehaviorGraphStringData::~hkbBehaviorGraphStringData(){

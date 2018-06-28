@@ -15,12 +15,13 @@ public:
     bool link();
     void unlink();
     QString getName() const;
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfKeyframeInfos() const;
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
+    bool merge(HkxObject *recessiveObject);
 private:
     hkbKeyframeBonesModifier& operator=(const hkbKeyframeBonesModifier&);
     hkbKeyframeBonesModifier(const hkbKeyframeBonesModifier &);

@@ -38,22 +38,22 @@ bool hkbHandIkControlsModifier::readData(const HkxXmlReader &reader, long index)
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "hands"){
             int numhands = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
@@ -66,71 +66,71 @@ bool hkbHandIkControlsModifier::readData(const HkxXmlReader &reader, long index)
                     if (text == "targetPosition"){
                         hands.last().controlData.targetPosition = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'targetPosition' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'targetPosition' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "targetRotation"){
                         hands.last().controlData.targetRotation = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'targetRotation' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'targetRotation' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "targetNormal"){
                         hands.last().controlData.targetNormal = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'targetNormal' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'targetNormal' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "targetHandle"){
                         if (!hands.last().controlData.targetHandle.readShdPtrReference(index, reader)){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'targetHandle' reference!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'targetHandle' reference!\nObject Reference: "+ref);
                         }
                     }else if (text == "transformOnFraction"){
                         hands.last().controlData.transformOnFraction = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'transformOnFraction' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'transformOnFraction' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "normalOnFraction"){
                         hands.last().controlData.normalOnFraction = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'normalOnFraction' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'normalOnFraction' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "fadeInDuration"){
                         hands.last().controlData.fadeInDuration = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'fadeInDuration' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'fadeInDuration' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "fadeOutDuration"){
                         hands.last().controlData.fadeOutDuration = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'fadeOutDuration' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'fadeOutDuration' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "extrapolationTimeStep"){
                         hands.last().controlData.extrapolationTimeStep = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'extrapolationTimeStep' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'extrapolationTimeStep' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "handleChangeSpeed"){
                         hands.last().controlData.handleChangeSpeed = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'handleChangeSpeed' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'handleChangeSpeed' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "handleChangeMode"){
                         hands.last().controlData.handleChangeMode = reader.getElementValueAt(index);
                         if (!HandleChangeMode.contains(hands.last().controlData.handleChangeMode)){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'handleChangeMode' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'handleChangeMode' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "fixUp"){
                         hands.last().controlData.fixUp = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'fixUp' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'fixUp' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "handIndex"){
                         hands.last().handIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'handIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'handIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "enable"){
                         hands.last().enable = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'hands.enable' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'hands.enable' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -197,7 +197,7 @@ bool hkbHandIkControlsModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
@@ -212,7 +212,7 @@ bool hkbHandIkControlsModifier::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     return true;
 }
@@ -221,33 +221,27 @@ void hkbHandIkControlsModifier::unlink(){
     HkDynamicObject::unlink();
 }
 
-bool hkbHandIkControlsModifier::evaluateDataValidity(){
+QString hkbHandIkControlsModifier::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
     if (hands.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": hands is empty!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": hands is empty!\n");
     }else{
         for (auto i = 0; i < hands.size(); i++){
             if (hands.at(i).handIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
                 isvalid = false;
-                errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": handIndex at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": handIndex at "+QString::number(i)+" out of range!\n");
             }
         }
     }
-    if (!HkDynamicObject::evaluateDataValidity()){
-        isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
-    }
+    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
-    }
-    if (errors != ""){
-        LogFile::writeToLog(errors);
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
     setDataValidity(isvalid);
-    return isvalid;
+    return errors;
 }
 
 hkbHandIkControlsModifier::~hkbHandIkControlsModifier(){

@@ -15,27 +15,15 @@ public:
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
     void unlink();
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
     QString getName() const;
     int getThisIndex() const;
     void updateReferences(long &ref);
-    bool operator==(const BSBoneSwitchGeneratorBoneData & other){
-    {
-            if (
-                    !parentBSG.data() ||
-                    !other.parentBSG.data() ||
-                    static_cast<hkbGenerator *>(parentBSG.data())->getName() != static_cast<hkbGenerator *>(other.parentBSG.data())->getName()
-                )
-            {
-                return false;
-            }
-            //boneweights???
-            return true;
-        }
-    }
+    bool merge(HkxObject *recessiveObject);
+    bool operator==(const BSBoneSwitchGeneratorBoneData & other);
 private:
     QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;

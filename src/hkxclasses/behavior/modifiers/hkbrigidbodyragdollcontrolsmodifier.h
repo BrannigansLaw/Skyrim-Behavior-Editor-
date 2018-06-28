@@ -14,11 +14,12 @@ public:
     bool link();
     void unlink();
     QString getName() const;
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     bool write(HkxXMLWriter *writer);
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
+    bool merge(HkxObject *recessiveObject);
 private:
     hkbRigidBodyRagdollControlsModifier& operator=(const hkbRigidBodyRagdollControlsModifier&);
     hkbRigidBodyRagdollControlsModifier(const hkbRigidBodyRagdollControlsModifier &);

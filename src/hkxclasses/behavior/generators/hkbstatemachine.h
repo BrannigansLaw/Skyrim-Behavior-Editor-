@@ -17,7 +17,7 @@ public:
     bool link();
     void unlink();
     QString getName() const;
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     QString getStateName(int stateId) const;
     int getStateId(const QString & statename) const;

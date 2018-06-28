@@ -35,7 +35,7 @@ bool hkbExpressionCondition::readData(const HkxXmlReader & reader, long index){
         if (text == "expression"){
             expression = reader.getElementValueAt(index);
             if (expression == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'expression' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'expression' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -59,13 +59,13 @@ bool hkbExpressionCondition::write(HkxXMLWriter *writer){
     return true;
 }
 
-bool hkbExpressionCondition::evaluateDataValidity(){
+QString hkbExpressionCondition::evaluateDataValidity(){ //TO DO...
     if (expression == ""){
         setDataValidity(false);
-        return false;
+        return QString();
     }else{
         setDataValidity(true);
-        return true;
+        return QString();
     }
 }
 

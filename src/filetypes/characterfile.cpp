@@ -350,6 +350,12 @@ bool CharacterFile::link(){
     return true;
 }
 
+void CharacterFile::addAnimation(const QString &name){
+    if (stringData.data() && stringData->getSignature() == HKB_CHARACTER_STRING_DATA){
+        static_cast<hkbCharacterStringData *>(stringData.data())->addAnimation(name);
+    }
+}
+
 hkbBoneWeightArray *CharacterFile::addNewBoneWeightArray(){
     hkbBoneWeightArray *ptr = new hkbBoneWeightArray(this, 0, skeleton->getNumberOfBones());
     boneWeightArrays.append(HkxSharedPtr(ptr));

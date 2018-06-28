@@ -18,7 +18,7 @@ public:
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
     QStringList getVariableNames() const;
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     hkQuadVariable getQuadVariable(int index, bool *ok) const;
     HkxObject * getVariantVariable(int index) const;

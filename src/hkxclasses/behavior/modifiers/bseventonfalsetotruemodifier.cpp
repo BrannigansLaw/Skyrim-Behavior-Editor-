@@ -44,32 +44,32 @@ bool BSEventOnFalseToTrueModifier::readData(const HkxXmlReader &reader, long ind
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
             if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bEnableEvent1"){
             bEnableEvent1 = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'bEnableEvent1' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bEnableEvent1' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bVariableToTest1"){
             bVariableToTest1 = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'bVariableToTest1' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bVariableToTest1' data field!\nObject Reference: "+ref);
             }
         }else if (text == "EventToSend1"){
             index++;
@@ -78,11 +78,11 @@ bool BSEventOnFalseToTrueModifier::readData(const HkxXmlReader &reader, long ind
                 if (text == "id"){
                     eventToSend1.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!eventToSend1.payload.readShdPtrReference(index, reader)){
-                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -91,12 +91,12 @@ bool BSEventOnFalseToTrueModifier::readData(const HkxXmlReader &reader, long ind
         }else if (text == "bEnableEvent2"){
             bEnableEvent2 = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'bEnableEvent2' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bEnableEvent2' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bVariableToTest2"){
             bVariableToTest2 = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'bVariableToTest2' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bVariableToTest2' data field!\nObject Reference: "+ref);
             }
         }else if (text == "EventToSend2"){
             index++;
@@ -105,11 +105,11 @@ bool BSEventOnFalseToTrueModifier::readData(const HkxXmlReader &reader, long ind
                 if (text == "id"){
                     eventToSend2.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!eventToSend2.payload.readShdPtrReference(index, reader)){
-                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -118,12 +118,12 @@ bool BSEventOnFalseToTrueModifier::readData(const HkxXmlReader &reader, long ind
         }else if (text == "bEnableEvent3"){
             bEnableEvent3 = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'bEnableEvent3' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bEnableEvent3' data field!\nObject Reference: "+ref);
             }
         }else if (text == "bVariableToTest3"){
             bVariableToTest3 = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'bVariableToTest3' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bVariableToTest3' data field!\nObject Reference: "+ref);
             }
         }else if (text == "EventToSend3"){
             index++;
@@ -132,11 +132,11 @@ bool BSEventOnFalseToTrueModifier::readData(const HkxXmlReader &reader, long ind
                 if (text == "id"){
                     eventToSend3.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!eventToSend3.payload.readShdPtrReference(index, reader)){
-                        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -207,7 +207,7 @@ bool BSEventOnFalseToTrueModifier::write(HkxXMLWriter *writer){
         setIsWritten();
         writer->writeLine("\n");
         if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
@@ -254,7 +254,7 @@ void BSEventOnFalseToTrueModifier::fixMergedEventIndices(BehaviorFile *dominantf
         recdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
         domdata = static_cast<hkbBehaviorGraphData *>(dominantfile->getBehaviorGraphData());
         if (recdata && domdata){
-            auto fixIndex = [&](int & id){
+            auto fixIndex = [&](int & id){ if (id < 0){return;}
                 thiseventname = recdata->getEventNameAt(id);
                 eventindex = domdata->getIndexOfEvent(thiseventname);
                 if (eventindex == -1 && thiseventname != ""){
@@ -266,8 +266,8 @@ void BSEventOnFalseToTrueModifier::fixMergedEventIndices(BehaviorFile *dominantf
             fixIndex(eventToSend1.id);
             fixIndex(eventToSend2.id);
             fixIndex(eventToSend3.id);
+            setIsMerged(true);
         }
-        setIsMerged(true);
     }
 }
 
@@ -303,17 +303,37 @@ QVector<HkxObject *> BSEventOnFalseToTrueModifier::getChildrenOtherTypes() const
     return list;
 }
 
+bool BSEventOnFalseToTrueModifier::merge(HkxObject *recessiveObject){
+    BSEventOnFalseToTrueModifier *recobj;
+    if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER){
+        recobj = static_cast<BSEventOnFalseToTrueModifier *>(recessiveObject);
+        injectWhileMerging(recobj);
+        if (!eventToSend1.payload.data() && recobj->eventToSend1.payload.data()){
+            getParentFile()->addObjectToFile(recobj->eventToSend1.payload.data(), -1);
+        }
+        if (!eventToSend2.payload.data() && recobj->eventToSend2.payload.data()){
+            getParentFile()->addObjectToFile(recobj->eventToSend2.payload.data(), -1);
+        }
+        if (!eventToSend3.payload.data() && recobj->eventToSend3.payload.data()){
+            getParentFile()->addObjectToFile(recobj->eventToSend3.payload.data(), -1);
+        }
+        return true;
+    }else{
+        return false;
+    }
+}
+
 bool BSEventOnFalseToTrueModifier::link(){
     if (!getParentFile()){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToSend1.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
         eventToSend1.payload = *ptr;
@@ -321,7 +341,7 @@ bool BSEventOnFalseToTrueModifier::link(){
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToSend2.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
         eventToSend2.payload = *ptr;
@@ -329,7 +349,7 @@ bool BSEventOnFalseToTrueModifier::link(){
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventToSend3.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
         eventToSend3.payload = *ptr;
@@ -344,46 +364,40 @@ void BSEventOnFalseToTrueModifier::unlink(){
     eventToSend3.payload = HkxSharedPtr();
 }
 
-bool BSEventOnFalseToTrueModifier::evaluateDataValidity(){
+QString BSEventOnFalseToTrueModifier::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    if (!HkDynamicObject::evaluateDataValidity()){
-        isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
-    }
+    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
     if (eventToSend1.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToSend1 event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToSend1 event id out of range!\n");
     }
     if (eventToSend1.payload.data() && eventToSend1.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToSend1.payload type! Signature: "+QString::number(eventToSend1.payload.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToSend1.payload type! Signature: "+QString::number(eventToSend1.payload.data()->getSignature(), 16)+"\n");
     }
     if (eventToSend2.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToSend2 event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToSend2 event id out of range!\n");
     }
     if (eventToSend2.payload.data() && eventToSend2.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToSend2.payload type! Signature: "+QString::number(eventToSend2.payload.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToSend2.payload type! Signature: "+QString::number(eventToSend2.payload.data()->getSignature(), 16)+"\n");
     }
     if (eventToSend3.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToSend3 event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToSend3 event id out of range!\n");
     }
     if (eventToSend3.payload.data() && eventToSend3.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToSend3.payload type! Signature: "+QString::number(eventToSend3.payload.data()->getSignature(), 16)+"\n");
-    }
-    if (errors != ""){
-        LogFile::writeToLog(errors);
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToSend3.payload type! Signature: "+QString::number(eventToSend3.payload.data()->getSignature(), 16)+"\n");
     }
     setDataValidity(isvalid);
-    return isvalid;
+    return errors;
 }
 
 BSEventOnFalseToTrueModifier::~BSEventOnFalseToTrueModifier(){

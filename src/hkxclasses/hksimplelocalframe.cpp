@@ -35,7 +35,7 @@ bool hkSimpleLocalFrame::readData(const HkxXmlReader & reader, long index){
         if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -76,13 +76,13 @@ bool hkSimpleLocalFrame::write(HkxXMLWriter *writer){
     return true;
 }
 
-bool hkSimpleLocalFrame::evaluateDataValidity(){
+QString hkSimpleLocalFrame::evaluateDataValidity(){
     if (name == ""){
         setDataValidity(false);
-        return false;
+        return QString();
     }
     setDataValidity(true);
-    return true;
+    return QString();
 }
 
 hkSimpleLocalFrame::~hkSimpleLocalFrame(){

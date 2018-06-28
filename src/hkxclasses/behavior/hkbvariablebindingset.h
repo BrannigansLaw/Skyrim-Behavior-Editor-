@@ -27,7 +27,7 @@ public:
     virtual ~hkbVariableBindingSet();
     bool readData(const HkxXmlReader & reader, long index);
     bool link();
-    bool evaluateDataValidity();
+    QString evaluateDataValidity();
     static QString getClassname();
     int getNumberOfBindings() const;
     bool addBinding(const QString & path, int varIndex, hkBinding::BindingType type = hkBinding::BINDING_TYPE_VARIABLE);

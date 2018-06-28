@@ -68,62 +68,62 @@ bool hkbFootIkDriverInfo::readData(const HkxXmlReader &reader, long index){
                     if (text == "kneeAxisLS"){
                         legs.last().kneeAxisLS = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'kneeAxisLS' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'kneeAxisLS' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "footEndLS"){
                         legs.last().footEndLS = readVector4(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'footEndLS' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'footEndLS' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "footPlantedAnkleHeightMS"){
                         legs.last().footPlantedAnkleHeightMS = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'footPlantedAnkleHeightMS' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'footPlantedAnkleHeightMS' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "footRaisedAnkleHeightMS"){
                         legs.last().footRaisedAnkleHeightMS = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'footRaisedAnkleHeightMS' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'footRaisedAnkleHeightMS' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "maxAnkleHeightMS"){
                         legs.last().maxAnkleHeightMS = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'maxAnkleHeightMS' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'maxAnkleHeightMS' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "minAnkleHeightMS"){
                         legs.last().minAnkleHeightMS = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'minAnkleHeightMS' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'minAnkleHeightMS' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "maxKneeAngleDegrees"){
                         legs.last().maxKneeAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'maxKneeAngleDegrees' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'maxKneeAngleDegrees' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "minKneeAngleDegrees"){
                         legs.last().minKneeAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'minKneeAngleDegrees' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'minKneeAngleDegrees' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "maxAnkleAngleDegrees"){
                         legs.last().maxAnkleAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'maxAnkleAngleDegrees' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'maxAnkleAngleDegrees' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "hipIndex"){
                         legs.last().hipIndex = reader.getElementValueAt(index).toDouble(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'hipIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'hipIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "kneeIndex"){
                         legs.last().kneeIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'kneeIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'kneeIndex' data field!\nObject Reference: "+ref);
                         }
                     }else if (text == "ankleIndex"){
                         legs.last().ankleIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'ankleIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'ankleIndex' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -135,62 +135,62 @@ bool hkbFootIkDriverInfo::readData(const HkxXmlReader &reader, long index){
         }else if (text == "raycastDistanceUp"){
             raycastDistanceUp = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'raycastDistanceUp' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'raycastDistanceUp' data field!\nObject Reference: "+ref);
             }
         }else if (text == "raycastDistanceDown"){
             raycastDistanceDown = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'raycastDistanceDown' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'raycastDistanceDown' data field!\nObject Reference: "+ref);
             }
         }else if (text == "raycastDistanceUp"){
             raycastDistanceUp = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'raycastDistanceUp' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'raycastDistanceUp' data field!\nObject Reference: "+ref);
             }
         }else if (text == "originalGroundHeightMS"){
             originalGroundHeightMS = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'originalGroundHeightMS' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'originalGroundHeightMS' data field!\nObject Reference: "+ref);
             }
         }else if (text == "verticalOffset"){
             verticalOffset = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'verticalOffset' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'verticalOffset' data field!\nObject Reference: "+ref);
             }
         }else if (text == "collisionFilterInfo"){
             collisionFilterInfo = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'collisionFilterInfo' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'collisionFilterInfo' data field!\nObject Reference: "+ref);
             }
         }else if (text == "forwardAlignFraction"){
             forwardAlignFraction = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'forwardAlignFraction' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'forwardAlignFraction' data field!\nObject Reference: "+ref);
             }
         }else if (text == "sidewaysAlignFraction"){
             sidewaysAlignFraction = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'sidewaysAlignFraction' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'sidewaysAlignFraction' data field!\nObject Reference: "+ref);
             }
         }else if (text == "sidewaysSampleWidth"){
             sidewaysSampleWidth = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'sidewaysSampleWidth' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'sidewaysSampleWidth' data field!\nObject Reference: "+ref);
             }
         }else if (text == "lockFeetWhenPlanted"){
             lockFeetWhenPlanted = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'lockFeetWhenPlanted' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'lockFeetWhenPlanted' data field!\nObject Reference: "+ref);
             }
         }else if (text == "useCharacterUpVector"){
             useCharacterUpVector = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'useCharacterUpVector' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'useCharacterUpVector' data field!\nObject Reference: "+ref);
             }
         }else if (text == "isQuadrupedNarrow"){
             isQuadrupedNarrow = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->fileName().section("/", -1, -1)+": "+getClassname()+": readData()!\nFailed to properly read 'isQuadrupedNarrow' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'isQuadrupedNarrow' data field!\nObject Reference: "+ref);
             }
         }
         index++;
@@ -254,13 +254,13 @@ void hkbFootIkDriverInfo::unlink(){
     //
 }
 
-bool hkbFootIkDriverInfo::evaluateDataValidity(){
+QString hkbFootIkDriverInfo::evaluateDataValidity(){
     if (!legs.isEmpty()){
         setDataValidity(true);
-        return true;
+        return QString();
     }
     setDataValidity(false);
-    return false;
+    return QString();
 }
 
 hkbFootIkDriverInfo::~hkbFootIkDriverInfo(){

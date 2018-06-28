@@ -24,6 +24,8 @@ public:
     QString getRootObjectReferenceString();
     bool getIsChanged() const;
     void setIsChanged(bool wasEdited);
+    QString getFileName() const;
+    void setHKXFileName(const QString &name);
 protected:
     std::unique_lock <std::mutex> lockNGuard() const;
     MainWindow *getUI() const;
@@ -40,6 +42,7 @@ private:
     HkxXmlReader reader;
     HkxXMLWriter writer;
     bool changed;
+    QString fileNameWithoutPath;
     mutable std::mutex mutex;
 };
 
