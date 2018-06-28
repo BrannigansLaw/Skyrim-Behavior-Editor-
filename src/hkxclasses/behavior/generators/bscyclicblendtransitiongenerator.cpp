@@ -128,9 +128,6 @@ bool BSCyclicBlendTransitionGenerator::merge(HkxObject *recessiveObject){
     BSCyclicBlendTransitionGenerator *recobj;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == BS_CYCLIC_BLEND_TRANSITION_GENERATOR){
         recobj = static_cast<BSCyclicBlendTransitionGenerator *>(recessiveObject);
-        if (getName() == "H2H_AttackLeft_BSCyclicBlendTransitionGenerator"){
-            int h = 0;
-        }
         injectWhileMerging(recobj);
         if (!eventToFreezeBlendValue.payload.data() && recobj->eventToFreezeBlendValue.payload.data()){
             getParentFile()->addObjectToFile(recobj->eventToFreezeBlendValue.payload.data(), -1);

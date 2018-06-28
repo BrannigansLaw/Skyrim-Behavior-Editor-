@@ -658,13 +658,15 @@ void MainWindow::mergeFNIS(){
         convertProject(dominantfilename, "");
         openProject(dominantfilename, false, false);
         dominantProject = projectFile;
+        dominantProject->ensureAllRefedAnimationsExist();
+        recessiveProject->ensureAllRefedAnimationsExist();
         if (!dominantProject->merge(recessiveProject, true)){
             WARNING_MESSAGE("The attempt to merge projects failed!");
         }
         //TO DO: Merge animdata...
         //NEED TO FIX ANIMTION INDICES IN ANIMDATA FILES BEFORE MERGING!!!
         dominantProject->mergeAnimationCaches(recessiveProject);
-        dominantProject->ensureAllRefedAnimationsExist();
+        //dominantProject->ensureAllRefedAnimationsExist();
         saveProject(false);
         //packAndExportProjectToSkyrimDirectory();
         //delete recessiveProject;

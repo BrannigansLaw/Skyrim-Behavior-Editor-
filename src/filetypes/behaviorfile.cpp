@@ -855,21 +855,36 @@ bool BehaviorFile::existsInBehavior(HkDynamicObject *object, int startindex) con
     bool found = false;
     HkxObject::HkxType type;
     DataIconManager *obj;
+    HkxSignature objsig;
+    HkxSignature listobjsig;
+    QString objanimationname;
+    QString listobjanimationname;
+    QString objname;
+    QString listobjname;
     auto search = [&](const QList <HkxSharedPtr> & list){
-        obj = static_cast<DataIconManager *>(object);
         for (auto i = startindex; i < list.size(); i++){
-            if (obj->getSignature() == list.at(i).data()->getSignature() && ((obj->getSignature() == HKB_CLIP_GENERATOR && !QString::compare(static_cast<hkbClipGenerator *>(list.at(i).data())->getAnimationName(),
-                static_cast<hkbClipGenerator *>(obj)->getAnimationName(), Qt::CaseInsensitive)) || (obj->getName() == static_cast<hkbGenerator *>(list.at(i).data())->getName())))
-            {
+            listobjsig = list.at(i).data()->getSignature();
+            listobjname = static_cast<DataIconManager *>(list.at(i).data())->getName();
+            if (objsig == HKB_CLIP_GENERATOR){
+                objanimationname = static_cast<hkbClipGenerator *>(obj)->getAnimationName();
+            }
+            if (listobjsig == HKB_CLIP_GENERATOR){
+                listobjanimationname = static_cast<hkbClipGenerator *>(list.at(i).data())->getAnimationName();
+            }
+            if (objsig == listobjsig && ((objsig == HKB_CLIP_GENERATOR && !QString::compare(objanimationname, listobjanimationname, Qt::CaseInsensitive) && (objname == listobjname)) || (objname == listobjname))){
                 found = true;
                 break;
             }
         }
         if (!found){
             for (auto i = 0; i < startindex; i++){
-                if (obj->getSignature() == list.at(i).data()->getSignature() && ((obj->getSignature() == HKB_CLIP_GENERATOR && !QString::compare(static_cast<hkbClipGenerator *>(list.at(i).data())->getAnimationName(),
-                    static_cast<hkbClipGenerator *>(obj)->getAnimationName(), Qt::CaseInsensitive)) || (obj->getName() == static_cast<hkbGenerator *>(list.at(i).data())->getName())))
-                {
+                listobjsig = list.at(i).data()->getSignature();
+                listobjname = static_cast<DataIconManager *>(list.at(i).data())->getName();
+                if (objsig == HKB_CLIP_GENERATOR){
+                    objanimationname = static_cast<hkbClipGenerator *>(obj)->getAnimationName();
+                    listobjanimationname = static_cast<hkbClipGenerator *>(list.at(i).data())->getAnimationName();
+                }
+                if (objsig == listobjsig && ((objsig == HKB_CLIP_GENERATOR && !QString::compare(objanimationname, listobjanimationname, Qt::CaseInsensitive) && (objname == listobjname)) || (objname == listobjname))){
                     found = true;
                     break;
                 }
@@ -877,7 +892,10 @@ bool BehaviorFile::existsInBehavior(HkDynamicObject *object, int startindex) con
         }
     };
     if (object && startindex > -1){
+        obj = static_cast<DataIconManager *>(object);
         type = object->getType();
+        objsig = obj->getSignature();
+        objname = obj->getName();
         if (type == HkxObject::TYPE_GENERATOR){
             search(generators);
         }else if (type == HkxObject::TYPE_MODIFIER){

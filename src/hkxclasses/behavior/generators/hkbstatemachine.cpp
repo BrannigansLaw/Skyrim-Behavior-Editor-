@@ -337,8 +337,7 @@ bool hkbStateMachine::merge(HkxObject *recessiveObject){
     bool add;
     QList <DataIconManager *> objects;
     QList <DataIconManager *> children;
-    DataIconManager *object = nullptr;
-    QVector <HkxObject *> othertypes;
+    DataIconManager * obj;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_STATE_MACHINE){
         recobj = static_cast<hkbStateMachine *>(recessiveObject);
         recobj->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
@@ -378,21 +377,22 @@ bool hkbStateMachine::merge(HkxObject *recessiveObject){
                 }
             }
             if (add && (/* For FNIS*/otherobjstate->getName().contains("TKDodge") || static_cast<BehaviorFile *>(getParentFile())->isNameUniqueInProject(otherobjstate))){
-                states.append(HkxSharedPtr(otherobjstate)); //TO DO: use insertobj?
-                getParentFile()->addObjectToFile(otherobjstate, -1);
-                objects = static_cast<DataIconManager *>(otherobjstate)->getChildren();
+                insertObjectAt(i, otherobjstate);
+                if (!static_cast<BehaviorFile *>(getParentFile())->existsInBehavior(otherobjstate)){
+                    otherobjstate->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
+                    otherobjstate->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
+                    getParentFile()->addObjectToFile(otherobjstate, -1);
+                    getParentFile()->addObjectToFile(otherobjstate->variableBindingSet.data(), -1);
+                }
+                objects = otherobjstate->getChildren();
                 while (!objects.isEmpty()){
-                    object = objects.last();
-                    if (/* For FNIS*/object->getName() == "TKDodgeRightModifier" || !static_cast<BehaviorFile *>(getParentFile())->existsInBehavior(object)){
-                        object->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
-                        object->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
-                        getParentFile()->addObjectToFile(object, -1);
-                        getParentFile()->addObjectToFile(object->variableBindingSet.data(), -1);
-                        children = object->getChildren();
-                        othertypes = object->getChildrenOtherTypes();
-                        for (auto k = 0; k < othertypes.size(); k++){
-                            getParentFile()->addObjectToFile(othertypes.at(k), -1);
-                        }
+                    obj = objects.last();
+                    if (!static_cast<BehaviorFile *>(getParentFile())->existsInBehavior(obj)){
+                        obj->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
+                        obj->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
+                        getParentFile()->addObjectToFile(obj, -1);
+                        getParentFile()->addObjectToFile(obj->variableBindingSet.data(), -1);
+                        children = obj->getChildren();
                     }
                     objects.removeLast();
                     objects = objects + children;

@@ -215,8 +215,9 @@ void hkbClipGenerator::mergeEventIndex(int oldindex, int newindex){
 }
 
 void hkbClipGenerator::fixMergedEventIndices(BehaviorFile *dominantfile){
-    if (triggers.data()){
+    if (triggers.data() && dominantfile){
         triggers.data()->fixMergedEventIndices(dominantfile);
+        dominantfile->addObjectToFile(triggers.data(), -1);
     }
 }
 
@@ -231,8 +232,8 @@ bool hkbClipGenerator::merge(HkxObject *recessiveObject){
             }
         }else if (obj->triggers.data()){
             triggers = obj->triggers;
-            getParentFile()->addObjectToFile(obj->triggers.data(), -1);
             obj->triggers.data()->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
+            getParentFile()->addObjectToFile(obj->triggers.data(), -1);
         }
         return true;
     }else{

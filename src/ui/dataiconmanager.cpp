@@ -121,9 +121,6 @@ void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
         bool found;
         QList <DataIconManager *> objects;
         QList <DataIconManager *> children;
-        if (getName() == "DagEquipMSG"){
-            int h = 0;
-        }
         if (variableBindingSet.data()){
             variableBindingSet.data()->merge(recobj->variableBindingSet.data());
         }else if (recobj->variableBindingSet.data()){
