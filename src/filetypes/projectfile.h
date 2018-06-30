@@ -43,6 +43,8 @@ public:
     bool appendAnimation(SkyrimAnimationMotionData *motiondata);
     SkyrimAnimationMotionData getAnimationMotionData(int animationindex) const;
     bool isNameUniqueInProject(HkxObject *object, const QString & filenametoignore) const;
+    bool hasAnimData() const;
+    bool hasAnimSetData() const;
 private:
 protected:
     bool parse();

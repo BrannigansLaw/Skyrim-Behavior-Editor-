@@ -22,6 +22,7 @@ public:
     //bool extractProject(const QString & projectname);
     AnimCacheProjectData *getProjectCacheData(const QString &name);
     bool mergeAnimationCaches(const QString & projectname, const QString &recessiveprojectname, SkyrimAnimSetData *recessiveprojectdata);
+    bool isEmpty() const;
 private:
     QStringList projectNames;
     QVector <AnimCacheProjectData *> projects;

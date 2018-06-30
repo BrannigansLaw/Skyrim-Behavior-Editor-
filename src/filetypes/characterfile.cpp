@@ -206,7 +206,7 @@ void CharacterFile::getCharacterPropertyBoneWeightArray(const QString &name, hkb
     }
 }
 
-bool CharacterFile::merge(CharacterFile *recessivefile){
+bool CharacterFile::merge(CharacterFile *recessivefile){    //TO DO: merge character properties...
     if (recessivefile){
         if (!static_cast<hkbCharacterData *>(characterData.data())->merge(recessivefile->characterData.data())){
             WARNING_MESSAGE("CharacterFile: merge() failed!\hkbCharacterData failed to merge!");

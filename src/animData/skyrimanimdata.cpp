@@ -398,3 +398,11 @@ void SkyrimAnimData::merge(SkyrimAnimData *recessiveanimdata, const QString & pr
     }
 }
 
+bool SkyrimAnimData::isEmpty() const{
+    if (projectNames.isEmpty()){
+        return true;
+    }else{
+        return false;
+    }
+}
+

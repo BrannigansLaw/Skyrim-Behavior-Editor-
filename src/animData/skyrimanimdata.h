@@ -39,6 +39,7 @@ public:
     qreal getAnimationDurationFromAnimData(const QString &projectname, int animationindex) const;
     SkyrimAnimationMotionData getAnimationMotionData(const QString &projectname, int animationindex) const;
     void merge(SkyrimAnimData *recessiveanimdata, const QString &projecttomerge);
+    bool isEmpty() const;
 private:
     QStringList projectNames;
     QVector <ProjectAnimData *> animData;

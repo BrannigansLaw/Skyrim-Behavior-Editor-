@@ -149,6 +149,13 @@ bool SkyrimAnimSetData::mergeAnimationCaches(const QString &projectname, const Q
     return false;
 }
 
+bool SkyrimAnimSetData::isEmpty() const{
+    if (projectNames.isEmpty()){
+        return true;
+    }else{
+        return false;
+    }
+}
 /*bool SkyrimAnimSetData::extractProject(const QString &projectname){
     int index = 0;
     for (; index < projectNames.size(); index++){

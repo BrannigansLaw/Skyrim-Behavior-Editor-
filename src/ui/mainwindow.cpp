@@ -412,19 +412,15 @@ void MainWindow::saveFile(int index, int & taskCount, bool usenormalsave){
 }
 
 void MainWindow::saveProject(bool usenormalsave){
-    if (projectFile && projectFile->character && skeletonFile && projectFile->skyrimAnimData && projectFile->skyrimAnimSetData){
-        QFile animData(lastFileSelectedPath+"/animationdatasinglefile.txt");
+    auto removefile = [](const QString & path){
+        QFile animData(path);
         if (animData.exists()){
             if (!animData.remove()){
                 LogFile::writeToLog("Failed to remove to old animData file!");
             }
         }
-        QFile animSetData(lastFileSelectedPath+"/animationsetdatasinglefile.txt");
-        if (animSetData.exists()){
-            if (!animSetData.remove()){
-                LogFile::writeToLog("Failed to remove to old animSetData file!");
-            }
-        }
+    };
+    if (projectFile && projectFile->character && skeletonFile && projectFile->skyrimAnimData && projectFile->skyrimAnimSetData){
         ProgressDialog progress("Saving project...", "", 0, 100, this, Qt::Dialog);
         progress.setWindowModality(Qt::WindowModal);
         int percent = 0;
@@ -440,10 +436,16 @@ void MainWindow::saveProject(bool usenormalsave){
         threads.push_back(std::thread(&ProjectFile::write, projectFile));
         progress.setProgress("Saving character file...", 2);
         threads.push_back(std::thread(&CharacterFile::write, projectFile->character));
-        progress.setProgress("Saving animation translation and rotation data (animationdatasinglefile.txt)...", 10);
-        threads.push_back(std::thread(&SkyrimAnimData::write, projectFile->skyrimAnimData, QString(lastFileSelectedPath+"/animationdatasinglefile.txt")));
-        progress.setProgress("Saving animation cache file (animationsetdatasinglefile.txt)...", 15);
-        threads.push_back(std::thread(&SkyrimAnimSetData::write, projectFile->skyrimAnimSetData, QString(lastFileSelectedPath+"/animationsetdatasinglefile.txt")));
+        if (projectFile->hasAnimData()){
+            removefile(lastFileSelectedPath+"/animationdatasinglefile.txt");
+            progress.setProgress("Saving animation translation and rotation data (animationdatasinglefile.txt)...", 10);
+            threads.push_back(std::thread(&SkyrimAnimData::write, projectFile->skyrimAnimData, QString(lastFileSelectedPath+"/animationdatasinglefile.txt")));
+        }
+        if (projectFile->hasAnimSetData()){
+            removefile(lastFileSelectedPath+"/animationsetdatasinglefile.txt");
+            progress.setProgress("Saving animation cache file (animationsetdatasinglefile.txt)...", 15);
+            threads.push_back(std::thread(&SkyrimAnimSetData::write, projectFile->skyrimAnimSetData, QString(lastFileSelectedPath+"/animationsetdatasinglefile.txt")));
+        }
         for (auto i = 0; i < threads.size(); i++){
             if (threads.at(i).joinable()){
                 threads.at(i).join();
@@ -623,22 +625,34 @@ void MainWindow::mergeProjects(){
         convertProject(dominantfilename, "");
         openProject(dominantfilename, false, true);
         dominantProject = projectFile;
-        if (!dominantProject->merge(recessiveProject)){
-            WARNING_MESSAGE("The attempt to merge projects failed!");
+        if (dominantProject->merge(recessiveProject)){
+            saveProject(false);
+            //TO DO: Merge animdata...
+            //packAndExportProjectToSkyrimDirectory();
+            //delete recessiveProject;
+            //delete projectFile;
+            //projectFile = nullptr;
+            LogFile::writeToLog("Time taken to merge project \""+recessivefilename+"\" with project \""+dominantfilename+"\" is "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
+            USER_MESSAGE("The project \""+recessivefilename+"\" was sucessfully merged with \""+dominantfilename+"\" project! This program will now close!");
+        }else{
+            WARNING_MESSAGE("The attempt to merge projects failed! This program will now close!");
         }
-        saveProject(false);
-        //TO DO: Merge animdata...
-        //packAndExportProjectToSkyrimDirectory();
-        //delete recessiveProject;
-        //delete projectFile;
-        //projectFile = nullptr;
-        LogFile::writeToLog("Time taken to merge project \""+recessivefilename+"\" with project \""+dominantfilename+"\" is "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
-        USER_MESSAGE("The project \""+recessivefilename+"\" was sucessfully merged with \""+dominantfilename+"\" project! This program will now close!");
         QApplication::exit(0);
     }
 }
 
 void MainWindow::mergeFNIS(){
+    QString othercharactername;
+    auto replacefile = [&](){
+        QFile file(othercharactername);
+        if (file.exists() && file.remove()){
+            if (!QFile(QString(othercharactername).replace(".hkx", "-out.hkx")).rename(othercharactername)){
+                WARNING_MESSAGE("The attempt to rename defaultfemale failed!");return;
+            }
+        }else{
+            LogFile::writeToLog("MainWindow::mergeFNIS(): Failed to remove the character file \""+othercharactername+"!");
+        }
+    };
     QTime timer;
     int timeelapsed;
     timer.start();
@@ -660,20 +674,44 @@ void MainWindow::mergeFNIS(){
         dominantProject = projectFile;
         dominantProject->ensureAllRefedAnimationsExist();
         recessiveProject->ensureAllRefedAnimationsExist();
-        if (!dominantProject->merge(recessiveProject, true)){
-            WARNING_MESSAGE("The attempt to merge projects failed!");
+        if (dominantProject->merge(recessiveProject, true)){
+            //TO DO: Merge animdata...
+            //NEED TO FIX ANIMTION INDICES IN ANIMDATA FILES BEFORE MERGING!!!
+            //dominantProject->mergeAnimationCaches(recessiveProject);
+            saveProject(false);
+            packAndExportProjectToSkyrimDirectory();
+            othercharactername = skyrimDirectory+"/data/meshes/actors/character/characters female/defaultfemale.hkx";
+            CharacterFile *defaultfemale = new CharacterFile(this, projectFile, othercharactername);
+            auto count = 1;
+            if (hkxcmd(othercharactername, "", count, "") == HKXCMD_SUCCESS){
+                replacefile();
+                if (defaultfemale->parse()){
+                    if (projectFile->character && defaultfemale->merge(projectFile->character)){
+                        {
+                            if (!QFile(othercharactername).remove()){
+                                WARNING_MESSAGE("The attempt to remove "+othercharactername+" failed!")//;return;
+                            }
+                        }
+                        defaultfemale->write();
+                        if (hkxcmd(othercharactername, "", count) == HKXCMD_SUCCESS){
+                            replacefile();
+                        }else{
+                            WARNING_MESSAGE("The attempt to convert "+othercharactername+" failed!");return;
+                        }
+                    }else{
+                        WARNING_MESSAGE("The attempt to merge defaultfemale failed!");return;
+                    }
+                }else{
+                    WARNING_MESSAGE("The attempt to parse defaultfemale failed!");return;
+                }
+            }else{
+                WARNING_MESSAGE("The attempt to convert "+othercharactername+" failed!");return;
+            }
+            LogFile::writeToLog("Time taken to merge project \""+recessivefilename+"\" with project \""+dominantfilename+"\" is "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
+            USER_MESSAGE("FNIS patch was sucessful! This program will now close!");
+        }else{
+            WARNING_MESSAGE("The FNIS patch failed! This program will now close! Check the debuglog.txt in the application directory for what went wrong!");
         }
-        //TO DO: Merge animdata...
-        //NEED TO FIX ANIMTION INDICES IN ANIMDATA FILES BEFORE MERGING!!!
-        dominantProject->mergeAnimationCaches(recessiveProject);
-        //dominantProject->ensureAllRefedAnimationsExist();
-        saveProject(false);
-        //packAndExportProjectToSkyrimDirectory();
-        //delete recessiveProject;
-        //delete projectFile;
-        //projectFile = nullptr;
-        LogFile::writeToLog("Time taken to merge project \""+recessivefilename+"\" with project \""+dominantfilename+"\" is "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds");
-        USER_MESSAGE("FNIS patch was sucessful! This program will now close!");
         QApplication::exit(0);
     }
 }
@@ -732,17 +770,20 @@ void MainWindow::findModifier(){
 BehaviorFile * MainWindow::openBehaviorForMerger(QString & filepath){
     BehaviorFile *ptr = nullptr;
     auto count = 1;
-    if (filepath != "" && hkxcmd(filepath, filepath, count, "-v:xml") == HKXCMD_SUCCESS){
-        QFile *file = new QFile(QString(filepath).replace(".hkx", "-out.hkx"));
-        if (file->exists() && file->remove()){
-            file->setFileName(filepath);
-            delete file;
-            ptr = new BehaviorFile(this, nullptr, nullptr, filepath);
-            if (!ptr->parse()){
-                CRITICAL_ERROR_MESSAGE("MainWindow::openBehaviorForMerger(): The selected behavior file \""+filepath+"\" was not parsed!");
+    if (filepath != "" && hkxcmd(filepath, filepath, count, "") == HKXCMD_SUCCESS){
+        {
+            QFile file(QString(filepath).replace(".hkx", "-out.hkx"));
+            if (file.exists() && file.remove()){
+                if (!file.rename(filepath)){
+                    WARNING_MESSAGE("The attempt to rename "+filepath+" failed!");
+                }
+            }else{
+                LogFile::writeToLog("MainWindow::openBehaviorForMerger(): Failed to remove the behavior file \""+filepath+"!");
             }
-        }else{
-            LogFile::writeToLog("MainWindow::openBehaviorForMerger(): Failed to remove the behavior file \""+filepath+"!");
+        }
+        ptr = new BehaviorFile(this, nullptr, nullptr, filepath);
+        if (!ptr->parse()){
+            CRITICAL_ERROR_MESSAGE("MainWindow::openBehaviorForMerger(): The selected behavior file \""+filepath+"\" was not parsed!");
         }
     }else{
         LogFile::writeToLog("MainWindow::openBehaviorForMerger(): Failed to convert the behavior file \""+filepath+"!");

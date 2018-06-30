@@ -224,7 +224,7 @@ bool ProjectFile::link(){
 }
 
 QString ProjectFile::detectErrorsInProject(){
-    ProgressDialog progress("Detecting errors...", "", 0, 100, getUI());
+    ProgressDialog progress("Detecting possible errors...", "", 0, 100, getUI());
     progress.setWindowModality(Qt::WindowModal);
     std::vector <std::future<QString>> futures;
     auto percent = 0;
@@ -360,7 +360,7 @@ bool ProjectFile::merge(ProjectFile *recessiveproject, bool isFNIS){ //Make sure
             percent = 0;
             progress.setProgress("Merging loose objects...", percent);
             difference = ((1.0)/((qreal)(dominantbehaviors.size())))*(100.0);
-            for (auto k = 0; k < dominantbehaviors.size() && !objectsnotfound.isEmpty(); k++){
+            for (auto k = dominantbehaviors.size() - 1; k >= 0 && !objectsnotfound.isEmpty(); k--){ //need to cycle backwards to prevent jump/horsebehavior merge bug...
                 dominantbehaviors.at(k)->mergeObjects(objectsnotfound);
                 percent += difference;
                 progress.setValue(percent);
@@ -607,6 +607,30 @@ bool ProjectFile::isNameUniqueInProject(HkxObject *object, const QString &filena
         }
     }
     return true;
+}
+
+bool ProjectFile::hasAnimData() const{
+    if (skyrimAnimData){
+        if (!skyrimAnimData->isEmpty()){
+            return true;
+        }else{
+            return false;
+        }
+    }else{
+        return false;
+    }
+}
+
+bool ProjectFile::hasAnimSetData() const{
+    if (skyrimAnimData){
+        if (!skyrimAnimData->isEmpty()){
+            return true;
+        }else{
+            return false;
+        }
+    }else{
+        return false;
+    }
 }
 
 bool ProjectFile::appendClipGeneratorAnimData(const QString &name){

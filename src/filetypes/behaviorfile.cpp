@@ -871,7 +871,7 @@ bool BehaviorFile::existsInBehavior(HkDynamicObject *object, int startindex) con
             if (listobjsig == HKB_CLIP_GENERATOR){
                 listobjanimationname = static_cast<hkbClipGenerator *>(list.at(i).data())->getAnimationName();
             }
-            if (objsig == listobjsig && ((objsig == HKB_CLIP_GENERATOR && !QString::compare(objanimationname, listobjanimationname, Qt::CaseInsensitive) && (objname == listobjname)) || (objname == listobjname))){
+            if (!objname.contains("TKDodge") && objsig == listobjsig && ((objsig == HKB_CLIP_GENERATOR && !QString::compare(objanimationname, listobjanimationname, Qt::CaseInsensitive) && (objname == listobjname)) || (objname == listobjname))){
                 found = true;
                 break;
             }
@@ -884,7 +884,7 @@ bool BehaviorFile::existsInBehavior(HkDynamicObject *object, int startindex) con
                     objanimationname = static_cast<hkbClipGenerator *>(obj)->getAnimationName();
                     listobjanimationname = static_cast<hkbClipGenerator *>(list.at(i).data())->getAnimationName();
                 }
-                if (objsig == listobjsig && ((objsig == HKB_CLIP_GENERATOR && !QString::compare(objanimationname, listobjanimationname, Qt::CaseInsensitive) && (objname == listobjname)) || (objname == listobjname))){
+                if (!objname.contains("TKDodge") && objsig == listobjsig && ((objsig == HKB_CLIP_GENERATOR && !QString::compare(objanimationname, listobjanimationname, Qt::CaseInsensitive) && (objname == listobjname)) || (objname == listobjname))){
                     found = true;
                     break;
                 }
@@ -1518,7 +1518,7 @@ QString BehaviorFile::detectErrors(){
         checkError(otherTypes, i);
     }
     if (errors){
-        return "WARNING: Errors found in \""+getFileName()+"\"!\n";
+        return "WARNING: Potential errors found in \""+getFileName()+"\"!\n";
     }else{
         return "";
     }
@@ -1612,20 +1612,24 @@ QVector <DataIconManager *> BehaviorFile::merge(BehaviorFile *recessivefile){
             }
         }
     };
+    auto checkobjects = [&](const QList <HkxSharedPtr> & domlist){
+        for (auto i = objectsnotfound.size() - 1; i >= 0; i--){
+            found = false;
+            for (auto j = gensize; j < domlist.size(); j++){
+                if (static_cast<const DataIconManager *>(objectsnotfound.at(i))->hasSameSignatureAndName(static_cast<const DataIconManager *>(domlist.at(j).data()))){
+                    objectsnotfound.removeAt(i);
+                    break;
+                }
+            }
+        }
+    };
     if (recessivefile){
         searchMergeForward(generators, gensize, recessivefile->generators);
         searchMergeForward(modifiers, modsize, recessivefile->modifiers);
+        checkobjects(generators);
+        checkobjects(modifiers);
     }else{
         LogFile::writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
-    }
-    for (auto i = objectsnotfound.size() - 1; i >= 0; i--){
-        found = false;
-        for (auto j = gensize; j < generators.size(); j++){
-            if (static_cast<const DataIconManager *>(objectsnotfound.at(i))->hasSameSignatureAndName(static_cast<const DataIconManager *>(generators.at(j).data()))){
-                objectsnotfound.removeAt(i);
-                break;
-            }
-        }
     }
     return objectsnotfound;
 }
