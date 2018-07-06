@@ -47,11 +47,11 @@ AnimationsUI::AnimationsUI(const QString &title)
     verLyt->addLayout(buttonLyt);
     verLyt->addLayout(stackLyt);
     setLayout(verLyt);
-    connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeAnimation()));
-    connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addAnimation()));
-    //connect(animationName, SIGNAL(editingFinished()), this, SLOT(renameSelectedAnimation()));
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewAnimation(int,int)));
-    connect(animationUI, SIGNAL(returnToParent()), this, SLOT(returnToTable()));
+    connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeAnimation()), Qt::UniqueConnection);
+    connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addAnimation()), Qt::UniqueConnection);
+    //connect(animationName, SIGNAL(editingFinished()), this, SLOT(renameSelectedAnimation()), Qt::UniqueConnection);
+    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewAnimation(int,int)), Qt::UniqueConnection);
+    connect(animationUI, SIGNAL(returnToParent()), this, SLOT(returnToTable()), Qt::UniqueConnection);
 }
 
 void AnimationsUI::viewAnimation(int row, int column){

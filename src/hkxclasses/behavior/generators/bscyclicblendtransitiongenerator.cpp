@@ -359,33 +359,41 @@ void BSCyclicBlendTransitionGenerator::unlink(){
 QString BSCyclicBlendTransitionGenerator::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
     if (eventToFreezeBlendValue.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToFreezeBlendValue event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToFreezeBlendValue event id out of range! Setting to max index in range!\n");
+        eventToFreezeBlendValue.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (eventToCrossBlend.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToCrossBlend event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToCrossBlend event id out of range! Setting to max index in range!\n");
+        eventToCrossBlend.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (eventToFreezeBlendValue.payload.data() && eventToFreezeBlendValue.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToFreezeBlendValue.payload type! Signature: "+QString::number(eventToFreezeBlendValue.payload.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToFreezeBlendValue.payload type! Signature: "+QString::number(eventToFreezeBlendValue.payload.data()->getSignature(), 16)+" Setting null value!\n");
+        eventToFreezeBlendValue.payload = HkxSharedPtr();
     }
     if (eventToCrossBlend.payload.data() && eventToCrossBlend.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToCrossBlend.payload type! Signature: "+QString::number(eventToCrossBlend.payload.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToCrossBlend.payload type! Signature: "+QString::number(eventToCrossBlend.payload.data()->getSignature(), 16)+" Setting null value!\n");
+        eventToCrossBlend.payload = HkxSharedPtr();
     }
     if (!pBlenderGenerator.data()){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null pBlenderGenerator!\n");
     }else if (pBlenderGenerator.data()->getSignature() != HKB_BLENDER_GENERATOR){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pBlenderGenerator type! Signature: "+QString::number(pBlenderGenerator.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pBlenderGenerator type! Signature: "+QString::number(pBlenderGenerator.data()->getSignature(), 16)+" Setting null value!\n");
+        pBlenderGenerator = HkxSharedPtr();
     }
     setDataValidity(isvalid);
     return errors;

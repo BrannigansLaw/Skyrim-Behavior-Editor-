@@ -118,11 +118,12 @@ void TreeGraphicsScene::expandBranch(TreeGraphicsItem *icon, bool expandAll){
 
 bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicates){
     QList <DataIconManager *> objects;
-    QList <DataIconManager *> children = rootData->getChildren();
+    QList <DataIconManager *> children;
     QList <TreeGraphicsItem *> parentIcons;
     QVector <short> numChildren;
     TreeGraphicsItem *newIcon = nullptr;
     if (rootData){
+        children = rootData->getChildren();
         rootIcon = new BehaviorGraphIcon(nullptr, rootData);
         addItem(rootIcon);
         objects.append(children);
@@ -152,16 +153,18 @@ bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicate
                 }
             }
         }
-    }
-    QList <QGraphicsView *> view = views();
-    if (!view.isEmpty()){
-        QGraphicsView *ptr = view.front();
-        QRectF rect = ptr->sceneRect();
-        ptr->setSceneRect(rect.marginsAdded(QMarginsF(rect.width(), rect.height(), rect.width(), rect.height())));
+        QList <QGraphicsView *> view = views();
+        if (!view.isEmpty()){
+            QGraphicsView *ptr = view.front();
+            QRectF rect = ptr->sceneRect();
+            ptr->setSceneRect(rect.marginsAdded(QMarginsF(rect.width(), rect.height(), rect.width(), rect.height())));
+        }else{
+            CRITICAL_ERROR_MESSAGE("TreeGraphicsScene::drawGraph: No view!!!");return false;
+        }
+        return true;
     }else{
-        CRITICAL_ERROR_MESSAGE("TreeGraphicsScene::drawGraph: No view!!!");
+        CRITICAL_ERROR_MESSAGE("TreeGraphicsScene::drawGraph: rootData is null!!!");return false;
     }
-    return true;
 }
 
 //Appends "data" to the 'itemData' of "selectedIcon" after creating a new icon representing "data" and appending it to "selectedIcon"...

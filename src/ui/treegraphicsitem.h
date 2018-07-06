@@ -33,6 +33,7 @@ public:
     void setPenColor(Qt::GlobalColor color);
     bool reorderChildren();
     TreeGraphicsItem *getChildWithData(DataIconManager *data);
+    bool isCircular(TreeGraphicsItem *itemtocheck) const;
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) Q_DECL_OVERRIDE;
     virtual void setIconSelected();

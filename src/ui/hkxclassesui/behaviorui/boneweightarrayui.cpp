@@ -38,10 +38,10 @@ BoneWeightArrayUI::BoneWeightArrayUI()
     selectedBone->setMinimum(0);
     selectedBone->setMaximum(1);
     selectedBone->setSingleStep(0.05);
-    connect(selectedBone, SIGNAL(editingFinished()), this, SLOT(setBoneWeight()));
-    connect(bones, SIGNAL(cellClicked(int,int)), this, SLOT(loadBoneWeight(int,int)));
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
-    connect(invertAllPB, SIGNAL(released()), this, SLOT(invert()));
+    connect(selectedBone, SIGNAL(editingFinished()), this, SLOT(setBoneWeight()), Qt::UniqueConnection);
+    connect(bones, SIGNAL(cellClicked(int,int)), this, SLOT(loadBoneWeight(int,int)), Qt::UniqueConnection);
+    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
+    connect(invertAllPB, SIGNAL(released()), this, SLOT(invert()), Qt::UniqueConnection);
 }
 
 void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){

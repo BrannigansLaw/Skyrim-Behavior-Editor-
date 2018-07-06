@@ -85,7 +85,7 @@ void hkbStateMachineTransitionInfoArray::removeTransition(int index){
     }
 }
 
-void hkbStateMachineTransitionInfoArray::removeTransitionToState(uint stateId){
+void hkbStateMachineTransitionInfoArray::removeTransitionToState(ulong stateId){
     for (int i = transitions.size() - 1; i >= 0; i--){
         if (transitions.at(i).toStateId == stateId){
             transitions.removeAt(i);
@@ -185,17 +185,17 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
                             LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'eventId' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "toStateId"){
-                        transitions.last().toStateId = reader.getElementValueAt(index).toInt(&ok);
+                        transitions.last().toStateId = reader.getElementValueAt(index).toULong(&ok);
                         if (!ok){
                             LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'toStateId' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "fromNestedStateId"){
-                        transitions.last().fromNestedStateId = reader.getElementValueAt(index).toInt(&ok);
+                        transitions.last().fromNestedStateId = reader.getElementValueAt(index).toULong(&ok);
                         if (!ok){
                             LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'fromNestedStateId' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "toNestedStateId"){
-                        transitions.last().toNestedStateId = reader.getElementValueAt(index).toInt(&ok);
+                        transitions.last().toNestedStateId = reader.getElementValueAt(index).toULong(&ok);
                         if (!ok){
                             LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'toNestedStateId' data field!\nObject Reference: "+ref);
                         }

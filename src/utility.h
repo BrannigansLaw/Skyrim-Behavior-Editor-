@@ -59,12 +59,8 @@ private:
 private:
     static void init(){
         logFile.setFileName(QDir::currentPath()+"/DebugLog.txt");
+        stream.setDevice(&logFile);
         logFile.remove();
-        if (logFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)){
-            stream.setDevice(&logFile);
-        }else{
-            WARNING_MESSAGE("Log file failed to open!");
-        }
     }
 public:
     LogFile(){
@@ -73,13 +69,19 @@ public:
 
     static void writeToLog(const QString & message){
         std::lock_guard <std::mutex> guard(mutex);
-        stream << message << "\n";
+        if (logFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)){
+            stream << message << "\n";
+            logFile.close();
+        }
     }
 
     static void writeToLog(const QStringList & messages){
         std::lock_guard <std::mutex> guard(mutex);
-        for (auto i = 0; i < messages.size(); i++){
-            stream << messages.at(i) << "\n";
+        if (logFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)){
+            for (auto i = 0; i < messages.size(); i++){
+                stream << messages.at(i) << "\n";
+            }
+            logFile.close();
         }
     }
 };

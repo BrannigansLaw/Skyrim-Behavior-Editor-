@@ -40,8 +40,8 @@ public:
         lyt->addWidget(checkbox, Qt::AlignCenter);
         lyt->addSpacing(1);
         setLayout(lyt);
-        connect(checkbox, SIGNAL(released()), this,  SIGNAL(released()));
-        connect(checkbox, SIGNAL(clicked(bool)), this, SIGNAL(clicked(bool)));
+        connect(checkbox, SIGNAL(released()), this,  SIGNAL(released()), Qt::UniqueConnection);
+        connect(checkbox, SIGNAL(clicked(bool)), this, SIGNAL(clicked(bool)), Qt::UniqueConnection);
     }
 
     void setChecked(bool checked){
@@ -117,8 +117,8 @@ public:
         lyt->addWidget(pushButton, 6);
         lyt->setContentsMargins(0,0,0,0);
         setLayout(lyt);
-        connect(checkBox, SIGNAL(clicked(bool)), this, SLOT(setChecked(bool)));
-        connect(pushButton, SIGNAL(clicked(bool)), this, SIGNAL(pressed()));
+        connect(checkBox, SIGNAL(clicked(bool)), this, SLOT(setChecked(bool)), Qt::UniqueConnection);
+        connect(pushButton, SIGNAL(clicked(bool)), this, SIGNAL(pressed()), Qt::UniqueConnection);
     }
 
     void setText(const QString & buttontext){
@@ -138,7 +138,7 @@ public slots:
         }
         disconnect(checkBox, SIGNAL(clicked(bool)), this, SLOT(setChecked(bool)));
         checkBox->setChecked(checked);
-        connect(checkBox, SIGNAL(clicked(bool)), this, SLOT(setChecked(bool)));
+        connect(checkBox, SIGNAL(clicked(bool)), this, SLOT(setChecked(bool)), Qt::UniqueConnection);
         emit enabled(checked);
     }
 private:
@@ -360,10 +360,10 @@ public:
         spinBoxY->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         spinBoxZ->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         spinBoxW->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        connect(spinBoxX, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()));
-        connect(spinBoxY, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()));
-        connect(spinBoxZ, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()));
-        connect(spinBoxW, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()));
+        connect(spinBoxX, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()), Qt::UniqueConnection);
+        connect(spinBoxY, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()), Qt::UniqueConnection);
+        connect(spinBoxZ, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()), Qt::UniqueConnection);
+        connect(spinBoxW, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()), Qt::UniqueConnection);
     }
 
     /*QSize sizeHint() const{

@@ -69,12 +69,13 @@ void BehaviorReferenceGeneratorUI::loadData(HkxObject *data){
                 behaviorName->clear();
                 behaviorName->insertItems(0, behaviors);
             }
-            bsData->behaviorName.replace("\\", "/");    //Do this once on object read?
-            int index = behaviorName->findText(bsData->behaviorName, Qt::MatchFixedString);
-            if (index < 0){
-                WARNING_MESSAGE("BehaviorReferenceGeneratorUI::loadData(): The data has an invalid behavior name!!!");
-            }else{
+            //bsData->behaviorName.replace("/", "\\");
+            auto index = behaviorName->findText(bsData->behaviorName, Qt::MatchFixedString);
+            if (index >= 0){
                 behaviorName->setCurrentIndex(index);
+                bsData->behaviorName = behaviorName->currentText();
+            }else{
+                WARNING_MESSAGE("BehaviorReferenceGeneratorUI::loadData(): The data has an invalid behavior name!!!");
             }
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BehaviorReferenceGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());

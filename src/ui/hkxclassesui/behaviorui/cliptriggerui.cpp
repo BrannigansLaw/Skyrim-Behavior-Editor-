@@ -144,7 +144,7 @@ void ClipTriggerUI::setEventId(int index, const QString & name){
         index--;
         if (bsData->event.id != index){
             bsData->event.id = index;
-            file->setEventNameForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, index);
+            //file->setEventNameForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, index);
             table->item(EVENT_ROW, VALUE_COLUMN)->setText(name);
             file->setIsChanged(true);
         }
@@ -187,7 +187,7 @@ void ClipTriggerUI::setLocalTime(){
             }else{
                 trigtime = localTime->value();
             }
-            file->setLocalTimeForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, trigtime);
+            //file->setLocalTimeForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, trigtime);
             file->setIsChanged(true);
         }
     }else{
@@ -205,7 +205,7 @@ void ClipTriggerUI::setRelativeToEndOfClip(){
             }else{
                 trigtime = localTime->value();
             }
-            file->setLocalTimeForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, trigtime);
+            //file->setLocalTimeForClipGenAnimData(parentClipGen->getName(), indexOfTrigger, trigtime);
             file->setIsChanged(true);
         }
     }else{

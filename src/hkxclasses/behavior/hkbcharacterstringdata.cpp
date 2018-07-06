@@ -34,8 +34,12 @@ QString hkbCharacterStringData::getCharacterPropertyNameAt(int index) const{
 }
 
 void hkbCharacterStringData::addAnimation(const QString & name){
-    animationNames.append(name);
-    getParentFile()->setIsChanged(true);
+    if (!animationNames.contains(name, Qt::CaseInsensitive)){
+        animationNames.append(name);
+        getParentFile()->setIsChanged(true);
+    }else{
+        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": addAnimation()!\nAnimation: "+name+": already exists in the character file!!");
+    }
 }
 
 QString hkbCharacterStringData::getAnimationNameAt(int index) const{
@@ -47,7 +51,7 @@ QString hkbCharacterStringData::getAnimationNameAt(int index) const{
 
 int hkbCharacterStringData::getAnimationIndex(const QString &name) const{
     for (int i = 0; i < animationNames.size(); i++){
-        if (name.compare(animationNames.at(i), Qt::CaseInsensitive) == 0){
+        if (!name.compare(animationNames.at(i), Qt::CaseInsensitive)){
             return i;
         }
     }

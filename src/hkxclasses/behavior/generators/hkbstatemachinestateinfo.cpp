@@ -32,14 +32,14 @@ QString hkbStateMachineStateInfo::getClassname(){
     return classname;
 }
 
-QString hkbStateMachineStateInfo::getStateName(int stateId) const{
+QString hkbStateMachineStateInfo::getStateName(ulong stateId) const{
     if (parentSM){
         return parentSM->getStateName(stateId);
     }
     return "";
 }
 
-QString hkbStateMachineStateInfo::getNestedStateName(int stateId, int nestedStateId) const{
+QString hkbStateMachineStateInfo::getNestedStateName(ulong stateId, ulong nestedStateId) const{
     if (parentSM){
         return parentSM->getNestedStateName(stateId, nestedStateId);
     }
@@ -454,6 +454,7 @@ QString hkbStateMachineStateInfo::evaluateDataValidity(){
         }else if (transitions.data()->isDataValid() && transitions.data()->evaluateDataValidity() != ""){
             isvalid = false;
             errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid transitions data!\n");
+            //transitions = HkxSignature(); TO DO: fix???
         }
     }
     if (!generator.data()){

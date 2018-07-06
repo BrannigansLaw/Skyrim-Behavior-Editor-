@@ -330,8 +330,9 @@ QString hkbVariableBindingSet::evaluateDataValidity(){
                 errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": memberPath is null string!\n");
             }
             if (bindings.at(i).bindingType == hkBinding::BINDING_TYPE_VARIABLE && bindings.at(i).variableIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfVariables()){
-                isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": variableIndex at "+QString::number(i)+" out of range!\n");
+                //isvalid = false;
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": variableIndex at "+QString::number(i)+" out of range! Setting to last variable index!\n");
+                bindings[i].variableIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfVariables() - 1;
             }
             /*if (bindings.at(i).bindingType == hkBinding::BINDING_TYPE_CHARACTER_PROPERTY && bindings.at(i).variableIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfCharacterProperties()){
                 isvalid = false;

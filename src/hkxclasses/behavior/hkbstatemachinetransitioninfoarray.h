@@ -24,7 +24,7 @@ public:
     int getNumTransitions() const;
     void addTransition();
     void removeTransition(int index);
-    void removeTransitionToState(uint stateId);
+    void removeTransitionToState(ulong stateId);
     bool write(HkxXMLWriter *writer);
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
@@ -107,9 +107,9 @@ public:
         HkxSharedPtr transition;
         HkxSharedPtr condition;
         int eventId;
-        int toStateId;
-        int fromNestedStateId;
-        int toNestedStateId;
+        ulong toStateId;
+        ulong fromNestedStateId;
+        ulong toNestedStateId;
         int priority;
         QString flags;
     };

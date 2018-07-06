@@ -29,8 +29,8 @@ TreeGraphicsItem::TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *ob
     itemData->appendIcon(this);
     //name = itemData->getName();
     if (parentItem()){
-        if (indexToInsert > -1 && indexToInsert < parentItem()->childItems().size()){
-            children = parentItem()->childItems();
+        children = parentItem()->childItems();
+        if (indexToInsert > -1 && indexToInsert < children.size()){
             for (int i = 0; i < children.size(); i++){
                 children[i]->setParentItem(nullptr);
             }
@@ -47,6 +47,9 @@ TreeGraphicsItem::TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *ob
             }
         }
         setPosition(QPointF(boundingRect().width()*2, getYCoordinate()));
+    }
+    if (!obj){
+        CRITICAL_ERROR_MESSAGE("TreeGraphicsItem::TreeGraphicsItem(): Icon data is nullptr!!!");
     }
 }
 
@@ -347,7 +350,7 @@ bool TreeGraphicsItem::hasSameData(TreeGraphicsItem *icon) const{
 }
 
 bool TreeGraphicsItem::hasSameData(DataIconManager *data) const{
-    if (itemData == data){
+    if (data && itemData == data){
         return true;
     }
     return false;
@@ -397,6 +400,16 @@ TreeGraphicsItem *TreeGraphicsItem::getChildWithData(DataIconManager *data){
         }
     }
     return nullptr;
+}
+
+bool TreeGraphicsItem::isCircular(TreeGraphicsItem* itemtocheck) const{
+    if (!parentItem() || !itemtocheck){
+        return false;
+    }else if (parentItem() == itemtocheck){
+        return true;
+    }else{
+        return static_cast<TreeGraphicsItem *>(parentItem())->isCircular(itemtocheck);
+    }
 }
 
 /*TreeGraphicsItem *TreeGraphicsItem::getChildWithData(DataIconManager *data, int index){
@@ -463,10 +476,12 @@ int TreeGraphicsItem::getIndexOfChild(TreeGraphicsItem *child) const{
 }
 
 int TreeGraphicsItem::getIndexofIconWithData(DataIconManager *data) const{
-    QList <QGraphicsItem *> children = childItems();
-    for (int i = 0; i < children.size(); i++){
-        if (((TreeGraphicsItem *)children.at(i))->hasSameData(data)){
-            return i;
+    if (data){
+        QList <QGraphicsItem *> children = childItems();
+        for (int i = 0; i < children.size(); i++){
+            if (((TreeGraphicsItem *)children.at(i))->hasSameData(data)){
+                return i;
+            }
         }
     }
     return -1;

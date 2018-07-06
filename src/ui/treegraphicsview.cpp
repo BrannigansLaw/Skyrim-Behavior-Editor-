@@ -18,7 +18,7 @@ TreeGraphicsView::TreeGraphicsView(QMenu *menu)
 {
     setScene(treeScene);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-    connect(treeScene, SIGNAL(iconSelected(TreeGraphicsItem*)), this, SIGNAL(iconSelected(TreeGraphicsItem*)));
+    connect(treeScene, SIGNAL(iconSelected(TreeGraphicsItem*)), this, SIGNAL(iconSelected(TreeGraphicsItem*)), Qt::UniqueConnection);
 }
 
 QSize TreeGraphicsView::sizeHint() const{

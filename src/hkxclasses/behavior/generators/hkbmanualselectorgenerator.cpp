@@ -235,33 +235,40 @@ void hkbManualSelectorGenerator::unlink(){
 
 QString hkbManualSelectorGenerator::evaluateDataValidity(){
     QString errors;
-    bool isvalid = true;
+    auto isvalid = true;
     if (generators.isEmpty()){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": generators is empty!\n");
     }else{
-        for (int i = 0; i < generators.size(); i++){
+        for (auto i = generators.size() - 1; i >= 0; i--){
             if (!generators.at(i).data()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": generators at index '"+QString::number(i)+"' is null!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": generators at index '"+QString::number(i)+"' is null! Removing child!\n");
+                generators.removeAt(i);
             }else if (generators.at(i).data()->getType() != HkxObject::TYPE_GENERATOR){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid generator! Signature: "+QString::number(generators.at(i).data()->getSignature(), 16)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid generator! Signature: "+QString::number(generators.at(i).data()->getSignature(), 16)+" Removing child!\n");
+                generators.removeAt(i);
             }
         }
     }
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
     if (selectedGeneratorIndex >= generators.size()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": selectedGeneratorIndex is out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": selectedGeneratorIndex is out of range! Setting default value!\n");
+        selectedGeneratorIndex = generators.size() - 1;
     }
     if (currentGeneratorIndex >= generators.size()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": currentGeneratorIndex is out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": currentGeneratorIndex is out of range! Setting default value!\n");
+        currentGeneratorIndex = generators.size() - 1;
     }
     setDataValidity(isvalid);
     return errors;

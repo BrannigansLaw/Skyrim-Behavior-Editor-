@@ -85,19 +85,19 @@ FootIkDriverInfoLegUI::FootIkDriverInfoLegUI()
     table->setCellWidget(12, 2, ankleIndex);
     lyt->addWidget(table);
     setLayout(lyt);
-    connect(kneeAxisLS, SIGNAL(editingFinished()), this, SLOT(setKneeAxisLS()));
-    connect(footEndLS, SIGNAL(editingFinished()), this, SLOT(setFootEndLS()));
-    connect(footPlantedAnkleHeightMS, SIGNAL(editingFinished()), this, SLOT(setFootPlantedAnkleHeightMS()));
-    connect(footRaisedAnkleHeightMS, SIGNAL(editingFinished()), this, SLOT(setFootRaisedAnkleHeightMS()));
-    connect(maxAnkleHeightMS, SIGNAL(editingFinished()), this, SLOT(setMaxAnkleHeightMS()));
-    connect(minAnkleHeightMS, SIGNAL(editingFinished()), this, SLOT(setMinAnkleHeightMS()));
-    connect(maxKneeAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setMaxKneeAngleDegrees()));
-    connect(minKneeAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setMinKneeAngleDegrees()));
-    connect(maxAnkleAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setMaxAnkleAngleDegrees()));
-    connect(hipIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setHipIndex(int)));
-    connect(kneeIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setKneeIndex(int)));
-    connect(ankleIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setAnkleIndex(int)));
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+    connect(kneeAxisLS, SIGNAL(editingFinished()), this, SLOT(setKneeAxisLS()), Qt::UniqueConnection);
+    connect(footEndLS, SIGNAL(editingFinished()), this, SLOT(setFootEndLS()), Qt::UniqueConnection);
+    connect(footPlantedAnkleHeightMS, SIGNAL(editingFinished()), this, SLOT(setFootPlantedAnkleHeightMS()), Qt::UniqueConnection);
+    connect(footRaisedAnkleHeightMS, SIGNAL(editingFinished()), this, SLOT(setFootRaisedAnkleHeightMS()), Qt::UniqueConnection);
+    connect(maxAnkleHeightMS, SIGNAL(editingFinished()), this, SLOT(setMaxAnkleHeightMS()), Qt::UniqueConnection);
+    connect(minAnkleHeightMS, SIGNAL(editingFinished()), this, SLOT(setMinAnkleHeightMS()), Qt::UniqueConnection);
+    connect(maxKneeAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setMaxKneeAngleDegrees()), Qt::UniqueConnection);
+    connect(minKneeAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setMinKneeAngleDegrees()), Qt::UniqueConnection);
+    connect(maxAnkleAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setMaxAnkleAngleDegrees()), Qt::UniqueConnection);
+    connect(hipIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setHipIndex(int)), Qt::UniqueConnection);
+    connect(kneeIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setKneeIndex(int)), Qt::UniqueConnection);
+    connect(ankleIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setAnkleIndex(int)), Qt::UniqueConnection);
+    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
 }
 
 void FootIkDriverInfoLegUI::loadData(hkbFootIkDriverInfoLeg *data){

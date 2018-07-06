@@ -537,7 +537,7 @@ QStringList BehaviorFile::getAllBehaviorFileNames() const{
     QDirIterator it(QFileInfo(*this).absolutePath()+"/");
     while (it.hasNext()){
         if (QFileInfo(it.next()).fileName().contains(".hkx")){
-            list.append(it.fileInfo().filePath().section("/", -2, -1));
+            list.append(it.fileInfo().filePath().section("/", -2, -1).replace("/", "\\"));
         }
     }
     return list;
@@ -774,7 +774,7 @@ void BehaviorFile::getCharacterPropertyBoneWeightArray(const QString &name, hkbB
 hkbStateMachine *BehaviorFile::findRootStateMachineFromBehavior(const QString behaviorname) const{
     if (project){
         for (auto i = 0; i < project->behaviorFiles.size(); i++){
-            if (project->behaviorFiles.at(i)->fileName().contains(behaviorname, Qt::CaseInsensitive)){
+            if (project->behaviorFiles.at(i)->fileName().contains(QString(behaviorname).replace("\\", "/"), Qt::CaseInsensitive)){
                 return static_cast<hkbStateMachine *>(project->behaviorFiles.at(i)->getRootStateMachine());
             }
         }
@@ -1500,6 +1500,11 @@ QString BehaviorFile::detectErrors(){
                 }
                 errors = true;
             }
+            if (obj->getType() != HkxObject::TYPE_OTHER && static_cast<DataIconManager *>(obj)->isCircularLoop()){
+                errorList.append(static_cast<DataIconManager *>(obj)->getName()+"-->Ref: "+obj->getReferenceString()+" IS A CIRCULAR REFERENCE!!!");
+                static_cast<DataIconManager *>(obj)->setDataInvalid();
+                errors = true;
+            }
         }
     };
     /*if ((behaviorGraph.data() && !behaviorGraph.data()->evaluateDataValidity()) || (stringData.data() && !stringData.data()->evaluateDataValidity()) ||
@@ -1911,9 +1916,9 @@ QVector<int> BehaviorFile::removeGeneratorData(){
             if (obj->ref < 2){
                 generators.removeAt(i);
                 removedIndices.append(i);
-                if (obj->getSignature() == HKB_BEHAVIOR_REFERENCE_GENERATOR){
+                /*if (obj->getSignature() == HKB_BEHAVIOR_REFERENCE_GENERATOR){
                     removeUnreferencedFiles((const hkbBehaviorReferenceGenerator *)obj);
-                }
+                }*/
             }
         }
     }

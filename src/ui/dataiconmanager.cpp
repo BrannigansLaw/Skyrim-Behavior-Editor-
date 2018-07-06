@@ -105,6 +105,19 @@ void DataIconManager::setFocusOnTopIcon(){
     }
 }
 
+bool DataIconManager::isCircularLoop() const{
+    if (!icons.isEmpty()){
+        for (auto i = 0; i < icons.size(); i++){
+            if (icons.at(i)->isCircular(icons.at(i))){
+                return true;
+            }
+        }
+    }else{
+        LogFile::writeToLog(getName()+": icons is empty!!");
+    }
+    return false;
+}
+
 void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
     if (!getIsMerged() && recessiveobj){
         DataIconManager *recobj = static_cast<DataIconManager *>(recessiveobj);

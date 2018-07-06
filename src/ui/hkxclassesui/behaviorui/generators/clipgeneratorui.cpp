@@ -211,7 +211,7 @@ void ClipGeneratorUI::addTrigger(){
         }
         triggers->addTrigger();
         triggers->triggers.last().event.id = 0;
-        static_cast<BehaviorFile *>(bsData->getParentFile())->appendClipTriggerToAnimData(bsData->name);
+        //static_cast<BehaviorFile *>(bsData->getParentFile())->appendClipTriggerToAnimData(bsData->name);
         bsData->getParentFile()->setIsChanged(true);
         loadDynamicTableRows();
     }else{
@@ -226,7 +226,7 @@ void ClipGeneratorUI::removeTrigger(int index){
         if (triggers){
             if (index < triggers->triggers.size() && index >= 0){
                 triggers->removeTrigger(index);
-                static_cast<BehaviorFile *>(bsData->getParentFile())->removeClipTriggerToAnimDataAt(bsData->name, index);
+                //static_cast<BehaviorFile *>(bsData->getParentFile())->removeClipTriggerToAnimDataAt(bsData->name, index);
             }else{
                 WARNING_MESSAGE("ClipGeneratorUI::removeTrigger(): Invalid row index selected!!");
                 return;
@@ -469,7 +469,11 @@ void ClipGeneratorUI::returnToWidget(){
 void ClipGeneratorUI::setName(){
     if (bsData){
         if (bsData->name != name->text()){
-            if (static_cast<BehaviorFile *>(bsData->getParentFile())->isClipGenNameAvailable(name->text())){
+            bsData->setName(bsData->name, name->text());
+            static_cast<DataIconManager*>((bsData))->updateIconNames();
+            emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
+            bsData->getParentFile()->setIsChanged(true);
+            /*if (static_cast<BehaviorFile *>(bsData->getParentFile())->isClipGenNameAvailable(name->text())){
                 bsData->setName(bsData->name, name->text());
                 static_cast<DataIconManager*>((bsData))->updateIconNames();
                 emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
@@ -479,7 +483,7 @@ void ClipGeneratorUI::setName(){
                 name->setText(bsData->name);
                 connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
                 WARNING_MESSAGE("ClipGeneratorUI::setName(): This clip generator name is already is use elsewhere in the project!!");
-            }
+            }*/
         }
     }else{
         CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setName(): The data is nullptr!!");

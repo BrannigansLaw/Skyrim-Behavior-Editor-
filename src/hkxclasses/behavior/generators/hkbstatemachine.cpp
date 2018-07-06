@@ -77,7 +77,7 @@ int hkbStateMachine::getIndexToInsertIcon() const{
     return -1;
 }
 
-QString hkbStateMachine::getStateName(int stateId) const{
+QString hkbStateMachine::getStateName(ulong stateId) const{
     hkbStateMachineStateInfo *state;
     for (int i = 0; i < states.size(); i++){
         state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
@@ -117,7 +117,7 @@ QStringList hkbStateMachine::getStateNames() const{
     return list;
 }
 
-QString hkbStateMachine::getNestedStateName(int stateId, int nestedStateId) const{
+QString hkbStateMachine::getNestedStateName(ulong stateId, ulong nestedStateId) const{
     hkbStateMachine *ptr = getNestedStateMachine(stateId);
     if (ptr){
         return ptr->getStateName(nestedStateId);
@@ -125,7 +125,7 @@ QString hkbStateMachine::getNestedStateName(int stateId, int nestedStateId) cons
     return "";
 }
 
-QStringList hkbStateMachine::getNestedStateNames(int stateId) const{
+QStringList hkbStateMachine::getNestedStateNames(ulong stateId) const{
     hkbStateMachine *ptr = getNestedStateMachine(stateId);
     if (ptr){
         return ptr->getStateNames();
@@ -133,7 +133,7 @@ QStringList hkbStateMachine::getNestedStateNames(int stateId) const{
     return QStringList();
 }
 
-int hkbStateMachine::getNumberOfNestedStates(int stateId) const{
+int hkbStateMachine::getNumberOfNestedStates(ulong stateId) const{
     hkbStateMachine *ptr = getNestedStateMachine(stateId);
     if (ptr){
         return ptr->getNumberOfStates();
@@ -180,7 +180,7 @@ bool hkbStateMachine::removeObjectAt(int index){
     if (index < states.size()){
         hkbStateMachineStateInfo *state = nullptr;
         hkbStateMachineTransitionInfoArray *trans = nullptr;
-        int stateId = 0;
+        ulong stateId = 0;
         if (index > -1 && index < states.size()){
             trans = static_cast<hkbStateMachineTransitionInfoArray *>(wildcardTransitions.data());
             state = static_cast<hkbStateMachineStateInfo *>(states.at(index).data());
@@ -193,7 +193,7 @@ bool hkbStateMachine::removeObjectAt(int index){
             }
             state->unlink();
             for (int i = 0; i < states.size(); i++){
-                state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
+                //state = static_cast<hkbStateMachineStateInfo *>(states.at(i).data());
                 trans = static_cast<hkbStateMachineTransitionInfoArray *>(state->transitions.data());
                 if (trans){
                     trans->removeTransitionToState(stateId);
@@ -460,7 +460,7 @@ QList<DataIconManager *> hkbStateMachine::getChildren() const{
     return list;
 }
 
-hkbStateMachine * hkbStateMachine::getNestedStateMachine(int stateId) const{
+hkbStateMachine * hkbStateMachine::getNestedStateMachine(ulong stateId) const{
     hkbGenerator *gen = nullptr;
     hkbStateMachineStateInfo *state = nullptr;
     qlonglong sig = 0;
@@ -526,7 +526,7 @@ bool hkbStateMachine::readData(const HkxXmlReader &reader, long index){
                 return false;
             }*/
         }else if (text == "startStateId"){
-            startStateId = reader.getElementValueAt(index).toInt(&ok);
+            startStateId = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
                 LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'startStateId' data field!\nObject Reference: "+ref);
             }
@@ -730,24 +730,34 @@ QString hkbStateMachine::evaluateDataValidity(){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": states is empty!\n");
     }else{
-        for (int i = 0; i < states.size(); i++){
+        for (auto i = states.size() - 1; i >= 0; i--){
             if (!states.at(i).data()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": states at index '"+QString::number(i)+"' is null!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": states at index '"+QString::number(i)+"' is null! Removing child!\n");
+                states.removeAt(i);
             }else if (states.at(i).data()->getSignature() != HKB_STATE_MACHINE_STATE_INFO){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid state! Signature: "+QString::number(states.at(i).data()->getSignature(), 16)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid state! Signature: "+QString::number(states.at(i).data()->getSignature(), 16)+" Removing child!\n");
+                states.removeAt(i);
             }
         }
     }
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
-    if (startStateId > -1 && getStateName(startStateId) == ""){
+    if (getStateName(startStateId) == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid startStateId!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid startStateId! Setting default value!\n");
+        if (!states.isEmpty()){
+            startStateId = static_cast<hkbStateMachineStateInfo *>(states.first().data())->stateId;
+        }else{
+            startStateId = -1;
+        }
     }
     if (eventToSendWhenStateOrTransitionChanges.payload.data() && eventToSendWhenStateOrTransitionChanges.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;

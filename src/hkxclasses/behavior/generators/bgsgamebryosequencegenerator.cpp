@@ -105,7 +105,10 @@ QString BGSGamebryoSequenceGenerator::getName() const{
 QString BGSGamebryoSequenceGenerator::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
@@ -116,7 +119,8 @@ QString BGSGamebryoSequenceGenerator::evaluateDataValidity(){
     }
     if (!BlendModeFunction.contains(eBlendModeFunction)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eBlendModeFunction!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eBlendModeFunction! Setting default value!\n");
+        eBlendModeFunction = BlendModeFunction.first();
     }
     setDataValidity(isvalid);
     return errors;

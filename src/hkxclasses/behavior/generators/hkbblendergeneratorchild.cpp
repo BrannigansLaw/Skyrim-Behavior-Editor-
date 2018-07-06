@@ -275,24 +275,30 @@ void hkbBlenderGeneratorChild::unlink(){
 QString hkbBlenderGeneratorChild::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (boneWeights.data() && boneWeights.data()->getSignature() != HKB_BONE_WEIGHT_ARRAY){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid boneWeights type! Signature: "+QString::number(boneWeights.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid boneWeights type! Signature: "+QString::number(boneWeights.data()->getSignature(), 16)+" Setting null value!\n");
+        boneWeights = HkxSharedPtr();
     }
     if (!generator.data()){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null generator!\n");
     }else if (generator.data()->getType() != HkxObject::TYPE_GENERATOR){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid generator type! Signature: "+QString::number(generator.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid generator type! Signature: "+QString::number(generator.data()->getSignature(), 16)+" Setting null value!\n");
+        generator = HkxSharedPtr();
     }
     if (!parentBG.data()){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null parentBG!\n");
     }else if (parentBG.data()->getSignature() != HKB_BLENDER_GENERATOR && parentBG.data()->getSignature() != HKB_POSE_MATCHING_GENERATOR){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid parentBG type! Signature: "+QString::number(parentBG.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid parentBG type! Signature: "+QString::number(parentBG.data()->getSignature(), 16)+" Setting null value!\n");
+        parentBG = HkxSharedPtr();
     }
     setDataValidity(isvalid);
     return errors;

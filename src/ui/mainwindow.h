@@ -117,9 +117,9 @@ private slots:
     void setProjectExportPath();
     void save();
     void saveProject(bool usenormalsave);
-    void packAndExportProjectToSkyrimDirectory();
+    void packAndExportProjectToSkyrimDirectory(bool exportanimdata = true);
     void exportAnimationData();
-    void packAndExportFileToSkyrimDirectory();
+    void packAndExportFileToSkyrimDirectory(bool exportanimdata = true);
     void mergeBehaviors();
     void mergeProjects();
     void mergeFNIS();

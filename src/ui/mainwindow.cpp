@@ -183,8 +183,8 @@ MainWindow::MainWindow()
     connect(openPackedProjectA, SIGNAL(triggered(bool)), this, SLOT(openPackedProject()), Qt::UniqueConnection);
     connect(openUnpackedProjectA, SIGNAL(triggered(bool)), this, SLOT(openUnpackedProject()), Qt::UniqueConnection);
     connect(saveA, SIGNAL(triggered(bool)), this, SLOT(save()), Qt::UniqueConnection);
-    connect(exportToSkyrimDirA, SIGNAL(triggered(bool)), this, SLOT(packAndExportProjectToSkyrimDirectory()), Qt::UniqueConnection);
-    connect(exportCurrentFileA, SIGNAL(triggered(bool)), this, SLOT(packAndExportFileToSkyrimDirectory()), Qt::UniqueConnection);
+    connect(exportToSkyrimDirA, SIGNAL(triggered(bool)), this, SLOT(packAndExportProjectToSkyrimDirectory(bool)), Qt::UniqueConnection);
+    connect(exportCurrentFileA, SIGNAL(triggered(bool)), this, SLOT(packAndExportFileToSkyrimDirectory(bool)), Qt::UniqueConnection);
     connect(saveProjectA, SIGNAL(triggered(bool)), this, SLOT(saveProject(bool)), Qt::UniqueConnection);
     connect(zoomInA, SIGNAL(triggered(bool)), this, SLOT(zoomIn()), Qt::UniqueConnection);
     connect(zoomOutA, SIGNAL(triggered(bool)), this, SLOT(zoomOut()), Qt::UniqueConnection);
@@ -484,13 +484,15 @@ void MainWindow::saveProject(bool usenormalsave){
     }
 }
 
-void MainWindow::packAndExportProjectToSkyrimDirectory(){
+void MainWindow::packAndExportProjectToSkyrimDirectory(bool exportanimdata){
     if (projectFile){
         LogFile::writeToLog("Exporting the current project to the Skyrim game directory...");
         QString path = skyrimDirectory+"/"+projectExportPath;
         QString projectFolder = path+"/"+lastFileSelectedPath.section("/", -1, -1);
         convertProject(lastFileSelectedPath, projectFolder, "-f SAVE_CONCISE");
-        exportAnimationData();
+        if (exportanimdata){
+            exportAnimationData();
+        }
         /*QString errors = projectFile->detectErrorsInProject();
         if (errors != ""){
             USER_MESSAGE(errors);
@@ -501,63 +503,40 @@ void MainWindow::packAndExportProjectToSkyrimDirectory(){
 }
 
 void MainWindow::exportAnimationData(){
-    QFile animData(lastFileSelectedPath+"/animationdatasinglefile.txt");
-    if (animData.exists()){
-        QDir dir(skyrimDirectory+"/data/meshes");
-        if (dir.exists()){
-            QFile file(skyrimDirectory+"/data/meshes/animationdatasinglefile.txt");
-            if (file.exists()){
-                file.remove();
-            }
-            if (!animData.copy(skyrimDirectory+"/data/meshes/animationdatasinglefile.txt")){
-                LogFile::writeToLog("Failed to export animationdatasinglefile.txt to the game directory!");
-            }
-        }else{
-            if (QDir().mkdir(skyrimDirectory+"/data/meshes")){
-                QFile file(skyrimDirectory+"/data/meshes/animationdatasinglefile.txt");
+    auto exportanimdata = [&](const QString & filename){
+        QFile animData(lastFileSelectedPath+"/"+filename);
+        if (animData.exists()){
+            QDir dir(skyrimDirectory+"/data/meshes");
+            if (dir.exists()){
+                QFile file(skyrimDirectory+"/data/meshes/"+filename);
                 if (file.exists()){
                     file.remove();
                 }
-                if (!animData.copy(skyrimDirectory+"/data/meshes/animationdatasinglefile.txt")){
+                if (!animData.copy(skyrimDirectory+"/data/meshes/"+filename)){
                     LogFile::writeToLog("Failed to export animationdatasinglefile.txt to the game directory!");
                 }
             }else{
-                LogFile::writeToLog(QString("Failed to create directory: "+skyrimDirectory+"/data/meshes"+"!").toLocal8Bit().data());
-            }
-        }
-    }else{
-        LogFile::writeToLog("animationdatasinglefile.txt was not found in the project directory!");
-    }
-    QFile animSetData(lastFileSelectedPath+"/animationsetdatasinglefile.txt");
-    if (animSetData.exists()){
-        QDir dir(skyrimDirectory+"/data/meshes");
-        if (dir.exists()){
-            QFile file(skyrimDirectory+"/data/meshes/animationsetdatasinglefile.txt");
-            if (file.exists()){
-                file.remove();
-            }
-            if (!animSetData.copy(skyrimDirectory+"/data/meshes/animationsetdatasinglefile.txt")){
-                LogFile::writeToLog("Failed to export animationsetdatasinglefile.txt to the game directory!");
+                if (QDir().mkdir(skyrimDirectory+"/data/meshes")){
+                    QFile file(skyrimDirectory+"/data/meshes/"+filename);
+                    if (file.exists()){
+                        file.remove();
+                    }
+                    if (!animData.copy(skyrimDirectory+"/data/meshes/"+filename)){
+                        LogFile::writeToLog("Failed to export animationdatasinglefile.txt to the game directory!");
+                    }
+                }else{
+                    LogFile::writeToLog(QString("Failed to create directory: "+skyrimDirectory+"/data/meshes"+"!").toLocal8Bit().data());
+                }
             }
         }else{
-            if (QDir().mkdir(skyrimDirectory+"/data/meshes")){
-                QFile file(skyrimDirectory+"/data/meshes/animationsetdatasinglefile.txt");
-                if (file.exists()){
-                    file.remove();
-                }
-                if (!animSetData.copy(skyrimDirectory+"/data/meshes/animationsetdatasinglefile.txt")){
-                    LogFile::writeToLog("Failed to export animationsetdatasinglefile.txt to the game directory!");
-                }
-            }else{
-                LogFile::writeToLog(QString("Failed to create directory: "+skyrimDirectory+"/data/meshes"+"!").toLocal8Bit().data());
-            }
+            LogFile::writeToLog(filename+" was not found in the project directory!");
         }
-    }else{
-        LogFile::writeToLog("animationsetdatasinglefile.txt was not found in the project directory!");
-    }
+    };
+    exportanimdata("animationdatasinglefile.txt");
+    exportanimdata("animationsetdatasinglefile.txt");
 }
 
-void MainWindow::packAndExportFileToSkyrimDirectory(){
+void MainWindow::packAndExportFileToSkyrimDirectory(bool exportanimdata){
     QTime timer;
     auto count = 1;
     if (projectFile && projectFile->character){
@@ -570,7 +549,9 @@ void MainWindow::packAndExportFileToSkyrimDirectory(){
             QString filename = tabs->tabText(tabs->currentIndex());
             QString temppath = projectFolder+"/"+projectFile->character->getBehaviorDirectoryName()+"/"+filename;
             if (hkxcmd(lastFileSelectedPath+"/"+projectFile->character->getBehaviorDirectoryName()+"/"+filename, temppath, count) == HKXCMD_SUCCESS){
-                exportAnimationData();
+                if (exportanimdata){
+                    exportAnimationData();
+                }
                 dialog.setProgress("Behavior file exported sucessfully!", dialog.maximum());
                 LogFile::writeToLog("Time taken to export the file is approximately "+QString::number(timer.elapsed())+" milliseconds");
                 QString errors = projectFile->detectErrorsInBehavior(temppath);
@@ -670,16 +651,18 @@ void MainWindow::mergeFNIS(){
         openProject(recessivefilename, false, false, true);
         recessiveProject = projectFile;
         convertProject(dominantfilename, "");
-        openProject(dominantfilename, false, false);
+        openProject(dominantfilename, false, false, true);
         dominantProject = projectFile;
         dominantProject->ensureAllRefedAnimationsExist();
         recessiveProject->ensureAllRefedAnimationsExist();
+        projectFile->writeOrderOfFiles();
         if (dominantProject->merge(recessiveProject, true)){
             //TO DO: Merge animdata...
             //NEED TO FIX ANIMTION INDICES IN ANIMDATA FILES BEFORE MERGING!!!
             //dominantProject->mergeAnimationCaches(recessiveProject);
+            projectFile->detectErrorsInProject();
             saveProject(false);
-            packAndExportProjectToSkyrimDirectory();
+            packAndExportProjectToSkyrimDirectory(false);
             othercharactername = skyrimDirectory+"/data/meshes/actors/character/characters female/defaultfemale.hkx";
             CharacterFile *defaultfemale = new CharacterFile(this, projectFile, othercharactername);
             auto count = 1;

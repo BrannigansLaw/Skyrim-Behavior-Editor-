@@ -22,8 +22,8 @@ SkeletonUI::SkeletonUI(const QString & title)
     //lyt->addWidget(backPB, 2);
     lyt->addWidget(bones, 8);
     setLayout(lyt);
-    //connect(mapper, SIGNAL(mapped(int)), this, SLOT(setLocalFrame(int)));
-    //connect(backPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+    //connect(mapper, SIGNAL(mapped(int)), this, SLOT(setLocalFrame(int)), Qt::UniqueConnection);
+    //connect(backPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
 }
 
 SkeletonUI::~SkeletonUI(){
@@ -58,14 +58,14 @@ void SkeletonUI::loadData(HkxObject *data, bool isRagdoll){
                 }else{
                     //bones->setCellWidget(rowCount, 1, new LineEdit(bsData->getLocalFrameName(i)));
                     //mapper->setMapping(bones->cellWidget(rowCount, 1), i);
-                    //connect(static_cast<LineEdit *>(bones->cellWidget(i, 1)), SIGNAL(editingFinished()), mapper, SLOT(map()));
+                    //connect(static_cast<LineEdit *>(bones->cellWidget(i, 1)), SIGNAL(editingFinished()), mapper, SLOT(map()), Qt::UniqueConnection);
                 }
             }else{
                 bones->setRowCount(rowCount + 1);
                 bones->setItem(rowCount, 0, new QTableWidgetItem(boneNames.at(i)));
                 //bones->setCellWidget(rowCount, 1, new LineEdit(bsData->getLocalFrameName(i)));
                 //mapper->setMapping(bones->cellWidget(rowCount, 1), i);
-                //connect(static_cast<LineEdit *>(bones->cellWidget(i, 1)), SIGNAL(editingFinished()), mapper, SLOT(map()));
+                //connect(static_cast<LineEdit *>(bones->cellWidget(i, 1)), SIGNAL(editingFinished()), mapper, SLOT(map()), Qt::UniqueConnection);
             }
         }
         for (int j = bsData->bones.size(); j < bones->rowCount(); j++){

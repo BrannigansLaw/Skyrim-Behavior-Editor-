@@ -291,7 +291,7 @@ void ProjectFile::removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *g
         referencedbehaviors = behaviorFiles.at(behaviorindices.at(i))->getReferencedBehaviors(gentoignore);
         for (auto j = 0; j < referencedbehaviors.size(); j++){
             for (auto k = filestoremove.size() - 1; k > -1; k--){
-                if (!QString::compare(referencedbehaviors.at(j), filestoremove.at(k).section("/", -1, -1), Qt::CaseInsensitive)){
+                if (!QString::compare(QString(referencedbehaviors.at(j)).replace("\\", "/"), filestoremove.at(k).section("/", -1, -1), Qt::CaseInsensitive)){
                     for (auto l = 0; l < behaviorFiles.size(); l++){
                         if (behaviorFiles.at(l)->fileName() == filestoremove.at(k)){
                             behaviorindices.append(l);
@@ -474,8 +474,8 @@ void ProjectFile::loadEncryptedAnimationNames(){
 
 void ProjectFile::addEncryptedAnimationName(const QString &unencryptedname){
     bool ok;
-    QString animationhash = HkCRC().compute(unencryptedname.section("\\", -1, -1).toLower().replace(".hkx", "").toLocal8Bit());
-    animationhash = QString::number(animationhash.toInt(&ok));
+    QString animationhash = HkCRC().compute(unencryptedname.section("/", -1, -1).toLower().replace(".hkx", "").toLocal8Bit());
+    animationhash = QString::number(animationhash.toULong(&ok, 16));
     if (!ok){
         CRITICAL_ERROR_MESSAGE("AnimCacheAnimSetData::removeAnimationFromCache(): animation hash is invalid!!!");
     }
@@ -630,6 +630,12 @@ bool ProjectFile::hasAnimSetData() const{
         }
     }else{
         return false;
+    }
+}
+
+void ProjectFile::writeOrderOfFiles() const{
+    for (int i = 0; i < behaviorFiles.size(); i++){
+        LogFile::writeToLog("File at index "+QString::number(i)+" is "+behaviorFiles.at(i)->getFileName());
     }
 }
 

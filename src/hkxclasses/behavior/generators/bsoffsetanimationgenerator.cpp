@@ -227,7 +227,10 @@ void BSOffsetAnimationGenerator::unlink(){
 QString BSOffsetAnimationGenerator::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
@@ -237,14 +240,16 @@ QString BSOffsetAnimationGenerator::evaluateDataValidity(){
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null pDefaultGenerator!\n");
     }else if (pDefaultGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pDefaultGenerator type! Signature: "+QString::number(pDefaultGenerator.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pDefaultGenerator type! Signature: "+QString::number(pDefaultGenerator.data()->getSignature(), 16)+" Setting null value!\n");
+        pDefaultGenerator = HkxSharedPtr();
     }
     if (!pOffsetClipGenerator.data()){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null pOffsetClipGenerator!\n");
     }else if (pOffsetClipGenerator.data()->getSignature() != HKB_CLIP_GENERATOR){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOffsetClipGenerator type! Signature: "+QString::number(pOffsetClipGenerator.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOffsetClipGenerator type! Signature: "+QString::number(pOffsetClipGenerator.data()->getSignature(), 16)+" Setting null value!\n");
+        pOffsetClipGenerator = HkxSharedPtr();
     }
     setDataValidity(isvalid);
     return errors;

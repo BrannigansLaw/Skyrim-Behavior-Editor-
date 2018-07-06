@@ -94,21 +94,21 @@ HandIkDriverInfoHandUI::HandIkDriverInfoHandUI()
     table->setCellWidget(14, 2, localFrameName);
     lyt->addWidget(table);
     setLayout(lyt);
-    connect(elbowAxisLS, SIGNAL(editingFinished()), this, SLOT(setElbowAxisLS()));
-    connect(backHandNormalLS, SIGNAL(editingFinished()), this, SLOT(setBackHandNormalLS()));
-    connect(handOffsetLS, SIGNAL(editingFinished()), this, SLOT(setHandOffsetLS()));
-    connect(handOrienationOffsetLS, SIGNAL(editingFinished()), this, SLOT(setHandOrienationOffsetLS()));
-    connect(maxElbowAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setMaxElbowAngleDegrees()));
-    connect(minElbowAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setMinElbowAngleDegrees()));
-    connect(shoulderIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setShoulderIndex(int)));
-    connect(shoulderSiblingIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setShoulderSiblingIndex(int)));
-    connect(elbowIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setElbowIndex(int)));
-    connect(elbowSiblingIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setElbowSiblingIndex(int)));
-    connect(wristIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setWristIndex(int)));
-    connect(enforceEndPosition, SIGNAL(released()), this, SLOT(setEnforceEndPosition()));
-    connect(enforceEndRotation, SIGNAL(released()), this, SLOT(setEnforceEndRotation()));
-    connect(localFrameName, SIGNAL(editingFinished()), this, SLOT(setLocalFrameName()));
-    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()));
+    connect(elbowAxisLS, SIGNAL(editingFinished()), this, SLOT(setElbowAxisLS()), Qt::UniqueConnection);
+    connect(backHandNormalLS, SIGNAL(editingFinished()), this, SLOT(setBackHandNormalLS()), Qt::UniqueConnection);
+    connect(handOffsetLS, SIGNAL(editingFinished()), this, SLOT(setHandOffsetLS()), Qt::UniqueConnection);
+    connect(handOrienationOffsetLS, SIGNAL(editingFinished()), this, SLOT(setHandOrienationOffsetLS()), Qt::UniqueConnection);
+    connect(maxElbowAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setMaxElbowAngleDegrees()), Qt::UniqueConnection);
+    connect(minElbowAngleDegrees, SIGNAL(editingFinished()), this, SLOT(setMinElbowAngleDegrees()), Qt::UniqueConnection);
+    connect(shoulderIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setShoulderIndex(int)), Qt::UniqueConnection);
+    connect(shoulderSiblingIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setShoulderSiblingIndex(int)), Qt::UniqueConnection);
+    connect(elbowIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setElbowIndex(int)), Qt::UniqueConnection);
+    connect(elbowSiblingIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setElbowSiblingIndex(int)), Qt::UniqueConnection);
+    connect(wristIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(setWristIndex(int)), Qt::UniqueConnection);
+    connect(enforceEndPosition, SIGNAL(released()), this, SLOT(setEnforceEndPosition()), Qt::UniqueConnection);
+    connect(enforceEndRotation, SIGNAL(released()), this, SLOT(setEnforceEndRotation()), Qt::UniqueConnection);
+    connect(localFrameName, SIGNAL(editingFinished()), this, SLOT(setLocalFrameName()), Qt::UniqueConnection);
+    connect(returnPB, SIGNAL(released()), this, SIGNAL(returnToParent()), Qt::UniqueConnection);
 }
 
 void HandIkDriverInfoHandUI::loadData(hkbHandIkDriverInfoHand *data, hkbHandIkDriverInfo *par){

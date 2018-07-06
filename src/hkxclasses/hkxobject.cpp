@@ -570,6 +570,7 @@ void HkDynamicObject::unlink(){
 
 QString HkDynamicObject::evaluateDataValidity(){
     if (variableBindingSet.data() && variableBindingSet.data()->getSignature() != HKB_VARIABLE_BINDING_SET){
+        variableBindingSet = HkxSharedPtr();
         setDataValidity(false);
         return QString(getParentFile()->getFileName()+": HkDynamicObject: Ref: "+getReferenceString()+": variableBindingSet is invalid type! Signature: "+QString::number(variableBindingSet.data()->getSignature(), 16)+"\n");
     }

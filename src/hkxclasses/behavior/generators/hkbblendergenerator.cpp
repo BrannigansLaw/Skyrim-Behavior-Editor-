@@ -322,34 +322,41 @@ void hkbBlenderGenerator::unlink(){
 
 QString hkbBlenderGenerator::evaluateDataValidity(){
     QString errors;
-    bool isvalid = true;
-    bool valid = true;
+    auto isvalid = true;
+    auto valid = true;
     if (children.isEmpty()){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": children is empty!\n");
     }else{
-        for (int i = 0; i < children.size(); i++){
+        for (auto i = children.size() - 1; i >= 0; i--){
             if (!children.at(i).data()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": children at index '"+QString::number(i)+"' is null!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": children at index '"+QString::number(i)+"' is null! Removing child!\n");
+                children.removeAt(i);
             }else if (children.at(i).data()->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid child! Signature: "+QString::number(children.at(i).data()->getSignature(), 16)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid child! Signature: "+QString::number(children.at(i).data()->getSignature(), 16)+" Removing child!\n");
+                children.removeAt(i);
             }
         }
     }
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
     if (indexOfSyncMasterChild >= children.size()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": indexOfSyncMasterChild is out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": indexOfSyncMasterChild is out of range! Setting default value!\n");
+        indexOfSyncMasterChild = -1;
     }
     if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid flags!\n");
+        //TO DO: fix flag here!
     }
     setDataValidity(isvalid);
     return errors;

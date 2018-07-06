@@ -87,21 +87,21 @@ FootIkDriverInfoUI::FootIkDriverInfoUI()
     footDriverGB->setLayout(footDriverLyt);
     addWidget(footDriverGB);
     addWidget(legUI);
-    connect(raycastDistanceUp, SIGNAL(editingFinished()), this, SLOT(setRaycastDistanceUp()));
-    connect(raycastDistanceDown, SIGNAL(editingFinished()), this, SLOT(setRaycastDistanceDown()));
-    connect(originalGroundHeightMS, SIGNAL(editingFinished()), this, SLOT(setOriginalGroundHeightMS()));
-    connect(verticalOffset, SIGNAL(editingFinished()), this, SLOT(setVerticalOffset()));
-    connect(collisionFilterInfo, SIGNAL(editingFinished()), this, SLOT(setCollisionFilterInfo()));
-    connect(forwardAlignFraction, SIGNAL(editingFinished()), this, SLOT(setForwardAlignFraction()));
-    connect(sidewaysAlignFraction, SIGNAL(editingFinished()), this, SLOT(setSidewaysAlignFraction()));
-    connect(sidewaysSampleWidth, SIGNAL(editingFinished()), this, SLOT(setSidewaysSampleWidth()));
-    connect(lockFeetWhenPlanted, SIGNAL(released()), this, SLOT(setLockFeetWhenPlanted()));
-    connect(useCharacterUpVector, SIGNAL(released()), this, SLOT(setUseCharacterUpVector()));
-    connect(isQuadrupedNarrow, SIGNAL(released()), this, SLOT(setIsQuadrupedNarrow()));
-    connect(addLegPB, SIGNAL(released()), this, SLOT(addLeg()));
-    connect(removeLegPB, SIGNAL(released()), this, SLOT(removeSelectedLeg()));
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelectedLeg(int,int)));
-    connect(legUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+    connect(raycastDistanceUp, SIGNAL(editingFinished()), this, SLOT(setRaycastDistanceUp()), Qt::UniqueConnection);
+    connect(raycastDistanceDown, SIGNAL(editingFinished()), this, SLOT(setRaycastDistanceDown()), Qt::UniqueConnection);
+    connect(originalGroundHeightMS, SIGNAL(editingFinished()), this, SLOT(setOriginalGroundHeightMS()), Qt::UniqueConnection);
+    connect(verticalOffset, SIGNAL(editingFinished()), this, SLOT(setVerticalOffset()), Qt::UniqueConnection);
+    connect(collisionFilterInfo, SIGNAL(editingFinished()), this, SLOT(setCollisionFilterInfo()), Qt::UniqueConnection);
+    connect(forwardAlignFraction, SIGNAL(editingFinished()), this, SLOT(setForwardAlignFraction()), Qt::UniqueConnection);
+    connect(sidewaysAlignFraction, SIGNAL(editingFinished()), this, SLOT(setSidewaysAlignFraction()), Qt::UniqueConnection);
+    connect(sidewaysSampleWidth, SIGNAL(editingFinished()), this, SLOT(setSidewaysSampleWidth()), Qt::UniqueConnection);
+    connect(lockFeetWhenPlanted, SIGNAL(released()), this, SLOT(setLockFeetWhenPlanted()), Qt::UniqueConnection);
+    connect(useCharacterUpVector, SIGNAL(released()), this, SLOT(setUseCharacterUpVector()), Qt::UniqueConnection);
+    connect(isQuadrupedNarrow, SIGNAL(released()), this, SLOT(setIsQuadrupedNarrow()), Qt::UniqueConnection);
+    connect(addLegPB, SIGNAL(released()), this, SLOT(addLeg()), Qt::UniqueConnection);
+    connect(removeLegPB, SIGNAL(released()), this, SLOT(removeSelectedLeg()), Qt::UniqueConnection);
+    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelectedLeg(int,int)), Qt::UniqueConnection);
+    connect(legUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
 }
 
 void FootIkDriverInfoUI::loadData(HkxObject *data){

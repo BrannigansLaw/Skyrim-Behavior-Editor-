@@ -224,24 +224,30 @@ void BSBoneSwitchGeneratorBoneData::unlink(){
 QString BSBoneSwitchGeneratorBoneData::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (spBoneWeight.data() && spBoneWeight.data()->getSignature() != HKB_BONE_WEIGHT_ARRAY){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid spBoneWeight type! Signature: "+QString::number(spBoneWeight.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid spBoneWeight type! Signature: "+QString::number(spBoneWeight.data()->getSignature(), 16)+" Setting default value!\n");
+        spBoneWeight = HkxSharedPtr();
     }
     if (!pGenerator.data()){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null pGenerator!\n");
     }else if (pGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pGenerator type! Signature: "+QString::number(pGenerator.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pGenerator type! Signature: "+QString::number(pGenerator.data()->getSignature(), 16)+" Setting null value!\n");
+        pGenerator = HkxSharedPtr();
     }
     if (!parentBSG.data()){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null parentBG!\n");
     }else if (parentBSG.data()->getSignature() != BS_BONE_SWITCH_GENERATOR){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid parentBSG type! Signature: "+QString::number(parentBSG.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid parentBSG type! Signature: "+QString::number(parentBSG.data()->getSignature(), 16)+" Setting null value!\n");
+        parentBSG = HkxSharedPtr();
     }
     setDataValidity(isvalid);
     return errors;

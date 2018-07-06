@@ -103,29 +103,29 @@ BehaviorVariablesUI::BehaviorVariablesUI(const QString &title)
     nameMapper->setMapping(intName, 1);
     nameMapper->setMapping(doubleName, 2);
     nameMapper->setMapping(quadName, 3);
-    connect(boolName, SIGNAL(editingFinished()), nameMapper, SLOT(map()));
-    connect(intName, SIGNAL(editingFinished()), nameMapper, SLOT(map()));
-    connect(doubleName, SIGNAL(editingFinished()), nameMapper, SLOT(map()));
-    connect(quadName, SIGNAL(editingFinished()), nameMapper, SLOT(map()));
+    connect(boolName, SIGNAL(editingFinished()), nameMapper, SLOT(map()), Qt::UniqueConnection);
+    connect(intName, SIGNAL(editingFinished()), nameMapper, SLOT(map()), Qt::UniqueConnection);
+    connect(doubleName, SIGNAL(editingFinished()), nameMapper, SLOT(map()), Qt::UniqueConnection);
+    connect(quadName, SIGNAL(editingFinished()), nameMapper, SLOT(map()), Qt::UniqueConnection);
     valueMapper->setMapping(boolCB, 0);
     valueMapper->setMapping(intSB, 1);
     valueMapper->setMapping(doubleSB, 2);
     valueMapper->setMapping(quadWidget, 3);
-    connect(boolCB, SIGNAL(released()), valueMapper, SLOT(map()));
-    connect(intSB, SIGNAL(editingFinished()), valueMapper, SLOT(map()));
-    connect(doubleSB, SIGNAL(editingFinished()), valueMapper, SLOT(map()));
-    connect(quadWidget, SIGNAL(editingFinished()), valueMapper, SLOT(map()));
+    connect(boolCB, SIGNAL(released()), valueMapper, SLOT(map()), Qt::UniqueConnection);
+    connect(intSB, SIGNAL(editingFinished()), valueMapper, SLOT(map()), Qt::UniqueConnection);
+    connect(doubleSB, SIGNAL(editingFinished()), valueMapper, SLOT(map()), Qt::UniqueConnection);
+    connect(quadWidget, SIGNAL(editingFinished()), valueMapper, SLOT(map()), Qt::UniqueConnection);
     setLayout(verLyt);
-    connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeVariable()));
-    connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addVariable()));
-    connect(nameMapper, SIGNAL(mapped(int)), this, SLOT(renameSelectedVariable(int)));
-    connect(valueMapper, SIGNAL(mapped(int)), this, SLOT(setVariableValue(int)));
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewVariable(int,int)));
-    connect(returnBoolPB, SIGNAL(released()), this, SLOT(returnToTable()));
-    connect(returnIntPB, SIGNAL(released()), this, SLOT(returnToTable()));
-    connect(returnDoublePB, SIGNAL(released()), this, SLOT(returnToTable()));
-    connect(returnQuadPB, SIGNAL(released()), this, SLOT(returnToTable()));
-    connect(boneWeightArrayWidget, SIGNAL(returnToParent()), this, SLOT(returnToTable()));
+    connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeVariable()), Qt::UniqueConnection);
+    connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addVariable()), Qt::UniqueConnection);
+    connect(nameMapper, SIGNAL(mapped(int)), this, SLOT(renameSelectedVariable(int)), Qt::UniqueConnection);
+    connect(valueMapper, SIGNAL(mapped(int)), this, SLOT(setVariableValue(int)), Qt::UniqueConnection);
+    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewVariable(int,int)), Qt::UniqueConnection);
+    connect(returnBoolPB, SIGNAL(released()), this, SLOT(returnToTable()), Qt::UniqueConnection);
+    connect(returnIntPB, SIGNAL(released()), this, SLOT(returnToTable()), Qt::UniqueConnection);
+    connect(returnDoublePB, SIGNAL(released()), this, SLOT(returnToTable()), Qt::UniqueConnection);
+    connect(returnQuadPB, SIGNAL(released()), this, SLOT(returnToTable()), Qt::UniqueConnection);
+    connect(boneWeightArrayWidget, SIGNAL(returnToParent()), this, SLOT(returnToTable()), Qt::UniqueConnection);
 }
 
 /*QSize BehaviorVariablesUI::sizeHint() const{
@@ -188,7 +188,7 @@ void BehaviorVariablesUI::loadVariable(CheckBox *variableWid){
             variableWid->setChecked(varValues->wordVariableValues.at(index));
         }
         hideOtherVariables(0);
-        connect(variableWid, SIGNAL(released()), this, SLOT(setVariableValue()));
+        connect(variableWid, SIGNAL(released()), this, SLOT(setVariableValue()), Qt::UniqueConnection);
     }
 }
 
@@ -203,7 +203,7 @@ void BehaviorVariablesUI::loadVariable(SpinBox *variableWid){
             variableWid->setValue(varValues->wordVariableValues.at(index));
         }
         hideOtherVariables(1);
-        connect(variableWid, SIGNAL(editingFinished()), this, SLOT(setVariableValue()));
+        connect(variableWid, SIGNAL(editingFinished()), this, SLOT(setVariableValue()), Qt::UniqueConnection);
     }
 }
 
@@ -218,7 +218,7 @@ void BehaviorVariablesUI::loadVariable(DoubleSpinBox *variableWid){
             variableWid->setValue(varValues->wordVariableValues.at(index));
         }
         hideOtherVariables(2);
-        connect(variableWid, SIGNAL(editingFinished()), this, SLOT(setVariableValue()));
+        connect(variableWid, SIGNAL(editingFinished()), this, SLOT(setVariableValue()), Qt::UniqueConnection);
     }
 }
 
@@ -399,7 +399,7 @@ void BehaviorVariablesUI::removeVariable(){
         }else{
             WARNING_MESSAGE(message);
         }
-        connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeVariable()));
+        connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeVariable()), Qt::UniqueConnection);
     }
 }
 

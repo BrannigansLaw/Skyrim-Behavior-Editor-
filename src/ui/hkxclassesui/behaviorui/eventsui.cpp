@@ -50,12 +50,12 @@ EventsUI::EventsUI(const QString &title)
     verLyt->addLayout(buttonLyt, 1);
     verLyt->addLayout(stackLyt, 10);
     setLayout(verLyt);
-    connect(flag, SIGNAL(released()), this, SLOT(setBoolVariableValue()));
-    connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeEvent()));
-    connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addEvent()));
-    connect(eventName, SIGNAL(editingFinished()), this, SLOT(renameSelectedEvent()));
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewEvent(int,int)));
-    connect(returnPB, SIGNAL(released()), this, SLOT(returnToTable()));
+    connect(flag, SIGNAL(released()), this, SLOT(setBoolVariableValue()), Qt::UniqueConnection);
+    connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeEvent()), Qt::UniqueConnection);
+    connect(addObjectPB, SIGNAL(pressed()), this, SLOT(addEvent()), Qt::UniqueConnection);
+    connect(eventName, SIGNAL(editingFinished()), this, SLOT(renameSelectedEvent()), Qt::UniqueConnection);
+    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewEvent(int,int)), Qt::UniqueConnection);
+    connect(returnPB, SIGNAL(released()), this, SLOT(returnToTable()), Qt::UniqueConnection);
 }
 
 void EventsUI::viewEvent(int row, int column){
@@ -69,8 +69,8 @@ void EventsUI::viewEvent(int row, int column){
         }else{
             flag->setChecked(false);
         }
-        connect(flag, SIGNAL(released()), this, SLOT(setBoolVariableValue()));
-        connect(eventName, SIGNAL(editingFinished()), this, SLOT(renameSelectedEvent()));
+        connect(flag, SIGNAL(released()), this, SLOT(setBoolVariableValue()), Qt::UniqueConnection);
+        connect(eventName, SIGNAL(editingFinished()), this, SLOT(renameSelectedEvent()), Qt::UniqueConnection);
         stackLyt->setCurrentIndex(EVENT_WIDGET);
     }
 }
@@ -163,7 +163,7 @@ void EventsUI::removeEvent(){
         }else{
             WARNING_MESSAGE(message);
         }
-        connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeEvent()));
+        connect(removeObjectPB, SIGNAL(pressed()), this, SLOT(removeEvent()), Qt::UniqueConnection);
     }
 }
 

@@ -22,8 +22,8 @@ public:
     QString getName() const;
     QString evaluateDataValidity();
     static QString getClassname();
-    QString getStateName(int stateId) const;
-    QString getNestedStateName(int stateId, int nestedStateId) const;
+    QString getStateName(ulong stateId) const;
+    QString getNestedStateName(ulong stateId, ulong nestedStateId) const;
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
     bool isEventReferenced(int eventindex) const;

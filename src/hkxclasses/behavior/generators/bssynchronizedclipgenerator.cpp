@@ -215,7 +215,10 @@ void BSSynchronizedClipGenerator::unlink(){
 QString BSSynchronizedClipGenerator::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
@@ -225,7 +228,8 @@ QString BSSynchronizedClipGenerator::evaluateDataValidity(){
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null pClipGenerator!\n");
     }else if (pClipGenerator.data()->getSignature() != HKB_CLIP_GENERATOR){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pClipGenerator type! Signature: "+QString::number(pClipGenerator.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pClipGenerator type! Signature: "+QString::number(pClipGenerator.data()->getSignature(), 16)+" Setting null value!\n");
+        pClipGenerator = HkxSharedPtr();
     }
     setDataValidity(isvalid);
     return errors;

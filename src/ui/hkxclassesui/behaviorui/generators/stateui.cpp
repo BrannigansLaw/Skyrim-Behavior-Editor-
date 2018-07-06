@@ -87,11 +87,11 @@ StateUI::StateUI()
     table->setItem(GENERATOR_ROW, TYPE_COLUMN, new TableWidgetItem("hkbGenerator", Qt::AlignCenter));
     table->setItem(GENERATOR_ROW, BINDING_COLUMN, new TableWidgetItem("N/A", Qt::AlignCenter));
     table->setItem(GENERATOR_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), VIEW_GENERATORS_TABLE_TIP));
-    table->setItem(ADD_ENTER_EVENT_ROW, NAME_COLUMN, new TableWidgetItem("Add Enter Event", Qt::AlignCenter, QColor(Qt::green), QBrush(Qt::black), "Double click to add a event to be emitted when this state is entered"));
+    table->setItem(ADD_ENTER_EVENT_ROW, NAME_COLUMN, new TableWidgetItem("Add Enter Event", Qt::AlignCenter, QColor(Qt::green), QBrush(Qt::black), "Double click to add a event to be raised when this state is entered"));
     table->setItem(ADD_ENTER_EVENT_ROW, TYPE_COLUMN, new TableWidgetItem("hkbStateMachineEventPropertyArray", Qt::AlignCenter, QColor(Qt::gray)));
     table->setItem(ADD_ENTER_EVENT_ROW, BINDING_COLUMN, new TableWidgetItem("Remove Selected Enter Event", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black)));
     table->setItem(ADD_ENTER_EVENT_ROW, VALUE_COLUMN, new TableWidgetItem("Edit Selected Enter Event", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black)));
-    table->setItem(INITIAL_EXIT_EVENT_ROW, NAME_COLUMN, new TableWidgetItem("Add Exit Event", Qt::AlignCenter, QColor(Qt::green), QBrush(Qt::black), "Double click to add a event to be emitted when this state is exited"));
+    table->setItem(INITIAL_EXIT_EVENT_ROW, NAME_COLUMN, new TableWidgetItem("Add Exit Event", Qt::AlignCenter, QColor(Qt::green), QBrush(Qt::black), "Double click to add a event to be raised when this state is exited"));
     table->setItem(INITIAL_EXIT_EVENT_ROW, TYPE_COLUMN, new TableWidgetItem("hkbStateMachineEventPropertyArray", Qt::AlignCenter, QColor(Qt::gray)));
     table->setItem(INITIAL_EXIT_EVENT_ROW, BINDING_COLUMN, new TableWidgetItem("Remove Selected Exit Event", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black)));
     table->setItem(INITIAL_EXIT_EVENT_ROW, VALUE_COLUMN, new TableWidgetItem("Edit Selected Exit Event", Qt::AlignCenter, QColor(Qt::gray), QBrush(Qt::black)));

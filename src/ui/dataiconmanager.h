@@ -30,6 +30,7 @@ public:
     virtual int getIndexOfObj(DataIconManager *) const;
     void setDataInvalid();
     void setFocusOnTopIcon();
+    bool isCircularLoop() const;
 protected:
     virtual QList <DataIconManager *> getChildren() const;
     virtual bool insertObjectAt(int , DataIconManager *);

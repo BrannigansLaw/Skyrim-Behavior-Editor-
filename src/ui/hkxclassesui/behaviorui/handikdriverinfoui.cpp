@@ -48,11 +48,11 @@ HandIkDriverInfoUI::HandIkDriverInfoUI()
     handDriverGB->setLayout(footDriverLyt);
     addWidget(handDriverGB);
     addWidget(handUI);
-    connect(fadeInOutCurve, SIGNAL(currentIndexChanged(int)), this, SLOT(setFadeInOutCurve(int)));
-    connect(addHandPB, SIGNAL(released()), this, SLOT(addHand()));
-    connect(removeHandPB, SIGNAL(released()), this, SLOT(removeSelectedHand()));
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelectedHand(int,int)));
-    connect(handUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+    connect(fadeInOutCurve, SIGNAL(currentIndexChanged(int)), this, SLOT(setFadeInOutCurve(int)), Qt::UniqueConnection);
+    connect(addHandPB, SIGNAL(released()), this, SLOT(addHand()), Qt::UniqueConnection);
+    connect(removeHandPB, SIGNAL(released()), this, SLOT(removeSelectedHand()), Qt::UniqueConnection);
+    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(viewSelectedHand(int,int)), Qt::UniqueConnection);
+    connect(handUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
 }
 
 void HandIkDriverInfoUI::loadData(HkxObject *data){

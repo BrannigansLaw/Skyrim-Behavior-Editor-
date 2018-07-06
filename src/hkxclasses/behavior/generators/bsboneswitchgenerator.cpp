@@ -323,11 +323,15 @@ QString BSBoneSwitchGenerator::evaluateDataValidity(){
                 errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": ChildrenA at index '"+QString::number(i)+"' is null!\n");
             }else if (ChildrenA.at(i).data()->getSignature() != BS_BONE_SWITCH_GENERATOR_BONE_DATA){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid child! Signature: "+QString::number(ChildrenA.at(i).data()->getSignature(), 16)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid child! Signature: "+QString::number(ChildrenA.at(i).data()->getSignature(), 16)+" Setting null value!\n");
+                ChildrenA[i] = HkxSharedPtr();
             }
         }
     }
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
@@ -337,7 +341,8 @@ QString BSBoneSwitchGenerator::evaluateDataValidity(){
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null pDefaultGenerator!\n");
     }else if (pDefaultGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pDefaultGenerator type! Signature: "+QString::number(pDefaultGenerator.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pDefaultGenerator type! Signature: "+QString::number(pDefaultGenerator.data()->getSignature(), 16)+" Setting null value!\n");
+        pDefaultGenerator = HkxSharedPtr();
     }
     setDataValidity(isvalid);
     return errors;

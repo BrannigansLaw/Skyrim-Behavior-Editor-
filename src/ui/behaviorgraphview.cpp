@@ -286,85 +286,85 @@ BehaviorGraphView::BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file)
     contextMenu->addAction(removeObjBranchAct);
     //setContextMenu(contextMenu);
     setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(appendStateMachineAct, SIGNAL(triggered()), this, SLOT(appendStateMachine()));
-    connect(appendStateAct, SIGNAL(triggered()), this, SLOT(appendState()));
-    connect(appendManualSelectorGeneratorAct, SIGNAL(triggered()), this, SLOT(appendManualSelectorGenerator()));
-    connect(appendModifierGeneratorAct, SIGNAL(triggered()), this, SLOT(appendModifierGenerator()));
-    connect(appendBSIStateTaggingGeneratorAct, SIGNAL(triggered()), this, SLOT(appendIStateTaggingGenerator()));
-    connect(appendBSSynchronizedClipGeneratorAct, SIGNAL(triggered()), this, SLOT(appendSynchronizedClipGenerator()));
-    connect(appendBSOffsetAnimationGeneratorAct, SIGNAL(triggered()), this, SLOT(appendOffsetAnimationGenerator()));
-    connect(appendBSCyclicBlendTransitionGeneratorAct, SIGNAL(triggered()), this, SLOT(appendCyclicBlendTransitionGenerator()));
-    connect(appendPoseMatchingGeneratorAct, SIGNAL(triggered()), this, SLOT(appendPoseMatchingGenerator()));
-    connect(appendBlenderGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBlenderGenerator()));
-    connect(appendBlenderGeneratorChildAct, SIGNAL(triggered()), this, SLOT(appendBlenderGeneratorChild()));
-    connect(appendBSBoneSwitchGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBoneSwitchGenerator()));
-    connect(appendBSBoneSwitchGeneratorChildAct, SIGNAL(triggered()), this, SLOT(appendBoneSwitchGeneratorChild()));
-    connect(appendClipGeneratorAct, SIGNAL(triggered()), this, SLOT(appendClipGenerator()));
-    connect(appendBehaviorReferenceGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBehaviorReferenceGenerator()));
-    connect(appendBGSGamebryoSequenceGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBGSGamebryoSequenceGenerator()));
-    connect(wrapManualSelectorGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapManualSelectorGenerator()));
-    connect(wrapModifierGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapModifierGenerator()));
-    connect(wrapBSIStateTaggingGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapIStateTaggingGenerator()));
-    connect(wrapBSSynchronizedClipGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapSynchronizedClipGenerator()));
-    connect(wrapBSOffsetAnimationGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapOffsetAnimationGenerator()));
-    connect(wrapBSCyclicBlendTransitionGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapCyclicBlendTransitionGenerator()));
-    connect(wrapBSBoneSwitchGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapBoneSwitchGenerator()));
-    connect(wrapStateMachineAct, SIGNAL(triggered()), this, SLOT(wrapStateMachine()));
-    connect(wrapBlenderGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapBlenderGenerator()));
-    connect(wrapPoseMatchingGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapPoseMatchingGenerator()));
-    connect(appendModifierListAct, SIGNAL(triggered()), this, SLOT(appendModifierList()));
-    connect(appendTwistModifierAct, SIGNAL(triggered()), this, SLOT(appendTwistModifier()));
-    connect(appendEventDrivenModifierAct, SIGNAL(triggered()), this, SLOT(appendEventDrivenModifier()));
-    connect(appendIsActiveModifierAct, SIGNAL(triggered()), this, SLOT(appendIsActiveModifier()));
-    connect(appendLimbIKModifierAct, SIGNAL(triggered()), this, SLOT(appendLimbIKModifier()));
-    connect(appendInterpValueModifierAct, SIGNAL(triggered()), this, SLOT(appendInterpValueModifier()));
-    connect(appendGetTimeStepModifierAct, SIGNAL(triggered()), this, SLOT(appendGetTimeStepModifier()));
-    connect(appendFootIkControlsModifierAct, SIGNAL(triggered()), this, SLOT(appendFootIkControlsModifier()));
-    connect(appendGetHandleOnBoneModifierAct, SIGNAL(triggered()), this, SLOT(appendGetHandleOnBoneModifier()));
-    connect(appendTransformVectorModifierAct, SIGNAL(triggered()), this, SLOT(appendTransformVectorModifier()));
-    connect(appendProxyModifierAct, SIGNAL(triggered()), this, SLOT(appendProxyModifier()));
-    connect(appendLookAtModifierAct, SIGNAL(triggered()), this, SLOT(appendLookAtModifier()));
-    connect(appendMirrorModifierAct, SIGNAL(triggered()), this, SLOT(appendMirrorModifier()));
-    connect(appendGetWorldFromModelModifierAct, SIGNAL(triggered()), this, SLOT(appendGetWorldFromModelModifier()));
-    connect(appendSenseHandleModifierAct, SIGNAL(triggered()), this, SLOT(appendSenseHandleModifier()));
-    connect(appendEvaluateExpressionModifierAct, SIGNAL(triggered()), this, SLOT(appendEvaluateExpressionModifier()));
-    connect(appendEvaluateHandleModifierAct, SIGNAL(triggered()), this, SLOT(appendEvaluateHandleModifier()));
-    connect(appendAttachmentModifierAct, SIGNAL(triggered()), this, SLOT(appendAttachmentModifier()));
-    connect(appendAttributeModifierAct, SIGNAL(triggered()), this, SLOT(appendAttributeModifier()));
-    connect(appendCombineTransformsModifierAct, SIGNAL(triggered()), this, SLOT(appendCombineTransformsModifier()));
-    connect(appendComputeRotationFromAxisAngleModifierAct, SIGNAL(triggered()), this, SLOT(appendComputeRotationFromAxisAngleModifier()));
-    connect(appendComputeRotationToTargetModifierAct, SIGNAL(triggered()), this, SLOT(appendComputeRotationToTargetModifier()));
-    connect(appendEventsFromRangeModifierAct, SIGNAL(triggered()), this, SLOT(appendEventsFromRangeModifier()));
-    connect(appendMoveCharacterModifierAct, SIGNAL(triggered()), this, SLOT(appendMoveCharacterModifier()));
-    connect(appendExtractRagdollPoseModifierAct, SIGNAL(triggered()), this, SLOT(appendExtractRagdollPoseModifier()));
-    connect(appendModifyOnceModifierAct, SIGNAL(triggered()), this, SLOT(appendModifyOnceModifier()));
-    connect(appendEventOnDeactivateModifierAct, SIGNAL(triggered()), this, SLOT(appendEventOnDeactivateModifier()));
-    connect(appendEventEveryNEventsModifierAct, SIGNAL(triggered()), this, SLOT(appendEventEveryNEventsModifier()));
-    connect(appendRagdollContactListenerModifierAct, SIGNAL(triggered()), this, SLOT(appendRagdollContactListenerModifier()));
-    connect(appendPoweredRagdollControlsModifierAct, SIGNAL(triggered()), this, SLOT(appendPoweredRagdollControlsModifier()));
-    connect(appendEventOnFalseToTrueModifierAct, SIGNAL(triggered()), this, SLOT(appendEventOnFalseToTrueModifier()));
-    connect(appendDirectAtModifierAct, SIGNAL(triggered()), this, SLOT(appendDirectAtModifier()));
-    connect(appendDistTriggerModifierAct, SIGNAL(triggered()), this, SLOT(appendDistTriggerModifier()));
-    connect(appendDecomposeVectorModifierAct, SIGNAL(triggered()), this, SLOT(appendDecomposeVectorModifier()));
-    connect(appendComputeAddBoneAnimModifierAct, SIGNAL(triggered()), this, SLOT(appendComputeAddBoneAnimModifier()));
-    connect(appendTweenerModifierAct, SIGNAL(triggered()), this, SLOT(appendTweenerModifier()));
-    connect(appendBSIStateManagerModifierAct, SIGNAL(triggered()), this, SLOT(appendBSIStateManagerModifier()));
-    connect(appendTimerModifierAct, SIGNAL(triggered()), this, SLOT(appendTimerModifier()));
-    connect(appendRotateCharacterModifierAct, SIGNAL(triggered()), this, SLOT(appendRotateCharacterModifier()));
-    connect(appendDampingModifierAct, SIGNAL(triggered()), this, SLOT(appendDampingModifier()));
-    connect(appendDelayedModifierAct, SIGNAL(triggered()), this, SLOT(appendDelayedModifier()));
-    connect(appendGetUpModifierAct, SIGNAL(triggered()), this, SLOT(appendGetUpModifier()));
-    connect(appendKeyframeBonesModifierAct, SIGNAL(triggered()), this, SLOT(appendKeyframeBonesModifier()));
-    connect(appendComputeDirectionModifierAct, SIGNAL(triggered()), this, SLOT(appendComputeDirectionModifier()));
-    connect(appendRigidBodyRagdollControlsModifierAct, SIGNAL(triggered()), this, SLOT(appendRigidBodyRagdollControlsModifier()));
-    connect(appendBSSpeedSamplerModifierAct, SIGNAL(triggered()), this, SLOT(appendBSSpeedSamplerModifier()));
-    connect(appendDetectCloseToGroundModifierAct, SIGNAL(triggered()), this, SLOT(appendDetectCloseToGroundModifier()));
-    connect(appendBSTimerModifierAct, SIGNAL(triggered()), this, SLOT(appendBSTimerModifier()));
-    connect(appendBSLookAtModifierAct, SIGNAL(triggered()), this, SLOT(appendBSLookAtModifier()));
-    connect(appendHandIKControlsModifierAct, SIGNAL(triggered()), this, SLOT(appendHandIKControlsModifier()));
-    connect(appendBSPassByTargetTriggerModifierAct, SIGNAL(triggered()), this, SLOT(appendBSPassByTargetTriggerModifier()));
-    connect(removeObjBranchAct, SIGNAL(triggered()), this, SLOT(deleteSelectedObjectBranchSlot()));
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(popUpMenuRequested(QPoint)));
+    connect(appendStateMachineAct, SIGNAL(triggered()), this, SLOT(appendStateMachine()), Qt::UniqueConnection);
+    connect(appendStateAct, SIGNAL(triggered()), this, SLOT(appendState()), Qt::UniqueConnection);
+    connect(appendManualSelectorGeneratorAct, SIGNAL(triggered()), this, SLOT(appendManualSelectorGenerator()), Qt::UniqueConnection);
+    connect(appendModifierGeneratorAct, SIGNAL(triggered()), this, SLOT(appendModifierGenerator()), Qt::UniqueConnection);
+    connect(appendBSIStateTaggingGeneratorAct, SIGNAL(triggered()), this, SLOT(appendIStateTaggingGenerator()), Qt::UniqueConnection);
+    connect(appendBSSynchronizedClipGeneratorAct, SIGNAL(triggered()), this, SLOT(appendSynchronizedClipGenerator()), Qt::UniqueConnection);
+    connect(appendBSOffsetAnimationGeneratorAct, SIGNAL(triggered()), this, SLOT(appendOffsetAnimationGenerator()), Qt::UniqueConnection);
+    connect(appendBSCyclicBlendTransitionGeneratorAct, SIGNAL(triggered()), this, SLOT(appendCyclicBlendTransitionGenerator()), Qt::UniqueConnection);
+    connect(appendPoseMatchingGeneratorAct, SIGNAL(triggered()), this, SLOT(appendPoseMatchingGenerator()), Qt::UniqueConnection);
+    connect(appendBlenderGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBlenderGenerator()), Qt::UniqueConnection);
+    connect(appendBlenderGeneratorChildAct, SIGNAL(triggered()), this, SLOT(appendBlenderGeneratorChild()), Qt::UniqueConnection);
+    connect(appendBSBoneSwitchGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBoneSwitchGenerator()), Qt::UniqueConnection);
+    connect(appendBSBoneSwitchGeneratorChildAct, SIGNAL(triggered()), this, SLOT(appendBoneSwitchGeneratorChild()), Qt::UniqueConnection);
+    connect(appendClipGeneratorAct, SIGNAL(triggered()), this, SLOT(appendClipGenerator()), Qt::UniqueConnection);
+    connect(appendBehaviorReferenceGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBehaviorReferenceGenerator()), Qt::UniqueConnection);
+    connect(appendBGSGamebryoSequenceGeneratorAct, SIGNAL(triggered()), this, SLOT(appendBGSGamebryoSequenceGenerator()), Qt::UniqueConnection);
+    connect(wrapManualSelectorGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapManualSelectorGenerator()), Qt::UniqueConnection);
+    connect(wrapModifierGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapModifierGenerator()), Qt::UniqueConnection);
+    connect(wrapBSIStateTaggingGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapIStateTaggingGenerator()), Qt::UniqueConnection);
+    connect(wrapBSSynchronizedClipGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapSynchronizedClipGenerator()), Qt::UniqueConnection);
+    connect(wrapBSOffsetAnimationGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapOffsetAnimationGenerator()), Qt::UniqueConnection);
+    connect(wrapBSCyclicBlendTransitionGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapCyclicBlendTransitionGenerator()), Qt::UniqueConnection);
+    connect(wrapBSBoneSwitchGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapBoneSwitchGenerator()), Qt::UniqueConnection);
+    connect(wrapStateMachineAct, SIGNAL(triggered()), this, SLOT(wrapStateMachine()), Qt::UniqueConnection);
+    connect(wrapBlenderGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapBlenderGenerator()), Qt::UniqueConnection);
+    connect(wrapPoseMatchingGeneratorAct, SIGNAL(triggered()), this, SLOT(wrapPoseMatchingGenerator()), Qt::UniqueConnection);
+    connect(appendModifierListAct, SIGNAL(triggered()), this, SLOT(appendModifierList()), Qt::UniqueConnection);
+    connect(appendTwistModifierAct, SIGNAL(triggered()), this, SLOT(appendTwistModifier()), Qt::UniqueConnection);
+    connect(appendEventDrivenModifierAct, SIGNAL(triggered()), this, SLOT(appendEventDrivenModifier()), Qt::UniqueConnection);
+    connect(appendIsActiveModifierAct, SIGNAL(triggered()), this, SLOT(appendIsActiveModifier()), Qt::UniqueConnection);
+    connect(appendLimbIKModifierAct, SIGNAL(triggered()), this, SLOT(appendLimbIKModifier()), Qt::UniqueConnection);
+    connect(appendInterpValueModifierAct, SIGNAL(triggered()), this, SLOT(appendInterpValueModifier()), Qt::UniqueConnection);
+    connect(appendGetTimeStepModifierAct, SIGNAL(triggered()), this, SLOT(appendGetTimeStepModifier()), Qt::UniqueConnection);
+    connect(appendFootIkControlsModifierAct, SIGNAL(triggered()), this, SLOT(appendFootIkControlsModifier()), Qt::UniqueConnection);
+    connect(appendGetHandleOnBoneModifierAct, SIGNAL(triggered()), this, SLOT(appendGetHandleOnBoneModifier()), Qt::UniqueConnection);
+    connect(appendTransformVectorModifierAct, SIGNAL(triggered()), this, SLOT(appendTransformVectorModifier()), Qt::UniqueConnection);
+    connect(appendProxyModifierAct, SIGNAL(triggered()), this, SLOT(appendProxyModifier()), Qt::UniqueConnection);
+    connect(appendLookAtModifierAct, SIGNAL(triggered()), this, SLOT(appendLookAtModifier()), Qt::UniqueConnection);
+    connect(appendMirrorModifierAct, SIGNAL(triggered()), this, SLOT(appendMirrorModifier()), Qt::UniqueConnection);
+    connect(appendGetWorldFromModelModifierAct, SIGNAL(triggered()), this, SLOT(appendGetWorldFromModelModifier()), Qt::UniqueConnection);
+    connect(appendSenseHandleModifierAct, SIGNAL(triggered()), this, SLOT(appendSenseHandleModifier()), Qt::UniqueConnection);
+    connect(appendEvaluateExpressionModifierAct, SIGNAL(triggered()), this, SLOT(appendEvaluateExpressionModifier()), Qt::UniqueConnection);
+    connect(appendEvaluateHandleModifierAct, SIGNAL(triggered()), this, SLOT(appendEvaluateHandleModifier()), Qt::UniqueConnection);
+    connect(appendAttachmentModifierAct, SIGNAL(triggered()), this, SLOT(appendAttachmentModifier()), Qt::UniqueConnection);
+    connect(appendAttributeModifierAct, SIGNAL(triggered()), this, SLOT(appendAttributeModifier()), Qt::UniqueConnection);
+    connect(appendCombineTransformsModifierAct, SIGNAL(triggered()), this, SLOT(appendCombineTransformsModifier()), Qt::UniqueConnection);
+    connect(appendComputeRotationFromAxisAngleModifierAct, SIGNAL(triggered()), this, SLOT(appendComputeRotationFromAxisAngleModifier()), Qt::UniqueConnection);
+    connect(appendComputeRotationToTargetModifierAct, SIGNAL(triggered()), this, SLOT(appendComputeRotationToTargetModifier()), Qt::UniqueConnection);
+    connect(appendEventsFromRangeModifierAct, SIGNAL(triggered()), this, SLOT(appendEventsFromRangeModifier()), Qt::UniqueConnection);
+    connect(appendMoveCharacterModifierAct, SIGNAL(triggered()), this, SLOT(appendMoveCharacterModifier()), Qt::UniqueConnection);
+    connect(appendExtractRagdollPoseModifierAct, SIGNAL(triggered()), this, SLOT(appendExtractRagdollPoseModifier()), Qt::UniqueConnection);
+    connect(appendModifyOnceModifierAct, SIGNAL(triggered()), this, SLOT(appendModifyOnceModifier()), Qt::UniqueConnection);
+    connect(appendEventOnDeactivateModifierAct, SIGNAL(triggered()), this, SLOT(appendEventOnDeactivateModifier()), Qt::UniqueConnection);
+    connect(appendEventEveryNEventsModifierAct, SIGNAL(triggered()), this, SLOT(appendEventEveryNEventsModifier()), Qt::UniqueConnection);
+    connect(appendRagdollContactListenerModifierAct, SIGNAL(triggered()), this, SLOT(appendRagdollContactListenerModifier()), Qt::UniqueConnection);
+    connect(appendPoweredRagdollControlsModifierAct, SIGNAL(triggered()), this, SLOT(appendPoweredRagdollControlsModifier()), Qt::UniqueConnection);
+    connect(appendEventOnFalseToTrueModifierAct, SIGNAL(triggered()), this, SLOT(appendEventOnFalseToTrueModifier()), Qt::UniqueConnection);
+    connect(appendDirectAtModifierAct, SIGNAL(triggered()), this, SLOT(appendDirectAtModifier()), Qt::UniqueConnection);
+    connect(appendDistTriggerModifierAct, SIGNAL(triggered()), this, SLOT(appendDistTriggerModifier()), Qt::UniqueConnection);
+    connect(appendDecomposeVectorModifierAct, SIGNAL(triggered()), this, SLOT(appendDecomposeVectorModifier()), Qt::UniqueConnection);
+    connect(appendComputeAddBoneAnimModifierAct, SIGNAL(triggered()), this, SLOT(appendComputeAddBoneAnimModifier()), Qt::UniqueConnection);
+    connect(appendTweenerModifierAct, SIGNAL(triggered()), this, SLOT(appendTweenerModifier()), Qt::UniqueConnection);
+    connect(appendBSIStateManagerModifierAct, SIGNAL(triggered()), this, SLOT(appendBSIStateManagerModifier()), Qt::UniqueConnection);
+    connect(appendTimerModifierAct, SIGNAL(triggered()), this, SLOT(appendTimerModifier()), Qt::UniqueConnection);
+    connect(appendRotateCharacterModifierAct, SIGNAL(triggered()), this, SLOT(appendRotateCharacterModifier()), Qt::UniqueConnection);
+    connect(appendDampingModifierAct, SIGNAL(triggered()), this, SLOT(appendDampingModifier()), Qt::UniqueConnection);
+    connect(appendDelayedModifierAct, SIGNAL(triggered()), this, SLOT(appendDelayedModifier()), Qt::UniqueConnection);
+    connect(appendGetUpModifierAct, SIGNAL(triggered()), this, SLOT(appendGetUpModifier()), Qt::UniqueConnection);
+    connect(appendKeyframeBonesModifierAct, SIGNAL(triggered()), this, SLOT(appendKeyframeBonesModifier()), Qt::UniqueConnection);
+    connect(appendComputeDirectionModifierAct, SIGNAL(triggered()), this, SLOT(appendComputeDirectionModifier()), Qt::UniqueConnection);
+    connect(appendRigidBodyRagdollControlsModifierAct, SIGNAL(triggered()), this, SLOT(appendRigidBodyRagdollControlsModifier()), Qt::UniqueConnection);
+    connect(appendBSSpeedSamplerModifierAct, SIGNAL(triggered()), this, SLOT(appendBSSpeedSamplerModifier()), Qt::UniqueConnection);
+    connect(appendDetectCloseToGroundModifierAct, SIGNAL(triggered()), this, SLOT(appendDetectCloseToGroundModifier()), Qt::UniqueConnection);
+    connect(appendBSTimerModifierAct, SIGNAL(triggered()), this, SLOT(appendBSTimerModifier()), Qt::UniqueConnection);
+    connect(appendBSLookAtModifierAct, SIGNAL(triggered()), this, SLOT(appendBSLookAtModifier()), Qt::UniqueConnection);
+    connect(appendHandIKControlsModifierAct, SIGNAL(triggered()), this, SLOT(appendHandIKControlsModifier()), Qt::UniqueConnection);
+    connect(appendBSPassByTargetTriggerModifierAct, SIGNAL(triggered()), this, SLOT(appendBSPassByTargetTriggerModifier()), Qt::UniqueConnection);
+    connect(removeObjBranchAct, SIGNAL(triggered()), this, SLOT(deleteSelectedObjectBranchSlot()), Qt::UniqueConnection);
+    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(popUpMenuRequested(QPoint)), Qt::UniqueConnection);
 }
 
 bool BehaviorGraphView::confirmationDialogue(const QString & message, QWidget *parent){
@@ -556,7 +556,7 @@ void BehaviorGraphView::appendStateMachine(){
 }
 
 void BehaviorGraphView::appendState(){
-    append(new hkbStateMachineStateInfo(behavior, (hkbStateMachine *)getSelectedData()));
+    append(new hkbStateMachineStateInfo(behavior, (hkbStateMachine *)getSelectedData())) ;
 }
 
 void BehaviorGraphView::appendManualSelectorGenerator(){
@@ -592,7 +592,7 @@ void BehaviorGraphView::appendBlenderGenerator(){
 }
 
 void BehaviorGraphView::appendBlenderGeneratorChild(){
-    append(new hkbBlenderGeneratorChild(behavior, (hkbBlenderGenerator *)getSelectedData()));
+    append(new hkbBlenderGeneratorChild(behavior, (hkbBlenderGenerator *)getSelectedData())) ;
 }
 
 void BehaviorGraphView::appendBoneSwitchGenerator(){
@@ -600,7 +600,7 @@ void BehaviorGraphView::appendBoneSwitchGenerator(){
 }
 
 void BehaviorGraphView::appendBoneSwitchGeneratorChild(){
-    append(new BSBoneSwitchGeneratorBoneData(behavior, (BSBoneSwitchGenerator *)getSelectedData()));
+    append(new BSBoneSwitchGeneratorBoneData(behavior, (BSBoneSwitchGenerator *)getSelectedData())) ;
 }
 
 void BehaviorGraphView::appendClipGenerator(){

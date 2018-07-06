@@ -19,14 +19,14 @@ public:
     QString getName() const;
     QString evaluateDataValidity();
     static QString getClassname();
-    QString getStateName(int stateId) const;
+    QString getStateName(ulong stateId) const;
     int getStateId(const QString & statename) const;
     int getNestedStateId(const QString & statename, int stateId) const;
     QStringList getStateNames() const;
     int getNumberOfStates() const;
-    QString getNestedStateName(int stateId, int nestedStateId) const;
-    QStringList getNestedStateNames(int stateId) const;
-    int getNumberOfNestedStates(int stateId) const;
+    QString getNestedStateName(ulong stateId, ulong nestedStateId) const;
+    QStringList getNestedStateNames(ulong stateId) const;
+    int getNumberOfNestedStates(ulong stateId) const;
     int getIndexToInsertIcon() const;
     bool write(HkxXMLWriter *writer);
     int generateValidStateId();
@@ -43,7 +43,7 @@ private:
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int index, DataIconManager *obj);
     bool removeObjectAt(int index);
-    hkbStateMachine * getNestedStateMachine(int stateId) const;
+    hkbStateMachine * getNestedStateMachine(ulong stateId) const;
     hkbStateMachine& operator=(const hkbStateMachine&);
     hkbStateMachine(const hkbStateMachine &);
 private:
@@ -55,7 +55,7 @@ private:
     QString name;
     //startStateChooser
     hkEventPayload eventToSendWhenStateOrTransitionChanges;
-    int startStateId;
+    ulong startStateId;
     int returnToPreviousStateEventId;
     int randomTransitionEventId;
     int transitionToNextHigherStateEventId;

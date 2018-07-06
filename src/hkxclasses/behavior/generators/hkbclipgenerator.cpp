@@ -325,27 +325,36 @@ QString hkbClipGenerator::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
     bool valid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QStringList list = static_cast<BehaviorFile *>(getParentFile())->getAnimationNames();
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
-    if (!static_cast<BehaviorFile *>(getParentFile())->getAnimationNames().contains(animationName, Qt::CaseInsensitive)){
+    if (!list.contains(animationName, Qt::CaseInsensitive)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid animationName!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid animationName! Fixing!\n");
+        if (!list.isEmpty()){
+            animationName = list.first();
+        }
     }
     if (triggers.data()){
         if (triggers.data()->getSignature() != HKB_CLIP_TRIGGER_ARRAY){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid triggers type! Signature: "+QString::number(triggers.data()->getSignature(), 16)+"\n");
-        }else if (triggers.data()->isDataValid() && triggers.data()->evaluateDataValidity() != ""){
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid triggers type! Signature: "+QString::number(triggers.data()->getSignature(), 16)+" Setting null value!\n");
+            triggers = HkxSharedPtr();
+        }/*else if (triggers.data()->isDataValid() && triggers.data()->evaluateDataValidity() != ""){
             isvalid = false;
             errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid triggers data!\n");
-        }
+        }*/
     }
     if (!PlaybackMode.contains(mode)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid mode!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid mode! Setting default value!\n");
+        mode = PlaybackMode.first();
     }
     if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){    //TO DO: Fix this...
         isvalid = false;

@@ -69,7 +69,7 @@ bool hkbBehaviorReferenceGenerator::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("behaviorName"), QString(behaviorName).replace("/", "\\"));
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("behaviorName"), QString(behaviorName).replace("/", "\\"), true);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
@@ -103,7 +103,10 @@ QString hkbBehaviorReferenceGenerator::evaluateDataValidity(){
     behaviorname.replace("\\", "/");
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");

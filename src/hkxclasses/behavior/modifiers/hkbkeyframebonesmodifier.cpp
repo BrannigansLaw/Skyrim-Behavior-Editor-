@@ -241,7 +241,7 @@ QString hkbKeyframeBonesModifier::evaluateDataValidity(){
         }
     }else if (!keyframedBonesList.data()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null expressions!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null keyframedBonesList!\n");
     }
     setDataValidity(isvalid);
     return errors;
