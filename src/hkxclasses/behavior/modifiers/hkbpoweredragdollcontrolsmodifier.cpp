@@ -267,40 +267,49 @@ void hkbPoweredRagdollControlsModifier::unlink(){
 QString hkbPoweredRagdollControlsModifier::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
     if (poseMatchingBone0 >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": poseMatchingBone0 out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": poseMatchingBone0 out of range! Setting to last bone index!\n");
+        poseMatchingBone0 = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (poseMatchingBone1 >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": poseMatchingBone1 out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": poseMatchingBone1 out of range! Setting to last bone index!\n");
+        poseMatchingBone1 = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (poseMatchingBone2 >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": poseMatchingBone2 out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": poseMatchingBone2 out of range! Setting to last bone index!\n");
+        poseMatchingBone2 = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (!Mode.contains(mode)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid mode!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid mode! Setting default value!\n");
+        mode = Mode.first();
     }
     if (!bones.data()){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null bones!\n");
     }else if (bones.data()->getSignature() != HKB_BONE_INDEX_ARRAY){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid bones type! Signature: "+QString::number(bones.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid bones type! Signature: "+QString::number(bones.data()->getSignature(), 16)+" Setting null value!\n");
+        bones = HkxSharedPtr();
     }
     if (!boneWeights.data()){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null boneWeights!\n");
     }else if (boneWeights.data()->getSignature() != HKB_BONE_WEIGHT_ARRAY){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid boneWeights type! Signature: "+QString::number(boneWeights.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid boneWeights type! Signature: "+QString::number(boneWeights.data()->getSignature(), 16)+" Setting null value!\n");
+        boneWeights = HkxSharedPtr();
     }
     setDataValidity(isvalid);
     return errors;

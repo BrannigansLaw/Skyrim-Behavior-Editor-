@@ -23,6 +23,7 @@ public:
     bool merge(HkxObject *recessiveObject);
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
+    int getNumOfEvents() const;
 protected:
 private:
     void addEvent(const hkEventPayload & event = hkEventPayload());

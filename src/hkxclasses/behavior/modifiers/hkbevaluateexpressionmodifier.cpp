@@ -189,7 +189,10 @@ void hkbEvaluateExpressionModifier::unlink(){
 QString hkbEvaluateExpressionModifier::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
@@ -197,7 +200,11 @@ QString hkbEvaluateExpressionModifier::evaluateDataValidity(){
     if (expressions.data()){
         if (expressions.data()->getSignature() != HKB_EXPRESSION_DATA_ARRAY){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid expressions type! Signature: "+QString::number(expressions.data()->getSignature(), 16)+"\n");
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid expressions type! Signature: "+QString::number(expressions.data()->getSignature(), 16)+" Setting default value!\n");
+            expressions = HkxSharedPtr();
+        }else if (static_cast<hkbExpressionDataArray *>(expressions.data())->expressionsData.size() < 1){
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": expressions has no expressionsData! Setting null value!\n");
+            expressions = HkxSharedPtr();
         }else if (expressions.data()->isDataValid() && expressions.data()->evaluateDataValidity() != ""){
             isvalid = false;
             //errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid expressions data!\n");

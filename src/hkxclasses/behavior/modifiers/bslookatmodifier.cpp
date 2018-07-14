@@ -438,31 +438,38 @@ QString BSLookAtModifier::evaluateDataValidity(){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": bones is empty!\n");
     }else{
-        for (auto i = 0; i < bones.size(); i++){
+        for (auto i = bones.size() - 1; i >= 0; i--){
             if (bones.at(i).index >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid bones at index: "+QString::number(i)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid bones at index: "+QString::number(i)+" Removing bone!\n");
+                bones.removeAt(i);
             }
         }
-        for (auto i = 0; i < eyeBones.size(); i++){
+        for (auto i = eyeBones.size() - 1; i >= 0; i--){
             if (eyeBones.at(i).index >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid bones at index: "+QString::number(i)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid bones at index: "+QString::number(i)+" Removing bone!\n");
+                eyeBones.removeAt(i);
             }
         }
     }
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
     if (id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": event id out of range! Setting to max index in range!\n");
+        id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (payload.data() && payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid payload type! Signature: "+QString::number(payload.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid payload type! Signature: "+QString::number(payload.data()->getSignature(), 16)+" Setting null value!\n");
+        payload = HkxSharedPtr();
     }
     setDataValidity(isvalid);
     return errors;

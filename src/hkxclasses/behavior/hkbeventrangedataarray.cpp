@@ -234,15 +234,18 @@ QString hkbEventRangeDataArray::evaluateDataValidity(){
         for (auto i = 0; i < eventData.size(); i++){
             if (eventData.at(i).event.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": id in eventData at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": id in eventData at "+QString::number(i)+" out of range! Setting to max index in range!\n");
+                eventData[i].event.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
             }
             if (eventData.at(i).event.payload.data() && eventData.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(eventData.at(i).event.payload.data()->getSignature(), 16)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(eventData.at(i).event.payload.data()->getSignature(), 16)+" Setting null value!\n");
+                eventData[i].event.payload = HkxSharedPtr();
             }
             if (!hkbEventRangeData::EventRangeMode.contains(eventData.at(i).eventMode)){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid eventMode!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid eventMode! Setting default value!\n");
+                eventData[i].eventMode = hkbEventRangeData::EventRangeMode.first();
             }
         }
     }

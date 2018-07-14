@@ -367,34 +367,43 @@ void BSEventOnFalseToTrueModifier::unlink(){
 QString BSEventOnFalseToTrueModifier::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
     if (eventToSend1.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToSend1 event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToSend1 event id out of range! Setting to max index in range!\n");
+        eventToSend1.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (eventToSend1.payload.data() && eventToSend1.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToSend1.payload type! Signature: "+QString::number(eventToSend1.payload.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToSend1.payload type! Signature: "+QString::number(eventToSend1.payload.data()->getSignature(), 16)+" Setting null value!\n");
+        eventToSend1.payload = HkxSharedPtr();
     }
     if (eventToSend2.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToSend2 event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToSend2 event id out of range! Setting to max index in range!\n");
+        eventToSend2.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (eventToSend2.payload.data() && eventToSend2.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToSend2.payload type! Signature: "+QString::number(eventToSend2.payload.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToSend2.payload type! Signature: "+QString::number(eventToSend2.payload.data()->getSignature(), 16)+" Setting null value!\n");
+        eventToSend2.payload = HkxSharedPtr();
     }
     if (eventToSend3.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToSend3 event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventToSend3 event id out of range! Setting to max index in range!\n");
+        eventToSend3.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (eventToSend3.payload.data() && eventToSend3.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToSend3.payload type! Signature: "+QString::number(eventToSend3.payload.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToSend3.payload type! Signature: "+QString::number(eventToSend3.payload.data()->getSignature(), 16)+" Setting null value!\n");
+        eventToSend3.payload = HkxSharedPtr();
     }
     setDataValidity(isvalid);
     return errors;

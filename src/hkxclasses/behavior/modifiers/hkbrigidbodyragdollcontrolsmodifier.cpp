@@ -261,7 +261,10 @@ void hkbRigidBodyRagdollControlsModifier::unlink(){
 QString hkbRigidBodyRagdollControlsModifier::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
@@ -271,7 +274,8 @@ QString hkbRigidBodyRagdollControlsModifier::evaluateDataValidity(){
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null bones!\n");
     }else if (bones.data()->getSignature() != HKB_BONE_INDEX_ARRAY){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid bones type! Signature: "+QString::number(bones.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid bones type! Signature: "+QString::number(bones.data()->getSignature(), 16)+" Setting null value!\n");
+        bones = HkxSharedPtr();
     }
     setDataValidity(isvalid);
     return errors;

@@ -210,7 +210,10 @@ void BSModifyOnceModifier::unlink(){
 QString BSModifyOnceModifier::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
@@ -221,16 +224,19 @@ QString BSModifyOnceModifier::evaluateDataValidity(){
             errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": pOnActivateModifier and pOnDeactivateModifier are both nullptr!\n");
         }else if (pOnDeactivateModifier.data()->getType() != HkxObject::TYPE_MODIFIER){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOnDeactivateModifier type! Signature: "+QString::number(pOnDeactivateModifier.data()->getSignature(), 16)+"\n");
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOnDeactivateModifier type! Signature: "+QString::number(pOnDeactivateModifier.data()->getSignature(), 16)+" Setting null value!\n");
+            pOnDeactivateModifier = HkxSharedPtr();
         }
     }else{
         if (pOnActivateModifier.data()->getType() != HkxObject::TYPE_MODIFIER){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOnActivateModifier type! Signature: "+QString::number(pOnActivateModifier.data()->getSignature(), 16)+"\n");
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOnActivateModifier type! Signature: "+QString::number(pOnActivateModifier.data()->getSignature(), 16)+" Setting null value!\n");
+            pOnActivateModifier = HkxSharedPtr();
         }
         if (pOnDeactivateModifier.data() && pOnDeactivateModifier.data()->getType() != HkxObject::TYPE_MODIFIER){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOnDeactivateModifier type! Signature: "+QString::number(pOnDeactivateModifier.data()->getSignature(), 16)+"\n");
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOnDeactivateModifier type! Signature: "+QString::number(pOnDeactivateModifier.data()->getSignature(), 16)+" Setting null value!\n");
+            pOnDeactivateModifier = HkxSharedPtr();
         }
     }
     setDataValidity(isvalid);

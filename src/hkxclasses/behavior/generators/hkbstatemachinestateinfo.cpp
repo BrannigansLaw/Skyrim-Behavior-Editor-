@@ -1,5 +1,6 @@
 #include "hkbstatemachinestateinfo.h"
 #include "src/hkxclasses/behavior/hkbstatemachinetransitioninfoarray.h"
+#include "src/hkxclasses/behavior/hkbstatemachineeventpropertyarray.h"
 #include "src/hkxclasses/behavior/generators/hkbstatemachine.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
@@ -428,11 +429,18 @@ void hkbStateMachineStateInfo::unlink(){
 QString hkbStateMachineStateInfo::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (enterNotifyEvents.data()){
         if (enterNotifyEvents.data()->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid enterNotifyEvents type! Signature: "+QString::number(enterNotifyEvents.data()->getSignature(), 16)+"\n");
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid enterNotifyEvents type! Signature: "+QString::number(enterNotifyEvents.data()->getSignature(), 16)+" Setting null value!\n");
+            enterNotifyEvents = HkxSharedPtr();
+        }else if (static_cast<hkbStateMachineEventPropertyArray *>(enterNotifyEvents.data())->getNumOfEvents() < 1){
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": enterNotifyEvents has no events! Setting null value!\n");
+            enterNotifyEvents = HkxSharedPtr();
         }else if (enterNotifyEvents.data()->isDataValid() && enterNotifyEvents.data()->evaluateDataValidity() != ""){
             isvalid = false;
             errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid enterNotifyEvents data!\n");
@@ -441,7 +449,11 @@ QString hkbStateMachineStateInfo::evaluateDataValidity(){
     if (exitNotifyEvents.data()){
         if (exitNotifyEvents.data()->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid exitNotifyEvents type! Signature: "+QString::number(exitNotifyEvents.data()->getSignature(), 16)+"\n");
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid exitNotifyEvents type! Signature: "+QString::number(exitNotifyEvents.data()->getSignature(), 16)+" Setting null value!\n");
+            exitNotifyEvents = HkxSharedPtr();
+        }else if (static_cast<hkbStateMachineEventPropertyArray *>(exitNotifyEvents.data())->getNumOfEvents() < 1){
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": exitNotifyEvents has no events! Setting null value!\n");
+            exitNotifyEvents = HkxSharedPtr();
         }else if (exitNotifyEvents.data()->isDataValid() && exitNotifyEvents.data()->evaluateDataValidity() != ""){
             isvalid = false;
             errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid exitNotifyEvents data!\n");
@@ -450,7 +462,11 @@ QString hkbStateMachineStateInfo::evaluateDataValidity(){
     if (transitions.data()){
         if (transitions.data()->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid transitions type! Signature: "+QString::number(transitions.data()->getSignature(), 16)+"\n");
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid transitions type! Signature: "+QString::number(transitions.data()->getSignature(), 16)+" Setting null value!\n");
+            transitions = HkxSharedPtr();
+        }else if (static_cast<hkbStateMachineTransitionInfoArray *>(transitions.data())->getNumTransitions() < 1){
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": transitions has no transitions! Setting null value!\n");
+            transitions = HkxSharedPtr();
         }else if (transitions.data()->isDataValid() && transitions.data()->evaluateDataValidity() != ""){
             isvalid = false;
             errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid transitions data!\n");
@@ -462,7 +478,12 @@ QString hkbStateMachineStateInfo::evaluateDataValidity(){
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null generator!\n");
     }else if (generator.data()->getType() != HkxObject::TYPE_GENERATOR){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid generator type! Signature: "+QString::number(generator.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid generator type! Signature: "+QString::number(generator.data()->getSignature(), 16)+" Setting null value!\n");
+        generator = HkxSharedPtr();
+    }
+    if (!parentSM){
+        isvalid = false;
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null parentSM!\n");
     }
     setDataValidity(isvalid);
     return errors;

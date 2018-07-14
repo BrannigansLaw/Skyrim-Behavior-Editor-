@@ -221,6 +221,10 @@ QVector<HkxObject *> hkbStateMachineEventPropertyArray::getChildrenOtherTypes() 
     return list;
 }
 
+int hkbStateMachineEventPropertyArray::getNumOfEvents() const{
+    return events.size();
+}
+
 bool hkbStateMachineEventPropertyArray::link(){
     if (!getParentFile()){
         return false;
@@ -254,11 +258,13 @@ QString hkbStateMachineEventPropertyArray::evaluateDataValidity(){
         for (auto i = 0; i < events.size(); i++){
             if (events.at(i).id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": id in events at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": id in events at "+QString::number(i)+" out of range! Setting to last event index!\n");
+                events[i].id  = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
             }
             if (events.at(i).payload.data() && events.at(i).payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(events.at(i).payload.data()->getSignature(), 16)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(events.at(i).payload.data()->getSignature(), 16)+" Setting null value!\n");
+                events[i].payload = HkxSharedPtr();
             }
         }
     }

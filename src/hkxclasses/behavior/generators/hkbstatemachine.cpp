@@ -761,48 +761,62 @@ QString hkbStateMachine::evaluateDataValidity(){
     }
     if (eventToSendWhenStateOrTransitionChanges.payload.data() && eventToSendWhenStateOrTransitionChanges.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToSendWhenStateOrTransitionChanges.payload type! Signature: "+QString::number(eventToSendWhenStateOrTransitionChanges.payload.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventToSendWhenStateOrTransitionChanges.payload type! Signature: "+QString::number(eventToSendWhenStateOrTransitionChanges.payload.data()->getSignature(), 16)+" Setting null value!\n");
+        eventToSendWhenStateOrTransitionChanges.payload = HkxSharedPtr();
     }
     if (returnToPreviousStateEventId >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": returnToPreviousStateEventId event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": returnToPreviousStateEventId event id out of range! Setting to max index in range!\n");
+        returnToPreviousStateEventId = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (randomTransitionEventId >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": randomTransitionEventId event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": randomTransitionEventId event id out of range! Setting to max index in range!\n");
+        randomTransitionEventId = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (transitionToNextHigherStateEventId >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": transitionToNextHigherStateEventId event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": transitionToNextHigherStateEventId event id out of range! Setting to max index in range!\n");
+        transitionToNextHigherStateEventId = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (transitionToNextLowerStateEventId >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": transitionToNextLowerStateEventId event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": transitionToNextLowerStateEventId event id out of range! Setting to max index in range!\n");
+        transitionToNextLowerStateEventId = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (syncVariableIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfVariables()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": syncVariableIndex out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": syncVariableIndex out of range! Setting to last variable index!\n");
+        syncVariableIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfVariables() - 1;
     }
     if (startStateMode == "START_STATE_MODE_SYNC" && syncVariableIndex < 0){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Using START_STATE_MODE_SYNC but syncVariableIndex is not set!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Using START_STATE_MODE_SYNC but syncVariableIndex is not set! Setting to max index in range!\n");
+        syncVariableIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfVariables() - 1;
     }
     if (!StartStateMode.contains(startStateMode)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid startStateMode!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid startStateMode! Setting default value!\n");
+        startStateMode = StartStateMode.first();
     }
     if (!SelfTransitionMode.contains(selfTransitionMode)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid selfTransitionMode!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid selfTransitionMode! Setting default value!\n");
+        selfTransitionMode = SelfTransitionMode.first();
     }
     if (maxSimultaneousTransitions > 32 || maxSimultaneousTransitions < 0){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid maxSimultaneousTransitions!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid maxSimultaneousTransitions! Setting default value!\n");
+        maxSimultaneousTransitions = 32;
     }
     if (wildcardTransitions.data()){
         if (wildcardTransitions.data()->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid wildcardTransitions type! Signature: "+QString::number(wildcardTransitions.data()->getSignature(), 16)+"\n");
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid wildcardTransitions type! Signature: "+QString::number(wildcardTransitions.data()->getSignature(), 16)+" Setting null value!\n");
+            wildcardTransitions = HkxSharedPtr();
+        }else if (static_cast<hkbStateMachineTransitionInfoArray *>(wildcardTransitions.data())->getNumTransitions() < 1){
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": wildcardTransitions has no transitions! Setting null value!\n");
+            wildcardTransitions = HkxSharedPtr();
         }else if (wildcardTransitions.data()->isDataValid() && wildcardTransitions.data()->evaluateDataValidity() != ""){
             isvalid = false;
             errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid wildcardTransitions data!\n");

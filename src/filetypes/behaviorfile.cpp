@@ -1451,7 +1451,7 @@ QString BehaviorFile::detectErrorsMT(int & taskcount, std::mutex & mutex, std::c
                 errorList.append(error);
                 if (obj->getType() != HkxObject::TYPE_OTHER){
                     mutex.lock();
-                    static_cast<DataIconManager *>(obj)->setDataInvalid();
+                    static_cast<DataIconManager *>(obj)->setDataValidity(false);
                     mutex.unlock();
                 }
                 errors = true;
@@ -1470,9 +1470,9 @@ QString BehaviorFile::detectErrorsMT(int & taskcount, std::mutex & mutex, std::c
     for (auto i = 0; i < modifiers.size(); i++){
         checkError(modifiers, i);
     }
-    for (auto i = 0; i < otherTypes.size(); i++){
+    /*for (auto i = 0; i < otherTypes.size(); i++){
         checkError(otherTypes, i);
-    }
+    }*/
     mutex.lock();
     taskcount--;
     conditionVar.notify_one();
@@ -1496,13 +1496,13 @@ QString BehaviorFile::detectErrors(){
             if (error != ""){
                 errorList.append(error);
                 if (obj->getType() != HkxObject::TYPE_OTHER){
-                    static_cast<DataIconManager *>(obj)->setDataInvalid();
+                    static_cast<DataIconManager *>(obj)->setDataValidity(false);
                 }
                 errors = true;
             }
             if (obj->getType() != HkxObject::TYPE_OTHER && static_cast<DataIconManager *>(obj)->isCircularLoop()){
                 errorList.append(static_cast<DataIconManager *>(obj)->getName()+"-->Ref: "+obj->getReferenceString()+" IS A CIRCULAR REFERENCE!!!");
-                static_cast<DataIconManager *>(obj)->setDataInvalid();
+                static_cast<DataIconManager *>(obj)->setDataValidity(false);
                 errors = true;
             }
         }
@@ -1519,9 +1519,9 @@ QString BehaviorFile::detectErrors(){
     for (auto i = 0; i < modifiers.size(); i++){
         checkError(modifiers, i);
     }
-    for (auto i = 0; i < otherTypes.size(); i++){
+    /*for (auto i = 0; i < otherTypes.size(); i++){
         checkError(otherTypes, i);
-    }
+    }*/
     if (errors){
         return "WARNING: Potential errors found in \""+getFileName()+"\"!\n";
     }else{

@@ -82,11 +82,14 @@ bool DataIconManager::merge(HkxObject *recessiveObject){
     return true;
 }
 
-void DataIconManager::setDataInvalid(){
-    for (int i = 0; i < icons.size(); i++){
-        icons.at(i)->setPenColor(Qt::red);
-        icons.at(i)->update(/*QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size()))*/);
-    }
+void DataIconManager::setIconValidity(bool valid){
+    auto setoutlinecolor = [this](Qt::GlobalColor color){
+        for (int i = 0; i < icons.size(); i++){
+            icons.at(i)->setPenColor(color);
+            icons.at(i)->update(/*QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size()))*/);
+        }
+    };
+    valid ? setoutlinecolor(Qt::black) : setoutlinecolor(Qt::red);
 }
 
 void DataIconManager::setFocusOnTopIcon(){

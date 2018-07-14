@@ -346,10 +346,13 @@ QString hkbClipGenerator::evaluateDataValidity(){
             isvalid = false;
             errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid triggers type! Signature: "+QString::number(triggers.data()->getSignature(), 16)+" Setting null value!\n");
             triggers = HkxSharedPtr();
-        }/*else if (triggers.data()->isDataValid() && triggers.data()->evaluateDataValidity() != ""){
+        }else if (static_cast<hkbClipTriggerArray *>(triggers.data())->triggers.size() < 1){
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": triggers has no triggers! Setting null value!\n");
+            triggers = HkxSharedPtr();
+        }else if (triggers.data()->isDataValid() && triggers.data()->evaluateDataValidity() != ""){
             isvalid = false;
             errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid triggers data!\n");
-        }*/
+        }
     }
     if (!PlaybackMode.contains(mode)){
         isvalid = false;

@@ -178,7 +178,7 @@ QString BSIStateManagerModifier::evaluateDataValidity(){
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": stateData is empty!\n");
     }else{
         for (int i = 0; i < stateData.size(); i++){
-            if (!stateData.at(i).pStateMachine.data()){
+            if (!stateData.at(i).pStateMachine.data()){ //TO DO: remove statedata...
                 isvalid = false;
                 errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": stateData at index '"+QString::number(i)+"' is null!\n");
             }else if (stateData.at(i).pStateMachine.data()->getSignature() != HKB_STATE_MACHINE){
@@ -187,7 +187,10 @@ QString BSIStateManagerModifier::evaluateDataValidity(){
             }
         }
     }
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");

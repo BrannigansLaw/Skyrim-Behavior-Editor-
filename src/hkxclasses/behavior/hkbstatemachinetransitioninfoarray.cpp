@@ -507,11 +507,16 @@ QString hkbStateMachineTransitionInfoArray::evaluateDataValidity(){
             isvalid = false;
             errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": transitions is empty!\n");
         }else{
-            for (auto i = 0; i < transitions.size(); i++){
+            for (auto i = transitions.size() - 1; i >= 0; i--){
                 if (transitions.at(i).condition.data()){
                     if (transitions.at(i).condition.data()->getSignature() != HKB_EXPRESSION_CONDITION){
-                        isvalid = false;
-                        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid condition type! Signature: "+QString::number(transitions.at(i).condition.data()->getSignature(), 16)+"\n");
+                        if (transitions.at(i).condition.data()->getSignature() == HKB_STRING_CONDITION){
+                            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid condition type! Fixing: "+QString::number(transitions.at(i).condition.data()->getSignature(), 16)+"\n");
+                            transitions[i].condition = HkxSharedPtr();
+                        }else{
+                            isvalid = false;
+                            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid condition type! Signature: "+QString::number(transitions.at(i).condition.data()->getSignature(), 16)+"\n");
+                        }
                     }else if (transitions.at(i).condition.data()->isDataValid() && transitions.at(i).condition.data()->evaluateDataValidity() != ""){
                         isvalid = false;
                         //errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid condition data!\n");
@@ -528,23 +533,36 @@ QString hkbStateMachineTransitionInfoArray::evaluateDataValidity(){
                 }
                 if (transitions.at(i).eventId >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                     isvalid = false;
-                    errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": eventId in transitions at "+QString::number(i)+" out of range!\n");
+                    errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": eventId in transitions at "+QString::number(i)+" out of range! Removing transition!\n");
+                    transitions.removeAt(i);
+                    break;
                 }
                 if (parent->getSignature() == HKB_STATE_MACHINE){
                     if (static_cast<hkbStateMachine *>(parent)->getStateName(transitions.at(i).toStateId) == ""){
-                        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": toStateId in transitions at "+QString::number(i)+" does not exist!\n");
+                        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": toStateId in transitions at "+QString::number(i)+" does not exist! Removing transition!\n");
+                        transitions.removeAt(i);
+                        break;
                     }
                     if (transitions.at(i).flags.contains("FLAG_TO_NESTED_STATE_ID_IS_VALID") && static_cast<hkbStateMachine *>(parent)->getNestedStateName(transitions.at(i).toStateId, transitions.at(i).toNestedStateId) == ""){
                         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": toNestedStateId in transitions at "+QString::number(i)+" does not exist!\n");
                     }
                 }else if (parent->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
                     if (static_cast<hkbStateMachineStateInfo *>(parent)->getStateName(transitions.at(i).toStateId) == ""){
-                        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": toStateId in transitions at "+QString::number(i)+" does not exist!\n");
+                        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": toStateId in transitions at "+QString::number(i)+" does not exist! Removing transition!\n");
+                        transitions.removeAt(i);
+                        break;
                     }
                     if (transitions.at(i).flags.contains("FLAG_TO_NESTED_STATE_ID_IS_VALID") && static_cast<hkbStateMachineStateInfo *>(parent)->getNestedStateName(transitions.at(i).toStateId, transitions.at(i).toNestedStateId) == ""){
                         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": toNestedStateId in transitions at "+QString::number(i)+" does not exist!\n");
                     }
                 }
+            }
+        }
+        if (transitions.isEmpty()){
+            if (parent->getSignature() == HKB_STATE_MACHINE){
+                static_cast<hkbStateMachine *>(parent)->wildcardTransitions = HkxSharedPtr();
+            }else if (parent->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
+                static_cast<hkbStateMachineStateInfo *>(parent)->transitions =  HkxSharedPtr();
             }
         }
         setDataValidity(isvalid);

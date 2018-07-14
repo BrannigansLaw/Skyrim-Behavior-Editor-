@@ -446,42 +446,53 @@ void hkbAttachmentModifier::unlink(){
 QString hkbAttachmentModifier::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
     if (sendToAttacherOnAttach.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacherOnAttach event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacherOnAttach event id out of range! Setting to max index in range!\n");
+        sendToAttacherOnAttach.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (sendToAttacherOnAttach.payload.data() && sendToAttacherOnAttach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacherOnAttach.payload type! Signature: "+QString::number(sendToAttacherOnAttach.payload.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacherOnAttach.payload type! Signature: "+QString::number(sendToAttacherOnAttach.payload.data()->getSignature(), 16)+" Setting null value!\n");
+        sendToAttacherOnAttach.payload = HkxSharedPtr();
     }
     if (sendToAttacheeOnAttach.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacheeOnAttach event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacheeOnAttach event id out of range! Setting to max index in range!\n");
+        sendToAttacheeOnAttach.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (sendToAttacheeOnAttach.payload.data() && sendToAttacheeOnAttach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacheeOnAttach.payload type! Signature: "+QString::number(sendToAttacheeOnAttach.payload.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacheeOnAttach.payload type! Signature: "+QString::number(sendToAttacheeOnAttach.payload.data()->getSignature(), 16)+" Setting null value!\n");
+        sendToAttacheeOnAttach.payload = HkxSharedPtr();
     }
     if (sendToAttacherOnDetach.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacherOnDetach event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacherOnDetach event id out of range! Setting to max index in range!\n");
+        sendToAttacherOnDetach.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (sendToAttacherOnDetach.payload.data() && sendToAttacherOnDetach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacherOnDetach.payload type! Signature: "+QString::number(sendToAttacherOnDetach.payload.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacherOnDetach.payload type! Signature: "+QString::number(sendToAttacherOnDetach.payload.data()->getSignature(), 16)+" Setting null value!\n");
+        sendToAttacherOnDetach.payload = HkxSharedPtr();
     }
     if (sendToAttacheeOnDetach.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacheeOnDetach event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacheeOnDetach event id out of range! Setting to max index in range!\n");
+        sendToAttacheeOnDetach.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (sendToAttacheeOnDetach.payload.data() && sendToAttacheeOnDetach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacheeOnDetach.payload type! Signature: "+QString::number(sendToAttacheeOnDetach.payload.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacheeOnDetach.payload type! Signature: "+QString::number(sendToAttacheeOnDetach.payload.data()->getSignature(), 16)+" Setting null value!\n");
+        sendToAttacheeOnDetach.payload = HkxSharedPtr();
     }
     setDataValidity(isvalid);
     return errors;

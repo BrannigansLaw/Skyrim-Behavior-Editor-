@@ -222,35 +222,43 @@ void CharacterFile::setSkeletonFile(SkeletonFile *skel){
 }
 
 bool CharacterFile::addObjectToFile(HkxObject *obj, long ref){
-    if (ref > largestRef){
-        largestRef = ref;
+    if (obj){
+        if (ref < 1){
+            largestRef++;
+            ref = largestRef;
+        }else if (ref > largestRef){
+            largestRef = ref;
+        }else{
+            largestRef++;
+        }
+        obj->setReference(largestRef);
+        if (obj->getSignature() == HKB_BONE_WEIGHT_ARRAY){
+            boneWeightArrays.append(HkxSharedPtr(obj, ref));
+        }else if (obj->getSignature() == HKB_CHARACTER_DATA){
+            characterData = HkxSharedPtr(obj, ref);
+        }else if (obj->getSignature() == HKB_CHARACTER_STRING_DATA){
+            stringData = HkxSharedPtr(obj, ref);
+        }else if (obj->getSignature() == HKB_MIRRORED_SKELETON_INFO){
+            mirroredSkeletonInfo = HkxSharedPtr(obj, ref);
+        }else if (obj->getSignature() == HKB_VARIABLE_VALUE_SET){
+            characterPropertyValues = HkxSharedPtr(obj, ref);
+        }else if (obj->getSignature() == HKB_HAND_IK_DRIVER_INFO){
+            handIkDriverInfo = HkxSharedPtr(obj, ref);
+        }else if (obj->getSignature() == HKB_FOOT_IK_DRIVER_INFO){
+            footIkDriverInfo = HkxSharedPtr(obj, ref);
+        }else if (obj->getSignature() == HKB_CHARACTER_DATA){
+            characterData = HkxSharedPtr(obj, ref);
+        }else if (obj->getSignature() == HK_ROOT_LEVEL_CONTAINER){
+            setRootObject(HkxSharedPtr(obj, ref));
+        }else{
+            LogFile::writeToLog("CharacterFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16));
+            return false;
+        }
+        obj->setParentFile(this);
+        return true;
     }else{
-        largestRef++;
-    }
-    obj->setReference(largestRef);
-    if (obj->getSignature() == HKB_BONE_WEIGHT_ARRAY){
-        boneWeightArrays.append(HkxSharedPtr(obj, ref));
-    }else if (obj->getSignature() == HKB_CHARACTER_DATA){
-        characterData = HkxSharedPtr(obj, ref);
-    }else if (obj->getSignature() == HKB_CHARACTER_STRING_DATA){
-        stringData = HkxSharedPtr(obj, ref);
-    }else if (obj->getSignature() == HKB_MIRRORED_SKELETON_INFO){
-        mirroredSkeletonInfo = HkxSharedPtr(obj, ref);
-    }else if (obj->getSignature() == HKB_VARIABLE_VALUE_SET){
-        characterPropertyValues = HkxSharedPtr(obj, ref);
-    }else if (obj->getSignature() == HKB_HAND_IK_DRIVER_INFO){
-        handIkDriverInfo = HkxSharedPtr(obj, ref);
-    }else if (obj->getSignature() == HKB_FOOT_IK_DRIVER_INFO){
-        footIkDriverInfo = HkxSharedPtr(obj, ref);
-    }else if (obj->getSignature() == HKB_CHARACTER_DATA){
-        characterData = HkxSharedPtr(obj, ref);
-    }else if (obj->getSignature() == HK_ROOT_LEVEL_CONTAINER){
-        setRootObject(HkxSharedPtr(obj, ref));
-    }else{
-        LogFile::writeToLog("CharacterFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16));
         return false;
     }
-    return true;
 }
 
 bool CharacterFile::parse(){
@@ -364,7 +372,7 @@ hkbBoneWeightArray *CharacterFile::addNewBoneWeightArray(){
 
 void CharacterFile::write(){
     if (getRootObject().data()){
-        ulong ref = getRootObject().getShdPtrReference();
+        ulong ref = getRootObject().data()->getReference();
         getRootObject().data()->setIsWritten(false);
         stringData.data()->setIsWritten(false);
         characterData.data()->setIsWritten(false);

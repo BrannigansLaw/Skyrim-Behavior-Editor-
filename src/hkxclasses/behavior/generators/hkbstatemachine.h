@@ -10,6 +10,7 @@ class hkbStateMachine: public hkbGenerator
     friend class StateUI;
     friend class hkbStateMachineStateInfo;
     friend class BehaviorFile;
+    friend class hkbStateMachineTransitionInfoArray;
 public:
     hkbStateMachine(HkxFile *parent, long ref = 0);
     virtual ~hkbStateMachine();

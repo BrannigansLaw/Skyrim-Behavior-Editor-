@@ -214,7 +214,10 @@ void hkbEventsFromRangeModifier::unlink(){
 QString hkbEventsFromRangeModifier::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
@@ -222,14 +225,19 @@ QString hkbEventsFromRangeModifier::evaluateDataValidity(){
     if (eventRanges.data()){
         if (eventRanges.data()->getSignature() != HKB_EVENT_RANGE_DATA_ARRAY){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventRanges type! Signature: "+QString::number(eventRanges.data()->getSignature(), 16)+"\n");
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventRanges type! Signature: "+QString::number(eventRanges.data()->getSignature(), 16)+" Setting default value!\n");
+            eventRanges = HkxSharedPtr();
+        }else if (static_cast<hkbEventRangeDataArray *>(eventRanges.data())->eventData.size() < 1){
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": eventRanges has no eventData! Setting null value!\n");
+            eventRanges = HkxSharedPtr();
         }else if (eventRanges.data()->isDataValid() && eventRanges.data()->evaluateDataValidity() != ""){
             isvalid = false;
             //errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eventRanges data!\n");
         }
     }else if (!eventRanges.data()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null eventRanges!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null eventRanges! Setting default value!\n");
+        eventRanges = HkxSharedPtr();
     }
     setDataValidity(isvalid);
     return errors;

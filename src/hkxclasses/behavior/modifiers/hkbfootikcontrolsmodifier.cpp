@@ -379,15 +379,20 @@ QString hkbFootIkControlsModifier::evaluateDataValidity(){
         for (auto i = 0; i < legs.size(); i++){
             if (legs.at(i).id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": id in legs at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": id in legs at "+QString::number(i)+" out of range! Setting to max index in range!\n");
+                legs[i].id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
             }
             if (legs.at(i).payload.data() && legs.at(i).payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid payload type! Signature: "+QString::number(legs.at(i).payload.data()->getSignature(), 16)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid payload type! Signature: "+QString::number(legs.at(i).payload.data()->getSignature(), 16)+" Setting null value!\n");
+                legs[i].payload = HkxSharedPtr();
             }
         }
     }
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");

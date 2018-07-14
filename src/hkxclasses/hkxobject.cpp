@@ -56,7 +56,7 @@ void HkxObject::setRefsUpdated(bool value){
     refsUpdated = value;
 }
 
-void HkxObject::setParentFile(BehaviorFile *parent){
+void HkxObject::setParentFile(HkxFile *parent){
     if (parent){
         parentFile = parent;
     }
@@ -88,7 +88,7 @@ HkxObject::HkxType HkxObject::getType() const{
 void HkxObject::setDataValidity(bool isValid){
     dataValid = isValid;
     if (!dataValid && (getType() == TYPE_GENERATOR || getType() == TYPE_MODIFIER)){
-        static_cast<DataIconManager *>(this)->setDataInvalid();
+        static_cast<DataIconManager *>(this)->setIconValidity(isValid);
     }
 }
 
@@ -569,10 +569,16 @@ void HkDynamicObject::unlink(){
 }
 
 QString HkDynamicObject::evaluateDataValidity(){
-    if (variableBindingSet.data() && variableBindingSet.data()->getSignature() != HKB_VARIABLE_BINDING_SET){
-        variableBindingSet = HkxSharedPtr();
-        setDataValidity(false);
-        return QString(getParentFile()->getFileName()+": HkDynamicObject: Ref: "+getReferenceString()+": variableBindingSet is invalid type! Signature: "+QString::number(variableBindingSet.data()->getSignature(), 16)+"\n");
+    if (variableBindingSet.data()){
+        if (variableBindingSet.data()->getSignature() != HKB_VARIABLE_BINDING_SET){
+            variableBindingSet = HkxSharedPtr();
+            setDataValidity(false);
+            return QString(getParentFile()->getFileName()+": HkDynamicObject: Ref: "+getReferenceString()+": variableBindingSet is invalid type! Signature: "+QString::number(variableBindingSet.data()->getSignature(), 16)+"\n");
+        }else if (static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->getNumberOfBindings() < 1){
+            variableBindingSet = HkxSharedPtr();
+            setDataValidity(false);
+            return QString(getParentFile()->getFileName()+": HkDynamicObject: Ref: "+getReferenceString()+": variableBindingSet has no bindings! Setting null value!\n");
+        }
     }
     setDataValidity(true);
     return QString();

@@ -283,11 +283,13 @@ QString hkbClipTriggerArray::evaluateDataValidity(){
         for (auto i = 0; i < triggers.size(); i++){
             if (triggers.at(i).event.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": id in triggers at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": id in triggers at "+QString::number(i)+" out of range! Setting to last event index!\n");
+                triggers[i].event.id  = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
             }
             if (triggers.at(i).event.payload.data() && triggers.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(triggers.at(i).event.payload.data()->getSignature(), 16)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(triggers.at(i).event.payload.data()->getSignature(), 16)+" Setting null value!\n");
+                triggers[i].event.payload = HkxSharedPtr();
             }
         }
     }

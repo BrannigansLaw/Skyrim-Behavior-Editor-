@@ -73,7 +73,7 @@ protected:
     std::lock_guard <std::mutex> lockNGuard() const;
     bool getRefsUpdated() const;
     void setRefsUpdated(bool value);
-    void setParentFile(BehaviorFile *parent);
+    void setParentFile(HkxFile *parent);
 private:
     HkxObject(const HkxObject &obj);
     HkxObject& operator=(const HkxObject&);

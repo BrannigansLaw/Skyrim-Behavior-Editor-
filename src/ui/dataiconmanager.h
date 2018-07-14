@@ -28,7 +28,7 @@ public:
     void updateIconNames();
     bool hasSameSignatureAndName(const DataIconManager * other) const;
     virtual int getIndexOfObj(DataIconManager *) const;
-    void setDataInvalid();
+    void setIconValidity(bool valid);
     void setFocusOnTopIcon();
     bool isCircularLoop() const;
 protected:

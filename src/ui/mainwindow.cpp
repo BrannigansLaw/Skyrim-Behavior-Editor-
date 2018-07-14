@@ -949,7 +949,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata,
                 }
                 progress.setProgress("Loading behavior files...", 0);
                 //This also reads files that may not belong to the current project! See dog!!
-                std::vector <std::thread> threads;
+                std::vector <std::future<bool>> futures;
                 auto maxThreads = std::thread::hardware_concurrency() - 1;
                 auto taskCount = behaviornames.size();
                 auto previousCount = taskCount;
@@ -960,8 +960,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata,
                 std::unique_lock<std::mutex> locker(mutex);
                 //Start reading behavior files...
                 for (uint i = 0; i < maxThreads, behaviorIndex < behaviornames.size(); i++, behaviorIndex++){
-                    threads.push_back(std::thread(&MainWindow::openBehavior, this, behaviornames.at(behaviorIndex), std::ref(taskCount), false));
-                    threads.back().detach();
+                    futures.push_back(std::async(std::launch::async, &MainWindow::openBehavior, this, behaviornames.at(behaviorIndex), std::ref(taskCount), false));
                 }
                 while (taskCount > 0){
                     if (taskCount < behaviornames.size()){
@@ -972,14 +971,20 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata,
                     previousCount = taskCount;
                     for (; taskdifference > 0; taskdifference--){
                         if (behaviorIndex < behaviornames.size()){
-                            threads.push_back(std::thread(&MainWindow::openBehavior, this, behaviornames.at(behaviorIndex), std::ref(taskCount), false));
-                            threads.back().detach();
+                            futures.push_back(std::async(std::launch::async, &MainWindow::openBehavior, this, behaviornames.at(behaviorIndex), std::ref(taskCount), false));
                             behaviorIndex++;
                         }
                     }
                     conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
                 }
-                threads.clear();
+                for (auto i = 0; i < futures.size(); i++){
+                    if (!futures.at(i).get()){
+                        LogFile::writeToLog("Open project failed! \""+behaviornames.at(i)+"\" failed to parse!\n");
+                        cleanup();
+                        return;
+                    }
+                }
+                futures.clear();
                 if (loadui){
                     percent = 0;
                     progress.setProgress("Loading behavior graphs...", percent);
@@ -1017,7 +1022,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata,
                         }
                         conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
                     }*/
-                    threads.clear();
+                    futures.clear();
                 }
                 //projectFile->generateAnimClipDataForProject();
                 if (loadui && !behaviornames.isEmpty()){
@@ -1044,6 +1049,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata,
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The project file "+lastFileSelected+" could not be parsed!!!\nYou have tried to open non-project file or the project file is corrupted!").toLocal8Bit().data());
+        cleanup();
     }
 }
 
@@ -1314,7 +1320,7 @@ bool MainWindow::findGameDirectory(const QString & gamename, QString & gamedirec
     return value;
 }
 
-void MainWindow::convertProject(const QString &filepath, const QString &newpath, const QString &flags){
+bool MainWindow::convertProject(const QString &filepath, const QString &newpath, const QString &flags){
     QStringList pathtoallfiles;
     QStringList filelist;
     {
@@ -1327,89 +1333,94 @@ void MainWindow::convertProject(const QString &filepath, const QString &newpath,
             }
         }
     }
-    if (newpath != ""){
-        for (auto i = 0; i < filelist.size(); i++){
-            if (filelist.at(i).contains("/behaviors", Qt::CaseInsensitive) || filelist.at(i).contains("/animations", Qt::CaseInsensitive) || filelist.at(i).contains("/character assets", Qt::CaseInsensitive)
-                    || (filelist.at(i).contains("/character", Qt::CaseInsensitive) && filelist.at(i).count("/character") == 2))
+    if (!filelist.isEmpty()){
+        if (newpath != ""){
+            for (auto i = 0; i < filelist.size(); i++){
+                if (filelist.at(i).contains("/behaviors", Qt::CaseInsensitive) || filelist.at(i).contains("/animations", Qt::CaseInsensitive) || filelist.at(i).contains("/character assets", Qt::CaseInsensitive)
+                        || (filelist.at(i).contains("/character", Qt::CaseInsensitive) && filelist.at(i).count("/character") == 2))
+                {
+                    pathtoallfiles.append(newpath+"/"+filelist.at(i).section("/", -2, -1));
+                }else{
+                    pathtoallfiles.append(newpath+"/"+filelist.at(i).section("/", -1, -1));
+                }
+            }
+        }else{
+            for (auto i = 0; i < filelist.size(); i++){
+                pathtoallfiles.append("");
+            }
+        }
+        QProgressDialog progress("Converting packed hkx binaries to hkx xml...", "", 0, 100, this);
+        progress.setWindowModality(Qt::WindowModal);
+        std::vector <std::thread> threads;
+        auto percent = 0;
+        auto taskCount = filelist.size();
+        auto previousCount = taskCount;
+        auto fileIndex = 0;
+        auto maxThreads = std::thread::hardware_concurrency() - 1;
+        auto taskdifference = 0;
+        qreal difference = ((1.0)/((qreal)(filelist.size())))*(100.0);
+        std::unique_lock<std::mutex> locker(mutex);
+        //Read files...
+        for (uint i = 0; i < maxThreads, fileIndex < filelist.size(); i++, fileIndex++){
+            threads.push_back(std::thread(&MainWindow::hkxcmd, this, filelist.at(fileIndex), pathtoallfiles.at(fileIndex), std::ref(taskCount), flags));
+            threads.back().detach();
+        }
+        while (taskCount > 0){
+            if (taskCount < filelist.size()){
+                percent += difference;
+                progress.setValue(percent);
+            }
+            taskdifference = previousCount - taskCount;
+            previousCount = taskCount;
+            for (; taskdifference > 0; taskdifference--){
+                if (fileIndex < filelist.size()){
+                    threads.push_back(std::thread(&MainWindow::hkxcmd, this, filelist.at(fileIndex), pathtoallfiles.at(fileIndex), std::ref(taskCount), flags));
+                    threads.back().detach();
+                    fileIndex++;
+                }
+            }
+            conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
+        }
+        threads.clear();
+        if (newpath == ""){
+            progress.setLabelText("Renaming converted files, cleaning up extras...");
+            progress.setValue(10);
+            //remove all hkx files then rename the rest to hkx files...
             {
-                pathtoallfiles.append(newpath+"/"+filelist.at(i).section("/", -2, -1));
-            }else{
-                pathtoallfiles.append(newpath+"/"+filelist.at(i).section("/", -1, -1));
+                QDirIterator it(filepath.section("/", 0, -2), QDirIterator::Subdirectories);
+                QString temp;
+                while (it.hasNext()){
+                    temp = it.next();
+                    if (temp.contains(".hkx") && !temp.contains("/animations/", Qt::CaseInsensitive) && !temp.contains("/_1stperson/", Qt::CaseInsensitive)){
+                        if (!QDir(temp).remove(temp)){
+                            CRITICAL_ERROR_MESSAGE(QString("MainWindow::convertProject(): The file "+temp+" could not be removed!!!").toLocal8Bit().data());
+                        }
+                    }
+                }
+            }
+            progress.setValue(50);
+            {
+                QDirIterator it(filepath.section("/", 0, -2), QDirIterator::Subdirectories);
+                QString temp;
+                while (it.hasNext()){
+                    temp = it.next();
+                    if (temp.contains("-out.xml")){
+                        if (!QDir(temp).rename(temp, QString(temp).replace("-out.xml", ".hkx"))){
+                            CRITICAL_ERROR_MESSAGE(QString("MainWindow::convertProject(): The file "+temp+" could not be renamed!!!").toLocal8Bit().data());
+                        }
+                    }else if (temp.contains(".xml")){
+                        if (!QDir(temp).rename(temp, QString(temp).replace(".xml", ".hkx"))){
+                            CRITICAL_ERROR_MESSAGE(QString("MainWindow::convertProject(): The file "+temp+" could not be renamed!!!").toLocal8Bit().data());
+                        }
+                    }
+                }
             }
         }
+        progress.setValue(100);
     }else{
-        for (auto i = 0; i < filelist.size(); i++){
-            pathtoallfiles.append("");
-        }
+        return false;
     }
-    QProgressDialog progress("Converting packed hkx binaries to hkx xml...", "", 0, 100, this);
-    progress.setWindowModality(Qt::WindowModal);
-    std::vector <std::thread> threads;
-    auto percent = 0;
-    auto taskCount = filelist.size();
-    auto previousCount = taskCount;
-    auto fileIndex = 0;
-    auto maxThreads = std::thread::hardware_concurrency() - 1;
-    auto taskdifference = 0;
-    qreal difference = ((1.0)/((qreal)(filelist.size())))*(100.0);
-    std::unique_lock<std::mutex> locker(mutex);
-    //Read files...
-    for (uint i = 0; i < maxThreads, fileIndex < filelist.size(); i++, fileIndex++){
-        threads.push_back(std::thread(&MainWindow::hkxcmd, this, filelist.at(fileIndex), pathtoallfiles.at(fileIndex), std::ref(taskCount), flags));
-        threads.back().detach();
-    }
-    while (taskCount > 0){
-        if (taskCount < filelist.size()){
-            percent += difference;
-            progress.setValue(percent);
-        }
-        taskdifference = previousCount - taskCount;
-        previousCount = taskCount;
-        for (; taskdifference > 0; taskdifference--){
-            if (fileIndex < filelist.size()){
-                threads.push_back(std::thread(&MainWindow::hkxcmd, this, filelist.at(fileIndex), pathtoallfiles.at(fileIndex), std::ref(taskCount), flags));
-                threads.back().detach();
-                fileIndex++;
-            }
-        }
-        conditionVar.wait(locker, [&](){return (taskCount < previousCount);});
-    }
-    threads.clear();
-    if (newpath == ""){
-        progress.setLabelText("Renaming converted files, cleaning up extras...");
-        progress.setValue(10);
-        //remove all hkx files then rename the rest to hkx files...
-        {
-            QDirIterator it(filepath.section("/", 0, -2), QDirIterator::Subdirectories);
-            QString temp;
-            while (it.hasNext()){
-                temp = it.next();
-                if (temp.contains(".hkx") && !temp.contains("/animations/", Qt::CaseInsensitive) && !temp.contains("/_1stperson/", Qt::CaseInsensitive)){
-                    if (!QDir(temp).remove(temp)){
-                        CRITICAL_ERROR_MESSAGE(QString("MainWindow::convertProject(): The file "+temp+" could not be removed!!!").toLocal8Bit().data());
-                    }
-                }
-            }
-        }
-        progress.setValue(50);
-        {
-            QDirIterator it(filepath.section("/", 0, -2), QDirIterator::Subdirectories);
-            QString temp;
-            while (it.hasNext()){
-                temp = it.next();
-                if (temp.contains("-out.xml")){
-                    if (!QDir(temp).rename(temp, QString(temp).replace("-out.xml", ".hkx"))){
-                        CRITICAL_ERROR_MESSAGE(QString("MainWindow::convertProject(): The file "+temp+" could not be renamed!!!").toLocal8Bit().data());
-                    }
-                }else if (temp.contains(".xml")){
-                    if (!QDir(temp).rename(temp, QString(temp).replace(".xml", ".hkx"))){
-                        CRITICAL_ERROR_MESSAGE(QString("MainWindow::convertProject(): The file "+temp+" could not be renamed!!!").toLocal8Bit().data());
-                    }
-                }
-            }
-        }
-    }
-    progress.setValue(100);
+    return true;
 }
 
 MainWindow::HKXCMD_RETURN MainWindow::hkxcmd(const QString &filepath, const QString &outputDirectory, int & taskcount, const QString &flags){

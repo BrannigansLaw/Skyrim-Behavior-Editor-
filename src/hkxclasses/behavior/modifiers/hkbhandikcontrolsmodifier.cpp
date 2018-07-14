@@ -231,11 +231,15 @@ QString hkbHandIkControlsModifier::evaluateDataValidity(){
         for (auto i = 0; i < hands.size(); i++){
             if (hands.at(i).handIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": handIndex at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": handIndex at "+QString::number(i)+" out of range! Setting to last bone index!\n");
+                hands[i].handIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
             }
         }
     }
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");

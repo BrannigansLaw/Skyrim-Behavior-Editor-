@@ -1139,6 +1139,9 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
     HkxSignature sig;
     if (icon && (icon->itemData)){
         HkxObject *oldData = loadedData;
+        if (oldData){
+            oldData->evaluateDataValidity();
+        }
         sig = ((HkxObject *)((icon->itemData)))->getSignature();
         loadedData = ((HkxObject *)((icon->itemData)));
         switch (sig){

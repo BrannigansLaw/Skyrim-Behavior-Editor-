@@ -248,34 +248,43 @@ void hkbDetectCloseToGroundModifier::unlink(){
 QString hkbDetectCloseToGroundModifier::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
     }
     if (closeToGroundEvent.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": closeToGroundEvent event id out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": closeToGroundEvent event id out of range! Setting to max index in range!\n");
+        closeToGroundEvent.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (closeToGroundEvent.payload.data() && closeToGroundEvent.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid closeToGroundEvent.payload type! Signature: "+QString::number(closeToGroundEvent.payload.data()->getSignature(), 16)+"\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid closeToGroundEvent.payload type! Signature: "+QString::number(closeToGroundEvent.payload.data()->getSignature(), 16)+" Setting null value!\n");
+        closeToGroundEvent.payload = HkxSharedPtr();
     }
     if (boneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": boneIndex out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": boneIndex out of range! Setting to last bone index!\n");
+        boneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
     }
     if (animBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": animBoneIndex out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": animBoneIndex out of range! Setting to last bone index!\n");
+        animBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (boneIndex > -1 && animBoneIndex > -1){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": boneIndex and animBoneIndex are both in use at the same time! This will crash the game!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": boneIndex and animBoneIndex are both in use at the same time! This will crash the game! Setting boneIndex to -1!\n");
+        boneIndex = -1;
     }
     if (boneIndex < 0 && animBoneIndex < 0 ){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Neither boneIndex and animBoneIndex are in use!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Neither boneIndex and animBoneIndex are in use! Setting animBoneIndex to 0!\n");
+        animBoneIndex = 0;
     }
     setDataValidity(isvalid);
     return errors;

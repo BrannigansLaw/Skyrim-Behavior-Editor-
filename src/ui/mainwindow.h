@@ -142,7 +142,7 @@ private:
     bool openBehavior(const QString & filename, int &taskCount, bool checkisopen = true);
     bool exitProgram();
     bool findGameDirectory(const QString &gamename, QString &gamedirectory);
-    void convertProject(const QString &filepath, const QString &newpath = "", const QString &flags = "-v:xml");
+    bool convertProject(const QString &filepath, const QString &newpath = "", const QString &flags = "-v:xml");
     HKXCMD_RETURN hkxcmd(const QString &filepath, const QString &outputDirectory, int &taskcount, const QString &flags = "-f SAVE_CONCISE");
     int getBehaviorGraphIndex(const QString & filename);
     void readSettings();

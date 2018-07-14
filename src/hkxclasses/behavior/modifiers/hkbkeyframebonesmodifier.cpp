@@ -222,7 +222,8 @@ QString hkbKeyframeBonesModifier::evaluateDataValidity(){
         for (auto i = 0; i < keyframeInfo.size(); i++){
             if (keyframeInfo.at(i).boneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": boneIndex at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": boneIndex at "+QString::number(i)+" out of range! Setting to last bone index!\n");
+                keyframeInfo[i].boneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
             }
         }
     }
@@ -234,7 +235,8 @@ QString hkbKeyframeBonesModifier::evaluateDataValidity(){
     if (keyframedBonesList.data()){
         if (keyframedBonesList.data()->getSignature() != HKB_BONE_INDEX_ARRAY){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid keyframedBonesList type! Signature: "+QString::number(keyframedBonesList.data()->getSignature(), 16)+"\n");
+            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid keyframedBonesList type! Signature: "+QString::number(keyframedBonesList.data()->getSignature(), 16)+" Setting null value!\n");
+            keyframedBonesList = HkxSharedPtr();    //TO DO: add here?
         }else if (keyframedBonesList.data()->isDataValid() && keyframedBonesList.data()->evaluateDataValidity() != ""){
             isvalid = false;
             //errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid keyframedBonesList data!\n");

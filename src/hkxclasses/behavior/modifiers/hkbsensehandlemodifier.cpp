@@ -405,23 +405,28 @@ QString hkbSenseHandleModifier::evaluateDataValidity(){
     }
     if (!SensingMode.contains(sensingMode)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sensingMode!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sensingMode! Setting default value!\n");
+        sensingMode = SensingMode.first();
     }
     if (sensorRagdollBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sensorRagdollBoneIndex out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sensorRagdollBoneIndex out of range! Setting to last bone index!\n");
+        sensorRagdollBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
     }
     if (sensorAnimationBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sensorAnimationBoneIndex out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sensorAnimationBoneIndex out of range! Setting to last bone index!\n");
+        sensorAnimationBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (sensorRagdollBoneIndex > -1 && sensorAnimationBoneIndex > -1){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sensorRagdollBoneIndex and sensorAnimationBoneIndex are both in use at the same time! This will crash the game!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sensorRagdollBoneIndex and sensorAnimationBoneIndex are both in use at the same time! This will crash the game! Setting sensorRagdollBoneIndex to -1!\n");
+        sensorRagdollBoneIndex = -1;
     }
     if (sensorRagdollBoneIndex < 0 && sensorAnimationBoneIndex < 0 ){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Neither sensorRagdollBoneIndex and sensorAnimationBoneIndex are in use!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Neither sensorRagdollBoneIndex and sensorAnimationBoneIndex are in use! Setting sensorAnimationBoneIndex to 0!\n");
+        sensorAnimationBoneIndex = 0;
     }
     setDataValidity(isvalid);
     return errors;

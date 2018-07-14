@@ -133,7 +133,10 @@ void hkbGetHandleOnBoneModifier::unlink(){
 QString hkbGetHandleOnBoneModifier::evaluateDataValidity(){
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
@@ -144,19 +147,23 @@ QString hkbGetHandleOnBoneModifier::evaluateDataValidity(){
     }
     if (animationBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": animationBoneIndex out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": animationBoneIndex out of range! Setting to last bone index!\n");
+        animationBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (ragdollBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": ragdollBoneIndex out of range!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": ragdollBoneIndex out of range! Setting to last bone index!\n");
+        ragdollBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
     }
     if (animationBoneIndex > -1 && ragdollBoneIndex > -1){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": animationBoneIndex and ragdollBoneIndex are both in use at the same time! This will crash the game!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": animationBoneIndex and ragdollBoneIndex are both in use at the same time! This will crash the game! Setting ragdollBoneIndex to -1!\n");
+        ragdollBoneIndex = -1;
     }
     if (animationBoneIndex < 0 && ragdollBoneIndex < 0 ){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Neither animationBoneIndex and ragdollBoneIndex are in use!\n");
+        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Neither animationBoneIndex and ragdollBoneIndex are in use! Setting animationBoneIndex to 0!\n");
+        animationBoneIndex = 0;
     }
     setDataValidity(isvalid);
     return errors;

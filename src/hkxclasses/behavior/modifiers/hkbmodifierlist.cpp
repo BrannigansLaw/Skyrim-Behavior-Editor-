@@ -269,17 +269,22 @@ QString hkbModifierList::evaluateDataValidity(){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": modifiers is empty!\n");
     }else{
-        for (int i = 0; i < modifiers.size(); i++){
+        for (int i = modifiers.size() - 1; i >= 0; i--){
             if (!modifiers.at(i).data()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": modifiers at index '"+QString::number(i)+"' is null!\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": modifiers at index '"+QString::number(i)+"' is null! Removing child!\n");
+                modifiers.removeAt(i);
             }else if (modifiers.at(i).data()->getType() != HkxObject::TYPE_MODIFIER){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid state! Signature: "+QString::number(modifiers.at(i).data()->getSignature(), 16)+"\n");
+                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid state! Signature: "+QString::number(modifiers.at(i).data()->getSignature(), 16)+" Removing child!\n");
+                modifiers.removeAt(i);
             }
         }
     }
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    if (temp != ""){
+        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    }
     if (name == ""){
         isvalid = false;
         errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
