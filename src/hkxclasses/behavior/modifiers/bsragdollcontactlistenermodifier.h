@@ -3,19 +3,21 @@
 
 #include "hkbmodifier.h"
 
-class BSRagdollContactListenerModifier: public hkbModifier
+class BSRagdollContactListenerModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSRagdollContactListenerModifierUI;
 public:
     BSRagdollContactListenerModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSRagdollContactListenerModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSRagdollContactListenerModifier& operator=(const BSRagdollContactListenerModifier&) = delete;
+    BSRagdollContactListenerModifier(const BSRagdollContactListenerModifier &) = delete;
+    ~BSRagdollContactListenerModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
@@ -25,16 +27,14 @@ public:
     QVector <HkxObject *> getChildrenOtherTypes() const;
     bool merge(HkxObject *recessiveObject);
 private:
-    BSRagdollContactListenerModifier& operator=(const BSRagdollContactListenerModifier&);
-    BSRagdollContactListenerModifier(const BSRagdollContactListenerModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
     hkEventPayload contactEvent;
     HkxSharedPtr bones;
+    mutable std::mutex mutex;
 };
 
 #endif // BSRAGDOLLCONTACTLISTENERMODIFIER_H

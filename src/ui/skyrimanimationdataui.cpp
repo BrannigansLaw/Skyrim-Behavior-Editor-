@@ -111,22 +111,22 @@ void SkyrimAnimationDataUI::loadDynamicTableRows(){
     if (bsData){
         int temp = ADD_TRANSLATION_ROW + bsData->translations.size() + 1 - rotationsButtonRow;
         if (temp > 0){
-            for (int i = 0; i < temp; i++){
+            for (auto i = 0; i < temp; i++){
                 table->insertRow(rotationsButtonRow);
                 rotationsButtonRow++;
             }
         }else if (temp < 0){
-            for (int i = temp; i < 0; i++){
+            for (auto i = temp; i < 0; i++){
                 table->removeRow(rotationsButtonRow - 1);
                 rotationsButtonRow--;
             }
         }
         rotationsButtonRow = ADD_TRANSLATION_ROW + bsData->translations.size() + 1;
-        for (int i = INITIAL_ROTATION_ROW, j = 0; i < rotationsButtonRow, j < bsData->translations.size(); i++, j++){
+        for (auto i = INITIAL_ROTATION_ROW, j = 0; i < rotationsButtonRow, j < bsData->translations.size(); i++, j++){
             setRowItems(i, "Translation "+QString::number(j), "hkVector3", "Remove", "Edit", "Double click to remove this translation", "Double click to edit this translation");
         }
         table->setRowCount(rotationsButtonRow + bsData->rotations.size() + 1);
-        for (int i = rotationsButtonRow + 1, j = 0; i < table->rowCount(), j < bsData->rotations.size(); i++, j++){
+        for (auto i = rotationsButtonRow + 1, j = 0; i < table->rowCount(), j < bsData->rotations.size(); i++, j++){
             setRowItems(i, "Rotation "+QString::number(j), "hkQuaternion", "Remove", "Edit", "Double click to remove this quaternion", "Double click to edit this quaternion");
         }
     }else{

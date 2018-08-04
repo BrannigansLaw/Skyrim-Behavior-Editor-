@@ -4,31 +4,18 @@
 #include "hkbgenerator.h"
 #include "src/animData/skyrimclipgeneratodata.h"
 
-class hkbClipGenerator: public hkbGenerator
+class hkbClipGenerator final: public hkbGenerator
 {
-    friend class BehaviorGraphView;
     friend class ClipGeneratorUI;
-    friend class ProjectFile;
 public:
     hkbClipGenerator(HkxFile *parent, long ref = 0, bool addToAnimData = false, const QString & animationname = "");
-    virtual ~hkbClipGenerator();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
-    void unlink();
-    void removeData(){}
+    hkbClipGenerator& operator=(const hkbClipGenerator&) = delete;
+    hkbClipGenerator(const hkbClipGenerator &) = delete;
+    ~hkbClipGenerator();
     QString getName() const;
-    QString evaluateDataValidity();
-    static QString getClassname();
-    bool write(HkxXMLWriter *writer);
-    int getNumberOfTriggers() const;
+    static const QString getClassname();
+    SkyrimClipGeneratoData getClipGeneratorAnimData(ProjectAnimData *parent, uint animationIndex) const;
     QString getAnimationName() const;
-    bool isEventReferenced(int eventindex) const;
-    void updateEventIndices(int eventindex);
-    void mergeEventIndex(int oldindex, int newindex);
-    void fixMergedEventIndices(BehaviorFile *dominantfile);
-    bool merge(HkxObject *recessiveObject);
-    void updateReferences(long &ref);
-    QVector <HkxObject *> getChildrenOtherTypes() const;
     enum ClipFlag{
         FLAG_NONE = 0,
         FLAG_CONTINUE_MOTION_AT_END = 1,
@@ -40,19 +27,29 @@ public:
         INVALID_FLAG = 128
     };
     Q_DECLARE_FLAGS(ClipFlags, ClipFlag)
-    SkyrimClipGeneratoData getClipGeneratorAnimData(ProjectAnimData *parent, uint animationIndex) const;
 private:
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
+    void unlink();
+    QString evaluateDataValidity();
+    bool write(HkxXMLWriter *writer);
+    int getNumberOfTriggers() const;
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
+    void mergeEventIndex(int oldindex, int newindex);
+    void fixMergedEventIndices(BehaviorFile *dominantfile);
+    bool merge(HkxObject *recessiveObject);
+    void updateReferences(long &ref);
+    QVector <HkxObject *> getChildrenOtherTypes() const;
     void setName(const QString & oldclipname, const QString & newclipname);
     void setAnimationName(int index, const QString & animationname);
     void setPlaybackSpeed(qreal speed);
     void setCropStartAmountLocalTime(qreal time);
     void setCropEndAmountLocalTime(qreal time);
-    hkbClipGenerator& operator=(const hkbClipGenerator&);
-    hkbClipGenerator(const hkbClipGenerator &);
 private:
-    static QStringList PlaybackMode;    //{MODE_SINGLE_PLAY=0,MODE_LOOPING=1,MODE_USER_CONTROLLED=2,MODE_PING_PONG=3,MODE_COUNT=4};
     static uint refCount;
-    static QString classname;
+    static const QStringList PlaybackMode;
+    static const QString classname;
     ulong userData;
     QString name;
     QString animationName;
@@ -66,6 +63,7 @@ private:
     int animationBindingIndex;
     QString mode;
     QString flags;
+    mutable std::mutex mutex;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(hkbClipGenerator::ClipFlags)

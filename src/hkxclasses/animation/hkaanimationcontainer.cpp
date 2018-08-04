@@ -15,7 +15,7 @@ hkaAnimationContainer::hkaAnimationContainer(HkxFile *parent, long ref)
     : HkxObject(parent, ref)
 {
     setType(HKA_ANIMATION_CONTAINER, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
@@ -23,7 +23,7 @@ QString hkaAnimationContainer::getClassname(){
     return classname;
 }
 
-bool hkaAnimationContainer::readData(const HkxXmlReader &reader, long index){
+bool hkaAnimationContainer::readData(const HkxXmlReader &reader, long & index){
     bool ok;
     int numElems = 0;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
@@ -33,16 +33,17 @@ bool hkaAnimationContainer::readData(const HkxXmlReader &reader, long index){
         if (text == "skeletons"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'skeletons' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'skeletons' data!\nObject Reference: "+ref);
                 return false;
             }
             if (numElems > 0 && !readReferences(reader.getElementValueAt(index), skeletons)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'skeletons' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'skeletons' data!\nObject Reference: "+ref);
                 return false;
             }
         }
         index++;
     }
+    index--;
     return true;
 }
 
@@ -58,9 +59,9 @@ bool hkaAnimationContainer::write(HkxXMLWriter *writer){
         list2 = {"skeletons", QString::number(skeletons.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
         QString refs;
-        for (int i = 0; i < skeletons.size(); i++){
+        for (auto i = 0; i < skeletons.size(); i++){
             if (skeletons.at(i).data()){
-                refs = refs + skeletons.at(i).data()->getReferenceString()+" ";
+                refs = refs + skeletons.at(i)->getReferenceString()+" ";
             }
         }
         writer->writeLine(refs);
@@ -79,9 +80,9 @@ bool hkaAnimationContainer::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        for (int i = 0; i < skeletons.size(); i++){
+        for (auto i = 0; i < skeletons.size(); i++){
             if (skeletons.at(i).data()){
-                skeletons.at(i).data()->write(writer);
+                skeletons.at(i)->write(writer);
             }
         }
     }
@@ -93,13 +94,13 @@ bool hkaAnimationContainer::link(){
         return false;
     }
     HkxSharedPtr *ptr = nullptr;
-    for (int i = 0; i < skeletons.size(); i++){
+    for (auto i = 0; i < skeletons.size(); i++){
         ptr = static_cast<SkeletonFile *>(getParentFile())->findSkeleton(skeletons.at(i).getShdPtrReference());
-        if (!ptr){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'skeletons' data field!\n");
+        if (!ptr || !ptr->data()){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'skeletons' data field!\n");
             setDataValidity(false);
         }else if (!(*ptr).data() || (*ptr)->getSignature() != HKA_SKELETON){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'skeletons' data field is linked to invalid child!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'skeletons' data field is linked to invalid child!\n");
             setDataValidity(false);
             skeletons[i] = *ptr;
         }else{
@@ -110,8 +111,8 @@ bool hkaAnimationContainer::link(){
 }
 
 QString hkaAnimationContainer::evaluateDataValidity(){
-    for (int i = 0; i < skeletons.size(); i++){
-        if (!skeletons.at(i).data() || skeletons.at(i).data()->getSignature() != HKA_SKELETON){
+    for (auto i = 0; i < skeletons.size(); i++){
+        if (!skeletons.at(i).data() || skeletons.at(i)->getSignature() != HKA_SKELETON){
             setDataValidity(false);
             return QString();
         }

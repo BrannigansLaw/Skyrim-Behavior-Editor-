@@ -26,15 +26,14 @@ CharacterFile::CharacterFile(MainWindow *window, ProjectFile *projectfile, const
         hkbCharacterData *characterdata = new hkbCharacterData(this, 0);
         hkbMirroredSkeletonInfo *info = new hkbMirroredSkeletonInfo(this);
         hkbVariableValueSet *values = new hkbVariableValueSet(this);
-        stringdata->name = name.section("/", -1, -1).remove(".hkx");
-        stringdata->rigName = skeletonrelativepath;
-        stringdata->ragdollName = skeletonrelativepath;
-        stringdata->behaviorFilename = "Behaviors\\Master.hkx";
+        stringdata->setName(name.section("/", -1, -1).remove(".hkx"));
+        stringdata->setRigName(skeletonrelativepath);
+        stringdata->setRagdollName(skeletonrelativepath);
+        stringdata->setBehaviorFilename("Behaviors\\Master.hkx");
         characterdata->stringData = HkxSharedPtr(stringdata);
         characterdata->mirroredSkeletonInfo = HkxSharedPtr(info);
         characterdata->characterPropertyValues = HkxSharedPtr(values);
-        root->addVariant("hkbCharacterData");
-        root->setVariantAt(0, characterdata);
+        root->addVariant("hkbCharacterData", characterdata);
         setRootObject(HkxSharedPtr(root));
         setIsChanged(false);
     }
@@ -48,7 +47,7 @@ HkxSharedPtr * CharacterFile::findCharacterData(long ref){
 }
 
 HkxSharedPtr * CharacterFile::findCharacterPropertyValues(long ref){
-    for (int i = 0; i < boneWeightArrays.size(); i++){
+    for (auto i = 0; i < boneWeightArrays.size(); i++){
         if (boneWeightArrays.at(i).data() && boneWeightArrays.at(i).getShdPtrReference() == ref){
             return &boneWeightArrays[i];
         }
@@ -67,7 +66,7 @@ HkxSharedPtr * CharacterFile::findCharacterPropertyValues(long ref){
 QString CharacterFile::getBehaviorDirectoryName() const{
     hkbCharacterStringData *ptr = static_cast<hkbCharacterStringData *>(stringData.data());
     if (ptr){
-        return QString(ptr->behaviorFilename).replace("\\", "/").section("/", -2, -2);
+        return QString(ptr->getBehaviorFilename()).replace("\\", "/").section("/", -2, -2);
     }
     return "";
 }
@@ -75,7 +74,7 @@ QString CharacterFile::getBehaviorDirectoryName() const{
 QString CharacterFile::getRigName() const{
     hkbCharacterStringData *ptr = static_cast<hkbCharacterStringData *>(stringData.data());
     if (ptr){
-        return QString(ptr->rigName).replace("\\", "/").section("/", -2, -1);
+        return QString(ptr->getRigName()).replace("\\", "/").section("/", -2, -1);
     }
     return "";
 }
@@ -104,7 +103,7 @@ int CharacterFile::getNumberOfBones(bool ragdoll) const{
 QString CharacterFile::getRagdollName() const{
     hkbCharacterStringData *ptr = static_cast<hkbCharacterStringData *>(stringData.data());
     if (ptr){
-        return ptr->ragdollName;
+        return ptr->getRagdollName();
     }
     return "";
 }
@@ -136,7 +135,7 @@ QString CharacterFile::getCharacterPropertyNameAt(int index) const{
 
 int CharacterFile::getCharacterPropertyIndex(const QString &name) const{
     if (stringData.data() && stringData->getSignature() == HKB_CHARACTER_STRING_DATA){
-        return static_cast<hkbCharacterStringData *>(stringData.data())->characterPropertyNames.indexOf(name);
+        return static_cast<hkbCharacterStringData *>(stringData.data())->getCharacterPropertyIndex(name);
     }
     return -1;
 }
@@ -162,7 +161,7 @@ int CharacterFile::getAnimationIndex(const QString &name) const{
 
 int CharacterFile::getNumberOfAnimations() const{
     if (stringData.data() && stringData->getSignature() == HKB_CHARACTER_STRING_DATA){
-        return static_cast<hkbCharacterStringData *>(stringData.data())->animationNames.size();
+        return static_cast<hkbCharacterStringData *>(stringData.data())->getNumberOfAnimations();
     }
     return -1;
 }
@@ -173,7 +172,7 @@ bool CharacterFile::isAnimationUsed(const QString &animationname) const{
 
 QString CharacterFile::getRootBehaviorFilename() const{
     if (stringData.data() && stringData->getSignature() == HKB_CHARACTER_STRING_DATA){
-        QString string = static_cast<hkbCharacterStringData *>(stringData.data())->behaviorFilename;
+        QString string = static_cast<hkbCharacterStringData *>(stringData.data())->getBehaviorFilename();
         if (string.contains("\\")){
             return string.section("\\", -1, -1);
         }else if (string.contains("/")){
@@ -187,22 +186,9 @@ QString CharacterFile::getRootBehaviorFilename() const{
 void CharacterFile::getCharacterPropertyBoneWeightArray(const QString &name, hkbBoneWeightArray *ptrtosetdata) const{
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
     hkbCharacterData *data = static_cast<hkbCharacterData *>(characterData.data());
-    hkbVariableValueSet *values = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
-    int count = -1;
-    if (strData && data && values){
-        int index = strData->characterPropertyNames.indexOf(name);
-        if (index < strData->characterPropertyNames.size() && index < data->characterPropertyInfos.size()){
-            if (data->characterPropertyInfos.at(index).type == "VARIABLE_TYPE_POINTER"){
-                for (int i = 0; i <= index; i++){
-                    if (data->characterPropertyInfos.at(i).type == "VARIABLE_TYPE_POINTER"){
-                        count++;
-                    }
-                }
-                if (count < values->variantVariableValues.size() && count > -1 && values->variantVariableValues.at(count).constData()->getSignature() == HKB_BONE_WEIGHT_ARRAY){
-                    ptrtosetdata->copyBoneWeights(static_cast<const hkbBoneWeightArray *>(values->variantVariableValues.at(count).constData()));
-                }
-            }
-        }
+    if (strData && data){
+        auto index = strData->getCharacterPropertyIndex(name);
+        ptrtosetdata->copyBoneWeights(static_cast<hkbBoneWeightArray *>(data->getVariantVariable(index)));
     }
 }
 
@@ -254,7 +240,7 @@ bool CharacterFile::addObjectToFile(HkxObject *obj, long ref){
             LogFile::writeToLog("CharacterFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16));
             return false;
         }
-        obj->setParentFile(this);
+        //obj->setParentFile(this);
         return true;
     }else{
         return false;
@@ -265,7 +251,7 @@ bool CharacterFile::parse(){
     if (!getReader().parse()){
         return false;
     }
-    int index = 2;
+    long index = 2;
     bool ok = true;
     HkxSignature signature;
     QByteArray value;
@@ -343,15 +329,15 @@ bool CharacterFile::link(){
         LogFile::writeToLog("CharacterFile: link() failed!\nThe root object of this character file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16));
         return false;
     }
-    if (!getRootObject().data()->link()){
+    if (!getRootObject()->link()){
         LogFile::writeToLog("CharacterFile: link() failed!\nThe root object of this character file failed to link to it's children!");
         return false;
     }
-    if (!characterData.data() || !characterData.data()->link()){
+    if (!characterData.data() || !characterData->link()){
         LogFile::writeToLog("CharacterFile: link() failed!\ncharacterData failed to link to it's children!\n");
         return false;
     }
-    if (!characterPropertyValues.data() || !characterPropertyValues.data()->link()){
+    if (!characterPropertyValues.data() || !characterPropertyValues->link()){
         LogFile::writeToLog("CharacterFile: link() failed!\ncharacterPropertyValues failed to link to it's children!\n");
         return false;
     }
@@ -372,42 +358,42 @@ hkbBoneWeightArray *CharacterFile::addNewBoneWeightArray(){
 
 void CharacterFile::write(){
     if (getRootObject().data()){
-        ulong ref = getRootObject().data()->getReference();
-        getRootObject().data()->setIsWritten(false);
-        stringData.data()->setIsWritten(false);
-        characterData.data()->setIsWritten(false);
-        characterPropertyValues.data()->setIsWritten(false);
+        ulong ref = getRootObject()->getReference();
+        getRootObject()->setIsWritten(false);
+        stringData->setIsWritten(false);
+        characterData->setIsWritten(false);
+        characterPropertyValues->setIsWritten(false);
         if (mirroredSkeletonInfo.data()){
-            mirroredSkeletonInfo.data()->setIsWritten(false);
+            mirroredSkeletonInfo->setIsWritten(false);
         }else{
             CRITICAL_ERROR_MESSAGE("CharacterFile::write(): no mirroredSkeletonInfo!!");
         }
         if (handIkDriverInfo.data()){
-            handIkDriverInfo.data()->setIsWritten(false);
+            handIkDriverInfo->setIsWritten(false);
         }
         if (footIkDriverInfo.data()){
-            footIkDriverInfo.data()->setIsWritten(false);
+            footIkDriverInfo->setIsWritten(false);
         }
         ref++;
-        stringData.data()->setReference(ref);
+        stringData->setReference(ref);
         ref++;
-        characterData.data()->setReference(ref);
+        characterData->setReference(ref);
         ref++;
-        characterPropertyValues.data()->setReference(ref);
+        characterPropertyValues->setReference(ref);
         ref++;
-        mirroredSkeletonInfo.data()->setReference(ref);
+        mirroredSkeletonInfo->setReference(ref);
         ref++;
         if (handIkDriverInfo.data()){
-            handIkDriverInfo.data()->setReference(ref);
+            handIkDriverInfo->setReference(ref);
             ref++;
         }
         if (footIkDriverInfo.data()){
-            footIkDriverInfo.data()->setReference(ref);
+            footIkDriverInfo->setReference(ref);
             ref++;
         }
-        for (int i = 0; i < boneWeightArrays.size(); i++, ref++){
-            boneWeightArrays.at(i).data()->setIsWritten(false);
-            boneWeightArrays.at(i).data()->setReference(ref);
+        for (auto i = 0; i < boneWeightArrays.size(); i++, ref++){
+            boneWeightArrays.at(i)->setIsWritten(false);
+            boneWeightArrays.at(i)->setReference(ref);
         }
         getWriter().setFile(this);
         if (!getWriter().writeToXMLFile()){

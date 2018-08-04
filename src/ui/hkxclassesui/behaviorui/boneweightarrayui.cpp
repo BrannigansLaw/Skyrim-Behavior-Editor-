@@ -69,7 +69,7 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
                 CRITICAL_ERROR_MESSAGE("BoneWeightArrayUI::loadData(): Parent file type is unrecognized!!!");
             }
         }
-        for (int i = 0; i < bsData->boneWeights.size() && i < boneNames.size(); i++){
+        for (auto i = 0; i < bsData->boneWeights.size() && i < boneNames.size(); i++){
             rowCount = bones->rowCount();
             if (rowCount > i){
                 bones->setRowHidden(i, false);
@@ -89,7 +89,7 @@ void BoneWeightArrayUI::loadData(HkxObject *data, bool isRagdoll){
                 bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
             }
         }
-        for (int j = bsData->boneWeights.size(); j < bones->rowCount(); j++){
+        for (auto j = bsData->boneWeights.size(); j < bones->rowCount(); j++){
             bones->setRowHidden(j, true);
         }
     }else{
@@ -119,7 +119,7 @@ void BoneWeightArrayUI::setBoneWeight(){
                     bones->setItem(row, VALUE_COLUMN, new TableWidgetItem(QString::number(selectedBone->value(), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
                 }
             }
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BoneWeightArrayUI::setBoneWeight(): The 'bsData' pointer is nullptr!!");
@@ -148,7 +148,7 @@ void BoneWeightArrayUI::invert(){
                 bones->setItem(i, VALUE_COLUMN, new TableWidgetItem(QString::number(bsData->boneWeights.at(i), char('f'), 6), Qt::AlignCenter, QColor(Qt::white)));
             }
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BoneWeightArrayUI::invert(): The 'bsData' pointer is nullptr!!");
     }

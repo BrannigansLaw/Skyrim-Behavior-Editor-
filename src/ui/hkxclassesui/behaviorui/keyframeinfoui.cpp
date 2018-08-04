@@ -105,7 +105,7 @@ void KeyframeInfoUI::loadData(BehaviorFile *parentFile, hkbKeyframeBonesModifier
         }
         boneIndex->setCurrentIndex(bsData->boneIndex + 1);
         isValid->setChecked(bsData->isValid);
-        hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data());
+        hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
         if (varBind){
             loadBinding(KEYFRAMED_POSITION_ROW, BINDING_COLUMN, varBind, "keyframeInfo:"+QString::number(keyframeIndex)+"/keyframedPosition");
             loadBinding(KEYFRAMED_ROTATION_ROW, BINDING_COLUMN, varBind, "keyframeInfo:"+QString::number(keyframeIndex)+"/keyframedRotation");
@@ -123,7 +123,7 @@ void KeyframeInfoUI::loadData(BehaviorFile *parentFile, hkbKeyframeBonesModifier
     connectSignals();
 }
 
-void KeyframeInfoUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void KeyframeInfoUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -131,7 +131,7 @@ void KeyframeInfoUI::loadBinding(int row, int colunm, hkbVariableBindingSet *var
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(file)->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(file)->getVariableNameAt(index);
                 }
@@ -139,7 +139,7 @@ void KeyframeInfoUI::loadBinding(int row, int colunm, hkbVariableBindingSet *var
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("KeyframeInfoUI::loadBinding(): The variable binding set is nullptr!!");
         }
@@ -149,16 +149,16 @@ void KeyframeInfoUI::loadBinding(int row, int colunm, hkbVariableBindingSet *var
 }
 
 bool KeyframeInfoUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(parent)->variableBindingSet = HkxSharedPtr();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(parent)->getVariableBindingSet() = HkxSharedPtr();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && static_cast<BehaviorFile *>(file)->getVariableTypeAt(index - 1) == type) ||
                   (isProperty && static_cast<BehaviorFile *>(file)->getCharacterPropertyTypeAt(index - 1) == type)){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(file);
-                parent->variableBindingSet = HkxSharedPtr(varBind);
+                parent->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -299,14 +299,14 @@ void KeyframeInfoUI::viewSelectedChild(int row, int column){
 void KeyframeInfoUI::selectTableToView(bool viewproperties, const QString & path){
     if (bsData){
         if (viewproperties){
-            if (parent->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (parent->getVariableBindingSetData()){
+                emit viewProperties(static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (parent->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (parent->getVariableBindingSetData()){
+                emit viewVariables(static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -323,8 +323,8 @@ void KeyframeInfoUI::variableRenamed(const QString & name, int index){
         WARNING_MESSAGE("KeyframeInfoUI::variableRenamed(): The new variable name is the empty string!!");
     }
     if (bsData){
-        //index--;
-        bind = static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data());
+        index--;
+        bind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
         if (bind){
             bindIndex = bind->getVariableIndexOfBinding("keyframeInfo:"+QString::number(keyframeIndex)+"/keyframedPosition");
             if (bindIndex == index){

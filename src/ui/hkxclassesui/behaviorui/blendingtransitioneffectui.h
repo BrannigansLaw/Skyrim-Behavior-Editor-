@@ -48,7 +48,7 @@ private slots:
 private:
     void connectSignals();
     void disconnectSignals();
-    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
+    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString & path);
     void selectTableToView(bool viewproperties, const QString & path);
     void variableRenamed(const QString & name, int index);
     void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);

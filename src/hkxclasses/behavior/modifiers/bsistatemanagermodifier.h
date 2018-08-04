@@ -3,22 +3,21 @@
 
 #include "hkbmodifier.h"
 
-class BSIStateManagerModifier: public hkbModifier
+class BSIStateManagerModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
 public:
     BSIStateManagerModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSIStateManagerModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSIStateManagerModifier& operator=(const BSIStateManagerModifier&) = delete;
+    BSIStateManagerModifier(const BSIStateManagerModifier &) = delete;
+    ~BSIStateManagerModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
-private:
-    BSIStateManagerModifier& operator=(const BSIStateManagerModifier&);
-    BSIStateManagerModifier(const BSIStateManagerModifier &);
 private:
     struct BSiStateData{
         BSiStateData()
@@ -34,12 +33,13 @@ private:
     };
 
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
     int iStateVar;
-    QList <BSiStateData> stateData;
+    QVector <BSiStateData> stateData;
+    mutable std::mutex mutex;
 };
 
 #endif // BSISTATEMANAGERMODIFIER_H

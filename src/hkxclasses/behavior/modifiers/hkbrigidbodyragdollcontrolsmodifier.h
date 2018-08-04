@@ -3,29 +3,28 @@
 
 #include "hkbmodifier.h"
 
-class hkbRigidBodyRagdollControlsModifier: public hkbModifier
+class hkbRigidBodyRagdollControlsModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class RigidBodyRagdollControlsModifierUI;
 public:
     hkbRigidBodyRagdollControlsModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbRigidBodyRagdollControlsModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbRigidBodyRagdollControlsModifier& operator=(const hkbRigidBodyRagdollControlsModifier&) = delete;
+    hkbRigidBodyRagdollControlsModifier(const hkbRigidBodyRagdollControlsModifier &) = delete;
+    ~hkbRigidBodyRagdollControlsModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
     bool merge(HkxObject *recessiveObject);
 private:
-    hkbRigidBodyRagdollControlsModifier& operator=(const hkbRigidBodyRagdollControlsModifier&);
-    hkbRigidBodyRagdollControlsModifier(const hkbRigidBodyRagdollControlsModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -43,6 +42,7 @@ private:
     qreal snapMaxAngularDistance;
     qreal durationToBlend;
     HkxSharedPtr bones;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBRIGIDBODYRAGDOLLCONTROLSMODIFIER_H

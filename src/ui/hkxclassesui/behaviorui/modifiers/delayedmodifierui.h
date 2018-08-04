@@ -42,7 +42,7 @@ private:
     void connectSignals();
     void disconnectSignals();
     void connectToTables(GenericTableWidget *modifiers, GenericTableWidget *variables, GenericTableWidget *properties);
-    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path);
+    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
     void variableRenamed(const QString & name, int index);
     void modifierRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);

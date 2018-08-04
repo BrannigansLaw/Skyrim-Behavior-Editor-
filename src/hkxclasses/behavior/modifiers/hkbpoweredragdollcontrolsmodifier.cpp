@@ -2,15 +2,11 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 
-/*
- * CLASS: hkbPoweredRagdollControlsModifier
-*/
-
 uint hkbPoweredRagdollControlsModifier::refCount = 0;
 
-QString hkbPoweredRagdollControlsModifier::classname = "hkbPoweredRagdollControlsModifier";
+const QString hkbPoweredRagdollControlsModifier::classname = "hkbPoweredRagdollControlsModifier";
 
-QStringList hkbPoweredRagdollControlsModifier::Mode = {"WORLD_FROM_MODEL_MODE_USE_OLD", "WORLD_FROM_MODEL_MODE_USE_INPUT", "WORLD_FROM_MODEL_MODE_COMPUTE", "WORLD_FROM_MODEL_MODE_NONE", "WORLD_FROM_MODEL_MODE_RAGDOLL"};
+const QStringList hkbPoweredRagdollControlsModifier::Mode = {"WORLD_FROM_MODEL_MODE_USE_OLD", "WORLD_FROM_MODEL_MODE_USE_INPUT", "WORLD_FROM_MODEL_MODE_COMPUTE", "WORLD_FROM_MODEL_MODE_NONE", "WORLD_FROM_MODEL_MODE_RAGDOLL"};
 
 hkbPoweredRagdollControlsModifier::hkbPoweredRagdollControlsModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -27,290 +23,254 @@ hkbPoweredRagdollControlsModifier::hkbPoweredRagdollControlsModifier(HkxFile *pa
       mode(Mode.first())
 {
     setType(HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "PoweredRagdollControlsModifier"+QString::number(refCount);
+    name = "PoweredRagdollControlsModifier_"+QString::number(refCount);
 }
 
-QString hkbPoweredRagdollControlsModifier::getClassname(){
+const QString hkbPoweredRagdollControlsModifier::getClassname(){
     return classname;
 }
 
 QString hkbPoweredRagdollControlsModifier::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-bool hkbPoweredRagdollControlsModifier::readData(const HkxXmlReader &reader, long index){
+bool hkbPoweredRagdollControlsModifier::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "maxForce"){
             maxForce = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'maxForce' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "tau"){
             tau = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'tau' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "damping"){
             damping = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'damping' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "proportionalRecoveryVelocity"){
             proportionalRecoveryVelocity = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'proportionalRecoveryVelocity' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "constantRecoveryVelocity"){
             constantRecoveryVelocity = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'constantRecoveryVelocity' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "poseMatchingBone0"){
             poseMatchingBone0 = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'poseMatchingBone0' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "poseMatchingBone1"){
             poseMatchingBone1 = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'poseMatchingBone1' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "poseMatchingBone2"){
             poseMatchingBone2 = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'poseMatchingBone2' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "mode"){
             mode = reader.getElementValueAt(index);
-            if (!Mode.contains(mode)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nInvalid 'mode' data!\nObject Reference: "+ref);
-            }
+            checkvalue(Mode.contains(mode), "mode");
         }else if (text == "boneWeights"){
-            if (!boneWeights.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'boneWeights' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(boneWeights.readShdPtrReference(index, reader), "boneWeights");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbPoweredRagdollControlsModifier::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("controlData"), "");
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData));
+        writedatafield("name", name);
+        writedatafield("enable", getBoolAsString(enable));
+        writedatafield("controlData", "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxForce"), QString::number(maxForce, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("tau"), QString::number(tau, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("damping"), QString::number(damping, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("proportionalRecoveryVelocity"), QString::number(proportionalRecoveryVelocity, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("constantRecoveryVelocity"), QString::number(constantRecoveryVelocity, char('f'), 6));
+        writedatafield("maxForce", QString::number(maxForce, char('f'), 6));
+        writedatafield("tau", QString::number(tau, char('f'), 6));
+        writedatafield("damping", QString::number(damping, char('f'), 6));
+        writedatafield("proportionalRecoveryVelocity", QString::number(proportionalRecoveryVelocity, char('f'), 6));
+        writedatafield("constantRecoveryVelocity", QString::number(constantRecoveryVelocity, char('f'), 6));
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
-        if (bones.data()){
-            refString = bones.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bones"), refString);
-
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("worldFromModelModeData"), "");
+        writeref(bones, "bones");
+        writedatafield("worldFromModelModeData", "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("poseMatchingBone0"), QString::number(poseMatchingBone0));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("poseMatchingBone1"), QString::number(poseMatchingBone1));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("poseMatchingBone2"), QString::number(poseMatchingBone2));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("mode"), mode);
+        writedatafield("poseMatchingBone0", QString::number(poseMatchingBone0));
+        writedatafield("poseMatchingBone1", QString::number(poseMatchingBone1));
+        writedatafield("poseMatchingBone2", QString::number(poseMatchingBone2));
+        writedatafield("mode", mode);
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
-        if (boneWeights.data()){
-            refString = boneWeights.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("boneWeights"), refString);
+        writeref(boneWeights, "boneWeights");
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        if (bones.data() && !bones.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'bones'!!!");
-        }
-        if (boneWeights.data() && !boneWeights.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'boneWeights'!!!");
-        }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        writechild(bones, "bones");
+        writechild(boneWeights, "boneWeights");
     }
     return true;
 }
 
 void hkbPoweredRagdollControlsModifier::updateReferences(long &ref){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto updateref = [&](const HkxSharedPtr & shdptr){
+        (shdptr.data()) ? shdptr->updateReferences(++ref) : NULL;
+    };
     setReference(ref);
-    ref++;
-    setBindingReference(ref);
-    if (bones.data()){
-        ref++;
-        bones.data()->updateReferences(ref);
-    }
-    if (boneWeights.data()){
-        ref++;
-        boneWeights.data()->updateReferences(ref);
-    }
+    setBindingReference(++ref);
+    updateref(bones);
+    updateref(boneWeights);
 }
 
 QVector<HkxObject *> hkbPoweredRagdollControlsModifier::getChildrenOtherTypes() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QVector<HkxObject *> list;
-    if (bones.data()){
-        list.append(bones.data());
-    }
-    if (boneWeights.data()){
-        list.append(boneWeights.data());
-    }
+    auto getchildren = [&](const HkxSharedPtr & shdptr){
+        if (shdptr.data()){
+            list.append(shdptr.data());
+        }
+    };
+    getchildren(bones);
+    getchildren(boneWeights);
     return list;
 }
 
-bool hkbPoweredRagdollControlsModifier::merge(HkxObject *recessiveObject){
+bool hkbPoweredRagdollControlsModifier::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
+    auto merge = [&](HkxSharedPtr & shdptr, const HkxSharedPtr & recshdptr){
+        if (shdptr.data()){
+            if (recshdptr.data()){
+                shdptr->merge(recshdptr.data());
+            }
+        }else if (recshdptr.data()){
+            shdptr = recshdptr;
+            getParentFile()->addObjectToFile(recshdptr.data(), -1);
+        }
+    };
     hkbPoweredRagdollControlsModifier *obj = nullptr;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER){
         obj = static_cast<hkbPoweredRagdollControlsModifier *>(recessiveObject);
-        if (bones.data()){
-            if (obj->bones.data()){
-                bones.data()->merge(obj->bones.data());
-            }
-        }else if (obj->bones.data()){
-            bones = obj->bones;
-            getParentFile()->addObjectToFile(obj->bones.data(), -1);
-        }
-        if (boneWeights.data()){
-            if (obj->boneWeights.data()){
-                boneWeights.data()->merge(obj->bones.data());
-            }
-        }else if (obj->boneWeights.data()){
-            boneWeights = obj->boneWeights;
-            getParentFile()->addObjectToFile(obj->boneWeights.data(), -1);
-        }
+        merge(bones, obj->getBones());
+        merge(boneWeights, obj->getBoneWeights());
         injectWhileMerging(obj);
         return true;
-    }else{
-        return false;
     }
+    return false;
+}
+
+HkxSharedPtr hkbPoweredRagdollControlsModifier::getBoneWeights() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return boneWeights;
+}
+
+HkxSharedPtr hkbPoweredRagdollControlsModifier::getBones() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return bones;
 }
 
 bool hkbPoweredRagdollControlsModifier::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    HkxSharedPtr *ptr;
+    auto link = [&](HkxSharedPtr & data, const QString & fieldname, HkxSignature sig){
+        if (ptr){
+            if ((*ptr)->getSignature() != sig){
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": linkVar()!\nThe linked object '"+fieldname+"' is not the correct type!");
+                setDataValidity(false);
+            }
+            data = *ptr;
+        }
+    };
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(bones.getShdPtrReference());
-    if (ptr){
-        if ((*ptr)->getSignature() != HKB_BONE_INDEX_ARRAY){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'bones' is not a HKB_BONE_INDEX_ARRAY!");
-        }
-        bones = *ptr;
-    }
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(bones.getShdPtrReference());
+    link(bones, "bones", HKB_BONE_INDEX_ARRAY);
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(boneWeights.getShdPtrReference());
-    if (ptr){
-        if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'boneWeights' is not a HKB_BONE_WEIGHT_ARRAY!");
-        }
-        boneWeights = *ptr;
-    }
+    link(boneWeights, "boneWeights", HKB_BONE_WEIGHT_ARRAY);
     return true;
 }
 
 void hkbPoweredRagdollControlsModifier::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     bones = HkxSharedPtr();
     boneWeights = HkxSharedPtr();
 }
 
 QString hkbPoweredRagdollControlsModifier::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
+    auto checkbones = [&](int & boneindex, const QString & fieldname){
+        if (boneindex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
+            isvalid = false;
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+fieldname+" bone id out of range! Setting to max index in range!\n");
+            boneindex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
+        }
+    };
+    auto checktype = [&](HkxSharedPtr & shdptr, const QString & fieldname, HkxSignature sig){
+        if (!shdptr.data()){
+            isvalid = false;
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null "+fieldname+"!\n");
+        }else if (shdptr->getSignature() != sig){
+            isvalid = false;
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid "+fieldname+" type! Signature: "+QString::number(shdptr->getSignature(), 16)+" Setting null value!\n");
+            shdptr = HkxSharedPtr();
+        }
+    };
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
-    if (poseMatchingBone0 >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": poseMatchingBone0 out of range! Setting to last bone index!\n");
-        poseMatchingBone0 = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
-    }
-    if (poseMatchingBone1 >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": poseMatchingBone1 out of range! Setting to last bone index!\n");
-        poseMatchingBone1 = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
-    }
-    if (poseMatchingBone2 >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": poseMatchingBone2 out of range! Setting to last bone index!\n");
-        poseMatchingBone2 = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
-    }
+    checkbones(poseMatchingBone0, "poseMatchingBone0");
+    checkbones(poseMatchingBone1, "poseMatchingBone1");
+    checkbones(poseMatchingBone2, "poseMatchingBone2");
     if (!Mode.contains(mode)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid mode! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid mode! Setting default value!\n");
         mode = Mode.first();
     }
-    if (!bones.data()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null bones!\n");
-    }else if (bones.data()->getSignature() != HKB_BONE_INDEX_ARRAY){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid bones type! Signature: "+QString::number(bones.data()->getSignature(), 16)+" Setting null value!\n");
-        bones = HkxSharedPtr();
-    }
-    if (!boneWeights.data()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null boneWeights!\n");
-    }else if (boneWeights.data()->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid boneWeights type! Signature: "+QString::number(boneWeights.data()->getSignature(), 16)+" Setting null value!\n");
-        boneWeights = HkxSharedPtr();
-    }
+    checktype(bones, "bones", HKB_BONE_INDEX_ARRAY);
+    checktype(boneWeights, "boneWeights", HKB_BONE_WEIGHT_ARRAY);
     setDataValidity(isvalid);
     return errors;
 }

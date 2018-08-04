@@ -3,22 +3,21 @@
 
 #include "hkbmodifier.h"
 
-class hkbProxyModifier: public hkbModifier
+class hkbProxyModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
 public:
     hkbProxyModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbProxyModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbProxyModifier& operator=(const hkbProxyModifier&) = delete;
+    hkbProxyModifier(const hkbProxyModifier &) = delete;
+    ~hkbProxyModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
-private:
-    hkbProxyModifier& operator=(const hkbProxyModifier&);
-    hkbProxyModifier(const hkbProxyModifier &);
 private:
     struct hkProxyInfo{
         hkProxyInfo()
@@ -38,7 +37,6 @@ private:
         {
             //
         }
-
         qreal dynamicFriction;
         qreal staticFriction;
         qreal keepContactTolerance;
@@ -54,11 +52,11 @@ private:
         int maxCastIterations;
         bool refreshManifoldInCheckSupport;
     };
-
-    static QStringList PhantomType;  //PhantomType (PHANTOM_TYPE_SIMPLE=0;PHANTOM_TYPE_CACHING=1)
-    static QStringList LinearVelocityMode;   //LinearVelocityMode (LINEAR_VELOCITY_MODE_WORLD=0;LINEAR_VELOCITY_MODE_MODEL=1)
+private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
+    static const QStringList PhantomType;
+    static const QStringList LinearVelocityMode;
     long userData;
     QString name;
     bool enable;
@@ -85,6 +83,7 @@ private:
     bool includeDownwardMomentum;
     bool followWorldFromModel;
     bool isTouchingGround;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBPROXYMODIFIER_H

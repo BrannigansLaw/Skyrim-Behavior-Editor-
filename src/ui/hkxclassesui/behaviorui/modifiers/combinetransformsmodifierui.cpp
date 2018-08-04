@@ -165,7 +165,7 @@ void CombineTransformsModifierUI::loadData(HkxObject *data){
             invertLeftTransform->setChecked(bsData->invertLeftTransform);
             invertRightTransform->setChecked(bsData->invertRightTransform);
             invertResult->setChecked(bsData->invertResult);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
                 loadBinding(TRANSLATION_OUT_ROW, BINDING_COLUMN, varBind, "translationOut");
@@ -203,7 +203,7 @@ void CombineTransformsModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -214,7 +214,7 @@ void CombineTransformsModifierUI::setName(){
 void CombineTransformsModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setEnable(): The data is nullptr!!");
     }
@@ -224,7 +224,7 @@ void CombineTransformsModifierUI::setTranslationOut(){
     if (bsData){
         if (bsData->translationOut != translationOut->value()){
             bsData->translationOut = translationOut->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setTranslationOut(): The data is nullptr!!");
@@ -235,7 +235,7 @@ void CombineTransformsModifierUI::setRotationOut(){
     if (bsData){
         if (bsData->rotationOut != rotationOut->value()){
             bsData->rotationOut = rotationOut->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setRotationOut(): The data is nullptr!!");
@@ -246,7 +246,7 @@ void CombineTransformsModifierUI::setLeftTranslation(){
     if (bsData){
         if (bsData->leftTranslation != leftTranslation->value()){
             bsData->leftTranslation = leftTranslation->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setLeftTranslation(): The data is nullptr!!");
@@ -257,7 +257,7 @@ void CombineTransformsModifierUI::setLeftRotation(){
     if (bsData){
         if (bsData->leftRotation != leftRotation->value()){
             bsData->leftRotation = leftRotation->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setLeftRotation(): The data is nullptr!!");
@@ -268,7 +268,7 @@ void CombineTransformsModifierUI::setRightTranslation(){
     if (bsData){
         if (bsData->rightTranslation != rightTranslation->value()){
             bsData->rightTranslation = rightTranslation->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setRightTranslation(): The data is nullptr!!");
@@ -279,7 +279,7 @@ void CombineTransformsModifierUI::setRightRotation(){
     if (bsData){
         if (bsData->rightRotation != rightRotation->value()){
             bsData->rightRotation = rightRotation->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setRightRotation(): The data is nullptr!!");
@@ -289,7 +289,7 @@ void CombineTransformsModifierUI::setRightRotation(){
 void CombineTransformsModifierUI::setInvertLeftTransform(){
     if (bsData){
         bsData->invertLeftTransform = invertLeftTransform->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setInvertLeftTransform(): The data is nullptr!!");
     }
@@ -298,7 +298,7 @@ void CombineTransformsModifierUI::setInvertLeftTransform(){
 void CombineTransformsModifierUI::setInvertRightTransform(){
     if (bsData){
         bsData->invertRightTransform = invertRightTransform->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setInvertRightTransform(): The data is nullptr!!");
     }
@@ -307,7 +307,7 @@ void CombineTransformsModifierUI::setInvertRightTransform(){
 void CombineTransformsModifierUI::setInvertResult(){
     if (bsData){
         bsData->invertResult = invertResult->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setInvertResult(): The data is nullptr!!");
     }
@@ -390,14 +390,14 @@ void CombineTransformsModifierUI::viewSelected(int row, int column){
 void CombineTransformsModifierUI::selectTableToView(bool viewisProperty, const QString & path){
     if (bsData){
         if (viewisProperty){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -410,7 +410,7 @@ void CombineTransformsModifierUI::selectTableToView(bool viewisProperty, const Q
 void CombineTransformsModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
         if (bind){
             int bindIndex = bind->getVariableIndexOfBinding("enable");
             if (bindIndex == index){
@@ -459,16 +459,16 @@ void CombineTransformsModifierUI::variableRenamed(const QString & name, int inde
 }
 
 bool CombineTransformsModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -480,7 +480,7 @@ bool CombineTransformsModifierUI::setBinding(int index, int row, const QString &
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -558,13 +558,13 @@ void CombineTransformsModifierUI::setBindingVariable(int index, const QString &n
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-void CombineTransformsModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void CombineTransformsModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -572,7 +572,7 @@ void CombineTransformsModifierUI::loadBinding(int row, int colunm, hkbVariableBi
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -580,7 +580,7 @@ void CombineTransformsModifierUI::loadBinding(int row, int colunm, hkbVariableBi
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("CombineTransformsModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }

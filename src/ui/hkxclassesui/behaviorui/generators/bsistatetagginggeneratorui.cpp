@@ -114,7 +114,7 @@ void BSiStateTaggingGeneratorUI::loadData(HkxObject *data){
             }else{
                 table->item(P_DEFAULT_GENERATOR_ROW, VALUE_COLUMN)->setText("NONE");
             }
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(I_STATE_TO_SET_AS_ROW, BINDING_COLUMN, varBind, "iStateToSetAs");
                 loadBinding(I_PRIORITY_ROW, BINDING_COLUMN, varBind, "iPriority");
@@ -136,7 +136,7 @@ void BSiStateTaggingGeneratorUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }
@@ -146,7 +146,7 @@ void BSiStateTaggingGeneratorUI::setIStateToSetAs(){
     if (bsData){
         if (bsData->iStateToSetAs != iStateToSetAs->value()){
             bsData->iStateToSetAs = iStateToSetAs->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::setIStateToSetAs(): The 'bsData' pointer is nullptr!!");
@@ -157,7 +157,7 @@ void BSiStateTaggingGeneratorUI::setIPriority(){
     if (bsData){
         if (bsData->iPriority != iPriority->value()){
             bsData->iPriority = iPriority->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::setIPriority(): The 'bsData' pointer is nullptr!!");
@@ -189,7 +189,7 @@ void BSiStateTaggingGeneratorUI::setDefaultGenerator(int index, const QString & 
             }
             behaviorView->removeGeneratorData();
             table->item(P_DEFAULT_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::setDefaultGenerator(): The 'behaviorView' pointer is nullptr!!");
         }
@@ -198,7 +198,7 @@ void BSiStateTaggingGeneratorUI::setDefaultGenerator(int index, const QString & 
     }
 }
 
-void BSiStateTaggingGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void BSiStateTaggingGeneratorUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -206,7 +206,7 @@ void BSiStateTaggingGeneratorUI::loadBinding(int row, int colunm, hkbVariableBin
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -214,7 +214,7 @@ void BSiStateTaggingGeneratorUI::loadBinding(int row, int colunm, hkbVariableBin
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
         }
@@ -224,16 +224,16 @@ void BSiStateTaggingGeneratorUI::loadBinding(int row, int colunm, hkbVariableBin
 }
 
 void BSiStateTaggingGeneratorUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -245,7 +245,7 @@ void BSiStateTaggingGeneratorUI::setBinding(int index, int row, const QString & 
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -274,7 +274,7 @@ void BSiStateTaggingGeneratorUI::setBindingVariable(int index, const QString & n
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
     }
@@ -283,14 +283,14 @@ void BSiStateTaggingGeneratorUI::setBindingVariable(int index, const QString & n
 void BSiStateTaggingGeneratorUI::selectTableToView(bool viewproperties, const QString & path){
     if (bsData){
         if (viewproperties){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -320,7 +320,7 @@ void BSiStateTaggingGeneratorUI::viewSelected(int row, int column){
             }
         }else if (row == P_DEFAULT_GENERATOR_ROW && column == VALUE_COLUMN){
             QStringList list = {hkbStateMachineStateInfo::getClassname(), hkbBlenderGeneratorChild::getClassname(), BSBoneSwitchGeneratorBoneData::getClassname()};
-            emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pDefaultGenerator) + 1, QString(), list);
+            emit viewGenerators(bsData->getIndexOfGenerator(bsData->pDefaultGenerator) + 1, QString(), list);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSiStateTaggingGeneratorUI::viewSelected(): The 'bsData' pointer is nullptr!!");
@@ -330,7 +330,7 @@ void BSiStateTaggingGeneratorUI::viewSelected(int row, int column){
 void BSiStateTaggingGeneratorUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
         if (bind){
             int bindIndex = bind->getVariableIndexOfBinding("iStateToSetAs");
             if (bindIndex == index){

@@ -3,32 +3,32 @@
 
 #include "hkbmodifier.h"
 
-class hkbRotateCharacterModifier: public hkbModifier
+class hkbRotateCharacterModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class RotateCharacterModifierUI;
 public:
     hkbRotateCharacterModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbRotateCharacterModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbRotateCharacterModifier& operator=(const hkbRotateCharacterModifier&) = delete;
+    hkbRotateCharacterModifier(const hkbRotateCharacterModifier &) = delete;
+    ~hkbRotateCharacterModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbRotateCharacterModifier& operator=(const hkbRotateCharacterModifier&);
-    hkbRotateCharacterModifier(const hkbRotateCharacterModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
     qreal degreesPerSecond;
     qreal speedMultiplier;
     hkQuadVariable axisOfRotation;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBROTATECHARACTERMODIFIER_H

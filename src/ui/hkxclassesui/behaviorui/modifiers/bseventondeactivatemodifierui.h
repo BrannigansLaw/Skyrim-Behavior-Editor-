@@ -46,7 +46,7 @@ private:
     void eventRenamed(const QString & name, int index);
     void selectTableToView(bool viewproperties, const QString & path);
     bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
-    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
+    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString & path);
 private:
     static QStringList headerLabels;
     BSEventOnDeactivateModifier *bsData;

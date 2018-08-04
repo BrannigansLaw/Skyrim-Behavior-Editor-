@@ -3,19 +3,21 @@
 
 #include "hkbmodifier.h"
 
-class BSDistTriggerModifier: public hkbModifier
+class BSDistTriggerModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSDistTriggerModifierUI;
 public:
     BSDistTriggerModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSDistTriggerModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSDistTriggerModifier& operator=(const BSDistTriggerModifier&) = delete;
+    BSDistTriggerModifier(const BSDistTriggerModifier &) = delete;
+    ~BSDistTriggerModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
@@ -25,11 +27,8 @@ public:
     QVector <HkxObject *> getChildrenOtherTypes() const;
     bool merge(HkxObject *recessiveObject);
 private:
-    BSDistTriggerModifier& operator=(const BSDistTriggerModifier&);
-    BSDistTriggerModifier(const BSDistTriggerModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -37,6 +36,7 @@ private:
     qreal distance;
     qreal distanceTrigger;
     hkEventPayload triggerEvent;
+    mutable std::mutex mutex;
 };
 
 #endif // BSDISTTRIGGERMODIFIER_H

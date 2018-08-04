@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class hkbComputeDirectionModifier: public hkbModifier
+class hkbComputeDirectionModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class ComputeDirectionModifierUI;
 public:
     hkbComputeDirectionModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbComputeDirectionModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbComputeDirectionModifier& operator=(const hkbComputeDirectionModifier&) = delete;
+    hkbComputeDirectionModifier(const hkbComputeDirectionModifier &) = delete;
+    ~hkbComputeDirectionModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbComputeDirectionModifier& operator=(const hkbComputeDirectionModifier&);
-    hkbComputeDirectionModifier(const hkbComputeDirectionModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -37,6 +36,7 @@ private:
     bool normalizePoint;
     bool computeOnlyOnce;
     bool computedOutput;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBCOMPUTEDIRECTIONMODIFIER_H

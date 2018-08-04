@@ -147,7 +147,7 @@ void CharacterPropertiesUI::setVariableValue(int type){
     }*/else if (type == 3){
         loadedData->setQuadVariableValueAt(index, quadWidget->value());
     }
-    loadedData->getParentFile()->setIsChanged(true);
+    loadedData->setIsFileChanged(true);
 }
 
 void CharacterPropertiesUI::renameSelectedVariable(int type){
@@ -164,8 +164,8 @@ void CharacterPropertiesUI::renameSelectedVariable(int type){
         newName = quadName->text();
     }
     table->item(table->currentRow(), 0)->setText(newName);
-    loadedData->setVariableNameAt(table->currentRow(), newName);
-    loadedData->getParentFile()->setIsChanged(true);
+    loadedData->setCharacterPropertyNameAt(table->currentRow(), newName);
+    loadedData->setIsFileChanged(true);
     emit variableNameChanged(newName, table->currentRow());
 }
 
@@ -173,10 +173,10 @@ void CharacterPropertiesUI::setVariableName(QTableWidgetItem *item){
     if (item && item->text() != "" && loadedData){
         int column = table->column(item);
         if (column == 0){
-            loadedData->setVariableNameAt(table->row(item), item->text());
+            loadedData->setCharacterPropertyNameAt(table->row(item), item->text());
         }
     }else{
-        WARNING_MESSAGE("CharacterPropertiesUI::setVariableName: error!!");
+        LogFile::writeToLog("CharacterPropertiesUI::setVariableName: error!!");
     }
 }
 
@@ -189,13 +189,9 @@ void CharacterPropertiesUI::removeVariableFromTable(int row){
 void CharacterPropertiesUI::loadVariable(CheckBox *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
-        hkbCharacterStringData *varNames = static_cast<hkbCharacterStringData *>(loadedData->stringData.data());
-        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->characterPropertyValues.data());
         int index = table->currentRow();
-        if (varValues->wordVariableValues.size() > index && varNames->characterPropertyNames.size() > index){
-            boolName->setText(varNames->characterPropertyNames.at(index));
-            variableWid->setChecked(varValues->wordVariableValues.at(index));
-        }
+        boolName->setText(loadedData->getCharacterPropertyNameAt(index));
+        variableWid->setChecked(loadedData->getWordVariableValueAt(index));
         hideOtherVariables(0);
         connect(variableWid, SIGNAL(released()), this, SLOT(setVariableValue()), Qt::UniqueConnection);
     }
@@ -204,13 +200,9 @@ void CharacterPropertiesUI::loadVariable(CheckBox *variableWid){
 void CharacterPropertiesUI::loadVariable(SpinBox *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
-        hkbCharacterStringData *varNames = static_cast<hkbCharacterStringData *>(loadedData->stringData.data());
-        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->characterPropertyValues.data());
         int index = table->currentRow();
-        if (varValues->wordVariableValues.size() > index && varNames->characterPropertyNames.size() > index){
-            intName->setText(varNames->characterPropertyNames.at(index));
-            variableWid->setValue(varValues->wordVariableValues.at(index));
-        }
+        intName->setText(loadedData->getCharacterPropertyNameAt(index));
+        variableWid->setValue(loadedData->getWordVariableValueAt(index));
         hideOtherVariables(1);
         connect(variableWid, SIGNAL(editingFinished()), this, SLOT(setVariableValue()), Qt::UniqueConnection);
     }
@@ -219,13 +211,9 @@ void CharacterPropertiesUI::loadVariable(SpinBox *variableWid){
 void CharacterPropertiesUI::loadVariable(DoubleSpinBox *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
-        hkbCharacterStringData *varNames = static_cast<hkbCharacterStringData *>(loadedData->stringData.data());
-        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->characterPropertyValues.data());
         int index = table->currentRow();
-        if (varValues->wordVariableValues.size() > index && varNames->characterPropertyNames.size() > index){
-            doubleName->setText(varNames->characterPropertyNames.at(index));
-            variableWid->setValue(varValues->wordVariableValues.at(index));
-        }
+        doubleName->setText(loadedData->getCharacterPropertyNameAt(index));
+        variableWid->setValue(loadedData->getWordVariableValueAt(index));
         hideOtherVariables(2);
         connect(variableWid, SIGNAL(editingFinished()), this, SLOT(setVariableValue()), Qt::UniqueConnection);
     }
@@ -235,23 +223,16 @@ void CharacterPropertiesUI::loadVariable(QuadVariableWidget *variableWid){
     if (loadedData){
         disconnect(variableWid, 0, this, 0);
         bool ok;
-        hkbCharacterStringData *varNames = static_cast<hkbCharacterStringData *>(loadedData->stringData.data());
-        hkbVariableValueSet *varValues = static_cast<hkbVariableValueSet *>(loadedData->characterPropertyValues.data());
         int index = table->currentRow();
-        if (varValues->wordVariableValues.size() > index && varNames->characterPropertyNames.size() > index){
-            quadName->setText(varNames->characterPropertyNames.at(index));
-            variableWid->setValue(loadedData->getQuadVariable(index, &ok));
-            if (!ok){
-                //
-            }
-        }
+        quadName->setText(loadedData->getCharacterPropertyNameAt(index));
+        variableWid->setValue(loadedData->getQuadVariable(index, &ok));
         hideOtherVariables(3);
         connect(variableWid, SIGNAL(editingFinished()), this, SLOT(setVariableValue()), Qt::UniqueConnection);
     }
 }
 
 void CharacterPropertiesUI::hideOtherVariables(int indexToView){
-    for (int i = 0; i < variableWidget->rowCount(); i++){
+    for (auto i = 0; i < variableWidget->rowCount(); i++){
         if (i == indexToView){
             variableWidget->setRowHidden(i, false);
         }else{
@@ -306,24 +287,25 @@ void CharacterPropertiesUI::loadData(HkxObject *data){
         table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         loadedData = static_cast<hkbCharacterData *>(data);
         int row;
-        hkbCharacterStringData *varNames = static_cast<hkbCharacterStringData *>(loadedData->stringData.data());
-        for (int i = 0; i < varNames->characterPropertyNames.size(); i++){
+        QStringList varNames = loadedData->getCharacterPropertyNames();
+        QStringList typeNames = loadedData->getCharacterPropertyTypenames();
+        for (auto i = 0; i < varNames.size(); i++){
             row = table->rowCount();
             if (table->rowCount() > i){
                 table->setRowHidden(i, false);
                 if (table->item(row, 0)){
-                    table->item(row, 0)->setText(varNames->characterPropertyNames.at(i));
+                    table->item(row, 0)->setText(varNames.at(i));
                 }else{
-                    table->setItem(row, 0, new QTableWidgetItem(varNames->characterPropertyNames.at(i)));
+                    table->setItem(row, 0, new QTableWidgetItem(varNames.at(i)));
                 }
             }else{
                 table->setRowCount(row + 1);
-                table->setItem(row, 0, new QTableWidgetItem(varNames->characterPropertyNames.at(i)));
-                table->setItem(row, 1, new QTableWidgetItem(loadedData->characterPropertyInfos.at(i).type.section("_", -1, -1)));
+                table->setItem(row, 0, new QTableWidgetItem(varNames.at(i)));
+                table->setItem(row, 1, new QTableWidgetItem(typeNames.at(i).section("_", -1, -1)));
                 table->setItem(row, 2, new QTableWidgetItem("Edit"));
             }
         }
-        for (int j = varNames->characterPropertyNames.size(); j < table->rowCount(); j++){
+        for (auto j = varNames.size(); j < table->rowCount(); j++){
             table->setRowHidden(j, true);
         }
         table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
@@ -331,45 +313,46 @@ void CharacterPropertiesUI::loadData(HkxObject *data){
 }
 
 void CharacterPropertiesUI::addVariable(){
-    int type = typeSelector->currentIndex();
-    hkVariableType varType;
-    hkbCharacterStringData *vars = static_cast<hkbCharacterStringData *>(loadedData->stringData.data());
-    switch (type){
-    case VARIABLE_TYPE_BOOL:
-        varType = hkVariableType::VARIABLE_TYPE_BOOL;
-        loadedData->addVariable(varType);
-        addVariableToTable(vars->characterPropertyNames.last(), "BOOL");
-        break;
-    case VARIABLE_TYPE_INT32:
-        varType = hkVariableType::VARIABLE_TYPE_INT32;
-        loadedData->addVariable(varType);
-        addVariableToTable(vars->characterPropertyNames.last(), "INT32");
-        break;
-    case VARIABLE_TYPE_REAL:
-        varType = hkVariableType::VARIABLE_TYPE_REAL;
-        loadedData->addVariable(varType);
-        addVariableToTable(vars->characterPropertyNames.last(), "REAL");
-        break;
-    case VARIABLE_TYPE_POINTER:
-        varType = hkVariableType::VARIABLE_TYPE_POINTER;
-        loadedData->addVariable(varType);
-        addVariableToTable(vars->characterPropertyNames.last(), "POINTER");
-        break;
-    case VARIABLE_TYPE_VECTOR4:
-        varType = hkVariableType::VARIABLE_TYPE_VECTOR4;
-        loadedData->addVariable(varType);
-        addVariableToTable(vars->characterPropertyNames.last(), "VECTOR4");
-        break;
-    case VARIABLE_TYPE_QUATERNION:
-        varType = hkVariableType::VARIABLE_TYPE_QUATERNION;
-        loadedData->addVariable(varType);
-        addVariableToTable(vars->characterPropertyNames.last(), "QUATERNION");
-        break;
-    default:
-        return;
+    if (loadedData){
+        auto type = typeSelector->currentIndex();
+        hkVariableType varType;
+        switch (type){
+        case VARIABLE_TYPE_BOOL:
+            varType = hkVariableType::VARIABLE_TYPE_BOOL;
+            loadedData->addVariable(varType);
+            addVariableToTable(loadedData->getLastCharacterPropertyName(), "BOOL");
+            break;
+        case VARIABLE_TYPE_INT32:
+            varType = hkVariableType::VARIABLE_TYPE_INT32;
+            loadedData->addVariable(varType);
+            addVariableToTable(loadedData->getLastCharacterPropertyName(), "INT32");
+            break;
+        case VARIABLE_TYPE_REAL:
+            varType = hkVariableType::VARIABLE_TYPE_REAL;
+            loadedData->addVariable(varType);
+            addVariableToTable(loadedData->getLastCharacterPropertyName(), "REAL");
+            break;
+        case VARIABLE_TYPE_POINTER:
+            varType = hkVariableType::VARIABLE_TYPE_POINTER;
+            loadedData->addVariable(varType);
+            addVariableToTable(loadedData->getLastCharacterPropertyName(), "POINTER");
+            break;
+        case VARIABLE_TYPE_VECTOR4:
+            varType = hkVariableType::VARIABLE_TYPE_VECTOR4;
+            loadedData->addVariable(varType);
+            addVariableToTable(loadedData->getLastCharacterPropertyName(), "VECTOR4");
+            break;
+        case VARIABLE_TYPE_QUATERNION:
+            varType = hkVariableType::VARIABLE_TYPE_QUATERNION;
+            loadedData->addVariable(varType);
+            addVariableToTable(loadedData->getLastCharacterPropertyName(), "QUATERNION");
+            break;
+        default:
+            return;
+        }
+        loadedData->setIsFileChanged(true);
+        emit variableAdded(loadedData->getLastCharacterPropertyName());
     }
-    loadedData->getParentFile()->setIsChanged(true);
-    emit variableAdded(vars->characterPropertyNames.last());
 }
 
 void CharacterPropertiesUI::removeVariable(){
@@ -391,7 +374,7 @@ void CharacterPropertiesUI::removeVariable(){
             if (stackLyt->currentIndex() == VARIABLE_WIDGET){
                 stackLyt->setCurrentIndex(TABLE_WIDGET);
             }
-            loadedData->getParentFile()->setIsChanged(true);
+            loadedData->setIsFileChanged(true);
             static_cast<BehaviorFile *>(loadedData->getParentFile())->updateVariableIndices(index);
             emit variableRemoved(index);
             table->setFocus();

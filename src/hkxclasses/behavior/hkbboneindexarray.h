@@ -5,26 +5,26 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbBoneIndexArray: public HkDynamicObject
+class hkbBoneIndexArray final: public HkDynamicObject
 {
-    friend class BehaviorGraphView;
     friend class BoneIndexArrayUI;
 public:
     hkbBoneIndexArray(HkxFile *parent, long ref = 0);
-    virtual ~hkbBoneIndexArray();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbBoneIndexArray& operator=(const hkbBoneIndexArray&) = delete;
+    hkbBoneIndexArray(const hkbBoneIndexArray &) = delete;
+    ~hkbBoneIndexArray();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     //QString evaluateDataValidity();
-    static QString getClassname();
+    static const QString getClassname();
     bool write(HkxXMLWriter *writer);   //TO DO: implement getChildrenOtherTypes()??
     QVector <HkxObject *> getChildrenOtherTypes() const;
 private:
-    hkbBoneIndexArray& operator=(const hkbBoneIndexArray&);
-    hkbBoneIndexArray(const hkbBoneIndexArray &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     QVector <int> boneIndices;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBBONEINDEXARRAY_H

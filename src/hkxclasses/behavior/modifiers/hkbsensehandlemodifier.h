@@ -3,20 +3,22 @@
 
 #include "hkbmodifier.h"
 
-class hkbSenseHandleModifier: public hkbModifier
+class hkbSenseHandleModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class SenseHandleModifierUI;
     friend class RangesUI;
 public:
     hkbSenseHandleModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbSenseHandleModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbSenseHandleModifier& operator=(const hkbSenseHandleModifier&) = delete;
+    hkbSenseHandleModifier(const hkbSenseHandleModifier &) = delete;
+    ~hkbSenseHandleModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfRanges() const;
     bool isEventReferenced(int eventindex) const;
@@ -27,32 +29,22 @@ public:
     QVector <HkxObject *> getChildrenOtherTypes() const;
     bool merge(HkxObject *recessiveObject);
 private:
-    hkbSenseHandleModifier& operator=(const hkbSenseHandleModifier&);
-    hkbSenseHandleModifier(const hkbSenseHandleModifier &);
-private:
     struct hkRanges{
-        hkRanges()
-            : minDistance(0),
-              maxDistance(0),
-              ignoreHandle(false)
-        {
-            //
-        }
-
+        hkRanges() : minDistance(0), maxDistance(0), ignoreHandle(false){}
         hkEventPayload event;
         qreal minDistance;
         qreal maxDistance;
         bool ignoreHandle;
     };
-
-    static QStringList SensingMode; //(SENSE_IN_NEARBY_RIGID_BODIES=0;SENSE_IN_RIGID_BODIES_OUTSIDE_THIS_CHARACTER=1;SENSE_IN_OTHER_CHARACTER_RIGID_BODIES=2;SENSE_IN_THIS_CHARACTER_RIGID_BODIES=3;SENSE_IN_GIVEN_CHARACTER_RIGID_BODIES=4;SENSE_IN_GIVEN_RIGID_BODY=5;SENSE_IN_OTHER_CHARACTER_SKELETON=6;SENSE_IN_THIS_CHARACTER_SKELETON=7;SENSE_IN_GIVEN_CHARACTER_SKELETON=8;SENSE_IN_GIVEN_LOCAL_FRAME_GROUP=9)
+private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
+    static const QStringList SensingMode;
     long userData;
     QString name;
     bool enable;
     hkQuadVariable sensorLocalOffset;
-    QList <hkRanges> ranges;
+    QVector <hkRanges> ranges;
     HkxSharedPtr handleOut;
     HkxSharedPtr handleIn;
     QString localFrameName;
@@ -67,6 +59,7 @@ private:
     bool extrapolateSensorPosition;
     bool keepFirstSensedHandle;
     bool foundHandleOut;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBSENSEHANDLEMODIFIER_H

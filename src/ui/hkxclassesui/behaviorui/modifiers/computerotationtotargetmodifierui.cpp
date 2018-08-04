@@ -147,7 +147,7 @@ void ComputeRotationToTargetModifierUI::loadData(HkxObject *data){
             localAxisOfRotation->setValue(bsData->localAxisOfRotation);
             localFacingDirection->setValue(bsData->localFacingDirection);
             resultIsDelta->setChecked(bsData->resultIsDelta);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
                 loadBinding(ROTATION_OUT_ROW, BINDING_COLUMN, varBind, "rotationOut");
@@ -181,7 +181,7 @@ void ComputeRotationToTargetModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -192,7 +192,7 @@ void ComputeRotationToTargetModifierUI::setName(){
 void ComputeRotationToTargetModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setEnable(): The data is nullptr!!");
     }
@@ -202,7 +202,7 @@ void ComputeRotationToTargetModifierUI::setRotationOut(){
     if (bsData){
         if (bsData->rotationOut != rotationOut->value()){
             bsData->rotationOut = rotationOut->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setrotationOut(): The data is nullptr!!");
@@ -213,7 +213,7 @@ void ComputeRotationToTargetModifierUI::setTargetPosition(){
     if (bsData){
         if (bsData->targetPosition != targetPosition->value()){
             bsData->targetPosition = targetPosition->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::settargetPosition(): The data is nullptr!!");
@@ -224,7 +224,7 @@ void ComputeRotationToTargetModifierUI::setCurrentPosition(){
     if (bsData){
         if (bsData->currentPosition != currentPosition->value()){
             bsData->currentPosition = currentPosition->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setcurrentPosition(): The data is nullptr!!");
@@ -235,7 +235,7 @@ void ComputeRotationToTargetModifierUI::setCurrentRotation(){
     if (bsData){
         if (bsData->currentRotation != currentRotation->value()){
             bsData->currentRotation = currentRotation->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setcurrentRotation(): The data is nullptr!!");
@@ -246,7 +246,7 @@ void ComputeRotationToTargetModifierUI::setLocalAxisOfRotation(){
     if (bsData){
         if (bsData->localAxisOfRotation != localAxisOfRotation->value()){
             bsData->localAxisOfRotation = localAxisOfRotation->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setlocalAxisOfRotation(): The data is nullptr!!");
@@ -257,7 +257,7 @@ void ComputeRotationToTargetModifierUI::setLocalFacingDirection(){
     if (bsData){
         if (bsData->localFacingDirection != localFacingDirection->value()){
             bsData->localFacingDirection = localFacingDirection->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setlocalFacingDirection(): The data is nullptr!!");
@@ -267,7 +267,7 @@ void ComputeRotationToTargetModifierUI::setLocalFacingDirection(){
 void ComputeRotationToTargetModifierUI::setResultIsDelta(){
     if (bsData){
         bsData->resultIsDelta = resultIsDelta->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setresultIsDelta(): The data is nullptr!!");
     }
@@ -338,14 +338,14 @@ void ComputeRotationToTargetModifierUI::viewSelected(int row, int column){
 void ComputeRotationToTargetModifierUI::selectTableToView(bool viewisProperty, const QString & path){
     if (bsData){
         if (viewisProperty){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -358,7 +358,7 @@ void ComputeRotationToTargetModifierUI::selectTableToView(bool viewisProperty, c
 void ComputeRotationToTargetModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
         if (bind){
             int bindIndex = bind->getVariableIndexOfBinding("enable");
             if (bindIndex == index){
@@ -399,16 +399,16 @@ void ComputeRotationToTargetModifierUI::variableRenamed(const QString & name, in
 }
 
 bool ComputeRotationToTargetModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -420,7 +420,7 @@ bool ComputeRotationToTargetModifierUI::setBinding(int index, int row, const QSt
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -486,13 +486,13 @@ void ComputeRotationToTargetModifierUI::setBindingVariable(int index, const QStr
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-void ComputeRotationToTargetModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void ComputeRotationToTargetModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -500,7 +500,7 @@ void ComputeRotationToTargetModifierUI::loadBinding(int row, int colunm, hkbVari
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -508,7 +508,7 @@ void ComputeRotationToTargetModifierUI::loadBinding(int row, int colunm, hkbVari
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("ComputeRotationToTargetModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }

@@ -8,23 +8,25 @@ AnimationFile::AnimationFile(MainWindow *window, const QString & name)
 }
 
 qreal AnimationFile::getDuration() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return duration;
 }
 
-bool AnimationFile::addObjectToFile(HkxObject *, long )
-{
+bool AnimationFile::addObjectToFile(HkxObject *, long ){
     return true;
 }
 
 bool AnimationFile::parse(){
-    if (!getReader().parse()){
-        return false;
-    }
-    QByteArray value = getReader().findFirstValueWithAttributeValue("duration");
-    bool ok = true;
-    duration = value.toFloat(&ok);
-    if (!ok){
-        CRITICAL_ERROR_MESSAGE("AnimationFile::parse(): The animation duration was not found!");
+    std::lock_guard <std::mutex> guard(mutex);
+    bool ok = false;
+    if (getReader().parse()){
+        QByteArray value = getReader().findFirstValueWithAttributeValue("duration");
+        duration = value.toFloat(&ok);
+        if (!ok){
+            LogFile::writeToLog(getFileName()+" :parse(): The animation duration was not found!");
+        }
+    }else{
+        LogFile::writeToLog(getFileName()+" :parse(): The animation file failed to parse!");
     }
     return ok;
 }

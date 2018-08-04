@@ -20,9 +20,7 @@
 #define TYPE_COLUMN 1
 #define VALUE_COLUMN 2
 
-#define BINDING_ITEM_LABEL QString("Use Property     ")
-
-QStringList BGSGamebryoSequenceGeneratorUI::headerLabels = {
+const QStringList BGSGamebryoSequenceGeneratorUI::headerLabels = {
     "Name",
     "Type",
     "Value"
@@ -55,63 +53,57 @@ BGSGamebryoSequenceGeneratorUI::BGSGamebryoSequenceGeneratorUI()
     table->setCellWidget(PERCENT_ROW, VALUE_COLUMN, fPercent);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BGSGamebryoSequenceGeneratorUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(pSequence, SIGNAL(editingFinished()), this, SLOT(setSequence()), Qt::UniqueConnection);
-    connect(eBlendModeFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(setBlendModeFunction(int)), Qt::UniqueConnection);
-    connect(fPercent, SIGNAL(editingFinished()), this, SLOT(setPercent()), Qt::UniqueConnection);
-}
-
-void BGSGamebryoSequenceGeneratorUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(pSequence, SIGNAL(editingFinished()), this, SLOT(setSequence()));
-    disconnect(eBlendModeFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(setBlendModeFunction(int)));
-    disconnect(fPercent, SIGNAL(editingFinished()), this, SLOT(setPercent()));
+void BGSGamebryoSequenceGeneratorUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(pSequence, SIGNAL(textEdited(QString)), this, SLOT(setSequence(QString)), Qt::UniqueConnection);
+        connect(eBlendModeFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(setBlendModeFunction(int)), Qt::UniqueConnection);
+        connect(fPercent, SIGNAL(editingFinished()), this, SLOT(setPercent()), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(pSequence, SIGNAL(textEdited(QString)), this, SLOT(setSequence()));
+        disconnect(eBlendModeFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(setBlendModeFunction(int)));
+        disconnect(fPercent, SIGNAL(editingFinished()), this, SLOT(setPercent()));
+    }
 }
 
 void BGSGamebryoSequenceGeneratorUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == BGS_GAMEBYRO_SEQUENCE_GENERATOR){
             bsData = static_cast<BGSGamebryoSequenceGenerator *>(data);
-            name->setText(bsData->name);
-            pSequence->setText(bsData->pSequence);
-            if (eBlendModeFunction->count() == 0){
-                eBlendModeFunction->insertItems(0, bsData->BlendModeFunction);
-            }
-            eBlendModeFunction->setCurrentIndex(bsData->BlendModeFunction.indexOf(bsData->eBlendModeFunction));
-            fPercent->setValue(bsData->fPercent);
+            name->setText(bsData->getName());
+            pSequence->setText(bsData->getPSequence());
+            (eBlendModeFunction->count() == 0) ? eBlendModeFunction->insertItems(0, bsData->BlendModeFunction) : NULL;
+            eBlendModeFunction->setCurrentIndex(bsData->BlendModeFunction.indexOf(bsData->getEBlendModeFunction()));
+            fPercent->setValue(bsData->getFPercent());
         }else{
             CRITICAL_ERROR_MESSAGE(QString("BGSGamebryoSequenceGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BGSGamebryoSequenceGeneratorUI::loadData(): The data passed to the UI is nullptr!!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BGSGamebryoSequenceGeneratorUI::setName(){
+void BGSGamebryoSequenceGeneratorUI::setName(const QString & newname){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
-            emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-        }
+        bsData->setName(newname);   //Make sure name is valid???
+        bsData->updateIconNames();
+        bsData->setIsFileChanged(true);
+        emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("BGSGamebryoSequenceGeneratorUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("BGSGamebryoSequenceGeneratorUI::setName(): The data is nullptr!!");
     }
 }
 
-void BGSGamebryoSequenceGeneratorUI::setSequence(){
+void BGSGamebryoSequenceGeneratorUI::setSequence(const QString & sequence){
     if (bsData){
-        if (bsData->pSequence != pSequence->text()){
-            bsData->pSequence = pSequence->text();
-            bsData->getParentFile()->setIsChanged(true);
-        }
+        bsData->setPSequence(sequence);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BGSGamebryoSequenceGeneratorUI::setSequence(): The data is nullptr!!");
     }
@@ -119,8 +111,8 @@ void BGSGamebryoSequenceGeneratorUI::setSequence(){
 
 void BGSGamebryoSequenceGeneratorUI::setBlendModeFunction(int index){
     if (bsData){
-        bsData->eBlendModeFunction = bsData->BlendModeFunction.at(index);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setEBlendModeFunction(index);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BGSGamebryoSequenceGeneratorUI::setBlendModeFunction(): The data is nullptr!!");
     }
@@ -128,10 +120,8 @@ void BGSGamebryoSequenceGeneratorUI::setBlendModeFunction(int index){
 
 void BGSGamebryoSequenceGeneratorUI::setPercent(){
     if (bsData){
-        if (bsData->fPercent != fPercent->value()){
-            bsData->fPercent = fPercent->value();
-            bsData->getParentFile()->setIsChanged(true);
-        }
+        bsData->setFPercent(fPercent->value());
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BGSGamebryoSequenceGeneratorUI::setPercent(): The data is nullptr!!");
     }

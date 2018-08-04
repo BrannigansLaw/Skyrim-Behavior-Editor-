@@ -1,6 +1,13 @@
 #include "genericdatawidgets.h"
+#include "src/hkxclasses/behavior/hkbvariablebindingset.h"
+#include "src/hkxclasses/behavior/generators/hkbgenerator.h"
+#include "src/hkxclasses/behavior/modifiers/hkbmodifier.h"
+#include "src/ui/behaviorgraphview.h"
+#include "src/ui/treegraphicsitem.h"
 
 #include <QApplication>
+
+#define BINDING_ITEM_LABEL QString("Use Property     ")
 
 GenericTableWidget::GenericTableWidget(const QString & title)
     : lyt(new QGridLayout),
@@ -77,7 +84,7 @@ void GenericTableWidget::loadTable(const QStringList & names, const QStringList 
                 table->setItem(0, 1, new QTableWidgetItem(firstElement));
             }
         }
-        for (int i = start, j = 0; j < names.size(); i++, j++){
+        for (auto i = start, j = 0; j < names.size(); i++, j++){
             if (i < table->rowCount()){
                 if (table->item(i, 0)){
                     table->item(i, 0)->setText(names.at(j));
@@ -125,7 +132,7 @@ void GenericTableWidget::loadTable(const QStringList & names, const QString & ty
             table->setItem(0, 1, new QTableWidgetItem(firstElement));
         }
     }
-    for (int i = start, j = 0; j < names.size(); i++, j++){
+    for (auto i = start, j = 0; j < names.size(); i++, j++){
         if (i < table->rowCount()){
             if (table->item(i, 0)){
                 table->item(i, 0)->setText(names.at(j));
@@ -199,7 +206,7 @@ void GenericTableWidget::showTable(int index, const QString & typeallowed, const
 
 void GenericTableWidget::showTable(const QString & name, const QString & typeallowed, const QStringList &typesdisallowed){
     int index = -1;
-    for (int i = 0; i < table->rowCount(); i++){
+    for (auto i = 0; i < table->rowCount(); i++){
         /*if (table->isRowHidden(i)){
             table->setRowHidden(i, false);
         }*/
@@ -395,3 +402,205 @@ void GenericTableWidget::itemSelectedAt(int row, int ){
     typeSelector->addItems(typeNames);
 }*/
 
+namespace UIHelperFunctions{
+
+void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2, TableWidget *table){
+    if (table->item(row, 0)){
+        table->item(row, 0)->setText(name);
+    }else{
+        table->setItem(row, 0, new TableWidgetItem(name));
+    }
+    if (table->item(row, 1)){
+        table->item(row, 1)->setText(classname);
+    }else{
+        table->setItem(row, 1, new TableWidgetItem(classname, Qt::AlignCenter));
+    }
+    if (table->item(row, 2)){
+        table->item(row, 2)->setText(bind);
+    }else{
+        table->setItem(row, 2, new TableWidgetItem(bind, Qt::AlignCenter, QColor(Qt::red), QBrush(Qt::black), tip1));
+    }
+    if (table->item(row, 3)){
+        table->item(row, 3)->setText(value);
+    }else{
+        table->setItem(row, 3, new TableWidgetItem(value, Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), tip2));
+    }
+}
+
+void setBinding(int index, int row, int column, const QString & variableName, const QString & path, hkVariableType type, bool isProperty, TableWidget *table, HkDynamicObject *bsData){
+    hkbVariableBindingSet *varBind;
+    QTableWidgetItem *tableitem;
+    auto checkitem = [&](const QString & text){
+        tableitem = table->item(row, column);
+        if (tableitem){
+            tableitem->setText(text);
+        }else{
+            CRITICAL_ERROR_MESSAGE("setBinding(): 'tableitem' is nullptr!!");
+        }
+    };
+    if (bsData){
+        varBind = bsData->getVariableBindingSetData();
+        if (index == 0){
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){
+                static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr();
+                static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
+            }
+            checkitem(BINDING_ITEM_LABEL+"NONE");
+        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
+                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
+            if (!varBind){
+                varBind = new hkbVariableBindingSet(bsData->getParentFile());
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
+            }
+            if (isProperty){
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
+                    CRITICAL_ERROR_MESSAGE("setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                }
+            }else{
+                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
+                    CRITICAL_ERROR_MESSAGE("setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
+                }
+            }
+            checkitem(BINDING_ITEM_LABEL+variableName);
+            bsData->setIsFileChanged(true);
+        }else{
+            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!");
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE("setBinding(): The 'bsData' pointer is nullptr!!");
+    }
+}
+
+void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path, TableWidget *table, HkxObject *bsData){
+    QTableWidgetItem *tableitem;
+    QString varName;
+    int index;
+    if (bsData){
+        if (varBind){
+            index = varBind->getVariableIndexOfBinding(path);
+            if (index != -1){
+                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
+                    tableitem = table->item(row, column);
+                    if (tableitem){
+                        tableitem->setCheckState(Qt::Checked);
+                    }else{
+                        CRITICAL_ERROR_MESSAGE("loadBinding(): 'tableitem' is nullptr!!");
+                    }
+                }else{
+                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
+                }
+            }
+            (varName == "") ? varName = "NONE" : NULL;
+            tableitem = table->item(row, column);
+            if (tableitem){
+                tableitem->setText(BINDING_ITEM_LABEL+varName);
+            }else{
+                CRITICAL_ERROR_MESSAGE("loadBinding(): 'tableitem' is nullptr!!");
+            }
+        }else{
+            CRITICAL_ERROR_MESSAGE("loadBinding(): The variable binding set is nullptr!!");
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE("loadBinding(): The data is nullptr!!");
+    }
+}
+
+void setGenerator(int index, const QString &name, DataIconManager *dynobj, hkbGenerator *child, HkxSignature sig, HkxObject::HkxType type, TableWidget *table, BehaviorGraphView *behaviorView, int row, int column){
+    QTableWidgetItem *tableitem;
+    HkxSignature signature;
+    TreeGraphicsItem *item;
+    DataIconManager *ptr;
+    int indexOfGenerator;
+    if (table){
+        if (dynobj){
+            indexOfGenerator = dynobj->getIndexOfObj(static_cast<DataIconManager*>(child));
+            if (behaviorView){
+                ptr = static_cast<BehaviorFile *>(dynobj->getParentFile())->getGeneratorDataAt(index - 1);
+                signature = ptr->getSignature();
+                if (ptr){
+                    if (name != ptr->getName()){
+                        CRITICAL_ERROR_MESSAGE("setGenerator():The name of the selected object does not match it's name in the object selection table!!!");
+                    }else if ((signature == NULL_SIGNATURE && signature != sig) || (type != HkxObject::TYPE_GENERATOR)){
+                        WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nThe selected object is an incorrect type!!!");
+                    }else if (ptr == dynobj || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(child), 0, ptr, false)){
+                        WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
+                    }
+                }else{
+                    item = behaviorView->getSelectedItem();
+                    if (item){
+                        behaviorView->removeItemFromGraph(item->getChildWithData(static_cast<DataIconManager*>(child)), indexOfGenerator);
+                    }else{
+                        CRITICAL_ERROR_MESSAGE("setGenerator(): The selected icon is nullptr!!");
+                        return;
+                    }
+                }
+                behaviorView->removeGeneratorData();
+                tableitem = table->item(row, column);
+                if (tableitem){
+                    tableitem->setText(name);
+                }else{
+                    CRITICAL_ERROR_MESSAGE("setGenerator(): The 'tableitem' pointer is nullptr!!");
+                }
+                dynobj->setIsFileChanged(true);
+            }else{
+                CRITICAL_ERROR_MESSAGE("setGenerator(): The 'behaviorView' pointer is nullptr!!");
+            }
+        }else{
+            CRITICAL_ERROR_MESSAGE("setGenerator(): The 'generator' pointer is nullptr!!");
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE("setGenerator(): The 'table' pointer is nullptr!!");
+    }
+}
+
+void setModifier(int index, const QString &name, DataIconManager *dynobj, hkbModifier *child, HkxSignature sig, HkxObject::HkxType type, TableWidget *table, BehaviorGraphView *behaviorView, int row, int column){
+    DataIconManager *ptr;
+    TreeGraphicsItem *item;
+    QTableWidgetItem *tableitem;
+    HkxSignature signature;
+    int indexofmodifier;
+    if (table){
+        if (dynobj){
+            indexofmodifier = dynobj->getIndexOfObj(static_cast<DataIconManager*>(child));
+            if (behaviorView){
+                ptr = static_cast<BehaviorFile *>(dynobj->getParentFile())->getModifierDataAt(index - 1);
+                signature = ptr->getSignature();
+                if (ptr){
+                    if (name != ptr->getName()){
+                        CRITICAL_ERROR_MESSAGE("setModifier():The name of the selected object does not match it's name in the object selection table!!!");
+                    }else if ((signature == NULL_SIGNATURE && signature != sig) || (type != HkxObject::TYPE_MODIFIER)){
+                        WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nThe selected object is an incorrect type!!!");
+                    }else if (ptr == dynobj || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(child), 0, ptr, false)){
+                        WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
+                    }
+                }else{
+                    item = behaviorView->getSelectedItem();
+                    if (item){
+                        behaviorView->removeItemFromGraph(item->getChildWithData(static_cast<DataIconManager*>(child)), indexofmodifier);
+                    }else{
+                        CRITICAL_ERROR_MESSAGE("setModifier(): The selected icon is nullptr!!");
+                        return;
+                    }
+                }
+                behaviorView->removeModifierData();
+                tableitem = table->item(row, column);
+                if (tableitem){
+                    tableitem->setText(name);
+                }else{
+                    CRITICAL_ERROR_MESSAGE("setModifier(): The 'tableitem' pointer is nullptr!!");
+                }
+                dynobj->setIsFileChanged(true);
+            }else{
+                CRITICAL_ERROR_MESSAGE("setModifier(): The 'behaviorView' pointer is nullptr!!");
+            }
+        }else{
+            CRITICAL_ERROR_MESSAGE("setModifier(): The 'modifier' pointer is nullptr!!");
+        }
+    }else{
+        CRITICAL_ERROR_MESSAGE("setModifier(): The 'table' pointer is nullptr!!");
+    }
+}
+
+
+}

@@ -132,7 +132,7 @@ void ExtractRagdollPoseModifierUI::loadData(HkxObject *data){
             }
             poseMatchingBone2->setCurrentIndex(bsData->poseMatchingBone2 + 1);
             enableComputeWorldFromModel->setChecked(bsData->enableComputeWorldFromModel);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
                 loadBinding(POSE_MATCHING_BONE_0_ROW, BINDING_COLUMN, varBind, "poseMatchingBone0");
@@ -160,7 +160,7 @@ void ExtractRagdollPoseModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -171,7 +171,7 @@ void ExtractRagdollPoseModifierUI::setName(){
 void ExtractRagdollPoseModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setEnable(): The data is nullptr!!");
     }
@@ -180,7 +180,7 @@ void ExtractRagdollPoseModifierUI::setEnable(){
 void ExtractRagdollPoseModifierUI::setPoseMatchingBone0(int index){
     if (bsData){
         bsData->poseMatchingBone0 = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setposeMatchingBone0(): The data is nullptr!!");
     }
@@ -189,7 +189,7 @@ void ExtractRagdollPoseModifierUI::setPoseMatchingBone0(int index){
 void ExtractRagdollPoseModifierUI::setPoseMatchingBone1(int index){
     if (bsData){
         bsData->poseMatchingBone1 = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setposeMatchingBone1(): The data is nullptr!!");
     }
@@ -198,7 +198,7 @@ void ExtractRagdollPoseModifierUI::setPoseMatchingBone1(int index){
 void ExtractRagdollPoseModifierUI::setPoseMatchingBone2(int index){
     if (bsData){
         bsData->poseMatchingBone2 = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setposeMatchingBone2(): The data is nullptr!!");
     }
@@ -207,7 +207,7 @@ void ExtractRagdollPoseModifierUI::setPoseMatchingBone2(int index){
 void ExtractRagdollPoseModifierUI::setEnableComputeWorldFromModel(){
     if (bsData){
         bsData->enableComputeWorldFromModel = enableComputeWorldFromModel->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setenableComputeWorldFromModel(): The data is nullptr!!");
     }
@@ -260,14 +260,14 @@ void ExtractRagdollPoseModifierUI::viewSelected(int row, int column){
 void ExtractRagdollPoseModifierUI::selectTableToView(bool viewisProperty, const QString & path){
     if (bsData){
         if (viewisProperty){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -280,7 +280,7 @@ void ExtractRagdollPoseModifierUI::selectTableToView(bool viewisProperty, const 
 void ExtractRagdollPoseModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
         if (bind){
             int bindIndex = bind->getVariableIndexOfBinding("enable");
             if (bindIndex == index){
@@ -309,16 +309,16 @@ void ExtractRagdollPoseModifierUI::variableRenamed(const QString & name, int ind
 }
 
 bool ExtractRagdollPoseModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -330,7 +330,7 @@ bool ExtractRagdollPoseModifierUI::setBinding(int index, int row, const QString 
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -378,13 +378,13 @@ void ExtractRagdollPoseModifierUI::setBindingVariable(int index, const QString &
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-void ExtractRagdollPoseModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void ExtractRagdollPoseModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -392,7 +392,7 @@ void ExtractRagdollPoseModifierUI::loadBinding(int row, int colunm, hkbVariableB
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -400,7 +400,7 @@ void ExtractRagdollPoseModifierUI::loadBinding(int row, int colunm, hkbVariableB
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("ExtractRagdollPoseModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }

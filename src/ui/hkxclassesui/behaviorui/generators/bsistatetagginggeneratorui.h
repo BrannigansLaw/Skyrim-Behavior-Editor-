@@ -39,7 +39,7 @@ private:
     void connectSignals();
     void disconnectSignals();
     void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *generators);
-    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path);
+    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
     void variableRenamed(const QString & name, int index);
     void generatorRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);

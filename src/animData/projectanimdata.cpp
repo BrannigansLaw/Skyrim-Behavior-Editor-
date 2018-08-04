@@ -134,18 +134,18 @@ bool ProjectAnimData::write(QFile & file, QTextStream & out){
     out << QString::number(animationDataLines) << "\n";
     out << "1" << "\n";
     out << QString::number(projectFiles.size()) << "\n";
-    for (int i = 0; i < projectFiles.size(); i++){
+    for (auto i = 0; i < projectFiles.size(); i++){
         out << projectFiles.at(i) << "\n";
     }
     if (animationData.size() > 0){
         out << "1" << "\n";
-        for (int i = 0; i < animationData.size(); i++){
+        for (auto i = 0; i < animationData.size(); i++){
             if (!animationData.at(i)->write(&file, out)){
                 return false;
             }
         }
         out << QString::number(animationMotionDataLines) << "\n";
-        for (int i = 0; i < animationMotionData.size(); i++){
+        for (auto i = 0; i < animationMotionData.size(); i++){
             if (!animationMotionData.at(i)->write(&file, out)){
                 return false;
             }
@@ -157,7 +157,7 @@ bool ProjectAnimData::write(QFile & file, QTextStream & out){
 }
 
 bool ProjectAnimData::appendClipGenerator(SkyrimClipGeneratoData * animData){
-    for (int i = 0; i < animationData.size(); i++){
+    for (auto i = 0; i < animationData.size(); i++){
         if (animationData.at(i)->clipGeneratorName == animData->clipGeneratorName){
             return false;
         }
@@ -168,7 +168,7 @@ bool ProjectAnimData::appendClipGenerator(SkyrimClipGeneratoData * animData){
 }
 
 bool ProjectAnimData::removeClipGenerator(const QString &clipname){
-    for (int i = 0; i < animationData.size(); i++){
+    for (auto i = 0; i < animationData.size(); i++){
         if (animationData.at(i)->clipGeneratorName == clipname){
             animationDataLines = animationDataLines - animationData.at(i)->lineCount();
             animationData.removeAt(i);
@@ -179,7 +179,7 @@ bool ProjectAnimData::removeClipGenerator(const QString &clipname){
 }
 
 bool ProjectAnimData::appendAnimation(SkyrimAnimationMotionData * motiondata){
-    for (int i = 0; i < animationMotionData.size(); i++){
+    for (auto i = 0; i < animationMotionData.size(); i++){
         if (animationMotionData.at(i)->animationIndex == motiondata->animationIndex){
             return false;
         }
@@ -190,7 +190,7 @@ bool ProjectAnimData::appendAnimation(SkyrimAnimationMotionData * motiondata){
 }
 
 bool ProjectAnimData::removeAnimation(int animationindex){
-    for (int i = 0; i < animationMotionData.size(); i++){
+    for (auto i = 0; i < animationMotionData.size(); i++){
         if (animationMotionData.at(i)->animationIndex == animationindex){
             animationMotionDataLines = animationMotionDataLines - animationMotionData.at(i)->lineCount();
             animationMotionData.removeAt(i);
@@ -201,7 +201,7 @@ bool ProjectAnimData::removeAnimation(int animationindex){
 }
 
 SkyrimAnimationMotionData *ProjectAnimData::findMotionData(int animationindex){
-    for (int i = 0; i < animationMotionData.size(); i++){
+    for (auto i = 0; i < animationMotionData.size(); i++){
         if (animationMotionData.at(i)->animationIndex == animationindex){
             return animationMotionData.at(i);
         }
@@ -211,7 +211,7 @@ SkyrimAnimationMotionData *ProjectAnimData::findMotionData(int animationindex){
 }
 
 void ProjectAnimData::setLocalTimeForClipGenAnimData(const QString &clipname, int triggerindex, qreal time){
-    for (int i = 0; i < animationData.size(); i++){
+    for (auto i = 0; i < animationData.size(); i++){
         if (animationData.at(i)->clipGeneratorName == clipname && triggerindex >= 0 && triggerindex < animationData.at(i)->triggers.size()){
             animationData.at(i)->triggers[triggerindex].time = time;
             return;
@@ -221,7 +221,7 @@ void ProjectAnimData::setLocalTimeForClipGenAnimData(const QString &clipname, in
 }
 
 void ProjectAnimData::setEventNameForClipGenAnimData(const QString &clipname, int triggerindex, const QString &eventname){
-    for (int i = 0; i < animationData.size(); i++){
+    for (auto i = 0; i < animationData.size(); i++){
         if (animationData.at(i)->clipGeneratorName == clipname && triggerindex >= 0 && triggerindex < animationData.at(i)->triggers.size()){
             animationData.at(i)->triggers[triggerindex].name = eventname;
             return;
@@ -231,7 +231,7 @@ void ProjectAnimData::setEventNameForClipGenAnimData(const QString &clipname, in
 }
 
 void ProjectAnimData::setClipNameAnimData(const QString &oldclipname, const QString &newclipname){
-    for (int i = 0; i < animationData.size(); i++){
+    for (auto i = 0; i < animationData.size(); i++){
         if (animationData.at(i)->clipGeneratorName == oldclipname){
             animationData.at(i)->clipGeneratorName = newclipname;
             return;
@@ -241,7 +241,7 @@ void ProjectAnimData::setClipNameAnimData(const QString &oldclipname, const QStr
 }
 
 void ProjectAnimData::setAnimationIndexForClipGen(const QString &clipGenName, int index){
-    for (int i = 0; i < animationData.size(); i++){
+    for (auto i = 0; i < animationData.size(); i++){
         if (animationData.at(i)->clipGeneratorName == clipGenName){
             animationData.at(i)->animationIndex = index;
             return;
@@ -251,7 +251,7 @@ void ProjectAnimData::setAnimationIndexForClipGen(const QString &clipGenName, in
 }
 
 void ProjectAnimData::setPlaybackSpeedForClipGen(const QString &clipGenName, qreal speed){
-    for (int i = 0; i < animationData.size(); i++){
+    for (auto i = 0; i < animationData.size(); i++){
         if (animationData.at(i)->clipGeneratorName == clipGenName){
             animationData.at(i)->playbackSpeed = speed;
             return;
@@ -261,7 +261,7 @@ void ProjectAnimData::setPlaybackSpeedForClipGen(const QString &clipGenName, qre
 }
 
 void ProjectAnimData::setCropStartAmountLocalTimeForClipGen(const QString &clipGenName, qreal time){
-    for (int i = 0; i < animationData.size(); i++){
+    for (auto i = 0; i < animationData.size(); i++){
         if (animationData.at(i)->clipGeneratorName == clipGenName){
             animationData.at(i)->cropStartTime = time;
             return;
@@ -271,7 +271,7 @@ void ProjectAnimData::setCropStartAmountLocalTimeForClipGen(const QString &clipG
 }
 
 void ProjectAnimData::setCropEndAmountLocalTimeForClipGen(const QString &clipGenName, qreal time){
-    for (int i = 0; i < animationData.size(); i++){
+    for (auto i = 0; i < animationData.size(); i++){
         if (animationData.at(i)->clipGeneratorName == clipGenName){
             animationData.at(i)->cropEndTime = time;
             return;
@@ -281,7 +281,7 @@ void ProjectAnimData::setCropEndAmountLocalTimeForClipGen(const QString &clipGen
 }
 
 void ProjectAnimData::appendClipTriggerToAnimData(const QString &clipGenName, const QString & eventname){
-    for (int i = 0; i < animationData.size(); i++){
+    for (auto i = 0; i < animationData.size(); i++){
         if (animationData.at(i)->clipGeneratorName == clipGenName){
             animationData.at(i)->addTrigger(SkyrimClipTrigger(0, eventname));
             return;
@@ -291,7 +291,7 @@ void ProjectAnimData::appendClipTriggerToAnimData(const QString &clipGenName, co
 }
 
 void ProjectAnimData::removeClipTriggerToAnimDataAt(const QString &clipGenName, int index){
-    for (int i = 0; i < animationData.size(); i++){
+    for (auto i = 0; i < animationData.size(); i++){
         if (animationData.at(i)->clipGeneratorName == clipGenName){
             animationData.at(i)->removeTrigger(index);
             return;
@@ -301,7 +301,7 @@ void ProjectAnimData::removeClipTriggerToAnimDataAt(const QString &clipGenName, 
 }
 
 bool ProjectAnimData::removeBehaviorFromProject(const QString &behaviorname){
-    for (int i = 0; i < projectFiles.size(); i++){
+    for (auto i = 0; i < projectFiles.size(); i++){
         if (!QString::compare(projectFiles.at(i), behaviorname, Qt::CaseInsensitive)){
             projectFiles.removeAt(i);
             animationDataLines--;
@@ -312,7 +312,7 @@ bool ProjectAnimData::removeBehaviorFromProject(const QString &behaviorname){
 }
 
 qreal ProjectAnimData::getAnimationDuration(int animationindex) const{
-    for (int i = 0; i < animationMotionData.size(); i++){
+    for (auto i = 0; i < animationMotionData.size(); i++){
         if (animationMotionData.at(i)->animationIndex == animationindex){
             return animationMotionData.at(i)->duration;
         }
@@ -321,7 +321,7 @@ qreal ProjectAnimData::getAnimationDuration(int animationindex) const{
 }
 
 SkyrimAnimationMotionData ProjectAnimData::getAnimationMotionData(int animationindex) const{
-    for (int i = 0; i < animationMotionData.size(); i++){
+    for (auto i = 0; i < animationMotionData.size(); i++){
         if (animationMotionData.at(i)->animationIndex == animationindex){
             return *animationMotionData.at(i);
         }

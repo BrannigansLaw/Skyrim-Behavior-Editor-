@@ -3,22 +3,26 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbStringEventPayload: public HkxObject
+class hkbStringEventPayload final: public HkxObject
 {
 public:
     hkbStringEventPayload(HkxFile *parent, const QString & string = "", long ref = -1);
-    virtual ~hkbStringEventPayload();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbStringEventPayload& operator=(const hkbStringEventPayload&) = delete;
+    hkbStringEventPayload(const hkbStringEventPayload &) = delete;
+    ~hkbStringEventPayload();
+    static const QString getClassname();
+    QString getData() const;
+    void setData(const QString &value);
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     QString evaluateDataValidity();
-    static QString getClassname();
     bool link(){return true;}
     bool write(HkxXMLWriter *writer);
-public:
-    QString data;
-protected:
 private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
+    QString data;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBSTRINGEVENTPAYLOAD_H

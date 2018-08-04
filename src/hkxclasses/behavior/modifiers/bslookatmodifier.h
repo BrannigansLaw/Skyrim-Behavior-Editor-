@@ -3,20 +3,22 @@
 
 #include "hkbmodifier.h"
 
-class BSLookAtModifier: public hkbModifier
+class BSLookAtModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSBoneUI;
     friend class BSLookAtModifierUI;
 public:
     BSLookAtModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSLookAtModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSLookAtModifier& operator=(const BSLookAtModifier&) = delete;
+    BSLookAtModifier(const BSLookAtModifier &) = delete;
+    ~BSLookAtModifier();
+    static const QString getClassname();
+    QString getName() const;
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfBones() const;
     int getNumberOfEyeBones() const;
@@ -28,9 +30,6 @@ public:
     QVector <HkxObject *> getChildrenOtherTypes() const;
     bool merge(HkxObject *recessiveObject);
 private:
-    BSLookAtModifier& operator=(const BSLookAtModifier&);
-    BSLookAtModifier(const BSLookAtModifier &);
-private:
     struct BsBone{
         BsBone(): index(-1), limitAngleDegrees(0), onGain(0), offGain(0), enabled(true){}
         int index;
@@ -40,15 +39,15 @@ private:
         qreal offGain;
         bool enabled;
     };
-
+private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
     bool lookAtTarget;
-    QList <BsBone> bones;
-    QList <BsBone> eyeBones;
+    QVector <BsBone> bones;
+    QVector <BsBone> eyeBones;
     qreal limitAngleDegrees;
     qreal limitAngleThresholdDegrees;
     bool continueLookOutsideOfLimit;
@@ -63,6 +62,7 @@ private:
     qreal lookAtCameraX;
     qreal lookAtCameraY;
     qreal lookAtCameraZ;
+    mutable std::mutex mutex;
 };
 
 #endif // BSLOOKATMODIFIER_H

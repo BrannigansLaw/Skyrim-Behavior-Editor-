@@ -41,7 +41,7 @@ private:
     void connectSignals();
     void disconnectSignals();
     void modifierRenamed(const QString & name, int index);
-    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path);
+    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
     void variableRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);
     void selectTableToView(bool viewproperties, const QString & path);

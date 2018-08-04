@@ -117,7 +117,7 @@ void ClipTriggerUI::loadData(BehaviorFile *parentFile, hkbClipGenerator *parent,
             table->item(EVENT_ROW, VALUE_COLUMN)->setText("NONE");
         }
         if (trigger->event.payload.data()){
-            payload->setText(static_cast<hkbStringEventPayload *>(trigger->event.payload.data())->data);
+            payload->setText(static_cast<hkbStringEventPayload *>(trigger->event.payload.data())->getData());
         }else{
             payload->setText("");
         }
@@ -159,8 +159,8 @@ void ClipTriggerUI::setEventPayload(){
         payloadData = static_cast<hkbStringEventPayload *>(bsData->event.payload.data());
         if (payload->text() != ""){
             if (payloadData){
-                if (payloadData->data != payload->text()){
-                    payloadData->data = payload->text();
+                if (payloadData->getData() != payload->text()){
+                    payloadData->setData(payload->text());
                 }else{
                     return;
                 }

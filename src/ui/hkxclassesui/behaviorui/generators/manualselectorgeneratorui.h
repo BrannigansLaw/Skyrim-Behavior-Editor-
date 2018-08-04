@@ -40,7 +40,7 @@ private slots:
 private:
     void connectSignals();
     void disconnectSignals();
-    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path);
+    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
     void variableRenamed(const QString & name, int index);
     void generatorRenamed(const QString & name, int index);
     void setBehaviorView(BehaviorGraphView *view);

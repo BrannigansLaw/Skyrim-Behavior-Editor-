@@ -3,19 +3,21 @@
 
 #include "hkbmodifier.h"
 
-class hkbTimerModifier: public hkbModifier
+class hkbTimerModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class TimerModifierUI;
 public:
     hkbTimerModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbTimerModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbTimerModifier& operator=(const hkbTimerModifier&) = delete;
+    hkbTimerModifier(const hkbTimerModifier &) = delete;
+    ~hkbTimerModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
@@ -25,16 +27,14 @@ public:
     QVector <HkxObject *> getChildrenOtherTypes() const;
     bool merge(HkxObject *recessiveObject);
 private:
-    hkbTimerModifier& operator=(const hkbTimerModifier&);
-    hkbTimerModifier(const hkbTimerModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
     qreal alarmTimeSeconds;
     hkEventPayload alarmEvent;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBTIMERMODIFIER_H

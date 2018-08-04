@@ -38,10 +38,6 @@ void HkxFile::setHKXFileName(const QString &name){
     fileNameWithoutPath = name.section("/", -1, -1);
 }
 
-std::unique_lock <std::mutex> HkxFile::lockNGuard() const{
-    return std::unique_lock <std::mutex> (mutex);
-}
-
 HkxSharedPtr & HkxFile::getRootObject(){
     return rootObject;
 }
@@ -60,12 +56,12 @@ void HkxFile::setRootObject(HkxSharedPtr & obj){
 
 QString HkxFile::getRootObjectReferenceString(){
     if (rootObject.data()){
-        return rootObject.data()->getReferenceString();
+        return rootObject->getReferenceString();
     }
     return true;
 }
 
-bool HkxFile::appendAndReadData(int index, HkxObject *obj){
+bool HkxFile::appendAndReadData(long &index, HkxObject *obj){
     index++;    //Skip the current line.
     if (!obj->readData(getReader(), index)){
         return false;

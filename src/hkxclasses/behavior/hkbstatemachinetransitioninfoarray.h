@@ -7,32 +7,9 @@
 
 class hkbStateMachine;
 
-class hkbStateMachineTransitionInfoArray: public HkxObject
+class hkbStateMachineTransitionInfoArray final: public HkxObject
 {
-    friend class hkbStateMachine;
-    friend class hkbStateMachineStateInfo;
-    friend class StateMachineUI;
-    friend class StateUI;
 public:
-    hkbStateMachineTransitionInfoArray(HkxFile *parent, hkbStateMachine *parentSM, long ref = -1);
-    virtual ~hkbStateMachineTransitionInfoArray();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
-    QString evaluateDataValidity();
-    static QString getClassname();
-    QString getTransitionNameAt(int index);
-    int getNumTransitions() const;
-    void addTransition();
-    void removeTransition(int index);
-    void removeTransitionToState(ulong stateId);
-    bool write(HkxXMLWriter *writer);
-    bool isEventReferenced(int eventindex) const;
-    void updateEventIndices(int eventindex);
-    void mergeEventIndex(int oldindex, int newindex);
-    void fixMergedEventIndices(BehaviorFile *dominantfile);
-    bool merge(HkxObject *recessiveObject);
-    void updateReferences(long &ref);
-    QVector <HkxObject *> getChildrenOtherTypes() const;
     struct HkTransition
     {
         HkTransition()
@@ -107,24 +84,50 @@ public:
         HkxSharedPtr transition;
         HkxSharedPtr condition;
         int eventId;
-        ulong toStateId;
-        ulong fromNestedStateId;
-        ulong toNestedStateId;
+        int toStateId;
+        int fromNestedStateId;
+        int toNestedStateId;
         int priority;
         QString flags;
     };
-protected:
+public:
+    hkbStateMachineTransitionInfoArray(HkxFile *parent, hkbGenerator *parentSM, long ref = -1);
+    hkbStateMachineTransitionInfoArray& operator=(const hkbStateMachineTransitionInfoArray&) = delete;
+    hkbStateMachineTransitionInfoArray(const hkbStateMachineTransitionInfoArray &) = delete;
+    ~hkbStateMachineTransitionInfoArray();
+    static const QString getClassname();
+    void updateTransitionStateId(int oldid, int newid);
+    void removeTransitionToState(ulong stateId);
+    void setParentSM(hkbGenerator *parS);
+    int getNumTransitions() const;
+    QString getTransitionNameAt(int index) const;
+    hkbStateMachineTransitionInfoArray::HkTransition * getTransitionAt(int index);
+    void addTransition();
+    void removeTransition(int index);
 private:
-    enum INTERVAL_TYPE {
-        NONE = -1,
-        TRIGGER = 0,
-        INITIATE = 1
+    enum Interval_Type {
+        TRIGGER,
+        INITIATE
     };
-    static QStringList transitionFlags; //(FLAG_USE_TRIGGER_INTERVAL=1;FLAG_USE_INITIATE_INTERVAL=2;FLAG_UNINTERRUPTIBLE_WHILE_PLAYING=4;FLAG_UNINTERRUPTIBLE_WHILE_DELAYED=8;FLAG_DELAY_STATE_CHANGE=16;FLAG_DISABLED=32;FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE=64;FLAG_DISALLOW_RANDOM_TRANSITION=128;FLAG_DISABLE_CONDITION=256;FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE=512;FLAG_IS_GLOBAL_WILDCARD=1024;FLAG_IS_LOCAL_WILDCARD=2048;FLAG_FROM_NESTED_STATE_ID_IS_VALID=4096;FLAG_TO_NESTED_STATE_ID_IS_VALID=8192;FLAG_ABUT_AT_END_OF_FROM_GENERATOR=16384)
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
+    bool write(HkxXMLWriter *writer);
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
+    void mergeEventIndex(int oldindex, int newindex);
+    void fixMergedEventIndices(BehaviorFile *dominantfile);
+    bool merge(HkxObject *recessiveObject);
+    void updateReferences(long &ref);
+    QVector <HkxObject *> getChildrenOtherTypes() const;
+    QString evaluateDataValidity();
+private:
     static uint refCount;
-    static QString classname;
-    QList <HkTransition> transitions;
-    HkxObject *parent;
+    static const QString classname;
+    static const QStringList transitionFlags;
+    QVector <HkTransition> transitions;
+    hkbGenerator *parent;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBSTATEMACHINETRANSITIONINFOARRAY_H

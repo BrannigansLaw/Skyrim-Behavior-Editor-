@@ -28,22 +28,8 @@ class hkbPoseMatchingGenerator;
 class BehaviorGraphView: public TreeGraphicsView
 {
     Q_OBJECT
-    friend class TreeGraphicsItem;
-    friend class HkDataUI;
-    friend class ManualSelectorGeneratorUI;
-    friend class ModifierGeneratorUI;
-    friend class BSiStateTaggingGeneratorUI;
-    friend class StateMachineUI;
-    friend class StateUI;
-    friend class TransitionsUI;
-    friend class TreeGraphicsItem;
-    friend class BlenderGeneratorUI;
-    friend class BSBoneSwitchGeneratorUI;
-    friend class BSBoneSwitchGeneratorBoneDataUI;
-    friend class PoseMatchingGeneratorUI;
-    friend class ModifierListUI;
-
     friend class MainWindow;
+    friend class ModifierListUI;
 public:
     BehaviorGraphView(HkDataUI *mainUI, BehaviorFile * file);
     virtual ~BehaviorGraphView();
@@ -54,15 +40,16 @@ public:
     bool refocus();
     void setSelectedItem(TreeGraphicsItem *item);
     QString getBehaviorFilename() const;
+    TreeGraphicsItem * getSelectedIconsChildIcon(HkxObject *child);
+    void removeObjects();
+    BehaviorFile *getBehavior() const;
 signals:
     void addedGenerator(const QString & name, const QString & type);
     void addedModifier(const QString & name, const QString & type);
     void removedGenerator(int index);
     void removedModifier(int index);
     void disconnectTablesFromHkDataUI();
-private slots:
-    void focusOnGeneratorIcon(int index, const QString & name);
-    void focusOnModifierIcon(int index, const QString & name);
+public slots:
     void appendStateMachine();
     void appendState();
     void appendManualSelectorGenerator();
@@ -80,6 +67,9 @@ private slots:
     void appendBehaviorReferenceGenerator();
     void appendBGSGamebryoSequenceGenerator();
 
+private slots:
+    void focusOnGeneratorIcon(int index, const QString & name);
+    void focusOnModifierIcon(int index, const QString & name);
     void appendModifierList();
     void appendTwistModifier();
     void appendEventDrivenModifier();
@@ -150,8 +140,6 @@ private:
     void enableAllMenuActions(QMenu *menu);
     void disableAllMenuActions(QMenu *menu);
     bool confirmationDialogue(const QString & message, QWidget *parent);
-    TreeGraphicsItem * getSelectedIconsChildIcon(HkxObject *child);
-    void removeObjects();
     void deleteAllObjectBranches();
 private:
     HkDataUI *ui;

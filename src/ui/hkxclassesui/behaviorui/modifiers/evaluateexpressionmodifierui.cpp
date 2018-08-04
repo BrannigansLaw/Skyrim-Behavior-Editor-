@@ -97,7 +97,7 @@ void EvaluateExpressionModifierUI::addExpression(){
             bsData->expressions = HkxSharedPtr(exps);
         }
         exps->addExpression();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
         loadDynamicTableRows();
     }else{
         CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::addExpression(): The data is nullptr!!");
@@ -115,7 +115,7 @@ void EvaluateExpressionModifierUI::removeExpression(int index){
                 WARNING_MESSAGE("EvaluateExpressionModifierUI::removeExpression(): Invalid row index selected!!");
                 return;
             }
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             loadDynamicTableRows();
         }else{
             WARNING_MESSAGE("EvaluateExpressionModifierUI::removeExpression(): Event data is nullptr!!");
@@ -135,7 +135,7 @@ void EvaluateExpressionModifierUI::loadData(HkxObject *data){
             bsData = static_cast<hkbEvaluateExpressionModifier *>(data);
             name->setText(bsData->name);
             enable->setChecked(bsData->enable);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
             }else{
@@ -160,7 +160,7 @@ void EvaluateExpressionModifierUI::loadDynamicTableRows(){
         }
         hkbExpressionDataArray *exps = static_cast<hkbExpressionDataArray *>(bsData->expressions.data());
         if (exps){
-            for (int i = ADD_EXPRESSION_ROW + 1, j = 0; j < bsData->getNumberOfExpressions(); i++, j++){
+            for (auto i = ADD_EXPRESSION_ROW + 1, j = 0; j < bsData->getNumberOfExpressions(); i++, j++){
                 setRowItems(i, exps->expressionsData.at(j).expression, exps->getClassname(), "Remove", "Edit", "Double click to remove this expression", "Double click to edit this expression");
             }
         }
@@ -194,16 +194,16 @@ void EvaluateExpressionModifierUI::setRowItems(int row, const QString & name, co
 }
 
 bool EvaluateExpressionModifierUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -215,7 +215,7 @@ bool EvaluateExpressionModifierUI::setBinding(int index, int row, const QString 
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -239,7 +239,7 @@ void EvaluateExpressionModifierUI::setBindingVariable(int index, const QString &
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::setBindingVariable(): The data is nullptr!!");
     }
@@ -256,7 +256,7 @@ void EvaluateExpressionModifierUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit modifierNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::setName(): The data is nullptr!!");
@@ -266,7 +266,7 @@ void EvaluateExpressionModifierUI::setName(){
 void EvaluateExpressionModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::setEnable(): The data is nullptr!!");
     }
@@ -293,7 +293,7 @@ void EvaluateExpressionModifierUI::viewSelectedChild(int row, int column){
             result = row - BASE_NUMBER_OF_ROWS;
             if (bsData->getNumberOfExpressions() > result && result >= 0){
                 if (column == VALUE_COLUMN){
-                    expressionUI->loadData((BehaviorFile *)(bsData->expressions.data()->getParentFile()), &static_cast<hkbExpressionDataArray *>(bsData->expressions.data())->expressionsData[result]);
+                    expressionUI->loadData((BehaviorFile *)(bsData->expressions->getParentFile()), &static_cast<hkbExpressionDataArray *>(bsData->expressions.data())->expressionsData[result]);
                     setCurrentIndex(CHILD_WIDGET);
                 }else if (column == BINDING_COLUMN){
                     if (MainWindow::yesNoDialogue("Are you sure you want to remove the expression \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
@@ -338,7 +338,7 @@ void EvaluateExpressionModifierUI::connectToTables(GenericTableWidget *variables
     }
 }
 
-void EvaluateExpressionModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void EvaluateExpressionModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -346,7 +346,7 @@ void EvaluateExpressionModifierUI::loadBinding(int row, int colunm, hkbVariableB
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -354,7 +354,7 @@ void EvaluateExpressionModifierUI::loadBinding(int row, int colunm, hkbVariableB
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("EvaluateExpressionModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
@@ -366,14 +366,14 @@ void EvaluateExpressionModifierUI::loadBinding(int row, int colunm, hkbVariableB
 void EvaluateExpressionModifierUI::selectTableToView(bool viewproperties, const QString & path){
     if (bsData){
         if (viewproperties){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -402,7 +402,7 @@ void EvaluateExpressionModifierUI::variableRenamed(const QString & name, int ind
     if (bsData){
         index--;
         if (currentIndex() == MAIN_WIDGET){
-            bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            bind = bsData->getVariableBindingSetData();
             if (bind){
                 bindIndex = bind->getVariableIndexOfBinding("enable");
                 if (bindIndex == index){

@@ -3,24 +3,16 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbFootIkDriverInfo: public HkxObject
+class hkbFootIkDriverInfo final: public HkxObject
 {
     friend class FootIkDriverInfoUI;
     friend class FootIkDriverInfoLegUI;
 public:
     hkbFootIkDriverInfo(HkxFile *parent, long ref = 0);
-    virtual ~hkbFootIkDriverInfo();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
-    void unlink();
-    QString evaluateDataValidity();
-    static QString getClassname();
-    bool write(HkxXMLWriter *writer);
-private:
-    void addLeg();
-    void removeLegAt(int index);
-    hkbFootIkDriverInfo& operator=(const hkbFootIkDriverInfo&);
-    hkbFootIkDriverInfo(const hkbFootIkDriverInfo &);
+    hkbFootIkDriverInfo& operator=(const hkbFootIkDriverInfo&) = delete;
+    hkbFootIkDriverInfo(const hkbFootIkDriverInfo &) = delete;
+    ~hkbFootIkDriverInfo();
+    static const QString getClassname();
 private:
     struct hkbFootIkDriverInfoLeg{
         hkbFootIkDriverInfoLeg(hkbFootIkDriverInfo *par = nullptr)
@@ -53,12 +45,18 @@ private:
         int kneeIndex;
         int ankleIndex;
     };
-
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
+    QString evaluateDataValidity();
+    bool write(HkxXMLWriter *writer);
+    void addLeg();
+    void removeLegAt(int index);
     hkbFootIkDriverInfoLeg * getLegAt(int index);
-
+private:
     static uint refCount;
-    static QString classname;
-    QList <hkbFootIkDriverInfoLeg> legs;
+    static const QString classname;
+    QVector <hkbFootIkDriverInfoLeg> legs;
     qreal raycastDistanceUp;
     qreal raycastDistanceDown;
     qreal originalGroundHeightMS;
@@ -70,6 +68,7 @@ private:
     bool lockFeetWhenPlanted;
     bool useCharacterUpVector;
     bool isQuadrupedNarrow;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBFOOTIKDRIVERINFO_H

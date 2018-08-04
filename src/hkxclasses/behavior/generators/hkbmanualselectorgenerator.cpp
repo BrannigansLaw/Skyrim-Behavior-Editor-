@@ -1,14 +1,10 @@
 #include "hkbmanualselectorgenerator.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
-//#include "src/ui/dataiconmanager.h"
-/*
- * CLASS: hkbManualSelectorGenerator
-*/
 
 uint hkbManualSelectorGenerator::refCount = 0;
 
-QString hkbManualSelectorGenerator::classname = "hkbManualSelectorGenerator";
+const QString hkbManualSelectorGenerator::classname = "hkbManualSelectorGenerator";
 
 hkbManualSelectorGenerator::hkbManualSelectorGenerator(HkxFile *parent, long ref)
     : hkbGenerator(parent, ref),
@@ -17,42 +13,37 @@ hkbManualSelectorGenerator::hkbManualSelectorGenerator(HkxFile *parent, long ref
       currentGeneratorIndex(0)
 {
     setType(HKB_MANUAL_SELECTOR_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "ManualSelectorGenerator"+QString::number(refCount);
+    name = "ManualSelectorGenerator_"+QString::number(refCount);
 }
 
-QString hkbManualSelectorGenerator::getClassname(){
+const QString hkbManualSelectorGenerator::getClassname(){
     return classname;
 }
 
 QString hkbManualSelectorGenerator::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-int hkbManualSelectorGenerator::getIndexToInsertIcon(HkxObject *child) const{
-    for (int i = 0; i < generators.size(); i++){
-        if (generators.at(i).constData() == child){
-            return i;
-        }
-    }
-    return -1;
-}
-
 bool hkbManualSelectorGenerator::insertObjectAt(int index, DataIconManager *obj){
-    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
-        if (index >= generators.size() || index == -1){
-            generators.append(HkxSharedPtr(obj));
-        }else if (index == 0 || !generators.isEmpty()){
-            generators.replace(index, HkxSharedPtr(obj));
+    std::lock_guard <std::mutex> guard(mutex);
+    if (obj){
+        if (obj->getType() == TYPE_GENERATOR){
+            if (index >= generators.size() || index == -1){
+                generators.append(HkxSharedPtr(obj));
+            }else if (index == 0 || !generators.isEmpty()){
+                generators.replace(index, HkxSharedPtr(obj));
+            }
+            return true;
         }
-        return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 bool hkbManualSelectorGenerator::removeObjectAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
     if (index > -1 && index < generators.size()){
         generators.removeAt(index);
     }else if (index == -1){
@@ -64,7 +55,8 @@ bool hkbManualSelectorGenerator::removeObjectAt(int index){
 }
 
 bool hkbManualSelectorGenerator::hasChildren() const{
-    for (int i = 0; i < generators.size(); i++){
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < generators.size(); i++){
         if (generators.at(i).data()){
             return true;
         }
@@ -72,7 +64,8 @@ bool hkbManualSelectorGenerator::hasChildren() const{
     return false;
 }
 
-bool hkbManualSelectorGenerator::merge(HkxObject *recessiveObject){
+bool hkbManualSelectorGenerator::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     hkbManualSelectorGenerator *obj = nullptr;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_MANUAL_SELECTOR_GENERATOR){
         obj = static_cast<hkbManualSelectorGenerator *>(recessiveObject);
@@ -87,9 +80,10 @@ bool hkbManualSelectorGenerator::merge(HkxObject *recessiveObject){
     }
 }
 
-QList<DataIconManager *> hkbManualSelectorGenerator::getChildren() const{
-    QList<DataIconManager *> list;
-    for (int i = 0; i < generators.size(); i++){
+QVector<DataIconManager *> hkbManualSelectorGenerator::getChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QVector<DataIconManager *> list;
+    for (auto i = 0; i < generators.size(); i++){
         if (generators.at(i).data()){
             list.append(static_cast<DataIconManager*>(generators.at(i).data()));
         }
@@ -98,69 +92,69 @@ QList<DataIconManager *> hkbManualSelectorGenerator::getChildren() const{
 }
 
 int hkbManualSelectorGenerator::getIndexOfObj(DataIconManager *obj) const{
-    for (int i = 0; i < generators.size(); i++){
-        if (generators.at(i).data() == (HkxObject *)obj){
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < generators.size(); i++){
+        if (generators.at(i).data() == obj){
             return i;
         }
     }
     return -1;
 }
 
-bool hkbManualSelectorGenerator::readData(const HkxXmlReader &reader, long index){
+bool hkbManualSelectorGenerator::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "generators"){
-            if (!readReferences(reader.getElementValueAt(index), generators)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'generators' references!\nObject Reference: "+ref);
-            }
+            checkvalue(readReferences(reader.getElementValueAt(index), generators), "generators");
         }else if (text == "selectedGeneratorIndex"){
             selectedGeneratorIndex = reader.getElementValueAt(index).toShort(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'selectedGeneratorIndex' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "selectedGeneratorIndex");
         }else if (text == "currentGeneratorIndex"){
             currentGeneratorIndex = reader.getElementValueAt(index).toShort(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'currentGeneratorIndex' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "currentGeneratorIndex");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbManualSelectorGenerator::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value, bool allownull){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value, allownull);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QString refString = "null";
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
+        if (getVariableBindingSetData()){
+            refString = getVariableBindingSet()->getReferenceString();
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
+        writedatafield("userData", QString::number(userData), false);
+        writedatafield("name", name, false);
         refString = "";
         list1 = {writer->name, writer->numelements};
         for (auto i = generators.size() - 1; i >= 0; i--){
@@ -170,8 +164,8 @@ bool hkbManualSelectorGenerator::write(HkxXMLWriter *writer){
         }
         list2 = {"generators", QString::number(generators.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0, j = 1; i < generators.size(); i++, j++){
-            refString.append(generators.at(i).data()->getReferenceString());
+        for (auto i = 0, j = 1; i < generators.size(); i++, j++){
+            refString.append(generators.at(i)->getReferenceString());
             if (j % 16 == 0){
                 refString.append("\n");
             }else{
@@ -185,38 +179,32 @@ bool hkbManualSelectorGenerator::write(HkxXMLWriter *writer){
             writer->writeLine(refString);
             writer->writeLine(writer->parameter, false);
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("selectedGeneratorIndex"), QString::number(selectedGeneratorIndex));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("currentGeneratorIndex"), QString::number(currentGeneratorIndex));
+        writedatafield("selectedGeneratorIndex", QString::number(selectedGeneratorIndex), false);
+        writedatafield("currentGeneratorIndex", QString::number(currentGeneratorIndex), false);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        for (int i = 0; i < generators.size(); i++){
-            if (generators.at(i).data() && !generators.at(i).data()->write(writer)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'generators' at: "+QString::number(i)+"!!!");
-            }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        for (auto i = 0; i < generators.size(); i++){
+            writechild(generators.at(i), "generators.at("+QString::number(i)+")");
         }
     }
     return true;
 }
 
 bool hkbManualSelectorGenerator::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
-    for (int i = 0; i < generators.size(); i++){
+    for (auto i = 0; i < generators.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(generators.at(i).getShdPtrReference());
-        if (!ptr){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'generators' data field!\nObject Name: "+name);
+        if (!ptr || !ptr->data()){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'generators' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'generators' data field is linked to invalid child!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'generators' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             generators[i] = *ptr;
         }else{
@@ -227,47 +215,45 @@ bool hkbManualSelectorGenerator::link(){
 }
 
 void hkbManualSelectorGenerator::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
-    for (int i = 0; i < generators.size(); i++){
+    for (auto i = 0; i < generators.size(); i++){
         generators[i] = HkxSharedPtr();
     }
 }
 
 QString hkbManualSelectorGenerator::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    auto isvalid = true;
-    if (generators.isEmpty()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": generators is empty!\n");
-    }else{
-        for (auto i = generators.size() - 1; i >= 0; i--){
-            if (!generators.at(i).data()){
-                isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": generators at index '"+QString::number(i)+"' is null! Removing child!\n");
-                generators.removeAt(i);
-            }else if (generators.at(i).data()->getType() != HkxObject::TYPE_GENERATOR){
-                isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid generator! Signature: "+QString::number(generators.at(i).data()->getSignature(), 16)+" Removing child!\n");
-                generators.removeAt(i);
-            }
+    bool isvalid = true;
+    auto appenderror = [&](bool value, const QString & fieldname){
+        if (!value){
+            isvalid = false;
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid '"+fieldname+"'!\n");
         }
-    }
-    QString temp = HkDynamicObject::evaluateDataValidity();
-    if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
-    }
-    if (name == ""){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+    };
+    appenderror((HkDynamicObject::evaluateDataValidity() == ""), "hkbVariableBindingSet");
+    appenderror((name != ""), "name");
+    appenderror(!(generators.isEmpty()), "generators");
+    for (auto i = generators.size() - 1; i >= 0; i--){
+        if (!generators.at(i).data()){
+            isvalid = false;
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": generators at index '"+QString::number(i)+"' is null! Removing child!\n");
+            generators.removeAt(i);
+        }else if (generators.at(i)->getType() != HkxObject::TYPE_GENERATOR){
+            isvalid = false;
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid generator! Signature: "+QString::number(generators.at(i)->getSignature(), 16)+" Removing child!\n");
+            generators.removeAt(i);
+        }
     }
     if (selectedGeneratorIndex >= generators.size()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": selectedGeneratorIndex is out of range! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": selectedGeneratorIndex is out of range! Setting max value!\n");
         selectedGeneratorIndex = generators.size() - 1;
     }
     if (currentGeneratorIndex >= generators.size()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": currentGeneratorIndex is out of range! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": currentGeneratorIndex is out of range! Setting max value!\n");
         currentGeneratorIndex = generators.size() - 1;
     }
     setDataValidity(isvalid);

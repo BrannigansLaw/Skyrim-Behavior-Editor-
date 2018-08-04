@@ -128,7 +128,7 @@ void BSBoneUI::loadData(BehaviorFile *parentFile, BSLookAtModifier::BsBone *bon,
         onGain->setValue(bsData->onGain);
         offGain->setValue(bsData->offGain);
         enabled->setChecked(bsData->enabled);
-        hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data());
+        hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
         if (varBind){
             loadBinding(INDEX_ROW, BINDING_COLUMN, varBind, parameterName+QString::number(bsBoneIndex)+"/index");
             loadBinding(FWD_AXIS_LS_ROW, BINDING_COLUMN, varBind, parameterName+QString::number(bsBoneIndex)+"/fwdAxisLS");
@@ -150,7 +150,7 @@ void BSBoneUI::loadData(BehaviorFile *parentFile, BSLookAtModifier::BsBone *bon,
     connectSignals();
 }
 
-void BSBoneUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void BSBoneUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -158,7 +158,7 @@ void BSBoneUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, 
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(file)->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(file)->getVariableNameAt(index);
                 }
@@ -166,7 +166,7 @@ void BSBoneUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, 
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("BSBoneUI::loadBinding(): The variable binding set is nullptr!!");
         }
@@ -176,16 +176,16 @@ void BSBoneUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, 
 }
 
 bool BSBoneUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(parent)->variableBindingSet = HkxSharedPtr();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(parent)->getVariableBindingSet() = HkxSharedPtr();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && static_cast<BehaviorFile *>(file)->getVariableTypeAt(index - 1) == type) ||
                   (isProperty && static_cast<BehaviorFile *>(file)->getCharacterPropertyTypeAt(index - 1) == type)){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(file);
-                parent->variableBindingSet = HkxSharedPtr(varBind);
+                parent->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -372,14 +372,14 @@ void BSBoneUI::viewSelectedChild(int row, int column){
 void BSBoneUI::selectTableToView(bool viewproperties, const QString & path){
     if (bsData){
         if (viewproperties){
-            if (parent->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (parent->getVariableBindingSetData()){
+                emit viewProperties(static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (parent->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (parent->getVariableBindingSetData()){
+                emit viewVariables(static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -396,8 +396,8 @@ void BSBoneUI::variableRenamed(const QString & name, int index){
         WARNING_MESSAGE("BSBoneUI::variableRenamed(): The new variable name is the empty string!!");
     }
     if (bsData){
-        //index--;
-        bind = static_cast<hkbVariableBindingSet *>(parent->variableBindingSet.data());
+        index--;
+        bind = static_cast<hkbVariableBindingSet *>(parent->getVariableBindingSetData());
         if (bind){
             bindIndex = bind->getVariableIndexOfBinding(parameterName+QString::number(bsBoneIndex)+"/index");
             if (bindIndex == index){

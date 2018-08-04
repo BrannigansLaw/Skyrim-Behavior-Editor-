@@ -811,7 +811,7 @@ QString MainWindow::generateUniqueBehaviorName(){
                 behaviornames.append(it.fileInfo().fileName());
             }
         }
-        for (int i = 0; i < behaviornames.size(); i++){
+        for (auto i = 0; i < behaviornames.size(); i++){
             if (behaviornames.at(i) == name){
                 index = name.lastIndexOf('_');
                 if (index > -1){
@@ -988,7 +988,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata,
                 if (loadui){
                     percent = 0;
                     progress.setProgress("Loading behavior graphs...", percent);
-                    for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
+                    for (auto i = 0; i < projectFile->behaviorFiles.size(); i++){
                         behaviorGraphs.append(new BehaviorGraphView(objectDataWid, projectFile->behaviorFiles.at(i)));
                     }
                     taskCount = behaviornames.size();
@@ -1059,7 +1059,7 @@ bool MainWindow::openBehavior(const QString & filename, int & taskCount, bool ch
     if (filename != ""){
         if (projectFile){
             if (checkisopen){
-                for (int i = 0; i < projectFile->behaviorFiles.size(); i++){
+                for (auto i = 0; i < projectFile->behaviorFiles.size(); i++){
                     if (projectFile->behaviorFiles.at(i)->fileName() == filename){
                         LogFile::writeToLog("MainWindow::openBehavior(): The selected behavior file \""+filename+"\" is already open!");
                         mutex.lock();
@@ -1101,7 +1101,7 @@ bool MainWindow::openBehavior(const QString & filename, int & taskCount, bool ch
 bool MainWindow::closeAll(){
     if (projectFile){
         bool unsavedChanges = false;
-        for (int i = 0; i < behaviorGraphs.size(); i++){
+        for (auto i = 0; i < behaviorGraphs.size(); i++){
             if (projectFile->behaviorFiles.at(i)->getIsChanged()){
                 unsavedChanges = true;
             }
@@ -1113,13 +1113,13 @@ bool MainWindow::closeAll(){
             projectUI->setDisabled(true);
             objectDataWid->unloadDataWidget();
             tabs->clear();
-            for (int j = 0; j < behaviorGraphs.size(); j++){
+            for (auto j = 0; j < behaviorGraphs.size(); j++){
                 if (behaviorGraphs.at(j)){
                     delete behaviorGraphs.at(j);
                 }
             }
             behaviorGraphs.clear();
-            for (int j = 0; j < projectFile->behaviorFiles.size(); j++){
+            for (auto j = 0; j < projectFile->behaviorFiles.size(); j++){
                 if (projectFile->behaviorFiles.at(j)){
                     delete projectFile->behaviorFiles.at(j);
                 }
@@ -1174,7 +1174,7 @@ void MainWindow::openUnpackedProject(){
 
 void MainWindow::openBehaviorFile(const QModelIndex & index){
     QString fileName = index.data().toString();
-    for (int j = 0; j < behaviorGraphs.size(); j++){
+    for (auto j = 0; j < behaviorGraphs.size(); j++){
         if (!fileName.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive)){
             objectDataWid->loadBehaviorView(behaviorGraphs.at(j));
             tabs->addTab(behaviorGraphs.at(j), fileName);
@@ -1187,7 +1187,7 @@ void MainWindow::openBehaviorFile(const QModelIndex & index){
 
 void MainWindow::openBehaviorFile(const QString & fileName){
     QString name = fileName.section("/", -1, -1);
-    for (int j = 0; j < behaviorGraphs.size(); j++){
+    for (auto j = 0; j < behaviorGraphs.size(); j++){
         if (!name.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive)){
             objectDataWid->loadBehaviorView(behaviorGraphs.at(j));
             tabs->addTab(behaviorGraphs.at(j), name);
@@ -1260,7 +1260,7 @@ void MainWindow::zoomOut(){
 }
 
 int MainWindow::getBehaviorGraphIndex(const QString & filename){
-    for (int j = 0; j < behaviorGraphs.size(); j++){
+    for (auto j = 0; j < behaviorGraphs.size(); j++){
         if (filename.compare(behaviorGraphs.at(j)->getBehaviorFilename().section("/", -1, -1), Qt::CaseInsensitive) == 0){
             if (j >= projectFile->behaviorFiles.size() || filename.compare(projectFile->behaviorFiles.at(j)->getFileName(), Qt::CaseInsensitive) != 0){
                 LogFile::writeToLog("MainWindow::getBehaviorGraphIndex(): The index is invalid!");
@@ -1296,7 +1296,7 @@ bool MainWindow::findGameDirectory(const QString & gamename, QString & gamedirec
     QString path;
     QDir dir;
     bool value = false;
-    for (int i = 0; i < drives.size(); i++){
+    for (auto i = 0; i < drives.size(); i++){
         driveName = drives.at(i).absolutePath();
         dir.setPath(driveName);
         path = driveName+"Program Files/Steam/steamapps/common/"+gamename;

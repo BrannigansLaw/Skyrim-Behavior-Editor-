@@ -4,6 +4,7 @@
 #include <QStackedWidget>
 
 #include "src/utility.h"
+#include "src/hkxclasses/behavior/generators/hkbblendergenerator.h"
 
 class TableWidget;
 class hkbBlenderGenerator;
@@ -21,21 +22,26 @@ class ComboBox;
 class GenericTableWidget;
 class hkbVariableBindingSet;
 
-class BlenderGeneratorUI: public QStackedWidget
+class BlenderGeneratorUI final: public QStackedWidget
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     BlenderGeneratorUI();
-    virtual ~BlenderGeneratorUI(){}
+    BlenderGeneratorUI& operator=(const BlenderGeneratorUI&) = delete;
+    BlenderGeneratorUI(const BlenderGeneratorUI &) = delete;
+    ~BlenderGeneratorUI() = default;
     void loadData(HkxObject *data);
+    void setBehaviorView(BehaviorGraphView *view);
+    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
+    void variableRenamed(const QString & name, int index);
+    void generatorRenamed(const QString & name, int index);
 signals:
     void generatorNameChanged(const QString & newName, int index);
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setReferencePoseWeightThreshold();
     void setBlendParameter();
     void setMinCyclicBlendParameter();
@@ -54,24 +60,19 @@ private slots:
     void generatorTableElementSelected(int index, const QString &name);
     void swapGeneratorIndices(int index1, int index2);
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
     void addChildWithGenerator();
     void removeChild(int index);
     void selectTableToView(bool viewproperties, const QString & path);
     void loadDynamicTableRows();
     void setBindingVariable(int index, const QString & name);
-    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString &tip1, const QString &tip2);
-    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
-    void variableRenamed(const QString & name, int index);
-    void generatorRenamed(const QString & name, int index);
-    void setBehaviorView(BehaviorGraphView *view);
     void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
-    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
+    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString & path);
+    void setFlag(CheckBox *flagcheckbox, hkbBlenderGenerator::BlenderFlag flagtoset);
 private:
     enum ACTIVE_WIDGET {
-        MAIN_WIDGET = 0,
-        CHILD_WIDGET = 1
+        MAIN_WIDGET,
+        CHILD_WIDGET
     };
     enum Generator_Type {
         STATE_MACHINE,
@@ -88,8 +89,9 @@ private:
         BEHAVIOR_REFERENCE_GENERATOR,
         GAMEBYRO_SEQUENCE_GENERATOR
     };
-    static QStringList types;
-    static QStringList headerLabels;
+private:
+    static const QStringList types;
+    static const QStringList headerLabels;
     BehaviorGraphView *behaviorView;
     hkbBlenderGenerator *bsData;
     QGroupBox *groupBox;

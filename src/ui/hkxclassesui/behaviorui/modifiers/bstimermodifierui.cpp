@@ -126,12 +126,12 @@ void BSTimerModifierUI::loadData(HkxObject *data){
                 table->item(ALARM_EVENT_ID_ROW, VALUE_COLUMN)->setText("None");
             }
             if (payload){
-                alarmEventPayload->setText(payload->data);
+                alarmEventPayload->setText(payload->getData());
             }else{
                 alarmEventPayload->setText("");
             }
             resetAlarm->setChecked(bsData->resetAlarm);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
                 loadBinding(ALARM_TIME_SECONDS_ROW, BINDING_COLUMN, varBind, "alarmTimeSeconds");
@@ -155,7 +155,7 @@ void BSTimerModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -166,7 +166,7 @@ void BSTimerModifierUI::setName(){
 void BSTimerModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSTimerModifierUI::setEnable(): The data is nullptr!!");
     }
@@ -176,7 +176,7 @@ void BSTimerModifierUI::setAlarmTimeSeconds(){
     if (bsData){
         if (bsData->alarmTimeSeconds != alarmTimeSeconds->value()){
             bsData->alarmTimeSeconds = alarmTimeSeconds->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSTimerModifierUI::setalarmTimeSeconds(): The data is nullptr!!");
@@ -189,7 +189,7 @@ void BSTimerModifierUI::setAlarmEventId(int index, const QString & name){
         if (bsData->alarmEvent.id != index){
             bsData->alarmEvent.id = index;
             table->item(ALARM_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSTimerModifierUI::setAlarmEventId(): The data is nullptr!!");
@@ -202,7 +202,7 @@ void BSTimerModifierUI::setAlarmEventPayload(){
         payload = static_cast<hkbStringEventPayload *>(bsData->alarmEvent.payload.data());
         if (alarmEventPayload->text() != ""){
             if (payload){
-                payload->data = alarmEventPayload->text();
+                payload->getData() = alarmEventPayload->text();
             }else{
                 payload = new hkbStringEventPayload(bsData->getParentFile(), alarmEventPayload->text());
                 //bsData->getParentFile()->addObjectToFile(payload, -1);
@@ -211,7 +211,7 @@ void BSTimerModifierUI::setAlarmEventPayload(){
         }else{
             bsData->alarmEvent.payload = HkxSharedPtr();
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSTimerModifierUI::setalarmEventPayload(): The data is nullptr!!");
     }
@@ -220,7 +220,7 @@ void BSTimerModifierUI::setAlarmEventPayload(){
 void BSTimerModifierUI::setResetAlarm(){
     if (bsData){
         bsData->resetAlarm = resetAlarm->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSTimerModifierUI::setResetAlarm(): The data is nullptr!!");
     }
@@ -263,14 +263,14 @@ void BSTimerModifierUI::viewSelected(int row, int column){
 void BSTimerModifierUI::selectTableToView(bool viewisProperty, const QString & path){
     if (bsData){
         if (viewisProperty){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -294,7 +294,7 @@ void BSTimerModifierUI::eventRenamed(const QString & name, int index){
 void BSTimerModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
         if (bind){
             int bindIndex = bind->getVariableIndexOfBinding("enable");
             if (bindIndex == index){
@@ -315,16 +315,16 @@ void BSTimerModifierUI::variableRenamed(const QString & name, int index){
 }
 
 bool BSTimerModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -336,7 +336,7 @@ bool BSTimerModifierUI::setBinding(int index, int row, const QString &variableNa
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -372,13 +372,13 @@ void BSTimerModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSTimerModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-void BSTimerModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void BSTimerModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -386,7 +386,7 @@ void BSTimerModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -394,7 +394,7 @@ void BSTimerModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("BSTimerModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }

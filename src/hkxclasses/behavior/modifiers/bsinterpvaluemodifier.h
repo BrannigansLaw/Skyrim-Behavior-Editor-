@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class BSInterpValueModifier: public hkbModifier
+class BSInterpValueModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSInterpValueModifierUI;
 public:
     BSInterpValueModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSInterpValueModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSInterpValueModifier& operator=(const BSInterpValueModifier&) = delete;
+    BSInterpValueModifier(const BSInterpValueModifier &) = delete;
+    ~BSInterpValueModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    BSInterpValueModifier& operator=(const BSInterpValueModifier&);
-    BSInterpValueModifier(const BSInterpValueModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -30,6 +29,7 @@ private:
     qreal target;
     qreal result;
     qreal gain;
+    mutable std::mutex mutex;
 };
 
 #endif // BSINTERPVALUEMODIFIER_H

@@ -3,30 +3,30 @@
 
 #include "hkbmodifier.h"
 
-class BSGetTimeStepModifier: public hkbModifier
+class BSGetTimeStepModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSGetTimeStepModifierUI;
 public:
     BSGetTimeStepModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSGetTimeStepModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSGetTimeStepModifier& operator=(const BSGetTimeStepModifier&) = delete;
+    BSGetTimeStepModifier(const BSGetTimeStepModifier &) = delete;
+    ~BSGetTimeStepModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    BSGetTimeStepModifier& operator=(const BSGetTimeStepModifier&);
-    BSGetTimeStepModifier(const BSGetTimeStepModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
     qreal timeStep;
+    mutable std::mutex mutex;
 };
 
 #endif // BSGETTIMESTEPMODIFIER_H

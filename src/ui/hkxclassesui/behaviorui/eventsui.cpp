@@ -81,14 +81,14 @@ void EventsUI::returnToTable(){
 
 void EventsUI::setBoolVariableValue(){
     loadedData->setEventFlagAt(table->currentRow(), flag->isChecked());
-    loadedData->getParentFile()->setIsChanged(true);
+    loadedData->setIsFileChanged(true);
 }
 
 void EventsUI::renameSelectedEvent(){
     QString newName = eventName->text();
     table->item(table->currentRow(), 0)->setText(newName);
     loadedData->setEventNameAt(table->currentRow(), newName);
-    loadedData->getParentFile()->setIsChanged(true);
+    loadedData->setIsFileChanged(true);
     emit eventNameChanged(newName, table->currentRow());
 }
 
@@ -97,7 +97,7 @@ void EventsUI::loadData(HkxObject *data){
         loadedData = static_cast<hkbBehaviorGraphData *>(data);
         int row;
         hkbBehaviorGraphStringData *events = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        for (int i = 0; i < events->eventNames.size(); i++){
+        for (auto i = 0; i < events->eventNames.size(); i++){
             row = table->rowCount();
             if (table->rowCount() > i){
                 table->setRowHidden(i, false);
@@ -113,7 +113,7 @@ void EventsUI::loadData(HkxObject *data){
                 table->setItem(row, 2, new QTableWidgetItem("Edit"));
             }
         }
-        for (int j = events->eventNames.size(); j < table->rowCount(); j++){
+        for (auto j = events->eventNames.size(); j < table->rowCount(); j++){
             table->setRowHidden(j, true);
         }
     }
@@ -121,7 +121,7 @@ void EventsUI::loadData(HkxObject *data){
 
 void EventsUI::clear(){
     returnToTable();
-    for (int i = table->rowCount() - 1; i >= 0; i--){
+    for (auto i = table->rowCount() - 1; i >= 0; i--){
         table->removeRow(i);
     }
 }
@@ -156,7 +156,7 @@ void EventsUI::removeEvent(){
             if (stackLyt->currentIndex() == EVENT_WIDGET){
                 stackLyt->setCurrentIndex(TABLE_WIDGET);
             }
-            loadedData->getParentFile()->setIsChanged(true);
+            loadedData->setIsFileChanged(true);
             static_cast<BehaviorFile *>(loadedData->getParentFile())->updateEventIndices(index);
             emit eventRemoved(index);
             table->setFocus();

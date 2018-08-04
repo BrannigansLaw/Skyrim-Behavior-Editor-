@@ -2,13 +2,9 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 
-/*
- * CLASS: hkbDelayedModifier
-*/
-
 uint hkbDelayedModifier::refCount = 0;
 
-QString hkbDelayedModifier::classname = "hkbDelayedModifier";
+const QString hkbDelayedModifier::classname = "hkbDelayedModifier";
 
 hkbDelayedModifier::hkbDelayedModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -19,158 +15,145 @@ hkbDelayedModifier::hkbDelayedModifier(HkxFile *parent, long ref)
       secondsElapsed(0)
 {
     setType(HKB_DELAYED_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "DelayedModifier"+QString::number(refCount);
+    name = "DelayedModifier_"+QString::number(refCount);
 }
 
-QString hkbDelayedModifier::getClassname(){
+const QString hkbDelayedModifier::getClassname(){
     return classname;
 }
 
 QString hkbDelayedModifier::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
 bool hkbDelayedModifier::insertObjectAt(int , DataIconManager *obj){
-    if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
-        modifier = HkxSharedPtr((HkxObject *)obj);
+    std::lock_guard <std::mutex> guard(mutex);
+    if (obj && obj->getType() == TYPE_MODIFIER){
+        modifier = HkxSharedPtr(obj);
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 bool hkbDelayedModifier::removeObjectAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
     if (index == 0 || index == -1){
         modifier = HkxSharedPtr();
-    }else{
-        return false;
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool hkbDelayedModifier::hasChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (modifier.data()){
         return true;
     }
     return false;
 }
 
-QList<DataIconManager *> hkbDelayedModifier::getChildren() const{
-    QList<DataIconManager *> list;
-    if (modifier.data()){
-        list.append(static_cast<DataIconManager*>(modifier.data()));
-    }
+QVector<DataIconManager *> hkbDelayedModifier::getChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QVector<DataIconManager *> list;
+    (modifier.data()) ? list.append(static_cast<DataIconManager*>(modifier.data())) : NULL;
     return list;
 }
 
 int hkbDelayedModifier::getIndexOfObj(DataIconManager *obj) const{
-    if (modifier.data() == (HkxObject *)obj){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (modifier.data() == obj){
         return 0;
     }
     return -1;
 }
 
-bool hkbDelayedModifier::readData(const HkxXmlReader &reader, long index){
+bool hkbDelayedModifier::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "modifier"){
-            if (!modifier.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'modifier' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(modifier.readShdPtrReference(index, reader), "modifier");
         }else if (text == "delaySeconds"){
             delaySeconds = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'delaySeconds' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "delaySeconds");
         }else if (text == "durationSeconds"){
             durationSeconds = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'durationSeconds' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "durationSeconds");
         }else if (text == "secondsElapsed"){
             secondsElapsed = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'secondsElapsed' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "secondsElapsed");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbDelayedModifier::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        if (modifier.data()){
-            refString = modifier.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("modifier"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("delaySeconds"), QString::number(delaySeconds, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("durationSeconds"), QString::number(durationSeconds, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("secondsElapsed"), QString::number(secondsElapsed, char('f'), 6));
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData));
+        writedatafield("name", name);
+        writedatafield("enable", getBoolAsString(enable));
+        writeref(modifier, "modifier");
+        writedatafield("delaySeconds", QString::number(delaySeconds, char('f'), 6));
+        writedatafield("durationSeconds", QString::number(durationSeconds, char('f'), 6));
+        writedatafield("secondsElapsed", QString::number(secondsElapsed, char('f'), 6));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        if (modifier.data() && !modifier.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'modifier'!!!");
-        }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        writechild(modifier, "modifier");
     }
     return true;
 }
 
 bool hkbDelayedModifier::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifier.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_MODIFIER){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'modifier' is not a modifier!");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": linkVar()!\nThe linked object 'modifier' is not a modifier!");
             setDataValidity(false);
         }
         modifier = *ptr;
@@ -179,27 +162,29 @@ bool hkbDelayedModifier::link(){
 }
 
 void hkbDelayedModifier::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     modifier = HkxSharedPtr();
 }
 
 QString hkbDelayedModifier::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     if (!modifier.data()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null modifier!\n");
-    }else if (modifier.data()->getType() != HkxObject::TYPE_MODIFIER){
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null modifier!\n");
+    }else if (modifier->getType() != HkxObject::TYPE_MODIFIER){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid modifier type! Signature: "+QString::number(modifier.data()->getSignature(), 16)+" Setting null value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid modifier type! Signature: "+QString::number(modifier->getSignature(), 16)+" Setting null value!\n");
         modifier = HkxSharedPtr();
     }
     setDataValidity(isvalid);

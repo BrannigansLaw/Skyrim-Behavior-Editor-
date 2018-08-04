@@ -2,13 +2,9 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 
-/*
- * CLASS: hkbLookAtModifier
-*/
-
 uint hkbLookAtModifier::refCount = 0;
 
-QString hkbLookAtModifier::classname = "hkbLookAtModifier";
+const QString hkbLookAtModifier::classname = "hkbLookAtModifier";
 
 hkbLookAtModifier::hkbLookAtModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -29,217 +25,181 @@ hkbLookAtModifier::hkbLookAtModifier(HkxFile *parent, long ref)
       isTargetInsideLimitCone(false)
 {
     setType(HKB_LOOK_AT_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "LookAtModifier"+QString::number(refCount);
+    name = "LookAtModifier_"+QString::number(refCount);
 }
 
-QString hkbLookAtModifier::getClassname(){
+const QString hkbLookAtModifier::getClassname(){
     return classname;
 }
 
 QString hkbLookAtModifier::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-bool hkbLookAtModifier::readData(const HkxXmlReader &reader, long index){
+bool hkbLookAtModifier::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "targetWS"){
             targetWS = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'targetWS' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "targetWS");
         }else if (text == "headForwardLS"){
             headForwardLS = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'headForwardLS' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "headForwardLS");
         }else if (text == "neckForwardLS"){
             neckForwardLS = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'neckForwardLS' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "neckForwardLS");
         }else if (text == "neckRightLS"){
             neckRightLS = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'neckRightLS' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "neckRightLS");
         }else if (text == "eyePositionHS"){
             eyePositionHS = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'eyePositionHS' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "eyePositionHS");
         }else if (text == "newTargetGain"){
             newTargetGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'newTargetGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "newTargetGain");
         }else if (text == "onGain"){
             onGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'onGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "onGain");
         }else if (text == "offGain"){
             offGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'offGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "offGain");
         }else if (text == "limitAngleDegrees"){
             limitAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'limitAngleDegrees' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "limitAngleDegrees");
         }else if (text == "limitAngleLeft"){
             limitAngleLeft = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'limitAngleLeft' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "limitAngleLeft");
         }else if (text == "limitAngleRight"){
             limitAngleRight = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'limitAngleRight' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "limitAngleRight");
         }else if (text == "limitAngleUp"){
             limitAngleUp = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'limitAngleUp' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "limitAngleUp");
         }else if (text == "limitAngleDown"){
             limitAngleDown = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'limitAngleDown' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "limitAngleDown");
         }else if (text == "headIndex"){
             headIndex = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'headIndex' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "headIndex");
         }else if (text == "neckIndex"){
             neckIndex = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'neckIndex' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "neckIndex");
         }else if (text == "isOn"){
             isOn = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'isOn' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "isOn");
         }else if (text == "individualLimitsOn"){
             individualLimitsOn = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'individualLimitsOn' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "individualLimitsOn");
         }else if (text == "isTargetInsideLimitCone"){
             isTargetInsideLimitCone = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'isTargetInsideLimitCone' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "isTargetInsideLimitCone");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbLookAtModifier::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    if (writer && !getIsWritten()){
         QString refString = "null";
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
+        if (getVariableBindingSetData()){
+            refString = getVariableBindingSet()->getReferenceString();
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("targetWS"), targetWS.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("headForwardLS"), headForwardLS.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("neckForwardLS"), neckForwardLS.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("neckRightLS"), neckRightLS.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("eyePositionHS"), eyePositionHS.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("newTargetGain"), QString::number(newTargetGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("onGain"), QString::number(onGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("offGain"), QString::number(offGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleDegrees"), QString::number(limitAngleDegrees, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleLeft"), QString::number(limitAngleLeft, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleRight"), QString::number(limitAngleRight, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleUp"), QString::number(limitAngleUp, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleDown"), QString::number(limitAngleDown, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("headIndex"), QString::number(headIndex));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("neckIndex"), QString::number(neckIndex));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("isOn"), getBoolAsString(isOn));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("individualLimitsOn"), getBoolAsString(individualLimitsOn));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("isTargetInsideLimitCone"), getBoolAsString(isTargetInsideLimitCone));
+        writedatafield("variableBindingSet", refString);
+        writedatafield("userData", QString::number(userData));
+        writedatafield("name", name);
+        writedatafield("enable", getBoolAsString(enable));
+        writedatafield("targetWS", targetWS.getValueAsString());
+        writedatafield("headForwardLS", headForwardLS.getValueAsString());
+        writedatafield("neckForwardLS", neckForwardLS.getValueAsString());
+        writedatafield("neckRightLS", neckRightLS.getValueAsString());
+        writedatafield("eyePositionHS", eyePositionHS.getValueAsString());
+        writedatafield("newTargetGain", QString::number(newTargetGain, char('f'), 6));
+        writedatafield("onGain", QString::number(onGain, char('f'), 6));
+        writedatafield("offGain", QString::number(offGain, char('f'), 6));
+        writedatafield("limitAngleDegrees", QString::number(limitAngleDegrees, char('f'), 6));
+        writedatafield("limitAngleLeft", QString::number(limitAngleLeft, char('f'), 6));
+        writedatafield("limitAngleRight", QString::number(limitAngleRight, char('f'), 6));
+        writedatafield("limitAngleUp", QString::number(limitAngleUp, char('f'), 6));
+        writedatafield("limitAngleDown", QString::number(limitAngleDown, char('f'), 6));
+        writedatafield("headIndex", QString::number(headIndex));
+        writedatafield("neckIndex", QString::number(neckIndex));
+        writedatafield("isOn", getBoolAsString(isOn));
+        writedatafield("individualLimitsOn", getBoolAsString(individualLimitsOn));
+        writedatafield("isTargetInsideLimitCone", getBoolAsString(isTargetInsideLimitCone));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+        if (getVariableBindingSetData() && !getVariableBindingSet()->write(writer)){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
 }
 
 bool hkbLookAtModifier::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     return true;
 }
 
 void hkbLookAtModifier::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
 }
 
 QString hkbLookAtModifier::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     if (headIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": headIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": headIndex out of range! Setting to last bone index!\n");
         headIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
     }
     if (neckIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": neckIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": neckIndex out of range! Setting to last bone index!\n");
         neckIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
     }
     setDataValidity(isvalid);

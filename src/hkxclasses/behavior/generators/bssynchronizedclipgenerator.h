@@ -3,31 +3,30 @@
 
 #include "hkbgenerator.h"
 
-class BSSynchronizedClipGenerator: public hkbGenerator
+class BSSynchronizedClipGenerator final: public hkbGenerator
 {
-    friend class BehaviorGraphView;
     friend class BSSynchronizedClipGeneratorUI;
 public:
     BSSynchronizedClipGenerator(HkxFile *parent, long ref = 0);
-    virtual ~BSSynchronizedClipGenerator();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSSynchronizedClipGenerator& operator=(const BSSynchronizedClipGenerator&) = delete;
+    BSSynchronizedClipGenerator(const BSSynchronizedClipGenerator &) = delete;
+    ~BSSynchronizedClipGenerator();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
-private:
-    QList <DataIconManager *> getChildren() const;
+    QVector <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int, DataIconManager *obj);
     bool removeObjectAt(int index);
-    BSSynchronizedClipGenerator& operator=(const BSSynchronizedClipGenerator&);
-    BSSynchronizedClipGenerator(const BSSynchronizedClipGenerator &);
 private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     ulong userData;
     QString name;
     HkxSharedPtr pClipGenerator;
@@ -39,6 +38,7 @@ private:
     bool bReorientSupportChar;
     bool bApplyMotionFromRoot;
     int sAnimationBindingIndex;
+    mutable std::mutex mutex;
 };
 
 #endif // BSSYNCHRONIZEDCLIPGENERATOR_H

@@ -146,7 +146,7 @@ void BehaviorVariablesUI::setVariableValue(int type){
         }*/else if (type == 3){
             loadedData->setQuadVariableValueAt(index, quadWidget->value());
         }
-        loadedData->getParentFile()->setIsChanged(true);
+        loadedData->setIsFileChanged(true);
     }
 }
 
@@ -166,7 +166,7 @@ void BehaviorVariablesUI::renameSelectedVariable(int type){
         }
         table->item(table->currentRow(), 0)->setText(newName);
         loadedData->setVariableNameAt(table->currentRow(), newName);
-        loadedData->getParentFile()->setIsChanged(true);
+        loadedData->setIsFileChanged(true);
         emit variableNameChanged(newName, table->currentRow());
     }
 }
@@ -242,7 +242,7 @@ void BehaviorVariablesUI::loadVariable(QuadVariableWidget *variableWid){
 }
 
 void BehaviorVariablesUI::hideOtherVariables(int indexToView){
-    for (int i = 0; i < variableWidget->rowCount(); i++){
+    for (auto i = 0; i < variableWidget->rowCount(); i++){
         if (i == indexToView){
             variableWidget->setRowHidden(i, false);
         }else{
@@ -298,7 +298,7 @@ void BehaviorVariablesUI::loadData(HkxObject *data){
         loadedData = static_cast<hkbBehaviorGraphData *>(data);
         int row;
         hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        for (int i = 0; i < varNames->variableNames.size(); i++){
+        for (auto i = 0; i < varNames->variableNames.size(); i++){
             row = table->rowCount();
             if (table->rowCount() > i){
                 table->setRowHidden(i, false);
@@ -314,7 +314,7 @@ void BehaviorVariablesUI::loadData(HkxObject *data){
                 table->setItem(row, 2, new QTableWidgetItem("Edit"));
             }
         }
-        for (int j = varNames->variableNames.size(); j < table->rowCount(); j++){
+        for (auto j = varNames->variableNames.size(); j < table->rowCount(); j++){
             table->setRowHidden(j, true);
         }
         table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
@@ -323,7 +323,7 @@ void BehaviorVariablesUI::loadData(HkxObject *data){
 
 void BehaviorVariablesUI::clear(){
     returnToTable();
-    for (int i = table->rowCount() - 1; i >= 0; i--){
+    for (auto i = table->rowCount() - 1; i >= 0; i--){
         table->removeRow(i);
     }
 }
@@ -374,7 +374,7 @@ void BehaviorVariablesUI::addVariable(){
         default:
             return;
         }
-        loadedData->getParentFile()->setIsChanged(true);
+        loadedData->setIsFileChanged(true);
         emit variableAdded(vars->variableNames.last(), typeString);
     }
 }
@@ -392,7 +392,7 @@ void BehaviorVariablesUI::removeVariable(){
             if (stackLyt->currentIndex() == VARIABLE_WIDGET){
                 stackLyt->setCurrentIndex(TABLE_WIDGET);
             }
-            loadedData->getParentFile()->setIsChanged(true);
+            loadedData->setIsFileChanged(true);
             static_cast<BehaviorFile *>(loadedData->getParentFile())->updateVariableIndices(index);
             emit variableRemoved(index);
             table->setFocus();

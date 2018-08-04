@@ -3,13 +3,9 @@
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
-/*
- * CLASS: BSEventOnDeactivateModifier
-*/
-
 uint BSEventOnDeactivateModifier::refCount = 0;
 
-QString BSEventOnDeactivateModifier::classname = "BSEventOnDeactivateModifier";
+const QString BSEventOnDeactivateModifier::classname = "BSEventOnDeactivateModifier";
 
 BSEventOnDeactivateModifier::BSEventOnDeactivateModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -17,100 +13,93 @@ BSEventOnDeactivateModifier::BSEventOnDeactivateModifier(HkxFile *parent, long r
       enable(true)
 {
     setType(BS_EVENT_ON_DEACTIVATE_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "EventOnDeactivateModifier"+QString::number(refCount);
+    name = "EventOnDeactivateModifier_"+QString::number(refCount);
 }
 
-QString BSEventOnDeactivateModifier::getClassname(){
+const QString BSEventOnDeactivateModifier::getClassname(){
     return classname;
 }
 
 QString BSEventOnDeactivateModifier::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-bool BSEventOnDeactivateModifier::readData(const HkxXmlReader &reader, long index){
+bool BSEventOnDeactivateModifier::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "id"){
             event.id = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "event.id");
         }else if (text == "payload"){
-            if (!event.payload.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(event.payload.readShdPtrReference(index, reader), "event.payload");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool BSEventOnDeactivateModifier::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value, bool allownull){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value, allownull);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("event"), "");
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData), false);
+        writedatafield("name", name, false);
+        writedatafield("enable", getBoolAsString(enable), false);
+        writedatafield("event", "", false);
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(event.id));
-        if (event.payload.data()){
-            refString = event.payload.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
+        writedatafield("id", QString::number(event.id), false);
+        writeref(event.payload, "payload");
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        if (event.payload.data() && !event.payload.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'payload'!!!");
-        }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        writechild(event.payload, "event.payload");
     }
     return true;
 }
 
 bool BSEventOnDeactivateModifier::isEventReferenced(int eventindex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (event.id == eventindex){
         return true;
     }
@@ -118,18 +107,17 @@ bool BSEventOnDeactivateModifier::isEventReferenced(int eventindex) const{
 }
 
 void BSEventOnDeactivateModifier::updateEventIndices(int eventindex){
-    if (event.id > eventindex){
-        event.id--;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (event.id > eventindex) ? event.id-- : NULL;
 }
 
 void BSEventOnDeactivateModifier::mergeEventIndex(int oldindex, int newindex){
-    if (event.id == oldindex){
-        event.id = newindex;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (event.id == oldindex) ? event.id = newindex : NULL;
 }
 
 void BSEventOnDeactivateModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphData *recdata;
     hkbBehaviorGraphData *domdata;
     QString thiseventname;
@@ -155,24 +143,21 @@ void BSEventOnDeactivateModifier::fixMergedEventIndices(BehaviorFile *dominantfi
 }
 
 void BSEventOnDeactivateModifier::updateReferences(long &ref){
+    std::lock_guard <std::mutex> guard(mutex);
     setReference(ref);
-    ref++;
-    setBindingReference(ref);
-    if (event.payload.data()){
-        ref++;
-        event.payload.data()->updateReferences(ref);
-    }
+    setBindingReference(++ref);
+    (event.payload.data()) ? event.payload->updateReferences(++ref) : NULL;
 }
 
 QVector<HkxObject *> BSEventOnDeactivateModifier::getChildrenOtherTypes() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QVector<HkxObject *> list;
-    if (event.payload.data()){
-        list.append(event.payload.data());
-    }
+    (event.payload.data()) ? list.append(event.payload.data()): NULL;
     return list;
 }
 
-bool BSEventOnDeactivateModifier::merge(HkxObject *recessiveObject){
+bool BSEventOnDeactivateModifier::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     BSEventOnDeactivateModifier *recobj;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == BS_EVENT_ON_DEACTIVATE_MODIFIER){
         recobj = static_cast<BSEventOnDeactivateModifier *>(recessiveObject);
@@ -187,16 +172,14 @@ bool BSEventOnDeactivateModifier::merge(HkxObject *recessiveObject){
 }
 
 bool BSEventOnDeactivateModifier::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(event.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
         event.payload = *ptr;
@@ -205,29 +188,28 @@ bool BSEventOnDeactivateModifier::link(){
 }
 
 void BSEventOnDeactivateModifier::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     event.payload = HkxSharedPtr();
 }
 
 QString BSEventOnDeactivateModifier::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
+    auto setinvalid = [&](const QString & message){
+        isvalid = false;
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!\n");
+    };
     QString temp = HkDynamicObject::evaluateDataValidity();
-    if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
-    }
-    if (name == ""){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
-    }
+    (temp != "") ? errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n"): NULL;
+    (name == "") ? setinvalid("Invalid name") : NULL;
     if (event.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": event event id out of range! Setting to max index in range!\n");
+        setinvalid("Event id out of range! Setting to max index in range!");
         event.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
-    if (event.payload.data() && event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid event.payload type! Signature: "+QString::number(event.payload.data()->getSignature(), 16)+" Setting null value!\n");
+    if (event.payload.data() && event.payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+        setinvalid("Invalid event.payload type! Signature: "+QString::number(event.payload->getSignature(), 16)+" Setting null value!");
         event.payload = HkxSharedPtr();
     }
     setDataValidity(isvalid);

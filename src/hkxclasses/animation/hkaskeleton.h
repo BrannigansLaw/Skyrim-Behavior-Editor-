@@ -14,7 +14,7 @@ class hkaSkeleton: public HkxObject
 public:
     hkaSkeleton(HkxFile *parent, long ref = 0);
     virtual ~hkaSkeleton();
-    bool readData(const HkxXmlReader & reader, long index);
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
     QString evaluateDataValidity();
@@ -45,11 +45,11 @@ private:
     static QString classname;
     QString name;
     QVector <int> parentIndices;
-    QList <hkBone> bones;
+    QVector <hkBone> bones;
     QString referencePose;
     QVector <qreal> referenceFloats;
     QStringList floatSlots;
-    QList <hkLocalFrame> localFrames;
+    QVector <hkLocalFrame> localFrames;
 };
 
 #endif // HKASKELETON_H

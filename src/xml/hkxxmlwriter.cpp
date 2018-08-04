@@ -4,7 +4,7 @@
 #include <QFile>
 #include <QTextStream>
 
-HkxXMLWriter::HkxXMLWriter(BehaviorFile *file)
+HkxXMLWriter::HkxXMLWriter(HkxFile *file)
     : hkxXmlFile(file),
       version("1.0"),
       encoding("ascii"),
@@ -52,7 +52,7 @@ bool HkxXMLWriter::writeToXMLFile(){
             writeLine("\n");
             writeLine(section, QStringList(name), QStringList("__data__"), "");
             writeLine("\n");
-            if (!hkxXmlFile->getRootObject().data()->write(this)){
+            if (!hkxXmlFile->getRootObject()->write(this)){
                 result = false;
             }
             writeLine(section, false);
@@ -86,7 +86,7 @@ bool HkxXMLWriter::writeLine(const QString & tag, const QStringList & attribs, c
     }
     text = text+"<"+tag;
     *stream << text;
-    for (int j = 0; j < attribs.size(); j++){
+    for (auto j = 0; j < attribs.size(); j++){
         *stream << " "+attribs.at(j)+"=\""+attribValues.at(j)+"\"";
     }
     if (value == ""){
@@ -143,7 +143,7 @@ bool HkxXMLWriter::writeLine(const QString & value){
         if (list.isEmpty()){
             *stream << text+value+"\n";
         }else{
-            for (int i = 0; i < list.size(); i++){
+            for (auto i = 0; i < list.size(); i++){
                 *stream << text+list.at(i)+"\n";
             }
         }

@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class BSDecomposeVectorModifier: public hkbModifier
+class BSDecomposeVectorModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSDecomposeVectorModifierUI;
 public:
     BSDecomposeVectorModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSDecomposeVectorModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSDecomposeVectorModifier& operator=(const BSDecomposeVectorModifier&) = delete;
+    BSDecomposeVectorModifier(const BSDecomposeVectorModifier &) = delete;
+    ~BSDecomposeVectorModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    BSDecomposeVectorModifier& operator=(const BSDecomposeVectorModifier&);
-    BSDecomposeVectorModifier(const BSDecomposeVectorModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -31,6 +30,7 @@ private:
     qreal y;
     qreal z;
     qreal w;
+    mutable std::mutex mutex;
 };
 
 #endif // BSDECOMPOSEVECTORMODIFIER_H

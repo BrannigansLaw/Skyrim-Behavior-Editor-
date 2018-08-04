@@ -2,146 +2,100 @@
 #include "src/hkxclasses/hkxobject.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/projectfile.h"
-/*
- * CLASS: hkbProjectStringData
-*/
 
 uint hkbProjectStringData::refCount = 0;
 
-QString hkbProjectStringData::classname = "hkbProjectStringData";
+const QString hkbProjectStringData::classname = "hkbProjectStringData";
 
 hkbProjectStringData::hkbProjectStringData(HkxFile *parent, long ref, const QString &characterfilename)
     : HkxObject(parent, ref)
 {
     setType(HKB_PROJECT_STRING_DATA, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    if (characterfilename != ""){
-        characterFilenames.append(characterfilename);
-    }
+    (characterfilename != "") ? characterFilenames.append(characterfilename) : NULL;
 }
 
-QString hkbProjectStringData::getClassname(){
+const QString hkbProjectStringData::getClassname(){
     return classname;
 }
 
 QString hkbProjectStringData::getCharacterFilePathAt(int index) const{
-    if (index < characterFilenames.size()){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (index >= 0 && index < characterFilenames.size()){
         return QString(characterFilenames.at(index)).replace("\\", "/").section("/", -2, -1);
     }
     return "";
 }
 
-bool hkbProjectStringData::readData(const HkxXmlReader &reader, long index){
-    bool ok;
-    int numElems = 0;
+bool hkbProjectStringData::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto ok = true;
+    auto numElems = 0;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-        text = reader.getNthAttributeValueAt(index, 0);
-        if (text == "animationFilenames"){
-            numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'animationFilenames' data!\nObject Reference: "+ref);
-                return false;
-            }
+    auto getstrings = [&](QStringList & strings, const QString & fieldname){
+        numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+        if (!ok){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read '"+fieldname+"' data!\nObject Reference: "+ref);
+        }
+        if (numElems > 0){
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'animationFilenames' data!\nObject Reference: "+ref);
-                    return false;
+                    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'behaviorFilenames' data!\nObject Reference: "+ref);
                 }
-                animationFilenames.append(reader.getElementValueAt(index));
-            }
-            continue;
-        }else if (text == "behaviorFilenames"){
-            numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'behaviorFilenames' data!\nObject Reference: "+ref);
-                return false;
-            }
-            index++;
-            numElems = numElems + index;
-            for (; index < numElems; index++){
-                if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'behaviorFilenames' data!\nObject Reference: "+ref);
-                    return false;
-                }
-                behaviorFilenames.append(reader.getElementValueAt(index));
-            }
-            continue;
-        }else if (text == "characterFilenames"){
-            numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'characterFilenames' data!\nObject Reference: "+ref);
-                return false;
-            }
-            index++;
-            numElems = numElems + index;
-            for (; index < numElems; index++){
-                if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'characterFilenames' data!\nObject Reference: "+ref);
-                    return false;
-                }
-                characterFilenames.append(reader.getElementValueAt(index));
-            }
-            continue;
-        }else if (text == "eventNames"){
-            numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'eventNames' data!\nObject Reference: "+ref);
-                return false;
-            }
-            index++;
-            numElems = numElems + index;
-            for (; index < numElems; index++){
-                if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'eventNames' data!\nObject Reference: "+ref);
-                    return false;
-                }
-                eventNames.append(reader.getElementValueAt(index));
-            }
-            continue;
-        }else if (text == "animationPath"){
-            animationPath = reader.getElementValueAt(index);
-            if (animationPath == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'animationPath' data field!\nObject Reference: "+ref);
-            }
-        }else if (text == "behaviorPath"){
-            behaviorPath = reader.getElementValueAt(index);
-            if (behaviorPath == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'behaviorPath' data field!\nObject Reference: "+ref);
-            }
-        }else if (text == "characterPath"){
-            characterPath = reader.getElementValueAt(index);
-            if (characterPath == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'characterPath' data field!\nObject Reference: "+ref);
-            }
-        }else if (text == "fullPathToSource"){
-            fullPathToSource = reader.getElementValueAt(index);
-            if (fullPathToSource == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'fullPathToSource' data field!\nObject Reference: "+ref);
+                strings.append(reader.getElementValueAt(index));
             }
         }
-        index++;
+    };
+    auto getpath = [&](QString & field, const QString & fieldname){
+        field = reader.getElementValueAt(index);
+        if (field == ""){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read '"+fieldname+"' data field!\nObject Reference: "+ref);
+        }
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
+        text = reader.getNthAttributeValueAt(index, 0);
+        if (text == "animationFilenames"){
+            getstrings(animationFilenames, "animationFilenames");
+        }else if (text == "behaviorFilenames"){
+            getstrings(behaviorFilenames, "behaviorFilenames");
+        }else if (text == "characterFilenames"){
+            getstrings(characterFilenames, "characterFilenames");
+        }else if (text == "eventNames"){
+            getstrings(eventNames, "eventNames");
+        }else if (text == "animationPath"){
+            getpath(animationPath, "animationPath");
+        }else if (text == "behaviorPath"){
+            getpath(behaviorPath, "behaviorPath");
+        }else if (text == "characterPath"){
+            getpath(characterPath, "characterPath");
+        }else if (text == "fullPathToSource"){
+            getpath(fullPathToSource, "fullPathToSource");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
+        }
     }
+    index--;
     return true;
 }
 
 bool hkbProjectStringData::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value, bool allownull){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value, allownull);
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
         QStringList list3 = {writer->name, writer->numelements};
         QStringList list4 = {"animationFilenames", QString::number(animationFilenames.size())};
         writer->writeLine(writer->parameter, list3, list4, "");
-        for (int i = 0; i < animationFilenames.size(); i++){
-            writer->writeLine(writer->string, QStringList(), QStringList(), animationFilenames.at(i));
+        for (auto i = 0; i < animationFilenames.size(); i++){
+            writedatafield("", animationFilenames.at(i), false);
         }
         if (animationFilenames.size() > 0){
             writer->writeLine(writer->parameter, false);
@@ -149,8 +103,8 @@ bool hkbProjectStringData::write(HkxXMLWriter *writer){
         list3 = {writer->name, writer->numelements};
         list4 = {"behaviorFilenames", QString::number(behaviorFilenames.size())};
         writer->writeLine(writer->parameter, list3, list4, "");
-        for (int i = 0; i < behaviorFilenames.size(); i++){
-            writer->writeLine(writer->string, QStringList(), QStringList(), behaviorFilenames.at(i));
+        for (auto i = 0; i < behaviorFilenames.size(); i++){
+            writedatafield("", behaviorFilenames.at(i), false);
         }
         if (behaviorFilenames.size() > 0){
             writer->writeLine(writer->parameter, false);
@@ -158,8 +112,8 @@ bool hkbProjectStringData::write(HkxXMLWriter *writer){
         list3 = {writer->name, writer->numelements};
         list4 = {"characterFilenames", QString::number(characterFilenames.size())};
         writer->writeLine(writer->parameter, list3, list4, "");
-        for (int i = 0; i < characterFilenames.size(); i++){
-            writer->writeLine(writer->string, QStringList(), QStringList(), QString(characterFilenames.at(i)).replace("/", "\\"));
+        for (auto i = 0; i < characterFilenames.size(); i++){
+            writedatafield("", QString(characterFilenames.at(i)).replace("/", "\\"), false);
         }
         if (characterFilenames.size() > 0){
             writer->writeLine(writer->parameter, false);
@@ -167,16 +121,16 @@ bool hkbProjectStringData::write(HkxXMLWriter *writer){
         list3 = {writer->name, writer->numelements};
         list4 = {"eventNames", QString::number(eventNames.size())};
         writer->writeLine(writer->parameter, list3, list4, "");
-        for (int i = 0; i < eventNames.size(); i++){
-            writer->writeLine(writer->string, QStringList(), QStringList(), eventNames.at(i));
+        for (auto i = 0; i < eventNames.size(); i++){
+            writedatafield("", eventNames.at(i), false);
         }
         if (eventNames.size() > 0){
             writer->writeLine(writer->parameter, false);
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("animationPath"), animationPath, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("behaviorPath"), behaviorPath, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("characterPath"), characterPath, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fullPathToSource"), fullPathToSource, true);
+        writedatafield("animationPath", animationPath, true);
+        writedatafield("behaviorPath", behaviorPath, true);
+        writedatafield("characterPath", characterPath, true);
+        writedatafield("fullPathToSource", fullPathToSource, true);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
@@ -189,36 +143,27 @@ bool hkbProjectStringData::link(){
 }
 
 QString hkbProjectStringData::evaluateDataValidity(){
-    for (int i = 0; i < animationFilenames.size(); i++){
-        if (animationFilenames.at(i) == ""){
-            setDataValidity(false);
-            return QString();
+    std::lock_guard <std::mutex> guard(mutex);
+    QString errors;
+    bool isvalid = true;
+    auto checkstring = [&](const QStringList & list, const QString & fieldname){
+        for (auto i = 0; i < list.size(); i++){
+            if (list.at(i) == ""){
+                isvalid = false;
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid "+fieldname+" at "+QString::number(i)+"!\n");
+            }
         }
-    }
-    for (int i = 0; i < behaviorFilenames.size(); i++){
-        if (behaviorFilenames.at(i) == ""){
-            setDataValidity(false);
-            return QString();
-        }
-    }
-    for (int i = 0; i < characterFilenames.size(); i++){
-        if (characterFilenames.at(i) == ""){
-            setDataValidity(false);
-            return QString();
-        }
-    }
-    for (int i = 0; i < eventNames.size(); i++){
-        if (eventNames.at(i) == ""){
-            setDataValidity(false);
-            return QString();
-        }
-    }
-    if (animationPath == "" || behaviorPath == "" || characterPath == "" || fullPathToSource == ""){
-        setDataValidity(false);
-        return QString();
-    }
+    };
+    checkstring(animationFilenames, "animationFilenames");
+    checkstring(behaviorFilenames, "behaviorFilenames");
+    checkstring(characterFilenames, "characterFilenames");
+    checkstring(eventNames, "eventNames");
+    //checkstring(QStringList(animationPath), "eventNames");
+    //checkstring(QStringList(behaviorPath), "behaviorPath");
+    checkstring(QStringList(characterPath), "characterPath");
+    //checkstring(QStringList(fullPathToSource), "fullPathToSource");
     setDataValidity(true);
-    return QString();
+    return errors;
 }
 
 hkbProjectStringData::~hkbProjectStringData(){

@@ -5,43 +5,42 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbBehaviorGraphData: public HkxObject
+class hkbBehaviorGraphStringData;
+class hkbVariableValueSet;
+
+class hkbBehaviorGraphData final: public HkxObject
 {
-    friend class BehaviorGraphView;
     friend class BehaviorVariablesUI;
     friend class EventsUI;
-    friend class BehaviorFile;
-    friend class hkbVariableBindingSet;
 public:
-    hkbBehaviorGraphData(HkxFile *parent, long ref = 0);
-    virtual ~hkbBehaviorGraphData();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
+    hkbBehaviorGraphData(HkxFile *parent, long ref = 0, hkbBehaviorGraphStringData *strings = nullptr, hkbVariableValueSet *values = nullptr);
+    hkbBehaviorGraphData& operator=(const hkbBehaviorGraphData&) = delete;
+    hkbBehaviorGraphData(const hkbBehaviorGraphData &) = delete;
+    ~hkbBehaviorGraphData();
+    int addVariable(hkVariableType type, const QString & name, bool isProperty = false);
+    //int addVariable(const QString & type, const QString & name, bool isProperty = false);
+    void addVariable(hkVariableType type);
+    void addEvent(const QString &name);
+    HkxObject * getVariantVariable(int index) const;
+    static const QString getClassname();
     QStringList getVariableNames() const;
     QStringList getEventNames() const;
     int getNumberOfEvents() const;
     int getNumberOfVariables() const;
-    QString evaluateDataValidity();
-    static QString getClassname();
+    QStringList getVariableTypeNames() const;
+    int getIndexOfVariable(const QString & name) const;
+    int getIndexOfEvent(const QString & name) const;
     hkQuadVariable getQuadVariable(int index, bool *ok) const;
-    HkxObject * getVariantVariable(int index) const;
     hkVariableType getCharacterPropertyTypeAt(int index) const;
     QString getCharacterPropertyNameAt(int index) const;
     hkVariableType getVariableTypeAt(int index) const;
     QString getVariableNameAt(int index) const;
     QString getEventNameAt(int index) const;
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
+    QString evaluateDataValidity();
     bool write(HkxXMLWriter *writer);
-    QStringList getVariableTypeNames() const;
-    int getIndexOfVariable(const QString & name) const;
-    int getIndexOfEvent(const QString & name) const;
-    void addEvent(const QString &name);
-    int addVariable(hkVariableType type, const QString & name, bool isProperty = false);
-    int addVariable(const QString & type, const QString & name, bool isProperty = false);
-    void addVariable(hkVariableType type);
-private:
-    hkbBehaviorGraphData& operator=(const hkbBehaviorGraphData&);
-    hkbBehaviorGraphData(const hkbBehaviorGraphData &);
-private:
     bool merge(HkxObject *recessiveobj);
     void removeVariable(int index);
     void setVariableNameAt(int index, const QString & name);
@@ -52,7 +51,6 @@ private:
     void setEventNameAt(int index, const QString & name);
     void setEventFlagAt(int index, bool state);
 private:
-    static QStringList Type;    //See hkVariableType...
     struct hkVariableInfo
     {
         hkVariableInfo(){}
@@ -64,11 +62,12 @@ private:
         };
 
         hkRole role;
-        QString type;
+        QString type;    //See hkVariableType...
     };
-
+private:
     static uint refCount;
-    static QString classname;
+    static const QStringList Type;
+    static const QString classname;
     //QVector <??> attributeDefaults;
     QVector <hkVariableInfo> variableInfos;
     QVector <hkVariableInfo> characterPropertyInfos;
@@ -77,6 +76,7 @@ private:
     QVector <int> wordMaxVariableValues;
     HkxSharedPtr variableInitialValues;
     HkxSharedPtr stringData;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBBEHAVIORGRAPHDATA_H

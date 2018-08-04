@@ -2,13 +2,9 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 
-/*
- * CLASS: BSiStateTaggingGenerator
-*/
-
 uint BSiStateTaggingGenerator::refCount = 0;
 
-QString BSiStateTaggingGenerator::classname = "BSiStateTaggingGenerator";
+const QString BSiStateTaggingGenerator::classname = "BSiStateTaggingGenerator";
 
 BSiStateTaggingGenerator::BSiStateTaggingGenerator(HkxFile *parent, long ref)
     : hkbGenerator(parent, ref),
@@ -17,46 +13,49 @@ BSiStateTaggingGenerator::BSiStateTaggingGenerator(HkxFile *parent, long ref)
       iPriority(0)
 {
     setType(BS_I_STATE_TAGGING_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "iStateTaggingGenerator"+QString::number(refCount);
+    name = "iStateTaggingGenerator_"+QString::number(refCount);
 }
 
-QString BSiStateTaggingGenerator::getClassname(){
+const QString BSiStateTaggingGenerator::getClassname(){
     return classname;
 }
 
 QString BSiStateTaggingGenerator::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
 bool BSiStateTaggingGenerator::insertObjectAt(int , DataIconManager *obj){
-    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
-        pDefaultGenerator = HkxSharedPtr((HkxObject *)obj);
+    std::lock_guard <std::mutex> guard(mutex);
+    if (obj && obj->getType() == TYPE_GENERATOR){
+        pDefaultGenerator = HkxSharedPtr(obj);
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 bool BSiStateTaggingGenerator::removeObjectAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
     if (index == 0 || index == -1){
         pDefaultGenerator = HkxSharedPtr();
-    }else{
-        return false;
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool BSiStateTaggingGenerator::hasChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (pDefaultGenerator.data()){
         return true;
     }
     return false;
 }
 
-QList<DataIconManager *> BSiStateTaggingGenerator::getChildren() const{
-    QList<DataIconManager *> list;
+QVector<DataIconManager *> BSiStateTaggingGenerator::getChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QVector<DataIconManager *> list;
     if (pDefaultGenerator.data()){
         list.append(static_cast<DataIconManager*>(pDefaultGenerator.data()));
     }
@@ -64,101 +63,91 @@ QList<DataIconManager *> BSiStateTaggingGenerator::getChildren() const{
 }
 
 int BSiStateTaggingGenerator::getIndexOfObj(DataIconManager *obj) const{
-    if (pDefaultGenerator.data() == (HkxObject *)obj){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (pDefaultGenerator.data() == obj){
         return 0;
     }
     return -1;
 }
 
-bool BSiStateTaggingGenerator::readData(const HkxXmlReader &reader, long index){
+bool BSiStateTaggingGenerator::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "pDefaultGenerator"){
-            if (!pDefaultGenerator.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'pDefaultGenerator' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(pDefaultGenerator.readShdPtrReference(index, reader), "pDefaultGenerator");
         }else if (text == "iStateToSetAs"){
             iStateToSetAs = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'iStateToSetAs' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "iStateToSetAs");
         }else if (text == "iPriority"){
             iPriority = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'iPriority' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "iPriority");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool BSiStateTaggingGenerator::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value, bool allownull){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value, allownull);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        if (pDefaultGenerator.data()){
-            refString = pDefaultGenerator.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pDefaultGenerator"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("iStateToSetAs"), QString::number(iStateToSetAs));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("iPriority"), QString::number(iPriority));
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData), false);
+        writedatafield("name", name, false);
+        writeref(pDefaultGenerator, "pDefaultGenerator");
+        writedatafield("iStateToSetAs", QString::number(iStateToSetAs), false);
+        writedatafield("iPriority", QString::number(iPriority), false);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        if (pDefaultGenerator.data() && !pDefaultGenerator.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'pDefaultGenerator'!!!");
-        }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        writechild(pDefaultGenerator, "pDefaultGenerator");
     }
     return true;
 }
 
 bool BSiStateTaggingGenerator::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getShdPtrReference());
-    if (!ptr){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'pDefaultGenerator' data field!\nObject Name: "+name);
+    if (!ptr || !ptr->data()){
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'pDefaultGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
     }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'pDefaultGenerator' data field is linked to invalid child!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'pDefaultGenerator' data field is linked to invalid child!\nObject Name: "+name);
         setDataValidity(false);
         pDefaultGenerator = *ptr;
     }else{
@@ -168,27 +157,29 @@ bool BSiStateTaggingGenerator::link(){
 }
 
 void BSiStateTaggingGenerator::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     pDefaultGenerator = HkxSharedPtr();
 }
 
 QString BSiStateTaggingGenerator::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     if (!pDefaultGenerator.data()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null pDefaultGenerator!\n");
-    }else if (pDefaultGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null pDefaultGenerator!\n");
+    }else if (pDefaultGenerator->getType() != HkxObject::TYPE_GENERATOR){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pDefaultGenerator type! Signature: "+QString::number(pDefaultGenerator.data()->getSignature(), 16)+" Setting null value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid pDefaultGenerator type! Signature: "+QString::number(pDefaultGenerator->getSignature(), 16)+" Setting null value!\n");
         pDefaultGenerator = HkxSharedPtr();
     }
     setDataValidity(isvalid);

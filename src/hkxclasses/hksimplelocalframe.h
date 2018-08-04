@@ -3,28 +3,30 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkSimpleLocalFrame: public HkxObject
+class hkSimpleLocalFrame final: public HkxObject
 {
-    friend class hkaSkeleton;
-    friend class SkeletonFile;
 public:
     hkSimpleLocalFrame(HkxFile *parent, const QString & string = "", long ref = -1);
-    virtual ~hkSimpleLocalFrame();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkSimpleLocalFrame& operator=(const hkSimpleLocalFrame&) = delete;
+    hkSimpleLocalFrame(const hkSimpleLocalFrame &) = delete;
+    ~hkSimpleLocalFrame();
+    static const QString getClassname();
+    QString getName() const;
+    void setName(const QString &value);
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     QString evaluateDataValidity();
-    static QString getClassname();
     bool link(){return true;}
     bool write(HkxXMLWriter *writer);
-    QString getName() const;
-protected:
 private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     //hkTransform transform;
-    //QList <hkLocalFrame> children;
+    //QVector <hkLocalFrame> children;
     //hkLocalFrame parentFrame;
     //hkLocalFrameGroup group;
     QString name;
+    mutable std::mutex mutex;
 };
 
 #endif // HKSIMPLELOCALFRAME_H

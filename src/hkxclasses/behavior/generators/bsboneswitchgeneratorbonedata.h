@@ -3,40 +3,44 @@
 
 #include "hkbgenerator.h"
 
-class BSBoneSwitchGeneratorBoneData: public hkbGenerator
+class BSBoneSwitchGenerator;
+
+class BSBoneSwitchGeneratorBoneData final: public hkbGenerator
 {
-    friend class BehaviorGraphView;
-    friend class BSBoneSwitchGenerator;
-    friend class BSBoneSwitchGeneratorUI;
     friend class BSBoneSwitchGeneratorBoneDataUI;
 public:
-    BSBoneSwitchGeneratorBoneData(HkxFile *parent, hkbGenerator *parentBSG, long ref = 0);
-    virtual ~BSBoneSwitchGeneratorBoneData();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSBoneSwitchGeneratorBoneData(HkxFile *parent, BSBoneSwitchGenerator *parentBSG, long ref = 0);
+    BSBoneSwitchGeneratorBoneData& operator=(const BSBoneSwitchGeneratorBoneData&) = delete;
+    BSBoneSwitchGeneratorBoneData(const BSBoneSwitchGeneratorBoneData &) = delete;
+    ~BSBoneSwitchGeneratorBoneData();
+    bool operator==(const BSBoneSwitchGeneratorBoneData & other);
+    static const QString getClassname();
+    int getThisIndex() const;
+    QString getName() const;
+    QVector <DataIconManager *> getChildren() const;
+    bool merge(HkxObject *recessiveObject);
+    void setParentBSG(BSBoneSwitchGenerator *par);
+private:
+    QString getPGeneratorName() const;
+    HkxSharedPtr getPGenerator() const;
+    HkxSharedPtr getSpBoneWeight() const;
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
-    QString getName() const;
-    int getThisIndex() const;
     void updateReferences(long &ref);
-    bool merge(HkxObject *recessiveObject);
-    bool operator==(const BSBoneSwitchGeneratorBoneData & other);
-private:
-    QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int, DataIconManager *obj);
     bool removeObjectAt(int index);
-    BSBoneSwitchGeneratorBoneData& operator=(const BSBoneSwitchGeneratorBoneData&);
-    BSBoneSwitchGeneratorBoneData(const BSBoneSwitchGeneratorBoneData &);
 private:
     static uint refCount;
-    static QString classname;
-    HkxSharedPtr parentBSG;
+    static const QString classname;
+    BSBoneSwitchGenerator *parentBSG;
     HkxSharedPtr pGenerator;
     HkxSharedPtr spBoneWeight;
+    mutable std::mutex mutex;
 };
 
 #endif // BSBONESWITCHGENERATORBONEDATA_H

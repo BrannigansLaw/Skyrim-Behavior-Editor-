@@ -5,55 +5,69 @@
 
 class hkbStateMachine;
 
-class hkbStateMachineStateInfo: public hkbGenerator
+class hkbStateMachineStateInfo final: public hkbGenerator
 {
-    friend class HkDataUI;
-    friend class BehaviorGraphView;
-    friend class hkbStateMachine;
-    friend class hkbStateMachineTransitionInfoArray;
-    friend class StateMachineUI;
     friend class StateUI;
 public:
     hkbStateMachineStateInfo(HkxFile *parent, hkbStateMachine *parentsm, long ref = 0);
-    virtual ~hkbStateMachineStateInfo();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
+    hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&) = delete;
+    hkbStateMachineStateInfo(const hkbStateMachineStateInfo &) = delete;
+    ~hkbStateMachineStateInfo();
+    void removeTransitions();
+    void removeTransitionsNoLock();
+    void removeTransitionToState(int id);
+    void setParentSM(hkbStateMachine *value);
+    bool setStateId(int id);
     void unlink();
+    void setTransitionsParentSM(hkbStateMachine *parSM);
+    void fixMergedEventIndices(BehaviorFile *dominantfile);
     QString getName() const;
+    int getStateId() const;
+    QString getNameNoLock() const;
+    int getStateIdNoLock() const;
+    static const QString getClassname();
+    QVector <DataIconManager *> getChildren() const;
+    hkbStateMachine * getNestedStateMachine() const;
+    hkbStateMachine * getParentStateMachine() const;
+    QString getStateName(int stateId) const;
+    QString getNestedStateName(int stateId, ulong nestedStateId) const;
+    QString getStateNameNoLock(int stateId) const;
+    QString getNestedStateNameNoLock(int stateId, ulong nestedStateId) const;
+private:
+    HkxSharedPtr getEnterNotifyEvents() const;
+    HkxSharedPtr getExitNotifyEvents() const;
+    HkxSharedPtr getTransitions() const;
+    HkxObject * getEnterNotifyEventsData() const;
+    HkxObject * getExitNotifyEventsData() const;
+    HkxObject * getTransitionsData() const;
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
     QString evaluateDataValidity();
-    static QString getClassname();
-    QString getStateName(ulong stateId) const;
-    QString getNestedStateName(ulong stateId, ulong nestedStateId) const;
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
     void mergeEventIndex(int oldindex, int newindex);
-    void fixMergedEventIndices(BehaviorFile *dominantfile);
     bool merge(HkxObject *recessiveObject);
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
-private:
-    QList <DataIconManager *> getChildren() const;
+    void updateTransitionStateId(bool lock, int newid);
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int, DataIconManager *obj);
     bool removeObjectAt(int index);
-    bool setStateId(ulong id);
-    hkbStateMachine * getParentStateMachine() const;
-    hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&);
-    hkbStateMachineStateInfo(const hkbStateMachineStateInfo &);
 private:
-    hkbStateMachine *parentSM;
     static uint refCount;
-    static QString classname;
+    static const QString classname;
+    hkbStateMachine *parentSM;
     HkxSharedPtr enterNotifyEvents;
     HkxSharedPtr exitNotifyEvents;
     HkxSharedPtr transitions;
     HkxSharedPtr generator;
     QString name;
-    ulong stateId;
+    int stateId;
     qreal probability;
     bool enable;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBSTATEMACHINESTATEINFO_H

@@ -3,22 +3,21 @@
 
 #include "hkbmodifier.h"
 
-class hkbAttributeModifier: public hkbModifier
+class hkbAttributeModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
 public:
     hkbAttributeModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbAttributeModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbAttributeModifier& operator=(const hkbAttributeModifier&) = delete;
+    hkbAttributeModifier(const hkbAttributeModifier &) = delete;
+    ~hkbAttributeModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
-private:
-    hkbAttributeModifier& operator=(const hkbAttributeModifier&);
-    hkbAttributeModifier(const hkbAttributeModifier &);
 private:
     struct hkAttributeMod{
         hkAttributeMod()
@@ -31,13 +30,14 @@ private:
         int attributeIndex;
         qreal attributeValue;
     };
-
+private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
-    QList <hkAttributeMod> assignments;
+    QVector <hkAttributeMod> assignments;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBATTRIBUTEMODIFIER_H

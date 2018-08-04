@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class hkbGetHandleOnBoneModifier: public hkbModifier
+class hkbGetHandleOnBoneModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class GetHandleOnBoneModifierUI;
 public:
     hkbGetHandleOnBoneModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbGetHandleOnBoneModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbGetHandleOnBoneModifier& operator=(const hkbGetHandleOnBoneModifier&) = delete;
+    hkbGetHandleOnBoneModifier(const hkbGetHandleOnBoneModifier &) = delete;
+    ~hkbGetHandleOnBoneModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbGetHandleOnBoneModifier& operator=(const hkbGetHandleOnBoneModifier&);
-    hkbGetHandleOnBoneModifier(const hkbGetHandleOnBoneModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -30,6 +29,7 @@ private:
     QString localFrameName;
     int ragdollBoneIndex;
     int animationBoneIndex;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBGETHANDLEONBONEMODIFIER_H

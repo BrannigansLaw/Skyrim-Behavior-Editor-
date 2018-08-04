@@ -2,13 +2,9 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 
-/*
- * CLASS: BSIsActiveModifier
-*/
-
 uint BSIsActiveModifier::refCount = 0;
 
-QString BSIsActiveModifier::classname = "BSIsActiveModifier";
+const QString BSIsActiveModifier::classname = "BSIsActiveModifier";
 
 BSIsActiveModifier::BSIsActiveModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -26,161 +22,140 @@ BSIsActiveModifier::BSIsActiveModifier(HkxFile *parent, long ref)
       bInvertActive4(false)
 {
     setType(BS_IS_ACTIVE_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "IsActiveModifier"+QString::number(refCount);
+    name = "IsActiveModifier_"+QString::number(refCount);
 }
 
-QString BSIsActiveModifier::getClassname(){
+const QString BSIsActiveModifier::getClassname(){
     return classname;
 }
 
 QString BSIsActiveModifier::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-bool BSIsActiveModifier::readData(const HkxXmlReader &reader, long index){
+bool BSIsActiveModifier::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "bIsActive0"){
             bIsActive0 = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bIsActive0' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "bIsActive0");
         }else if (text == "bInvertActive0"){
             bInvertActive0 = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bInvertActive0' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "bInvertActive0");
         }else if (text == "bIsActive1"){
             bIsActive1 = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bIsActive1' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "bIsActive1");
         }else if (text == "bInvertActive1"){
             bInvertActive1 = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bInvertActive1' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "bInvertActive1");
         }else if (text == "bIsActive2"){
             bIsActive2 = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bIsActive2' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "bIsActive2");
         }else if (text == "bInvertActive2"){
             bInvertActive2 = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bInvertActive2' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "bInvertActive2");
         }else if (text == "bIsActive3"){
             bIsActive3 = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bIsActive3' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "bIsActive3");
         }else if (text == "bInvertActive3"){
             bInvertActive3 = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bInvertActive3' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "bInvertActive3");
         }else if (text == "bIsActive4"){
             bIsActive4 = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bIsActive4' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "bIsActive4");
         }else if (text == "bInvertActive4"){
             bInvertActive4 = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bInvertActive4' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "bInvertActive4");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool BSIsActiveModifier::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value, bool allownull){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value, allownull);
+    };
+    if (writer && !getIsWritten()){
         QString refString = "null";
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
+        if (getVariableBindingSetData()){
+            refString = getVariableBindingSet()->getReferenceString();
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bIsActive0"), getBoolAsString(bIsActive0));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bInvertActive0"), getBoolAsString(bInvertActive0));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bIsActive1"), getBoolAsString(bIsActive1));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bInvertActive1"), getBoolAsString(bInvertActive1));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bIsActive2"), getBoolAsString(bIsActive2));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bInvertActive2"), getBoolAsString(bInvertActive2));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bIsActive3"), getBoolAsString(bIsActive3));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bInvertActive3"), getBoolAsString(bInvertActive3));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bIsActive4"), getBoolAsString(bIsActive4));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bInvertActive4"), getBoolAsString(bInvertActive4));
+        writedatafield("variableBindingSet", refString, false);
+        writedatafield("userData", QString::number(userData), false);
+        writedatafield("name", name, false);
+        writedatafield("enable", getBoolAsString(enable), false);
+        writedatafield("bIsActive0", getBoolAsString(bIsActive0), false);
+        writedatafield("bInvertActive0", getBoolAsString(bInvertActive0), false);
+        writedatafield("bIsActive1", getBoolAsString(bIsActive1), false);
+        writedatafield("bInvertActive1", getBoolAsString(bInvertActive1), false);
+        writedatafield("bIsActive2", getBoolAsString(bIsActive2), false);
+        writedatafield("bInvertActive2", getBoolAsString(bInvertActive2), false);
+        writedatafield("bIsActive3", getBoolAsString(bIsActive3), false);
+        writedatafield("bInvertActive3", getBoolAsString(bInvertActive3), false);
+        writedatafield("bIsActive4", getBoolAsString(bIsActive4), false);
+        writedatafield("bInvertActive4", getBoolAsString(bInvertActive4), false);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+        if (getVariableBindingSetData() && !getVariableBindingSet()->write(writer)){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
 }
 
 bool BSIsActiveModifier::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     return true;
 }
 
 void BSIsActiveModifier::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
 }
 
 QString BSIsActiveModifier::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity();
-    if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
-    }
-    if (name == ""){
+    auto setinvalid = [&](const QString & message){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
-    }
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!\n");
+    };
+    QString temp = HkDynamicObject::evaluateDataValidity();
+    (temp != "") ? errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n"): NULL;
+    (name == "") ? setinvalid("Invalid name") : NULL;
     setDataValidity(isvalid);
     return errors;
 }

@@ -188,13 +188,13 @@ void StateUI::loadDynamicTableRows(){
             temp = INITIAL_EXIT_EVENT_ROW - exitEventsButtonRow;
         }
         if (temp > 0){
-            for (int i = 0; i < temp; i++){
+            for (auto i = 0; i < temp; i++){
                 table->insertRow(exitEventsButtonRow);
                 exitEventsButtonRow++;
                 transitionsButtonRow++;
             }
         }else if (temp < 0){
-            for (int i = temp; i < 0; i++){
+            for (auto i = temp; i < 0; i++){
                 table->removeRow(exitEventsButtonRow - 1);
                 exitEventsButtonRow--;
                 transitionsButtonRow--;
@@ -207,12 +207,12 @@ void StateUI::loadDynamicTableRows(){
             temp = exitEventsButtonRow + 1 - transitionsButtonRow;
         }
         if (temp > 0){
-            for (int i = 0; i < temp; i++){
+            for (auto i = 0; i < temp; i++){
                 table->insertRow(transitionsButtonRow);
                 transitionsButtonRow++;
             }
         }else if (temp < 0){
-            for (int i = temp; i < 0; i++){
+            for (auto i = temp; i < 0; i++){
                 table->removeRow(transitionsButtonRow - 1);
                 transitionsButtonRow--;
             }
@@ -220,7 +220,7 @@ void StateUI::loadDynamicTableRows(){
         QString eventName;
         events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->enterNotifyEvents.data());
         if (events){
-            for (int i = INITIAL_EXIT_EVENT_ROW, j = 0; i < exitEventsButtonRow, j < events->events.size(); i++, j++){
+            for (auto i = INITIAL_EXIT_EVENT_ROW, j = 0; i < exitEventsButtonRow, j < events->events.size(); i++, j++){
                 eventName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(events->events.at(j).id);
                 if (eventName != ""){
                     setRowItems(i, eventName, events->getClassname(), "Remove", "Edit", "Double click to remove this enter event", "Double click to edit this enter event");
@@ -231,7 +231,7 @@ void StateUI::loadDynamicTableRows(){
         }
         events = static_cast<hkbStateMachineEventPropertyArray *>(bsData->exitNotifyEvents.data());
         if (events){
-            for (int i = exitEventsButtonRow + 1, j = 0; i < transitionsButtonRow, j < events->events.size(); i++, j++){
+            for (auto i = exitEventsButtonRow + 1, j = 0; i < transitionsButtonRow, j < events->events.size(); i++, j++){
                 eventName = static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(events->events.at(j).id);
                 if (eventName != ""){
                     setRowItems(i, eventName, events->getClassname(), "Remove", "Edit", "Double click to remove this exit event", "Double click to edit this exit event");
@@ -243,7 +243,7 @@ void StateUI::loadDynamicTableRows(){
         hkbStateMachineTransitionInfoArray *trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
         if (trans && trans->getSignature() == HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
             table->setRowCount(transitionsButtonRow + trans->getNumTransitions() + 1);
-            for (int i = transitionsButtonRow + 1, j = 0; i < table->rowCount(), j < trans->getNumTransitions(); i++, j++){
+            for (auto i = transitionsButtonRow + 1, j = 0; i < table->rowCount(), j < trans->getNumTransitions(); i++, j++){
                 setRowItems(i, trans->getTransitionNameAt(j), trans->getClassname(), "Remove", "Edit", "Double click to remove this transition", "Double click to edit this transition");
             }
         }else{
@@ -279,7 +279,7 @@ void StateUI::setRowItems(int row, const QString & name, const QString & classna
 }
 
 void StateUI::eventTableElementSelected(int index, const QString &name){
-    //index--;
+    index--;
     switch (currentIndex()){
     case EVENT_PAYLOAD_WIDGET:
         eventUI->setEvent(index, name);
@@ -320,7 +320,7 @@ void StateUI::setName(){
     if (bsData){
         if (bsData->name != name->text()){
             bsData->name = name->text();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit stateNameChanged(name->text(), stateIndex);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
@@ -333,7 +333,7 @@ void StateUI::setStateId(int id){
     if (bsData){
         if (bsData->setStateId(id)){
             emit stateIdChanged(stateIndex, bsData->stateId, bsData->name);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("StateUI::setStateId(): Another state has the selected state ID!!! The state ID for this state was not changed!!!");
             disconnect(stateId, SIGNAL(valueChanged(int)), this, SLOT(setStateId(int)));
@@ -349,7 +349,7 @@ void StateUI::setProbability(){
     if (bsData){
         if (bsData->probability != probability->value()){
             bsData->probability = probability->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("StateUI::setProbability(): The data is nullptr!!");
@@ -359,7 +359,7 @@ void StateUI::setProbability(){
 void StateUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("StateUI::setEnable(): The data is nullptr!!");
     }
@@ -376,7 +376,7 @@ void StateUI::addEnterEvent(){
         enterEvents->addEvent();
         enterEvents->events.last().id = 0;
         loadDynamicTableRows();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("StateUI::addEnterEvent(): The data is nullptr!!");
     }
@@ -401,7 +401,7 @@ void StateUI::removeEnterEvent(int index){
             return;
         }
         loadDynamicTableRows();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("StateUI::removeEnterEvent(): The data is nullptr!!");
     }
@@ -418,7 +418,7 @@ void StateUI::addExitEvent(){
         exitEvents->addEvent();
         exitEvents->events.last().id = 0;
         loadDynamicTableRows();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("StateUI::addExitEvent(): The data is nullptr!!");
     }
@@ -443,7 +443,7 @@ void StateUI::removeExitEvent(int index){
             return;
         }
         loadDynamicTableRows();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("StateUI::removeExitEvent(): The data is nullptr!!");
     }
@@ -459,7 +459,7 @@ void StateUI::addTransition(){
         }
         trans->addTransition();
         loadDynamicTableRows();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("StateUI::addTransition(): The data is nullptr!!");
     }
@@ -484,7 +484,7 @@ void StateUI::removeTransition(int index){
             return;
         }
         loadDynamicTableRows();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("StateUI::removeTransition(): The data is nullptr!!");
     }
@@ -499,7 +499,7 @@ void StateUI::viewSelectedChild(int row, int column){
     if (bsData){
         if (row == GENERATOR_ROW && column == VALUE_COLUMN){
             QStringList list = {hkbStateMachineStateInfo::getClassname(), hkbBlenderGeneratorChild::getClassname(), BSBoneSwitchGeneratorBoneData::getClassname()};
-            emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1, QString(), list);
+            emit viewGenerators(bsData->getIndexOfGenerator(bsData->generator) + 1, QString(), list);
         }else if (row == ADD_ENTER_EVENT_ROW && column == NAME_COLUMN){
             addEnterEvent();
         }else if (row == exitEventsButtonRow && column == NAME_COLUMN){
@@ -549,7 +549,7 @@ void StateUI::viewSelectedChild(int row, int column){
             trans = static_cast<hkbStateMachineTransitionInfoArray *>(bsData->transitions.data());
             if (trans && result < trans->getNumTransitions() && result >= 0){
                 if (column == VALUE_COLUMN){
-                    transitionUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), bsData->getParentStateMachine(), &trans->transitions[result], result);
+                    transitionUI->loadData(static_cast<BehaviorFile *>(bsData->getParentFile()), bsData->getParentStateMachine(), trans->getTransitionAt(result), result);
                     setCurrentIndex(TRANSITION_WIDGET);
                 }else if (column == BINDING_COLUMN){
                     if (MainWindow::yesNoDialogue("Are you sure you want to remove the transition \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
@@ -593,7 +593,7 @@ void StateUI::setGenerator(int index, const QString & name){
             }
             behaviorView->removeGeneratorData();
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit returnToParent(true);
         }else{
             CRITICAL_ERROR_MESSAGE("StateUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");

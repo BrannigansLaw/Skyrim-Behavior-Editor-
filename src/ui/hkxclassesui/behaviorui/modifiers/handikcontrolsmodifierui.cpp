@@ -88,7 +88,7 @@ void HandIkControlsModifierUI::disconnectSignals(){
 void HandIkControlsModifierUI::addHand(){
     if (bsData){
         bsData->hands.append(hkbHandIkControlsModifier::hkHand());
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
         loadDynamicTableRows();
     }else{
         CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::addHand(): The data is nullptr!!");
@@ -104,7 +104,7 @@ void HandIkControlsModifierUI::removeHand(int index){
                 WARNING_MESSAGE("HandIkControlsModifierUI::removeHand(): Invalid row index selected!!");
                 return;
             }
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             loadDynamicTableRows();
         }else{
             WARNING_MESSAGE("HandIkControlsModifierUI::removeHand(): Ranges is empty!!");
@@ -124,7 +124,7 @@ void HandIkControlsModifierUI::loadData(HkxObject *data){
             bsData = static_cast<hkbHandIkControlsModifier *>(data);
             name->setText(bsData->name);
             enable->setChecked(bsData->enable);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
             }else{
@@ -147,7 +147,7 @@ void HandIkControlsModifierUI::loadDynamicTableRows(){
         if (table->rowCount() != temp){
             table->setRowCount(temp);
         }
-        for (int i = ADD_HAND_ROW + 1, j = 0; j < bsData->getNumberOfHands(); i++, j++){
+        for (auto i = ADD_HAND_ROW + 1, j = 0; j < bsData->getNumberOfHands(); i++, j++){
             setRowItems(i, "Hand "+QString::number(j), "hkHand", "Remove", "Edit", "Double click to remove this Hand", "Double click to edit this Hand");
         }
     }else{
@@ -180,16 +180,16 @@ void HandIkControlsModifierUI::setRowItems(int row, const QString & name, const 
 }
 
 bool HandIkControlsModifierUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -201,7 +201,7 @@ bool HandIkControlsModifierUI::setBinding(int index, int row, const QString & va
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -225,7 +225,7 @@ void HandIkControlsModifierUI::setBindingVariable(int index, const QString & nam
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::setBindingVariable(): The data is nullptr!!");
     }
@@ -242,7 +242,7 @@ void HandIkControlsModifierUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit modifierNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::setName(): The data is nullptr!!");
@@ -252,7 +252,7 @@ void HandIkControlsModifierUI::setName(){
 void HandIkControlsModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::setEnable(): The data is nullptr!!");
     }
@@ -321,7 +321,7 @@ void HandIkControlsModifierUI::connectToTables(GenericTableWidget *variables, Ge
     }
 }
 
-void HandIkControlsModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void HandIkControlsModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -329,7 +329,7 @@ void HandIkControlsModifierUI::loadBinding(int row, int colunm, hkbVariableBindi
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -337,7 +337,7 @@ void HandIkControlsModifierUI::loadBinding(int row, int colunm, hkbVariableBindi
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("HandIkControlsModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
@@ -349,14 +349,14 @@ void HandIkControlsModifierUI::loadBinding(int row, int colunm, hkbVariableBindi
 void HandIkControlsModifierUI::selectTableToView(bool viewproperties, const QString & path){
     if (bsData){
         if (viewproperties){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -375,7 +375,7 @@ void HandIkControlsModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
         if (currentIndex() == MAIN_WIDGET){
-            bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            bind = bsData->getVariableBindingSetData();
             if (bind){
                 bindIndex = bind->getVariableIndexOfBinding("enable");
                 if (bindIndex == index){

@@ -152,7 +152,7 @@ void GetUpModifierUI::loadData(HkxObject *data){
                 anotherBoneIndex->insertItems(0, boneNames);
             }
             anotherBoneIndex->setCurrentIndex(bsData->anotherBoneIndex + 1);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
                 loadBinding(GROUND_NORMAL_ROW, BINDING_COLUMN, varBind, "groundNormal");
@@ -184,7 +184,7 @@ void GetUpModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -195,7 +195,7 @@ void GetUpModifierUI::setName(){
 void GetUpModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setEnable(): The data is nullptr!!");
     }
@@ -205,7 +205,7 @@ void GetUpModifierUI::setGroundNormal(){
     if (bsData){
         if (bsData->groundNormal != groundNormal->value()){
             bsData->groundNormal = groundNormal->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setgroundNormal(): The data is nullptr!!");
@@ -216,7 +216,7 @@ void GetUpModifierUI::setDuration(){
     if (bsData){
         if (bsData->duration != duration->value()){
             bsData->duration = duration->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setduration(): The data is nullptr!!");
@@ -227,7 +227,7 @@ void GetUpModifierUI::setAlignWithGroundDuration(){
     if (bsData){
         if (bsData->alignWithGroundDuration != alignWithGroundDuration->value()){
             bsData->alignWithGroundDuration = alignWithGroundDuration->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setalignWithGroundDuration(): The data is nullptr!!");
@@ -237,7 +237,7 @@ void GetUpModifierUI::setAlignWithGroundDuration(){
 void GetUpModifierUI::setRootBoneIndex(int index){
     if (bsData){
         bsData->rootBoneIndex = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setrootBoneIndex(): The data is nullptr!!");
     }
@@ -246,7 +246,7 @@ void GetUpModifierUI::setRootBoneIndex(int index){
 void GetUpModifierUI::setOtherBoneIndex(int index){
     if (bsData){
         bsData->otherBoneIndex = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setotherBoneIndex(): The data is nullptr!!");
     }
@@ -255,7 +255,7 @@ void GetUpModifierUI::setOtherBoneIndex(int index){
 void GetUpModifierUI::setAnotherBoneIndex(int index){
     if (bsData){
         bsData->anotherBoneIndex = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setanotherBoneIndex(): The data is nullptr!!");
     }
@@ -320,14 +320,14 @@ void GetUpModifierUI::viewSelected(int row, int column){
 void GetUpModifierUI::selectTableToView(bool viewisProperty, const QString & path){
     if (bsData){
         if (viewisProperty){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -340,7 +340,7 @@ void GetUpModifierUI::selectTableToView(bool viewisProperty, const QString & pat
 void GetUpModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
         if (bind){
             int bindIndex = bind->getVariableIndexOfBinding("enable");
             if (bindIndex == index){
@@ -377,16 +377,16 @@ void GetUpModifierUI::variableRenamed(const QString & name, int index){
 }
 
 bool GetUpModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -398,7 +398,7 @@ bool GetUpModifierUI::setBinding(int index, int row, const QString &variableName
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -458,13 +458,13 @@ void GetUpModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("GetUpModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-void GetUpModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void GetUpModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -472,7 +472,7 @@ void GetUpModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *va
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -480,7 +480,7 @@ void GetUpModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *va
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("GetUpModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }

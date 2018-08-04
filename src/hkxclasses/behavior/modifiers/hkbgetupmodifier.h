@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class hkbGetUpModifier: public hkbModifier
+class hkbGetUpModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class GetUpModifierUI;
 public:
     hkbGetUpModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbGetUpModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbGetUpModifier& operator=(const hkbGetUpModifier&) = delete;
+    hkbGetUpModifier(const hkbGetUpModifier &) = delete;
+    ~hkbGetUpModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbGetUpModifier& operator=(const hkbGetUpModifier&);
-    hkbGetUpModifier(const hkbGetUpModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -32,6 +31,7 @@ private:
     int rootBoneIndex;
     int otherBoneIndex;
     int anotherBoneIndex;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBGETUPMODIFIER_H

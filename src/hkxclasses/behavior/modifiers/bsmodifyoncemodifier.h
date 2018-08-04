@@ -3,38 +3,36 @@
 
 #include "hkbmodifier.h"
 
-class BSModifyOnceModifier: public hkbModifier
+class BSModifyOnceModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSModifyOnceModifierUI;
 public:
     BSModifyOnceModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSModifyOnceModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSModifyOnceModifier& operator=(const BSModifyOnceModifier&) = delete;
+    BSModifyOnceModifier(const BSModifyOnceModifier &) = delete;
+    ~BSModifyOnceModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
-    int getIndexToInsertIcon() const;
     bool hasChildren() const;
-protected:
-    QList <DataIconManager *> getChildren() const;
+    QVector <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int index, DataIconManager *obj);
     bool removeObjectAt(int index);
 private:
-    BSModifyOnceModifier& operator=(const BSModifyOnceModifier&);
-    BSModifyOnceModifier(const BSModifyOnceModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
     HkxSharedPtr pOnActivateModifier;
     HkxSharedPtr pOnDeactivateModifier;
+    mutable std::mutex mutex;
 };
 
 #endif // BSMODIFYONCEMODIFIER_H

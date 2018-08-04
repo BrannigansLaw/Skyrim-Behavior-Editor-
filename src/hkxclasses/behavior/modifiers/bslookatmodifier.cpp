@@ -3,13 +3,9 @@
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
-/*
- * CLASS: BSLookAtModifier
-*/
-
 uint BSLookAtModifier::refCount = 0;
 
-QString BSLookAtModifier::classname = "BSLookAtModifier";
+const QString BSLookAtModifier::classname = "BSLookAtModifier";
 
 BSLookAtModifier::BSLookAtModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -30,244 +26,186 @@ BSLookAtModifier::BSLookAtModifier(HkxFile *parent, long ref)
       lookAtCameraZ(0)
 {
     setType(BS_LOOK_AT_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "LookAtModifier"+QString::number(refCount);
+    name = "LookAtModifier_"+QString::number(refCount);
 }
 
-QString BSLookAtModifier::getClassname(){
+const QString BSLookAtModifier::getClassname(){
     return classname;
 }
 
 QString BSLookAtModifier::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-bool BSLookAtModifier::readData(const HkxXmlReader &reader, long index){
+bool BSLookAtModifier::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    int numbones;
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "lookAtTarget"){
             lookAtTarget = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'lookAtTarget' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "lookAtTarget");
         }else if (text == "bones"){
-            int numbones = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                return false;
-            }
-            for (int j = 0; j < numbones; j++){
+            numbones = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            checkvalue(ok, "bones");
+            for (auto j = 0; j < numbones; j++, index++){
                 bones.append(BsBone());
-                while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-                    if (reader.getNthAttributeValueAt(index, 0) == "index"){
+                for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
+                    text = reader.getNthAttributeValueAt(index, 0);
+                    if (text == "index"){
                         bones.last().index = reader.getElementValueAt(index).toInt(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'index' data field!\nObject Reference: "+ref);
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "fwdAxisLS"){
+                        checkvalue(ok, "bones.at("+QString::number(j)+").index");
+                    }else if (text == "fwdAxisLS"){
                         bones.last().fwdAxisLS = readVector4(reader.getElementValueAt(index), &ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'fwdAxisLS' data field!\nObject Reference: "+ref);
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "limitAngleDegrees"){
+                        checkvalue(ok, "bones.at("+QString::number(j)+").fwdAxisLS");
+                    }else if (text == "limitAngleDegrees"){
                         bones.last().limitAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'limitAngleDegrees' data field!\nObject Reference: "+ref);
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "onGain"){
+                        checkvalue(ok, "bones.at("+QString::number(j)+").limitAngleDegrees");
+                    }else if (text == "onGain"){
                         bones.last().onGain = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'onGain' data field!\nObject Reference: "+ref);
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "offGain"){
+                        checkvalue(ok, "bones.at("+QString::number(j)+").onGain");
+                    }else if (text == "offGain"){
                         bones.last().offGain = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'offGain' data field!\nObject Reference: "+ref);
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "enabled"){
+                        checkvalue(ok, "bones.at("+QString::number(j)+").offGain");
+                    }else if (text == "enabled"){
                         bones.last().enabled = toBool(reader.getElementValueAt(index), &ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enabled' data field!\nObject Reference: "+ref);
-                        }
-                        index++;
+                        checkvalue(ok, "bones.at("+QString::number(j)+").enabled");
                         break;
                     }
-                    index++;
                 }
             }
-            index--;
+            (numbones > 0) ? index-- : NULL;
         }else if (text == "eyeBones"){
-            int numbones = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                return false;
-            }
-            for (int j = 0; j < numbones; j++){
+            numbones = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            checkvalue(ok, "eyeBones");
+            for (auto j = 0; j < numbones; j++, index++){
                 eyeBones.append(BsBone());
-                while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-                    if (reader.getNthAttributeValueAt(index, 0) == "index"){
+                for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
+                    text = reader.getNthAttributeValueAt(index, 0);
+                    if (text == "index"){
                         eyeBones.last().index = reader.getElementValueAt(index).toInt(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'index' data field!\nObject Reference: "+ref);
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "fwdAxisLS"){
+                        checkvalue(ok, "eyeBones.at("+QString::number(j)+").index");
+                    }else if (text == "fwdAxisLS"){
                         eyeBones.last().fwdAxisLS = readVector4(reader.getElementValueAt(index), &ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'fwdAxisLS' data field!\nObject Reference: "+ref);
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "limitAngleDegrees"){
+                        checkvalue(ok, "eyeBones.at("+QString::number(j)+").fwdAxisLS");
+                    }else if (text == "limitAngleDegrees"){
                         eyeBones.last().limitAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'limitAngleDegrees' data field!\nObject Reference: "+ref);
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "onGain"){
+                        checkvalue(ok, "eyeBones.at("+QString::number(j)+").limitAngleDegrees");
+                    }else if (text == "onGain"){
                         eyeBones.last().onGain = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'onGain' data field!\nObject Reference: "+ref);
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "offGain"){
+                        checkvalue(ok, "eyeBones.at("+QString::number(j)+").onGain");
+                    }else if (text == "offGain"){
                         eyeBones.last().offGain = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'offGain' data field!\nObject Reference: "+ref);
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "enabled"){
+                        checkvalue(ok, "eyeBones.at("+QString::number(j)+").offGain");
+                    }else if (text == "enabled"){
                         eyeBones.last().enabled = toBool(reader.getElementValueAt(index), &ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enabled' data field!\nObject Reference: "+ref);
-                        }
-                        index++;
+                        checkvalue(ok, "eyeBones.at("+QString::number(j)+").enabled");
                         break;
                     }
-                    index++;
                 }
             }
-            if (numbones > 0){
-                index--;
-            }
+            (numbones > 0) ? index-- : NULL;
         }else if (text == "limitAngleDegrees"){
             limitAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'limitAngleDegrees' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "limitAngleDegrees");
         }else if (text == "limitAngleThresholdDegrees"){
             limitAngleThresholdDegrees = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'limitAngleThresholdDegrees' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "limitAngleThresholdDegrees");
         }else if (text == "continueLookOutsideOfLimit"){
             continueLookOutsideOfLimit = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'continueLookOutsideOfLimit' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "continueLookOutsideOfLimit");
         }else if (text == "onGain"){
             onGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'onGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "onGain");
         }else if (text == "offGain"){
             offGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'offGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "offGain");
         }else if (text == "useBoneGains"){
             useBoneGains = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'useBoneGains' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "useBoneGains");
         }else if (text == "targetLocation"){
             targetLocation = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'targetLocation' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "targetLocation");
         }else if (text == "targetOutsideLimits"){
             targetOutsideLimits = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'targetOutsideLimits' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "targetOutsideLimits");
         }else if (text == "id"){
             id = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "id");
         }else if (text == "payload"){
-            if (!payload.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(payload.readShdPtrReference(index, reader), "payload");
         }else if (text == "lookAtCamera"){
             lookAtCamera = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'lookAtCamera' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "lookAtCamera");
         }else if (text == "lookAtCameraX"){
             lookAtCameraX = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'lookAtCameraX' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "lookAtCameraX");
         }else if (text == "lookAtCameraY"){
             lookAtCameraY = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'lookAtCameraY' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "lookAtCameraY");
         }else if (text == "lookAtCameraZ"){
             lookAtCameraZ = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'lookAtCameraZ' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "lookAtCameraZ");
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool BSLookAtModifier::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lookAtTarget"), getBoolAsString(lookAtTarget));
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData));
+        writedatafield("name", name);
+        writedatafield("enable", getBoolAsString(enable));
+        writedatafield("lookAtTarget", getBoolAsString(lookAtTarget));
         list1 = {writer->name, writer->numelements};
         list2 = {"bones", QString::number(bones.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < bones.size(); i++){
+        for (auto i = 0; i < bones.size(); i++){
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("index"), QString::number(bones.at(i).index));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fwdAxisLS"), bones[i].fwdAxisLS.getValueAsString());
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleDegrees"), QString::number(bones.at(i).limitAngleDegrees, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("onGain"), QString::number(bones.at(i).onGain, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("offGain"), QString::number(bones.at(i).offGain, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enabled"), getBoolAsString(bones.at(i).enabled));
+            writedatafield("index", QString::number(bones.at(i).index));
+            writedatafield("fwdAxisLS", bones[i].fwdAxisLS.getValueAsString());
+            writedatafield("limitAngleDegrees", QString::number(bones.at(i).limitAngleDegrees, char('f'), 6));
+            writedatafield("onGain", QString::number(bones.at(i).onGain, char('f'), 6));
+            writedatafield("offGain", QString::number(bones.at(i).offGain, char('f'), 6));
+            writedatafield("enabled", getBoolAsString(bones.at(i).enabled));
             writer->writeLine(writer->object, false);
         }
         if (bones.size() > 0){
@@ -275,64 +213,58 @@ bool BSLookAtModifier::write(HkxXMLWriter *writer){
         }
         list2 = {"eyeBones", QString::number(eyeBones.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < eyeBones.size(); i++){
+        for (auto i = 0; i < eyeBones.size(); i++){
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("index"), QString::number(eyeBones.at(i).index));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fwdAxisLS"), eyeBones[i].fwdAxisLS.getValueAsString());
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleDegrees"), QString::number(eyeBones.at(i).limitAngleDegrees, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("onGain"), QString::number(eyeBones.at(i).onGain, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("offGain"), QString::number(eyeBones.at(i).offGain, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enabled"), getBoolAsString(eyeBones.at(i).enabled));
+            writedatafield("index", QString::number(eyeBones.at(i).index));
+            writedatafield("fwdAxisLS", eyeBones[i].fwdAxisLS.getValueAsString());
+            writedatafield("limitAngleDegrees", QString::number(eyeBones.at(i).limitAngleDegrees, char('f'), 6));
+            writedatafield("onGain", QString::number(eyeBones.at(i).onGain, char('f'), 6));
+            writedatafield("offGain", QString::number(eyeBones.at(i).offGain, char('f'), 6));
+            writedatafield("enabled", getBoolAsString(eyeBones.at(i).enabled));
             writer->writeLine(writer->object, false);
         }
         if (eyeBones.size() > 0){
             writer->writeLine(writer->parameter, false);
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleDegrees"), QString::number(limitAngleDegrees));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("limitAngleThresholdDegrees"), QString::number(limitAngleThresholdDegrees));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("continueLookOutsideOfLimit"), getBoolAsString(continueLookOutsideOfLimit));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("onGain"), QString::number(onGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("offGain"), QString::number(offGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("useBoneGains"), getBoolAsString(useBoneGains));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("targetLocation"), targetLocation.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("targetOutsideLimits"), getBoolAsString(targetOutsideLimits));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("targetOutOfLimitEvent"), "");
+        writedatafield("limitAngleDegrees", QString::number(limitAngleDegrees));
+        writedatafield("limitAngleThresholdDegrees", QString::number(limitAngleThresholdDegrees));
+        writedatafield("continueLookOutsideOfLimit", getBoolAsString(continueLookOutsideOfLimit));
+        writedatafield("onGain", QString::number(onGain, char('f'), 6));
+        writedatafield("offGain", QString::number(offGain, char('f'), 6));
+        writedatafield("useBoneGains", getBoolAsString(useBoneGains));
+        writedatafield("targetLocation", targetLocation.getValueAsString());
+        writedatafield("targetOutsideLimits", getBoolAsString(targetOutsideLimits));
+        writedatafield("targetOutOfLimitEvent", "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(id));
-        if (payload.data()){
-            refString = payload.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
+        writedatafield("id", QString::number(id));
+        writeref(payload, "payload");
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lookAtCamera"), getBoolAsString(lookAtCamera));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lookAtCameraX"), QString::number(lookAtCameraX, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lookAtCameraY"), QString::number(lookAtCameraY, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lookAtCameraZ"), QString::number(lookAtCameraZ, char('f'), 6));
+        writedatafield("lookAtCamera", getBoolAsString(lookAtCamera));
+        writedatafield("lookAtCameraX", QString::number(lookAtCameraX, char('f'), 6));
+        writedatafield("lookAtCameraY", QString::number(lookAtCameraY, char('f'), 6));
+        writedatafield("lookAtCameraZ", QString::number(lookAtCameraZ, char('f'), 6));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        if (payload.data() && !payload.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'payload'!!!");
-        }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        writechild(payload, "payload");
     }
     return true;
 }
 
 int BSLookAtModifier::getNumberOfBones() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return bones.size();
 }
 
 int BSLookAtModifier::getNumberOfEyeBones() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return eyeBones.size();
 }
 
 bool BSLookAtModifier::isEventReferenced(int eventindex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (id == eventindex){
         return true;
     }
@@ -340,18 +272,17 @@ bool BSLookAtModifier::isEventReferenced(int eventindex) const{
 }
 
 void BSLookAtModifier::updateEventIndices(int eventindex){
-    if (id > eventindex){
-        id--;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (id > eventindex) ? id-- : NULL;
 }
 
 void BSLookAtModifier::mergeEventIndex(int oldindex, int newindex){
-    if (id == oldindex){
-        id = newindex;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (id == oldindex) ? id = newindex: NULL;
 }
 
 void BSLookAtModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphData *recdata;
     hkbBehaviorGraphData *domdata;
     QString thiseventname;
@@ -378,24 +309,21 @@ void BSLookAtModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
 
 
 void BSLookAtModifier::updateReferences(long &ref){
+    std::lock_guard <std::mutex> guard(mutex);
     setReference(ref);
-    ref++;
-    setBindingReference(ref);
-    if (payload.data()){
-        ref++;
-        payload.data()->updateReferences(ref);
-    }
+    setBindingReference(++ref);
+    (payload.data()) ? payload->updateReferences(++ref) : NULL;
 }
 
 QVector<HkxObject *> BSLookAtModifier::getChildrenOtherTypes() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QVector<HkxObject *> list;
-    if (payload.data()){
-        list.append(payload.data());
-    }
+    (payload.data()) ? list.append(payload.data()) : NULL;
     return list;
 }
 
-bool BSLookAtModifier::merge(HkxObject *recessiveObject){
+bool BSLookAtModifier::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     BSLookAtModifier *recobj;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == BS_LOOK_AT_MODIFIER){
         recobj = static_cast<BSLookAtModifier *>(recessiveObject);
@@ -404,22 +332,19 @@ bool BSLookAtModifier::merge(HkxObject *recessiveObject){
             getParentFile()->addObjectToFile(recobj->payload.data(), -1);
         }
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 bool BSLookAtModifier::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
         }
         payload = *ptr;
     }
@@ -427,48 +352,50 @@ bool BSLookAtModifier::link(){
 }
 
 void BSLookAtModifier::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     payload = HkxSharedPtr();
 }
 
 QString BSLookAtModifier::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     if (bones.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": bones is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": bones is empty!\n");
     }else{
         for (auto i = bones.size() - 1; i >= 0; i--){
             if (bones.at(i).index >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid bones at index: "+QString::number(i)+" Removing bone!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid bones at index: "+QString::number(i)+" Removing bone!\n");
                 bones.removeAt(i);
             }
         }
         for (auto i = eyeBones.size() - 1; i >= 0; i--){
             if (eyeBones.at(i).index >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid bones at index: "+QString::number(i)+" Removing bone!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid bones at index: "+QString::number(i)+" Removing bone!\n");
                 eyeBones.removeAt(i);
             }
         }
     }
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     if (id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": event id out of range! Setting to max index in range!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": event id out of range! Setting to max index in range!\n");
         id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
-    if (payload.data() && payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+    if (payload.data() && payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid payload type! Signature: "+QString::number(payload.data()->getSignature(), 16)+" Setting null value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid payload type! Signature: "+QString::number(payload->getSignature(), 16)+" Setting null value!\n");
         payload = HkxSharedPtr();
     }
     setDataValidity(isvalid);

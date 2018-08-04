@@ -30,7 +30,7 @@ bool DataIconManager::hasIcons() const{
 
 void DataIconManager::updateIconNames(){
     //icons.first()->scene()->update();
-    for (int i = 0; i < icons.size(); i++){
+    for (auto i = 0; i < icons.size(); i++){
         icons.at(i)->update(/*QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size()))*/);
     }
 }
@@ -42,8 +42,8 @@ bool DataIconManager::hasSameSignatureAndName(const DataIconManager *other) cons
     return true;
 }
 
-QList<DataIconManager *> DataIconManager::getChildren() const{
-    return QList<DataIconManager *> ();
+QVector<DataIconManager *> DataIconManager::getChildren() const{
+    return QVector<DataIconManager *> ();
 }
 
 int DataIconManager::getIndexOfObj(DataIconManager *) const{
@@ -73,7 +73,7 @@ DataIconManager::DataIconManager(HkxFile *parent, long ref)
     //
 }
 
-bool DataIconManager::merge(HkxObject *recessiveObject){
+bool DataIconManager::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
     if (getType() == TYPE_GENERATOR){
         injectWhileMerging(((hkbGenerator *)recessiveObject));
     }else if (getType() == TYPE_MODIFIER){
@@ -84,7 +84,7 @@ bool DataIconManager::merge(HkxObject *recessiveObject){
 
 void DataIconManager::setIconValidity(bool valid){
     auto setoutlinecolor = [this](Qt::GlobalColor color){
-        for (int i = 0; i < icons.size(); i++){
+        for (auto i = 0; i < icons.size(); i++){
             icons.at(i)->setPenColor(color);
             icons.at(i)->update(/*QRectF(icons.at(i)->pos(), QSizeF(icons.at(i)->boundingRect().size()))*/);
         }
@@ -124,9 +124,9 @@ bool DataIconManager::isCircularLoop() const{
 void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
     if (!getIsMerged() && recessiveobj){
         DataIconManager *recobj = static_cast<DataIconManager *>(recessiveobj);
-        QList <DataIconManager *> domchildren = getChildren();
-        QList <DataIconManager *> recchildren = recobj->getChildren();
-        QList <DataIconManager *> tempchildren;
+        QVector <DataIconManager *> domchildren = getChildren();
+        QVector <DataIconManager *> recchildren = recobj->getChildren();
+        QVector <DataIconManager *> tempchildren;
         DataIconManager *domchild;
         DataIconManager *recchild;
         DataIconManager *obj;
@@ -135,14 +135,14 @@ void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
         HkxSignature recsig;
         HkxSignature tempsig;
         bool found;
-        QList <DataIconManager *> objects;
-        QList <DataIconManager *> children;
-        if (variableBindingSet.data()){
-            variableBindingSet.data()->merge(recobj->variableBindingSet.data());
-        }else if (recobj->variableBindingSet.data()){
-            variableBindingSet = HkxSharedPtr(recobj->variableBindingSet.data());
+        QVector <DataIconManager *> objects;
+        QVector <DataIconManager *> children;
+        if (getVariableBindingSetData()){
+            getVariableBindingSet()->merge(recobj->getVariableBindingSetData());
+        }else if (recobj->getVariableBindingSetData()){
+            getVariableBindingSet() = HkxSharedPtr(recobj->getVariableBindingSetData());
             recobj->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
-            getParentFile()->addObjectToFile(recobj->variableBindingSet.data(), -1);
+            getParentFile()->addObjectToFile(recobj->getVariableBindingSetData(), -1);
         }
         for (auto i = 0; i < domchildren.size(); i++){
             found = false;
@@ -172,7 +172,7 @@ void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
                                 recchild->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
                                 recchild->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
                                 getParentFile()->addObjectToFile(recchild, -1);
-                                getParentFile()->addObjectToFile(recchild->variableBindingSet.data(), -1);
+                                getParentFile()->addObjectToFile(recchild->getVariableBindingSetData(), -1);
                             }
                             //tempchildren.removeAt(k);
                             for (auto m = 0; m < tempchildren.size(); m++){
@@ -181,7 +181,7 @@ void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
                                     tempchild->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
                                     tempchild->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
                                     getParentFile()->addObjectToFile(tempchild, -1);
-                                    getParentFile()->addObjectToFile(tempchild->variableBindingSet.data(), -1);
+                                    getParentFile()->addObjectToFile(tempchild->getVariableBindingSetData(), -1);
                                     objects = static_cast<DataIconManager *>(tempchild)->getChildren();
                                     while (!objects.isEmpty()){
                                         obj = objects.last();
@@ -189,7 +189,7 @@ void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
                                             obj->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
                                             obj->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
                                             getParentFile()->addObjectToFile(obj, -1);
-                                            getParentFile()->addObjectToFile(obj->variableBindingSet.data(), -1);
+                                            getParentFile()->addObjectToFile(obj->getVariableBindingSetData(), -1);
                                             children = obj->getChildren();
                                         }
                                         objects.removeLast();
@@ -213,7 +213,7 @@ void DataIconManager::injectWhileMerging(HkxObject *recessiveobj){
 
 TreeGraphicsItem * DataIconManager::reconnectToNext(){
     TreeGraphicsItem *iconToBeRemoved = nullptr;
-    QList<QGraphicsItem *> children;
+    QList <QGraphicsItem *> children;
     if (!icons.isEmpty()){
         if (icons.size() > 1){
             iconToBeRemoved = icons.at(1);

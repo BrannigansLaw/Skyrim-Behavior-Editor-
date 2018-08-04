@@ -2,13 +2,9 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 
-/*
- * CLASS: BSIStateManagerModifier
-*/
-
 uint BSIStateManagerModifier::refCount = 0;
 
-QString BSIStateManagerModifier::classname = "BSIStateManagerModifier";
+const QString BSIStateManagerModifier::classname = "BSIStateManagerModifier";
 
 BSIStateManagerModifier::BSIStateManagerModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -17,60 +13,60 @@ BSIStateManagerModifier::BSIStateManagerModifier(HkxFile *parent, long ref)
       iStateVar(-1)
 {
     setType(BS_I_STATE_MANAGER_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "IStateManagerModifier"+QString::number(refCount);
+    name = "IStateManagerModifier_"+QString::number(refCount);
 }
 
-QString BSIStateManagerModifier::getClassname(){
+const QString BSIStateManagerModifier::getClassname(){
     return classname;
 }
 
-QString BSIStateManagerModifier::getName() const{
+QString BSIStateManagerModifier::getName() const{   //TO DO: Lock!!!
     return name;
 }
 
-bool BSIStateManagerModifier::readData(const HkxXmlReader &reader, long index){
+bool BSIStateManagerModifier::readData(const HkxXmlReader &reader, long & index){
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+            if (!getVariableBindingSet().readShdPtrReference(index, reader)){
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "iStateVar"){
             iStateVar = reader.getElementValueAt(index).toDouble(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'iStateVar' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'iStateVar' data field!\nObject Reference: "+ref);
             }
         }if (text == "stateData"){
             int numtriggers = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
                 return false;
             }
-            for (int j = 0; j < numtriggers; j++){
+            for (auto j = 0; j < numtriggers; j++){
                 stateData.append(BSiStateData());
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                     if (reader.getNthAttributeValueAt(index, 0) == "pStateMachine"){
                         if (!stateData.last().pStateMachine.readShdPtrReference(index, reader)){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'pStateMachine' reference!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'pStateMachine' reference!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "stateID"){
                         stateData.last().stateID = reader.getElementValueAt(index).toInt(&ok);
@@ -91,6 +87,7 @@ bool BSIStateManagerModifier::readData(const HkxXmlReader &reader, long index){
         }
         index++;
     }
+    index--;
     return true;
 }
 
@@ -103,8 +100,8 @@ bool BSIStateManagerModifier::write(HkxXMLWriter *writer){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
+        if (getVariableBindingSetData()){
+            refString = getVariableBindingSet()->getReferenceString();
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
@@ -114,10 +111,10 @@ bool BSIStateManagerModifier::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"stateData", QString::number(stateData.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < stateData.size(); i++){
+        for (auto i = 0; i < stateData.size(); i++){
             writer->writeLine(writer->object, true);
             if (stateData.at(i).pStateMachine.data()){
-                refString = stateData.at(i).pStateMachine.data()->getReferenceString();
+                refString = stateData.at(i).pStateMachine->getReferenceString();
             }else{
                 refString = "null";
             }
@@ -132,8 +129,8 @@ bool BSIStateManagerModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+        if (getVariableBindingSetData() && !getVariableBindingSet()->write(writer)){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
@@ -144,16 +141,16 @@ bool BSIStateManagerModifier::link(){
         return false;
     }
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
-    for (int i = 0; i < stateData.size(); i++){
+    for (auto i = 0; i < stateData.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(stateData.at(i).pStateMachine.getShdPtrReference());
-        if (!ptr){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'stateData' data field!\nObject Name: "+name);
+        if (!ptr || !ptr->data()){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'stateData' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'stateData' data field is linked to invalid child!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'stateData' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             stateData[i].pStateMachine = *ptr;
         }else{
@@ -165,7 +162,7 @@ bool BSIStateManagerModifier::link(){
 
 void BSIStateManagerModifier::unlink(){
     HkDynamicObject::unlink();
-    for (int i = 0; i < stateData.size(); i++){
+    for (auto i = 0; i < stateData.size(); i++){
         stateData[i].pStateMachine = HkxSharedPtr();
     }
 }
@@ -175,25 +172,25 @@ QString BSIStateManagerModifier::evaluateDataValidity(){
     bool isvalid = true;
     if (stateData.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": stateData is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": stateData is empty!\n");
     }else{
-        for (int i = 0; i < stateData.size(); i++){
+        for (auto i = 0; i < stateData.size(); i++){
             if (!stateData.at(i).pStateMachine.data()){ //TO DO: remove statedata...
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": stateData at index '"+QString::number(i)+"' is null!\n");
-            }else if (stateData.at(i).pStateMachine.data()->getSignature() != HKB_STATE_MACHINE){
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": stateData at index '"+QString::number(i)+"' is null!\n");
+            }else if (stateData.at(i).pStateMachine->getSignature() != HKB_STATE_MACHINE){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid stateData! Signature: "+QString::number(stateData.at(i).pStateMachine.data()->getSignature(), 16)+"\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid stateData! Signature: "+QString::number(stateData.at(i).pStateMachine->getSignature(), 16)+"\n");
             }
         }
     }
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     setDataValidity(isvalid);
     return errors;

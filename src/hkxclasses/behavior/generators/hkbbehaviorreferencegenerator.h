@@ -3,31 +3,31 @@
 
 #include "hkbgenerator.h"
 
-class hkbBehaviorReferenceGenerator: public hkbGenerator
+class hkbBehaviorReferenceGenerator final: public hkbGenerator
 {
-    friend class BehaviorGraphView;
-    friend class BehaviorFile;
     friend class BehaviorReferenceGeneratorUI;
 public:
     hkbBehaviorReferenceGenerator(HkxFile *parent, long ref = 0);
-    virtual ~hkbBehaviorReferenceGenerator();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
-    void removeData(){}
+    hkbBehaviorReferenceGenerator& operator=(const hkbBehaviorReferenceGenerator&) = delete;
+    hkbBehaviorReferenceGenerator(const hkbBehaviorReferenceGenerator &) = delete;
+    ~hkbBehaviorReferenceGenerator();
     QString getName() const;
-    QString evaluateDataValidity();
-    static QString getClassname();
-    bool write(HkxXMLWriter *writer);
+    static const QString getClassname();
     QString getBehaviorName() const;
 private:
-    hkbBehaviorReferenceGenerator& operator=(const hkbBehaviorReferenceGenerator&);
-    hkbBehaviorReferenceGenerator(const hkbBehaviorReferenceGenerator &);
+    void setName(const QString &value);
+    void setBehaviorName(const QString &value);
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
+    QString evaluateDataValidity();
+    bool write(HkxXMLWriter *writer);
 private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     ulong userData;
     QString name;
     QString behaviorName;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBBEHAVIORREFERENCEGENERATOR_H

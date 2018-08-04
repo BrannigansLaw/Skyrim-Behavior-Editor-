@@ -201,7 +201,7 @@ void DampingModifierUI::loadData(HkxObject *data){
             vecPreviousError->setValue(bsData->vecPreviousError);
             errorSum->setValue(bsData->errorSum);
             previousError->setValue(bsData->previousError);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
                 loadBinding(KP_ROW, BINDING_COLUMN, varBind, "kP");
@@ -247,7 +247,7 @@ void DampingModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -258,7 +258,7 @@ void DampingModifierUI::setName(){
 void DampingModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::setEnable(): The data is nullptr!!");
     }
@@ -268,7 +268,7 @@ void DampingModifierUI::setKP(){
     if (bsData){
         if (bsData->kP != kP->value()){
             bsData->kP = kP->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::setkP(): The data is nullptr!!");
@@ -279,7 +279,7 @@ void DampingModifierUI::setKI(){
     if (bsData){
         if (bsData->kI != kI->value()){
             bsData->kI = kI->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::setkI(): The data is nullptr!!");
@@ -290,7 +290,7 @@ void DampingModifierUI::setKD(){
     if (bsData){
         if (bsData->kD != kD->value()){
             bsData->kD = kD->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::setkD(): The data is nullptr!!");
@@ -300,7 +300,7 @@ void DampingModifierUI::setKD(){
 void DampingModifierUI::setEnableScalarDamping(){
     if (bsData){
         bsData->enableScalarDamping = enableScalarDamping->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::setenableScalarDamping(): The data is nullptr!!");
     }
@@ -309,7 +309,7 @@ void DampingModifierUI::setEnableScalarDamping(){
 void DampingModifierUI::setEnableVectorDamping(){
     if (bsData){
         bsData->enableVectorDamping = enableVectorDamping->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::setenableVectorDamping(): The data is nullptr!!");
     }
@@ -319,7 +319,7 @@ void DampingModifierUI::setRawValue(){
     if (bsData){
         if (bsData->rawValue != rawValue->value()){
             bsData->rawValue = rawValue->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::setrawValue(): The data is nullptr!!");
@@ -330,7 +330,7 @@ void DampingModifierUI::setDampedValue(){
     if (bsData){
         if (bsData->dampedValue != dampedValue->value()){
             bsData->dampedValue = dampedValue->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::setdampedValue(): The data is nullptr!!");
@@ -341,7 +341,7 @@ void DampingModifierUI::setRawVector(){
     if (bsData){
         if (bsData->rawVector != rawVector->value()){
             bsData->rawVector = rawVector->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::setrawVector(): The data is nullptr!!");
@@ -352,7 +352,7 @@ void DampingModifierUI::setDampedVector(){
     if (bsData){
         if (bsData->dampedVector != dampedVector->value()){
             bsData->dampedVector = dampedVector->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::setdampedVector(): The data is nullptr!!");
@@ -363,7 +363,7 @@ void DampingModifierUI::setVecErrorSum(){
     if (bsData){
         if (bsData->vecErrorSum != vecErrorSum->value()){
             bsData->vecErrorSum = vecErrorSum->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::setvecErrorSum(): The data is nullptr!!");
@@ -374,7 +374,7 @@ void DampingModifierUI::setVecPreviousError(){
     if (bsData){
         if (bsData->vecPreviousError != vecPreviousError->value()){
             bsData->vecPreviousError = vecPreviousError->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::setvecPreviousError(): The data is nullptr!!");
@@ -385,7 +385,7 @@ void DampingModifierUI::setErrorSum(){
     if (bsData){
         if (bsData->errorSum != errorSum->value()){
             bsData->errorSum = errorSum->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::seterrorSum(): The data is nullptr!!");
@@ -396,7 +396,7 @@ void DampingModifierUI::setPreviousError(){
     if (bsData){
         if (bsData->previousError != previousError->value()){
             bsData->previousError = previousError->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::setpreviousError(): The data is nullptr!!");
@@ -504,14 +504,14 @@ void DampingModifierUI::viewSelected(int row, int column){
 void DampingModifierUI::selectTableToView(bool viewisProperty, const QString & path){
     if (bsData){
         if (viewisProperty){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -524,7 +524,7 @@ void DampingModifierUI::selectTableToView(bool viewisProperty, const QString & p
 void DampingModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
         if (bind){
             int bindIndex = bind->getVariableIndexOfBinding("enable");
             if (bindIndex == index){
@@ -589,16 +589,16 @@ void DampingModifierUI::variableRenamed(const QString & name, int index){
 }
 
 bool DampingModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -610,7 +610,7 @@ bool DampingModifierUI::setBinding(int index, int row, const QString &variableNa
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -712,13 +712,13 @@ void DampingModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("DampingModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-void DampingModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void DampingModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -726,7 +726,7 @@ void DampingModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -734,7 +734,7 @@ void DampingModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("DampingModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }

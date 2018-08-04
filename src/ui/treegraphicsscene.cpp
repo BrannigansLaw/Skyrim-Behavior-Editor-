@@ -42,7 +42,7 @@ void TreeGraphicsScene::setCanDeleteRoot(bool value){
 }*/
 
 void TreeGraphicsScene::selectIcon(TreeGraphicsItem *icon, BranchBehaviorEnum expand){    //Change so expand all sub branches on right click on expand box!!!!!!
-    QList <TreeGraphicsItem *> branch;
+    QVector <TreeGraphicsItem *> branch;
     if (selectedIcon){
         selectedIcon->unselect();
     }
@@ -67,7 +67,7 @@ void TreeGraphicsScene::selectIcon(TreeGraphicsItem *icon, BranchBehaviorEnum ex
                 selectedIcon = selectedIcon->getPrimaryIcon();
                 if (!selectedIcon->isVisible()){
                     branch = selectedIcon->getAllIconsInBranch();
-                    for (int i = 0; i < branch.size(); i++){
+                    for (auto i = 0; i < branch.size(); i++){
                         expandBranch(branch.at(i));
                     }
                 }
@@ -84,7 +84,7 @@ void TreeGraphicsScene::contractBranch(TreeGraphicsItem *icon, bool contractAll)
     QList <QGraphicsItem *> children;
     if (icon){
         children = icon->childItems();
-        for (int i = 0; i < children.size(); i++){
+        for (auto i = 0; i < children.size(); i++){
             children.at(i)->setVisible(false);
             ((TreeGraphicsItem *)children.at(i))->path->setVisible(false);
             if (contractAll){
@@ -103,7 +103,7 @@ void TreeGraphicsScene::expandBranch(TreeGraphicsItem *icon, bool expandAll){
     if (icon){
         children = icon->childItems();
         icon->setIsExpanded(true);
-        for (int i = 0; i < children.size(); i++){
+        for (auto i = 0; i < children.size(); i++){
             children.at(i)->setVisible(true);
             ((TreeGraphicsItem *)children.at(i))->path->setVisible(true);
             if (expandAll){
@@ -117,9 +117,9 @@ void TreeGraphicsScene::expandBranch(TreeGraphicsItem *icon, bool expandAll){
 }
 
 bool TreeGraphicsScene::drawGraph(DataIconManager *rootData, bool allowDuplicates){
-    QList <DataIconManager *> objects;
-    QList <DataIconManager *> children;
-    QList <TreeGraphicsItem *> parentIcons;
+    QVector <DataIconManager *> objects;
+    QVector <DataIconManager *> children;
+    QVector <TreeGraphicsItem *> parentIcons;
     QVector <short> numChildren;
     TreeGraphicsItem *newIcon = nullptr;
     if (rootData){
@@ -177,7 +177,7 @@ TreeGraphicsItem * TreeGraphicsScene::addItemToGraph(TreeGraphicsItem *selectedI
             if (selectedIcon){
                 if (!allowDuplicates){
                     children = selectedIcon->childItems();
-                    for (int i = 0; i < children.size(); i++){
+                    for (auto i = 0; i < children.size(); i++){
                         if (((TreeGraphicsItem *)children.at(i))->itemData == data){
                             if (!inject && !isFirstDraw){
                                 selectedIcon->itemData->insertObjectAt(indexToInsert, data);
@@ -282,7 +282,7 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
     QList <QGraphicsItem *> iconsToRemove;  //Storage for all icons to be removed from the graph...
     TreeGraphicsItem *itemToDeleteParent = nullptr;
     TreeGraphicsItem *itemToDelete = nullptr;  //Represents any icons to be removed that had children that were adopted by another icon representing the same data...
-    QList <DataIconManager *> childrenData;//Used to count the data references if less than 2 remove the icon...
+    QVector <DataIconManager *> childrenData;//Used to count the data references if less than 2 remove the icon...
     int dataCount = 0;
     TreeGraphicsItem *iconChild = nullptr;
     int count = 0;  //Used to prevent possible infinite looping due to icons referencing ancestors...
@@ -324,7 +324,7 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
                     children = tempList + children;
                 }
                 if (removeAllSameData){
-                    for (int i = childrenData.size() - 1; i >= 0; i--){
+                    for (auto i = childrenData.size() - 1; i >= 0; i--){
                         if (childrenData.at(i) == item->itemData){
                             itemToDeleteParent->itemData->removeObjectAt(i);
                         }
@@ -332,7 +332,7 @@ bool TreeGraphicsScene::removeItemFromGraph(TreeGraphicsItem *item, int indexToR
                 }else if (removeData){
                     itemToDeleteParent->itemData->removeObjectAt(indexToRemove);
                 }
-                for (int i = iconsToRemove.size() - 1; i >= 0; i--){//Duplicates sometimes...
+                for (auto i = iconsToRemove.size() - 1; i >= 0; i--){//Duplicates sometimes...
                     delete iconsToRemove.at(i);
                 }
                 itemToDeleteParent->reposition();

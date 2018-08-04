@@ -3,29 +3,32 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbExpressionCondition: public HkxObject
+class hkbExpressionCondition final: public HkxObject
 {
-    friend class TransitionsUI;
 public:
     hkbExpressionCondition(BehaviorFile *parent, const QString & string = "", long ref = -1);
-    virtual ~hkbExpressionCondition();
-    bool readData(const HkxXmlReader & reader, long index);
-    QString evaluateDataValidity();
-    static QString getClassname();
-    bool link(){return true;}
+    hkbExpressionCondition& operator=(const hkbExpressionCondition&) = delete;
+    hkbExpressionCondition(const hkbExpressionCondition &) = delete;
+    ~hkbExpressionCondition();
+    static const QString getClassname();
     QString getExpression() const;
-    bool write(HkxXMLWriter *writer);
+    void setExpression(const QString &value);
     bool operator ==(const hkbExpressionCondition & other){
         if (expression != other.expression){
             return false;
         }
         return true;
     }
-protected:
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
+    QString evaluateDataValidity();
+    bool link(){return true;}
+    bool write(HkxXMLWriter *writer);
 private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     QString expression;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBEXPRESSIONCONDITION_H

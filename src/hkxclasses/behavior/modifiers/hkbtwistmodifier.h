@@ -3,28 +3,27 @@
 
 #include "hkbmodifier.h"
 
-class hkbTwistModifier: public hkbModifier
+class hkbTwistModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class TwistModifierUI;
 public:
     hkbTwistModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbTwistModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbTwistModifier& operator=(const hkbTwistModifier&) = delete;
+    hkbTwistModifier(const hkbTwistModifier &) = delete;
+    ~hkbTwistModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbTwistModifier& operator=(const hkbTwistModifier&);
-    hkbTwistModifier(const hkbTwistModifier &);
-private:
-    static QStringList SetAngleMethod;  //(LINEAR=0;RAMPED=1)
-    static QStringList RotationAxisCoordinates; //(ROTATION_AXIS_IN_MODEL_COORDINATES=0;ROTATION_AXIS_IN_LOCAL_COORDINATES=1)
     static uint refCount;
-    static QString classname;
+    static const QString classname;
+    static const QStringList SetAngleMethod;
+    static const QStringList RotationAxisCoordinates;
     long userData;
     QString name;
     bool enable;
@@ -35,6 +34,7 @@ private:
     QString setAngleMethod;
     QString rotationAxisCoordinates;
     bool isAdditive;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBTWISTMODIFIER_H

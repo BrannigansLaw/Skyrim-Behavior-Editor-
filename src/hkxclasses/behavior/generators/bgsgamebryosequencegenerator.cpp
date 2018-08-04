@@ -1,94 +1,86 @@
 #include "bgsgamebryosequencegenerator.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
-/*
- * CLASS: BGSGamebryoSequenceGenerator
-*/
 
 uint BGSGamebryoSequenceGenerator::refCount = 0;
 
-QString BGSGamebryoSequenceGenerator::classname = "BGSGamebryoSequenceGenerator";
+const QString BGSGamebryoSequenceGenerator::classname = "BGSGamebryoSequenceGenerator";
 
-QStringList BGSGamebryoSequenceGenerator::BlendModeFunction = {"BMF_NONE", "BMF_PERCENT", "BMF_ONE_MINUS_PERCENT"};
+const QStringList BGSGamebryoSequenceGenerator::BlendModeFunction = {"BMF_NONE", "BMF_PERCENT", "BMF_ONE_MINUS_PERCENT"};
 
 BGSGamebryoSequenceGenerator::BGSGamebryoSequenceGenerator(HkxFile *parent, long ref)
     : hkbGenerator(parent, ref),
       userData(0)
 {
     setType(BGS_GAMEBYRO_SEQUENCE_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "BGSGamebryoSequenceGenerator"+QString::number(refCount);
+    name = "BGSGamebryoSequenceGenerator_"+QString::number(refCount);
 }
 
-QString BGSGamebryoSequenceGenerator::getClassname(){
+const QString BGSGamebryoSequenceGenerator::getClassname(){
     return classname;
 }
 
-bool BGSGamebryoSequenceGenerator::readData(const HkxXmlReader &reader, long index){
+bool BGSGamebryoSequenceGenerator::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "pSequence"){
             pSequence = reader.getElementValueAt(index);
-            if (pSequence == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'pSequence' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((pSequence == ""), "pSequence");
         }else if (text == "eBlendModeFunction"){
             eBlendModeFunction = reader.getElementValueAt(index);
-            if (!BlendModeFunction.contains(eBlendModeFunction)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'eBlendModeFunction' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(BlendModeFunction.contains(eBlendModeFunction), "eBlendModeFunction");
         }else if (text == "fPercent"){
             fPercent = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'fPercent' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "fPercent");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool BGSGamebryoSequenceGenerator::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value, bool allownull){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value, allownull);
+    };
+    if (writer && !getIsWritten()){
         QString refString = "null";
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
+        if (getVariableBindingSetData()){
+            refString = getVariableBindingSet()->getReferenceString();
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pSequence"), pSequence, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("eBlendModeFunction"), eBlendModeFunction);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fPercent"), QString::number(fPercent, char('f'), 6));
+        writedatafield("variableBindingSet", refString, false);
+        writedatafield("userData", QString::number(userData), false);
+        writedatafield("name", name, false);
+        writedatafield("pSequence", pSequence, true);
+        writedatafield("eBlendModeFunction", eBlendModeFunction, false);
+        writedatafield("fPercent", QString::number(fPercent, char('f'), 6), false);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+        if (getVariableBindingSetData() && !getVariableBindingSet()->write(writer)){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
@@ -98,28 +90,63 @@ bool BGSGamebryoSequenceGenerator::link(){
     return true;
 }
 
+void BGSGamebryoSequenceGenerator::setFPercent(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    fPercent = value;
+}
+
+void BGSGamebryoSequenceGenerator::setEBlendModeFunction(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < BlendModeFunction.size()) ? eBlendModeFunction = BlendModeFunction.at(index) : NULL;
+}
+
+void BGSGamebryoSequenceGenerator::setPSequence(const QString &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != "") ? pSequence = value : NULL;
+}
+
+void BGSGamebryoSequenceGenerator::setName(const QString &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != "") ? name = value : NULL;
+}
+
+qreal BGSGamebryoSequenceGenerator::getFPercent() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return fPercent;
+}
+
+QString BGSGamebryoSequenceGenerator::getEBlendModeFunction() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return eBlendModeFunction;
+}
+
+QString BGSGamebryoSequenceGenerator::getPSequence() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return pSequence;
+}
+
 QString BGSGamebryoSequenceGenerator::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
 QString BGSGamebryoSequenceGenerator::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity();
-    if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
-    }
-    if (name == ""){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
-    }
-    if (pSequence == ""){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pSequence!\n");
-    }
-    if (!BlendModeFunction.contains(eBlendModeFunction)){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid eBlendModeFunction! Setting default value!\n");
+    bool temp;
+    auto isvalid = true;
+    auto appenderror = [&](bool value, const QString & fieldname){
+        if (!value){
+            isvalid = false;
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid '"+fieldname+"'!\n");
+        }
+    };
+    appenderror((HkDynamicObject::evaluateDataValidity() == ""), "hkbVariableBindingSet");
+    appenderror((name != ""), "name");
+    appenderror((pSequence == ""), "pSequence");
+    temp = BlendModeFunction.contains(eBlendModeFunction);
+    appenderror(temp, "eBlendModeFunction");
+    if (!temp){
         eBlendModeFunction = BlendModeFunction.first();
     }
     setDataValidity(isvalid);

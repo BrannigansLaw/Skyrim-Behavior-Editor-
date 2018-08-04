@@ -3,19 +3,21 @@
 
 #include "hkbgenerator.h"
 
-class BSCyclicBlendTransitionGenerator: public hkbGenerator
+class BSCyclicBlendTransitionGenerator final: public hkbGenerator
 {
-    friend class BehaviorGraphView;
     friend class BSCyclicBlendTransitionGeneratorUI;
 public:
     BSCyclicBlendTransitionGenerator(HkxFile *parent, long ref = 0);
-    virtual ~BSCyclicBlendTransitionGenerator();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSCyclicBlendTransitionGenerator& operator=(const BSCyclicBlendTransitionGenerator&) = delete;
+    BSCyclicBlendTransitionGenerator(const BSCyclicBlendTransitionGenerator &) = delete;
+    ~BSCyclicBlendTransitionGenerator();
+    static const QString getClassname();
+    QString getName() const;
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
     bool isEventReferenced(int eventindex) const;
@@ -25,17 +27,14 @@ public:
     void updateReferences(long &ref);
     bool merge(HkxObject *recessiveObject);
     QVector <HkxObject *> getChildrenOtherTypes() const;
-private:
-    QList <DataIconManager *> getChildren() const;
+    QVector <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int, DataIconManager *obj);
     bool removeObjectAt(int index);
-    BSCyclicBlendTransitionGenerator& operator=(const BSCyclicBlendTransitionGenerator&);
-    BSCyclicBlendTransitionGenerator(const BSCyclicBlendTransitionGenerator &);
 private:
-    static QStringList BlendCurve;   //BLEND_CURVE_SMOOTH=0;BLEND_CURVE_LINEAR=1;BLEND_CURVE_LINEAR_TO_SMOOTH=2;BLEND_CURVE_SMOOTH_TO_LINEAR=3
+    static const QStringList BlendCurve;
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     ulong userData;
     QString name;
     HkxSharedPtr pBlenderGenerator;
@@ -44,6 +43,7 @@ private:
     qreal fBlendParameter;
     qreal fTransitionDuration;
     QString eBlendCurve;
+    mutable std::mutex mutex;
 };
 
 #endif // BSCYCLICBLENDTRANSITIONGENERATOR_H

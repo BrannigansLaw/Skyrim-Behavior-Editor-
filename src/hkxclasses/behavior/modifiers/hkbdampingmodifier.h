@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class hkbDampingModifier: public hkbModifier
+class hkbDampingModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class DampingModifierUI;
 public:
     hkbDampingModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbDampingModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbDampingModifier& operator=(const hkbDampingModifier&) = delete;
+    hkbDampingModifier(const hkbDampingModifier &) = delete;
+    ~hkbDampingModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbDampingModifier& operator=(const hkbDampingModifier&);
-    hkbDampingModifier(const hkbDampingModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -39,6 +38,7 @@ private:
     hkQuadVariable vecPreviousError;
     qreal errorSum;
     qreal previousError;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBDAMPINGMODIFIER_H

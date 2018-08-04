@@ -76,7 +76,7 @@ private:
     void setBehaviorView(BehaviorGraphView *view);
     void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
     void generatorRenamed(const QString & name, int index);
-    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString & path);
+    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString & path);
     void loadTableValue(int row, const QString & value);
     void removeState(int index);
     void removeTransition(int index);

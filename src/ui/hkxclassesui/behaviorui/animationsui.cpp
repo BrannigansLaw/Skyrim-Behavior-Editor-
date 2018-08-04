@@ -78,7 +78,7 @@ void AnimationsUI::loadData(HkxObject *data, ProjectAnimData *animdata){
         loadedData = static_cast<hkbCharacterStringData *>(data);
         animData = animdata;
         int row;
-        for (int i = 0; i < loadedData->animationNames.size(); i++){
+        for (auto i = 0; i < loadedData->animationNames.size(); i++){
             row = table->rowCount();
             if (table->rowCount() > i){
                 table->setRowHidden(i, false);
@@ -93,14 +93,14 @@ void AnimationsUI::loadData(HkxObject *data, ProjectAnimData *animdata){
                 table->setItem(row, 1, new QTableWidgetItem("Edit"));
             }
         }
-        for (int j = loadedData->animationNames.size(); j < table->rowCount(); j++){
+        for (auto j = loadedData->animationNames.size(); j < table->rowCount(); j++){
             table->setRowHidden(j, true);
         }
     }
 }
 
 void AnimationsUI::clear(){
-    for (int i = table->rowCount() - 1; i >= 0; i--){
+    for (auto i = table->rowCount() - 1; i >= 0; i--){
         table->removeRow(i);
     }
 }
@@ -138,7 +138,7 @@ void AnimationsUI::removeAnimation(){
         if (stackLyt->currentIndex() == ANIMATION_WIDGET){
             stackLyt->setCurrentIndex(TABLE_WIDGET);
         }
-        loadedData->getParentFile()->setIsChanged(true);
+        loadedData->setIsFileChanged(true);
         emit animationRemoved(index);
         table->setFocus();
     }else{

@@ -3,30 +3,30 @@
 
 #include "hkbmodifier.h"
 
-class hkbMoveCharacterModifier: public hkbModifier
+class hkbMoveCharacterModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class MoveCharacterModifierUI;
 public:
     hkbMoveCharacterModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbMoveCharacterModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbMoveCharacterModifier& operator=(const hkbMoveCharacterModifier&) = delete;
+    hkbMoveCharacterModifier(const hkbMoveCharacterModifier &) = delete;
+    ~hkbMoveCharacterModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbMoveCharacterModifier& operator=(const hkbMoveCharacterModifier&);
-    hkbMoveCharacterModifier(const hkbMoveCharacterModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
     hkQuadVariable offsetPerSecondMS;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBMOVECHARACTERMODIFIER_H

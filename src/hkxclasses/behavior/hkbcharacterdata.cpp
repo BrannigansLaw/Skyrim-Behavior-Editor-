@@ -5,15 +5,11 @@
 #include "src/hkxclasses/behavior/hkbcharacterstringdata.h"
 #include "src/hkxclasses/behavior/hkbvariablevalueset.h"
 
-/*
- * CLASS: hkbCharacterData
-*/
-
 uint hkbCharacterData::refCount = 0;
 
-QString hkbCharacterData::classname = "hkbCharacterData";
+const QString hkbCharacterData::classname = "hkbCharacterData";
 
-QStringList hkbCharacterData::Type = {
+const QStringList hkbCharacterData::Type = {
     "VARIABLE_TYPE_BOOL",
     "VARIABLE_TYPE_INT8",
     "VARIABLE_TYPE_INT16",
@@ -32,396 +28,298 @@ hkbCharacterData::hkbCharacterData(HkxFile *parent, long ref)
       scale(1)
 {
     setType(HKB_CHARACTER_DATA, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
-QString hkbCharacterData::getClassname(){
+const QString hkbCharacterData::getClassname(){
     return classname;
 }
 
-HkxObject * hkbCharacterData::getVariantVariable(int index) const{
+int hkbCharacterData::getWordVariableValueAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbVariableValueSet *variableValues = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
-    if (variableValues->wordVariableValues.size() > index && characterPropertyInfos.size() > index){
-        int count = -1;
-        for (int i = 0; i <= index; i++){
-            if (characterPropertyInfos.at(i).type == "VARIABLE_TYPE_POINTER"){
-                count++;
+    if (variableValues){
+        return variableValues->getWordVariableAt(index);
+    }else{
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": characterPropertyValues is nullptr!\n");
+    }
+    return -1;
+}
+
+HkxObject * hkbCharacterData::getVariantVariable(int index) const{
+    std::lock_guard <std::mutex> guard(mutex);
+    hkbVariableValueSet *variableValues = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
+    if (variableValues){
+        if (characterPropertyInfos.size() > index){
+            auto count = -1;
+            for (auto i = 0; i <= index; i++){
+                (characterPropertyInfos.at(i).type == "VARIABLE_TYPE_POINTER") ? count++ : NULL;
             }
+            if (count != -1){
+                return variableValues->getVariantVariableValueAt(count);
+            }
+        }else{
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": getVariantVariable(): Index out of range!\n");
         }
-        if (count < variableValues->variantVariableValues.size() && count > -1){
-            return variableValues->variantVariableValues.at(count).data();
-        }
+    }else{
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": characterPropertyValues is nullptr!\n");
     }
     return nullptr;
 }
 
 void hkbCharacterData::addVariable(hkVariableType type, const QString & name){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
-    hkVariableInfo varInfo;
-    switch (type){
-    case VARIABLE_TYPE_BOOL:
-        varInfo.type = "VARIABLE_TYPE_BOOL";
-        break;
-    case VARIABLE_TYPE_INT8:
-        varInfo.type = "VARIABLE_TYPE_INT8";
-        break;
-    case VARIABLE_TYPE_INT16:
-        varInfo.type = "VARIABLE_TYPE_INT16";
-        break;
-    case VARIABLE_TYPE_INT32:
-        varInfo.type = "VARIABLE_TYPE_INT32";
-        break;
-    case VARIABLE_TYPE_REAL:
-        varInfo.type = "VARIABLE_TYPE_REAL";
-        break;
-    case VARIABLE_TYPE_POINTER:
-        varInfo.type = "VARIABLE_TYPE_POINTER";
-        varData->variantVariableValues.append(HkxSharedPtr());
-        break;
-    case VARIABLE_TYPE_VECTOR4:
-        varInfo.type = "VARIABLE_TYPE_VECTOR4";
-        varData->quadVariableValues.append(hkQuadVariable());
-        break;
-    case VARIABLE_TYPE_QUATERNION:
-        varInfo.type = "VARIABLE_TYPE_QUATERNION";
-        varData->quadVariableValues.append(hkQuadVariable());
-        break;
-    default:
-        return;
+    auto index = -1;
+    auto varAdded = false;
+    if (strData && varData){
+        if (name != "" /* && (isProperty || !strData->variableNames.contains(name))*/){
+            hkVariableInfo varInfo;
+            varInfo.type = Type.at(type);
+            index = strData->addCharacterPropertyName(name, &varAdded);
+            if (varAdded){
+                characterPropertyInfos.append(varInfo);
+                varData->addWordVariableValue(0);
+                if (type > VARIABLE_TYPE_POINTER){
+                    varData->addQuadVariableValue(hkQuadVariable());
+                }else if (type == VARIABLE_TYPE_POINTER){
+                    //varData->variantVariableValues.append(HkxSharedPtr());
+                }
+            }
+        }
+    }else{
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or characterPropertyValues are nullptr!\n");
     }
-    strData->characterPropertyNames.append(name);
-    varData->wordVariableValues.append(0);
-    characterPropertyInfos.append(varInfo);
 }
 
 void hkbCharacterData::addVariable(hkVariableType type){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
-    /*if (!varData){
-        varData = new hkbVariableValueSet(this);
-        characterPropertyValues = HkxSharedPtr(varData);
-    }*/
     hkVariableInfo varInfo;
-    switch (type){
-    case VARIABLE_TYPE_BOOL:
-        varInfo.type = "VARIABLE_TYPE_BOOL";
-        break;
-    case VARIABLE_TYPE_INT8:
-        varInfo.type = "VARIABLE_TYPE_INT8";
-        break;
-    case VARIABLE_TYPE_INT16:
-        varInfo.type = "VARIABLE_TYPE_INT16";
-        break;
-    case VARIABLE_TYPE_INT32:
-        varInfo.type = "VARIABLE_TYPE_INT32";
-        break;
-    case VARIABLE_TYPE_REAL:
-        varInfo.type = "VARIABLE_TYPE_REAL";
-        break;
-    case VARIABLE_TYPE_POINTER:
-        varInfo.type = "VARIABLE_TYPE_POINTER";
-        varData->variantVariableValues.append(HkxSharedPtr((HkxObject *)(static_cast<CharacterFile *>(getParentFile())->addNewBoneWeightArray())));
-        break;
-    case VARIABLE_TYPE_VECTOR4:
-        varInfo.type = "VARIABLE_TYPE_VECTOR4";
-        varData->quadVariableValues.append(hkQuadVariable());
-        break;
-    case VARIABLE_TYPE_QUATERNION:
-        varInfo.type = "VARIABLE_TYPE_QUATERNION";
-        varData->quadVariableValues.append(hkQuadVariable());
-        break;
-    default:
-        return;
+    varInfo.type = Type.at(type);
+    if (strData && varData){
+        strData->generateAppendCharacterPropertyName(varInfo.type);
+        varData->addWordVariableValue(0);
+        characterPropertyInfos.append(varInfo);
+    }else{
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or variableInitialValues are nullptr!\n");
     }
-    QString name = "NEW-"+varInfo.type;
-    int num = 0;
-    int index;
-    for (int i = 0; i < strData->characterPropertyNames.size(); i++){
-        if (strData->characterPropertyNames.at(i) == name){
-            index = name.indexOf('_');
-            if (index > -1){
-                name.remove(name.indexOf('_'), name.size());
-            }
-            name.append("_"+QString::number(num));
-            num++;
-            if (num > 1){
-                if (num > 10){
-                    name = name+"_FUCKING_RENAME_YOUR_VARIABLES_PROPERLY!";
-                    break;
-                }
-                i = 0;
-            }
-        }
-    }
-    strData->characterPropertyNames.append(name);
-    varData->wordVariableValues.append(0);
-    characterPropertyInfos.append(varInfo);
 }
 
 void hkbCharacterData::removeVariable(int index){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
-    int count = -1;
-    if (index < strData->characterPropertyNames.size() && index < varData->wordVariableValues.size() && index < characterPropertyInfos.size() && index > -1){
-        if (characterPropertyInfos.at(index).type == "VARIABLE_TYPE_POINTER"){
-            for (int i = 0; i <= index; i++){
-                if (characterPropertyInfos.at(i).type == "VARIABLE_TYPE_POINTER"){
-                    count++;
+    auto count = -1;
+    if (strData && varData){
+        if (index < characterPropertyInfos.size() && index > -1){
+            if (characterPropertyInfos.at(index).type == "VARIABLE_TYPE_POINTER"){
+                for (auto i = 0; i <= index; i++){
+                    (characterPropertyInfos.at(i).type == "VARIABLE_TYPE_POINTER") ? count++ : NULL;
                 }
-            }
-            if (count < varData->variantVariableValues.size() && count > -1){
-                varData->variantVariableValues.removeAt(count);
-            }
-        }else if (characterPropertyInfos.at(index).type == "VARIABLE_TYPE_VECTOR4" || characterPropertyInfos.at(index).type == "VARIABLE_TYPE_QUATERNION"){
-            for (int i = 0; i <= index; i++){
-                if (characterPropertyInfos.at(i).type == "VARIABLE_TYPE_VECTOR4" || characterPropertyInfos.at(i).type == "VARIABLE_TYPE_QUATERNION"){
-                    count++;
+                varData->removeVariantVariableValueAt(count);
+            }else if (characterPropertyInfos.at(index).type == "VARIABLE_TYPE_VECTOR4" || characterPropertyInfos.at(index).type == "VARIABLE_TYPE_QUATERNION"){
+                for (auto i = 0; i <= index; i++){
+                    (characterPropertyInfos.at(i).type == "VARIABLE_TYPE_VECTOR4" || characterPropertyInfos.at(i).type == "VARIABLE_TYPE_QUATERNION") ? count++ : NULL;
                 }
+                varData->removeQuadVariableValueAt(count);
             }
-            if (count < varData->quadVariableValues.size() && count > -1){
-                varData->quadVariableValues.removeAt(count);
-            }
+            strData->removeCharacterPropertyNameAt(index);
+            varData->removeWordVariableValueAt(index);
+            characterPropertyInfos.removeAt(index);
         }
-        strData->characterPropertyNames.removeAt(index);
-        varData->wordVariableValues.removeAt(index);
-        characterPropertyInfos.removeAt(index);
+    }else{
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or variableInitialValues are nullptr!\n");
     }
 }
 
 hkVariableType hkbCharacterData::getVariableTypeAt(int index) const{
+    std::lock_guard <std::mutex> guard(mutex);
+    int type;
     if (characterPropertyInfos.size() > index && index > -1){
-        QString type = characterPropertyInfos.at(index).type;
-        if (type == "VARIABLE_TYPE_BOOL"){
-            return VARIABLE_TYPE_BOOL;
-        }else if (type == "VARIABLE_TYPE_INT8"){
-            return VARIABLE_TYPE_INT8;
-        }else if (type == "VARIABLE_TYPE_INT16"){
-            return VARIABLE_TYPE_INT16;
-        }else if (type == "VARIABLE_TYPE_INT32"){
-            return VARIABLE_TYPE_INT32;
-        }else if (type == "VARIABLE_TYPE_REAL"){
-            return VARIABLE_TYPE_REAL;
-        }else if (type == "VARIABLE_TYPE_POINTER"){
-            return VARIABLE_TYPE_POINTER;
-        }else if (type == "VARIABLE_TYPE_VECTOR4"){
-            return VARIABLE_TYPE_VECTOR4;
-        }else if (type == "VARIABLE_TYPE_QUATERNION"){
-            return VARIABLE_TYPE_QUATERNION;
-        }
+        type = Type.indexOf(characterPropertyInfos.at(index).type);
     }
-    return VARIABLE_TYPE_INT8;
+    (type == -1) ? type = VARIABLE_TYPE_INT8 : NULL;
+    return (hkVariableType)type;
 }
 
-void hkbCharacterData::setVariableNameAt(int index, const QString & name){
+void hkbCharacterData::setCharacterPropertyNameAt(int index, const QString & name){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
-    if (strData->characterPropertyNames.size() > index && index > -1){
-        strData->characterPropertyNames.replace(index, name);
+    if (strData){
+        strData->setCharacterPropertyNameAt(index, name);
+    }else{
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
     }
 }
 
 void hkbCharacterData::setWordVariableValueAt(int index, int value){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
-    if (varData->wordVariableValues.size() > index && index > -1){
-        varData->wordVariableValues.replace(index, value);
+    if (varData){
+        varData->setWordVariableAt(index, value);
+    }else{
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": characterPropertyValues is nullptr!\n");
     }
 }
 
 void hkbCharacterData::setQuadVariableValueAt(int index, hkQuadVariable value){
-    hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
+    std::lock_guard <std::mutex> guard(mutex);
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
-    int count = -1;
-    if (index < strData->characterPropertyNames.size() && index < varData->wordVariableValues.size() && index < characterPropertyInfos.size()){
-        if (characterPropertyInfos.at(index).type == "VARIABLE_TYPE_VECTOR4" || characterPropertyInfos.at(index).type == "VARIABLE_TYPE_QUATERNION"){
-            for (int i = 0; i <= index; i++){
-                if (characterPropertyInfos.at(i).type == "VARIABLE_TYPE_VECTOR4" || characterPropertyInfos.at(i).type == "VARIABLE_TYPE_QUATERNION"){
-                    count++;
+    auto count = -1;
+    if (varData){
+        if (index < characterPropertyInfos.size() && index >= 0){
+            if (characterPropertyInfos.at(index).type == "VARIABLE_TYPE_VECTOR4" || characterPropertyInfos.at(index).type == "VARIABLE_TYPE_QUATERNION"){
+                for (auto i = 0; i <= index; i++){
+                    (characterPropertyInfos.at(i).type == "VARIABLE_TYPE_VECTOR4" || characterPropertyInfos.at(i).type == "VARIABLE_TYPE_QUATERNION") ? count++ : NULL;
+                }
+                if (count != -1){
+                    varData->setQuadVariableValueAt(count, value);
                 }
             }
-            if (count < varData->quadVariableValues.size() && count > -1){
-                varData->quadVariableValues.replace(count, value);
-            }
-        }else{
-            return;
         }
+    }else{
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": varData is nullptr!\n");
     }
 }
 
 hkQuadVariable hkbCharacterData::getQuadVariable(int index, bool *ok) const{
-    *ok = false;
+    std::lock_guard <std::mutex> guard(mutex);
     hkbVariableValueSet *variableValues = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
-    if (variableValues->wordVariableValues.size() > index && characterPropertyInfos.size() > index){
-        int count = -1;
-        for (int i = 0; i <= index; i++){
-            if (characterPropertyInfos.at(i).type == "VARIABLE_TYPE_VECTOR4" || characterPropertyInfos.at(i).type == "VARIABLE_TYPE_QUATERNION"){
-                count++;
+    if (variableValues){
+        if (characterPropertyInfos.size() > index){
+            auto count = -1;
+            for (auto i = 0; i <= index; i++){
+                (characterPropertyInfos.at(i).type == "VARIABLE_TYPE_VECTOR4" || characterPropertyInfos.at(i).type == "VARIABLE_TYPE_QUATERNION") ? count++ : NULL;
+            }
+            if (count != -1){
+                return variableValues->getQuadVariableValueAt(count, ok);
             }
         }
-        if (count < variableValues->quadVariableValues.size() && count > -1){
-            *ok = true;
-            return variableValues->quadVariableValues.at(count);
-        }
+    }else{
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableInitialValues is nullptr!\n");
     }
+    (ok) ? ok = false : NULL;
     return hkQuadVariable();
 }
 
 
-bool hkbCharacterData::readData(const HkxXmlReader &reader, long index){
+bool hkbCharacterData::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
+    int numElems;
     bool ok;
-    int numElems = 0;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "capsuleHeight"){
             characterControllerInfo.capsuleHeight = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'capsuleHeight' data field!\nObject Reference: "+ref);
-            }
-        }else if (text == "capsuleRadius"){
+            checkvalue(ok, "userData");
+        }else if (text == "capsuleHeight"){
             characterControllerInfo.capsuleRadius = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'capsuleRadius' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "capsuleRadius");
         }else if (text == "collisionFilterInfo"){
             characterControllerInfo.collisionFilterInfo = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'collisionFilterInfo' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "collisionFilterInfo");
         }else if (text == "characterControllerCinfo"){
-            if (!characterControllerInfo.characterControllerCinfo.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'characterControllerCinfo' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(characterControllerInfo.characterControllerCinfo.readShdPtrReference(index, reader), "characterControllerInfo.characterControllerCinfo");
         }else if (text == "modelUpMS"){
             modelUpMS = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'modelUpMS' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "modelUpMS");
         }else if (text == "modelForwardMS"){
             modelForwardMS = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'modelForwardMS' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "modelForwardMS");
         }else if (text == "modelRightMS"){
             modelRightMS = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'modelRightMS' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "modelRightMS");
         }else if (text == "characterPropertyInfos"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
-                return false;
-            }
-            for (int i = 0; i < numElems; i++){
+            checkvalue(ok, "characterPropertyInfos");
+            for (auto i = 0; i < numElems; i++){
                 index += 4;
-                if (index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
-                    return false;
-                }
+                checkvalue((index < reader.getNumElements()), "characterPropertyInfos");
                 hkVariableInfo temp;
                 temp.role.role = reader.getElementValueAt(index);
                 index++;
-                if (index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
-                    return false;
-                }
+                checkvalue((index < reader.getNumElements()), "characterPropertyInfos");
                 temp.role.flags = reader.getElementValueAt(index);
                 index++;
-                if (index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyInfos' data!\nObject Reference: "+ref);
-                    return false;
-                }
+                checkvalue((index < reader.getNumElements()), "characterPropertyInfos");
                 temp.type = reader.getElementValueAt(index);
                 characterPropertyInfos.append(temp);
-                if (!Type.contains(temp.type)){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nInvalid variable type read!\nObject Reference: "+ref);
-                    return false;
-                }
+                checkvalue(Type.contains(temp.type), "type");
             }
         }else if (text == "numBonesPerLod"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'numBonesPerLod' data!\nObject Reference: "+ref);
-                return false;
-            }
-            index++;
-            if (index >= reader.getNumElements()){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'numBonesPerLod' data!\nObject Reference: "+ref);
-                return false;
-            }
-            for (int i = 0; i < numElems; i++){
-                index++;
-                if (index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'numBonesPerLod' data!\nObject Reference: "+ref);
-                    return false;
-                }
+            checkvalue(ok, "numBonesPerLod");
+            (numElems > 0) ? index++ : NULL;
+            checkvalue((index < reader.getNumElements()), "numBonesPerLod");
+            for (auto i = 0; i < numElems; i++, index++){
+                checkvalue((index < reader.getNumElements()), "numBonesPerLod");
                 numBonesPerLod.append(reader.getElementValueAt(index).toInt(&ok));
-                if (!ok){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'numBonesPerLod' data!\nObject Reference: "+ref);
-                    return false;
-                }
+                checkvalue(ok, "numBonesPerLod");
             }
-            index--;
         }else if (text == "characterPropertyValues"){
-            if (!characterPropertyValues.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'characterPropertyValues' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(characterPropertyValues.readShdPtrReference(index, reader), "characterPropertyValues");
         }else if (text == "footIkDriverInfo"){
-            if (!footIkDriverInfo.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'footIkDriverInfo' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(footIkDriverInfo.readShdPtrReference(index, reader), "footIkDriverInfo");
         }else if (text == "handIkDriverInfo"){
-            if (!handIkDriverInfo.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'handIkDriverInfo' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(handIkDriverInfo.readShdPtrReference(index, reader), "handIkDriverInfo");
         }else if (text == "stringData"){
-            if (!stringData.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'stringData' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(stringData.readShdPtrReference(index, reader), "stringData");
         }else if (text == "mirroredSkeletonInfo"){
-            if (!mirroredSkeletonInfo.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'mirroredSkeletonInfo' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(mirroredSkeletonInfo.readShdPtrReference(index, reader), "mirroredSkeletonInfo");
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbCharacterData::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
+        QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    std::lock_guard <std::mutex> guard(mutex);
+    if (writer && !getIsWritten()){
         QString refString = "null";
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("characterControllerInfo"), "");
+        writedatafield("characterControllerInfo", "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("capsuleHeight"), QString::number(characterControllerInfo.capsuleHeight, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("capsuleRadius"), QString::number(characterControllerInfo.capsuleRadius, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("collisionFilterInfo"), QString::number(characterControllerInfo.collisionFilterInfo, char('f'), 6));
-        if (characterControllerInfo.characterControllerCinfo.data()){
-            refString = characterControllerInfo.characterControllerCinfo.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("characterControllerCinfo"), refString);
+        writedatafield("capsuleHeight", QString::number(characterControllerInfo.capsuleHeight, char('f'), 6));
+        writedatafield("capsuleRadius", QString::number(characterControllerInfo.capsuleRadius, char('f'), 6));
+        writedatafield("collisionFilterInfo", QString::number(characterControllerInfo.collisionFilterInfo));
+        writeref(characterControllerInfo.characterControllerCinfo, "characterControllerCinfo");
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
         list1 = {writer->name, writer->numelements};
         list2 = {"characterPropertyInfos", QString::number(characterPropertyInfos.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < characterPropertyInfos.size(); i++){
+        for (auto i = 0; i < characterPropertyInfos.size(); i++){
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("role"), "");
+            writedatafield("role", "");
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("role"), characterPropertyInfos.at(i).role.role);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("flags"), characterPropertyInfos.at(i).role.flags);
+            writedatafield("role", characterPropertyInfos.at(i).role.role);
+            writedatafield("flags", characterPropertyInfos.at(i).role.flags);
             writer->writeLine(writer->object, false);
             writer->writeLine(writer->parameter, false);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("type"), characterPropertyInfos.at(i).type);
+            writedatafield("type", characterPropertyInfos.at(i).type);
             writer->writeLine(writer->object, false);
         }
         if (characterPropertyInfos.size() > 0){
@@ -430,125 +328,92 @@ bool hkbCharacterData::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"numBonesPerLod", QString::number(numBonesPerLod.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < numBonesPerLod.size(); i++){
+        for (auto i = 0; i < numBonesPerLod.size(); i++){
             writer->writeLine(writer->string, QStringList(), QStringList(), QString::number(numBonesPerLod.at(i)));
         }
         if (numBonesPerLod.size() > 0){
             writer->writeLine(writer->parameter, false);
         }
-        if (characterPropertyValues.data()){
-            refString = characterPropertyValues.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("characterPropertyValues"), refString);
-        if (footIkDriverInfo.data()){
-            refString = footIkDriverInfo.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("footIkDriverInfo"), refString);
-        if (handIkDriverInfo.data()){
-            refString = handIkDriverInfo.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("handIkDriverInfo"), refString);
-        if (stringData.data()){
-            refString = stringData.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("stringData"), refString);
-        if (mirroredSkeletonInfo.data()){
-            refString = mirroredSkeletonInfo.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("mirroredSkeletonInfo"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("scale"), QString::number(scale, char('f'), 6));
+        writedatafield("scale", QString::number(scale, char('f'), 6));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (characterPropertyValues.data() && !characterPropertyValues.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'characterPropertyValues'!!!");
-        }
-        if (footIkDriverInfo.data() && !footIkDriverInfo.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'footIkDriverInfo'!!!");
-        }
-        if (handIkDriverInfo.data() && !handIkDriverInfo.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'handIkDriverInfo'!!!");
-        }
-        if (stringData.data() && !stringData.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'stringData'!!!");
-        }
-        if (mirroredSkeletonInfo.data() && !mirroredSkeletonInfo.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'mirroredSkeletonInfo'!!!");
-        }
+        writeref(characterPropertyValues, "characterPropertyValues");
+        writeref(footIkDriverInfo, "footIkDriverInfo");
+        writeref(handIkDriverInfo, "handIkDriverInfo");
+        writeref(stringData, "stringData");
+        writeref(mirroredSkeletonInfo, "mirroredSkeletonInfo");
     }
     return true;
 }
 
 bool hkbCharacterData::link(){
-    if (!getParentFile()){
-        return false;
-    }
-    HkxSharedPtr *ptr = &static_cast<CharacterFile *>(getParentFile())->characterPropertyValues;
-    if ((*ptr).data() && (*ptr)->getSignature() != HKB_VARIABLE_VALUE_SET){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'characterPropertyValues' data field is linked to invalid child!\n");
-        setDataValidity(false);
-        characterPropertyValues = *ptr;
-    }else{
-        characterPropertyValues = *ptr;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    HkxSharedPtr *ptr;
+    auto linkptr = [&](HkxSignature sig, HkxSharedPtr & shdptr, const QString & fieldname){
+        if (!(*ptr).data() || (*ptr)->getSignature() != sig){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'"+fieldname+"' data field is linked to invalid child!\n");
+            setDataValidity(false);
+        }
+        shdptr = *ptr;
+    };
+    ptr = &static_cast<CharacterFile *>(getParentFile())->characterPropertyValues;
+    linkptr(HKB_VARIABLE_VALUE_SET, characterPropertyValues, "characterPropertyValues");
     ptr = &static_cast<CharacterFile *>(getParentFile())->footIkDriverInfo;
-    if ((*ptr).data() && (*ptr)->getSignature() != HKB_FOOT_IK_DRIVER_INFO){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'footIkDriverInfo' data field is linked to invalid child!\n");
-        setDataValidity(false);
-        footIkDriverInfo = *ptr;
-    }else{
-        footIkDriverInfo = *ptr;
-    }
+    linkptr(HKB_FOOT_IK_DRIVER_INFO, footIkDriverInfo, "footIkDriverInfo");
     ptr = &static_cast<CharacterFile *>(getParentFile())->handIkDriverInfo;
-    if ((*ptr).data() && (*ptr)->getSignature() != HKB_HAND_IK_DRIVER_INFO){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'handIkDriverInfo' data field is linked to invalid child!\n");
-        setDataValidity(false);
-        handIkDriverInfo = *ptr;
-    }else{
-        handIkDriverInfo = *ptr;
-    }
+    linkptr(HKB_HAND_IK_DRIVER_INFO, handIkDriverInfo, "handIkDriverInfo");
     ptr = &static_cast<CharacterFile *>(getParentFile())->stringData;
-    if ((*ptr).data() && (*ptr)->getSignature() != HKB_CHARACTER_STRING_DATA){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'stringData' data field is linked to invalid child!\n");
-        setDataValidity(false);
-        stringData = *ptr;
-    }else{
-        stringData = *ptr;
-    }
+    linkptr(HKB_CHARACTER_STRING_DATA, stringData, "stringData");
     ptr = &static_cast<CharacterFile *>(getParentFile())->mirroredSkeletonInfo;
-    if ((*ptr).data() && (*ptr)->getSignature() != HKB_MIRRORED_SKELETON_INFO){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'mirroredSkeletonInfo' data field is linked to invalid child!\n");
-        setDataValidity(false);
-        mirroredSkeletonInfo = *ptr;
-    }else{
-        mirroredSkeletonInfo = *ptr;
-    }
+    linkptr(HKB_MIRRORED_SKELETON_INFO, mirroredSkeletonInfo, "mirroredSkeletonInfo");
     return true;
 }
 
 QStringList hkbCharacterData::getCharacterPropertyNames() const{
-    return static_cast<hkbCharacterStringData *>(stringData.data())->characterPropertyNames;
+    std::lock_guard <std::mutex> guard(mutex);
+    hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
+    if (strData){
+        return strData->getCharacterPropertyNames();
+    }else{
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
+    }
+    return QStringList();
+}
+
+QString hkbCharacterData::getCharacterPropertyNameAt(int index) const{
+    std::lock_guard <std::mutex> guard(mutex);
+    hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
+    if (strData){
+        return strData->getCharacterPropertyNameAt(index);
+    }else{
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
+    }
+    return "";
+}
+
+QString hkbCharacterData::getLastCharacterPropertyName() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
+    if (strData){
+        return strData->getLastCharacterPropertyName();
+    }else{
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
+    }
+    return "";
 }
 
 QStringList hkbCharacterData::getCharacterPropertyTypenames() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QStringList list;
-    for (int i = 0; i < characterPropertyInfos.size(); i++){
+    for (auto i = 0; i < characterPropertyInfos.size(); i++){
         list.append(characterPropertyInfos.at(i).type);
     }
     return list;
 }
 
 bool hkbCharacterData::merge(HkxObject *recessiveobj){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterData *otherdata;
     hkbCharacterStringData *otherstrings;
     hkbVariableValueSet *othervalues;
@@ -614,33 +479,20 @@ bool hkbCharacterData::merge(HkxObject *recessiveobj){
 }
 
 hkVariableType hkbCharacterData::getCharacterPropertyTypeAt(int index) const{
-    if (index < characterPropertyInfos.size() && index >= 0){
-        QString type = characterPropertyInfos.at(index).type;
-        if (type == "VARIABLE_TYPE_BOOL"){
-            return VARIABLE_TYPE_BOOL;
-        }else if (type == "VARIABLE_TYPE_INT8"){
-            return VARIABLE_TYPE_INT8;
-        }else if (type == "VARIABLE_TYPE_INT16"){
-            return VARIABLE_TYPE_INT16;
-        }else if (type == "VARIABLE_TYPE_INT32"){
-            return VARIABLE_TYPE_INT32;
-        }else if (type == "VARIABLE_TYPE_REAL"){
-            return VARIABLE_TYPE_REAL;
-        }else if (type == "VARIABLE_TYPE_POINTER"){
-            return VARIABLE_TYPE_POINTER;
-        }else if (type == "VARIABLE_TYPE_VECTOR4"){
-            return VARIABLE_TYPE_VECTOR4;
-        }else if (type == "VARIABLE_TYPE_QUATERNION"){
-            return VARIABLE_TYPE_QUATERNION;
-        }
+    std::lock_guard <std::mutex> guard(mutex);
+    int type;
+    if (characterPropertyInfos.size() > index && index > -1){
+        type = Type.indexOf(characterPropertyInfos.at(index).type);
     }
-    return VARIABLE_TYPE_INT8;
+    (type == -1) ? type = VARIABLE_TYPE_INT8 : NULL;
+    return (hkVariableType)type;
 }
 
-QString hkbCharacterData::evaluateDataValidity(){
-    if ((!characterPropertyValues.data() || characterPropertyValues.data()->getSignature() != HKB_VARIABLE_VALUE_SET) || (footIkDriverInfo.data() && footIkDriverInfo.data()->getSignature() != HKB_FOOT_IK_DRIVER_INFO) ||
-            (handIkDriverInfo.data() && handIkDriverInfo.data()->getSignature() != HKB_HAND_IK_DRIVER_INFO) || (!stringData.data() || stringData.data()->getSignature() != HKB_CHARACTER_STRING_DATA) ||
-            (!mirroredSkeletonInfo.data() || mirroredSkeletonInfo.data()->getSignature() != HKB_MIRRORED_SKELETON_INFO))
+QString hkbCharacterData::evaluateDataValidity(){   //TO DO: finish....
+    std::lock_guard <std::mutex> guard(mutex);
+    if ((!characterPropertyValues.data() || characterPropertyValues->getSignature() != HKB_VARIABLE_VALUE_SET) || (footIkDriverInfo.data() && footIkDriverInfo->getSignature() != HKB_FOOT_IK_DRIVER_INFO) ||
+            (handIkDriverInfo.data() && handIkDriverInfo->getSignature() != HKB_HAND_IK_DRIVER_INFO) || (!stringData.data() || stringData->getSignature() != HKB_CHARACTER_STRING_DATA) ||
+            (!mirroredSkeletonInfo.data() || mirroredSkeletonInfo->getSignature() != HKB_MIRRORED_SKELETON_INFO))
     {
         setDataValidity(false);
         return QString();

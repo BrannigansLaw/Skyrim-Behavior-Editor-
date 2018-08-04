@@ -1,48 +1,45 @@
 #include "hkbstringeventpayload.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
-/**
- * hkbStringEventPayload
- */
 
 uint hkbStringEventPayload::refCount = 0;
 
-QString hkbStringEventPayload::classname = "hkbStringEventPayload";
+const QString hkbStringEventPayload::classname = "hkbStringEventPayload";
 
 hkbStringEventPayload::hkbStringEventPayload(HkxFile *parent, const QString &string, long ref)
     : HkxObject(parent, ref),
       data(string)
 {
     setType(HKB_STRING_EVENT_PAYLOAD, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
-QString hkbStringEventPayload::getClassname(){
+const QString hkbStringEventPayload::getClassname(){
     return classname;
 }
 
-bool hkbStringEventPayload::readData(const HkxXmlReader & reader, long index){
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+bool hkbStringEventPayload::readData(const HkxXmlReader & reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "data"){
             data = reader.getElementValueAt(index);
-            if (data == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'data' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((data != ""), "data");
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbStringEventPayload::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
@@ -54,10 +51,21 @@ bool hkbStringEventPayload::write(HkxXMLWriter *writer){
     return true;
 }
 
+void hkbStringEventPayload::setData(const QString &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    data = value;
+}
+
+QString hkbStringEventPayload::getData() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return data;
+}
+
 QString hkbStringEventPayload::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     if (data == ""){
         setDataValidity(false);
-        return QString();
+        return QString(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid 'data': "+data+"!\n");
     }
     setDataValidity(true);
     return QString();

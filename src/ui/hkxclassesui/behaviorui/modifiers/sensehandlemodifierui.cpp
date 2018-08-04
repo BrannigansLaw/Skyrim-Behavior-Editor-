@@ -266,7 +266,7 @@ void SenseHandleModifierUI::disconnectSignals(){
 void SenseHandleModifierUI::addRange(){
     if (bsData){
         bsData->ranges.append(hkbSenseHandleModifier::hkRanges());
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
         loadDynamicTableRows();
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::addRange(): The data is nullptr!!");
@@ -282,7 +282,7 @@ void SenseHandleModifierUI::removeRange(int index){
                 WARNING_MESSAGE("SenseHandleModifierUI::removeExpression(): Invalid row index selected!!");
                 return;
             }
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             loadDynamicTableRows();
         }else{
             WARNING_MESSAGE("SenseHandleModifierUI::removeExpression(): Ranges is empty!!");
@@ -358,7 +358,7 @@ void SenseHandleModifierUI::loadData(HkxObject *data){
             extrapolateSensorPosition->setChecked(bsData->extrapolateSensorPosition);
             keepFirstSensedHandle->setChecked(bsData->keepFirstSensedHandle);
             foundHandleOut->setChecked(bsData->foundHandleOut);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
                 loadBinding(SENSOR_LOCAL_OFFSET_ROW, BINDING_COLUMN, varBind, "sensorLocalOffset");
@@ -405,7 +405,7 @@ void SenseHandleModifierUI::loadDynamicTableRows(){
         if (table->rowCount() != temp){
             table->setRowCount(temp);
         }
-        for (int i = ADD_RANGE_ROW + 1, j = 0; j < bsData->getNumberOfRanges(); i++, j++){
+        for (auto i = ADD_RANGE_ROW + 1, j = 0; j < bsData->getNumberOfRanges(); i++, j++){
             setRowItems(i, "Range "+QString::number(j), "hkRange", "Remove", "Edit", "Double click to remove this range", "Double click to edit this range");
         }
     }else{
@@ -438,16 +438,16 @@ void SenseHandleModifierUI::setRowItems(int row, const QString & name, const QSt
 }
 
 bool SenseHandleModifierUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -459,7 +459,7 @@ bool SenseHandleModifierUI::setBinding(int index, int row, const QString & varia
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -555,7 +555,7 @@ void SenseHandleModifierUI::setBindingVariable(int index, const QString & name){
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setBindingVariable(): The data is nullptr!!");
     }
@@ -572,7 +572,7 @@ void SenseHandleModifierUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit modifierNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setName(): The data is nullptr!!");
@@ -582,7 +582,7 @@ void SenseHandleModifierUI::setName(){
 void SenseHandleModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setEnable(): The data is nullptr!!");
     }
@@ -592,7 +592,7 @@ void SenseHandleModifierUI::setSensorLocalOffset(){
     if (bsData){
         if (bsData->sensorLocalOffset != sensorLocalOffset->value()){
             bsData->sensorLocalOffset = sensorLocalOffset->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensorLocalOffset(): The data is nullptr!!");
@@ -603,7 +603,7 @@ void SenseHandleModifierUI::setMinDistance(){
     if (bsData){
         if (bsData->minDistance != minDistance->value()){
             bsData->minDistance = minDistance->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setMinDistance(): The data is nullptr!!");
@@ -614,7 +614,7 @@ void SenseHandleModifierUI::setMaxDistance(){
     if (bsData){
         if (bsData->maxDistance != maxDistance->value()){
             bsData->maxDistance = maxDistance->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setMaxDistance(): The data is nullptr!!");
@@ -625,7 +625,7 @@ void SenseHandleModifierUI::setDistanceOut(){
     if (bsData){
         if (bsData->distanceOut != distanceOut->value()){
             bsData->distanceOut = distanceOut->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setDistanceOut(): The data is nullptr!!");
@@ -635,7 +635,7 @@ void SenseHandleModifierUI::setDistanceOut(){
 void SenseHandleModifierUI::setLocalFrameName(const QString & text){
     if (bsData){
         bsData->localFrameName = text;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setLocalFrameName(): The data is nullptr!!");
     }
@@ -644,7 +644,7 @@ void SenseHandleModifierUI::setLocalFrameName(const QString & text){
 void SenseHandleModifierUI::setSensorLocalFrameName(const QString & text){
     if (bsData){
         bsData->sensorLocalFrameName = text;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensorLocalFrameName(): The data is nullptr!!");
     }
@@ -653,7 +653,7 @@ void SenseHandleModifierUI::setSensorLocalFrameName(const QString & text){
 void SenseHandleModifierUI::setCollisionFilterInfo(int index){
     if (bsData){
         bsData->collisionFilterInfo = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setCollisionFilterInfo(): The data is nullptr!!");
     }
@@ -665,7 +665,7 @@ void SenseHandleModifierUI::setSensorRagdollBoneIndex(int index){
         if (bsData->sensorRagdollBoneIndex > -1){   //sensorRagdollBoneIndex and sensorAnimationBoneIndex cannot simultaneously have nonnegative values!!!
             setSensorAnimationBoneIndex(-1);
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensorRagdollBoneIndex(): The data is nullptr!!");
     }
@@ -677,7 +677,7 @@ void SenseHandleModifierUI::setSensorAnimationBoneIndex(int index){
         if (bsData->sensorAnimationBoneIndex > -1){   //sensorRagdollBoneIndex and sensorAnimationBoneIndex cannot simultaneously have nonnegative values!!!
             setSensorRagdollBoneIndex(-1);
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensorAnimationBoneIndex(): The data is nullptr!!");
     }
@@ -686,7 +686,7 @@ void SenseHandleModifierUI::setSensorAnimationBoneIndex(int index){
 void SenseHandleModifierUI::setSensingMode(int index){
     if (bsData){
         bsData->sensingMode = bsData->SensingMode.at(index);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setSensingMode(): The data is nullptr!!");
     }
@@ -695,7 +695,7 @@ void SenseHandleModifierUI::setSensingMode(int index){
 void SenseHandleModifierUI::setExtrapolateSensorPosition(){
     if (bsData){
         bsData->extrapolateSensorPosition = extrapolateSensorPosition->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setExtrapolateSensorPosition(): The data is nullptr!!");
     }
@@ -704,7 +704,7 @@ void SenseHandleModifierUI::setExtrapolateSensorPosition(){
 void SenseHandleModifierUI::setKeepFirstSensedHandle(){
     if (bsData){
         bsData->keepFirstSensedHandle = keepFirstSensedHandle->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setKeepFirstSensedHandle(): The data is nullptr!!");
     }
@@ -713,7 +713,7 @@ void SenseHandleModifierUI::setKeepFirstSensedHandle(){
 void SenseHandleModifierUI::setFoundHandleOut(){
     if (bsData){
         bsData->foundHandleOut = foundHandleOut->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::setFoundHandleOut(): The data is nullptr!!");
     }
@@ -857,7 +857,7 @@ void SenseHandleModifierUI::connectToTables(GenericTableWidget *variables, Gener
     }
 }
 
-void SenseHandleModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void SenseHandleModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -865,7 +865,7 @@ void SenseHandleModifierUI::loadBinding(int row, int colunm, hkbVariableBindingS
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -873,7 +873,7 @@ void SenseHandleModifierUI::loadBinding(int row, int colunm, hkbVariableBindingS
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("SenseHandleModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }
@@ -885,14 +885,14 @@ void SenseHandleModifierUI::loadBinding(int row, int colunm, hkbVariableBindingS
 void SenseHandleModifierUI::selectTableToView(bool viewproperties, const QString & path){
     if (bsData){
         if (viewproperties){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -921,7 +921,7 @@ void SenseHandleModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
         if (currentIndex() == MAIN_WIDGET){
-            bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            bind = bsData->getVariableBindingSetData();
             if (bind){
                 bindIndex = bind->getVariableIndexOfBinding("enable");
                 if (bindIndex == index){

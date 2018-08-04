@@ -6,12 +6,11 @@
 
 class TreeGraphicsItem;
 
-class hkbModifier: public DataIconManager//, public DataIconManager
+class hkbModifier: public DataIconManager
 {
-    friend class BehaviorGraphView;
     friend class TreeGraphicsItem;
 public:
-    virtual ~hkbModifier();
+    ~hkbModifier();
     bool link();
     virtual QString getName() const;
     QString getClassname() const;

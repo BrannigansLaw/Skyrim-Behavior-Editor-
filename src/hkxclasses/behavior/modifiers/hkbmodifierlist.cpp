@@ -1,14 +1,11 @@
 #include "hkbmodifierlist.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
-
-/*
- * CLASS: hkbModifierList
-*/
+#include "src/hkxclasses/behavior/hkbvariablebindingset.h"
 
 uint hkbModifierList::refCount = 0;
 
-QString hkbModifierList::classname = "hkbModifierList";
+const QString hkbModifierList::classname = "hkbModifierList";
 
 hkbModifierList::hkbModifierList(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -16,42 +13,35 @@ hkbModifierList::hkbModifierList(HkxFile *parent, long ref)
       enable(true)
 {
     setType(HKB_MODIFIER_LIST, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "ModifierList"+QString::number(refCount);
+    name = "ModifierList_"+QString::number(refCount);
 }
 
-QString hkbModifierList::getClassname(){
+const QString hkbModifierList::getClassname(){
     return classname;
 }
 
 QString hkbModifierList::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-int hkbModifierList::getIndexToInsertIcon() const{
-    for (int i = 0; i < modifiers.size(); i++){
-        if (!modifiers.at(i).constData()){
-            return 1 + i;
-        }
-    }
-    return -1;
-}
-
 bool hkbModifierList::insertObjectAt(int index, DataIconManager *obj){
-    if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (obj && obj->getType() == TYPE_MODIFIER){
         if (index >= modifiers.size() || index == -1){
             modifiers.append(HkxSharedPtr(obj));
         }else if (index == 0 || !modifiers.isEmpty()){
             modifiers.replace(index, HkxSharedPtr(obj));
         }
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 bool hkbModifierList::removeObjectAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
     if (index > -1 && index < modifiers.size()){
         modifiers.removeAt(index);
     }else if (index == -1){
@@ -63,7 +53,8 @@ bool hkbModifierList::removeObjectAt(int index){
 }
 
 bool hkbModifierList::hasChildren() const{
-    for (int i = 0; i < modifiers.size(); i++){
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < modifiers.size(); i++){
         if (modifiers.at(i).data()){
             return true;
         }
@@ -71,22 +62,23 @@ bool hkbModifierList::hasChildren() const{
     return false;
 }
 
-bool hkbModifierList::merge(HkxObject *recessiveObject){
+bool hkbModifierList::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     hkbModifierList *recobj = nullptr;
     bool found;
     int size = modifiers.size();
-    QList <DataIconManager *> objects;
-    QList <DataIconManager *> children;
+    QVector <DataIconManager *> objects;
+    QVector <DataIconManager *> children;
     QVector <HkxObject *> othertypes;
     hkbModifier *modifier = nullptr;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_MODIFIER_LIST){
         recobj = static_cast<hkbModifierList *>(recessiveObject);
-        if (variableBindingSet.data()){
-            variableBindingSet.data()->merge(recobj->variableBindingSet.data());
-        }else if (recobj->variableBindingSet.data()){
-            variableBindingSet = HkxSharedPtr(recobj->variableBindingSet.data());
+        if (getVariableBindingSetData()){
+            getVariableBindingSet()->merge(recobj->getVariableBindingSetData());
+        }else if (recobj->getVariableBindingSetData()){
+            getVariableBindingSet() = HkxSharedPtr(recobj->getVariableBindingSetData());
             recobj->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
-            getParentFile()->addObjectToFile(recobj->variableBindingSet.data(), -1);
+            getParentFile()->addObjectToFile(recobj->getVariableBindingSetData(), -1);
         }
         for (auto i = 0; i < recobj->modifiers.size(); i++){
             found = false;
@@ -98,7 +90,7 @@ bool hkbModifierList::merge(HkxObject *recessiveObject){
             if (!found){
                 modifiers.append(recobj->modifiers.at(i));
                 getParentFile()->addObjectToFile(recobj->modifiers.at(i).data(), -1);
-                othertypes = recobj->modifiers.at(i).data()->getChildrenOtherTypes();
+                othertypes = recobj->modifiers.at(i)->getChildrenOtherTypes();
                 for (auto k = 0; k < othertypes.size(); k++){
                     getParentFile()->addObjectToFile(othertypes.at(k), -1);
                 }
@@ -122,87 +114,87 @@ bool hkbModifierList::merge(HkxObject *recessiveObject){
             }
         }
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
-QList<DataIconManager *> hkbModifierList::getChildren() const{
-    QList<DataIconManager *> list;
-    for (int i = 0; i < modifiers.size(); i++){
-        if (modifiers.at(i).data()){
-            list.append(static_cast<DataIconManager*>(modifiers.at(i).data()));
-        }
+QVector<DataIconManager *> hkbModifierList::getChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QVector<DataIconManager *> list;
+    for (auto i = 0; i < modifiers.size(); i++){
+        (modifiers.at(i).data()) ? list.append(static_cast<DataIconManager*>(modifiers.at(i).data())) : NULL;
     }
     return list;
 }
 
 int hkbModifierList::getIndexOfObj(DataIconManager *obj) const{
-    for (int i = 0; i < modifiers.size(); i++){
-        if (modifiers.at(i).data() == (HkxObject *)obj){
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < modifiers.size(); i++){
+        if (modifiers.at(i).data() == obj){
             return i;
         }
     }
     return -1;
 }
 
-bool hkbModifierList::readData(const HkxXmlReader &reader, long index){
+bool hkbModifierList::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "modifiers"){
-            if (!readReferences(reader.getElementValueAt(index), modifiers)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'modifiers' references!\nObject Reference: "+ref);
-            }
+            checkvalue(readReferences(reader.getElementValueAt(index), modifiers), "modifiers");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbModifierList::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QString refString = "null";
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
+        if (getVariableBindingSetData()){
+            refString = getVariableBindingSet()->getReferenceString();
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
+        writedatafield("variableBindingSet", refString);
+        writedatafield("userData", QString::number(userData));
+        writedatafield("name", name);
+        writedatafield("enable", getBoolAsString(enable));
         refString = "";
         list1 = {writer->name, writer->numelements};
         list2 = {"modifiers", QString::number(modifiers.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0, j = 1; i < modifiers.size(); i++, j++){
-            refString.append(modifiers.at(i).data()->getReferenceString());
+        for (auto i = 0, j = 1; i < modifiers.size(); i++, j++){
+            refString.append(modifiers.at(i)->getReferenceString());
             if (j % 16 == 0){
                 refString.append("\n");
             }else{
@@ -211,7 +203,7 @@ bool hkbModifierList::write(HkxXMLWriter *writer){
         }
         if (modifiers.size() > 0){
             if (refString.endsWith(" \0")){
-                refString.remove(refString.lastIndexOf(" "), 1);
+                refString.remove(refString.lastIndexOf(" ", 1));
             }
             writer->writeLine(refString);
             writer->writeLine(writer->parameter, false);
@@ -219,33 +211,27 @@ bool hkbModifierList::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        for (int i = 0; i < modifiers.size(); i++){
-            if (modifiers.at(i).data() && !modifiers.at(i).data()->write(writer)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'modifiers' at: "+QString::number(i)+"!!!");
-            }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        for (auto i = 0; i < modifiers.size(); i++){
+            writechild(modifiers.at(i), "modifiers.at("+QString::number(i)+")");
         }
     }
     return true;
 }
 
 bool hkbModifierList::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
-    for (int i = 0; i < modifiers.size(); i++){
+    for (auto i = 0; i < modifiers.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(modifiers.at(i).getShdPtrReference());
-        if (!ptr){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'modifiers' data field!\nObject Name: "+name);
+        if (!ptr || !ptr->data()){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'modifiers' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if ((*ptr)->getType() != TYPE_MODIFIER){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'modifiers' data field is linked to invalid child!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'modifiers' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             modifiers[i] = *ptr;
         }else{
@@ -256,38 +242,40 @@ bool hkbModifierList::link(){
 }
 
 void hkbModifierList::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
-    for (int i = 0; i < modifiers.size(); i++){
+    for (auto i = 0; i < modifiers.size(); i++){
         modifiers[i] = HkxSharedPtr();
     }
 }
 
 QString hkbModifierList::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     if (modifiers.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": modifiers is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": modifiers is empty!\n");
     }else{
-        for (int i = modifiers.size() - 1; i >= 0; i--){
+        for (auto i = modifiers.size() - 1; i >= 0; i--){
             if (!modifiers.at(i).data()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": modifiers at index '"+QString::number(i)+"' is null! Removing child!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": modifiers at index '"+QString::number(i)+"' is null! Removing child!\n");
                 modifiers.removeAt(i);
-            }else if (modifiers.at(i).data()->getType() != HkxObject::TYPE_MODIFIER){
+            }else if (modifiers.at(i)->getType() != HkxObject::TYPE_MODIFIER){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid state! Signature: "+QString::number(modifiers.at(i).data()->getSignature(), 16)+" Removing child!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid state! Signature: "+QString::number(modifiers.at(i)->getSignature(), 16)+" Removing child!\n");
                 modifiers.removeAt(i);
             }
         }
     }
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     setDataValidity(isvalid);
     return errors;

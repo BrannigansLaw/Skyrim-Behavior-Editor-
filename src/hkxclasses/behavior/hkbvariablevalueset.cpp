@@ -9,21 +9,82 @@
 
 uint hkbVariableValueSet::refCount = 0;
 
-QString hkbVariableValueSet::classname = "hkbVariableValueSet";
+const QString hkbVariableValueSet::classname = "hkbVariableValueSet";
 
 hkbVariableValueSet::hkbVariableValueSet(HkxFile *parent, long ref)
     : HkxObject(parent, ref)
 {
     setType(HKB_VARIABLE_VALUE_SET, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
-QString hkbVariableValueSet::getClassname(){
+const QString hkbVariableValueSet::getClassname(){
     return classname;
 }
 
-bool hkbVariableValueSet::readData(const HkxXmlReader &reader, long index){
+int hkbVariableValueSet::getWordVariableAt(int index) const{
+    std::lock_guard <std::mutex> guard(mutex);
+    if (wordVariableValues.size() > index && index > -1){
+        return wordVariableValues.at(index);
+    }
+    return -1;
+}
+
+HkxObject * hkbVariableValueSet::getVariantVariableValueAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (variantVariableValues.size() > index && index > -1){
+        return variantVariableValues.at(index).data();
+    }
+    return nullptr;
+}
+
+hkQuadVariable hkbVariableValueSet::getQuadVariableValueAt(int index, bool *ok){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (quadVariableValues.size() > index && index > -1){
+        (ok) ? *ok = true : NULL;
+        return quadVariableValues.at(index);
+    }
+    (ok) ? *ok = false : NULL;
+    return hkQuadVariable();
+}
+
+void hkbVariableValueSet::setQuadVariableValueAt(int index, const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (quadVariableValues.size() > index && index > -1) ? quadVariableValues.replace(index, value) : NULL;
+}
+
+void hkbVariableValueSet::setWordVariableAt(int index, int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (wordVariableValues.size() > index && index > -1) ? wordVariableValues.replace(index, value) : NULL;
+}
+
+void hkbVariableValueSet::removeWordVariableValueAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index > -1 && index < wordVariableValues.size()) ? wordVariableValues.removeAt(index) : NULL;
+}
+
+void hkbVariableValueSet::removeQuadVariableValueAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index > -1 && index < quadVariableValues.size()) ? quadVariableValues.removeAt(index) : NULL;
+}
+
+void hkbVariableValueSet::removeVariantVariableValueAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index > -1 && index < variantVariableValues.size()) ? variantVariableValues.removeAt(index) : NULL;
+}
+
+void hkbVariableValueSet::addQuadVariableValue(const hkQuadVariable &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    quadVariableValues.append(value);
+}
+
+void hkbVariableValueSet::addWordVariableValue(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    wordVariableValues.append(value);
+}
+
+bool hkbVariableValueSet::readData(const HkxXmlReader &reader, long & index){
     bool ok;
     int numElems = 0;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
@@ -33,19 +94,19 @@ bool hkbVariableValueSet::readData(const HkxXmlReader &reader, long index){
         if (text == "wordVariableValues"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
             index += 2;
             numElems = numElems*2 + index;
             for (; index < numElems; index += 2){
                 if (index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
                     return false;
                 }
                 wordVariableValues.append(reader.getElementValueAt(index).toInt(&ok));
                 if (!ok){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'wordVariableValues' data!\nObject Reference: "+ref);
                     return false;
                 }
             }
@@ -54,26 +115,27 @@ bool hkbVariableValueSet::readData(const HkxXmlReader &reader, long index){
         }else if (text == "quadVariableValues"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'quadVariableValues' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'quadVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
             if (numElems > 0 && !readMultipleVector4(reader.getElementValueAt(index), quadVariableValues)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'quadVariableValues' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'quadVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
         }else if (text == "variantVariableValues"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variantVariableValues' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'variantVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
             if (numElems > 0 && !readReferences(reader.getElementValueAt(index), variantVariableValues)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variantVariableValues' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'variantVariableValues' data!\nObject Reference: "+ref);
                 return false;
             }
         }
         index++;
     }
+    index--;
     return true;
 }
 
@@ -88,7 +150,7 @@ bool hkbVariableValueSet::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"wordVariableValues", QString::number(wordVariableValues.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < wordVariableValues.size(); i++){
+        for (auto i = 0; i < wordVariableValues.size(); i++){
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("value"), QString::number(wordVariableValues.at(i)));
             writer->writeLine(writer->object, false);
@@ -99,7 +161,7 @@ bool hkbVariableValueSet::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"quadVariableValues", QString::number(quadVariableValues.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < quadVariableValues.size(); i++){
+        for (auto i = 0; i < quadVariableValues.size(); i++){
             writer->writeLine(quadVariableValues[i].getValueAsString());
         }
         if (quadVariableValues.size() > 0){
@@ -109,8 +171,8 @@ bool hkbVariableValueSet::write(HkxXMLWriter *writer){
         list2 = {"variantVariableValues", QString::number(variantVariableValues.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
         QString refs;
-        for (int i = 0, j = 1; i < variantVariableValues.size(); i++, j++){
-            refs.append(variantVariableValues.at(i).data()->getReferenceString());
+        for (auto i = 0, j = 1; i < variantVariableValues.size(); i++, j++){
+            refs.append(variantVariableValues.at(i)->getReferenceString());
             if (j % 16 == 0){
                 refs.append("\n");
             }else{
@@ -127,9 +189,9 @@ bool hkbVariableValueSet::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        for (int i = 0; i < variantVariableValues.size(); i++){
+        for (auto i = 0; i < variantVariableValues.size(); i++){
             if (variantVariableValues.at(i).data()){
-                variantVariableValues.at(i).data()->write(writer);
+                variantVariableValues.at(i)->write(writer);
             }
         }
     }
@@ -141,10 +203,10 @@ bool hkbVariableValueSet::merge(HkxObject *recessiveobj){
         if (getSignature() == recessiveobj->getSignature()){
             //
         }else{
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": merge()!\n'recessiveobj' is not the correct type!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": merge()!\n'recessiveobj' is not the correct type!\n");
         }
     }else{
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": merge()!\n'recessiveobj' is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": merge()!\n'recessiveobj' is nullptr!\n");
     }
     return true;
 }
@@ -155,15 +217,15 @@ bool hkbVariableValueSet::link(){
     }
     HkxSharedPtr *ptr = nullptr;
     HkxFile *file = nullptr;
-    for (int i = 0; i < variantVariableValues.size(); i++){
+    for (auto i = 0; i < variantVariableValues.size(); i++){
         file = dynamic_cast<BehaviorFile *>(getParentFile());
         if (file){
             ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variantVariableValues.at(i).getShdPtrReference());
-            if (!ptr){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
+            if (!ptr || !ptr->data()){
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
                 setDataValidity(false);
             }else if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
                 setDataValidity(false);
                 variantVariableValues[i] = *ptr;
             }else{
@@ -173,11 +235,11 @@ bool hkbVariableValueSet::link(){
             file = dynamic_cast<CharacterFile *>(getParentFile());
             if (file){
                 ptr = static_cast<CharacterFile *>(getParentFile())->findCharacterPropertyValues(variantVariableValues.at(i).getShdPtrReference());
-                if (!ptr){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
+                if (!ptr || !ptr->data()){
+                    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
                     setDataValidity(false);
                 }else if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
+                    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
                     setDataValidity(false);
                     variantVariableValues[i] = *ptr;
                 }else{
@@ -190,8 +252,8 @@ bool hkbVariableValueSet::link(){
 }
 
 QString hkbVariableValueSet::evaluateDataValidity(){
-    for (int i = 0; i < variantVariableValues.size(); i++){
-        if (!variantVariableValues.at(i).data() || variantVariableValues.at(i).data()->getSignature() != HKB_BONE_WEIGHT_ARRAY){
+    for (auto i = 0; i < variantVariableValues.size(); i++){
+        if (!variantVariableValues.at(i).data() || variantVariableValues.at(i)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
             setDataValidity(false);
             return QString();
         }

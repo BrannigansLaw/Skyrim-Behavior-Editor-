@@ -3,19 +3,21 @@
 
 #include "src/filetypes/hkxfile.h"
 
-class AnimationFile: public HkxFile
+class AnimationFile final: public HkxFile
 {
-    friend class MainWindow;
 public:
     AnimationFile(MainWindow *window, const QString & name);
+    AnimationFile& operator=(const AnimationFile&) = delete;
+    AnimationFile(const AnimationFile &) = delete;
     qreal getDuration() const;
+    bool parse();
 protected:
     bool addObjectToFile(HkxObject *, long);
-    bool parse();
 private:
     qreal duration;
     //QVector <SkyrimAnimationTranslation> translations;
     //QVector <SkyrimAnimationRotation> rotations;
+    mutable std::mutex mutex;
 };
 
 #endif // ANIMATIONFILE_H

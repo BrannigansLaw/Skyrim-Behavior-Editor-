@@ -8,7 +8,7 @@ SkyrimAnimSetData::SkyrimAnimSetData()
 }
 
 SkyrimAnimSetData::~SkyrimAnimSetData(){
-    for (int i = 0; i < projects.size(); i++){
+    for (auto i = 0; i < projects.size(); i++){
         if (projects.at(i)){
             delete projects.at(i);
         }
@@ -43,7 +43,7 @@ bool SkyrimAnimSetData::parse(QFile *file){
                     return false;
                 }
             }
-            for (int i = 0; i < projectNames.size(); i++){
+            for (auto i = 0; i < projectNames.size(); i++){
                 projects.append(new AnimCacheProjectData());
                 if (!projects.last()->read(file)){
                     CRITICAL_ERROR_MESSAGE("SkyrimAnimSetData::parse(): ProjectAnimSetData read failed!");
@@ -65,10 +65,10 @@ bool SkyrimAnimSetData::write(const QString &filename){
     }
     QTextStream out(&file);
     out << QString::number(projectNames.size()) << "\n";
-    for (int i = 0; i < projectNames.size(); i++){
+    for (auto i = 0; i < projectNames.size(); i++){
         out << projectNames.at(i) << "\n";
     }
-    for (int i = 0; i < projects.size(); i++){
+    for (auto i = 0; i < projects.size(); i++){
         projects.at(i)->write(&file, out);
     }
     return true;
@@ -93,7 +93,7 @@ bool SkyrimAnimSetData::addAnimationToCache(const QString &projectname, const QS
     if (index < 0 || index >= projects.size()){
         return false;
     }
-    for (int i = 0; i < projects.at(index)->animSetData.size(); i++){
+    for (auto i = 0; i < projects.at(index)->animSetData.size(); i++){
         if (projects.at(index)->animSetData.at(i)->cacheEvents.contains(eventname)){
             count++;
             if (!projects[index]->animSetData[i]->addAnimationToCache(eventname, animations, vars, clips)){
@@ -112,14 +112,14 @@ bool SkyrimAnimSetData::removeAnimationFromCache(const QString & projectname, co
     if (index < 0 || index >= projects.size()){
         return false;
     }
-    for (int i = 0; i < projects.at(index)->animSetData.size(); i++){
+    for (auto i = 0; i < projects.at(index)->animSetData.size(); i++){
         projects[index]->animSetData[i]->removeAnimationFromCache(animationname, clipname, variablename);
     }
     return true;
 }
 
 AnimCacheProjectData *SkyrimAnimSetData::getProjectCacheData(const QString & name){
-    for (int i = 0; i < projectNames.size(); i++){
+    for (auto i = 0; i < projectNames.size(); i++){
         if (projectNames.at(i).contains(name, Qt::CaseInsensitive)){
             return projects.at(i);
         }
@@ -132,12 +132,12 @@ bool SkyrimAnimSetData::mergeAnimationCaches(const QString &projectname, const Q
     AnimCacheProjectData *thisdata = nullptr;
     AnimCacheProjectData *recessivedata = nullptr;
     if (recessiveprojectdata){
-        for (int i = 0; i < projectNames.size(); i++){
+        for (auto i = 0; i < projectNames.size(); i++){
             if (projectNames.at(i).contains(projectname, Qt::CaseInsensitive)){
                 thisdata = projects.at(i);
             }
         }
-        for (int i = 0; i < recessiveprojectdata->projectNames.size(); i++){
+        for (auto i = 0; i < recessiveprojectdata->projectNames.size(); i++){
             if (recessiveprojectdata->projectNames.at(i).contains(recessiveprojectname, Qt::CaseInsensitive)){
                 recessivedata = recessiveprojectdata->projects.at(i);
             }

@@ -5,33 +5,42 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbVariableValueSet: public HkxObject
+class hkbVariableValueSet final: public HkxObject
 {
     friend class hkbBehaviorGraphData;
-    friend class BehaviorGraphView;
-    friend class BehaviorVariablesUI;
     friend class hkbCharacterData;
+    friend class BehaviorVariablesUI;
     friend class CharacterPropertiesUI;
-    friend class BehaviorFile;
-    friend class CharacterFile;
+    //friend class CharacterFile;
 public:
     hkbVariableValueSet(HkxFile *parent, long ref = 0);
-    virtual ~hkbVariableValueSet();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbVariableValueSet& operator=(const hkbVariableValueSet&) = delete;
+    hkbVariableValueSet(const hkbVariableValueSet &) = delete;
+    ~hkbVariableValueSet();
+    static const QString getClassname();
+private:
+    int getWordVariableAt(int index) const;
+    HkxObject * getVariantVariableValueAt(int index);
+    hkQuadVariable getQuadVariableValueAt(int index, bool *ok = nullptr);
+    void setQuadVariableValueAt(int index, const hkQuadVariable & value);
+    void setWordVariableAt(int index, int value);
+    void removeWordVariableValueAt(int index);
+    void removeQuadVariableValueAt(int index);
+    void removeVariantVariableValueAt(int index);
+    void addQuadVariableValue(const hkQuadVariable & value);
+    void addWordVariableValue(int value);
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool merge(HkxObject *recessiveobj);
 private:
-    hkbVariableValueSet& operator=(const hkbVariableValueSet&);
-    hkbVariableValueSet(const hkbVariableValueSet &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     QVector <int> wordVariableValues;
     QVector <hkQuadVariable> quadVariableValues;
-    QList <HkxSharedPtr> variantVariableValues;
+    QVector <HkxSharedPtr> variantVariableValues;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBVARIABLEVALUESET_H

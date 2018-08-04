@@ -18,6 +18,7 @@ QString hkbGenerator::getName() const{
 }
 
 QString hkbGenerator::getClassname() const{
+    std::lock_guard <std::mutex> guard(mutex);
     switch (getSignature()){
     case HKB_STATE_MACHINE:
         return "hkbStateMachine";

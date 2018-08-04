@@ -7,34 +7,45 @@
 
 class HkxFile;
 
-class hkbCharacterStringData: public HkxObject
+class hkbCharacterStringData final: public HkxObject
 {
-    friend class BehaviorGraphView;
     friend class hkbCharacterData;
-    friend class CharacterFile;
-    friend class CharacterPropertiesUI;
-    friend class BehaviorFile;
     friend class AnimationsUI;
 public:
     hkbCharacterStringData(HkxFile *parent, long ref = 0);
-    virtual ~hkbCharacterStringData();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
-    QString evaluateDataValidity();
-    static QString getClassname();
-    bool write(HkxXMLWriter *writer);
+    hkbCharacterStringData& operator=(const hkbCharacterStringData&) = delete;
+    hkbCharacterStringData(const hkbCharacterStringData &) = delete;
+    ~hkbCharacterStringData();
+    int getAnimationIndex(const QString & name) const;
     QStringList getAnimationNames() const;
     QString getCharacterPropertyNameAt(int index) const;
-    void addAnimation(const QString &name = "");
     QString getAnimationNameAt(int index) const;
-    int getAnimationIndex(const QString & name) const;
-    bool merge(hkbCharacterStringData *obj);
+    QStringList getCharacterPropertyNames() const;
+    QString getLastCharacterPropertyName() const;
+    static const QString getClassname();
+    int getCharacterPropertyIndex(const QString &name) const;
+    void setName(const QString &value);
+    void setRigName(const QString &value);
+    void setRagdollName(const QString &value);
+    void setBehaviorFilename(const QString &value);
+    void addAnimation(const QString &name = "");
+    QString getBehaviorFilename() const;
+    QString getRigName() const;
+    QString getRagdollName() const;
+    int getNumberOfAnimations() const;
 private:
-    hkbCharacterStringData& operator=(const hkbCharacterStringData&);
-    hkbCharacterStringData(const hkbCharacterStringData &);
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
+    QString evaluateDataValidity();
+    void removeCharacterPropertyNameAt(int index);
+    void generateAppendCharacterPropertyName(const QString &type);
+    int addCharacterPropertyName(const QString & name, bool * wasadded = nullptr);
+    bool write(HkxXMLWriter *writer);
+    bool merge(hkbCharacterStringData *obj);
+    void setCharacterPropertyNameAt(int index, const QString &name);
 private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     QStringList deformableSkinNames;
     QStringList rigidSkinNames;
     QStringList animationNames;
@@ -48,6 +59,7 @@ private:
     QString rigName;
     QString ragdollName;
     QString behaviorFilename;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBCHARACTERSTRINGDATA_H

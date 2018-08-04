@@ -162,7 +162,7 @@ void TwistModifierUI::loadData(HkxObject *data){
             }
             rotationAxisCoordinates->setCurrentIndex(bsData->RotationAxisCoordinates.indexOf(bsData->rotationAxisCoordinates));
             isAdditive->setChecked(bsData->isAdditive);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
                 loadBinding(AXIS_OF_ROTATION_ROW, BINDING_COLUMN, varBind, "axisOfRotation");
@@ -192,7 +192,7 @@ void TwistModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -203,7 +203,7 @@ void TwistModifierUI::setName(){
 void TwistModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TwistModifierUI::setEnable(): The data is nullptr!!");
     }
@@ -213,7 +213,7 @@ void TwistModifierUI::setAxisOfRotation(){
     if (bsData){
         if (bsData->axisOfRotation != axisOfRotation->value()){
             bsData->axisOfRotation = axisOfRotation->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("TwistModifierUI::setaxisOfRotation(): The data is nullptr!!");
@@ -223,7 +223,7 @@ void TwistModifierUI::setAxisOfRotation(){
 void TwistModifierUI::setStartBoneIndex(int index){
     if (bsData){
         bsData->startBoneIndex = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TwistModifierUI::setStartBoneIndex(): The data is nullptr!!");
     }
@@ -232,7 +232,7 @@ void TwistModifierUI::setStartBoneIndex(int index){
 void TwistModifierUI::setEndBoneIndex(int index){
     if (bsData){
         bsData->endBoneIndex = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TwistModifierUI::setEndBoneIndex(): The data is nullptr!!");
     }
@@ -242,7 +242,7 @@ void TwistModifierUI::setTwistAngle(){
     if (bsData){
         if (bsData->twistAngle != twistAngle->value()){
             bsData->twistAngle = twistAngle->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("TwistModifierUI::settwistAngle(): The data is nullptr!!");
@@ -252,7 +252,7 @@ void TwistModifierUI::setTwistAngle(){
 void TwistModifierUI::setSetAngleMethod(int index){
     if (bsData){
         bsData->setAngleMethod = bsData->SetAngleMethod.at(index);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TwistModifierUI::setSetAngleMethod(): The data is nullptr!!");
     }
@@ -261,7 +261,7 @@ void TwistModifierUI::setSetAngleMethod(int index){
 void TwistModifierUI::setRotationAxisCoordinates(int index){
     if (bsData){
         bsData->rotationAxisCoordinates = bsData->RotationAxisCoordinates.at(index);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TwistModifierUI::setRotationAxisCoordinates(): The data is nullptr!!");
     }
@@ -270,7 +270,7 @@ void TwistModifierUI::setRotationAxisCoordinates(int index){
 void TwistModifierUI::setIsAdditive(){
     if (bsData){
         bsData->isAdditive = isAdditive->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TwistModifierUI::setIsAdditive(): The data is nullptr!!");
     }
@@ -329,14 +329,14 @@ void TwistModifierUI::viewSelected(int row, int column){
 void TwistModifierUI::selectTableToView(bool viewisProperty, const QString & path){
     if (bsData){
         if (viewisProperty){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -349,7 +349,7 @@ void TwistModifierUI::selectTableToView(bool viewisProperty, const QString & pat
 void TwistModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
         if (bind){
             int bindIndex = bind->getVariableIndexOfBinding("enable");
             if (bindIndex == index){
@@ -382,16 +382,16 @@ void TwistModifierUI::variableRenamed(const QString & name, int index){
 }
 
 bool TwistModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -403,7 +403,7 @@ bool TwistModifierUI::setBinding(int index, int row, const QString &variableName
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -457,13 +457,13 @@ void TwistModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TwistModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-void TwistModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void TwistModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -471,7 +471,7 @@ void TwistModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *va
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -479,7 +479,7 @@ void TwistModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *va
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("TwistModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }

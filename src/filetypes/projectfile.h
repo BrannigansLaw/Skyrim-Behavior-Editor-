@@ -85,7 +85,7 @@ private:
     std::mutex mutex;
     std::condition_variable conditionVar;
     CharacterFile *character;
-    QList <BehaviorFile *> behaviorFiles;
+    QVector <BehaviorFile *> behaviorFiles;
     HkxSharedPtr stringData;
     HkxSharedPtr projectData;
     long largestRef;

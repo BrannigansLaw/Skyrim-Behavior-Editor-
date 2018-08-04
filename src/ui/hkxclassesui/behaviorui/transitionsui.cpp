@@ -240,7 +240,7 @@ void TransitionsUI::loadData(BehaviorFile *parentfile, hkbStateMachine *parent, 
             transition->setText("nullptr");
         }
         if (bsData->condition.data()){
-            condition->setText(static_cast<hkbExpressionCondition *>(bsData->condition.data())->expression);
+            condition->setText(static_cast<hkbExpressionCondition *>(bsData->condition.data())->getExpression());
         }else{
             condition->setText("");
         }
@@ -280,7 +280,7 @@ void TransitionsUI::loadData(BehaviorFile *parentfile, hkbStateMachine *parent, 
                 flagAbutEndState->setChecked(true);
             }
         }else{
-            for (int i = 0; i < flags.size(); i++){
+            for (auto i = 0; i < flags.size(); i++){
                 if (flags.at(i) == "FLAG_IS_GLOBAL_WILDCARD"){
                     flagGlobalWildcard->setChecked(true);
                 }else if (flags.at(i) == "FLAG_IS_LOCAL_WILDCARD"){
@@ -324,7 +324,7 @@ void TransitionsUI::setTriggerIntervalEnterEventId(int index, const QString &nam
                 bsData->flags.remove(lastindex, lastindex + 1);
             }
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::setTriggerIntervalEnterEventId(): The data is nullptr!!");
     }
@@ -349,7 +349,7 @@ void TransitionsUI::setTriggerIntervalExitEventId(int index, const QString &name
                 bsData->flags.remove(lastindex, lastindex + 1);
             }
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::setTriggerIntervalExitEventId(): The data is nullptr!!");
     }
@@ -373,7 +373,7 @@ void TransitionsUI::setTriggerIntervalEnterTime(){
                 bsData->flags.remove(lastindex, lastindex + 1);
             }
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::setTriggerIntervalEnterTime(): The data is nullptr!!");
     }
@@ -397,7 +397,7 @@ void TransitionsUI::setTriggerIntervalExitTime(){
                 bsData->flags.remove(lastindex, lastindex + 1);
             }
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::setTriggerIntervalExitTime(): The data is nullptr!!");
     }
@@ -422,7 +422,7 @@ void TransitionsUI::setInitiateIntervalEnterEventId(int index, const QString &na
                 bsData->flags.remove(lastindex, lastindex + 1);
             }
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::setInitiateIntervalEnterEventId(): The data is nullptr!!");
     }
@@ -447,7 +447,7 @@ void TransitionsUI::setInitiateIntervalExitEventId(int index, const QString &nam
                 bsData->flags.remove(lastindex, lastindex + 1);
             }
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::setInitiateIntervalExitEventId(): The data is nullptr!!");
     }
@@ -471,7 +471,7 @@ void TransitionsUI::setInitiateIntervalEnterTime(){
                 bsData->flags.remove(lastindex, lastindex + 1);
             }
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::setInitiateIntervalEnterTime(): The data is nullptr!!");
     }
@@ -495,7 +495,7 @@ void TransitionsUI::setInitiateIntervalExitTime(){
                 bsData->flags.remove(lastindex, lastindex + 1);
             }
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::setInitiateIntervalExitTime(): The data is nullptr!!");
     }
@@ -530,7 +530,7 @@ void TransitionsUI::setCondition(){
     if (bsData && parentObj){
         if (condition->text() != ""){
             if (bsData->condition.data()){
-                static_cast<hkbExpressionCondition *>(bsData->condition.data())->expression = condition->text();
+                static_cast<hkbExpressionCondition *>(bsData->condition.data())->setExpression(condition->text());
             }else{
                 hkbExpressionCondition *con = new hkbExpressionCondition(static_cast<BehaviorFile *>(parentObj->getParentFile()), condition->text());
                 bsData->condition = HkxSharedPtr(con);
@@ -545,7 +545,7 @@ void TransitionsUI::setCondition(){
                 }
             }
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::setCondition(): The data or parent object is nullptr!!");
     }
@@ -559,7 +559,7 @@ void TransitionsUI::setEventId(int index, const QString &name){
         }else{
             CRITICAL_ERROR_MESSAGE("TransitionsUI::setEventId(): The event name is nullptr!!");
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::setEventId(): The data is nullptr!!");
     }
@@ -582,7 +582,7 @@ void TransitionsUI::setToStateId(const QString &name){
         }else{
             CRITICAL_ERROR_MESSAGE("TransitionsUI::setToStateId(): The event name is nullptr!!");
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::setToStateId(): The data or parent object is nullptr!!");
     }
@@ -595,7 +595,7 @@ void TransitionsUI::setFromNestedStateId(const QString &name){
         }else{
             CRITICAL_ERROR_MESSAGE("TransitionsUI::setFromNestedStateId(): The event name is nullptr!!");
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::setFromNestedStateId(): The data or parent object is nullptr!!");
     }
@@ -609,7 +609,7 @@ void TransitionsUI::setToNestedStateId(const QString &name){
         }else{
             CRITICAL_ERROR_MESSAGE("TransitionsUI::setToNestedStateId(): The event name is nullptr!!");
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::setToNestedStateId(): The data or parent object is nullptr!!");
     }
@@ -618,7 +618,7 @@ void TransitionsUI::setToNestedStateId(const QString &name){
 void TransitionsUI::setPriority(){
     if (bsData){
         bsData->priority = priority->value();
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::setPriority(): The data is nullptr!!");
     }
@@ -636,10 +636,11 @@ void TransitionsUI::toggleGlobalWildcardFlag(){
             if (bsData->flags == "FLAG_IS_GLOBAL_WILDCARD"){
                 bsData->flags = "0";
             }else{
-                bsData->flags.remove("|FLAG_IS_GLOBAL_WILDCARD");
+                bsData->flags.remove("FLAG_IS_GLOBAL_WILDCARD");
+                bsData->flags.replace("||", "|");
             }
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleGlobalWildcardFlag(): The data is nullptr!!");
     }
@@ -657,10 +658,11 @@ void TransitionsUI::toggleLocalWildcardFlag(){
             if (bsData->flags == "FLAG_IS_LOCAL_WILDCARD"){
                 bsData->flags = "0";
             }else{
-                bsData->flags.remove("|FLAG_IS_LOCAL_WILDCARD");
+                bsData->flags.remove("FLAG_IS_LOCAL_WILDCARD");
+                bsData->flags.replace("||", "|");
             }
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleLocalWildcardFlag(): The data is nullptr!!");
     }
@@ -679,11 +681,12 @@ void TransitionsUI::toggleUseNestedStateFlag(){
             if (bsData->flags == "FLAG_TO_NESTED_STATE_ID_IS_VALID"){
                 bsData->flags = "0";
             }else{
-                bsData->flags.remove("|FLAG_TO_NESTED_STATE_ID_IS_VALID");
+                bsData->flags.remove("FLAG_TO_NESTED_STATE_ID_IS_VALID");
+                bsData->flags.replace("||", "|");
             }
             toNestedStateId->setDisabled(true);
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleUseNestedStateFlag(): The data is nullptr!!");
     }
@@ -702,11 +705,12 @@ void TransitionsUI::toggleAllowSelfTransition(){
             if (bsData->flags == "FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE"){
                 bsData->flags = "0";
             }else{
-                bsData->flags.remove("|FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE");
+                bsData->flags.remove("FLAG_ALLOW_SELF_TRANSITION_BY_TRANSITION_FROM_ANY_STATE");
+                bsData->flags.replace("||", "|");
             }
             toNestedStateId->setDisabled(true);
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleAllowSelfTransition(): The data is nullptr!!");
     }
@@ -724,10 +728,11 @@ void TransitionsUI::toggleDisallowRandomTransitionFlag(){
             if (bsData->flags == "FLAG_DISALLOW_RANDOM_TRANSITION"){
                 bsData->flags = "0";
             }else{
-                bsData->flags.remove("|FLAG_DISALLOW_RANDOM_TRANSITION");
+                bsData->flags.remove("FLAG_DISALLOW_RANDOM_TRANSITION");
+                bsData->flags.replace("||", "|");
             }
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleDisallowRandomTransitionFlag(): The data is nullptr!!");
     }
@@ -745,10 +750,11 @@ void TransitionsUI::toggleDisallowReturnToStateFlag(){
             if (bsData->flags == "FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE"){
                 bsData->flags = "0";
             }else{
-                bsData->flags.remove("|FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE");
+                bsData->flags.remove("FLAG_DISALLOW_RETURN_TO_PREVIOUS_STATE");
+                bsData->flags.replace("||", "|");
             }
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleDisallowReturnToStateFlag(): The data is nullptr!!");
     }
@@ -766,10 +772,11 @@ void TransitionsUI::toggleAbutEndStateFlag(){
             if (bsData->flags == "FLAG_ABUT_AT_END_OF_FROM_GENERATOR"){
                 bsData->flags = "0";
             }else{
-                bsData->flags.remove("|FLAG_ABUT_AT_END_OF_FROM_GENERATOR");
+                bsData->flags.remove("FLAG_ABUT_AT_END_OF_FROM_GENERATOR");
+                bsData->flags.replace("||", "|");
             }
         }
-        parentObj->getParentFile()->setIsChanged(true);
+        parentObj->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("TransitionsUI::toggleAbutEndStateFlag(): The data is nullptr!!");
     }

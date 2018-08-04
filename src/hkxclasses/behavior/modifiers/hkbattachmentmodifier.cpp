@@ -3,13 +3,9 @@
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
-/*
- * CLASS: hkbAttachmentModifier
-*/
-
 uint hkbAttachmentModifier::refCount = 0;
 
-QString hkbAttachmentModifier::classname = "hkbAttachmentModifier";
+const QString hkbAttachmentModifier::classname = "hkbAttachmentModifier";
 
 hkbAttachmentModifier::hkbAttachmentModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -18,92 +14,45 @@ hkbAttachmentModifier::hkbAttachmentModifier(HkxFile *parent, long ref)
       attacheeLayer(0)
 {
     setType(HKB_ATTACHMENT_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "AttachmentModifier"+QString::number(refCount);
+    name = "AttachmentModifier_"+QString::number(refCount);
 }
 
-QString hkbAttachmentModifier::getClassname(){
+const QString hkbAttachmentModifier::getClassname(){
     return classname;
 }
 
 QString hkbAttachmentModifier::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-/*
-bool hkbAttachmentModifier::insertObjectAt(int index, DataIconManager *obj){
-    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR && index == 0){
-        pDefaultGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
-    }else if (((HkxObject *)obj)->getSignature() == HKB_CLIP_GENERATOR && index == 1){
-        pOffsetClipGenerator = HkxObjectExpSharedPtr((HkxObject *)obj);
-    }else{
-        return false;
-    }
-}
-
-bool hkbAttachmentModifier::removeObjectAt(int index){
-    if (index == 0){
-        pDefaultGenerator = HkxObjectExpSharedPtr();
-    }else if (index == 1){
-        pOffsetClipGenerator = HkxObjectExpSharedPtr();
-    }else{
-        return false;
-    }
-    return true;
-}
-
-bool hkbAttachmentModifier::hasChildren() const{
-    if (pDefaultGenerator.data() || pOffsetClipGenerator.data()){
-        return true;
-    }
-    return false;
-}
-
-QList<DataIconManager *> hkbAttachmentModifier::getChildren() const{
-    QList<DataIconManager *> list;
-    if (pDefaultGenerator.data()){
-        list.append(static_cast<DataIconManager*>(pDefaultGenerator.data()));
-    }
-    if (pOffsetClipGenerator.data()){
-        list.append(static_cast<DataIconManager*>(pOffsetClipGenerator.data()));
-    }
-    return list;
-}
-
-int hkbAttachmentModifier::getIndexOfObj(DataIconManager *obj) const{
-    if (pDefaultGenerator.data() == (HkxObject *)obj){
-        return 0;
-    }else if (pOffsetClipGenerator.data() == (HkxObject *)obj){
-        return 1;
-    }
-    return -1;
-}*/
-
-bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
+bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
+            if (!getVariableBindingSet().readShdPtrReference(index, reader)){
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
             }
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
             }
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
             }
         }else if (text == "sendToAttacherOnAttach"){
             index++;
@@ -112,11 +61,11 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
                 if (text == "id"){
                     sendToAttacherOnAttach.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!sendToAttacherOnAttach.payload.readShdPtrReference(index, reader)){
-                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -129,11 +78,11 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
                 if (text == "id"){
                     sendToAttacheeOnAttach.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!sendToAttacheeOnAttach.payload.readShdPtrReference(index, reader)){
-                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -146,11 +95,11 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
                 if (text == "id"){
                     sendToAttacherOnDetach.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!sendToAttacherOnDetach.payload.readShdPtrReference(index, reader)){
-                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -163,11 +112,11 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
                 if (text == "id"){
                     sendToAttacheeOnDetach.id = reader.getElementValueAt(index).toInt(&ok);
                     if (!ok){
-                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
                     }
                 }else if (text == "payload"){
                     if (!sendToAttacheeOnDetach.payload.readShdPtrReference(index, reader)){
-                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
+                        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
                     }
                     break;
                 }
@@ -175,117 +124,95 @@ bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long index){
             }
         }else if (text == "attachmentSetup"){
             if (!attachmentSetup.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'attachmentSetup' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'attachmentSetup' reference!\nObject Reference: "+ref);
             }
         }else if (text == "attacherHandle"){
             if (!attacherHandle.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'attacherHandle' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'attacherHandle' reference!\nObject Reference: "+ref);
             }
         }else if (text == "attacheeHandle"){
             if (!attacheeHandle.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'attacheeHandle' reference!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'attacheeHandle' reference!\nObject Reference: "+ref);
             }
         }else if (text == "attacheeLayer"){
             attacheeLayer = reader.getElementValueAt(index).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'attacheeLayer' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'attacheeLayer' data field!\nObject Reference: "+ref);
             }
         }
         index++;
     }
+    index--;
     return true;
 }
 
 bool hkbAttachmentModifier::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sendToAttacherOnAttach"), "");
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData));
+        writedatafield("name", name);
+        writedatafield("enable", getBoolAsString(enable));
+        writedatafield("sendToAttacherOnAttach", "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(sendToAttacherOnAttach.id));
-        if (sendToAttacherOnAttach.payload.data()){
-            refString = sendToAttacherOnAttach.payload.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
+        writedatafield("id", QString::number(sendToAttacherOnAttach.id));
+        writeref(sendToAttacherOnAttach.payload, "payload");
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sendToAttacheeOnAttach"), "");
+        writedatafield("sendToAttacheeOnAttach", "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(sendToAttacheeOnAttach.id));
-        if (sendToAttacheeOnAttach.payload.data()){
-            refString = sendToAttacheeOnAttach.payload.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
+        writedatafield("id", QString::number(sendToAttacheeOnAttach.id));
+        writeref(sendToAttacheeOnAttach.payload, "payload");
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sendToAttacherOnDetach"), "");
+        writedatafield("sendToAttacherOnDetach", "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(sendToAttacherOnDetach.id));
-        if (sendToAttacherOnDetach.payload.data()){
-            refString = sendToAttacherOnDetach.payload.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
+        writedatafield("id", QString::number(sendToAttacherOnDetach.id));
+        writeref(sendToAttacherOnDetach.payload, "payload");
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sendToAttacheeOnDetach"), "");
+        writedatafield("sendToAttacheeOnDetach", "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(sendToAttacheeOnDetach.id));
-        if (sendToAttacheeOnDetach.payload.data()){
-            refString = sendToAttacheeOnDetach.payload.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
+        writedatafield("id", QString::number(sendToAttacheeOnDetach.id));
+        writeref(sendToAttacheeOnDetach.payload, "payload");
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
-        if (attachmentSetup.data()){
-            refString = attachmentSetup.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("attachmentSetup"), refString);
-        if (attacherHandle.data()){
-            refString = attacherHandle.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("attacherHandle"), refString);
-        if (attacheeHandle.data()){
-            refString = attacheeHandle.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("attacheeHandle"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("attacheeLayer"), QString::number(attacheeLayer));
+        writeref(attachmentSetup, "attachmentSetup");
+        writeref(attacherHandle, "attacherHandle");
+        writeref(attacheeHandle, "attacheeHandle");
+        writedatafield("attacheeLayer", QString::number(attacheeLayer));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        writechild(sendToAttacherOnAttach.payload, "sendToAttacherOnAttach.payload");
+        writechild(sendToAttacheeOnAttach.payload, "sendToAttacherOnAttach.payload");
+        writechild(sendToAttacherOnDetach.payload, "sendToAttacherOnAttach.payload");
+        writechild(sendToAttacheeOnDetach.payload, "sendToAttacherOnAttach.payload");
+        /*writechild(attachmentSetup, "attachmentSetup");
+        writechild(attacherHandle, "attacherHandle");
+        writechild(attacheeHandle, "attacheeHandle");*/
     }
     return true;
 }
 
 bool hkbAttachmentModifier::isEventReferenced(int eventindex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (sendToAttacherOnAttach.id == eventindex || sendToAttacheeOnAttach.id == eventindex || sendToAttacherOnDetach.id == eventindex || sendToAttacheeOnDetach.id == eventindex ){
         return true;
     }
@@ -293,36 +220,29 @@ bool hkbAttachmentModifier::isEventReferenced(int eventindex) const{
 }
 
 void hkbAttachmentModifier::updateEventIndices(int eventindex){
-    if (sendToAttacherOnAttach.id > eventindex){
-        sendToAttacherOnAttach.id--;
-    }
-    if (sendToAttacheeOnAttach.id > eventindex){
-        sendToAttacheeOnAttach.id--;
-    }
-    if (sendToAttacherOnDetach.id > eventindex){
-        sendToAttacherOnDetach.id--;
-    }
-    if (sendToAttacheeOnDetach.id > eventindex){
-        sendToAttacheeOnDetach.id--;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    auto updateind = [&](int & index){
+        (index > eventindex) ? index-- : NULL;
+    };
+    updateind(sendToAttacherOnAttach.id);
+    updateind(sendToAttacheeOnAttach.id);
+    updateind(sendToAttacherOnDetach.id);
+    updateind(sendToAttacheeOnDetach.id);
 }
 
 void hkbAttachmentModifier::mergeEventIndex(int oldindex, int newindex){
-    if (sendToAttacherOnAttach.id == oldindex){
-        sendToAttacherOnAttach.id = newindex;
-    }
-    if (sendToAttacheeOnAttach.id == oldindex){
-        sendToAttacheeOnAttach.id = newindex;
-    }
-    if (sendToAttacherOnDetach.id == oldindex){
-        sendToAttacherOnDetach.id = newindex;
-    }
-    if (sendToAttacheeOnDetach.id == oldindex){
-        sendToAttacheeOnDetach.id = newindex;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    auto mergeind = [&](int & index){
+        (index == oldindex) ? index = newindex : NULL;
+    };
+    mergeind(sendToAttacherOnAttach.id);
+    mergeind(sendToAttacheeOnAttach.id);
+    mergeind(sendToAttacherOnDetach.id);
+    mergeind(sendToAttacheeOnDetach.id);
 }
 
 void hkbAttachmentModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphData *recdata;
     hkbBehaviorGraphData *domdata;
     QString thiseventname;
@@ -351,88 +271,59 @@ void hkbAttachmentModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
 }
 
 void hkbAttachmentModifier::updateReferences(long &ref){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto updateref = [&](HkxSharedPtr & shdptr){
+        (shdptr.data()) ? shdptr->updateReferences(++ref) : NULL;
+    };
     setReference(ref);
-    ref++;
-    setBindingReference(ref);
-    if (sendToAttacherOnAttach.payload.data()){
-        ref++;
-        sendToAttacherOnAttach.payload.data()->updateReferences(ref);
-    }
-    if (sendToAttacheeOnAttach.payload.data()){
-        ref++;
-        sendToAttacheeOnAttach.payload.data()->updateReferences(ref);
-    }
-    if (sendToAttacherOnDetach.payload.data()){
-        ref++;
-        sendToAttacherOnDetach.payload.data()->updateReferences(ref);
-    }
-    if (sendToAttacheeOnDetach.payload.data()){
-        ref++;
-        sendToAttacheeOnDetach.payload.data()->updateReferences(ref);
-    }
+    setBindingReference(++ref);
+    updateref(sendToAttacherOnAttach.payload);
+    updateref(sendToAttacheeOnAttach.payload);
+    updateref(sendToAttacherOnDetach.payload);
+    updateref(sendToAttacheeOnDetach.payload);
 }
 
 QVector<HkxObject *> hkbAttachmentModifier::getChildrenOtherTypes() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QVector<HkxObject *> list;
-    if (sendToAttacherOnAttach.payload.data()){
-        list.append(sendToAttacherOnAttach.payload.data());
-    }
-    if (sendToAttacheeOnAttach.payload.data()){
-        list.append(sendToAttacheeOnAttach.payload.data());
-    }
-    if (sendToAttacherOnDetach.payload.data()){
-        list.append(sendToAttacherOnDetach.payload.data());
-    }
-    if (sendToAttacheeOnDetach.payload.data()){
-        list.append(sendToAttacheeOnDetach.payload.data());
-    }
+    auto getchildren = [&](const HkxSharedPtr & shdptr){
+        (shdptr.data()) ? list.append(shdptr.data()) : NULL;
+    };
+    getchildren(sendToAttacherOnAttach.payload);
+    getchildren(sendToAttacheeOnAttach.payload);
+    getchildren(sendToAttacherOnDetach.payload);
+    getchildren(sendToAttacheeOnDetach.payload);
     return list;
 }
 
 bool hkbAttachmentModifier::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    HkxSharedPtr *ptr;
+    auto linkpayloads = [&](HkxSharedPtr & data, const QString & fieldname){
+        if (ptr){
+            if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": linkVar()!\nThe linked object '"+fieldname+"' is not a HKB_STRING_EVENT_PAYLOAD!");
+                setDataValidity(false);
+            }
+            data = *ptr;
+        }
+    };
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(sendToAttacherOnAttach.payload.getShdPtrReference());
-    if (ptr){
-        if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
-            setDataValidity(false);
-        }
-        sendToAttacherOnAttach.payload = *ptr;
-    }
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(sendToAttacherOnAttach.payload.getShdPtrReference());
+    linkpayloads(sendToAttacherOnAttach.payload, "sendToAttacherOnAttach.payload");
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(sendToAttacheeOnAttach.payload.getShdPtrReference());
-    if (ptr){
-        if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
-            setDataValidity(false);
-        }
-        sendToAttacheeOnAttach.payload = *ptr;
-    }
+    linkpayloads(sendToAttacheeOnAttach.payload, "sendToAttacherOnAttach.payload");
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(sendToAttacherOnDetach.payload.getShdPtrReference());
-    if (ptr){
-        if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
-            setDataValidity(false);
-        }
-        sendToAttacherOnDetach.payload = *ptr;
-    }
+    linkpayloads(sendToAttacherOnDetach.payload, "sendToAttacherOnAttach.payload");
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(sendToAttacheeOnDetach.payload.getShdPtrReference());
-    if (ptr){
-        if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
-            setDataValidity(false);
-        }
-        sendToAttacheeOnDetach.payload = *ptr;
-    }
-    //Link handles???
+    linkpayloads(sendToAttacheeOnDetach.payload, "sendToAttacherOnAttach.payload");
     return true;
 }
 
 void hkbAttachmentModifier::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     sendToAttacherOnAttach.payload = HkxSharedPtr();
     sendToAttacheeOnAttach.payload = HkxSharedPtr();
@@ -444,56 +335,31 @@ void hkbAttachmentModifier::unlink(){
 }
 
 QString hkbAttachmentModifier::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
+    auto checkevents = [&](int & id, HkxSharedPtr & payload, const QString & fieldname){
+        if (id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
+            isvalid = false;
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+fieldname+" event id out of range! Setting to max index in range!\n");
+            id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
+        }
+        if (payload.data() && payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+            isvalid = false;
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid "+fieldname+" type! Signature: "+QString::number(payload->getSignature(), 16)+" Setting null value!\n");
+            payload = HkxSharedPtr();
+        }
+    };
     QString temp = HkDynamicObject::evaluateDataValidity();
-    if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
-    }
+    (temp != "") ? errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n"): NULL;
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
-    if (sendToAttacherOnAttach.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacherOnAttach event id out of range! Setting to max index in range!\n");
-        sendToAttacherOnAttach.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
-    }
-    if (sendToAttacherOnAttach.payload.data() && sendToAttacherOnAttach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacherOnAttach.payload type! Signature: "+QString::number(sendToAttacherOnAttach.payload.data()->getSignature(), 16)+" Setting null value!\n");
-        sendToAttacherOnAttach.payload = HkxSharedPtr();
-    }
-    if (sendToAttacheeOnAttach.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacheeOnAttach event id out of range! Setting to max index in range!\n");
-        sendToAttacheeOnAttach.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
-    }
-    if (sendToAttacheeOnAttach.payload.data() && sendToAttacheeOnAttach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacheeOnAttach.payload type! Signature: "+QString::number(sendToAttacheeOnAttach.payload.data()->getSignature(), 16)+" Setting null value!\n");
-        sendToAttacheeOnAttach.payload = HkxSharedPtr();
-    }
-    if (sendToAttacherOnDetach.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacherOnDetach event id out of range! Setting to max index in range!\n");
-        sendToAttacherOnDetach.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
-    }
-    if (sendToAttacherOnDetach.payload.data() && sendToAttacherOnDetach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacherOnDetach.payload type! Signature: "+QString::number(sendToAttacherOnDetach.payload.data()->getSignature(), 16)+" Setting null value!\n");
-        sendToAttacherOnDetach.payload = HkxSharedPtr();
-    }
-    if (sendToAttacheeOnDetach.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sendToAttacheeOnDetach event id out of range! Setting to max index in range!\n");
-        sendToAttacheeOnDetach.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
-    }
-    if (sendToAttacheeOnDetach.payload.data() && sendToAttacheeOnDetach.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sendToAttacheeOnDetach.payload type! Signature: "+QString::number(sendToAttacheeOnDetach.payload.data()->getSignature(), 16)+" Setting null value!\n");
-        sendToAttacheeOnDetach.payload = HkxSharedPtr();
-    }
+    checkevents(sendToAttacherOnAttach.id, sendToAttacherOnAttach.payload, "sendToAttacherOnAttach");
+    checkevents(sendToAttacheeOnAttach.id, sendToAttacheeOnAttach.payload, "sendToAttacheeOnAttach");
+    checkevents(sendToAttacherOnDetach.id, sendToAttacherOnDetach.payload, "sendToAttacherOnDetach");
+    checkevents(sendToAttacheeOnDetach.id, sendToAttacheeOnDetach.payload, "sendToAttacheeOnDetach");
     setDataValidity(isvalid);
     return errors;
 }

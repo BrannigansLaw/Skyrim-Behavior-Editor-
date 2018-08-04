@@ -2,13 +2,9 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 
-/*
- * CLASS: hkbTransformVectorModifier
-*/
-
 uint hkbTransformVectorModifier::refCount = 0;
 
-QString hkbTransformVectorModifier::classname = "hkbTransformVectorModifier";
+const QString hkbTransformVectorModifier::classname = "hkbTransformVectorModifier";
 
 hkbTransformVectorModifier::hkbTransformVectorModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -20,148 +16,132 @@ hkbTransformVectorModifier::hkbTransformVectorModifier(HkxFile *parent, long ref
       computeOnModify(true)
 {
     setType(HKB_TRANSFORM_VECTOR_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "TransformVectorModifier"+QString::number(refCount);
+    name = "TransformVectorModifier_"+QString::number(refCount);
 }
 
-QString hkbTransformVectorModifier::getClassname(){
+const QString hkbTransformVectorModifier::getClassname(){
     return classname;
 }
 
 QString hkbTransformVectorModifier::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-bool hkbTransformVectorModifier::readData(const HkxXmlReader &reader, long index){
+bool hkbTransformVectorModifier::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "rotation"){
             rotation = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'rotation' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "rotation");
         }else if (text == "translation"){
             translation = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'translation' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "translation");
         }else if (text == "vectorIn"){
             vectorIn = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'vectorIn' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "vectorIn");
         }else if (text == "vectorOut"){
             vectorOut = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'vectorOut' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "vectorOut");
         }else if (text == "rotateOnly"){
             rotateOnly = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'rotateOnly' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "rotateOnly");
         }else if (text == "inverse"){
             inverse = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'inverse' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "inverse");
         }else if (text == "computeOnActivate"){
             computeOnActivate = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'computeOnActivate' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "computeOnActivate");
         }else if (text == "computeOnModify"){
             computeOnModify = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'computeOnModify' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "computeOnModify");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbTransformVectorModifier::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    if (writer && !getIsWritten()){
         QString refString = "null";
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
+        if (getVariableBindingSetData()){
+            refString = getVariableBindingSet()->getReferenceString();
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("rotation"), rotation.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("translation"), translation.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("vectorIn"), vectorIn.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("vectorOut"), vectorOut.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("rotateOnly"), getBoolAsString(rotateOnly));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("inverse"), getBoolAsString(inverse));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("computeOnActivate"), getBoolAsString(computeOnActivate));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("computeOnModify"), getBoolAsString(computeOnModify));
+        writedatafield("variableBindingSet", refString);
+        writedatafield("userData", QString::number(userData));
+        writedatafield("name", name);
+        writedatafield("enable", getBoolAsString(enable));
+        writedatafield("rotation", rotation.getValueAsString());
+        writedatafield("translation", translation.getValueAsString());
+        writedatafield("vectorIn", vectorIn.getValueAsString());
+        writedatafield("vectorOut", vectorOut.getValueAsString());
+        writedatafield("rotateOnly", getBoolAsString(rotateOnly));
+        writedatafield("inverse", getBoolAsString(inverse));
+        writedatafield("computeOnActivate", getBoolAsString(computeOnActivate));
+        writedatafield("computeOnModify", getBoolAsString(computeOnModify));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+        if (getVariableBindingSetData() && !getVariableBindingSet()->write(writer)){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
 }
 
 bool hkbTransformVectorModifier::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     return true;
 }
 
 void hkbTransformVectorModifier::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
 }
 
 QString hkbTransformVectorModifier::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     setDataValidity(isvalid);
     return errors;

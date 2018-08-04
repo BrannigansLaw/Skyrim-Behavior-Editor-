@@ -3,36 +3,38 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbStateMachineEventPropertyArray: public HkxObject
+class hkbStateMachineEventPropertyArray final: public HkxObject
 {
     friend class StateUI;
 public:
     hkbStateMachineEventPropertyArray(HkxFile *parent, long ref = -1);
-    virtual ~hkbStateMachineEventPropertyArray();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbStateMachineEventPropertyArray& operator=(const hkbStateMachineEventPropertyArray&) = delete;
+    hkbStateMachineEventPropertyArray(const hkbStateMachineEventPropertyArray &) = delete;
+    ~hkbStateMachineEventPropertyArray();
+    static const QString getClassname();
+    int getNumOfEvents() const;
+    int getLastEventIndex() const;
+private:
+    bool isEventReferenced(int eventindex) const;
+    QVector <HkxObject *> getChildrenOtherTypes() const;
     bool link();
     void unlink();
+    void removeEvent(int index);
     QString evaluateDataValidity();
-    static QString getClassname();
-    int getLastEventIndex() const;
     bool write(HkxXMLWriter *writer);
-    bool isEventReferenced(int eventindex) const;
+    void updateReferences(long &ref);
+    void setEventId(int index, int id);
+    bool merge(HkxObject *recessiveObject);
     void updateEventIndices(int eventindex);
     void mergeEventIndex(int oldindex, int newindex);
     void fixMergedEventIndices(BehaviorFile *dominantfile);
-    bool merge(HkxObject *recessiveObject);
-    void updateReferences(long &ref);
-    QVector <HkxObject *> getChildrenOtherTypes() const;
-    int getNumOfEvents() const;
-protected:
-private:
+    bool readData(const HkxXmlReader & reader, long & index);
     void addEvent(const hkEventPayload & event = hkEventPayload());
-    void setEventId(int index, int id);
-    void removeEvent(int index);
 private:
     static uint refCount;
-    static QString classname;
-    QList <hkEventPayload> events;
+    static const QString classname;
+    QVector <hkEventPayload> events;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBSTATEMACHINEEVENTPROPERTYARRAY_H

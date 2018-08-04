@@ -12,71 +12,67 @@ class HkxXMLWriter;
 class TreeGraphicsItem;
 class hkbGenerator;
 class BehaviorFile;
+class hkbVariableBindingSet;
 
 class HkxObject: public QSharedData
 {
     friend class BehaviorFile;
-    friend class ProjectFile;
     friend class CharacterFile;
-    friend class SkeletonFile;
-    friend class BehaviorUI;
-    friend class ProjectUI;
-    friend class CharacterUI;
-    friend class SkeletonUI;
-    friend class BSIStateManagerModifier;
-    friend class HkDynamicObject;
 public:
     enum HkxType {
         TYPE_OTHER=0,
-        TYPE_GENERATOR=1,
-        TYPE_MODIFIER=2
+        TYPE_GENERATOR,
+        TYPE_MODIFIER
     };
 public:
-    virtual ~HkxObject();
+    virtual ~HkxObject() = default;
+    HkxObject(const HkxObject &obj) = delete;
+    HkxObject& operator=(const HkxObject&) = delete;
+public:
+    int getIndexOfGenerator(const HkxSharedPtr & gen) const;
+    QString getParentFilename() const;
+    HkxFile * getParentFile() const;
+    void setIsFileChanged(bool ischanged);
+    void setReference(int ref);
     HkxSignature getSignature() const;
+    QString getReferenceString() const;
     HkxType getType() const;
-    virtual QString evaluateDataValidity();
     bool isDataValid() const;
+    long getReference() const;
     virtual bool link() = 0;
-    virtual void unlink();
+    virtual void updateReferences(long &);
     virtual bool write(HkxXMLWriter *);
-    virtual bool readData(const HkxXmlReader &, long);
     virtual bool merge(HkxObject *);
     virtual void mergeEventIndex(int, int);
-    virtual bool isEventReferenced(int ) const;
-    virtual bool isVariableReferenced(int ) const;
     virtual void updateEventIndices(int);
-    virtual void updateReferences(long &ref);
     virtual void fixMergedEventIndices(BehaviorFile *);
     virtual bool fixMergedIndices(BehaviorFile *);
-    QString getReferenceString() const;
-    QString getBoolAsString(bool b) const;
-    HkxFile * getParentFile() const;
-    bool getIsMerged() const;
-    void setReference(int ref);
+    virtual QString evaluateDataValidity();
+    virtual void unlink();
+    virtual bool readData(const HkxXmlReader &, long &);
+    virtual bool isEventReferenced(int ) const;
+    virtual bool isVariableReferenced(int ) const;
     virtual QVector <HkxObject *> getChildrenOtherTypes() const;
-    long getReference() const;
 protected:
     HkxObject(HkxFile *parent, long ref = -1);
+protected:
     void setDataValidity(bool isValid);
     void setType(HkxSignature sig, HkxType type);
-    bool readMultipleVector4(const QByteArray &lineIn,  QVector <hkQuadVariable> & vectors);
-    bool readReferences(const QByteArray &line, QList <HkxSharedPtr> & children);
-    bool readIntegers(const QByteArray &line, QVector<int> & ints);
-    bool toBool(const QByteArray &line, bool *ok);
-    bool readDoubles(const QByteArray &line, QVector<qreal> & doubles);
-    hkVector3 readVector3(const QByteArray &lineIn, bool *ok);
-    hkQuadVariable readVector4(const QByteArray &lineIn, bool *ok);
     void setIsWritten(bool written = true);
-    bool getIsWritten() const;
     void setIsMerged(bool value);
-    std::lock_guard <std::mutex> lockNGuard() const;
-    bool getRefsUpdated() const;
     void setRefsUpdated(bool value);
     void setParentFile(HkxFile *parent);
-private:
-    HkxObject(const HkxObject &obj);
-    HkxObject& operator=(const HkxObject&);
+    bool getIsWritten() const;
+    bool getRefsUpdated() const;
+    QString getBoolAsString(bool b) const;
+    bool getIsMerged() const;
+    bool readMultipleVector4(const QByteArray &lineIn,  QVector <hkQuadVariable> & vectors) const;
+    bool readReferences(const QByteArray &line, QVector <HkxSharedPtr> & children) const;
+    bool readIntegers(const QByteArray &line, QVector<int> & ints) const;
+    bool toBool(const QByteArray &line, bool *ok) const;
+    bool readDoubles(const QByteArray &line, QVector<qreal> & doubles) const;
+    hkVector3 readVector3(const QByteArray &lineIn, bool *ok) const;
+    hkQuadVariable readVector4(const QByteArray &lineIn, bool *ok) const;
 private:
     HkxFile *parentFile;
     long reference;
@@ -89,14 +85,15 @@ private:
     mutable std::mutex mutex;
 };
 
-class HkxSharedPtr: public QExplicitlySharedDataPointer <HkxObject>
+class HkxSharedPtr final: public QExplicitlySharedDataPointer <HkxObject>
 {
 public:
     HkxSharedPtr(HkxObject *obj = nullptr, long ref = -1);
     bool operator==(const HkxSharedPtr & other) const;
-    void setShdPtrReference(long ref);
     long getShdPtrReference() const;
     bool readShdPtrReference(long index, const HkxXmlReader & reader);
+private:
+    void setShdPtrReference(long ref);
 private:
     long smtreference;
 };
@@ -110,13 +107,18 @@ struct hkEventPayload{
 class HkDynamicObject: public HkxObject
 {
 public:
-    virtual ~HkDynamicObject();
+    ~HkDynamicObject() = default;
+    HkDynamicObject& operator=(const HkDynamicObject&) = delete;
+    HkDynamicObject(const HkDynamicObject &) = delete;
     bool linkVar();
-    void unlink();
-    QString evaluateDataValidity();
     void addBinding(const QString & path, int varIndex, bool isProperty = false);
     void removeBinding(const QString & path);
     void removeBinding(int varIndex);
+    HkxSharedPtr& getVariableBindingSet();
+    hkbVariableBindingSet * getVariableBindingSetData() const;
+protected:
+    void unlink();
+    QString evaluateDataValidity();
     bool isVariableReferenced(int variableindex) const;
     bool merge(HkxObject *recessiveObject);
     void setBindingReference(int ref);
@@ -125,11 +127,9 @@ public:
     bool fixMergedIndices(BehaviorFile *dominantfile);
 protected:
     HkDynamicObject(HkxFile *parent, long ref = -1);
-public:
-    HkxSharedPtr variableBindingSet;
 private:
-    HkDynamicObject& operator=(const HkDynamicObject&);
-    HkDynamicObject(const HkDynamicObject &);
+    HkxSharedPtr variableBindingSet;
+    mutable std::mutex mutex;
 };
 
 #endif // HKXOBJECT_H

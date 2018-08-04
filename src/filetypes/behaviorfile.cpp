@@ -125,18 +125,16 @@ BehaviorFile::BehaviorFile(MainWindow *window, ProjectFile *projectfile, Charact
 void BehaviorFile::generateNewBehavior(){
     hkRootLevelContainer *root = new hkRootLevelContainer(this);
     hkbBehaviorGraph *graph = new hkbBehaviorGraph(this);
-    graph->name = getFileName();
-    graph->name.replace(".hkx", ".hkb");
+    hkbBehaviorGraphStringData *strings = new hkbBehaviorGraphStringData(this);
+    hkbVariableValueSet *values = new hkbVariableValueSet(this);
+    graph->setName(getFileName().replace(".hkx", ".hkb"));
     behaviorGraph = HkxSharedPtr(graph);
-    stringData = HkxSharedPtr(new hkbBehaviorGraphStringData(this));
-    variableValues = HkxSharedPtr(new hkbVariableValueSet(this));
-    hkbBehaviorGraphData *data = new hkbBehaviorGraphData(this);
+    stringData = HkxSharedPtr(strings);
+    variableValues = HkxSharedPtr(values);
+    hkbBehaviorGraphData *data = new hkbBehaviorGraphData(this, -1, strings, values);
     graphData = HkxSharedPtr(data);
-    graph->data = graphData;
-    data->stringData = stringData;
-    data->variableInitialValues = variableValues;
-    root->namedVariants.append(hkRootLevelContainer::hkRootLevelContainerNamedVariant());
-    root->namedVariants.last().variant = behaviorGraph;
+    graph->setData(data);
+    root->addVariant("hkbBehaviorGraph", behaviorGraph.data());
     setRootObject(HkxSharedPtr(root));
     //setIsChanged(true);
 }
@@ -537,7 +535,7 @@ QStringList BehaviorFile::getAllBehaviorFileNames() const{
     QDirIterator it(QFileInfo(*this).absolutePath()+"/");
     while (it.hasNext()){
         if (QFileInfo(it.next()).fileName().contains(".hkx")){
-            list.append(it.fileInfo().filePath().section("/", -2, -1).replace("/", "\\"));
+            list.append(it.fileInfo().filePath().section("/", -1, -1)/*.replace("/", "\\")*/);
         }
     }
     return list;
@@ -556,8 +554,8 @@ void BehaviorFile::setEventNameForClipGenAnimData(const QString &clipname, int t
 }
 
 bool BehaviorFile::isClipGenNameTaken(const QString & name) const{
-    for (int i = 0; i < generators.size() - 1; i++){
-        if (generators.at(i).data()->getSignature() == HKB_CLIP_GENERATOR && name == static_cast<hkbClipGenerator *>(generators.at(i).data())->getName()){
+    for (auto i = 0; i < generators.size() - 1; i++){
+        if (generators.at(i)->getSignature() == HKB_CLIP_GENERATOR && name == static_cast<hkbClipGenerator *>(generators.at(i).data())->getName()){
             return true;
         }
     }
@@ -666,10 +664,10 @@ void BehaviorFile::updateEventIndices(int index){
     hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (stringdata && stringdata->eventNames.size() >= index && index > -1){
         for (auto i = 0; i < generators.size(); i++){
-            generators.at(i).data()->updateEventIndices(index);
+            generators.at(i)->updateEventIndices(index);
         }
         for (auto i = 0; i < modifiers.size(); i++){
-            modifiers.at(i).data()->updateEventIndices(index);
+            modifiers.at(i)->updateEventIndices(index);
         }
     }else{
         CRITICAL_ERROR_MESSAGE(QString("BehaviorFile::updateEventIndices(): stringdata null or invalid event index!!!"));
@@ -730,7 +728,7 @@ void BehaviorFile::updateVariableIndices(int index){
     hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     if (stringdata && stringdata->variableNames.size() >= index && index > -1){
         for (auto i = 0; i < otherTypes.size(); i++){
-            if (otherTypes.at(i).data()->getSignature() == HKB_VARIABLE_BINDING_SET){
+            if (otherTypes.at(i)->getSignature() == HKB_VARIABLE_BINDING_SET){
                 static_cast<hkbVariableBindingSet *>(otherTypes.at(i).data())->updateVariableIndices(index);
             }
         }
@@ -749,7 +747,7 @@ QStringList BehaviorFile::getReferencedBehaviors(const hkbBehaviorReferenceGener
     QStringList list;
     QString name;
     for (auto i = 0; i < generators.size(); i++){
-        if (generators.at(i).data()->getSignature() == HKB_BEHAVIOR_REFERENCE_GENERATOR && gentoignore != generators.at(i).constData()){
+        if (generators.at(i)->getSignature() == HKB_BEHAVIOR_REFERENCE_GENERATOR && gentoignore != generators.at(i).constData()){
             name = static_cast<hkbBehaviorReferenceGenerator *>(generators.at(i).data())->getBehaviorName();
             if (!list.contains(name)){
                 list.append(name);
@@ -790,8 +788,8 @@ qreal BehaviorFile::getAnimationDurationFromAnimData(const QString &animationnam
 }
 
 void BehaviorFile::mergeEventIndices(int oldindex, int newindex){
-    /*QList <DataIconManager *> objects = static_cast<DataIconManager *>(behaviorGraph.data())->getChildren();
-    QList <DataIconManager *> children;
+    /*QVector <DataIconManager *> objects = static_cast<DataIconManager *>(behaviorGraph.data())->getChildren();
+    QVector <DataIconManager *> children;
     hkbGenerator *generator = nullptr;
     hkbModifier *modifier = nullptr;
     while (!objects.isEmpty()){
@@ -809,16 +807,16 @@ void BehaviorFile::mergeEventIndices(int oldindex, int newindex){
         children.clear();
     }*/
     for (auto i = 0; i < generators.size(); i++){
-        generators.at(i).data()->mergeEventIndex(oldindex, newindex);
+        generators.at(i)->mergeEventIndex(oldindex, newindex);
     }
     for (auto i = 0; i < modifiers.size(); i++){
-        modifiers.at(i).data()->mergeEventIndex(oldindex, newindex);
+        modifiers.at(i)->mergeEventIndex(oldindex, newindex);
     }
 }
 
 void BehaviorFile::mergeVariableIndices(int oldindex, int newindex){
-    /*QList <DataIconManager *> objects = static_cast<DataIconManager *>(behaviorGraph.data())->getChildren();
-    QList <DataIconManager *> children;
+    /*QVector <DataIconManager *> objects = static_cast<DataIconManager *>(behaviorGraph.data())->getChildren();
+    QVector <DataIconManager *> children;
     hkbGenerator *generator = nullptr;
     hkbModifier *modifier = nullptr;
     while (!objects.isEmpty()){
@@ -836,7 +834,7 @@ void BehaviorFile::mergeVariableIndices(int oldindex, int newindex){
         children.clear();
     }*/
     for (auto i = 0; i < otherTypes.size(); i++){
-        if (otherTypes.at(i).data()->getSignature() == HKB_VARIABLE_BINDING_SET){
+        if (otherTypes.at(i)->getSignature() == HKB_VARIABLE_BINDING_SET){
             static_cast<hkbVariableBindingSet *>(otherTypes.at(i).data())->mergeVariableIndex(oldindex, newindex);
         }
     }
@@ -851,7 +849,7 @@ bool BehaviorFile::isNameUniqueInProject(HkxObject *object) const{
 }
 
 bool BehaviorFile::existsInBehavior(HkDynamicObject *object, int startindex) const{
-    std::unique_lock <std::mutex> guard = lockNGuard();
+
     bool found = false;
     HkxObject::HkxType type;
     DataIconManager *obj;
@@ -861,9 +859,9 @@ bool BehaviorFile::existsInBehavior(HkDynamicObject *object, int startindex) con
     QString listobjanimationname;
     QString objname;
     QString listobjname;
-    auto search = [&](const QList <HkxSharedPtr> & list){
+    auto search = [&](const QVector <HkxSharedPtr> & list){
         for (auto i = startindex; i < list.size(); i++){
-            listobjsig = list.at(i).data()->getSignature();
+            listobjsig = list.at(i)->getSignature();
             listobjname = static_cast<DataIconManager *>(list.at(i).data())->getName();
             if (objsig == HKB_CLIP_GENERATOR){
                 objanimationname = static_cast<hkbClipGenerator *>(obj)->getAnimationName();
@@ -878,7 +876,7 @@ bool BehaviorFile::existsInBehavior(HkDynamicObject *object, int startindex) con
         }
         if (!found){
             for (auto i = 0; i < startindex; i++){
-                listobjsig = list.at(i).data()->getSignature();
+                listobjsig = list.at(i)->getSignature();
                 listobjname = static_cast<DataIconManager *>(list.at(i).data())->getName();
                 if (objsig == HKB_CLIP_GENERATOR){
                     objanimationname = static_cast<hkbClipGenerator *>(obj)->getAnimationName();
@@ -905,9 +903,9 @@ bool BehaviorFile::existsInBehavior(HkDynamicObject *object, int startindex) con
     return found;
 }
 
-HkxObject * BehaviorFile::getRootStateMachine() const{
+hkbStateMachine * BehaviorFile::getRootStateMachine() const{
     if (behaviorGraph.data()){
-        return static_cast<hkbBehaviorGraph *>(behaviorGraph.data())->rootGenerator.data();
+        return static_cast<hkbBehaviorGraph *>(behaviorGraph.data())->getRootGenerator();
     }
     return nullptr;
 }
@@ -943,7 +941,7 @@ QStringList BehaviorFile::getRagdollBoneNames() const{
 /*TreeGraphicsItem * BehaviorFile::getRootIcon() const{
     hkRootLevelContainer *root = static_cast<hkRootLevelContainer *>(rootObject.data());
     hkbBehaviorGraph *graph = nullptr;
-    if (!root->namedVariants.isEmpty() && root->namedVariants.at(0).variant.data() && root->namedVariants.at(0).variant.data()->getSignature() == HKB_BEHAVIOR_GRAPH){
+    if (!root->namedVariants.isEmpty() && root->namedVariants.at(0).variant.data() && root->namedVariants.at(0).variant->getSignature() == HKB_BEHAVIOR_GRAPH){
         graph = static_cast<hkbBehaviorGraph *>(root->namedVariants.at(0).variant.data());
         if (!graph->icons.isEmpty()){
             return graph->icons.first();
@@ -956,7 +954,6 @@ QStringList BehaviorFile::getRagdollBoneNames() const{
 }*/
 
 bool BehaviorFile::addObjectToFile(HkxObject *obj, long ref){
-    std::unique_lock <std::mutex> lock = lockNGuard();
     if (obj){
         if (ref < 1){
             largestRef++;
@@ -988,7 +985,7 @@ bool BehaviorFile::parse(){
     if (!getReader().parse()){
         return false;
     }
-    int index = 2;
+    long index = 2;
     bool ok = true;
     HkxSignature signature;
     QByteArray value;
@@ -1380,45 +1377,26 @@ bool BehaviorFile::parse(){
 }
 
 bool BehaviorFile::link(){
-    if (!getRootObject().constData()){
+    auto linkobjs = [](QVector <HkxSharedPtr> & list){
+        for (auto i = 0; i < list.size(); i++){
+            list.at(i)->link();
+        }
+    };
+    if (getRootObject().constData()){
+        getRootObject()->link();
+        linkobjs(generators);
+        linkobjs(modifiers);
+        linkobjs(otherTypes);
+        behaviorGraph->link();
+        variableValues->link();
+        graphData->link();
+        HkxSignature sig;
+        for (auto i = 0; i < generators.size(); i++){
+            sig = generators.at(i)->getSignature();
+            (sig == HKB_STATE_MACHINE || sig == HKB_BLENDER_GENERATOR || sig == BS_BONE_SWITCH_GENERATOR) ? generators.at(i)->link() : NULL;
+        }
+    }else{
         LogFile::writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file is nullptr!");
-        return false;
-    }else if (getRootObject()->getSignature() != HK_ROOT_LEVEL_CONTAINER){
-        LogFile::writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16));
-        return false;
-    }
-    if (!getRootObject().data()->link()){
-        LogFile::writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file failed to link to it's children!");
-        return false;
-    }
-    for (int i = generators.size() - 1; i >= 0; i--){
-        if (!generators.at(i).data()->link()){
-            LogFile::writeToLog("BehaviorFile: link() failed!\nA generator failed to link to it's children!\nObject signature: "+QString::number(generators.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getShdPtrReference()));
-            return false;
-        }
-    }
-    for (int i = modifiers.size() - 1; i >= 0; i--){
-        if (!modifiers.at(i).data()->link()){
-            LogFile::writeToLog("BehaviorFile: link() failed!\nA modifier failed to link to it's children!\nObject signature: "+QString::number(modifiers.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getShdPtrReference()));
-            return false;
-        }
-    }
-    for (int i = otherTypes.size() - 1; i >= 0; i--){
-        if (!otherTypes.at(i).data()->link()){
-            LogFile::writeToLog("BehaviorFile: link() failed!\nA generator child failed to link to it's children!\nObject signature: "+QString::number(otherTypes.at(i)->getSignature(), 16)+"\nObject reference: "+QString::number(generators.at(i).getShdPtrReference()));
-            return false;
-        }
-    }
-    if (!behaviorGraph.data()->link()){
-        LogFile::writeToLog("BehaviorFile: link() failed!\nhkbBehaviorGraph failed to link to it's children!\n");
-        return false;
-    }
-    if (!variableValues.data()->link()){
-        LogFile::writeToLog("BehaviorFile: link() failed!\nhkbVariableValueSet failed to link to it's children!\n");
-        return false;
-    }
-    if (!graphData.data()->link()){
-        LogFile::writeToLog("BehaviorFile: link() failed!\nhkbBehaviorGraphData failed to link to it's children!\n");
         return false;
     }
     return true;
@@ -1443,7 +1421,7 @@ QString BehaviorFile::detectErrorsMT(int & taskcount, std::mutex & mutex, std::c
     bool errors = false;
     HkxObject *obj;
     QString error;
-    auto checkError = [&](QList <HkxSharedPtr> & objects, int index){
+    auto checkError = [&](QVector <HkxSharedPtr> & objects, int index){
         obj = static_cast<HkxObject *>(objects.at(index).data());
         if (obj){
             error = obj->evaluateDataValidity();
@@ -1458,8 +1436,8 @@ QString BehaviorFile::detectErrorsMT(int & taskcount, std::mutex & mutex, std::c
             }
         }
     };
-    /*if ((behaviorGraph.data() && !behaviorGraph.data()->evaluateDataValidity()) || (stringData.data() && !stringData.data()->evaluateDataValidity()) ||
-            (variableValues.data() && !variableValues.data()->evaluateDataValidity()) || (graphData.data() && !graphData.data()->evaluateDataValidity()))
+    /*if ((behaviorGraph.data() && !behaviorGraph->evaluateDataValidity()) || (stringData.data() && !stringData->evaluateDataValidity()) ||
+            (variableValues.data() && !variableValues->evaluateDataValidity()) || (graphData.data() && !graphData->evaluateDataValidity()))
     {
         errors = true;
         LogFile::writeToLog(getFileName()+": Root data is corrupted!"+"\n");
@@ -1489,7 +1467,7 @@ QString BehaviorFile::detectErrors(){
     errorList.clear();
     bool errors = false;
     HkxObject *obj;
-    auto checkError = [&](QList <HkxSharedPtr> & objects, int index){
+    auto checkError = [&](QVector <HkxSharedPtr> & objects, int index){
         obj = static_cast<HkxObject *>(objects.at(index).data());
         if (obj){
             error = obj->evaluateDataValidity();
@@ -1507,8 +1485,8 @@ QString BehaviorFile::detectErrors(){
             }
         }
     };
-    /*if ((behaviorGraph.data() && !behaviorGraph.data()->evaluateDataValidity()) || (stringData.data() && !stringData.data()->evaluateDataValidity()) ||
-            (variableValues.data() && !variableValues.data()->evaluateDataValidity()) || (graphData.data() && !graphData.data()->evaluateDataValidity()))
+    /*if ((behaviorGraph.data() && !behaviorGraph->evaluateDataValidity()) || (stringData.data() && !stringData->evaluateDataValidity()) ||
+            (variableValues.data() && !variableValues->evaluateDataValidity()) || (graphData.data() && !graphData->evaluateDataValidity()))
     {
         errors = true;
         LogFile::writeToLog(getFileName()+": Root data is corrupted!"+"\n");
@@ -1519,9 +1497,9 @@ QString BehaviorFile::detectErrors(){
     for (auto i = 0; i < modifiers.size(); i++){
         checkError(modifiers, i);
     }
-    /*for (auto i = 0; i < otherTypes.size(); i++){
-        checkError(otherTypes, i);
-    }*/
+    for (auto i = 0; i < otherTypes.size(); i++){
+        (otherTypes.at(i)->getSignature() == HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY) ? otherTypes.at(i)->evaluateDataValidity() : NULL;
+    }
     if (errors){
         return "WARNING: Potential errors found in \""+getFileName()+"\"!\n";
     }else{
@@ -1534,12 +1512,12 @@ QVector <DataIconManager *> BehaviorFile::merge(BehaviorFile *recessivefile, int
     QVector <DataIconManager *> objectsnotfound;
     auto gensize = generators.size();
     auto modsize = modifiers.size();
-    auto searchMerge = [&](const QList <HkxSharedPtr> & domlist, int domsize, const QList <HkxSharedPtr> & reclist){
+    auto searchMerge = [&](const QVector <HkxSharedPtr> & domlist, int domsize, const QVector <HkxSharedPtr> & reclist){
         for (auto i = 0; i < reclist.size(); i++){
             found = false;
             for (auto j = i; j < domsize; j++){
                 if (static_cast<const DataIconManager *>(domlist.at(j).data())->hasSameSignatureAndName(static_cast<const DataIconManager *>(reclist.at(i).data()))){
-                    domlist.at(j).data()->merge(reclist.at(i).data());
+                    domlist.at(j)->merge(reclist.at(i).data());
                     found = true;
                     break;
                 }
@@ -1547,7 +1525,7 @@ QVector <DataIconManager *> BehaviorFile::merge(BehaviorFile *recessivefile, int
             if (!found){
                 for (auto j = 0; j < i && j < domsize; j++){
                     if (static_cast<const DataIconManager *>(domlist.at(j).data())->hasSameSignatureAndName(static_cast<const DataIconManager *>(reclist.at(i).data()))){
-                        domlist.at(j).data()->merge(reclist.at(i).data());
+                        domlist.at(j)->merge(reclist.at(i).data());
                         found = true;
                         break;
                     }
@@ -1558,12 +1536,12 @@ QVector <DataIconManager *> BehaviorFile::merge(BehaviorFile *recessivefile, int
             }
         }
     };
-    auto searchMergeForward = [&](const QList <HkxSharedPtr> & domlist, int domsize, const QList <HkxSharedPtr> & reclist){
+    auto searchMergeForward = [&](const QVector <HkxSharedPtr> & domlist, int domsize, const QVector <HkxSharedPtr> & reclist){
         for (auto i = reclist.size() - 1; i >= 0; i--){
             found = false;
             for (auto j = domsize - 1; j >= 0; j--){
                 if (static_cast<const DataIconManager *>(domlist.at(j).data())->hasSameSignatureAndName(static_cast<const DataIconManager *>(reclist.at(i).data()))){
-                    domlist.at(j).data()->merge(reclist.at(i).data());
+                    domlist.at(j)->merge(reclist.at(i).data());
                     found = true;
                     break;
                 }
@@ -1602,12 +1580,12 @@ QVector <DataIconManager *> BehaviorFile::merge(BehaviorFile *recessivefile){
     QVector <DataIconManager *> objectsnotfound;
     auto gensize = generators.size();
     auto modsize = modifiers.size();
-    auto searchMergeForward = [&](const QList <HkxSharedPtr> & domlist, int domsize, const QList <HkxSharedPtr> & reclist){
+    auto searchMergeForward = [&](const QVector <HkxSharedPtr> & domlist, int domsize, const QVector <HkxSharedPtr> & reclist){
         for (auto i = reclist.size() - 1; i >= 0; i--){
             found = false;
             for (auto j = domsize - 1; j >= 0; j--){
                 if (static_cast<const DataIconManager *>(domlist.at(j).data())->hasSameSignatureAndName(static_cast<const DataIconManager *>(reclist.at(i).data()))){
-                    domlist.at(j).data()->merge(reclist.at(i).data());
+                    domlist.at(j)->merge(reclist.at(i).data());
                     found = true;
                     break;
                 }
@@ -1617,7 +1595,7 @@ QVector <DataIconManager *> BehaviorFile::merge(BehaviorFile *recessivefile){
             }
         }
     };
-    auto checkobjects = [&](const QList <HkxSharedPtr> & domlist){
+    auto checkobjects = [&](const QVector <HkxSharedPtr> & domlist){
         for (auto i = objectsnotfound.size() - 1; i >= 0; i--){
             found = false;
             for (auto j = gensize; j < domlist.size(); j++){
@@ -1643,13 +1621,13 @@ void BehaviorFile::mergeObjects(QVector <DataIconManager *> & recessiveobjects){
     bool found;
     auto gensize = generators.size();
     auto modsize = modifiers.size();
-    auto searchMergeForward = [&](const QList <HkxSharedPtr> & domlist, int domsize){
+    auto searchMergeForward = [&](const QVector <HkxSharedPtr> & domlist, int domsize){
         for (auto i = recessiveobjects.size() - 1; i >= 0; i--){
             found = false;
-            if (recessiveobjects.at(i)->getParentFile()->getFileName().compare(getFileName(), Qt::CaseInsensitive)){
+            if (recessiveobjects.at(i)->getParentFilename().compare(getFileName(), Qt::CaseInsensitive)){
                 for (auto j = domsize - 1; j >= 0; j--){
                     if (static_cast<const DataIconManager *>(domlist.at(j).data())->hasSameSignatureAndName(static_cast<const DataIconManager *>(recessiveobjects.at(i)))){
-                        domlist.at(j).data()->merge(recessiveobjects.at(i));
+                        domlist.at(j)->merge(recessiveobjects.at(i));
                         found = true;
                         break;
                     }
@@ -1669,23 +1647,23 @@ void BehaviorFile::mergeObjects(QVector <DataIconManager *> & recessiveobjects){
 void BehaviorFile::mergedWrite(){
     if (rootObject.data()){
         long ref = 100;
-        rootObject.data()->setIsWritten(false);
-        stringData.data()->setIsWritten(false);
-        variableValues.data()->setIsWritten(false);
-        graphData.data()->setIsWritten(false);
-        behaviorGraph.data()->setIsWritten(false);
-        rootObject.data()->setReference(ref);
+        rootObject->setIsWritten(false);
+        stringData->setIsWritten(false);
+        variableValues->setIsWritten(false);
+        graphData->setIsWritten(false);
+        behaviorGraph->setIsWritten(false);
+        rootObject->setReference(ref);
         ref++;
-        stringData.data()->setReference(ref);
+        stringData->setReference(ref);
         ref++;
-        variableValues.data()->setReference(ref);
+        variableValues->setReference(ref);
         ref++;
-        graphData.data()->setReference(ref);
+        graphData->setReference(ref);
         ref++;
-        behaviorGraph.data()->setReference(ref);
+        behaviorGraph->setReference(ref);
         ref++;
-        QList <DataIconManager *> objects = static_cast<DataIconManager *>(behaviorGraph.data())->getChildren();
-        QList <DataIconManager *> children;
+        QVector <DataIconManager *> objects = static_cast<DataIconManager *>(behaviorGraph.data())->getChildren();
+        QVector <DataIconManager *> children;
         DataIconManager *obj = nullptr;
         while (!objects.isEmpty()){
             obj = objects.last();
@@ -1703,22 +1681,22 @@ void BehaviorFile::mergedWrite(){
         ref++;
         for (auto i = 0; i < generators.size(); i++, ref++){
             if (!generators.at(i)->getRefsUpdated()){
-                generators.at(i).data()->setIsWritten(false);
-                generators.at(i).data()->setReference(ref);
+                generators.at(i)->setIsWritten(false);
+                generators.at(i)->setReference(ref);
             }
         }
         ref++;
         for (auto i = 0; i < modifiers.size(); i++, ref++){
             if (!modifiers.at(i)->getRefsUpdated()){
-                modifiers.at(i).data()->setIsWritten(false);
-                modifiers.at(i).data()->setReference(ref);
+                modifiers.at(i)->setIsWritten(false);
+                modifiers.at(i)->setReference(ref);
             }
         }
         ref++;
         for (auto i = 0; i < otherTypes.size(); i++, ref++){
             if (!otherTypes.at(i)->getRefsUpdated()){
-                otherTypes.at(i).data()->setIsWritten(false);
-                otherTypes.at(i).data()->setReference(ref);
+                otherTypes.at(i)->setIsWritten(false);
+                otherTypes.at(i)->setReference(ref);
             }
         }
         getWriter().setFile(this);
@@ -1733,34 +1711,34 @@ void BehaviorFile::mergedWrite(){
 void BehaviorFile::write(){
     if (rootObject.data()){
         long ref = 100;
-        rootObject.data()->setIsWritten(false);
-        stringData.data()->setIsWritten(false);
-        variableValues.data()->setIsWritten(false);
-        graphData.data()->setIsWritten(false);
-        behaviorGraph.data()->setIsWritten(false);
-        rootObject.data()->setReference(ref);
+        rootObject->setIsWritten(false);
+        stringData->setIsWritten(false);
+        variableValues->setIsWritten(false);
+        graphData->setIsWritten(false);
+        behaviorGraph->setIsWritten(false);
+        rootObject->setReference(ref);
         ref++;
-        stringData.data()->setReference(ref);
+        stringData->setReference(ref);
         ref++;
-        variableValues.data()->setReference(ref);
+        variableValues->setReference(ref);
         ref++;
-        graphData.data()->setReference(ref);
+        graphData->setReference(ref);
         ref++;
-        behaviorGraph.data()->setReference(ref);
+        behaviorGraph->setReference(ref);
         ref++;
-        for (int i = 0; i < generators.size(); i++, ref++){
-            generators.at(i).data()->setIsWritten(false);
-            generators.at(i).data()->setReference(ref);
+        for (auto i = 0; i < generators.size(); i++, ref++){
+            generators.at(i)->setIsWritten(false);
+            generators.at(i)->setReference(ref);
         }
         ref++;
-        for (int i = 0; i < modifiers.size(); i++, ref++){
-            modifiers.at(i).data()->setIsWritten(false);
-            modifiers.at(i).data()->setReference(ref);
+        for (auto i = 0; i < modifiers.size(); i++, ref++){
+            modifiers.at(i)->setIsWritten(false);
+            modifiers.at(i)->setReference(ref);
         }
         ref++;
-        for (int i = 0; i < otherTypes.size(); i++, ref++){
-            otherTypes.at(i).data()->setIsWritten(false);
-            otherTypes.at(i).data()->setReference(ref);
+        for (auto i = 0; i < otherTypes.size(); i++, ref++){
+            otherTypes.at(i)->setIsWritten(false);
+            otherTypes.at(i)->setReference(ref);
         }
         getWriter().setFile(this);
         if (!getWriter().writeToXMLFile()){
@@ -1775,7 +1753,7 @@ HkxSharedPtr * BehaviorFile::findGenerator(long ref){
     if (ref < 0){
         return nullptr;
     }
-    for (int i = 0; i < generators.size(); i++){
+    for (auto i = 0; i < generators.size(); i++){
         if (ref == generators.at(i).getShdPtrReference()){
             return &generators[i];
         }
@@ -1787,7 +1765,7 @@ HkxSharedPtr * BehaviorFile::findModifier(long ref){
     if (ref < 0){
         return nullptr;
     }
-    for (int i = 0; i < modifiers.size(); i++){
+    for (auto i = 0; i < modifiers.size(); i++){
         if (ref == modifiers.at(i).getShdPtrReference()){
             return &modifiers[i];
         }
@@ -1799,7 +1777,7 @@ HkxSharedPtr * BehaviorFile::findHkxObject(long ref){
     if (ref < 0){
         return nullptr;
     }
-    for (int i = 0; i < otherTypes.size(); i++){
+    for (auto i = 0; i < otherTypes.size(); i++){
         if (ref == otherTypes.at(i).getShdPtrReference()){
             return &otherTypes[i];
         }
@@ -1863,8 +1841,8 @@ QStringList BehaviorFile::getLocalFrameNames() const{
 }
 
 void BehaviorFile::removeBindings(int varIndex){
-    for (int i = 0; i < otherTypes.size(); i++){
-        if (otherTypes.at(i).data()->getSignature() == HKB_VARIABLE_BINDING_SET){
+    for (auto i = 0; i < otherTypes.size(); i++){
+        if (otherTypes.at(i)->getSignature() == HKB_VARIABLE_BINDING_SET){
             static_cast<hkbVariableBindingSet *>(otherTypes.at(i).data())->removeBinding(varIndex);
         }
     }
@@ -1874,20 +1852,16 @@ bool BehaviorFile::checkForDuplicateReferencesNumbers() const{
     auto duplicates = false;
     auto ref1 = 0;
     auto ref2 = 0;
-    auto checkrefs = [&](const QList <HkxSharedPtr> list){
-        std::unique_lock <std::mutex> guard = lockNGuard();
-        guard.unlock();
+    auto checkrefs = [&](const QVector <HkxSharedPtr> list){
         for (auto i = 0; i < list.size(); i++){
             if (list.at(i).data()){
-                ref1 = list.at(i).data()->getReference();
+                ref1 = list.at(i)->getReference();
                 for (auto j = 0; j < list.size(); j++){
                     if (list.at(j).data()){
-                        ref2 = list.at(j).data()->getReference();
+                        ref2 = list.at(j)->getReference();
                         if (ref1 == ref2 && j != i){
                             duplicates = true;
-                            guard.lock();
                             LogFile::writeToLog(getFileName()+"Reference "+QString::number(ref2)+" is duplicated!\n");
-                            guard.unlock();
                         }
                     }
                 }
@@ -1900,6 +1874,21 @@ bool BehaviorFile::checkForDuplicateReferencesNumbers() const{
     return duplicates;
 }
 
+HkxSharedPtr BehaviorFile::getGraphData() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return graphData;
+}
+
+HkxSharedPtr BehaviorFile::getStringData() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return stringData;
+}
+
+HkxSharedPtr BehaviorFile::getVariableValues() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return variableValues;
+}
+
 HkxSharedPtr * BehaviorFile::findBehaviorGraph(long ref){
     if (behaviorGraph.getShdPtrReference() == ref){
         return &behaviorGraph;
@@ -1910,7 +1899,7 @@ HkxSharedPtr * BehaviorFile::findBehaviorGraph(long ref){
 QVector<int> BehaviorFile::removeGeneratorData(){
     QVector<int> removedIndices;
     HkxObject *obj = nullptr;
-    for (int i = generators.size() - 1; i >= 0; i--){
+    for (auto i = generators.size() - 1; i >= 0; i--){
         obj = generators.at(i).data();
         if (obj){
             if (obj->ref < 2){
@@ -1927,7 +1916,7 @@ QVector<int> BehaviorFile::removeGeneratorData(){
 
 QVector<int> BehaviorFile::removeModifierData(){
     QVector<int> removedIndices;
-    for (int i = modifiers.size() - 1; i >= 0; i--){
+    for (auto i = modifiers.size() - 1; i >= 0; i--){
         if (modifiers.at(i).constData() && modifiers.at(i).constData()->ref < 2){
             modifiers.removeAt(i);
             removedIndices.append(i);
@@ -1938,7 +1927,7 @@ QVector<int> BehaviorFile::removeModifierData(){
 
 QVector<int> BehaviorFile::removeOtherData(){
     QVector<int> removedIndices;
-    for (int i = otherTypes.size() - 1; i >= 0; i--){
+    for (auto i = otherTypes.size() - 1; i >= 0; i--){
         if (otherTypes.at(i).constData() && otherTypes.at(i).constData()->ref < 2){
             otherTypes.removeAt(i);
             removedIndices.append(i);
@@ -1956,7 +1945,7 @@ hkVariableType BehaviorFile::getVariableTypeAt(int index) const{
 
 QStringList BehaviorFile::getGeneratorNames() const{
     QStringList list;
-    for (int i = 0; i < generators.size(); i++){
+    for (auto i = 0; i < generators.size(); i++){
         list.append(static_cast<hkbGenerator *>(generators.at(i).data())->getName());
     }
     return list;
@@ -1964,7 +1953,7 @@ QStringList BehaviorFile::getGeneratorNames() const{
 
 QStringList BehaviorFile::getGeneratorTypeNames() const{
     QStringList list;
-    for (int i = 0; i < generators.size(); i++){
+    for (auto i = 0; i < generators.size(); i++){
         list.append(static_cast<hkbGenerator *>(generators.at(i).data())->getClassname());
     }
     return list;
@@ -1972,7 +1961,7 @@ QStringList BehaviorFile::getGeneratorTypeNames() const{
 
 QStringList BehaviorFile::getModifierNames() const{
     QStringList list;
-    for (int i = 0; i < modifiers.size(); i++){
+    for (auto i = 0; i < modifiers.size(); i++){
         list.append(static_cast<hkbGenerator *>(modifiers.at(i).data())->getName());
     }
     return list;
@@ -1980,7 +1969,7 @@ QStringList BehaviorFile::getModifierNames() const{
 
 QStringList BehaviorFile::getModifierTypeNames() const{
     QStringList list;
-    for (int i = 0; i < modifiers.size(); i++){
+    for (auto i = 0; i < modifiers.size(); i++){
         list.append(static_cast<hkbModifier *>(modifiers.at(i).data())->getClassname());
     }
     return list;
@@ -1990,7 +1979,7 @@ int BehaviorFile::getCharacterPropertyIndexFromBehavior(const QString &name) con
     hkbBehaviorGraphStringData *strings = nullptr;
     if (stringData.data()){
         strings = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
-        for (int i = 0; i < strings->characterPropertyNames.size(); i++){
+        for (auto i = 0; i < strings->characterPropertyNames.size(); i++){
             if (strings->characterPropertyNames.at(i) == name){
                 return i;
             }
@@ -2003,11 +1992,7 @@ int BehaviorFile::getCharacterPropertyIndex(const QString &name) const{
     hkbCharacterStringData *strings = nullptr;
     if (character && character->stringData.data()){
         strings = static_cast<hkbCharacterStringData *>(character->stringData.data());
-        for (int i = 0; i < strings->characterPropertyNames.size(); i++){
-            if (strings->characterPropertyNames.at(i) == name){
-                return i;
-            }
-        }
+        return strings->getCharacterPropertyIndex(name);
     }
     return -1;
 }
@@ -2019,10 +2004,8 @@ int BehaviorFile::findCharacterPropertyIndexFromCharacter(int indexOfBehaviorPro
     if (character && stringData.data()){
         strings = static_cast<hkbCharacterStringData *>(character->stringData.data());
         behaviorstrings = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
-        if (!behaviorstrings->characterPropertyNames.isEmpty() && indexOfBehaviorProperty < behaviorstrings->characterPropertyNames.size() && indexOfBehaviorProperty >= 0 && !strings->characterPropertyNames.isEmpty()){
-            name = behaviorstrings->characterPropertyNames.at(indexOfBehaviorProperty);
-            return strings->characterPropertyNames.indexOf(name);
-        }
+        name = behaviorstrings->getCharacterPropertyNameAt(indexOfBehaviorProperty);
+        return strings->getCharacterPropertyIndex(name);
     }
     return -1;
 }
@@ -2037,12 +2020,10 @@ QStringList BehaviorFile::getCharacterPropertyNames() const{
 QStringList BehaviorFile::getAllReferencedBehaviorFilePaths() const{
     QStringList list;
     hkbBehaviorReferenceGenerator *ptr = nullptr;
-    for (int i = 0; i < generators.size(); i++){
+    for (auto i = 0; i < generators.size(); i++){
         if (generators.at(i).constData() && generators.at(i)->getSignature() == HKB_BEHAVIOR_REFERENCE_GENERATOR){
             ptr = static_cast<hkbBehaviorReferenceGenerator *>(generators.at(i).data());
-            if (ptr->behaviorName != ""){
-                list.append(ptr->behaviorName);
-            }
+            list.append(ptr->getBehaviorName());
         }
     }
     return list;
@@ -2057,11 +2038,7 @@ QStringList BehaviorFile::getErrors() const{
 }
 
 int BehaviorFile::getIndexOfGenerator(const HkxSharedPtr & obj) const{
-    int result = generators.indexOf(obj);
-    /*if (result == -1){
-        result = generatorChildren.indexOf(obj);
-    }*/
-    return result;
+    return generators.indexOf(obj);
 }
 
 bool BehaviorFile::setGeneratorData(HkxSharedPtr & ptrToSet, int index){

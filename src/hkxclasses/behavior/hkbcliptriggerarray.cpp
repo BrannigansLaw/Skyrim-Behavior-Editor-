@@ -2,113 +2,103 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
-/**
- * hkbClipTriggerArray
- */
 
 uint hkbClipTriggerArray::refCount = 0;
 
-QString hkbClipTriggerArray::classname = "hkbClipTriggerArray";
+const QString hkbClipTriggerArray::classname = "hkbClipTriggerArray";
 
 hkbClipTriggerArray::hkbClipTriggerArray(HkxFile *parent, long ref)
     : HkxObject(parent, ref)
 {
     setType(HKB_CLIP_TRIGGER_ARRAY, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
-QString hkbClipTriggerArray::getClassname(){
+const QString hkbClipTriggerArray::getClassname(){
     return classname;
 }
 
 void hkbClipTriggerArray::addTrigger(const HkTrigger & trigger){
+    std::lock_guard <std::mutex> guard(mutex);
     triggers.append(trigger);
 }
 
 void hkbClipTriggerArray::setTriggerId(int index, int id){
-    if (triggers.size() > index){
-        triggers[index].event.id = id;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (triggers.size() > index) ? triggers[index].event.id = id : NULL;
 }
 
 void hkbClipTriggerArray::setLocalTime(int index, qreal time){
-    if (triggers.size() > index){
-        triggers[index].localTime = time;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (triggers.size() > index) ? triggers[index].localTime = time : NULL;
 }
 
 void hkbClipTriggerArray::removeTrigger(int index){
-    if (triggers.size() > index){
-        triggers.removeAt(index);
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (triggers.size() > index) ? triggers.removeAt(index) : NULL;
 }
 
 int hkbClipTriggerArray::getLastTriggerIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return triggers.size() - 1;
 }
 
-bool hkbClipTriggerArray::readData(const HkxXmlReader &reader, long index){
+bool hkbClipTriggerArray::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
+    int numtriggers;
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "triggers"){
-            int numtriggers = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                return false;
-            }
-            for (int j = 0; j < numtriggers; j++){
+            numtriggers = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            checkvalue(ok, "triggers");
+            (numtriggers > 0) ? index++ : NULL;
+            for (auto j = 0; j < numtriggers; j++, index++){
                 triggers.append(HkTrigger());
-                while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-                    if (reader.getNthAttributeValueAt(index, 0) == "localTime"){
+                for (; index < reader.getNumElements(); index++){
+                    text = reader.getNthAttributeValueAt(index, 0);
+                    if (text == "localTime"){
                         triggers.last().localTime = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            return false;
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "id"){
+                        checkvalue(ok, "triggers.at("+QString::number(j)+").localTime");
+                    }else if (text == "id"){
                         triggers.last().event.id = reader.getElementValueAt(index).toInt(&ok);
-                        if (!ok){
-                            return false;
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "payload"){
-                        if (!triggers.last().event.payload.readShdPtrReference(index, reader)){
-                            return false;
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "relativeToEndOfClip"){
+                        checkvalue(ok, "triggers.at("+QString::number(j)+").id");
+                    }else if (text == "payload"){
+                        checkvalue(triggers.last().event.payload.readShdPtrReference(index, reader), "triggers.at("+QString::number(j)+").payload");
+                    }else if (text == "relativeToEndOfClip"){
                         triggers.last().relativeToEndOfClip = toBool(reader.getElementValueAt(index), &ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'relativeToEndOfClip' data field!\nObject Reference: "+ref);
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "acyclic"){
+                        checkvalue(ok, "triggers.at("+QString::number(j)+").relativeToEndOfClip");
+                    }else if (text == "acyclic"){
                         triggers.last().acyclic = toBool(reader.getElementValueAt(index), &ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'acyclic' data field!\nObject Reference: "+ref);
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "isAnnotation"){
+                        checkvalue(ok, "triggers.at("+QString::number(j)+").acyclic");
+                    }else if (text == "isAnnotation"){
                         triggers.last().isAnnotation = toBool(reader.getElementValueAt(index), &ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'isAnnotation' data field!\nObject Reference: "+ref);
-                        }
-                        index++;
+                        checkvalue(ok, "triggers.at("+QString::number(j)+").isAnnotation");
                         break;
+                    }else{
+                        //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                     }
-                    index++;
                 }
             }
-            return true;
+            (numtriggers > 0) ? index-- : NULL;
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbClipTriggerArray::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    if (writer && !getIsWritten()){
         QString refString;
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
@@ -116,23 +106,23 @@ bool hkbClipTriggerArray::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"triggers", QString::number(triggers.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < triggers.size(); i++){
+        for (auto i = 0; i < triggers.size(); i++){
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("localTime"), QString::number(triggers.at(i).localTime, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("event"), "");
+            writedatafield("localTime", QString::number(triggers.at(i).localTime, char('f'), 6));
+            writedatafield("event", "");
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(triggers.at(i).event.id));
+            writedatafield("id", QString::number(triggers.at(i).event.id));
             if (triggers.at(i).event.payload.data()){
-                refString = triggers.at(i).event.payload.data()->getReferenceString();
+                refString = triggers.at(i).event.payload->getReferenceString();
             }else{
                 refString = "null";
             }
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
+            writedatafield("payload", refString);
             writer->writeLine(writer->object, false);
             writer->writeLine(writer->parameter, false);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("relativeToEndOfClip"), getBoolAsString(triggers.at(i).relativeToEndOfClip));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("acyclic"), getBoolAsString(triggers.at(i).acyclic));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("isAnnotation"), getBoolAsString(triggers.at(i).isAnnotation));
+            writedatafield("relativeToEndOfClip", getBoolAsString(triggers.at(i).relativeToEndOfClip));
+            writedatafield("acyclic", getBoolAsString(triggers.at(i).acyclic));
+            writedatafield("isAnnotation", getBoolAsString(triggers.at(i).isAnnotation));
             writer->writeLine(writer->object, false);
         }
         if (triggers.size() > 0){
@@ -141,9 +131,9 @@ bool hkbClipTriggerArray::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        for (int i = 0; i < triggers.size(); i++){
-            if (triggers.at(i).event.payload.data() && !triggers.at(i).event.payload.data()->write(writer)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
+        for (auto i = 0; i < triggers.size(); i++){
+            if (triggers.at(i).event.payload.data() && !triggers.at(i).event.payload->write(writer)){
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
             }
         }
     }
@@ -151,6 +141,7 @@ bool hkbClipTriggerArray::write(HkxXMLWriter *writer){
 }
 
 bool hkbClipTriggerArray::isEventReferenced(int eventindex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < triggers.size(); i++){
         if (triggers.at(i).event.id == eventindex){
             return true;
@@ -160,22 +151,21 @@ bool hkbClipTriggerArray::isEventReferenced(int eventindex) const{
 }
 
 void hkbClipTriggerArray::updateEventIndices(int eventindex){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < triggers.size(); i++){
-        if (triggers.at(i).event.id > eventindex){
-            triggers[i].event.id--;
-        }
+        (triggers.at(i).event.id > eventindex) ? triggers[i].event.id-- : NULL;
     }
 }
 
 void hkbClipTriggerArray::mergeEventIndex(int oldindex, int newindex){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < triggers.size(); i++){
-        if (triggers.at(i).event.id == oldindex){
-            triggers[i].event.id = newindex;
-        }
+        (triggers.at(i).event.id == oldindex) ? triggers[i].event.id = newindex : NULL;
     }
 }
 
 void hkbClipTriggerArray::fixMergedEventIndices(BehaviorFile *dominantfile){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphData *recdata;
     hkbBehaviorGraphData *domdata;
     QString thiseventname;
@@ -199,7 +189,8 @@ void hkbClipTriggerArray::fixMergedEventIndices(BehaviorFile *dominantfile){
     }
 }
 
-bool hkbClipTriggerArray::merge(HkxObject *recessiveObject){
+bool hkbClipTriggerArray::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphData *recdata;
     hkbBehaviorGraphData *domdata;
     QString othereventname;
@@ -231,37 +222,31 @@ bool hkbClipTriggerArray::merge(HkxObject *recessiveObject){
         }
         setIsMerged(true);
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 void hkbClipTriggerArray::updateReferences(long &ref){
+    std::lock_guard <std::mutex> guard(mutex);
     setReference(ref);
     for (auto i = 0; i < triggers.size(); i++){
-        if (triggers.at(i).event.payload.data()){
-            ref++;
-            triggers[i].event.payload.data()->updateReferences(ref);
-        }
+        (triggers.at(i).event.payload.data()) ? triggers[i].event.payload->updateReferences(++ref) : NULL;
     }
 }
 
 QVector<HkxObject *> hkbClipTriggerArray::getChildrenOtherTypes() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QVector<HkxObject *> list;
     for (auto i = 0; i < triggers.size(); i++){
-        if (triggers.at(i).event.payload.data()){
-            list.append(triggers.at(i).event.payload.data());
-        }
+        (triggers.at(i).event.payload.data()) ? list.append(triggers.at(i).event.payload.data()) : NULL;
     }
     return list;
 }
 
 bool hkbClipTriggerArray::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     HkxSharedPtr *ptr;
-    for (int i = 0; i < triggers.size(); i++){
+    for (auto i = 0; i < triggers.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggers.at(i).event.payload.getShdPtrReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
@@ -274,27 +259,33 @@ bool hkbClipTriggerArray::link(){
 }
 
 QString hkbClipTriggerArray::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     if (triggers.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": triggers is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": triggers is empty!\n");
     }else{
         for (auto i = 0; i < triggers.size(); i++){
             if (triggers.at(i).event.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": id in triggers at "+QString::number(i)+" out of range! Setting to last event index!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": id in triggers at "+QString::number(i)+" out of range! Setting to last event index!\n");
                 triggers[i].event.id  = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
             }
-            if (triggers.at(i).event.payload.data() && triggers.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+            if (triggers.at(i).event.payload.data() && triggers.at(i).event.payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(triggers.at(i).event.payload.data()->getSignature(), 16)+" Setting null value!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(triggers.at(i).event.payload->getSignature(), 16)+" Setting null value!\n");
                 triggers[i].event.payload = HkxSharedPtr();
             }
         }
     }
     setDataValidity(isvalid);
     return errors;
+}
+
+int hkbClipTriggerArray::getNumberOfTriggers() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return triggers.size();
 }
 
 hkbClipTriggerArray::~hkbClipTriggerArray(){

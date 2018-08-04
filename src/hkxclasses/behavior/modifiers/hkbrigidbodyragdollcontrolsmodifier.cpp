@@ -2,13 +2,9 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 
-/*
- * CLASS: hkbRigidBodyRagdollControlsModifier
-*/
-
 uint hkbRigidBodyRagdollControlsModifier::refCount = 0;
 
-QString hkbRigidBodyRagdollControlsModifier::classname = "hkbRigidBodyRagdollControlsModifier";
+const QString hkbRigidBodyRagdollControlsModifier::classname = "hkbRigidBodyRagdollControlsModifier";
 
 hkbRigidBodyRagdollControlsModifier::hkbRigidBodyRagdollControlsModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -29,200 +25,165 @@ hkbRigidBodyRagdollControlsModifier::hkbRigidBodyRagdollControlsModifier(HkxFile
       durationToBlend(0)
 {
     setType(HKB_RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "RigidBodyRagdollControlsModifier"+QString::number(refCount);
+    name = "RigidBodyRagdollControlsModifier_"+QString::number(refCount);
 }
 
-QString hkbRigidBodyRagdollControlsModifier::getClassname(){
+const QString hkbRigidBodyRagdollControlsModifier::getClassname(){
     return classname;
 }
 
 QString hkbRigidBodyRagdollControlsModifier::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-bool hkbRigidBodyRagdollControlsModifier::readData(const HkxXmlReader &reader, long index){
+bool hkbRigidBodyRagdollControlsModifier::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "hierarchyGain"){
             hierarchyGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'hierarchyGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "hierarchyGain");
         }else if (text == "velocityDamping"){
             velocityDamping = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'velocityDamping' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "velocityDamping");
         }else if (text == "accelerationGain"){
             accelerationGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'accelerationGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "accelerationGain");
         }else if (text == "velocityGain"){
             velocityGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'velocityGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "velocityGain");
         }else if (text == "positionGain"){
             positionGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'positionGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "positionGain");
         }else if (text == "positionMaxLinearVelocity"){
             positionMaxLinearVelocity = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'positionMaxLinearVelocity' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "positionMaxLinearVelocity");
         }else if (text == "positionMaxAngularVelocity"){
             positionMaxAngularVelocity = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'positionMaxAngularVelocity' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "positionMaxAngularVelocity");
         }else if (text == "snapGain"){
             snapGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'snapGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "snapGain");
         }else if (text == "snapMaxLinearVelocity"){
             snapMaxLinearVelocity = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'snapMaxLinearVelocity' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "snapMaxLinearVelocity");
         }else if (text == "snapMaxAngularVelocity"){
             snapMaxAngularVelocity = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'snapMaxAngularVelocity' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "snapMaxAngularVelocity");
         }else if (text == "snapMaxLinearDistance"){
             snapMaxLinearDistance = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'snapMaxLinearDistance' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "snapMaxLinearDistance");
         }else if (text == "snapMaxAngularDistance"){
             snapMaxAngularDistance = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'snapMaxAngularDistance' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "snapMaxAngularDistance");
         }else if (text == "durationToBlend"){
             durationToBlend = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'durationToBlend' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "durationToBlend");
         }else if (text == "bones"){
-            if (!bones.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bones' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(bones.readShdPtrReference(index, reader), "bones");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbRigidBodyRagdollControlsModifier::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("controlData"), "");
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData));
+        writedatafield("name", name);
+        writedatafield("enable", getBoolAsString(enable));
+        writedatafield("controlData", "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("keyFrameHierarchyControlData"), "");
+        writedatafield("keyFrameHierarchyControlData", "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("hierarchyGain"), QString::number(hierarchyGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("velocityDamping"), QString::number(velocityDamping, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("accelerationGain"), QString::number(accelerationGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("velocityGain"), QString::number(velocityGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("positionGain"), QString::number(positionGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("positionMaxLinearVelocity"), QString::number(positionMaxLinearVelocity, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("positionMaxAngularVelocity"), QString::number(positionMaxAngularVelocity, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("snapGain"), QString::number(snapGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("snapMaxLinearVelocity"), QString::number(snapMaxLinearVelocity, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("snapMaxAngularVelocity"), QString::number(snapMaxAngularVelocity, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("snapMaxLinearDistance"), QString::number(snapMaxLinearDistance, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("snapMaxAngularDistance"), QString::number(snapMaxAngularDistance, char('f'), 6));
+        writedatafield("hierarchyGain", QString::number(hierarchyGain, char('f'), 6));
+        writedatafield("velocityDamping", QString::number(velocityDamping, char('f'), 6));
+        writedatafield("accelerationGain", QString::number(accelerationGain, char('f'), 6));
+        writedatafield("velocityGain", QString::number(velocityGain, char('f'), 6));
+        writedatafield("positionGain", QString::number(positionGain, char('f'), 6));
+        writedatafield("positionMaxLinearVelocity", QString::number(positionMaxLinearVelocity, char('f'), 6));
+        writedatafield("positionMaxAngularVelocity", QString::number(positionMaxAngularVelocity, char('f'), 6));
+        writedatafield("snapGain", QString::number(snapGain, char('f'), 6));
+        writedatafield("snapMaxLinearVelocity", QString::number(snapMaxLinearVelocity, char('f'), 6));
+        writedatafield("snapMaxAngularVelocity", QString::number(snapMaxAngularVelocity, char('f'), 6));
+        writedatafield("snapMaxLinearDistance", QString::number(snapMaxLinearDistance, char('f'), 6));
+        writedatafield("snapMaxAngularDistance", QString::number(snapMaxAngularDistance, char('f'), 6));
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("durationToBlend"), QString::number(durationToBlend, char('f'), 6));
+        writedatafield("durationToBlend", QString::number(durationToBlend, char('f'), 6));
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
-        if (bones.data()){
-            refString = bones.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("bones"), refString);
+        writeref(bones, "bones");
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        if (bones.data() && !bones.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'bones'!!!");
-        }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        writechild(bones, "bones");
     }
     return true;
 }
 
 void hkbRigidBodyRagdollControlsModifier::updateReferences(long &ref){
+    std::lock_guard <std::mutex> guard(mutex);
     setReference(ref);
-    ref++;
-    setBindingReference(ref);
-    if (bones.data()){
-        ref++;
-        bones.data()->updateReferences(ref);
-    }
+    setBindingReference(++ref);
+    (bones.data()) ? bones->updateReferences(++ref) : NULL;
 }
 
 QVector<HkxObject *> hkbRigidBodyRagdollControlsModifier::getChildrenOtherTypes() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QVector<HkxObject *> list;
-    if (bones.data()){
-        list.append(bones.data());
-    }
+    (bones.data()) ? list.append(bones.data()) : NULL;
     return list;
 }
 
-bool hkbRigidBodyRagdollControlsModifier::merge(HkxObject *recessiveObject){
+bool hkbRigidBodyRagdollControlsModifier::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     hkbRigidBodyRagdollControlsModifier *obj = nullptr;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER){
         obj = static_cast<hkbRigidBodyRagdollControlsModifier *>(recessiveObject);
         if (bones.data()){
             if (obj->bones.data()){
-                bones.data()->merge(obj->bones.data());
+                bones->merge(obj->bones.data());
             }
         }else if (obj->bones.data()){
             bones = obj->bones;
@@ -230,22 +191,19 @@ bool hkbRigidBodyRagdollControlsModifier::merge(HkxObject *recessiveObject){
         }
         injectWhileMerging(obj);
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 bool hkbRigidBodyRagdollControlsModifier::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(bones.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_BONE_INDEX_ARRAY){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'bones' is not a HKB_BONE_INDEX_ARRAY!");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": linkVar()!\nThe linked object 'bones' is not a HKB_BONE_INDEX_ARRAY!");
             setDataValidity(false);
         }
         bones = *ptr;
@@ -254,27 +212,29 @@ bool hkbRigidBodyRagdollControlsModifier::link(){
 }
 
 void hkbRigidBodyRagdollControlsModifier::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     bones = HkxSharedPtr();
 }
 
 QString hkbRigidBodyRagdollControlsModifier::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     if (!bones.data()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null bones!\n");
-    }else if (bones.data()->getSignature() != HKB_BONE_INDEX_ARRAY){
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null bones!\n");
+    }else if (bones->getSignature() != HKB_BONE_INDEX_ARRAY){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid bones type! Signature: "+QString::number(bones.data()->getSignature(), 16)+" Setting null value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid bones type! Signature: "+QString::number(bones->getSignature(), 16)+" Setting null value!\n");
         bones = HkxSharedPtr();
     }
     setDataValidity(isvalid);

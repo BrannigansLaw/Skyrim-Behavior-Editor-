@@ -5,40 +5,38 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbCharacterData: public HkxObject
+class hkbCharacterData final: public HkxObject
 {
-    friend class BehaviorGraphView;
-    friend class BehaviorVariablesUI;
-    friend class EventsUI;
-    friend class CharacterPropertiesUI;
     friend class CharacterFile;
 public:
     hkbCharacterData(HkxFile *parent, long ref = 0);
-    virtual ~hkbCharacterData();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
+    hkbCharacterData& operator=(const hkbCharacterData&) = delete;
+    hkbCharacterData(const hkbCharacterData &) = delete;
+    ~hkbCharacterData();
     QStringList getVariableNames() const;
-    QString evaluateDataValidity();
-    static QString getClassname();
+    static const QString getClassname();
+    int getWordVariableValueAt(int index);
     hkQuadVariable getQuadVariable(int index, bool *ok) const;
     HkxObject * getVariantVariable(int index) const;
     hkVariableType getVariableTypeAt(int index) const;
-    bool write(HkxXMLWriter *writer);
     QStringList getCharacterPropertyNames() const;
+    QString getCharacterPropertyNameAt(int index) const;
+    QString getLastCharacterPropertyName() const;
     QStringList getCharacterPropertyTypenames() const;
-private:
-    hkbCharacterData& operator=(const hkbCharacterData&);
-    hkbCharacterData(const hkbCharacterData &);
-private:
-    bool merge(HkxObject *recessiveobj);
+    hkVariableType getCharacterPropertyTypeAt(int index) const;
     void addVariable(hkVariableType type, const QString & name);
     void addVariable(hkVariableType type);
     void removeVariable(int index);
-    void setVariableNameAt(int index, const QString & name);
+    void setCharacterPropertyNameAt(int index, const QString & name);
     void setWordVariableValueAt(int index, int value);
     void setQuadVariableValueAt(int index, hkQuadVariable value);
 private:
-    static QStringList Type;    //See hkVariableType...
+    QString evaluateDataValidity();
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
+    bool write(HkxXMLWriter *writer);
+    bool merge(HkxObject *recessiveobj);
+private:
     struct hkVariableInfo
     {
         hkVariableInfo(){}
@@ -53,10 +51,6 @@ private:
         QString type;
     };
 
-public:
-    hkVariableType getCharacterPropertyTypeAt(int index) const;
-
-private:
     struct hkCharacterControllerInfo{
         hkCharacterControllerInfo(): capsuleHeight(1.7), capsuleRadius(0.4), collisionFilterInfo(1){}
         qreal capsuleHeight;
@@ -64,9 +58,10 @@ private:
         int collisionFilterInfo;
         HkxSharedPtr characterControllerCinfo;
     };
-
+private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
+    static const QStringList Type;    //See hkVariableType...
     hkCharacterControllerInfo characterControllerInfo;
     hkQuadVariable modelUpMS;
     hkQuadVariable modelForwardMS;
@@ -79,6 +74,7 @@ private:
     HkxSharedPtr stringData;
     HkxSharedPtr mirroredSkeletonInfo;
     qreal scale;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBCHARACTERDATA_H

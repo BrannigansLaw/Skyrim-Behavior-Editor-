@@ -117,7 +117,7 @@ void ModifierGeneratorUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
@@ -150,7 +150,7 @@ void ModifierGeneratorUI::setModifier(int index, const QString &name){
             }
             behaviorView->removeModifierData();
             table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             CRITICAL_ERROR_MESSAGE("ModifierGeneratorUI::setModifier(): The 'behaviorView' pointer is nullptr!!");
         }
@@ -184,7 +184,7 @@ void ModifierGeneratorUI::setGenerator(int index, const QString & name){
             }
             behaviorView->removeGeneratorData();
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             CRITICAL_ERROR_MESSAGE("ModifierGeneratorUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");
         }
@@ -200,7 +200,7 @@ void ModifierGeneratorUI::viewSelected(int row, int column){
                 emit viewModifiers(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData->modifier) + 1, QString(), QStringList());
             }else if (row == GENERATOR_ROW){
                 QStringList list = {hkbStateMachineStateInfo::getClassname(), hkbBlenderGeneratorChild::getClassname(), BSBoneSwitchGeneratorBoneData::getClassname()};
-                emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generator) + 1, QString(), list);
+                emit viewGenerators(bsData->getIndexOfGenerator(bsData->generator) + 1, QString(), list);
             }
         }
     }else{

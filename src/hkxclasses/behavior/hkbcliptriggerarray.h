@@ -5,28 +5,19 @@
 
 class BehaviorFile;
 
-class hkbClipTriggerArray: public HkxObject
+class hkbClipTriggerArray final: public HkxObject
 {
     friend class hkbClipGenerator;
     friend class ClipGeneratorUI;
     friend class ClipTriggerUI;
 public:
     hkbClipTriggerArray(HkxFile *parent, long ref = -1);
-    virtual ~hkbClipTriggerArray();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
-    QString evaluateDataValidity();
-    static QString getClassname();
+    hkbClipTriggerArray& operator=(const hkbClipTriggerArray&) = delete;
+    hkbClipTriggerArray(const hkbClipTriggerArray &) = delete;
+    ~hkbClipTriggerArray();
+    int getNumberOfTriggers() const;
+    static const QString getClassname();
     int getLastTriggerIndex() const;
-    bool write(HkxXMLWriter *writer);
-    bool isEventReferenced(int eventindex) const;
-    void updateEventIndices(int eventindex);
-    void mergeEventIndex(int oldindex, int newindex);
-    void fixMergedEventIndices(BehaviorFile *dominantfile);
-    bool merge(HkxObject *recessiveObject);
-    void updateReferences(long &ref);
-    QVector <HkxObject *> getChildrenOtherTypes() const;
-protected:
 private:
     struct HkTrigger
     {
@@ -44,14 +35,27 @@ private:
         bool acyclic;
         bool isAnnotation;
     };
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
+    QString evaluateDataValidity();
+    bool write(HkxXMLWriter *writer);
+    bool isEventReferenced(int eventindex) const;
+    void updateEventIndices(int eventindex);
+    void mergeEventIndex(int oldindex, int newindex);
+    void fixMergedEventIndices(BehaviorFile *dominantfile);
+    bool merge(HkxObject *recessiveObject);
+    void updateReferences(long &ref);
+    QVector <HkxObject *> getChildrenOtherTypes() const;
     void addTrigger(const HkTrigger & trigger = HkTrigger());
     void setTriggerId(int index, int id);
     void setLocalTime(int index, qreal time);
     void removeTrigger(int index);
 private:
     static uint refCount;
-    static QString classname;
-    QList <HkTrigger> triggers;
+    static QString const classname;
+    QVector <HkTrigger> triggers;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBCLIPTRIGGERARRAY_H

@@ -26,8 +26,8 @@ private:
     HkxSharedPtr * findSkeleton(long ref);
     HkxSharedPtr * findLocalFrame(long ref);
 private:
-    QList <HkxSharedPtr> skeletons;
-    QList <HkxSharedPtr> localFrames;
+    QVector <HkxSharedPtr> skeletons;
+    QVector <HkxSharedPtr> localFrames;
     long largestRef;
 };
 

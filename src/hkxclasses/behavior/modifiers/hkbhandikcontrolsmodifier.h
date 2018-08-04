@@ -3,25 +3,24 @@
 
 #include "hkbmodifier.h"
 
-class hkbHandIkControlsModifier: public hkbModifier
+class hkbHandIkControlsModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class HandUI;
     friend class HandIkControlsModifierUI;
 public:
     hkbHandIkControlsModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbHandIkControlsModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbHandIkControlsModifier& operator=(const hkbHandIkControlsModifier&) = delete;
+    hkbHandIkControlsModifier(const hkbHandIkControlsModifier &) = delete;
+    ~hkbHandIkControlsModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfHands()const;
-private:
-    hkbHandIkControlsModifier& operator=(const hkbHandIkControlsModifier&);
-    hkbHandIkControlsModifier(const hkbHandIkControlsModifier &);
 private:
     struct hkControlData{
         hkControlData()
@@ -31,12 +30,11 @@ private:
               fadeOutDuration(0),
               extrapolationTimeStep(0),
               handleChangeSpeed(0),
-              handleChangeMode("HANDLE_CHANGE_MODE_ABRUPT"),//HANDLE_CHANGE_MODE_CONSTANT_VELOCITY
+              handleChangeMode("HANDLE_CHANGE_MODE_ABRUPT"),
               fixUp(false)
         {
             //
         }
-
         hkQuadVariable targetPosition;
         hkQuadVariable targetRotation;
         hkQuadVariable targetNormal;
@@ -52,24 +50,20 @@ private:
     };
 
     struct hkHand{
-        hkHand()
-            : enable(false)
-        {
-            //
-        }
-
+        hkHand() : enable(false){}
         hkControlData controlData;
         int handIndex;
         bool enable;
     };
-
-    static QStringList HandleChangeMode;
+private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
+    static const QStringList HandleChangeMode;
     long userData;
     QString name;
     bool enable;
-    QList <hkHand> hands;
+    QVector <hkHand> hands;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBHANDIKCONTROLSMODIFIER_H

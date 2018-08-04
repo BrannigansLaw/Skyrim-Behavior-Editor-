@@ -2,63 +2,56 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/projectfile.h"
 
-/*
- * CLASS: hkbMirroredSkeletonInfo
-*/
-
 uint hkbMirroredSkeletonInfo::refCount = 0;
 
-QString hkbMirroredSkeletonInfo::classname = "hkbMirroredSkeletonInfo";
+const QString hkbMirroredSkeletonInfo::classname = "hkbMirroredSkeletonInfo";
 
 hkbMirroredSkeletonInfo::hkbMirroredSkeletonInfo(HkxFile *parent, long ref, int size)
     : HkxObject(parent, ref),
       mirrorAxis(1, 0, 0, 0)
 {
     setType(HKB_MIRRORED_SKELETON_INFO, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
     //bonePairMap.reserve(size);
-    for (int i = 0; i < size; i++){
+    for (auto i = 0; i < size; i++){
         bonePairMap.append(0);
     }
 }
 
-QString hkbMirroredSkeletonInfo::getClassname(){
+const QString hkbMirroredSkeletonInfo::getClassname(){
     return classname;
 }
 
-bool hkbMirroredSkeletonInfo::readData(const HkxXmlReader &reader, long index){
+bool hkbMirroredSkeletonInfo::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
+    int numElems;
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "mirrorAxis"){
             mirrorAxis = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'mirrorAxis' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "bonePairMap"){
-            int numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bonePairMap' data!\nObject Reference: "+ref);
-                return false;
-            }
-            if (numElems > 0 && !readIntegers(reader.getElementValueAt(index), bonePairMap)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bonePairMap' data!\nObject Reference: "+ref);
-                return false;
-            }
+            numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            checkvalue(ok, "bonePairMap");
+            checkvalue((numElems > 0 && !readIntegers(reader.getElementValueAt(index), bonePairMap)), "bonePairMap");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbMirroredSkeletonInfo::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (writer && !getIsWritten()){
         QString bones;
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
@@ -67,7 +60,7 @@ bool hkbMirroredSkeletonInfo::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"bonePairMap", QString::number(bonePairMap.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0, j = 1; i < bonePairMap.size(); i++, j++){
+        for (auto i = 0, j = 1; i < bonePairMap.size(); i++, j++){
             bones.append(QString::number(bonePairMap.at(i)));
             if (j % 16 == 0){
                 bones.append("\n");
@@ -90,17 +83,11 @@ bool hkbMirroredSkeletonInfo::write(HkxXMLWriter *writer){
 }
 
 bool hkbMirroredSkeletonInfo::link(){
-    if (!getParentFile()){
-        return false;
-    }
     return true;
 }
 
-void hkbMirroredSkeletonInfo::unlink(){
-    //
-}
-
-QString hkbMirroredSkeletonInfo::evaluateDataValidity(){
+QString hkbMirroredSkeletonInfo::evaluateDataValidity(){    //TO DO...
+    std::lock_guard <std::mutex> guard(mutex);
     setDataValidity(true);
     return QString();
 }

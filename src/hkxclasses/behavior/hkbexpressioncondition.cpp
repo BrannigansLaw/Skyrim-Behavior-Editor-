@@ -2,52 +2,48 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 
-/**
- * hkbExpressionCondition
- */
-
 uint hkbExpressionCondition::refCount = 0;
 
-QString hkbExpressionCondition::classname = "hkbExpressionCondition";
+const QString hkbExpressionCondition::classname = "hkbExpressionCondition";
 
 hkbExpressionCondition::hkbExpressionCondition(BehaviorFile *parent, const QString &string, long ref)
     : HkxObject(parent, ref),
       expression(string)
 {
     setType(HKB_EXPRESSION_CONDITION, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
-QString hkbExpressionCondition::getClassname(){
+const QString hkbExpressionCondition::getClassname(){
     return classname;
 }
 
 QString hkbExpressionCondition::getExpression() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return expression;
 }
 
-bool hkbExpressionCondition::readData(const HkxXmlReader & reader, long index){
+bool hkbExpressionCondition::readData(const HkxXmlReader & reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "expression"){
             expression = reader.getElementValueAt(index);
             if (expression == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'expression' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'expression' data field!\nObject Reference: "+ref);
             }
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbExpressionCondition::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
@@ -59,10 +55,16 @@ bool hkbExpressionCondition::write(HkxXMLWriter *writer){
     return true;
 }
 
+void hkbExpressionCondition::setExpression(const QString &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    expression = value;
+}
+
 QString hkbExpressionCondition::evaluateDataValidity(){ //TO DO...
+    std::lock_guard <std::mutex> guard(mutex);
     if (expression == ""){
         setDataValidity(false);
-        return QString();
+        return QString(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid "+expression+"!\n");
     }else{
         setDataValidity(true);
         return QString();

@@ -269,7 +269,7 @@ void BSDirectAtModifierUI::loadData(HkxObject *data){
             active->setChecked(bsData->active);
             currentHeadingOffset->setValue(bsData->currentHeadingOffset);
             currentPitchOffset->setValue(bsData->currentPitchOffset);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
                 loadBinding(DIRECT_AT_TARGET_ROW, BINDING_COLUMN, varBind, "directAtTarget");
@@ -327,7 +327,7 @@ void BSDirectAtModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -338,7 +338,7 @@ void BSDirectAtModifierUI::setName(){
 void BSDirectAtModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setEnable(): The data is nullptr!!");
     }
@@ -347,7 +347,7 @@ void BSDirectAtModifierUI::setEnable(){
 void BSDirectAtModifierUI::setDirectAtTarget(){
     if (bsData){
         bsData->directAtTarget = directAtTarget->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setDirectAtTarget(): The data is nullptr!!");
     }
@@ -356,7 +356,7 @@ void BSDirectAtModifierUI::setDirectAtTarget(){
 void BSDirectAtModifierUI::setSourceBoneIndex(int index){
     if (bsData){
         bsData->sourceBoneIndex = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setSourceBoneIndex(): The data is nullptr!!");
     }
@@ -365,7 +365,7 @@ void BSDirectAtModifierUI::setSourceBoneIndex(int index){
 void BSDirectAtModifierUI::setStartBoneIndex(int index){
     if (bsData){
         bsData->startBoneIndex = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setStartBoneIndex(): The data is nullptr!!");
     }
@@ -374,7 +374,7 @@ void BSDirectAtModifierUI::setStartBoneIndex(int index){
 void BSDirectAtModifierUI::setEndBoneIndex(int index){
     if (bsData){
         bsData->endBoneIndex = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setEndBoneIndex(): The data is nullptr!!");
     }
@@ -384,7 +384,7 @@ void BSDirectAtModifierUI::setLimitHeadingDegrees(){
     if (bsData){
         if (bsData->limitHeadingDegrees != limitHeadingDegrees->value()){
             bsData->limitHeadingDegrees = limitHeadingDegrees->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setLimitHeadingDegrees(): The data is nullptr!!");
@@ -395,7 +395,7 @@ void BSDirectAtModifierUI::setLimitPitchDegrees(){
     if (bsData){
         if (bsData->limitPitchDegrees != limitPitchDegrees->value()){
             bsData->limitPitchDegrees = limitPitchDegrees->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setLimitPitchDegrees(): The data is nullptr!!");
@@ -406,7 +406,7 @@ void BSDirectAtModifierUI::setOffsetHeadingDegrees(){
     if (bsData){
         if (bsData->offsetHeadingDegrees != offsetHeadingDegrees->value()){
             bsData->offsetHeadingDegrees = offsetHeadingDegrees->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setOffsetHeadingDegrees(): The data is nullptr!!");
@@ -417,7 +417,7 @@ void BSDirectAtModifierUI::setOffsetPitchDegrees(){
     if (bsData){
         if (bsData->offsetPitchDegrees != offsetPitchDegrees->value()){
             bsData->offsetPitchDegrees = offsetPitchDegrees->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setOffsetPitchDegrees(): The data is nullptr!!");
@@ -428,7 +428,7 @@ void BSDirectAtModifierUI::setOnGain(){
     if (bsData){
         if (bsData->onGain != onGain->value()){
             bsData->onGain = onGain->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setOnGain(): The data is nullptr!!");
@@ -439,7 +439,7 @@ void BSDirectAtModifierUI::setOffGain(){
     if (bsData){
         if (bsData->offGain != offGain->value()){
             bsData->offGain = offGain->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setOffGain(): The data is nullptr!!");
@@ -450,7 +450,7 @@ void BSDirectAtModifierUI::setTargetLocation(){
     if (bsData){
         if (bsData->targetLocation != targetLocation->value()){
             bsData->targetLocation = targetLocation->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setTargetLocation(): The data is nullptr!!");
@@ -461,7 +461,7 @@ void BSDirectAtModifierUI::setUserInfo(){
     if (bsData){
         if (bsData->userInfo != userInfo->value()){
             bsData->userInfo = userInfo->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setUserInfo(): The data is nullptr!!");
@@ -471,7 +471,7 @@ void BSDirectAtModifierUI::setUserInfo(){
 void BSDirectAtModifierUI::setDirectAtCamera(){
     if (bsData){
         bsData->directAtCamera = directAtCamera->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setDirectAtCamera(): The data is nullptr!!");
     }
@@ -481,7 +481,7 @@ void BSDirectAtModifierUI::setDirectAtCameraX(){
     if (bsData){
         if (bsData->directAtCameraX != directAtCameraX->value()){
             bsData->directAtCameraX = directAtCameraX->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setDirectAtCameraX(): The data is nullptr!!");
@@ -492,7 +492,7 @@ void BSDirectAtModifierUI::setDirectAtCameraY(){
     if (bsData){
         if (bsData->directAtCameraY != directAtCameraY->value()){
             bsData->directAtCameraY = directAtCameraY->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setDirectAtCameraY(): The data is nullptr!!");
@@ -503,7 +503,7 @@ void BSDirectAtModifierUI::setDirectAtCameraZ(){
     if (bsData){
         if (bsData->directAtCameraZ != directAtCameraZ->value()){
             bsData->directAtCameraZ = directAtCameraZ->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setDirectAtCameraZ(): The data is nullptr!!");
@@ -513,7 +513,7 @@ void BSDirectAtModifierUI::setDirectAtCameraZ(){
 void BSDirectAtModifierUI::setActive(){
     if (bsData){
         bsData->active = active->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setActive(): The data is nullptr!!");
     }
@@ -523,7 +523,7 @@ void BSDirectAtModifierUI::setCurrentHeadingOffset(){
     if (bsData){
         if (bsData->currentHeadingOffset != currentHeadingOffset->value()){
             bsData->currentHeadingOffset = currentHeadingOffset->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setCurrentHeadingOffset(): The data is nullptr!!");
@@ -533,7 +533,7 @@ void BSDirectAtModifierUI::setCurrentPitchOffset(){
     if (bsData){
         if (bsData->currentPitchOffset != currentPitchOffset->value()){
             bsData->currentPitchOffset = currentPitchOffset->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setCurrentPitchOffset(): The data is nullptr!!");
@@ -676,14 +676,14 @@ void BSDirectAtModifierUI::viewSelected(int row, int column){
 void BSDirectAtModifierUI::selectTableToView(bool viewisProperty, const QString & path){
     if (bsData){
         if (viewisProperty){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -696,7 +696,7 @@ void BSDirectAtModifierUI::selectTableToView(bool viewisProperty, const QString 
 void BSDirectAtModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
         if (bind){
             int bindIndex = bind->getVariableIndexOfBinding("enable");
             if (bindIndex == index){
@@ -785,16 +785,16 @@ void BSDirectAtModifierUI::variableRenamed(const QString & name, int index){
 }
 
 bool BSDirectAtModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -806,7 +806,7 @@ bool BSDirectAtModifierUI::setBinding(int index, int row, const QString &variabl
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -944,13 +944,13 @@ void BSDirectAtModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-void BSDirectAtModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void BSDirectAtModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -958,7 +958,7 @@ void BSDirectAtModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSe
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -966,7 +966,7 @@ void BSDirectAtModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSe
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("BSDirectAtModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }

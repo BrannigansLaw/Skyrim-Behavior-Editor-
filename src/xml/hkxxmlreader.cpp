@@ -21,14 +21,14 @@ bool HkxXmlReader::parse(){
     lineNumber = 0;
     if (!hkxXmlFile->open(QIODevice::ReadOnly)){
         isEOF = true;
-        //LogFile::writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" failed to open!");
+        LogFile::writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" failed to open!");
         return false;
     }
     isEOF = false;
     QByteArray line = hkxXmlFile->readLine(MAX_HKXXML_LINE_LENGTH);
     lineNumber++;
     if (line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\n" && line != "<?xml version=\"1.0\" encoding=\"ascii\"?>\r\n"){
-        //LogFile::writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" is not in the correct XML format!");
+        LogFile::writeToLog("HkxXmlReader: parse() failed!\nThe file "+hkxXmlFile->fileName()+" is not in the correct XML format!");
         return false;
     }
     HkxXmlParseLine result = NoError;
@@ -36,12 +36,12 @@ bool HkxXmlReader::parse(){
         //hkxXmlFile->//setProgressData("Parsing XML line number "+QString::number(lineNumber), 20);
         result = readNextLine();
         if (result != NoError && result != EmptyLine && result != EmptyLineEndFile){
-            //LogFile::writeToLog("HkxXmlReader: parse() failed because readNextLine() failed!");
+            LogFile::writeToLog("HkxXmlReader: parse() failed because readNextLine() failed!");
             return false;
         }
     }
     if (!indexOfElemTags.isEmpty()){
-        //LogFile::writeToLog("HkxXmlReader: parse() failed because there are orphaned element tags!!!");
+        LogFile::writeToLog("HkxXmlReader: parse() failed because there are orphaned element tags!!!");
         return false;
     }
     //hkxXmlFile->//setProgressData("XML parsed successfully!", 40);
@@ -216,7 +216,7 @@ int HkxXmlReader::readValue(const QByteArray & line, int startIndex, bool isValu
 }
 
 int HkxXmlReader::skipComment(const QByteArray & line, int index){
-    for (int j = 0; index < line.size(), j < 2; index++, j++){
+    for (auto j = 0; index < line.size(), j < 2; index++, j++){
         if (line.at(index) != '-'){
             return MalformedComment;
         }
@@ -225,7 +225,7 @@ int HkxXmlReader::skipComment(const QByteArray & line, int index){
     if (index >= line.size()){
         return MalformedComment;
     }
-    for (int j = 0; index < line.size(), j < 2; index++, j++){
+    for (auto j = 0; index < line.size(), j < 2; index++, j++){
         if (line.at(index) != '-'){
             return MalformedComment;
         }
@@ -244,7 +244,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
         return EmptyLineEndFile;
     }else if (line.size() == 1){
         if (line.at(0) != '\n'){
-            //LogFile::writeToLog("HkxXmlReader: readNextLine() failed because an orphaned character was found on line "+QString::number(lineNumber)+"!");
+            LogFile::writeToLog("HkxXmlReader: readNextLine() failed because an orphaned character was found on line "+QString::number(lineNumber)+"!");
             return OrphanedCharacter;
         }else{
             return EmptyLine;
@@ -252,7 +252,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
     }
     bool isIsolatedEndElemTag = true;
     bool isValueSplitOnMultipleLines = true;
-    for (int i = 0; i < line.size(); i++){
+    for (auto i = 0; i < line.size(); i++){
         if (line.at(i) == '<'){
             isValueSplitOnMultipleLines = false;
             i++;
@@ -297,7 +297,7 @@ HkxXmlReader::HkxXmlParseLine HkxXmlReader::readNextLine(){
 }
 
 int HkxXmlReader::getNumAttributesAt(int index) const{
-    if (index < elementList.size()){
+    if (index >= 0 && index < elementList.size()){
         return elementList.at(index).attributeList.size();
     }else{
         return 0;
@@ -305,7 +305,7 @@ int HkxXmlReader::getNumAttributesAt(int index) const{
 }
 
 QByteArray HkxXmlReader::getElementNameAt(int index) const{
-    if (index < elementList.size()){
+    if (index >= 0 && index < elementList.size()){
         return elementList.at(index).name;
     }else{
         return "";
@@ -313,7 +313,7 @@ QByteArray HkxXmlReader::getElementNameAt(int index) const{
 }
 
 QByteArray HkxXmlReader::getElementValueAt(int index) const{
-    if (index < elementList.size()){
+    if (index >= 0 && index < elementList.size()){
         return elementList.at(index).value;
     }else{
         return "";
@@ -321,7 +321,7 @@ QByteArray HkxXmlReader::getElementValueAt(int index) const{
 }
 
 QByteArray HkxXmlReader::getNthAttributeNameAt(int index, int nth) const{
-    if (index < elementList.size() && nth < elementList.at(index).attributeList.size()){
+    if (index >= 0 && index < elementList.size() && nth < elementList.at(index).attributeList.size()){
         return elementList.at(index).attributeList.at(nth).name;
     }else{
         return "";
@@ -340,9 +340,9 @@ QByteArray HkxXmlReader::getNthAttributeValueAt(int index, int nth) const{
 }
 
 QByteArray HkxXmlReader::findFirstValueWithAttributeValue(const QString &attributevalue) const{
-    for (int i = 0; i < elementList.size(); i++){
+    for (auto i = 0; i < elementList.size(); i++){
         if (!elementList.at(i).attributeList.isEmpty()){
-            for (int j = 0; j < elementList.at(i).attributeList.size(); j++){
+            for (auto j = 0; j < elementList.at(i).attributeList.size(); j++){
                 if (elementList.at(i).attributeList.at(j).value == attributevalue){
                     return elementList.at(i).value;
                 }

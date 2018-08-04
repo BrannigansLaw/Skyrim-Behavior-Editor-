@@ -3,23 +3,25 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbStringCondition: public HkxObject
+class hkbStringCondition final: public HkxObject
 {
-    friend class TransitionsUI;
 public:
     hkbStringCondition(BehaviorFile *parent, const QString & string = "", long ref = -1);
-    virtual ~hkbStringCondition();
-    bool readData(const HkxXmlReader & reader, long index);
-    QString evaluateDataValidity();
-    static QString getClassname();
-    bool link(){return true;}
+    hkbStringCondition& operator=(const hkbStringCondition&) = delete;
+    hkbStringCondition(const hkbStringCondition &) = delete;
+    ~hkbStringCondition();
+    static const QString getClassname();
     QString getExpression() const;
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
+    QString evaluateDataValidity();
+    bool link(){return true;}
     bool write(HkxXMLWriter *writer);
-protected:
 private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     QString conditionString;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBSTRINGCONDITION_H

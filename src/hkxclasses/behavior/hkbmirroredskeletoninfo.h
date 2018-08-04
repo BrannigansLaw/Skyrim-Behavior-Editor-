@@ -7,26 +7,25 @@
 
 class BehaviorFile;
 
-class hkbMirroredSkeletonInfo: public HkxObject
+class hkbMirroredSkeletonInfo final: public HkxObject
 {
-    friend class ProjectFile;
 public:
     hkbMirroredSkeletonInfo(HkxFile *parent, long ref = 0, int size = 0);
-    virtual ~hkbMirroredSkeletonInfo();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbMirroredSkeletonInfo& operator=(const hkbMirroredSkeletonInfo&) = delete;
+    hkbMirroredSkeletonInfo(const hkbMirroredSkeletonInfo &) = delete;
+    ~hkbMirroredSkeletonInfo();
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
-    void unlink();
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbMirroredSkeletonInfo& operator=(const hkbMirroredSkeletonInfo&);
-    hkbMirroredSkeletonInfo(const hkbMirroredSkeletonInfo &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     hkQuadVariable mirrorAxis;
     QVector <int> bonePairMap;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBMIRROREDSKELETONINFO_H

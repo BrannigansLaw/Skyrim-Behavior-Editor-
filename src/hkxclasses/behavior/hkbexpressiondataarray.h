@@ -3,7 +3,7 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbExpressionDataArray: public HkxObject
+class hkbExpressionDataArray final: public HkxObject
 {
     friend class ExpressionDataArrayUI;
     friend class hkbEvaluateExpressionModifier;
@@ -17,8 +17,11 @@ private:
     };
 public:
     hkbExpressionDataArray(HkxFile *parent, long ref = -1);
-    virtual ~hkbExpressionDataArray();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbExpressionDataArray& operator=(const hkbExpressionDataArray&) = delete;
+    hkbExpressionDataArray(const hkbExpressionDataArray &) = delete;
+    ~hkbExpressionDataArray();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     QString evaluateDataValidity();
     static QString getClassname();
@@ -30,10 +33,6 @@ public:
     void fixMergedEventIndices(BehaviorFile *dominantfile);
     bool merge(HkxObject *recessiveObject);
     void updateEventIndices(int eventindex);
-protected:
-private:
-    hkbExpressionDataArray& operator=(const hkbExpressionDataArray&);
-    hkbExpressionDataArray(const hkbExpressionDataArray &);
 private:
     struct hkExpression
     {
@@ -53,11 +52,12 @@ private:
         int assignmentEventIndex;
         QString eventMode;
     };
-
-    static QStringList EventMode;   //ExpressionEventMode (EVENT_MODE_SEND_ONCE=0;EVENT_MODE_SEND_ON_TRUE=1;EVENT_MODE_SEND_ON_FALSE_TO_TRUE=2;EVENT_MODE_SEND_EVERY_FRAME_ONCE_TRUE=3)
+private:
     static uint refCount;
-    static QString classname;
-    QList <hkExpression> expressionsData;
+    static const QString classname;
+    static const QStringList EventMode;
+    QVector <hkExpression> expressionsData;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBEXPRESSIONDATAARRAY_H

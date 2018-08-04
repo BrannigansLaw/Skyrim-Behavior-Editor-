@@ -62,7 +62,7 @@ private:
     bool getIsExpanded() const;
     void setIsExpanded(bool value);
     void setPathToParent();
-    QList <TreeGraphicsItem *> getAllIconsInBranch(TreeGraphicsItem *iconToFind = nullptr) const;
+    QVector <TreeGraphicsItem *> getAllIconsInBranch(TreeGraphicsItem *iconToFind = nullptr) const;
 protected:
     Qt::GlobalColor brushColor;
     Qt::GlobalColor penColor;

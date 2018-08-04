@@ -20,15 +20,20 @@ class CheckButtonCombo;
 class hkbVariableBindingSet;
 class GenericTableWidget;
 
-class BSBoneSwitchGeneratorBoneDataUI: public QStackedWidget
+class BSBoneSwitchGeneratorBoneDataUI final: public QStackedWidget
 {
     Q_OBJECT
     friend class BSBoneSwitchGeneratorUI;
-    friend class HkDataUI;
 public:
     BSBoneSwitchGeneratorBoneDataUI();
-    virtual ~BSBoneSwitchGeneratorBoneDataUI(){}
+    BSBoneSwitchGeneratorBoneDataUI& operator=(const BSBoneSwitchGeneratorBoneDataUI&) = delete;
+    BSBoneSwitchGeneratorBoneDataUI(const BSBoneSwitchGeneratorBoneDataUI &) = delete;
+    ~BSBoneSwitchGeneratorBoneDataUI() = default;
     void loadData(HkxObject *data, int childindex);
+    void variableRenamed(const QString & name, int index);
+    void generatorRenamed(const QString & name, int index);
+    void setBehaviorView(BehaviorGraphView *view);
+    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
 signals:
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
@@ -42,23 +47,19 @@ private slots:
     void generatorTableElementSelected(int index, const QString &name);
     void variableTableElementSelected(int index, const QString &name);
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
     void setGenerator(int index, const QString & name);
-    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path);
+    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
     void setBindingVariable(int index, const QString & name);
-    void variableRenamed(const QString & name, int index);
-    void generatorRenamed(const QString & name, int index);
-    void setBehaviorView(BehaviorGraphView *view);
-    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
     void selectTableToView(bool viewproperties, const QString & path);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
+    void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
 private:
     enum ACTIVE_WIDGET {
-        MAIN_WIDGET = 0,
-        BONE_WEIGHT_ARRAY_WIDGET = 1
+        MAIN_WIDGET,
+        BONE_WEIGHT_ARRAY_WIDGET
     };
-    static QStringList headerLabels;
+private:
+    static const QStringList headerLabels;
     BehaviorGraphView *behaviorView;
     BSBoneSwitchGeneratorBoneData *bsData;
     int childIndex;

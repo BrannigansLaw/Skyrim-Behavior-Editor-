@@ -3,18 +3,20 @@
 
 #include "hkbmodifier.h"
 
-class hkbAttachmentModifier: public hkbModifier
+class hkbAttachmentModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
 public:
     hkbAttachmentModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbAttachmentModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbAttachmentModifier& operator=(const hkbAttachmentModifier&) = delete;
+    hkbAttachmentModifier(const hkbAttachmentModifier &) = delete;
+    ~hkbAttachmentModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
@@ -23,15 +25,8 @@ public:
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
 private:
-    /*QList <DataIconManager *> getChildren() const;
-    int getIndexOfObj(DataIconManager *obj) const;
-    bool insertObjectAt(int index, DataIconManager *obj);
-    bool removeObjectAt(int index);*/
-    hkbAttachmentModifier& operator=(const hkbAttachmentModifier&);
-    hkbAttachmentModifier(const hkbAttachmentModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -43,6 +38,7 @@ private:
     HkxSharedPtr attacherHandle;
     HkxSharedPtr attacheeHandle;
     int attacheeLayer;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBATTACHMENTMODIFIER_H

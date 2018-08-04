@@ -2,32 +2,30 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/skeletonfile.h"
 
-/**
- * hkSimpleLocalFrame
- */
-
 uint hkSimpleLocalFrame::refCount = 0;
 
-QString hkSimpleLocalFrame::classname = "hkSimpleLocalFrame";
+const QString hkSimpleLocalFrame::classname = "hkSimpleLocalFrame";
 
 hkSimpleLocalFrame::hkSimpleLocalFrame(HkxFile *parent, const QString &string, long ref)
     : HkxObject(parent, ref),
       name(string)
 {
     setType(HK_SIMPLE_LOCAL_FRAME, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
-QString hkSimpleLocalFrame::getClassname(){
+const QString hkSimpleLocalFrame::getClassname(){
     return classname;
 }
 
 QString hkSimpleLocalFrame::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-bool hkSimpleLocalFrame::readData(const HkxXmlReader & reader, long index){
+bool hkSimpleLocalFrame::readData(const HkxXmlReader & reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
@@ -35,19 +33,18 @@ bool hkSimpleLocalFrame::readData(const HkxXmlReader & reader, long index){
         if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }
         index++;
     }
+    index--;
     return true;
 }
 
 bool hkSimpleLocalFrame::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
@@ -61,25 +58,31 @@ bool hkSimpleLocalFrame::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        /*for (int i = 0; i < children.size(); i++){
+        /*for (auto i = 0; i < children.size(); i++){
             if (children.at(i).data()){
-                children.at(i).data()->write(writer);
+                children.at(i)->write(writer);
             }
         }
         if (parentFrame.data()){
-            parentFrame.data()->write(writer);
+            parentFrame->write(writer);
         }
         if (group.data()){
-            group.data()->write(writer);
+            group->write(writer);
         }*/
     }
     return true;
 }
 
+void hkSimpleLocalFrame::setName(const QString &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    name = value;
+}
+
 QString hkSimpleLocalFrame::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     if (name == ""){
         setDataValidity(false);
-        return QString();
+        return QString(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid 'name': "+name+"!\n");
     }
     setDataValidity(true);
     return QString();

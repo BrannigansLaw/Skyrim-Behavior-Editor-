@@ -3,35 +3,34 @@
 
 #include "hkbmodifier.h"
 
-class hkbEventDrivenModifier: public hkbModifier
+class hkbEventDrivenModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class EventDrivenModifierUI;
 public:
     hkbEventDrivenModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbEventDrivenModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbEventDrivenModifier& operator=(const hkbEventDrivenModifier&) = delete;
+    hkbEventDrivenModifier(const hkbEventDrivenModifier &) = delete;
+    ~hkbEventDrivenModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
     void mergeEventIndex(int oldindex, int newindex);
     void fixMergedEventIndices(BehaviorFile *dominantfile);
-private:
-    QList <DataIconManager *> getChildren() const;
+    QVector <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int, DataIconManager *obj);
     bool removeObjectAt(int index);
-    hkbEventDrivenModifier& operator=(const hkbEventDrivenModifier&);
-    hkbEventDrivenModifier(const hkbEventDrivenModifier &);
 private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -39,6 +38,7 @@ private:
     int activateEventId;
     int deactivateEventId;
     bool activeByDefault;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBEVENTDRIVENMODIFIER_H

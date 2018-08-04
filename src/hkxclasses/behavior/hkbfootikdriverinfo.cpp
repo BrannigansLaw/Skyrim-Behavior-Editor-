@@ -2,13 +2,9 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 
-/*
- * CLASS: hkbFootIkDriverInfo
-*/
-
 uint hkbFootIkDriverInfo::refCount = 0;
 
-QString hkbFootIkDriverInfo::classname = "hkbFootIkDriverInfo";
+const QString hkbFootIkDriverInfo::classname = "hkbFootIkDriverInfo";
 
 hkbFootIkDriverInfo::hkbFootIkDriverInfo(HkxFile *parent, long ref)
     : HkxObject(parent, ref),
@@ -25,220 +21,180 @@ hkbFootIkDriverInfo::hkbFootIkDriverInfo(HkxFile *parent, long ref)
       isQuadrupedNarrow(true)
 {
     setType(HKB_FOOT_IK_DRIVER_INFO, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
-QString hkbFootIkDriverInfo::getClassname(){
+const QString hkbFootIkDriverInfo::getClassname(){
     return classname;
 }
 
 void hkbFootIkDriverInfo::addLeg(){
+    std::lock_guard <std::mutex> guard(mutex);
     legs.append(hkbFootIkDriverInfoLeg());
 }
 
 void hkbFootIkDriverInfo::removeLegAt(int index){
-    if (index >= 0 && index < legs.size()){
-        legs.removeAt(index);
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < legs.size()) ? legs.removeAt(index) : NULL;
 }
 
 hkbFootIkDriverInfo::hkbFootIkDriverInfoLeg * hkbFootIkDriverInfo::getLegAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
     if (index >= 0 && index < legs.size()){
         return &legs[index];
     }
     return nullptr;
 }
 
-bool hkbFootIkDriverInfo::readData(const HkxXmlReader &reader, long index){
+bool hkbFootIkDriverInfo::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
+    int numlegs;
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "legs"){
-            int numlegs = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                return false;
-            }
-            for (int j = 0; j < numlegs; j++){
+            numlegs = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            checkvalue(ok, "legs");
+            (numlegs > 0) ? index++ : NULL;
+            for (auto j = 0; j < numlegs; j++, index++){
                 legs.append(hkbFootIkDriverInfoLeg());
-                while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+                for (; index < reader.getNumElements(); index++){
                     text = reader.getNthAttributeValueAt(index, 0);
                     if (text == "kneeAxisLS"){
                         legs.last().kneeAxisLS = readVector4(reader.getElementValueAt(index), &ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'kneeAxisLS' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "legs.at("+QString::number(j)+").kneeAxisLS");
                     }else if (text == "footEndLS"){
                         legs.last().footEndLS = readVector4(reader.getElementValueAt(index), &ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'footEndLS' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "legs.at("+QString::number(j)+").footEndLS");
                     }else if (text == "footPlantedAnkleHeightMS"){
                         legs.last().footPlantedAnkleHeightMS = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'footPlantedAnkleHeightMS' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "legs.at("+QString::number(j)+").footPlantedAnkleHeightMS");
                     }else if (text == "footRaisedAnkleHeightMS"){
                         legs.last().footRaisedAnkleHeightMS = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'footRaisedAnkleHeightMS' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "legs.at("+QString::number(j)+").footRaisedAnkleHeightMS");
                     }else if (text == "maxAnkleHeightMS"){
                         legs.last().maxAnkleHeightMS = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'maxAnkleHeightMS' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "legs.at("+QString::number(j)+").maxAnkleHeightMS");
                     }else if (text == "minAnkleHeightMS"){
                         legs.last().minAnkleHeightMS = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'minAnkleHeightMS' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "legs.at("+QString::number(j)+").minAnkleHeightMS");
                     }else if (text == "maxKneeAngleDegrees"){
                         legs.last().maxKneeAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'maxKneeAngleDegrees' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "legs.at("+QString::number(j)+").maxKneeAngleDegrees");
                     }else if (text == "minKneeAngleDegrees"){
                         legs.last().minKneeAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'minKneeAngleDegrees' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "legs.at("+QString::number(j)+").minKneeAngleDegrees");
                     }else if (text == "maxAnkleAngleDegrees"){
                         legs.last().maxAnkleAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'maxAnkleAngleDegrees' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "legs.at("+QString::number(j)+").maxAnkleAngleDegrees");
                     }else if (text == "hipIndex"){
-                        legs.last().hipIndex = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'hipIndex' data field!\nObject Reference: "+ref);
-                        }
+                        legs.last().hipIndex = reader.getElementValueAt(index).toInt(&ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").hipIndex");
                     }else if (text == "kneeIndex"){
                         legs.last().kneeIndex = reader.getElementValueAt(index).toInt(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'kneeIndex' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "legs.at("+QString::number(j)+").kneeIndex");
                     }else if (text == "ankleIndex"){
                         legs.last().ankleIndex = reader.getElementValueAt(index).toInt(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'ankleIndex' data field!\nObject Reference: "+ref);
-                        }
-                        index++;
+                        checkvalue(ok, "legs.at("+QString::number(j)+").ankleIndex");
                         break;
+                    }else{
+                        //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                     }
-                    index++;
                 }
             }
-            index--;
+            (numlegs > 0) ? index-- : NULL;
         }else if (text == "raycastDistanceUp"){
             raycastDistanceUp = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'raycastDistanceUp' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "raycastDistanceUp");
         }else if (text == "raycastDistanceDown"){
             raycastDistanceDown = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'raycastDistanceDown' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "raycastDistanceDown");
         }else if (text == "raycastDistanceUp"){
             raycastDistanceUp = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'raycastDistanceUp' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "raycastDistanceUp");
         }else if (text == "originalGroundHeightMS"){
             originalGroundHeightMS = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'originalGroundHeightMS' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "originalGroundHeightMS");
         }else if (text == "verticalOffset"){
             verticalOffset = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'verticalOffset' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "verticalOffset");
         }else if (text == "collisionFilterInfo"){
             collisionFilterInfo = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'collisionFilterInfo' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "collisionFilterInfo");
         }else if (text == "forwardAlignFraction"){
             forwardAlignFraction = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'forwardAlignFraction' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "forwardAlignFraction");
         }else if (text == "sidewaysAlignFraction"){
             sidewaysAlignFraction = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'sidewaysAlignFraction' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "sidewaysAlignFraction");
         }else if (text == "sidewaysSampleWidth"){
             sidewaysSampleWidth = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'sidewaysSampleWidth' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "sidewaysSampleWidth");
         }else if (text == "lockFeetWhenPlanted"){
             lockFeetWhenPlanted = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'lockFeetWhenPlanted' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "lockFeetWhenPlanted");
         }else if (text == "useCharacterUpVector"){
             useCharacterUpVector = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'useCharacterUpVector' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "useCharacterUpVector");
         }else if (text == "isQuadrupedNarrow"){
             isQuadrupedNarrow = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'isQuadrupedNarrow' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "isQuadrupedNarrow");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbFootIkDriverInfo::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
         list1 = {writer->name, writer->numelements};
         list2 = {"legs", QString::number(legs.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < legs.size(); i++){
+        for (auto i = 0; i < legs.size(); i++){
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("kneeAxisLS"), legs[i].kneeAxisLS.getValueAsString());
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("footEndLS"), legs[i].footEndLS.getValueAsString());
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("footPlantedAnkleHeightMS"), QString::number(legs.at(i).footPlantedAnkleHeightMS, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("footRaisedAnkleHeightMS"), QString::number(legs.at(i).footRaisedAnkleHeightMS, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxAnkleHeightMS"), QString::number(legs.at(i).maxAnkleHeightMS, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minAnkleHeightMS"), QString::number(legs.at(i).minAnkleHeightMS, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxKneeAngleDegrees"), QString::number(legs.at(i).maxKneeAngleDegrees, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minKneeAngleDegrees"), QString::number(legs.at(i).minKneeAngleDegrees, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxAnkleAngleDegrees"), QString::number(legs.at(i).maxAnkleAngleDegrees, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("hipIndex"), QString::number(legs.at(i).hipIndex));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("kneeIndex"), QString::number(legs.at(i).kneeIndex));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("ankleIndex"), QString::number(legs.at(i).ankleIndex));
+            writedatafield("kneeAxisLS", legs[i].kneeAxisLS.getValueAsString());
+            writedatafield("footEndLS", legs[i].footEndLS.getValueAsString());
+            writedatafield("footPlantedAnkleHeightMS", QString::number(legs.at(i).footPlantedAnkleHeightMS, char('f'), 6));
+            writedatafield("footRaisedAnkleHeightMS", QString::number(legs.at(i).footRaisedAnkleHeightMS, char('f'), 6));
+            writedatafield("maxAnkleHeightMS", QString::number(legs.at(i).maxAnkleHeightMS, char('f'), 6));
+            writedatafield("minAnkleHeightMS", QString::number(legs.at(i).minAnkleHeightMS, char('f'), 6));
+            writedatafield("maxKneeAngleDegrees", QString::number(legs.at(i).maxKneeAngleDegrees, char('f'), 6));
+            writedatafield("minKneeAngleDegrees", QString::number(legs.at(i).minKneeAngleDegrees, char('f'), 6));
+            writedatafield("maxAnkleAngleDegrees", QString::number(legs.at(i).maxAnkleAngleDegrees, char('f'), 6));
+            writedatafield("hipIndex", QString::number(legs.at(i).hipIndex));
+            writedatafield("kneeIndex", QString::number(legs.at(i).kneeIndex));
+            writedatafield("ankleIndex", QString::number(legs.at(i).ankleIndex));
             writer->writeLine(writer->object, false);
         }
         if (legs.size() > 0){
             writer->writeLine(writer->parameter, false);
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("raycastDistanceUp"), QString::number(raycastDistanceUp, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("raycastDistanceDown"), QString::number(raycastDistanceDown, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("originalGroundHeightMS"), QString::number(originalGroundHeightMS, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("verticalOffset"), QString::number(verticalOffset, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("collisionFilterInfo"), QString::number(collisionFilterInfo));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("forwardAlignFraction"), QString::number(forwardAlignFraction, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sidewaysAlignFraction"), QString::number(sidewaysAlignFraction, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sidewaysSampleWidth"), QString::number(sidewaysSampleWidth, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("lockFeetWhenPlanted"), getBoolAsString(lockFeetWhenPlanted));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("useCharacterUpVector"), getBoolAsString(useCharacterUpVector));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("isQuadrupedNarrow"), getBoolAsString(isQuadrupedNarrow));
+        writedatafield("raycastDistanceUp", QString::number(raycastDistanceUp, char('f'), 6));
+        writedatafield("raycastDistanceDown", QString::number(raycastDistanceDown, char('f'), 6));
+        writedatafield("originalGroundHeightMS", QString::number(originalGroundHeightMS, char('f'), 6));
+        writedatafield("verticalOffset", QString::number(verticalOffset, char('f'), 6));
+        writedatafield("collisionFilterInfo", QString::number(collisionFilterInfo));
+        writedatafield("forwardAlignFraction", QString::number(forwardAlignFraction, char('f'), 6));
+        writedatafield("sidewaysAlignFraction", QString::number(sidewaysAlignFraction, char('f'), 6));
+        writedatafield("sidewaysSampleWidth", QString::number(sidewaysSampleWidth, char('f'), 6));
+        writedatafield("lockFeetWhenPlanted", getBoolAsString(lockFeetWhenPlanted));
+        writedatafield("useCharacterUpVector", getBoolAsString(useCharacterUpVector));
+        writedatafield("isQuadrupedNarrow", getBoolAsString(isQuadrupedNarrow));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
@@ -250,11 +206,8 @@ bool hkbFootIkDriverInfo::link(){
     return true;
 }
 
-void hkbFootIkDriverInfo::unlink(){
-    //
-}
-
-QString hkbFootIkDriverInfo::evaluateDataValidity(){
+QString hkbFootIkDriverInfo::evaluateDataValidity(){    //TO DO: ...
+    std::lock_guard <std::mutex> guard(mutex);
     if (!legs.isEmpty()){
         setDataValidity(true);
         return QString();

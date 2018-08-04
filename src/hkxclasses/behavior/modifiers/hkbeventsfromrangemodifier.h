@@ -3,19 +3,21 @@
 
 #include "hkbmodifier.h"
 
-class hkbEventsFromRangeModifier: public hkbModifier
+class hkbEventsFromRangeModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class EventsFromRangeModifierUI;
 public:
     hkbEventsFromRangeModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbEventsFromRangeModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbEventsFromRangeModifier& operator=(const hkbEventsFromRangeModifier&) = delete;
+    hkbEventsFromRangeModifier(const hkbEventsFromRangeModifier &) = delete;
+    ~hkbEventsFromRangeModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfRanges() const;
     bool isEventReferenced(int eventindex) const;
@@ -26,17 +28,15 @@ public:
     QVector <HkxObject *> getChildrenOtherTypes() const;
     bool merge(HkxObject *recessiveObject);
 private:
-    hkbEventsFromRangeModifier& operator=(const hkbEventsFromRangeModifier&);
-    hkbEventsFromRangeModifier(const hkbEventsFromRangeModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
     qreal inputValue;
     qreal lowerBound;
     HkxSharedPtr eventRanges;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBEVENTSFROMRANGEMODIFIER_H

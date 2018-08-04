@@ -3,27 +3,26 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbGeneratorTransitionEffect: public HkDynamicObject
+class hkbGeneratorTransitionEffect final: public HkDynamicObject
 {
-    friend class BehaviorGraphView;
 public:
     hkbGeneratorTransitionEffect(HkxFile *parent, long ref = -1);
-    virtual ~hkbGeneratorTransitionEffect();
+    hkbGeneratorTransitionEffect& operator=(const hkbGeneratorTransitionEffect&) = delete;
+    hkbGeneratorTransitionEffect(const hkbGeneratorTransitionEffect &) = delete;
+    ~hkbGeneratorTransitionEffect();
+    QString getName() const;
+    static const QString getClassname();
+private:
     bool link();
-    bool readData(const HkxXmlReader & reader, long index);
+    bool readData(const HkxXmlReader & reader, long & index);
     void unlink();
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
-    QString getName() const;
 private:
-    hkbGeneratorTransitionEffect& operator=(const hkbGeneratorTransitionEffect&);
-    hkbGeneratorTransitionEffect(const hkbGeneratorTransitionEffect &);
-private:
-    static QStringList SelfTransitionMode;  //SelfTransitionMode (SELF_TRANSITION_MODE_CONTINUE_IF_CYCLIC_BLEND_IF_ACYCLIC=0;SELF_TRANSITION_MODE_CONTINUE=1;SELF_TRANSITION_MODE_RESET=2;SELF_TRANSITION_MODE_BLEND=3)
-    static QStringList EventMode;   //EventMode (EVENT_MODE_DEFAULT=0;EVENT_MODE_PROCESS_ALL=1;EVENT_MODE_IGNORE_FROM_GENERATOR=2;EVENT_MODE_IGNORE_TO_GENERATOR=3)
     static uint refCount;
-    static QString classname;
+    static const QString classname;
+    static const QStringList EventMode;
+    static const QStringList SelfTransitionMode;
     ulong userData;
     QString name;
     QString selfTransitionMode;
@@ -32,6 +31,7 @@ private:
     qreal blendInDuration;
     qreal blendOutDuration;
     bool syncToGeneratorStartTime;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBGENERATORTRANSITIONEFFECT_H

@@ -1,13 +1,10 @@
 #include "bsoffsetanimationgenerator.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
-/*
- * CLASS: BSOffsetAnimationGenerator
-*/
 
 uint BSOffsetAnimationGenerator::refCount = 0;
 
-QString BSOffsetAnimationGenerator::classname = "BSOffsetAnimationGenerator";
+const QString BSOffsetAnimationGenerator::classname = "BSOffsetAnimationGenerator";
 
 BSOffsetAnimationGenerator::BSOffsetAnimationGenerator(HkxFile *parent, long ref)
     : hkbGenerator(parent, ref),
@@ -17,40 +14,37 @@ BSOffsetAnimationGenerator::BSOffsetAnimationGenerator(HkxFile *parent, long ref
       fOffsetRangeEnd(0)
 {
     setType(BS_OFFSET_ANIMATION_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "OffsetAnimationGenerator"+QString::number(refCount);
+    name = "OffsetAnimationGenerator_"+QString::number(refCount);
 }
 
-QString BSOffsetAnimationGenerator::getClassname(){
+const QString BSOffsetAnimationGenerator::getClassname(){
     return classname;
 }
 
 QString BSOffsetAnimationGenerator::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-int BSOffsetAnimationGenerator::getIndexToInsertIcon() const{
-    if (!pDefaultGenerator.constData()){    //Not sure about this...
-        return 0;
-    }else if (!pOffsetClipGenerator.constData()){
-        return 1;
-    }
-    return -1;
-}
-
 bool BSOffsetAnimationGenerator::insertObjectAt(int index, DataIconManager *obj){
-    if (((HkxObject *)obj)->getSignature() == HKB_CLIP_GENERATOR && index == 1){
-        pOffsetClipGenerator = HkxSharedPtr((HkxObject *)obj);
-    }else if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
-        pDefaultGenerator = HkxSharedPtr((HkxObject *)obj);
-    }else{
-        return false;
+    std::lock_guard <std::mutex> guard(mutex);
+    if (obj){
+        if (obj->getSignature() == HKB_CLIP_GENERATOR && index == 1){
+            pOffsetClipGenerator = HkxSharedPtr(obj);
+        }else if (obj->getType() == TYPE_GENERATOR){
+            pDefaultGenerator = HkxSharedPtr(obj);
+        }else{
+            return false;
+        }
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool BSOffsetAnimationGenerator::removeObjectAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
     if (index == 0){
         pDefaultGenerator = HkxSharedPtr();
     }else if (index == 1){
@@ -65,14 +59,16 @@ bool BSOffsetAnimationGenerator::removeObjectAt(int index){
 }
 
 bool BSOffsetAnimationGenerator::hasChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (pDefaultGenerator.data() || pOffsetClipGenerator.data()){
         return true;
     }
     return false;
 }
 
-QList<DataIconManager *> BSOffsetAnimationGenerator::getChildren() const{
-    QList<DataIconManager *> list;
+QVector<DataIconManager *> BSOffsetAnimationGenerator::getChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QVector<DataIconManager *> list;
     if (pDefaultGenerator.data()){
         list.append(static_cast<DataIconManager*>(pDefaultGenerator.data()));
     }
@@ -83,172 +79,153 @@ QList<DataIconManager *> BSOffsetAnimationGenerator::getChildren() const{
 }
 
 int BSOffsetAnimationGenerator::getIndexOfObj(DataIconManager *obj) const{
-    if (pDefaultGenerator.data() == (HkxObject *)obj){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (pDefaultGenerator.data() == obj){
         return 0;
-    }else if (pOffsetClipGenerator.data() == (HkxObject *)obj){
+    }else if (pOffsetClipGenerator.data() == obj){
         return 1;
     }
     return -1;
 }
 
-bool BSOffsetAnimationGenerator::readData(const HkxXmlReader &reader, long index){
+bool BSOffsetAnimationGenerator::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "pDefaultGenerator"){
-            if (!pDefaultGenerator.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'pDefaultGenerator' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(pDefaultGenerator.readShdPtrReference(index, reader), "pDefaultGenerator");
         }else if (text == "pOffsetClipGenerator"){
-            if (!pOffsetClipGenerator.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'pOffsetClipGenerator' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(pOffsetClipGenerator.readShdPtrReference(index, reader), "pOffsetClipGenerator");
         }else if (text == "fOffsetVariable"){
             fOffsetVariable = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'fOffsetVariable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "fOffsetVariable");
         }else if (text == "fOffsetRangeStart"){
             fOffsetRangeStart = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'fOffsetRangeStart' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "fOffsetRangeStart");
         }else if (text == "fOffsetRangeEnd"){
             fOffsetRangeEnd = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'fOffsetRangeEnd' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "fOffsetRangeEnd");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool BSOffsetAnimationGenerator::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value, bool allownull){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value, allownull);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        if (pDefaultGenerator.data()){
-            refString = pDefaultGenerator.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pDefaultGenerator"), refString);
-        if (pOffsetClipGenerator.data()){
-            refString = pOffsetClipGenerator.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pOffsetClipGenerator"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fOffsetVariable"), QString::number(fOffsetVariable, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fOffsetRangeStart"), QString::number(fOffsetRangeStart, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fOffsetRangeEnd"), QString::number(fOffsetRangeEnd, char('f'), 6));
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData), false);
+        writedatafield("name", name, false);
+        writeref(pDefaultGenerator, "pDefaultGenerator");
+        writeref(pOffsetClipGenerator, "pOffsetClipGenerator");
+        writedatafield("fOffsetVariable", QString::number(fOffsetVariable, char('f'), 6), false);
+        writedatafield("fOffsetRangeStart", QString::number(fOffsetRangeStart, char('f'), 6), false);
+        writedatafield("fOffsetRangeEnd", QString::number(fOffsetRangeEnd, char('f'), 6), false);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        if (pDefaultGenerator.data() && !pDefaultGenerator.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'pDefaultGenerator'!!!");
-        }
-        if (pOffsetClipGenerator.data() && !pOffsetClipGenerator.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'pOffsetClipGenerator'!!!");
-        }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        writechild(pDefaultGenerator, "pDefaultGenerator");
+        writechild(pOffsetClipGenerator, "pOffsetClipGenerator");
     }
     return true;
 }
 
 bool BSOffsetAnimationGenerator::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    HkxSharedPtr *ptr;
+    auto linkdata = [&](HkxType type, HkxSignature sig, HkxSharedPtr & shdptr, const QString & fieldname, bool nullallowed){
+        if (ptr){
+            if (!ptr->data()){
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link '"+fieldname+"' data field!");
+                setDataValidity(false);
+            }else if ((*ptr)->getType() != type || (sig != NULL_SIGNATURE && (*ptr)->getSignature() != sig) ||
+                      ((*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD))
+            {
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'"+fieldname+"' data field is linked to invalid child!");
+                setDataValidity(false);
+            }
+            shdptr = *ptr;
+        }else if (!nullallowed){
+            setDataValidity(false);
+        }
+    };
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getShdPtrReference());
-    if (!ptr){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'pDefaultGenerator' data field!\nObject Name: "+name);
-        setDataValidity(false);
-    }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'pDefaultGenerator' data field is linked to invalid child!\nObject Name: "+name);
-        setDataValidity(false);
-        pDefaultGenerator = *ptr;
-    }else{
-        pDefaultGenerator = *ptr;
-    }
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getShdPtrReference());
+    linkdata(TYPE_GENERATOR, NULL_SIGNATURE, pDefaultGenerator, "pDefaultGenerator", false);
     ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pOffsetClipGenerator.getShdPtrReference());
-    if (!ptr){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'pOffsetClipGenerator' data field!\nObject Name: "+name);
-        setDataValidity(false);
-    }else if ((*ptr)->getSignature() != HKB_CLIP_GENERATOR){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'pOffsetClipGenerator' data field is linked to invalid child!\nObject Name: "+name);
-        setDataValidity(false);
-        pOffsetClipGenerator = *ptr;
-    }else{
-        pOffsetClipGenerator = *ptr;
-    }
+    linkdata(TYPE_GENERATOR, HKB_CLIP_GENERATOR, pOffsetClipGenerator, "pOffsetClipGenerator", false);
     return true;
 }
 
 void BSOffsetAnimationGenerator::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     pDefaultGenerator = HkxSharedPtr();
     pOffsetClipGenerator = HkxSharedPtr();
 }
 
 QString BSOffsetAnimationGenerator::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity();
-    if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    auto appenderror = [&](const QString & fieldname, const QString & errortype, HkxSignature sig){
+        QString sigstring;
+        if (sig != NULL_SIGNATURE)
+            sigstring = " Signature of invalid type: "+QString::number(sig, 16);
+        isvalid = false;
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+fieldname+": "+errortype+"!"+sigstring+"\n");
+    };
+    if (HkDynamicObject::evaluateDataValidity() != ""){
+        appenderror("variableBindingSet", "Invalid data", NULL_SIGNATURE);
     }
     if (name == ""){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        appenderror("name", "Invalid name", NULL_SIGNATURE);
     }
     if (!pDefaultGenerator.data()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null pDefaultGenerator!\n");
-    }else if (pDefaultGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pDefaultGenerator type! Signature: "+QString::number(pDefaultGenerator.data()->getSignature(), 16)+" Setting null value!\n");
+        appenderror("pDefaultGenerator", "Null pDefaultGenerator!", NULL_SIGNATURE);
+    }else if (pDefaultGenerator->getType() != HkxObject::TYPE_GENERATOR){
+        appenderror("pDefaultGenerator", "pDefaultGenerator is invalid type! Setting null value!", pDefaultGenerator->getSignature());
         pDefaultGenerator = HkxSharedPtr();
     }
     if (!pOffsetClipGenerator.data()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null pOffsetClipGenerator!\n");
-    }else if (pOffsetClipGenerator.data()->getSignature() != HKB_CLIP_GENERATOR){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOffsetClipGenerator type! Signature: "+QString::number(pOffsetClipGenerator.data()->getSignature(), 16)+" Setting null value!\n");
+        appenderror("pOffsetClipGenerator", "Null pOffsetClipGenerator!", NULL_SIGNATURE);
+    }else if (pOffsetClipGenerator->getSignature() != HKB_CLIP_GENERATOR){
+        appenderror("pOffsetClipGenerator", "pOffsetClipGenerator is invalid type! Setting null value!", pOffsetClipGenerator->getSignature());
         pOffsetClipGenerator = HkxSharedPtr();
     }
     setDataValidity(isvalid);

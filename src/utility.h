@@ -10,6 +10,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <mutex>
+#include <fstream>
 
 #define MAX_HKXXML_LINE_LENGTH 512
 //#define WRITE_TO_LOG(message){QFile file(QDir::currentPath()+"/DebugLog.txt");if (file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)){QTextStream out(&file);out << message << "\n";}}
@@ -38,105 +39,6 @@ enum hkVariableType {
     VARIABLE_TYPE_POINTER,
     VARIABLE_TYPE_VECTOR4,
     VARIABLE_TYPE_QUATERNION
-};
-
-namespace {
-
-bool areVariableTypesCompatible(hkVariableType type1, hkVariableType type2){
-    if (type1 == type2 || (type1 < VARIABLE_TYPE_REAL && type2 < VARIABLE_TYPE_REAL)){
-        return true;
-    }
-    return false;
-}
-
-}
-namespace{
-class LogFile final{
-private:
-    static QFile logFile;
-    static QTextStream stream;
-    static std::mutex mutex;
-private:
-    static void init(){
-        logFile.setFileName(QDir::currentPath()+"/DebugLog.txt");
-        stream.setDevice(&logFile);
-        logFile.remove();
-    }
-public:
-    LogFile(){
-        init();
-    }
-
-    static void writeToLog(const QString & message){
-        std::lock_guard <std::mutex> guard(mutex);
-        if (logFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)){
-            stream << message << "\n";
-            logFile.close();
-        }
-    }
-
-    static void writeToLog(const QStringList & messages){
-        std::lock_guard <std::mutex> guard(mutex);
-        if (logFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)){
-            for (auto i = 0; i < messages.size(); i++){
-                stream << messages.at(i) << "\n";
-            }
-            logFile.close();
-        }
-    }
-};
-
-QFile LogFile::logFile;
-QTextStream LogFile::stream;
-std::mutex LogFile::mutex;
-}
-
-struct hkVector3
-{
-    hkVector3(qreal x = 0, qreal y = 0, qreal z = 0): x(x), y(y), z(z){}
-    qreal x;
-    qreal y;
-    qreal z;
-};
-
-struct hkQuadVariable
-{
-    hkQuadVariable(qreal x = 0, qreal y = 0, qreal z = 0, qreal w = 0)
-        : x(x),
-          y(y),
-          z(z),
-          w(w)
-    {
-        //
-    }
-
-    bool operator !=(const hkQuadVariable & rhs){
-        if (x != rhs.x || y != rhs.y || z != rhs.z || w != rhs.w){
-            return true;
-        }
-        return false;
-    }
-
-    QString getValueAsString() const{
-        return "("+QString::number(x, char('f'), 6)+" "+QString::number(y, char('f'), 6)+" "+QString::number(z, char('f'), 6)+" "+QString::number(w, char('f'), 6)+")";
-    }
-    qreal x;
-    qreal y;
-    qreal z;
-    qreal w;
-};
-
-struct hkTransform
-{
-    hkVector3 transformA;
-    hkVector3 transformB;
-};
-
-struct hkQsTransform
-{
-    hkVector3 v1;
-    hkQuadVariable v2;
-    hkVector3 v3;
 };
 
 enum HkxSignature: unsigned long long {
@@ -247,4 +149,108 @@ enum HkxSignature: unsigned long long {
     HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY = 0xb07b4388
 };
 
+namespace{
+class LogFile final{
+private:
+    static std::ofstream logFile;
+    static std::mutex mutex;
+public:
+    LogFile(){
+        logFile.open(QDir::currentPath().toStdString()+"/DebugLog.txt", std::ios::out | std::ios::trunc);
+    }
+    ~LogFile(){
+        logFile << "\n\nApplication closing... Bye..\n";
+        logFile.close();
+    }
+
+    static void writeToLog(const QString & message){
+        std::lock_guard <std::mutex> guard(mutex);
+        //logFile.open(QDir::currentPath().toStdString()+"/DebugLog.txt", std::ios::out | std::ios::trunc);
+        logFile << message.toStdString() << "\n";
+    }
+
+    static void writeToLog(const QStringList & messages){
+        std::lock_guard <std::mutex> guard(mutex);
+        //logFile.open(QDir::currentPath().toStdString()+"/DebugLog.txt", std::ios::out | std::ios::trunc);
+        for (auto i = 0; i < messages.size(); i++){
+            logFile << messages.at(i).toStdString() << "\n";
+        }
+    }
+};
+
+std::ofstream LogFile::logFile;
+std::mutex LogFile::mutex;
+}
+
+struct hkVector3
+{
+    hkVector3(qreal x = 0, qreal y = 0, qreal z = 0): x(x), y(y), z(z){}
+    qreal x;
+    qreal y;
+    qreal z;
+};
+
+struct hkQuadVariable
+{
+    hkQuadVariable(qreal x = 0, qreal y = 0, qreal z = 0, qreal w = 0)
+        : x(x),
+          y(y),
+          z(z),
+          w(w)
+    {
+        //
+    }
+
+    bool operator !=(const hkQuadVariable & rhs){
+        if (x != rhs.x || y != rhs.y || z != rhs.z || w != rhs.w){
+            return true;
+        }
+        return false;
+    }
+
+    QString getValueAsString() const{
+        return "("+QString::number(x, char('f'), 6)+" "+QString::number(y, char('f'), 6)+" "+QString::number(z, char('f'), 6)+" "+QString::number(w, char('f'), 6)+")";
+    }
+
+    qreal x;
+    qreal y;
+    qreal z;
+    qreal w;
+};
+
+struct hkTransform
+{
+    hkVector3 transformA;
+    hkVector3 transformB;
+};
+
+struct hkQsTransform
+{
+    hkVector3 v1;
+    hkQuadVariable v2;
+    hkVector3 v3;
+};
+
+namespace {
+
+void generateAppendStringToList(QStringList & list, QString & newname, const QChar & wheretoappend){
+    for (auto i = 0, num = 0, index = 0; i < list.size() - 1; i++){
+        if (list.at(i) == newname){
+            index = newname.lastIndexOf(wheretoappend);
+            (index > -1) ? newname.remove(index + 1, newname.size()) : NULL;
+            newname.append(QString::number(num));
+            (++num > 1) ? i = -1 : NULL;
+        }
+    }
+    list.append(newname);
+}
+
+bool areVariableTypesCompatible(hkVariableType type1, hkVariableType type2){
+    if (type1 == type2 || (type1 < VARIABLE_TYPE_REAL && type2 < VARIABLE_TYPE_REAL)){
+        return true;
+    }
+    return false;
+}
+
+}
 #endif // UTILITY_H

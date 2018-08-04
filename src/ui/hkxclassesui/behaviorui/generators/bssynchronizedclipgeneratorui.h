@@ -47,7 +47,7 @@ private:
     void connectSignals();
     void disconnectSignals();
     void selectTableToView(bool viewproperties, const QString & path);
-    void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path);
+    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
     bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
     void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
     void variableRenamed(const QString & name, int index);

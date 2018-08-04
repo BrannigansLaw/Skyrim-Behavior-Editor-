@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class BSLimbIKModifier: public hkbModifier
+class BSLimbIKModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSLimbIKModifierUI;
 public:
     BSLimbIKModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSLimbIKModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSLimbIKModifier& operator=(const BSLimbIKModifier&) = delete;
+    BSLimbIKModifier(const BSLimbIKModifier &) = delete;
+    ~BSLimbIKModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    BSLimbIKModifier& operator=(const BSLimbIKModifier&);
-    BSLimbIKModifier(const BSLimbIKModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -32,6 +31,7 @@ private:
     qreal gain;
     qreal boneRadius;
     qreal castOffset;
+    mutable std::mutex mutex;
 };
 
 #endif // BSLIMBIKMODIFIER_H

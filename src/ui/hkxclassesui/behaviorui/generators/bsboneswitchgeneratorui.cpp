@@ -91,6 +91,7 @@ BSBoneSwitchGeneratorUI::BSBoneSwitchGeneratorUI()
     //Order here must correspond with the ACTIVE_WIDGET Enumerated type!!!
     addWidget(groupBox);
     addWidget(childUI);
+    childUI->returnPB->setVisible(true);
     connectSignals();
 }
 
@@ -144,7 +145,7 @@ void BSBoneSwitchGeneratorUI::loadDynamicTableRows(){
             table->setRowCount(temp);
         }
         BSBoneSwitchGeneratorBoneData *child = nullptr;
-        for (int i = ADD_CHILD_ROW + 1, j = 0; j < bsData->ChildrenA.size(); i++, j++){
+        for (auto i = ADD_CHILD_ROW + 1, j = 0; j < bsData->ChildrenA.size(); i++, j++){
             child = static_cast<BSBoneSwitchGeneratorBoneData *>(bsData->ChildrenA.at(j).data());
             if (child){
                 setRowItems(i, "Bone Data "+QString::number(j), child->getClassname(), "Remove", "Edit", "Double click to remove this bone data", "Double click to edit this bone data");
@@ -194,7 +195,7 @@ void BSBoneSwitchGeneratorUI::setName(){
                 }
             }
             emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorUI::setName(): The data is nullptr!!");
@@ -202,17 +203,22 @@ void BSBoneSwitchGeneratorUI::setName(){
 }
 
 void BSBoneSwitchGeneratorUI::swapGeneratorIndices(int index1, int index2){
+    HkxObject *gen1;
+    HkxObject *gen2;
     if (bsData){
         index1 = index1 - BASE_NUMBER_OF_ROWS;
         index2 = index2 - BASE_NUMBER_OF_ROWS;
         if (bsData->ChildrenA.size() > index1 && bsData->ChildrenA.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
-            bsData->ChildrenA.swap(index1, index2);
+            gen1 = bsData->ChildrenA.at(index1).data();
+            gen2 = bsData->ChildrenA.at(index2).data();
+            bsData->ChildrenA[index1] = HkxSharedPtr(gen2);
+            bsData->ChildrenA[index2] = HkxSharedPtr(gen1);
             if (behaviorView->getSelectedItem()){
                 behaviorView->getSelectedItem()->reorderChildren();
             }else{
                 CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorUI::swapGeneratorIndices(): No item selected!!");
             }
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("BSBoneSwitchGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!");
         }
@@ -281,7 +287,7 @@ void BSBoneSwitchGeneratorUI::removeChild(int index){
     if (bsData && behaviorView){
         if (index < bsData->ChildrenA.size() && index >= 0){
             child = static_cast<BSBoneSwitchGeneratorBoneData *>(bsData->ChildrenA.at(index).data());
-            behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->pGenerator.data()), index);//Reorderchildren?
+            behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->getChildren().first()), index);//Reorderchildren?
             behaviorView->removeObjects();
         }else{
             WARNING_MESSAGE("BSBoneSwitchGeneratorUI::removeChild(): Invalid index of child to remove!!");
@@ -297,7 +303,7 @@ void BSBoneSwitchGeneratorUI::viewSelectedChild(int row, int column){
     if (bsData){
         if (row == DEFAULT_GENERATOR_ROW && column == VALUE_COLUMN){
             QStringList list = {hkbStateMachineStateInfo::getClassname(), hkbBlenderGeneratorChild::getClassname(), BSBoneSwitchGeneratorBoneData::getClassname()};
-            emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pDefaultGenerator) + 1, QString(), list);
+            emit viewGenerators(bsData->getIndexOfGenerator(bsData->pDefaultGenerator) + 1, QString(), list);
         }else if (row == ADD_CHILD_ROW && column == NAME_COLUMN){
             addChildWithGenerator();
         }else if (row > ADD_CHILD_ROW && row < ADD_CHILD_ROW + bsData->ChildrenA.size() + 1){
@@ -346,7 +352,7 @@ void BSBoneSwitchGeneratorUI::setDefaultGenerator(int index, const QString & nam
                 }
                 behaviorView->removeGeneratorData();
                 table->item(DEFAULT_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-                bsData->getParentFile()->setIsChanged(true);
+                bsData->setIsFileChanged(true);
             }else{
                 CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorUI::setDefaultGenerator(): The 'behaviorView' pointer is nullptr!!");
             }

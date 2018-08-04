@@ -3,19 +3,21 @@
 
 #include "hkbmodifier.h"
 
-class BSEventOnFalseToTrueModifier: public hkbModifier
+class BSEventOnFalseToTrueModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSEventOnFalseToTrueModifierUI;
 public:
     BSEventOnFalseToTrueModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSEventOnFalseToTrueModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSEventOnFalseToTrueModifier& operator=(const BSEventOnFalseToTrueModifier&) = delete;
+    BSEventOnFalseToTrueModifier(const BSEventOnFalseToTrueModifier &) = delete;
+    ~BSEventOnFalseToTrueModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
@@ -25,11 +27,8 @@ public:
     QVector <HkxObject *> getChildrenOtherTypes() const;
     bool merge(HkxObject *recessiveObject);
 private:
-    BSEventOnFalseToTrueModifier& operator=(const BSEventOnFalseToTrueModifier&);
-    BSEventOnFalseToTrueModifier(const BSEventOnFalseToTrueModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -42,6 +41,7 @@ private:
     bool bEnableEvent3;
     bool bVariableToTest3;
     hkEventPayload eventToSend3;
+    mutable std::mutex mutex;
 };
 
 #endif // BSEVENTONFALSETOTRUEMODIFIER_H

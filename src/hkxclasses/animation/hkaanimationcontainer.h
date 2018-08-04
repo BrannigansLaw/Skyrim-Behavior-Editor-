@@ -8,7 +8,7 @@ class hkaAnimationContainer: public HkxObject
 public:
     hkaAnimationContainer(HkxFile *parent, long ref = 0);
     virtual ~hkaAnimationContainer();
-    bool readData(const HkxXmlReader & reader, long index);
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     QString evaluateDataValidity();
     static QString getClassname();
@@ -19,7 +19,7 @@ private:
 private:
     static uint refCount;
     static QString classname;
-    QList <HkxSharedPtr> skeletons;
+    QVector <HkxSharedPtr> skeletons;
     //animations, bindings, attachments, skins, etc...
 };
 

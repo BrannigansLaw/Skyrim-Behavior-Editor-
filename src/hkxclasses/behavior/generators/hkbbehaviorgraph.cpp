@@ -1,17 +1,19 @@
 #include "hkbbehaviorgraph.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
+#include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
+#include "src/hkxclasses/behavior/generators/hkbstatemachine.h"
 
-#include <QExplicitlySharedDataPointer>
+//#include <QExplicitlySharedDataPointer>
 /*
  * CLASS: hkbBehaviorGraph
 */
 
 uint hkbBehaviorGraph::refCount = 0;
 
-QString hkbBehaviorGraph::classname = "hkbBehaviorGraph";
+const QString hkbBehaviorGraph::classname = "hkbBehaviorGraph";
 
-QStringList hkbBehaviorGraph::VariableMode = {"VARIABLE_MODE_DISCARD_WHEN_INACTIVE", "VARIABLE_MODE_MAINTAIN_VALUES_WHEN_INACTIVE"};
+const QStringList hkbBehaviorGraph::VariableMode = {"VARIABLE_MODE_DISCARD_WHEN_INACTIVE", "VARIABLE_MODE_MAINTAIN_VALUES_WHEN_INACTIVE"};
 
 hkbBehaviorGraph::hkbBehaviorGraph(HkxFile *parent, long ref)
     : hkbGenerator(parent, ref),
@@ -19,53 +21,100 @@ hkbBehaviorGraph::hkbBehaviorGraph(HkxFile *parent, long ref)
       variableMode(VariableMode.first())
 {
     setType(HKB_BEHAVIOR_GRAPH, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "BehaviorGraph"+QString::number(refCount);
+    name = "BehaviorGraph_"+QString::number(refCount);
 }
 
-QString hkbBehaviorGraph::getClassname(){
+const QString hkbBehaviorGraph::getClassname(){
     return classname;
 }
 
+void hkbBehaviorGraph::setData(hkbBehaviorGraphData *graphdata){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (graphdata){
+        data = HkxSharedPtr(graphdata);
+    }
+}
+
+hkbStateMachine *hkbBehaviorGraph::getRootGenerator() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    if (rootGenerator.data() && rootGenerator->getSignature() == HKB_STATE_MACHINE){
+        return static_cast<hkbStateMachine *>(rootGenerator.data());
+    }
+    return nullptr;
+}
+
+void hkbBehaviorGraph::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != "") ? name = newname : name;
+}
+
+/*hkbStateMachine *hkbBehaviorGraph::getRootGeneratorData() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbStateMachine *>(rootGenerator.data());
+}*/
+
+QString hkbBehaviorGraph::getRootGeneratorName() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QString rootname("NONE");
+    hkbStateMachine *rootgen = static_cast<hkbStateMachine *>(rootGenerator.data());
+    (rootgen) ? rootname = rootgen->getName() : NULL;
+    return rootname;
+}
+
 QString hkbBehaviorGraph::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-int hkbBehaviorGraph::getIndexToInsertIcon() const{
+/*int hkbBehaviorGraph::getIndexToInsertIcon() const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (!rootGenerator.constData()){
         return 0;
     }
     return -1;
-}
+}*/
 
 bool hkbBehaviorGraph::insertObjectAt(int , DataIconManager *obj){
-    if (((HkxObject *)obj)->getSignature() == HKB_STATE_MACHINE){
-        rootGenerator = HkxSharedPtr((HkxObject *)obj);
+    std::lock_guard <std::mutex> guard(mutex);
+    if (obj->getSignature() == HKB_STATE_MACHINE){
+        rootGenerator = HkxSharedPtr(obj);
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 bool hkbBehaviorGraph::removeObjectAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
     if (index == 0 || index == -1){
         rootGenerator = HkxSharedPtr();
-    }else{
-        return false;
+        return true;
     }
-    return true;
+    return false;
+}
+
+void hkbBehaviorGraph::setVariableMode(const QString &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (VariableMode.contains(value)) ? variableMode = value : NULL;
+}
+
+QString hkbBehaviorGraph::getVariableMode() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return variableMode;
 }
 
 bool hkbBehaviorGraph::hasChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (rootGenerator.data()){
         return true;
     }
     return false;
 }
 
-QList<DataIconManager *> hkbBehaviorGraph::getChildren() const{
-    QList<DataIconManager *> list;
+QVector<DataIconManager *> hkbBehaviorGraph::getChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QVector<DataIconManager *> list;
     if (rootGenerator.data()){
         list.append(static_cast<DataIconManager*>(rootGenerator.data()));
     }
@@ -73,163 +122,149 @@ QList<DataIconManager *> hkbBehaviorGraph::getChildren() const{
 }
 
 int hkbBehaviorGraph::getIndexOfObj(DataIconManager *obj) const{
-    if (rootGenerator.data() == (HkxObject *)obj){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (rootGenerator.data() == obj){
         return 0;
     }
     return -1;
 }
 
-bool hkbBehaviorGraph::readData(const HkxXmlReader &reader, long index){
+bool hkbBehaviorGraph::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
-        }else if (text == "variableMode"){
+            checkvalue((name != ""), "name");
+        }else if (text == "eBlendCurve"){
             variableMode = reader.getElementValueAt(index);
-            if (variableMode == ""){
-                LogFile::writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'variableMode' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(VariableMode.contains(variableMode), "variableMode");
         }else if (text == "rootGenerator"){
-            if (!rootGenerator.readShdPtrReference(index, reader)){
-                LogFile::writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'rootGenerator' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(rootGenerator.readShdPtrReference(index, reader), "rootGenerator");
         }else if (text == "data"){
-            if (!data.readShdPtrReference(index, reader)){
-                LogFile::writeToLog("hkbBehaviorGraph: readData()!\nFailed to properly read 'data' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(data.readShdPtrReference(index, reader), "data");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbBehaviorGraph::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value, bool allownull){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value, allownull);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableMode"), variableMode);
-        if (rootGenerator.data()){
-            refString = rootGenerator.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("rootGenerator"), refString);
-        if (data.data()){
-            refString = data.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("data"), refString);
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData), false);
+        writedatafield("name", name, false);
+        writedatafield("variableMode", variableMode, false);
+        writeref(rootGenerator, "rootGenerator");
+        writeref(data, "data");
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog("hkbBehaviorGraph: write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        if (rootGenerator.data() && !rootGenerator.data()->write(writer)){
-            LogFile::writeToLog("hkbBehaviorGraph: write()!\nUnable to write 'rootGenerator'!!!");
-        }
-        if (data.data() && !data.data()->write(writer)){
-            LogFile::writeToLog("hkbBehaviorGraph: write()!\nUnable to write 'data'!!!");
-        }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        writechild(rootGenerator, "rootGenerator");
+        writechild(data, "data");
     }
     return true;
 }
 
 bool hkbBehaviorGraph::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    HkxSharedPtr *ptr;
+    auto linkdata = [&](HkxType type, HkxSignature sig, HkxSharedPtr & shdptr, const QString & fieldname, bool nullallowed){
+        if (ptr){
+            if (!ptr->data()){
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link '"+fieldname+"' data field!");
+                setDataValidity(false);
+            }else if ((*ptr)->getType() != type || (sig != NULL_SIGNATURE && (*ptr)->getSignature() != sig) ||
+                      ((*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD))
+            {
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'"+fieldname+"' data field is linked to invalid child!");
+                setDataValidity(false);
+            }
+            shdptr = *ptr;
+        }else if (!nullallowed){
+            setDataValidity(false);
+        }
+    };
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(rootGenerator.getShdPtrReference());
-    if (!ptr){
-        LogFile::writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'rootGenerator' data field!\nObject Name: "+name);
-        setDataValidity(false);
-    }else if ((*ptr)->getSignature() != HKB_STATE_MACHINE){
-        LogFile::writeToLog("hkbBehaviorGraph: link()!\n'rootGenerator' data field is linked to invalid child!\nObject Name: "+name);
-        setDataValidity(false);
-        rootGenerator = *ptr;
-    }else{
-        rootGenerator = *ptr;
-    }
-    ptr = &static_cast<BehaviorFile *>(getParentFile())->graphData;
-    if (!ptr){
-        LogFile::writeToLog("hkbBehaviorGraph: link()!\nFailed to properly link 'data' data field!\nObject Name: "+name);
-        setDataValidity(false);
-    }else if ((*ptr)->getSignature() != HKB_BEHAVIOR_GRAPH_DATA){
-        LogFile::writeToLog("hkbBehaviorGraph: link()!\n'data' data field is linked to invalid child!\nObject Name: "+name);
-        setDataValidity(false);
-        data = *ptr;
-    }else{
-        data = *ptr;
-    }
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(rootGenerator.getShdPtrReference());
+    linkdata(TYPE_GENERATOR, HKB_STATE_MACHINE, rootGenerator, "rootGenerator", false);
+    ptr = &static_cast<BehaviorFile *>(getParentFile())->getGraphData();
+    linkdata(TYPE_OTHER, HKB_BEHAVIOR_GRAPH_DATA, data, "data", false);
     return true;
 }
 
 void hkbBehaviorGraph::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     rootGenerator = HkxSharedPtr();
     data = HkxSharedPtr();
 }
 
 QString hkbBehaviorGraph::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
+    bool temp;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity();
-    if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+    auto appenderror = [&](const QString & fieldname, const QString & errortype, HkxSignature sig){
+        QString sigstring;
+        if (sig != NULL_SIGNATURE)
+            sigstring = " Signature of invalid type: "+QString::number(sig, 16);
+        isvalid = false;
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+fieldname+": "+errortype+"!"+sigstring+"\n");
+    };
+    if (HkDynamicObject::evaluateDataValidity() != ""){
+        appenderror("variableBindingSet", "Invalid data", NULL_SIGNATURE);
     }
     if (name == ""){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        appenderror("name", "Invalid name", NULL_SIGNATURE);
     }
     if (!rootGenerator.data()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null rootGenerator!\n");
-    }else if (rootGenerator.data()->getType() != HkxObject::TYPE_GENERATOR){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid rootGenerator type! Signature: "+QString::number(rootGenerator.data()->getSignature(), 16)+" Setting null value!\n");
+        appenderror("rootGenerator", "Null rootGenerator!", NULL_SIGNATURE);
+    }else if (rootGenerator->getType() != HkxObject::TYPE_GENERATOR){
+        appenderror("rootGenerator", "rootGenerator is invalid type! Setting null value!", rootGenerator->getSignature());
         rootGenerator = HkxSharedPtr();
     }
     if (!data.data()){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null data!\n");
-    }else if (data.data()->getSignature() != HKB_BEHAVIOR_GRAPH_DATA){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid data type! Signature: "+QString::number(data.data()->getSignature(), 16)+" Setting null value!\n");
+        appenderror("data", "Null data!", NULL_SIGNATURE);
+    }else if (data->getSignature() != HKB_BEHAVIOR_GRAPH_DATA){
+        appenderror("data", "data is invalid type! Setting null value!", data->getSignature());
         data = HkxSharedPtr();
     }
-    if (!VariableMode.contains(variableMode)){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variableMode! Setting default value!\n");
+    temp = VariableMode.contains(variableMode);
+    if (!temp){
+        appenderror("variableMode", "variableMode is an invalid value! Setting default value!", NULL_SIGNATURE);
         variableMode = VariableMode.first();
     }
     setDataValidity(isvalid);

@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class BSComputeAddBoneAnimModifier: public hkbModifier
+class BSComputeAddBoneAnimModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSComputeAddBoneAnimModifierUI;
 public:
     BSComputeAddBoneAnimModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSComputeAddBoneAnimModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSComputeAddBoneAnimModifier& operator=(const BSComputeAddBoneAnimModifier&) = delete;
+    BSComputeAddBoneAnimModifier(const BSComputeAddBoneAnimModifier &) = delete;
+    ~BSComputeAddBoneAnimModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    BSComputeAddBoneAnimModifier& operator=(const BSComputeAddBoneAnimModifier&);
-    BSComputeAddBoneAnimModifier(const BSComputeAddBoneAnimModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -30,6 +29,7 @@ private:
     hkQuadVariable translationLSOut;
     hkQuadVariable rotationLSOut;
     hkQuadVariable scaleLSOut;
+    mutable std::mutex mutex;
 };
 
 #endif // BSCOMPUTEADDBONEANIMMODIFIER_H

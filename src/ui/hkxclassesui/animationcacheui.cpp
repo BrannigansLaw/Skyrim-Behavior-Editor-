@@ -151,7 +151,7 @@ void CacheClipWidget::loadData(AnimCacheClipInfo *data){
         eventName->setText(bsData->eventName);
         unknown->setValue(bsData->unknown);
         clipGenerators->setRowCount(bsData->clipGenerators.size());
-        for (int i = 0; i < bsData->clipGenerators.size(); i++){
+        for (auto i = 0; i < bsData->clipGenerators.size(); i++){
             if (clipGenerators->item(i, 0)){
                 clipGenerators->item(i, 0)->setText(bsData->clipGenerators.at(i));
             }else{
@@ -336,7 +336,7 @@ void CacheWidget::loadData(AnimCacheAnimSetData *data, ProjectFile *project){
         projectData = project;
         disconnectSignals();
         cacheEvents->setRowCount(bsData->cacheEvents.size());
-        for (int i = 0; i < bsData->cacheEvents.size(); i++){
+        for (auto i = 0; i < bsData->cacheEvents.size(); i++){
             if (cacheEvents->item(i, 0)){
                 cacheEvents->item(i, 0)->setText(bsData->cacheEvents.at(i));
             }else{
@@ -344,7 +344,7 @@ void CacheWidget::loadData(AnimCacheAnimSetData *data, ProjectFile *project){
             }
         }
         behaviorVariables->setRowCount(bsData->behaviorVariables.size());
-        for (int i = 0; i < bsData->behaviorVariables.size(); i++){
+        for (auto i = 0; i < bsData->behaviorVariables.size(); i++){
             if (behaviorVariables->item(i, 0)){
                 behaviorVariables->item(i, 0)->setText(bsData->behaviorVariables.at(i)->name);
             }else{
@@ -353,7 +353,7 @@ void CacheWidget::loadData(AnimCacheAnimSetData *data, ProjectFile *project){
             }
         }
         clipGenerators->setRowCount(bsData->clipGenerators.size());
-        for (int i = 0; i < bsData->clipGenerators.size(); i++){
+        for (auto i = 0; i < bsData->clipGenerators.size(); i++){
             if (clipGenerators->item(i, 0)){
                 clipGenerators->item(i, 0)->setText(bsData->clipGenerators.at(i)->eventName);
             }else{
@@ -362,7 +362,7 @@ void CacheWidget::loadData(AnimCacheAnimSetData *data, ProjectFile *project){
             }
         }
         animations->setRowCount(bsData->animations.size());
-        for (int i = 0; i < bsData->animations.size(); i++){
+        for (auto i = 0; i < bsData->animations.size(); i++){
             if (animations->item(i, 0)){
                 animations->item(i, 0)->setText(projectData->findAnimationNameFromEncryptedData(bsData->animations.at(i)->crcAnimationName));
             }else{
@@ -608,7 +608,7 @@ void AnimationCacheUI::loadData(ProjectFile *project){
         bsData = projectData->getProjectCacheData();
         disconnectSignals();
         cacheFiles->setRowCount(bsData->fileNames.size());
-        for (int i = 0; i < bsData->fileNames.size(); i++){
+        for (auto i = 0; i < bsData->fileNames.size(); i++){
             if (cacheFiles->item(i, 0)){
                 cacheFiles->item(i, 0)->setText(bsData->fileNames.at(i));
             }else{

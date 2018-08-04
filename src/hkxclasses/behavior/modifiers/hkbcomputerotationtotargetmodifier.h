@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class hkbComputeRotationToTargetModifier: public hkbModifier
+class hkbComputeRotationToTargetModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class ComputeRotationToTargetModifierUI;
 public:
     hkbComputeRotationToTargetModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbComputeRotationToTargetModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbComputeRotationToTargetModifier& operator=(const hkbComputeRotationToTargetModifier&) = delete;
+    hkbComputeRotationToTargetModifier(const hkbComputeRotationToTargetModifier &) = delete;
+    ~hkbComputeRotationToTargetModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbComputeRotationToTargetModifier& operator=(const hkbComputeRotationToTargetModifier&);
-    hkbComputeRotationToTargetModifier(const hkbComputeRotationToTargetModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -33,6 +32,7 @@ private:
     hkQuadVariable localAxisOfRotation;
     hkQuadVariable localFacingDirection;
     bool resultIsDelta;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBCOMPUTEROTATIONTOTARGETMODIFIER_H

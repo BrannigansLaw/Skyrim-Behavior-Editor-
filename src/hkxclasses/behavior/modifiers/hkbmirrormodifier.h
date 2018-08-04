@@ -3,30 +3,30 @@
 
 #include "hkbmodifier.h"
 
-class hkbMirrorModifier: public hkbModifier
+class hkbMirrorModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class MirrorModifierUI;
 public:
     hkbMirrorModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbMirrorModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbMirrorModifier& operator=(const hkbMirrorModifier&) = delete;
+    hkbMirrorModifier(const hkbMirrorModifier &) = delete;
+    ~hkbMirrorModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbMirrorModifier& operator=(const hkbMirrorModifier&);
-    hkbMirrorModifier(const hkbMirrorModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
     bool isAdditive;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBMIRRORMODIFIER_H

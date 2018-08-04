@@ -152,7 +152,7 @@ void BlendingTransitionEffectUI::loadData(HkxObject *data){
             eventMode->insertItems(0, bsData->EventMode);
         }
         eventMode->setCurrentIndex(bsData->EventMode.indexOf(bsData->eventMode));
-        varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        varBind = bsData->getVariableBindingSetData();
         if (varBind){
             loadBinding(DURATION_ROW, BINDING_COLUMN, varBind, "duration");
             loadBinding(TO_GENERATOR_START_TIME_FRACTION_ROW, BINDING_COLUMN, varBind, "toGeneratorStartTimeFraction");
@@ -173,7 +173,7 @@ void BlendingTransitionEffectUI::loadData(HkxObject *data){
                 flagIgnoreToWorldFromModel->setChecked(true);
             }
         }else{
-            for (int i = 0; i < flags.size(); i++){
+            for (auto i = 0; i < flags.size(); i++){
                 if (flags.at(i) == "FLAG_SYNC"){
                     flagSync->setChecked(true);
                 }else if (flags.at(i) == "FLAG_IGNORE_FROM_WORLD_FROM_MODEL"){
@@ -203,7 +203,7 @@ void BlendingTransitionEffectUI::setName(){
     if (bsData){
         if (bsData->name != name->text()){
             bsData->name = name->text();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit transitionEffectRenamed(bsData->name);
         }
     }else{
@@ -211,7 +211,7 @@ void BlendingTransitionEffectUI::setName(){
     }
 }
 
-void BlendingTransitionEffectUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void BlendingTransitionEffectUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -219,7 +219,7 @@ void BlendingTransitionEffectUI::loadBinding(int row, int colunm, hkbVariableBin
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -227,7 +227,7 @@ void BlendingTransitionEffectUI::loadBinding(int row, int colunm, hkbVariableBin
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("BlendingTransitionEffectUI::loadBinding(): The variable binding set is nullptr!!");
         }
@@ -257,7 +257,7 @@ void BlendingTransitionEffectUI::setBindingVariable(int index, const QString &na
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BlendingTransitionEffectUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
     }
@@ -266,7 +266,7 @@ void BlendingTransitionEffectUI::setBindingVariable(int index, const QString &na
 void BlendingTransitionEffectUI::setSelfTransitionMode(int index){
     if (bsData){
         bsData->selfTransitionMode = bsData->SelfTransitionMode.at(index);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BlendingTransitionEffectUI::setSelfTransitionMode(): The data is nullptr!!");
     }
@@ -275,7 +275,7 @@ void BlendingTransitionEffectUI::setSelfTransitionMode(int index){
 void BlendingTransitionEffectUI::setEventMode(int index){
     if (bsData){
         bsData->eventMode = bsData->EventMode.at(index);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BlendingTransitionEffectUI::setEventMode(): The data is nullptr!!");
     }
@@ -284,7 +284,7 @@ void BlendingTransitionEffectUI::setEventMode(int index){
 void BlendingTransitionEffectUI::setDuration(){
     if (bsData){
         bsData->duration = duration->value();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BlendingTransitionEffectUI::setDuration(): The data is nullptr!!");
     }
@@ -293,7 +293,7 @@ void BlendingTransitionEffectUI::setDuration(){
 void BlendingTransitionEffectUI::setToGeneratorStartTimeFraction(){
     if (bsData){
         bsData->toGeneratorStartTimeFraction = toGeneratorStartTimeFraction->value();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BlendingTransitionEffectUI::setToGeneratorStartTimeFraction(): The data is nullptr!!");
     }
@@ -302,7 +302,7 @@ void BlendingTransitionEffectUI::setToGeneratorStartTimeFraction(){
 void BlendingTransitionEffectUI::setEndMode(int index){
     if (bsData){
         bsData->endMode = bsData->EndMode.at(index);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BlendingTransitionEffectUI::setEndMode(): The data is nullptr!!");
     }
@@ -311,7 +311,7 @@ void BlendingTransitionEffectUI::setEndMode(int index){
 void BlendingTransitionEffectUI::setBlendCurve(int index){
     if (bsData){
         bsData->blendCurve = bsData->BlendCurve.at(index);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BlendingTransitionEffectUI::setBlendCurve(): The data is nullptr!!");
     }
@@ -329,10 +329,11 @@ void BlendingTransitionEffectUI::toggleSyncFlag(){
             if (bsData->flags == "FLAG_SYNC"){
                 bsData->flags = "FLAG_NONE";
             }else{
-                bsData->flags.remove("|FLAG_SYNC");
+                bsData->flags.remove("FLAG_SYNC");
+                bsData->flags.replace("||", "|");
             }
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BlendingTransitionEffectUI::setFlagSync(): The data is nullptr!!");
     }
@@ -350,10 +351,11 @@ void BlendingTransitionEffectUI::toggleIgnoreFromWorldFromModelFlag(){
             if (bsData->flags == "FLAG_IGNORE_FROM_WORLD_FROM_MODEL"){
                 bsData->flags = "FLAG_NONE";
             }else{
-                bsData->flags.remove("|FLAG_IGNORE_FROM_WORLD_FROM_MODEL");
+                bsData->flags.remove("FLAG_IGNORE_FROM_WORLD_FROM_MODEL");
+                bsData->flags.replace("||", "|");
             }
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BlendingTransitionEffectUI::setFlagIgnoreFromWorldFromModel(): The data is nullptr!!");
     }
@@ -371,10 +373,11 @@ void BlendingTransitionEffectUI::toggleIgnoreToWorldFromModelFlag(){
             if (bsData->flags == "FLAG_IGNORE_TO_WORLD_FROM_MODEL"){
                 bsData->flags = "FLAG_NONE";
             }else{
-                bsData->flags.remove("|FLAG_IGNORE_TO_WORLD_FROM_MODEL");
+                bsData->flags.remove("FLAG_IGNORE_TO_WORLD_FROM_MODEL");
+                bsData->flags.replace("||", "|");
             }
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BlendingTransitionEffectUI::setFlagIgnoreToWorldFromModel(): The data is nullptr!!");
     }
@@ -383,14 +386,14 @@ void BlendingTransitionEffectUI::toggleIgnoreToWorldFromModelFlag(){
 void BlendingTransitionEffectUI::selectTableToView(bool viewproperties, const QString & path){
     if (bsData){
         if (viewproperties){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -429,7 +432,7 @@ void BlendingTransitionEffectUI::variableRenamed(const QString &name, int index)
     hkbVariableBindingSet *bind = nullptr;
     if (bsData){
         index--;
-        bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        bind = bsData->getVariableBindingSetData();
         if (bind){
             bindIndex = bind->getVariableIndexOfBinding("duration");
             if (bindIndex == index){
@@ -446,16 +449,16 @@ void BlendingTransitionEffectUI::variableRenamed(const QString &name, int index)
 }
 
 void BlendingTransitionEffectUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY);
@@ -463,7 +466,7 @@ void BlendingTransitionEffectUI::setBinding(int index, int row, const QString & 
                 varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }

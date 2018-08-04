@@ -86,7 +86,7 @@ private:
     ProjectFile *projectFile;
     //CharacterFile *characterFile;
     SkeletonFile *skeletonFile;
-    QList <BehaviorGraphView *> behaviorGraphs;
+    QVector <BehaviorGraphView *> behaviorGraphs;
     ProjectUI *projectUI;
     QGroupBox *behaviorGraphViewGB;
     QVBoxLayout *iconGBLyt;

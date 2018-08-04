@@ -3,37 +3,37 @@
 
 #include "hkbmodifier.h"
 
-class hkbEvaluateHandleModifier: public hkbModifier
+class hkbEvaluateHandleModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class EvaluateHandleModifierUI;
 public:
     hkbEvaluateHandleModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbEvaluateHandleModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbEvaluateHandleModifier& operator=(const hkbEvaluateHandleModifier&) = delete;
+    hkbEvaluateHandleModifier(const hkbEvaluateHandleModifier &) = delete;
+    ~hkbEvaluateHandleModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbEvaluateHandleModifier& operator=(const hkbEvaluateHandleModifier&);
-    hkbEvaluateHandleModifier(const hkbEvaluateHandleModifier &);
-private:
-    static QStringList HandleChangeMode;    //HandleChangeMode (HANDLE_CHANGE_MODE_ABRUPT=0;HANDLE_CHANGE_MODE_CONSTANT_VELOCITY=1)
     static uint refCount;
-    static QString classname;
+    static const QString classname;
+    static const QStringList HandleChangeMode;
     long userData;
     QString name;
     bool enable;
-    HkxSharedPtr handle;   //Always nullptr???
+    HkxSharedPtr handle;
     hkQuadVariable handlePositionOut;
     hkQuadVariable handleRotationOut;
     bool isValidOut;
     qreal extrapolationTimeStep;
     qreal handleChangeSpeed;
     QString handleChangeMode;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBEVALUATEHANDLEMODIFIER_H

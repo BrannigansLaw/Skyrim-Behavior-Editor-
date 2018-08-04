@@ -159,14 +159,14 @@ bool SkyrimAnimationMotionData::write(QFile * file, QTextStream & out) const{
     out << QString::number(animationIndex) << "\n";
     out << trimFloat(QString::number(duration, char('f'), 6)) << "\n";
     out << QString::number(translations.size()) << "\n";
-    for (int i = 0; i < translations.size(); i++){
+    for (auto i = 0; i < translations.size(); i++){
         out << trimFloat(QString::number(translations.at(i).localTime, char('f'), 6));
         out << " "+trimFloat(QString::number(translations.at(i).x, char('f'), 6));
         out << " "+trimFloat(QString::number(translations.at(i).y, char('f'), 6));
         out << " "+trimFloat(QString::number(translations.at(i).z, char('f'), 6)) << "\n";
     }
     out << QString::number(rotations.size()) << "\n";
-    for (int i = 0; i < rotations.size(); i++){
+    for (auto i = 0; i < rotations.size(); i++){
         out << trimFloat(QString::number(rotations.at(i).localTime, char('f'), 6));
         out << " "+trimFloat(QString::number(rotations.at(i).x, char('f'), 6));
         out << " "+trimFloat(QString::number(rotations.at(i).y, char('f'), 6));

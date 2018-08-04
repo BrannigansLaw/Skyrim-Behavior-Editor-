@@ -164,7 +164,7 @@ bool SkyrimClipGeneratoData::write(QFile *file, QTextStream & out){
     out << trimFloat(QString::number(cropEndTime, char('f'), 6)) << "\n";
     out << QString::number(triggers.size()) << "\n";
     rearrangeTriggers();
-    for (int i = 0; i < triggers.size(); i++){
+    for (auto i = 0; i < triggers.size(); i++){
         out << triggers.at(i).name+":"+trimFloat(QString::number(triggers.at(i).time, char('f'), 6)) << "\n";
     }
     out << "\n";

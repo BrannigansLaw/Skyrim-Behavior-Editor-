@@ -2,16 +2,13 @@
 #include "hkbblendergeneratorchild.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
-/*
- * CLASS: hkbPoseMatchingGenerator
-*/
+#include "src/hkxclasses/behavior/hkbvariablebindingset.h"
 
 uint hkbPoseMatchingGenerator::refCount = 0;
 
-QString hkbPoseMatchingGenerator::classname = "hkbPoseMatchingGenerator";
+const QString hkbPoseMatchingGenerator::classname = "hkbPoseMatchingGenerator";
 
-QStringList hkbPoseMatchingGenerator::Mode = {"MODE_MATCH", "MODE_PLAY"};
-//QStringList hkbPoseMatchingGenerator::Flags = {"0", "FLAG_SYNC", "FLAG_SMOOTH_GENERATOR_WEIGHTS", "FLAG_DONT_DEACTIVATE_CHILDREN_WITH_ZERO_WEIGHTS", "FLAG_PARAMETRIC_BLEND", "FLAG_IS_PARAMETRIC_BLEND_CYCLIC", "FLAG_FORCE_DENSE_POSE"};
+const QStringList hkbPoseMatchingGenerator::Mode = {"MODE_MATCH", "MODE_PLAY"};
 
 hkbPoseMatchingGenerator::hkbPoseMatchingGenerator(HkxFile *parent, long ref)
     : hkbGenerator(parent, ref),
@@ -36,55 +33,48 @@ hkbPoseMatchingGenerator::hkbPoseMatchingGenerator(HkxFile *parent, long ref)
     mode(Mode.first())
 {
     setType(HKB_POSE_MATCHING_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "PoseMatchingGenerator"+QString::number(refCount);
+    name = "PoseMatchingGenerator_"+QString::number(refCount);
 }
 
-QString hkbPoseMatchingGenerator::getClassname(){
+const QString hkbPoseMatchingGenerator::getClassname(){
     return classname;
 }
 
 QString hkbPoseMatchingGenerator::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
 int hkbPoseMatchingGenerator::getNumberOfChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return children.size();
 }
 
-int hkbPoseMatchingGenerator::getIndexToInsertIcon(HkxObject *child) const{
-    for (int i = 0; i < children.size(); i++){
-        if (children.at(i).constData() == child){
-            return i;
-        }
-    }
-    return -1;
-}
-
 bool hkbPoseMatchingGenerator::insertObjectAt(int index, DataIconManager *obj){
-    if (((HkxObject *)obj)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        if (index >= children.size() || index == -1){
-            children.append(HkxSharedPtr(obj));
-        }else if (index == 0 || !children.isEmpty()){
-            children.replace(index, HkxSharedPtr(obj));
+    std::lock_guard <std::mutex> guard(mutex);
+    if (obj){
+        if (obj->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
+            if (index >= children.size() || index == -1){
+                children.append(HkxSharedPtr(obj));
+            }else if (index == 0 || !children.isEmpty()){
+                children.replace(index, HkxSharedPtr(obj));
+            }
+            return true;
         }
-        return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 bool hkbPoseMatchingGenerator::removeObjectAt(int index){
-    hkbBlenderGeneratorChild *objChild;
+    std::lock_guard <std::mutex> guard(mutex);
     if (index > -1 && index < children.size()){
-        objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(index).data());
-        objChild->unlink();
+        static_cast<hkbBlenderGeneratorChild *>(children.at(index).data())->unlink();
         children.removeAt(index);
     }else if (index == -1){
-        for (int i = 0; i < children.size(); i++){
-            objChild = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
-            objChild->unlink();
+        for (auto i = 0; i < children.size(); i++){
+            static_cast<hkbBlenderGeneratorChild *>(children.at(i).data())->unlink();
         }
         children.clear();
     }else{
@@ -94,7 +84,8 @@ bool hkbPoseMatchingGenerator::removeObjectAt(int index){
 }
 
 bool hkbPoseMatchingGenerator::hasChildren() const{
-    for (int i = 0; i < children.size(); i++){
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < children.size(); i++){
         if (children.at(i).data()){
             return true;
         }
@@ -103,6 +94,7 @@ bool hkbPoseMatchingGenerator::hasChildren() const{
 }
 
 bool hkbPoseMatchingGenerator::isEventReferenced(int eventindex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (startPlayingEventId == eventindex || startMatchingEventId == eventindex){
         return true;
     }
@@ -110,16 +102,17 @@ bool hkbPoseMatchingGenerator::isEventReferenced(int eventindex) const{
 }
 
 void hkbPoseMatchingGenerator::updateEventIndices(int eventindex){
-    if (startPlayingEventId > eventindex){
-        startPlayingEventId--;
-    }
-    if (startMatchingEventId > eventindex){
-        startMatchingEventId--;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    auto updateindices = [&](int & index){
+        (index > eventindex) ? index-- : index;
+    };
+    updateindices(startPlayingEventId);
+    updateindices(startMatchingEventId);
 }
 
 int hkbPoseMatchingGenerator::getIndexOfObj(DataIconManager *obj) const{
-    for (int i = 0; i < children.size(); i++){
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < children.size(); i++){
         if (children.at(i).data() == (HkxObject *)obj){
             return i;
         }
@@ -127,9 +120,10 @@ int hkbPoseMatchingGenerator::getIndexOfObj(DataIconManager *obj) const{
     return -1;
 }
 
-QList<DataIconManager *> hkbPoseMatchingGenerator::getChildren() const{
-    QList<DataIconManager *> list;
-    for (int i = 0; i < children.size(); i++){
+QVector<DataIconManager *> hkbPoseMatchingGenerator::getChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QVector<DataIconManager *> list;
+    for (auto i = 0; i < children.size(); i++){
         if (children.at(i).data()){
             list.append(static_cast<DataIconManager*>(children.at(i).data()));
         }
@@ -137,18 +131,19 @@ QList<DataIconManager *> hkbPoseMatchingGenerator::getChildren() const{
     return list;
 }
 
-bool hkbPoseMatchingGenerator::merge(HkxObject *recessiveObject){
+bool hkbPoseMatchingGenerator::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     hkbPoseMatchingGenerator *recobj;
     hkbBlenderGeneratorChild *domchild;
     hkbBlenderGeneratorChild *recchild;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_POSE_MATCHING_GENERATOR){
         recobj = static_cast<hkbPoseMatchingGenerator *>(recessiveObject);
-        if (variableBindingSet.data()){
-            variableBindingSet.data()->merge(recobj->variableBindingSet.data());
-        }else if (recobj->variableBindingSet.data()){
-            variableBindingSet = HkxSharedPtr(recobj->variableBindingSet.data());
+        if (getVariableBindingSetData()){
+            getVariableBindingSet()->merge(recobj->getVariableBindingSetData());
+        }else if (recobj->getVariableBindingSetData()){
+            getVariableBindingSet() = HkxSharedPtr(recobj->getVariableBindingSetData());
             recobj->fixMergedIndices(static_cast<BehaviorFile *>(getParentFile()));
-            getParentFile()->addObjectToFile(recobj->variableBindingSet.data(), -1);
+            getParentFile()->addObjectToFile(recobj->getVariableBindingSetData(), -1);
         }
         for (auto i = 0; i < children.size(); i++){
             domchild = static_cast<hkbBlenderGeneratorChild *>(children.at(i).data());
@@ -166,7 +161,8 @@ bool hkbPoseMatchingGenerator::merge(HkxObject *recessiveObject){
 }
 
 int hkbPoseMatchingGenerator::getIndexOfChild(hkbBlenderGeneratorChild *child) const{
-    for (int i = 0; i < children.size(); i++){
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < children.size(); i++){
         if (children.at(i).data() == child){
             return i;
         }
@@ -174,159 +170,124 @@ int hkbPoseMatchingGenerator::getIndexOfChild(hkbBlenderGeneratorChild *child) c
     return -1;
 }
 
-bool hkbPoseMatchingGenerator::readData(const HkxXmlReader &reader, long index){
+bool hkbPoseMatchingGenerator::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "referencePoseWeightThreshold"){
             referencePoseWeightThreshold = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'referencePoseWeightThreshold' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "referencePoseWeightThreshold");
         }else if (text == "blendParameter"){
             blendParameter = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'blendParameter' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "blendParameter");
         }else if (text == "minCyclicBlendParameter"){
             minCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'minCyclicBlendParameter' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "minCyclicBlendParameter");
         }else if (text == "maxCyclicBlendParameter"){
             maxCyclicBlendParameter = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'maxCyclicBlendParameter' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "maxCyclicBlendParameter");
         }else if (text == "indexOfSyncMasterChild"){
             indexOfSyncMasterChild = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'indexOfSyncMasterChild' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "indexOfSyncMasterChild");
         }else if (text == "flags"){
             flags = reader.getElementValueAt(index);
-            if (flags == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((flags != ""), "flags");    //TO DO: fix...
         }else if (text == "subtractLastChild"){
             subtractLastChild = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'subtractLastChild' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "subtractLastChild");
         }else if (text == "children"){
-            if (!readReferences(reader.getElementValueAt(index), children)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'children' references!\nObject Reference: "+ref);
-            }
+            checkvalue(readReferences(reader.getElementValueAt(index), children), "children");
         }else if (text == "worldFromModelRotation"){
             worldFromModelRotation = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'worldFromModelRotation' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "worldFromModelRotation");
         }else if (text == "blendSpeed"){
             blendSpeed = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'blendSpeed' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "blendSpeed");
         }else if (text == "minSpeedToSwitch"){
             minSpeedToSwitch = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'minSpeedToSwitch' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "minSpeedToSwitch");
         }else if (text == "minSwitchTimeNoError"){
             minSwitchTimeNoError = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'minSwitchTimeNoError' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "minSwitchTimeNoError");
         }else if (text == "minSwitchTimeFullError"){
             minSwitchTimeFullError = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'minSwitchTimeFullError' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "minSwitchTimeFullError");
         }else if (text == "startPlayingEventId"){
             startPlayingEventId = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'startPlayingEventId' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "startPlayingEventId");
         }else if (text == "startMatchingEventId"){
             startMatchingEventId = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'startMatchingEventId' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "startMatchingEventId");
         }else if (text == "rootBoneIndex"){
             rootBoneIndex = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'rootBoneIndex' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "rootBoneIndex");
         }else if (text == "otherBoneIndex"){
             otherBoneIndex = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'otherBoneIndex' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "otherBoneIndex");
         }else if (text == "anotherBoneIndex"){
             anotherBoneIndex = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'anotherBoneIndex' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "anotherBoneIndex");
         }else if (text == "pelvisIndex"){
             pelvisIndex = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'pelvisIndex' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "pelvisIndex");
         }else if (text == "mode"){
             mode = reader.getElementValueAt(index);
-            if (mode == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'mode' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(Mode.contains(mode), "mode");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbPoseMatchingGenerator::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value, bool allownull){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value, allownull);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QString refString = "null";
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
+        if (getVariableBindingSetData()){
+            refString = getVariableBindingSet()->getReferenceString();
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("referencePoseWeightThreshold"), QString::number(referencePoseWeightThreshold, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendParameter"), QString::number(blendParameter, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minCyclicBlendParameter"), QString::number(minCyclicBlendParameter, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxCyclicBlendParameter"), QString::number(maxCyclicBlendParameter, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("indexOfSyncMasterChild"), QString::number(indexOfSyncMasterChild));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("flags"), flags);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("subtractLastChild"), getBoolAsString(subtractLastChild));
+        writedatafield("variableBindingSet", refString, false);
+        writedatafield("userData", QString::number(userData), false);
+        writedatafield("name", name, false);
+        writedatafield("referencePoseWeightThreshold", QString::number(referencePoseWeightThreshold, char('f'), 6), false);
+        writedatafield("blendParameter", QString::number(blendParameter, char('f'), 6), false);
+        writedatafield("minCyclicBlendParameter", QString::number(minCyclicBlendParameter, char('f'), 6), false);
+        writedatafield("maxCyclicBlendParameter", QString::number(maxCyclicBlendParameter, char('f'), 6), false);
+        writedatafield("indexOfSyncMasterChild", QString::number(indexOfSyncMasterChild), false);
+        writedatafield("flags", flags, false);
+        writedatafield("subtractLastChild", getBoolAsString(subtractLastChild), false);
         refString = "";
         list1 = {writer->name, writer->numelements};
         list2 = {"children", QString::number(children.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0, j = 1; i < children.size(); i++, j++){
-            refString.append(children.at(i).data()->getReferenceString());
+        for (auto i = 0, j = 1; i < children.size(); i++, j++){
+            refString.append(children.at(i)->getReferenceString());
             if (j % 16 == 0){
                 refString.append("\n");
             }else{
@@ -340,139 +301,136 @@ bool hkbPoseMatchingGenerator::write(HkxXMLWriter *writer){
             writer->writeLine(refString);
             writer->writeLine(writer->parameter, false);
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("worldFromModelRotation"), worldFromModelRotation.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("blendSpeed"), QString::number(blendSpeed, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minSpeedToSwitch"), QString::number(minSpeedToSwitch, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minSwitchTimeNoError"), QString::number(minSwitchTimeNoError, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minSwitchTimeFullError"), QString::number(minSwitchTimeFullError, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("startPlayingEventId"), QString::number(startPlayingEventId));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("startMatchingEventId"), QString::number(startMatchingEventId));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("rootBoneIndex"), QString::number(rootBoneIndex));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("otherBoneIndex"), QString::number(otherBoneIndex));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("anotherBoneIndex"), QString::number(anotherBoneIndex));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pelvisIndex"), QString::number(pelvisIndex));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("mode"), mode);
+        writedatafield("worldFromModelRotation", worldFromModelRotation.getValueAsString(), false);
+        writedatafield("blendSpeed", QString::number(blendSpeed, char('f'), 6), false);
+        writedatafield("minSpeedToSwitch", QString::number(minSpeedToSwitch, char('f'), 6), false);
+        writedatafield("minSwitchTimeNoError", QString::number(minSwitchTimeNoError, char('f'), 6), false);
+        writedatafield("minSwitchTimeFullError", QString::number(minSwitchTimeFullError, char('f'), 6), false);
+        writedatafield("startPlayingEventId", QString::number(startPlayingEventId), false);
+        writedatafield("startMatchingEventId", QString::number(startMatchingEventId), false);
+        writedatafield("rootBoneIndex", QString::number(rootBoneIndex), false);
+        writedatafield("otherBoneIndex", QString::number(otherBoneIndex), false);
+        writedatafield("anotherBoneIndex", QString::number(anotherBoneIndex), false);
+        writedatafield("pelvisIndex", QString::number(pelvisIndex), false);
+        writedatafield("mode", mode, false);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        for (int i = 0; i < children.size(); i++){
-            if (children.at(i).data() && !children.at(i).data()->write(writer)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'children' at: "+QString::number(i)+"!!!");
-            }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        for (auto i = 0; i < children.size(); i++){
+            writechild(children.at(i), "children.at("+QString::number(i)+")");
         }
     }
     return true;
 }
 
 bool hkbPoseMatchingGenerator::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    auto baddata = [&](const QString & fieldname){
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'"+fieldname+"' is linked to invalid data!");
+        setDataValidity(false);
+    };
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
-    for (int i = 0; i < children.size(); i++){
-        //ptr = static_cast<BehaviorFile *>(getParentFile())->findGeneratorChild(children.at(i).getShdPtrReference());
+    for (auto i = 0; i < children.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(children.at(i).getShdPtrReference());
-        if (!ptr){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'children' data field!\nObject Name: "+name);
-            setDataValidity(false);
+        if (!ptr || !ptr->data()){
+            baddata("children.at("+QString::number(i)+")");
         }else if ((*ptr)->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'children' data field is linked to invalid child!\nObject Name: "+name);
-            setDataValidity(false);
+            baddata("children.at("+QString::number(i)+")");
             children[i] = *ptr;
         }else{
             children[i] = *ptr;
-            static_cast<hkbBlenderGeneratorChild *>(children[i].data())->parentBG = this;
+            static_cast<hkbBlenderGeneratorChild *>(children[i].data())->setParentBG(this);
         }
     }
     return true;
 }
 
 void hkbPoseMatchingGenerator::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
-    for (int i = 0; i < children.size(); i++){
+    for (auto i = 0; i < children.size(); i++){
         if (children.at(i).data()){
-            children[i].data()->unlink(); //Do here since this is not stored in the hkx file for long...
+            children[i]->unlink(); //Do here since this is not stored in the hkx file for long...
         }
         children[i] = HkxSharedPtr();
     }
 }
 
 QString hkbPoseMatchingGenerator::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     auto isvalid = true;
     auto valid = true;
     if (children.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": children is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": children is empty!\n");
     }else{
         for (auto i = children.size() - 1; i >= 0; i--){
             if (!children.at(i).data()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": children at index '"+QString::number(i)+"' is null! Removing child!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": children at index '"+QString::number(i)+"' is null! Removing child!\n");
                 children.removeAt(i);
-            }else if (children.at(i).data()->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
+            }else if (children.at(i)->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid child! Signature: "+QString::number(children.at(i).data()->getSignature(), 16)+" Removing child!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid child! Signature: "+QString::number(children.at(i)->getSignature(), 16)+" Removing child!\n");
                 children.removeAt(i);
             }
         }
     }
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){    //TO DO: fix
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid flags!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid flags!\n");
     }
     if (indexOfSyncMasterChild >= children.size()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": indexOfSyncMasterChild is out of range! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": indexOfSyncMasterChild is out of range! Setting default value!\n");
         indexOfSyncMasterChild = -1;
     }
     if (!Mode.contains(mode)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid mode! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid mode! Setting default value!\n");
         mode = Mode.first();
     }
     if (startPlayingEventId >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": startPlayingEventId event id out of range! Setting to last event index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": startPlayingEventId event id out of range! Setting to last event index!\n");
         startPlayingEventId = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (startMatchingEventId >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": startMatchingEventId event id out of range! Setting to last event index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": startMatchingEventId event id out of range! Setting to last event index!\n");
         startMatchingEventId = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (rootBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": rootBoneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": rootBoneIndex out of range! Setting to last bone index!\n");
         rootBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (otherBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": otherBoneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": otherBoneIndex out of range! Setting to last bone index!\n");
         otherBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (anotherBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": anotherBoneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": anotherBoneIndex out of range! Setting to last bone index!\n");
         anotherBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (pelvisIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": pelvisIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": pelvisIndex out of range! Setting to last bone index!\n");
         pelvisIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     setDataValidity(isvalid);

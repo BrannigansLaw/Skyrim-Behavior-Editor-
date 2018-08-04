@@ -6,28 +6,29 @@
 class BehaviorFile;
 class hkbProjectStringData;
 
-class hkbProjectData: public HkxObject
+class hkbProjectData final: public HkxObject
 {
     friend class ProjectFile;
 public:
     hkbProjectData(HkxFile *parent, long ref = 0, hkbProjectStringData *stringdata = nullptr);
-    virtual ~hkbProjectData();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbProjectData& operator=(const hkbProjectData&) = delete;
+    hkbProjectData(const hkbProjectData &) = delete;
+    ~hkbProjectData();
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbProjectData& operator=(const hkbProjectData&);
-    hkbProjectData(const hkbProjectData &);
-private:
-    static QStringList EventMode;   //EVENT_MODE_IGNORE_FROM_GENERATOR=0, ????
+    static const QStringList EventMode;
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     hkQuadVariable worldUpWS;
     HkxSharedPtr stringData;
     QString defaultEventMode;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBPROJECTDATA_H

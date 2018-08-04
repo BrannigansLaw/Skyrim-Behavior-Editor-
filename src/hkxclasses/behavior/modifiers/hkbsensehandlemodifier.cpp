@@ -3,15 +3,11 @@
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
-/*
- * CLASS: hkbSenseHandleModifier
-*/
-
 uint hkbSenseHandleModifier::refCount = 0;
 
-QString hkbSenseHandleModifier::classname = "hkbSenseHandleModifier";
+const QString hkbSenseHandleModifier::classname = "hkbSenseHandleModifier";
 
-QStringList hkbSenseHandleModifier::SensingMode = {"SENSE_IN_NEARBY_RIGID_BODIES", "SENSE_IN_RIGID_BODIES_OUTSIDE_THIS_CHARACTER", "SENSE_IN_OTHER_CHARACTER_RIGID_BODIES", "SENSE_IN_THIS_CHARACTER_RIGID_BODIES", "SENSE_IN_GIVEN_CHARACTER_RIGID_BODIES", "SENSE_IN_GIVEN_RIGID_BODY", "SENSE_IN_OTHER_CHARACTER_SKELETON", "SENSE_IN_THIS_CHARACTER_SKELETON", "SENSE_IN_GIVEN_CHARACTER_SKELETON", "SENSE_IN_GIVEN_LOCAL_FRAME_GROUP"};
+const QStringList hkbSenseHandleModifier::SensingMode = {"SENSE_IN_NEARBY_RIGID_BODIES", "SENSE_IN_RIGID_BODIES_OUTSIDE_THIS_CHARACTER", "SENSE_IN_OTHER_CHARACTER_RIGID_BODIES", "SENSE_IN_THIS_CHARACTER_RIGID_BODIES", "SENSE_IN_GIVEN_CHARACTER_RIGID_BODIES", "SENSE_IN_GIVEN_RIGID_BODY", "SENSE_IN_OTHER_CHARACTER_SKELETON", "SENSE_IN_THIS_CHARACTER_SKELETON", "SENSE_IN_GIVEN_CHARACTER_SKELETON", "SENSE_IN_GIVEN_LOCAL_FRAME_GROUP"};
 
 hkbSenseHandleModifier::hkbSenseHandleModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -29,242 +25,190 @@ hkbSenseHandleModifier::hkbSenseHandleModifier(HkxFile *parent, long ref)
       sensingMode(SensingMode.first())
 {
     setType(HKB_SENSE_HANDLE_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "SenseHandleModifier"+QString::number(refCount);
+    name = "SenseHandleModifier_"+QString::number(refCount);
 }
 
-QString hkbSenseHandleModifier::getClassname(){
+const QString hkbSenseHandleModifier::getClassname(){
     return classname;
 }
 
 QString hkbSenseHandleModifier::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-bool hkbSenseHandleModifier::readData(const HkxXmlReader &reader, long index){
+bool hkbSenseHandleModifier::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
+    int numranges;
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "sensorLocalOffset"){
             sensorLocalOffset = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'sensorLocalOffset' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "sensorLocalOffset");
         }else if (text == "ranges"){
-            int numranges = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                return false;
-            }
-            for (int j = 0; j < numranges; j++){
+            numranges = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            checkvalue(ok, "ranges");
+            (numranges > 0) ? index++ : NULL;
+            for (auto j = 0; j < numranges; j++, index++){
                 ranges.append(hkRanges());
-                while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+                for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
+                    text = reader.getNthAttributeValueAt(index, 0);
                     if (text == "id"){
                         ranges.last().event.id = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "ranges.at("+QString::number(j)+").event.id");
                     }else if (text == "payload"){
-                        if (!ranges.last().event.payload.readShdPtrReference(index, reader)){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ranges.last().event.payload.readShdPtrReference(index, reader), "ranges.at("+QString::number(j)+").event.payload");
                     }else if (text == "minDistance"){
                         ranges.last().minDistance = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'minDistance' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "ranges.at("+QString::number(j)+").minDistance");
                     }else if (text == "maxDistance"){
                         ranges.last().maxDistance = toBool(reader.getElementValueAt(index), &ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'maxDistance' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "ranges.at("+QString::number(j)+").maxDistance");
                     }else if (text == "ignoreHandle"){
                         ranges.last().ignoreHandle = toBool(reader.getElementValueAt(index), &ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'ignoreHandle' data field!\nObject Reference: "+ref);
-                        }
-                        index++;
+                        checkvalue(ok, "ranges.at("+QString::number(j)+").ignoreHandle");
                         break;
                     }
-                    index++;
                 }
             }
+            (numranges > 0) ? index-- : NULL;
         }else if (text == "handleOut"){
-            if (!handleOut.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'handleOut' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(handleOut.readShdPtrReference(index, reader), "handleOut");
         }else if (text == "handleIn"){
-            if (!handleIn.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'handleIn' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(handleIn.readShdPtrReference(index, reader), "handleIn");
         }else if (text == "localFrameName"){
             localFrameName = reader.getElementValueAt(index);
-            if (localFrameName == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'localFrameName' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "localFrameName");
         }else if (text == "sensorLocalFrameName"){
             sensorLocalFrameName = reader.getElementValueAt(index);
-            if (sensorLocalFrameName == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'sensorLocalFrameName' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "sensorLocalFrameName");
         }else if (text == "minDistance"){
             minDistance = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'minDistance' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "minDistance");
         }else if (text == "maxDistance"){
             maxDistance = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'maxDistance' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "maxDistance");
         }else if (text == "distanceOut"){
             distanceOut = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'distanceOut' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "distanceOut");
         }else if (text == "collisionFilterInfo"){
-            collisionFilterInfo = reader.getElementValueAt(index).toLong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'collisionFilterInfo' data field!\nObject Reference: "+ref);
-            }
+            collisionFilterInfo = reader.getElementValueAt(index).toInt(&ok);
+            checkvalue(ok, "collisionFilterInfo");
         }else if (text == "sensorRagdollBoneIndex"){
-            sensorRagdollBoneIndex = reader.getElementValueAt(index).toLong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'sensorRagdollBoneIndex' data field!\nObject Reference: "+ref);
-            }
+            sensorRagdollBoneIndex = reader.getElementValueAt(index).toInt(&ok);
+            checkvalue(ok, "sensorRagdollBoneIndex");
         }else if (text == "sensorAnimationBoneIndex"){
-            sensorAnimationBoneIndex = reader.getElementValueAt(index).toLong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'sensorAnimationBoneIndex' data field!\nObject Reference: "+ref);
-            }
+            sensorAnimationBoneIndex = reader.getElementValueAt(index).toInt(&ok);
+            checkvalue(ok, "sensorAnimationBoneIndex");
         }else if (text == "sensingMode"){
             sensingMode = reader.getElementValueAt(index);
-            if (!SensingMode.contains(sensingMode)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'sensingMode' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(SensingMode.contains(sensingMode), "sensingMode");
         }else if (text == "extrapolateSensorPosition"){
             extrapolateSensorPosition = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'extrapolateSensorPosition' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "extrapolateSensorPosition");
         }else if (text == "keepFirstSensedHandle"){
             keepFirstSensedHandle = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'keepFirstSensedHandle' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "keepFirstSensedHandle");
         }else if (text == "foundHandleOut"){
             foundHandleOut = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'foundHandleOut' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "foundHandleOut");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbSenseHandleModifier::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensorLocalOffset"), sensorLocalOffset.getValueAsString());
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData));
+        writedatafield("name", name);
+        writedatafield("enable", getBoolAsString(enable));
+        writedatafield("sensorLocalOffset", sensorLocalOffset.getValueAsString());
         list1 = {writer->name, writer->numelements};
         list2 = {"ranges", QString::number(ranges.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < ranges.size(); i++){
+        for (auto i = 0; i < ranges.size(); i++){
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(ranges.at(i).event.id));
-            if (ranges.at(i).event.payload.data()){
-                refString = ranges.at(i).event.payload.data()->getReferenceString();
-            }else{
-                refString = "null";
-            }
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minDistance"), QString::number(ranges.at(i).minDistance, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxDistance"), QString::number(ranges.at(i).maxDistance, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("ignoreHandle"), getBoolAsString(ranges.at(i).ignoreHandle));
+            writedatafield("id", QString::number(ranges.at(i).event.id));
+            writeref(ranges.at(i).event.payload, "payload");
+            writedatafield("minDistance", QString::number(ranges.at(i).minDistance, char('f'), 6));
+            writedatafield("maxDistance", QString::number(ranges.at(i).maxDistance, char('f'), 6));
+            writedatafield("ignoreHandle", getBoolAsString(ranges.at(i).ignoreHandle));
             writer->writeLine(writer->object, false);
         }
         if (ranges.size() > 0){
             writer->writeLine(writer->parameter, false);
         }
-        if (handleOut.data()){
-            refString = handleOut.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("handleOut"), refString);
-        if (handleIn.data()){
-            refString = handleIn.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("handleIn"), refString);
+        writeref(handleOut, "handleOut");
+        writeref(handleIn, "handleIn");
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("localFrameName"), localFrameName, true);
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensorLocalFrameName"), sensorLocalFrameName, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("minDistance"), QString::number(minDistance, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxDistance"), QString::number(maxDistance, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("distanceOut"), QString::number(distanceOut, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("collisionFilterInfo"), QString::number(collisionFilterInfo));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensorRagdollBoneIndex"), QString::number(sensorRagdollBoneIndex));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensorAnimationBoneIndex"), QString::number(sensorAnimationBoneIndex));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("sensingMode"), sensingMode);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("extrapolateSensorPosition"), getBoolAsString(extrapolateSensorPosition));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("keepFirstSensedHandle"), getBoolAsString(keepFirstSensedHandle));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("foundHandleOut"), getBoolAsString(foundHandleOut));
+        writedatafield("minDistance", QString::number(minDistance, char('f'), 6));
+        writedatafield("maxDistance", QString::number(maxDistance, char('f'), 6));
+        writedatafield("distanceOut", QString::number(distanceOut, char('f'), 6));
+        writedatafield("collisionFilterInfo", QString::number(collisionFilterInfo));
+        writedatafield("sensorRagdollBoneIndex", QString::number(sensorRagdollBoneIndex));
+        writedatafield("sensorAnimationBoneIndex", QString::number(sensorAnimationBoneIndex));
+        writedatafield("sensingMode", sensingMode);
+        writedatafield("extrapolateSensorPosition", getBoolAsString(extrapolateSensorPosition));
+        writedatafield("keepFirstSensedHandle", getBoolAsString(keepFirstSensedHandle));
+        writedatafield("foundHandleOut", getBoolAsString(foundHandleOut));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        for (int i = 0; i < ranges.size(); i++){
-            if (ranges.at(i).event.payload.data() && !ranges.at(i).event.payload.data()->write(writer)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
-            }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        for (auto i = 0; i < ranges.size(); i++){
+            writechild(ranges.at(i).event.payload, "ranges.at("+QString::number(i)+").event.payload");
         }
     }
     return true;
 }
 
 int hkbSenseHandleModifier::getNumberOfRanges() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return ranges.size();
 }
 
 bool hkbSenseHandleModifier::isEventReferenced(int eventindex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < ranges.size(); i++){
         if (ranges.at(i).event.id == eventindex){
             return true;
@@ -274,22 +218,21 @@ bool hkbSenseHandleModifier::isEventReferenced(int eventindex) const{
 }
 
 void hkbSenseHandleModifier::updateEventIndices(int eventindex){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < ranges.size(); i++){
-        if (ranges.at(i).event.id > eventindex){
-            ranges[i].event.id--;
-        }
+        (ranges.at(i).event.id > eventindex) ? ranges[i].event.id-- : NULL;
     }
 }
 
 void hkbSenseHandleModifier::mergeEventIndex(int oldindex, int newindex){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < ranges.size(); i++){
-        if (ranges.at(i).event.id == oldindex){
-            ranges[i].event.id = newindex;
-        }
+        (ranges.at(i).event.id == oldindex) ? ranges[i].event.id = newindex : NULL;
     }
 }
 
 void hkbSenseHandleModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphData *recdata;
     hkbBehaviorGraphData *domdata;
     QString thiseventname;
@@ -314,28 +257,25 @@ void hkbSenseHandleModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
 }
 
 void hkbSenseHandleModifier::updateReferences(long &ref){
+    std::lock_guard <std::mutex> guard(mutex);
     setReference(ref);
-    ref++;
-    setBindingReference(ref);
+    setBindingReference(++ref);
     for (auto i = 0; i < ranges.size(); i++){
-        if (ranges.at(i).event.payload.data()){
-            ref++;
-            ranges[i].event.payload.data()->updateReferences(ref);
-        }
+        (ranges.at(i).event.payload.data()) ? ranges[i].event.payload->updateReferences(++ref) : NULL;
     }
 }
 
 QVector<HkxObject *> hkbSenseHandleModifier::getChildrenOtherTypes() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QVector<HkxObject *> list;
     for (auto i = 0; i < ranges.size(); i++){
-        if (ranges.at(i).event.payload.data()){
-            list.append(ranges.at(i).event.payload.data());
-        }
+        (ranges.at(i).event.payload.data()) ? list.append(ranges.at(i).event.payload.data()) : NULL;
     }
     return list;
 }
 
-bool hkbSenseHandleModifier::merge(HkxObject *recessiveObject){
+bool hkbSenseHandleModifier::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     hkbSenseHandleModifier *recobj;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_SENSE_HANDLE_MODIFIER){
         recobj = static_cast<hkbSenseHandleModifier *>(recessiveObject);
@@ -348,20 +288,17 @@ bool hkbSenseHandleModifier::merge(HkxObject *recessiveObject){
             }
         }
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 bool hkbSenseHandleModifier::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
-    for (int i = 0; i < ranges.size(); i++){
+    for (auto i = 0; i < ranges.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(ranges.at(i).event.payload.getShdPtrReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
@@ -374,58 +311,60 @@ bool hkbSenseHandleModifier::link(){
 }
 
 void hkbSenseHandleModifier::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
-    for (int i = 0; i < ranges.size(); i++){
+    for (auto i = 0; i < ranges.size(); i++){
         ranges[i].event.payload = HkxSharedPtr();
     }
 }
 
 QString hkbSenseHandleModifier::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     if (ranges.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": ranges is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": ranges is empty!\n");
     }else{
         for (auto i = 0; i < ranges.size(); i++){
             if (ranges.at(i).event.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": id in ranges at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": id in ranges at "+QString::number(i)+" out of range!\n");
             }
-            if (ranges.at(i).event.payload.data() && ranges.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+            if (ranges.at(i).event.payload.data() && ranges.at(i).event.payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid payload type! Signature: "+QString::number(ranges.at(i).event.payload.data()->getSignature(), 16)+"\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid payload type! Signature: "+QString::number(ranges.at(i).event.payload->getSignature(), 16)+"\n");
             }
         }
     }
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");}
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     if (!SensingMode.contains(sensingMode)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid sensingMode! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid sensingMode! Setting default value!\n");
         sensingMode = SensingMode.first();
     }
     if (sensorRagdollBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sensorRagdollBoneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": sensorRagdollBoneIndex out of range! Setting to last bone index!\n");
         sensorRagdollBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
     }
     if (sensorAnimationBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sensorAnimationBoneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": sensorAnimationBoneIndex out of range! Setting to last bone index!\n");
         sensorAnimationBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (sensorRagdollBoneIndex > -1 && sensorAnimationBoneIndex > -1){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": sensorRagdollBoneIndex and sensorAnimationBoneIndex are both in use at the same time! This will crash the game! Setting sensorRagdollBoneIndex to -1!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": sensorRagdollBoneIndex and sensorAnimationBoneIndex are both in use at the same time! This will crash the game! Setting sensorRagdollBoneIndex to -1!\n");
         sensorRagdollBoneIndex = -1;
     }
     if (sensorRagdollBoneIndex < 0 && sensorAnimationBoneIndex < 0 ){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Neither sensorRagdollBoneIndex and sensorAnimationBoneIndex are in use! Setting sensorAnimationBoneIndex to 0!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Neither sensorRagdollBoneIndex and sensorAnimationBoneIndex are in use! Setting sensorAnimationBoneIndex to 0!\n");
         sensorAnimationBoneIndex = 0;
     }
     setDataValidity(isvalid);

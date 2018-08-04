@@ -62,7 +62,7 @@ void EventUI::loadData(BehaviorFile *parentFile, hkEventPayload * event){
         }
         selectEvent->setText(text);
         if (event->payload.data()){
-            eventPayload->setText(static_cast<hkbStringEventPayload *>(event->payload.data())->data);
+            eventPayload->setText(static_cast<hkbStringEventPayload *>(event->payload.data())->getData());
         }else{
             eventPayload->setText("");
         }
@@ -96,7 +96,7 @@ void EventUI::setEventPayload(){
         payload = static_cast<hkbStringEventPayload *>(eventData->payload.data());
         if (eventPayload->text() != ""){
             if (payload){
-                payload->data = eventPayload->text();
+                payload->setData(eventPayload->text());
             }else{
                 payload = new hkbStringEventPayload(file, eventPayload->text());
                 eventData->payload = HkxSharedPtr(payload);

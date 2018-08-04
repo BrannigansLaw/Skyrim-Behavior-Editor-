@@ -392,14 +392,14 @@ QStringList BehaviorGraphView::getEventNames() const{
 void BehaviorGraphView::removeGeneratorData(){
     QVector <int> removedIndices;
     removedIndices = behavior->removeGeneratorData();
-    for (int i = 0; i < removedIndices.size(); i++){
+    for (auto i = 0; i < removedIndices.size(); i++){
         emit removedGenerator(removedIndices.at(i) + 1);
     }
 }
 
 void BehaviorGraphView::removeModifierData(){
     QVector <int> removedIndices = behavior->removeModifierData();
-    for (int i = 0; i < removedIndices.size(); i++){
+    for (auto i = 0; i < removedIndices.size(); i++){
         emit removedModifier(removedIndices.at(i) + 1);
     }
 }
@@ -470,7 +470,7 @@ void BehaviorGraphView::removeObjects(){
 }
 
 void BehaviorGraphView::deleteAllObjectBranches(){
-    hkbBehaviorGraph *graph = static_cast<hkbBehaviorGraph *>(behavior->behaviorGraph.data());
+    hkbBehaviorGraph *graph = static_cast<hkbBehaviorGraph *>(behavior->getBehaviorGraph());
     if (!graph->icons.isEmpty()){
         QList <QGraphicsItem *> list = graph->icons.first()->childItems();
         if (!list.isEmpty()){
@@ -481,6 +481,11 @@ void BehaviorGraphView::deleteAllObjectBranches(){
             removeObjects();
         }
     }
+}
+
+BehaviorFile *BehaviorGraphView::getBehavior() const
+{
+    return behavior;
 }
 
 template <typename T>
@@ -881,14 +886,14 @@ void BehaviorGraphView::wrapPoseMatchingGenerator(){
 
 void BehaviorGraphView::enableAllMenuActions(QMenu *menu){
     QList <QAction *> actions = menu->actions();
-    for (int i = 0; i < actions.size(); i++){
+    for (auto i = 0; i < actions.size(); i++){
         actions.at(i)->setDisabled(false);
     }
 }
 
 void BehaviorGraphView::disableAllMenuActions(QMenu *menu){
     QList <QAction *> actions = menu->actions();
-    for (int i = 0; i < actions.size(); i++){
+    for (auto i = 0; i < actions.size(); i++){
         actions.at(i)->setDisabled(true);
     }
 }

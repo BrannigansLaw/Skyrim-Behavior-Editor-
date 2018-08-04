@@ -2,86 +2,83 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
-/**
- * hkbStateMachineEventPropertyArray
- */
 
 uint hkbStateMachineEventPropertyArray::refCount = 0;
 
-QString hkbStateMachineEventPropertyArray::classname = "hkbStateMachineEventPropertyArray";
+const QString hkbStateMachineEventPropertyArray::classname = "hkbStateMachineEventPropertyArray";
 
 hkbStateMachineEventPropertyArray::hkbStateMachineEventPropertyArray(HkxFile *parent, long ref)
     : HkxObject(parent, ref)
 {
     setType(HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
-QString hkbStateMachineEventPropertyArray::getClassname(){
+const QString hkbStateMachineEventPropertyArray::getClassname(){
     return classname;
 }
 
 void hkbStateMachineEventPropertyArray::addEvent(const hkEventPayload &event){
+    std::lock_guard <std::mutex> guard(mutex);
     events.append(event);
 }
 
 void hkbStateMachineEventPropertyArray::setEventId(int index, int id){
-    if (events.size() > index){
-        events[index].id = id;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (events.size() > index) ? events[index].id = id : NULL;
 }
 
 void hkbStateMachineEventPropertyArray::removeEvent(int index){
-    if (events.size() > index){
-        events.removeAt(index);
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (events.size() > index) ? events.removeAt(index) : NULL;
 }
 
 int hkbStateMachineEventPropertyArray::getLastEventIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return events.size() - 1;
 }
 
-bool hkbStateMachineEventPropertyArray::readData(const HkxXmlReader &reader, long index){
+bool hkbStateMachineEventPropertyArray::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
+    int numEvents;
     bool ok;
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "events"){
-            int numEvents = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                return false;
-            }
-            for (int j = 0; j < numEvents; j++){
+            numEvents = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            checkvalue(ok, "events");
+            (numEvents > 0) ? index++ : NULL;
+            for (auto j = 0; j < numEvents; j++, index++){
                 events.append(hkEventPayload());
-                while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-                    if (reader.getNthAttributeValueAt(index, 0) == "id"){
+                for (; index < reader.getNumElements(); index++){
+                    text = reader.getNthAttributeValueAt(index, 0);
+                    if (text == "id"){
                         events.last().id = reader.getElementValueAt(index).toInt(&ok);
-                        if (!ok){
-                            return false;
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "payload"){
-                        if (!events.last().payload.readShdPtrReference(index, reader)){
-                            return false;
-                        }
-                        index++;
+                        checkvalue(ok, "events.at("+QString::number(j)+").id");
+                    }else if (text == "payload"){
+                        checkvalue(events.last().payload.readShdPtrReference(index, reader), "events.at("+QString::number(j)+").payload");
                         break;
+                    }else{
+                        //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                     }
-                    index++;
                 }
             }
-            return true;
+            (numEvents > 0) ? index-- : NULL;
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbStateMachineEventPropertyArray::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (writer && !getIsWritten()){
         QString refString;
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
@@ -89,11 +86,11 @@ bool hkbStateMachineEventPropertyArray::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"events", QString::number(events.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < events.size(); i++){
+        for (auto i = 0; i < events.size(); i++){
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(events.at(i).id));
             if (events.at(i).payload.data()){
-                refString = events.at(i).payload.data()->getReferenceString();
+                refString = events.at(i).payload->getReferenceString();
             }else{
                 refString = "null";
             }
@@ -106,9 +103,9 @@ bool hkbStateMachineEventPropertyArray::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        for (int i = 0; i < events.size(); i++){
-            if (events.at(i).payload.data() && !events.at(i).payload.data()->write(writer)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
+        for (auto i = 0; i < events.size(); i++){
+            if (events.at(i).payload.data() && !events.at(i).payload->write(writer)){
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
             }
         }
     }
@@ -116,6 +113,7 @@ bool hkbStateMachineEventPropertyArray::write(HkxXMLWriter *writer){
 }
 
 bool hkbStateMachineEventPropertyArray::isEventReferenced(int eventindex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < events.size(); i++){
         if (events.at(i).id == eventindex){
             return true;
@@ -125,22 +123,21 @@ bool hkbStateMachineEventPropertyArray::isEventReferenced(int eventindex) const{
 }
 
 void hkbStateMachineEventPropertyArray::updateEventIndices(int eventindex){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < events.size(); i++){
-        if (events.at(i).id > eventindex){
-            events[i].id--;
-        }
+        (events.at(i).id > eventindex) ? events[i].id-- : NULL;
     }
 }
 
 void hkbStateMachineEventPropertyArray::mergeEventIndex(int oldindex, int newindex){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < events.size(); i++){
-        if (events.at(i).id == oldindex){
-            events[i].id = newindex;
-        }
+        (events.at(i).id == oldindex) ? events[i].id = newindex : NULL;
     }
 }
 
 void hkbStateMachineEventPropertyArray::fixMergedEventIndices(BehaviorFile *dominantfile){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphData *recdata;
     hkbBehaviorGraphData *domdata;
     QString thiseventname;
@@ -164,7 +161,8 @@ void hkbStateMachineEventPropertyArray::fixMergedEventIndices(BehaviorFile *domi
     }
 }
 
-bool hkbStateMachineEventPropertyArray::merge(HkxObject *recessiveObject){
+bool hkbStateMachineEventPropertyArray::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphData *recdata;
     hkbBehaviorGraphData *domdata;
     QString othereventname;
@@ -196,41 +194,36 @@ bool hkbStateMachineEventPropertyArray::merge(HkxObject *recessiveObject){
         }
         setIsMerged(true);
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 void hkbStateMachineEventPropertyArray::updateReferences(long &ref){
+    std::lock_guard <std::mutex> guard(mutex);
     setReference(ref);
     for (auto i = 0; i < events.size(); i++){
-        if (events.at(i).payload.data()){
-            ref++;
-            events[i].payload.data()->updateReferences(ref);
-        }
+        (events.at(i).payload.data()) ? events[i].payload->updateReferences(++ref) : NULL;
     }
 }
 
 QVector<HkxObject *> hkbStateMachineEventPropertyArray::getChildrenOtherTypes() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QVector<HkxObject *> list;
     for (auto i = 0; i < events.size(); i++){
-        if (events.at(i).payload.data()){
-            list.append(events.at(i).payload.data());
-        }
+        (events.at(i).payload.data()) ? list.append(events.at(i).payload.data()) : NULL;
     }
     return list;
 }
 
 int hkbStateMachineEventPropertyArray::getNumOfEvents() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return events.size();
 }
 
 bool hkbStateMachineEventPropertyArray::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     HkxSharedPtr *ptr;
-    for (int i = 0; i < events.size(); i++){
+    for (auto i = 0; i < events.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(events.at(i).payload.getShdPtrReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
@@ -243,27 +236,29 @@ bool hkbStateMachineEventPropertyArray::link(){
 }
 
 void hkbStateMachineEventPropertyArray::unlink(){
-    for (int i = 0; i < events.size(); i++){
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < events.size(); i++){
         events[i].payload = HkxSharedPtr();
     }
 }
 
 QString hkbStateMachineEventPropertyArray::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     if (events.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": events is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": events is empty!\n");
     }else{
         for (auto i = 0; i < events.size(); i++){
             if (events.at(i).id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": id in events at "+QString::number(i)+" out of range! Setting to last event index!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": id in events at "+QString::number(i)+" out of range! Setting to last event index!\n");
                 events[i].id  = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
             }
-            if (events.at(i).payload.data() && events.at(i).payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+            if (events.at(i).payload.data() && events.at(i).payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(events.at(i).payload.data()->getSignature(), 16)+" Setting null value!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(events.at(i).payload->getSignature(), 16)+" Setting null value!\n");
                 events[i].payload = HkxSharedPtr();
             }
         }

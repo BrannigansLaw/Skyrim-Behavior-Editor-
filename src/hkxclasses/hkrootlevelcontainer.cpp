@@ -6,63 +6,63 @@
 #include "src/filetypes/characterfile.h"
 #include "src/filetypes/skeletonfile.h"
 
-/**
- * hkRootLevelContainer
- */
-
 uint hkRootLevelContainer::refCount = 0;
 
-QString hkRootLevelContainer::classname = "hkRootLevelContainer";
+const QString hkRootLevelContainer::classname = "hkRootLevelContainer";
 
 hkRootLevelContainer::hkRootLevelContainer(HkxFile *parent, long ref)
     : HkxObject(parent, ref)
 {
     setType(HK_ROOT_LEVEL_CONTAINER, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
-QString hkRootLevelContainer::getClassname(){
+const QString hkRootLevelContainer::getClassname(){
     return classname;
 }
 
-bool hkRootLevelContainer::readData(const HkxXmlReader &reader, long index){
-    bool ok;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+bool hkRootLevelContainer::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
+    QString text;
+    auto ok = true;
+    auto numVariants = 0;
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         if (reader.getNthAttributeValueAt(index, 0) == "namedVariants"){
-            int numVariants = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nAttempt to read the number of variants failed!");
-                //return false;
-            }
-            for (int j = 0; j < numVariants; j++){
-                namedVariants.append(hkRootLevelContainerNamedVariant());
-                while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-                    if (reader.getNthAttributeValueAt(index, 0) == "name"){
-                        namedVariants.last().name = reader.getElementValueAt(index);
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "className"){
-                        namedVariants.last().className = reader.getElementValueAt(index);
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "variant"){
-                        if (!namedVariants.last().variant.readShdPtrReference(index, reader)){
-                            return false;
+            numVariants = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            if (ok){
+                for (auto j = 0; j < numVariants; j++, index++){
+                    namedVariants.append(hkRootLevelContainerNamedVariant());
+                    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
+                        text = reader.getNthAttributeValueAt(index, 0);
+                        if (text == "name"){
+                            namedVariants.last().name = reader.getElementValueAt(index);
+                        }else if (text == "className"){
+                            namedVariants.last().className = reader.getElementValueAt(index);
+                        }else if (text == "variant"){
+                            if (namedVariants.last().variant.readShdPtrReference(index, reader)){
+                                break;
+                            }else{
+                                return false;
+                            }
                         }
-                        index++;
-                        break;
                     }
-                    index++;
                 }
+                (numVariants > 0) ? index-- : NULL;
+            }else{
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nAttempt to read the number of variants failed!");
+                return false;
             }
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkRootLevelContainer::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto result = true;
+    if (writer && !getIsWritten()){
         QString refString;
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
@@ -70,12 +70,12 @@ bool hkRootLevelContainer::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"namedVariants", QString::number(namedVariants.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < namedVariants.size(); i++){
+        for (auto i = 0; i < namedVariants.size(); i++){
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), namedVariants.at(i).name);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("className"), namedVariants.at(i).className);
             if (namedVariants.at(i).variant.data()){
-                refString = namedVariants.at(i).variant.data()->getReferenceString();
+                refString = namedVariants.at(i).variant->getReferenceString();
             }else{
                 refString = "null";
             }
@@ -88,30 +88,31 @@ bool hkRootLevelContainer::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        for (int i = 0; i < namedVariants.size(); i++){
-            if (namedVariants.at(i).variant.data() && !namedVariants.at(i).variant.data()->write(writer)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write variant at "+QString::number(i));
+        for (auto i = 0; i < namedVariants.size(); i++){
+            if (namedVariants.at(i).variant.data() && !namedVariants.at(i).variant->write(writer)){
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write variant at "+QString::number(i));
+                result = false;
             }
         }
     }
-    return true;
+    return result;
 }
 
-void hkRootLevelContainer::addVariant(const QString &name){
-    namedVariants.append(hkRootLevelContainerNamedVariant(name, name));
+void hkRootLevelContainer::addVariant(const QString &name, HkxObject *ptr){
+    std::lock_guard <std::mutex> guard(mutex);
+    namedVariants.append(hkRootLevelContainerNamedVariant(name, name, ptr));
 }
 
 void hkRootLevelContainer::setVariantAt(int index, HkxObject * ptr){
+    std::lock_guard <std::mutex> guard(mutex);
     if (index > -1 && index < namedVariants.size()){
         namedVariants[index].variant = HkxSharedPtr(ptr);
     }
 }
 
 bool hkRootLevelContainer::link(){
-    if (!getParentFile()){
-        return false;
-    }
-    for (int i = 0; i < namedVariants.size(); i++){//This is awful, I know. I'll sort it out later...
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < namedVariants.size(); i++){//This is awful, I know. I'll sort it out later...
         HkxSharedPtr *ptr = nullptr;
         HkxFile *file = dynamic_cast<BehaviorFile *>(getParentFile());
         if (file){
@@ -129,13 +130,13 @@ bool hkRootLevelContainer::link(){
                     if (file){
                         ptr = static_cast<SkeletonFile *>(getParentFile())->findSkeleton(namedVariants.at(i).variant.getShdPtrReference());
                     }else{
-                        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nParent file type is invalid!!!");
+                        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nParent file type is invalid!!!");
                     }
                 }
             }
         }
-        if (!ptr){
-            //LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nUnable to link variant reference "+QString::number(namedVariants.at(i).variant.getShdPtrReference())+"!");
+        if (!ptr || !ptr->data()){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nUnable to link variant reference "+QString::number(namedVariants.at(i).variant.getShdPtrReference())+"!");
             setDataValidity(false);
         }else{
             namedVariants[i].variant = *ptr;
@@ -145,13 +146,15 @@ bool hkRootLevelContainer::link(){
 }
 
 void hkRootLevelContainer::unlink(){
-    for (int i = 0; i < namedVariants.size(); i++){
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < namedVariants.size(); i++){
         namedVariants[i].variant = HkxSharedPtr();
     }
 }
 
 QString hkRootLevelContainer::evaluateDataValidity(){
-    for (int i = 0; i < namedVariants.size(); i++){
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < namedVariants.size(); i++){
         if (!namedVariants.at(i).variant.data()){
             setDataValidity(false);
             return QString();
@@ -163,4 +166,19 @@ QString hkRootLevelContainer::evaluateDataValidity(){
 
 hkRootLevelContainer::~hkRootLevelContainer(){
     refCount--;
+}
+
+bool hkRootLevelContainer::hkRootLevelContainerNamedVariant::operator==(const hkRootLevelContainerNamedVariant & other){
+    if (name == other.name && className == other.className){
+        return true;
+    }
+    return false;
+}
+
+hkRootLevelContainer::hkRootLevelContainerNamedVariant::hkRootLevelContainerNamedVariant(const QString & varname, const QString & classname, HkxObject *ptr)
+    : name(varname),
+      className(classname),
+      variant(ptr)
+{
+    //
 }

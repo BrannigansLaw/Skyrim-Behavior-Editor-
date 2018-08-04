@@ -68,7 +68,7 @@ bool AnimCacheClipInfo::write(QFile *file, QTextStream &out) const{
     out << eventName << "\n";
     out << QString::number(unknown) << "\n";
     out << QString::number(clipGenerators.size()) << "\n";
-    for (int i = 0; i < clipGenerators.size(); i++){
+    for (auto i = 0; i < clipGenerators.size(); i++){
         out << clipGenerators.at(i) << "\n";
     }
     return true;

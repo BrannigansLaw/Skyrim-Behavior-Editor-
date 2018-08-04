@@ -10,25 +10,25 @@ class QGridLayout;
 class TableWidget;
 class LineEdit;
 
-class BehaviorReferenceGeneratorUI: public QGroupBox
+class BehaviorReferenceGeneratorUI final: public QGroupBox
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     BehaviorReferenceGeneratorUI();
-    virtual ~BehaviorReferenceGeneratorUI(){}
+    BehaviorReferenceGeneratorUI& operator=(const BehaviorReferenceGeneratorUI&) = delete;
+    BehaviorReferenceGeneratorUI(const BehaviorReferenceGeneratorUI &) = delete;
+    ~BehaviorReferenceGeneratorUI() = default;
     void loadData(HkxObject *data);
 signals:
     void generatorNameChanged(const QString & newName, int index);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setBehaviorName(const QString &text);
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
     void behaviorRenamed(const QString & name, int index);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     hkbBehaviorReferenceGenerator *bsData;
     QGridLayout *topLyt;
     TableWidget *table;

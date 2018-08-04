@@ -5,28 +5,30 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbBoneWeightArray: public HkDynamicObject
+class hkbBoneWeightArray final: public HkDynamicObject
 {
-    friend class BehaviorGraphView;
     friend class BoneWeightArrayUI;
 public:
     hkbBoneWeightArray(HkxFile *parent, long ref = 0, int size = 0);
+    hkbBoneWeightArray& operator=(const hkbBoneWeightArray&) = delete;
+    hkbBoneWeightArray(const hkbBoneWeightArray &other) = delete;
+    ~hkbBoneWeightArray();
     void copyBoneWeights(const hkbBoneWeightArray *other);
-    virtual ~hkbBoneWeightArray();
-    bool readData(const HkxXmlReader & reader, long index);
+private:
+    qreal getBoneWeightAt(int index, bool *ok = nullptr) const;
+    int getBoneWeightsSize() const;
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     //QString evaluateDataValidity();
-    static QString getClassname();
+    static const QString getClassname();
     bool write(HkxXMLWriter *writer);
-    hkbBoneWeightArray * clone() const;   //TO DO: implement getChildrenOtherTypes()??
+    //hkbBoneWeightArray * clone() const;   //TO DO: implement getChildrenOtherTypes()??
     QVector <HkxObject *> getChildrenOtherTypes() const;
 private:
-    hkbBoneWeightArray& operator=(const hkbBoneWeightArray&);
-    hkbBoneWeightArray(const hkbBoneWeightArray &other);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     QVector <qreal> boneWeights;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBBONEWEIGHTARRAY_H

@@ -183,7 +183,7 @@ void ComputeDirectionModifierUI::loadData(HkxObject *data){
             normalizePoint->setChecked(bsData->normalizePoint);
             computeOnlyOnce->setChecked(bsData->computeOnlyOnce);
             computedOutput->setChecked(bsData->computedOutput);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
                 loadBinding(POINT_IN_ROW, BINDING_COLUMN, varBind, "pointIn");
@@ -225,7 +225,7 @@ void ComputeDirectionModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -236,7 +236,7 @@ void ComputeDirectionModifierUI::setName(){
 void ComputeDirectionModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setEnable(): The data is nullptr!!");
     }
@@ -246,7 +246,7 @@ void ComputeDirectionModifierUI::setPointIn(){
     if (bsData){
         if (bsData->pointIn != pointIn->value()){
             bsData->pointIn = pointIn->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setPointIn(): The data is nullptr!!");
@@ -257,7 +257,7 @@ void ComputeDirectionModifierUI::setPointOut(){
     if (bsData){
         if (bsData->pointOut != pointOut->value()){
             bsData->pointOut = pointOut->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setPointOut(): The data is nullptr!!");
@@ -268,7 +268,7 @@ void ComputeDirectionModifierUI::setGroundAngleOut(){
     if (bsData){
         if (bsData->groundAngleOut != groundAngleOut->value()){
             bsData->groundAngleOut = groundAngleOut->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setGroundAngleOut(): The data is nullptr!!");
@@ -279,7 +279,7 @@ void ComputeDirectionModifierUI::setUpAngleOut(){
     if (bsData){
         if (bsData->upAngleOut != upAngleOut->value()){
             bsData->upAngleOut = upAngleOut->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setUpAngleOut(): The data is nullptr!!");
@@ -290,7 +290,7 @@ void ComputeDirectionModifierUI::setVerticalOffset(){
     if (bsData){
         if (bsData->verticalOffset != verticalOffset->value()){
             bsData->verticalOffset = verticalOffset->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setVerticalOffset(): The data is nullptr!!");
@@ -300,7 +300,7 @@ void ComputeDirectionModifierUI::setVerticalOffset(){
 void ComputeDirectionModifierUI::setReverseGroundAngle(){
     if (bsData){
         bsData->reverseGroundAngle = reverseGroundAngle->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setReverseGroundAngle(): The data is nullptr!!");
     }
@@ -309,7 +309,7 @@ void ComputeDirectionModifierUI::setReverseGroundAngle(){
 void ComputeDirectionModifierUI::setReverseUpAngle(){
     if (bsData){
         bsData->reverseUpAngle = reverseUpAngle->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setReverseUpAngle(): The data is nullptr!!");
     }
@@ -318,7 +318,7 @@ void ComputeDirectionModifierUI::setReverseUpAngle(){
 void ComputeDirectionModifierUI::setProjectPoint(){
     if (bsData){
         bsData->projectPoint = projectPoint->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setProjectPoint(): The data is nullptr!!");
     }
@@ -327,7 +327,7 @@ void ComputeDirectionModifierUI::setProjectPoint(){
 void ComputeDirectionModifierUI::setNormalizePoint(){
     if (bsData){
         bsData->normalizePoint = normalizePoint->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setNormalizePoint(): The data is nullptr!!");
     }
@@ -336,7 +336,7 @@ void ComputeDirectionModifierUI::setNormalizePoint(){
 void ComputeDirectionModifierUI::setComputeOnlyOnce(){
     if (bsData){
         bsData->computeOnlyOnce = computeOnlyOnce->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setComputeOnlyOnce(): The data is nullptr!!");
     }
@@ -345,7 +345,7 @@ void ComputeDirectionModifierUI::setComputeOnlyOnce(){
 void ComputeDirectionModifierUI::setComputedOutput(){
     if (bsData){
         bsData->computedOutput = computedOutput->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setComputedOutput(): The data is nullptr!!");
     }
@@ -440,14 +440,14 @@ void ComputeDirectionModifierUI::viewSelected(int row, int column){
 void ComputeDirectionModifierUI::selectTableToView(bool viewisProperty, const QString & path){
     if (bsData){
         if (viewisProperty){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -460,7 +460,7 @@ void ComputeDirectionModifierUI::selectTableToView(bool viewisProperty, const QS
 void ComputeDirectionModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
         if (bind){
             int bindIndex = bind->getVariableIndexOfBinding("enable");
             if (bindIndex == index){
@@ -517,16 +517,16 @@ void ComputeDirectionModifierUI::variableRenamed(const QString & name, int index
 }
 
 bool ComputeDirectionModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -538,7 +538,7 @@ bool ComputeDirectionModifierUI::setBinding(int index, int row, const QString &v
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -628,13 +628,13 @@ void ComputeDirectionModifierUI::setBindingVariable(int index, const QString &na
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-void ComputeDirectionModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void ComputeDirectionModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -642,7 +642,7 @@ void ComputeDirectionModifierUI::loadBinding(int row, int colunm, hkbVariableBin
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -650,7 +650,7 @@ void ComputeDirectionModifierUI::loadBinding(int row, int colunm, hkbVariableBin
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("ComputeDirectionModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }

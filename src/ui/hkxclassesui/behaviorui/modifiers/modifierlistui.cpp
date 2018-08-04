@@ -146,7 +146,7 @@ void ModifierListUI::loadData(HkxObject *data){
             bsData = static_cast<hkbModifierList *>(data);
             name->setText(bsData->name);
             enable->setChecked(bsData->enable);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
             }else{
@@ -170,7 +170,7 @@ void ModifierListUI::loadDynamicTableRows(){
             table->setRowCount(temp);
         }
         hkbModifier *child = nullptr;
-        for (int i = ADD_MODIFIER_ROW + 1, j = 0; j < bsData->modifiers.size(); i++, j++){
+        for (auto i = ADD_MODIFIER_ROW + 1, j = 0; j < bsData->modifiers.size(); i++, j++){
             child = static_cast<hkbModifier *>(bsData->modifiers.at(j).data());
             if (child){
                 setRowItems(i, child->getName(), child->getClassname(), "Remove", "Edit", "Double click to remove this modifier", VIEW_MODIFIERS_TABLE_TIP);
@@ -224,16 +224,16 @@ void ModifierListUI::connectToTables(GenericTableWidget *modifiers, GenericTable
 }
 
 bool ModifierListUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -245,7 +245,7 @@ bool ModifierListUI::setBinding(int index, int row, const QString & variableName
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -269,13 +269,13 @@ void ModifierListUI::setBindingVariable(int index, const QString & name){
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ModifierListUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-void ModifierListUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void ModifierListUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -283,7 +283,7 @@ void ModifierListUI::loadBinding(int row, int colunm, hkbVariableBindingSet *var
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -291,7 +291,7 @@ void ModifierListUI::loadBinding(int row, int colunm, hkbVariableBindingSet *var
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("ModifierListUI::loadBinding(): The variable binding set is nullptr!!");
         }
@@ -308,7 +308,7 @@ void ModifierListUI::variableRenamed(const QString &name, int index){
     }
     if (bsData){
         index--;
-        bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        bind = bsData->getVariableBindingSetData();
         if (bind){
             bindIndex = bind->getVariableIndexOfBinding("enable");
             if (bindIndex == index){
@@ -343,14 +343,14 @@ void ModifierListUI::setBehaviorView(BehaviorGraphView *view){
 void ModifierListUI::selectTableToView(bool viewproperties, const QString &path){
     if (bsData){
         if (viewproperties){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -365,7 +365,7 @@ void ModifierListUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -376,7 +376,7 @@ void ModifierListUI::setName(){
 void ModifierListUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ModifierListUI::setEnable(): The data is nullptr!!");
     }
@@ -419,13 +419,18 @@ void ModifierListUI::viewSelectedChild(int row, int column){
 }
 
 void ModifierListUI::swapGeneratorIndices(int index1, int index2){
+    HkxObject *gen1;
+    HkxObject *gen2;
     if (bsData){
         index1 = index1 - BASE_NUMBER_OF_ROWS;
         index2 = index2 - BASE_NUMBER_OF_ROWS;
         if (bsData->modifiers.size() > index1 && bsData->modifiers.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
-            bsData->modifiers.swap(index1, index2);
+            gen1 = bsData->modifiers.at(index1).data();
+            gen2 = bsData->modifiers.at(index2).data();
+            bsData->modifiers[index1] = HkxSharedPtr(gen2);
+            bsData->modifiers[index2] = HkxSharedPtr(gen1);
             behaviorView->getSelectedItem()->reorderChildren();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("ModifierListUI::swapGeneratorIndices(): Cannot swap these rows!!");
         }
@@ -459,7 +464,7 @@ void ModifierListUI::setModifier(int index, const QString &name){
                 }
                 behaviorView->removeModifierData();
                 table->item(table->currentRow(), NAME_COLUMN)->setText(name);
-                bsData->getParentFile()->setIsChanged(true);
+                bsData->setIsFileChanged(true);
                 loadDynamicTableRows();
             }else{
                 CRITICAL_ERROR_MESSAGE("ModifierListUI::setModifier(): Invalid modifier index selected!!");

@@ -5,38 +5,35 @@
 
 //class hkbEventsFromRangeModifier;
 
-class hkbEventRangeDataArray: public HkxObject
+class hkbEventRangeDataArray final: public HkxObject
 {
     friend class EventRangeDataUI;
     friend class EventsFromRangeModifierUI;
     friend class hkbEventsFromRangeModifier;
 public:
     hkbEventRangeDataArray(HkxFile *parent, long ref = -1);
-    virtual ~hkbEventRangeDataArray();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbEventRangeDataArray& operator=(const hkbEventRangeDataArray&) = delete;
+    hkbEventRangeDataArray(const hkbEventRangeDataArray &) = delete;
+    ~hkbEventRangeDataArray();
+    static const QString getClassname();
+    int getLastEventDataIndex() const;
+    int getNumberOfRanges() const;
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     QString evaluateDataValidity();
-    static QString getClassname();
-    int getLastEventDataIndex() const;
     bool write(HkxXMLWriter *writer);
-    int getNumberOfRanges() const;
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
     void mergeEventIndex(int oldindex, int newindex);
     void fixMergedEventIndices(BehaviorFile *dominantfile);
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
-protected:
 private:
     struct hkbEventRangeData
     {
-        static const QStringList EventRangeMode;    //(EVENT_MODE_SEND_ON_ENTER_RANGE=0;EVENT_MODE_SEND_WHEN_IN_RANGE=1)
-        hkbEventRangeData()
-            : upperBound(0),
-              eventMode(EventRangeMode.first())
-        {
-            //
-        }
+        static const QStringList EventRangeMode;
+        hkbEventRangeData() : upperBound(0), eventMode(EventRangeMode.first()){}
         qreal upperBound;
         hkEventPayload event;
         QString eventMode;
@@ -46,9 +43,10 @@ private:
     void removeEventData(int index);
 private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     //hkbEventsFromRangeModifier *parent;
-    QList <hkbEventRangeData> eventData;
+    QVector <hkbEventRangeData> eventData;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBEVENTRANGEDATAARRAY_H

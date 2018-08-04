@@ -7,25 +7,23 @@
 
 class HkxFile;
 
-class hkbProjectStringData: public HkxObject
+class hkbProjectStringData final: public HkxObject
 {
-    friend class BehaviorGraphView;
-    friend class ProjectFile;
 public:
     hkbProjectStringData(HkxFile *parent, long ref = 0, const QString & characterfilename = "");
-    virtual ~hkbProjectStringData();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
-    QString evaluateDataValidity();
-    static QString getClassname();
-    bool write(HkxXMLWriter *writer);
+    hkbProjectStringData& operator=(const hkbProjectStringData&) = delete;
+    hkbProjectStringData(const hkbProjectStringData &) = delete;
+    ~hkbProjectStringData();
+    static const QString getClassname();
     QString getCharacterFilePathAt(int index) const;
 private:
-    hkbProjectStringData& operator=(const hkbProjectStringData&);
-    hkbProjectStringData(const hkbProjectStringData &);
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
+    QString evaluateDataValidity();
+    bool write(HkxXMLWriter *writer);
 private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     QStringList animationFilenames;
     QStringList behaviorFilenames;
     QStringList characterFilenames;
@@ -34,6 +32,7 @@ private:
     QString behaviorPath;
     QString characterPath;
     QString fullPathToSource;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBPROJECTSTRINGDATA_H

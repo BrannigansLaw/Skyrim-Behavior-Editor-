@@ -11,26 +11,26 @@ class TableWidget;
 class LineEdit;
 class DoubleSpinBox;
 
-class BGSGamebryoSequenceGeneratorUI: public QGroupBox
+class BGSGamebryoSequenceGeneratorUI final: public QGroupBox
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     BGSGamebryoSequenceGeneratorUI();
-    virtual ~BGSGamebryoSequenceGeneratorUI(){}
+    BGSGamebryoSequenceGeneratorUI& operator=(const BGSGamebryoSequenceGeneratorUI&) = delete;
+    BGSGamebryoSequenceGeneratorUI(const BGSGamebryoSequenceGeneratorUI &) = delete;
+    ~BGSGamebryoSequenceGeneratorUI() = default;
     void loadData(HkxObject *data);
 signals:
     void generatorNameChanged(const QString & newName, int index);
 private slots:
-    void setName();
-    void setSequence();
+    void setName(const QString &newname);
+    void setSequence(const QString &sequence);
     void setBlendModeFunction(int index);
     void setPercent();
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     BGSGamebryoSequenceGenerator *bsData;
     QGridLayout *topLyt;
     TableWidget *table;

@@ -93,19 +93,19 @@ bool AnimCacheAnimSetData::write(QFile *file, QTextStream & out) const{
     }
     out << "V3\n";
     out << QString::number(cacheEvents.size()) << "\n";
-    for (int i = 0; i < cacheEvents.size(); i++){
+    for (auto i = 0; i < cacheEvents.size(); i++){
         out << cacheEvents.at(i) << "\n";
     }
     out << QString::number(behaviorVariables.size()) << "\n";
-    for (int i = 0; i < behaviorVariables.size(); i++){
+    for (auto i = 0; i < behaviorVariables.size(); i++){
         behaviorVariables.at(i)->write(file, out);
     }
     out << QString::number(clipGenerators.size()) << "\n";
-    for (int i = 0; i < clipGenerators.size(); i++){
+    for (auto i = 0; i < clipGenerators.size(); i++){
         clipGenerators.at(i)->write(file, out);
     }
     out << QString::number(animations.size()) << "\n";
-    for (int i = 0; i < animations.size(); i++){
+    for (auto i = 0; i < animations.size(); i++){
         animations.at(i)->write(file, out);
     }
     return true;
@@ -116,9 +116,9 @@ bool AnimCacheAnimSetData::addAnimationToCache(const QString & event, const QVec
     if (!cacheEvents.contains(event)){
         cacheEvents.append(event);
     }
-    for (int i = 0; i < anims.size(); i++){
+    for (auto i = 0; i < anims.size(); i++){
         exists = false;
-        for (int j = 0; j < animations.size(); j++){
+        for (auto j = 0; j < animations.size(); j++){
             if (animations.at(j) == anims.at(i)){
                 exists = true;
             }
@@ -127,9 +127,9 @@ bool AnimCacheAnimSetData::addAnimationToCache(const QString & event, const QVec
             animations.append(anims.at(i));
         }
     }
-    for (int i = 0; i < vars.size(); i++){
+    for (auto i = 0; i < vars.size(); i++){
         exists = false;
-        for (int j = 0; j < behaviorVariables.size(); j++){
+        for (auto j = 0; j < behaviorVariables.size(); j++){
             if (behaviorVariables.at(j) == vars.at(i)){
                 exists = true;
             }
@@ -138,9 +138,9 @@ bool AnimCacheAnimSetData::addAnimationToCache(const QString & event, const QVec
             behaviorVariables.append(vars.at(i));
         }
     }
-    for (int i = 0; i < clips.size(); i++){
+    for (auto i = 0; i < clips.size(); i++){
         exists = false;
-        for (int j = 0; j < clipGenerators.size(); j++){
+        for (auto j = 0; j < clipGenerators.size(); j++){
             if (clipGenerators.at(j) == clips.at(i)){
                 exists = true;
             }
@@ -171,21 +171,21 @@ void AnimCacheAnimSetData::removeAnimationFromCache(const QString &animationname
         if (!ok){
             CRITICAL_ERROR_MESSAGE("AnimCacheAnimSetData::removeAnimationFromCache(): animation hash is invalid!!!");
         }
-        for (int i = animations.size() - 1; i >= 0; i--){
+        for (auto i = animations.size() - 1; i >= 0; i--){
             if (animations.at(i)->crcAnimationName == animationhash){
                 animations.removeAt(i);
             }
         }
     }
     if (variablename != ""){
-        for (int i = behaviorVariables.size() - 1; i >= 0; i--){
+        for (auto i = behaviorVariables.size() - 1; i >= 0; i--){
             if (behaviorVariables.at(i)->name == variablename){
                 behaviorVariables.removeAt(i);
             }
         }
     }
     if (clipname != ""){
-        for (int i = clipGenerators.size() - 1; i >= 0; i--){
+        for (auto i = clipGenerators.size() - 1; i >= 0; i--){
             clipGenerators[i]->clipGenerators.removeAll(clipname);
         }
     }

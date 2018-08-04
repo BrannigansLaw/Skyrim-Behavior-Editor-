@@ -36,7 +36,7 @@ bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore, const Q
             line.chop(1);
             size = line.toUInt(&ok);
             if (ok){
-                for (int i = 0; i < size; i++){
+                for (auto i = 0; i < size; i++){
                     if (!file->atEnd()){
                         line = file->readLine();
                         line.chop(1);
@@ -69,7 +69,7 @@ bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore, const Q
         if (!name.contains(".txt")){
             name.append(".txt");
         }
-        for (int i = 0; i < projectNames.size(); i++){
+        for (auto i = 0; i < projectNames.size(); i++){
             if (!QString::compare(projectNames.at(i), name, Qt::CaseInsensitive)){
                 indexToIgnore = i;
                 break;
@@ -79,7 +79,7 @@ bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore, const Q
             indexToIgnore = projectNames.size();
         }
     }
-    for (int i = 0; i < size && i < indexToIgnore; i++){
+    for (auto i = 0; i < size && i < indexToIgnore; i++){
         animData.append(new ProjectAnimData());
         if (!animData.last()->read(file)){
             LogFile::writeToLog("SkyrimAnimData::parse(): ProjectAnimData read failed!");
@@ -108,7 +108,7 @@ bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore, const Q
             return false;
         }
         animData.last()->projectFiles = behaviorfilenames;
-        for (int i = 0; i < numFiles && !file->atEnd(); i++){
+        for (auto i = 0; i < numFiles && !file->atEnd(); i++){
             line = file->readLine();
             if ((!line.contains(".hkx") && !line.contains(".HKX"))){
                 return false;
@@ -125,7 +125,7 @@ bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore, const Q
             }
         }
         animData.last()->animationDataLines = numFiles + MIN_NUM_LINES;
-        for (int i = numFiles + MIN_NUM_LINES - 1; i < blocksize && !file->atEnd(); i++){
+        for (auto i = numFiles + MIN_NUM_LINES - 1; i < blocksize && !file->atEnd(); i++){
             line = file->readLine();
         }
         if (line != "0\n"){
@@ -134,7 +134,7 @@ bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore, const Q
                 return false;
             }
         }
-        for (int i = indexToIgnore; i < size; i++){
+        for (auto i = indexToIgnore; i < size; i++){
             animData.append(new ProjectAnimData());
             if (!animData.last()->read(file)){
                 LogFile::writeToLog("SkyrimAnimData::parse(): ProjectAnimData read failed!");
@@ -162,10 +162,10 @@ bool SkyrimAnimData::write(const QString &filename){
     }
     QTextStream out(&file);
     out << QString::number(projectNames.size()) << "\n";
-    for (int i = 0; i < projectNames.size(); i++){
+    for (auto i = 0; i < projectNames.size(); i++){
         out << projectNames.at(i) << "\n";
     }
-    for (int i = 0; i < animData.size(); i++){
+    for (auto i = 0; i < animData.size(); i++){
         if (!animData.at(i)->write(file, out)){
             return false;
         }
@@ -181,7 +181,7 @@ int SkyrimAnimData::getProjectIndex(const QString &projectname) const{
     if (!name.contains(".txt")){
         name.append(".txt");
     }
-    for (int i = 0; i < projectNames.size(); i++){
+    for (auto i = 0; i < projectNames.size(); i++){
         if (name.compare(projectNames.at(i), Qt::CaseInsensitive) == 0){
             return i;
         }

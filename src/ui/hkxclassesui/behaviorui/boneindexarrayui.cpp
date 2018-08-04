@@ -71,7 +71,7 @@ void BoneIndexArrayUI::loadDynamicTableRows(){
             table->setRowCount(temp);
         }
         QStringList bones = static_cast<BehaviorFile *>(bsData->getParentFile())->getRagdollBoneNames();
-        for (int i = ADD_RAGDOLL_BONE_ROW + 1, j = 0; j < bsData->boneIndices.size(); i++, j++){
+        for (auto i = ADD_RAGDOLL_BONE_ROW + 1, j = 0; j < bsData->boneIndices.size(); i++, j++){
             temp = bsData->boneIndices.at(j);
             if (temp < bones.size() && temp >= 0){
                 setRowItems(i, bones.at(temp), "Remove", "Edit", "Double click to remove this ragdoll bone", VIEW_BONES_TABLE_TIP);
@@ -145,7 +145,7 @@ void BoneIndexArrayUI::setRagdollBone(int index, const QString &name){
             if (row >= 0 && row < bsData->boneIndices.size()){
                 if (index >= 0){
                     bsData->boneIndices[row] = index;
-                    bsData->getParentFile()->setIsChanged(true);
+                    bsData->setIsFileChanged(true);
                     if (table->item(table->currentRow(), NAME_COLUMN)){
                         table->item(table->currentRow(), NAME_COLUMN)->setText(name);
                     }else{
@@ -168,7 +168,7 @@ void BoneIndexArrayUI::setRagdollBone(int index, const QString &name){
 void BoneIndexArrayUI::addRagdollBone(){
     if (bsData){
         bsData->boneIndices.append(0);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
         loadDynamicTableRows();
     }else{
         CRITICAL_ERROR_MESSAGE("BoneIndexArrayUI::addRagdollBone(): The data is nullptr!!");
@@ -179,7 +179,7 @@ void BoneIndexArrayUI::removeRagdollBone(int index){
     if (bsData){
         if (index < bsData->boneIndices.size() && index >= 0){
             bsData->boneIndices.removeAt(index);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("BoneIndexArrayUI::removeRagdollBone(): Invalid index!!");
         }

@@ -2,7 +2,7 @@
 #define HKXXMLREADER_H
 
 #include <QByteArray>
-#include <QList>
+#include <QVector>
 #include <QVector>
 
 #include "src/utility.h"

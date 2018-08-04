@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class BSTweenerModifier: public hkbModifier
+class BSTweenerModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSTweenerModifierUI;
 public:
     BSTweenerModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSTweenerModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSTweenerModifier& operator=(const BSTweenerModifier&) = delete;
+    BSTweenerModifier(const BSTweenerModifier &) = delete;
+    ~BSTweenerModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    BSTweenerModifier& operator=(const BSTweenerModifier&);
-    BSTweenerModifier(const BSTweenerModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -32,6 +31,7 @@ private:
     qreal tweenDuration;
     hkQuadVariable targetPosition;
     hkQuadVariable targetRotation;
+    mutable std::mutex mutex;
 };
 
 #endif // BSTWEENERMODIFIER_H

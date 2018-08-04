@@ -3,21 +3,22 @@
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
-/*
- * CLASS: hkbExpressionDataArray
-*/
-
 uint hkbExpressionDataArray::refCount = 0;
 
-QString hkbExpressionDataArray::classname = "hkbExpressionDataArray";
+const QString hkbExpressionDataArray::classname = "hkbExpressionDataArray";
 
-QStringList hkbExpressionDataArray::EventMode = {"EVENT_MODE_SEND_ONCE", "EVENT_MODE_SEND_ON_TRUE", "EVENT_MODE_SEND_ON_FALSE_TO_TRUE", "EVENT_MODE_SEND_EVERY_FRAME_ONCE_TRUE"};
+const QStringList hkbExpressionDataArray::EventMode = {
+    "EVENT_MODE_SEND_ONCE",
+    "EVENT_MODE_SEND_ON_TRUE",
+    "EVENT_MODE_SEND_ON_FALSE_TO_TRUE",
+    "EVENT_MODE_SEND_EVERY_FRAME_ONCE_TRUE"
+};
 
 hkbExpressionDataArray::hkbExpressionDataArray(HkxFile *parent, long ref)
     : HkxObject(parent, ref)
 {
     setType(HKB_EXPRESSION_DATA_ARRAY, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
@@ -26,87 +27,84 @@ QString hkbExpressionDataArray::getClassname(){
 }
 
 void hkbExpressionDataArray::addExpression(const QString & exp, ExpressionEventMode mode){
+    std::lock_guard <std::mutex> guard(mutex);
     expressionsData.append(hkExpression(exp, mode));
 }
 
 void hkbExpressionDataArray::removeExpression(const QString & exp){
-    for (int i = 0; i < expressionsData.size(); i++){
-        if (expressionsData.at(i).expression == exp){
-            expressionsData.removeAt(i);
-        }
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < expressionsData.size(); i++){
+        (expressionsData.at(i).expression == exp) ? expressionsData.removeAt(i) : NULL;
     }
 }
 
 void hkbExpressionDataArray::removeExpression(int index){
-    if (index < expressionsData.size() && index > -1){
-        expressionsData.removeAt(index);
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (index < expressionsData.size() && index > -1) ? expressionsData.removeAt(index) : NULL;
 }
 
-bool hkbExpressionDataArray::readData(const HkxXmlReader &reader, long index){
+bool hkbExpressionDataArray::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
+    int numexpressionsData;
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "expressionsData"){
-            int numexp = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                return false;
-            }
-            for (int j = 0; j < numexp; j++){
+            numexpressionsData = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            checkvalue(ok, "expressionsData");
+            (numexpressionsData > 0) ? index++ : NULL;
+            for (auto j = 0; j < numexpressionsData; j++, index++){
                 expressionsData.append(hkExpression());
-                while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+                for (; index < reader.getNumElements(); index++){
                     text = reader.getNthAttributeValueAt(index, 0);
                     if (text == "expression"){
                         expressionsData.last().expression = reader.getElementValueAt(index);
-                        if (expressionsData.last().expression == ""){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'expression' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue((expressionsData.last().expression != ""), "expressionsData.at("+QString::number(j)+").expression");
                     }else if (text == "assignmentVariableIndex"){
                         expressionsData.last().assignmentVariableIndex = reader.getElementValueAt(index).toInt(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'assignmentVariableIndex' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "expressionsData.at("+QString::number(j)+").assignmentVariableIndex");
                     }else if (text == "assignmentEventIndex"){
                         expressionsData.last().assignmentEventIndex = reader.getElementValueAt(index).toInt(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'assignmentEventIndex' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "expressionsData.at("+QString::number(j)+").assignmentEventIndex");
                     }else if (text == "eventMode"){
                         expressionsData.last().eventMode = reader.getElementValueAt(index);
-                        if (!EventMode.contains(expressionsData.last().eventMode)){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nInvalid 'eventMode' data!\nObject Reference: "+ref);
-                        }
-                        index++;
+                        checkvalue(EventMode.contains(expressionsData.last().eventMode), "expressionsData.at("+QString::number(j)+").eventMode");
                         break;
+                    }else{
+                        //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                     }
-                    index++;
                 }
             }
+            (numexpressionsData > 0) ? index-- : NULL;
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbExpressionDataArray::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
         list1 = {writer->name, writer->numelements};
         list2 = {"expressionsData", QString::number(expressionsData.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < expressionsData.size(); i++){
+        for (auto i = 0; i < expressionsData.size(); i++){
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("expression"), expressionsData.at(i).expression, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("assignmentVariableIndex"), QString::number(expressionsData.at(i).assignmentVariableIndex));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("assignmentEventIndex"), QString::number(expressionsData.at(i).assignmentEventIndex));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("eventMode"), expressionsData.at(i).eventMode);
+            writedatafield("assignmentVariableIndex", QString::number(expressionsData.at(i).assignmentVariableIndex));
+            writedatafield("assignmentEventIndex", QString::number(expressionsData.at(i).assignmentEventIndex));
+            writedatafield("eventMode", expressionsData.at(i).eventMode);
             writer->writeLine(writer->object, false);
         }
         if (expressionsData.size() > 0){
@@ -120,6 +118,7 @@ bool hkbExpressionDataArray::write(HkxXMLWriter *writer){
 }
 
 bool hkbExpressionDataArray::isEventReferenced(int eventindex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < expressionsData.size(); i++){
         if (expressionsData.at(i).assignmentEventIndex == eventindex){
             return true;
@@ -129,6 +128,7 @@ bool hkbExpressionDataArray::isEventReferenced(int eventindex) const{
 }
 
 void hkbExpressionDataArray::fixMergedEventIndices(BehaviorFile *dominantfile){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphData *recdata;
     hkbBehaviorGraphData *domdata;
     QString thiseventname;
@@ -158,7 +158,8 @@ bool hkbExpressionDataArray::hkExpression::operator==(const hkExpression & other
     return true;
 }
 
-bool hkbExpressionDataArray::merge(HkxObject *recessiveObject){
+bool hkbExpressionDataArray::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     bool found;
     hkbExpressionDataArray *obj = nullptr;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_EXPRESSION_DATA_ARRAY){
@@ -184,10 +185,9 @@ bool hkbExpressionDataArray::merge(HkxObject *recessiveObject){
 }
 
 void hkbExpressionDataArray::updateEventIndices(int eventindex){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < expressionsData.size(); i++){
-        if (expressionsData.at(i).assignmentEventIndex > eventindex){
-            expressionsData[i].assignmentEventIndex--;
-        }
+        (expressionsData.at(i).assignmentEventIndex > eventindex) ? expressionsData[i].assignmentEventIndex-- : NULL;
     }
 }
 
@@ -196,28 +196,29 @@ bool hkbExpressionDataArray::link(){
 }
 
 QString hkbExpressionDataArray::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     if (expressionsData.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": expression is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": expression is empty!\n");
     }else{
         for (auto i = 0; i < expressionsData.size(); i++){
             if (expressionsData.at(i).expression == ""){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": expression is null string!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": expression is null string!\n");
             }
             if (expressionsData.at(i).assignmentVariableIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfVariables()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": assignmentVariableIndex at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": assignmentVariableIndex at "+QString::number(i)+" out of range!\n");
             }
             if (expressionsData.at(i).assignmentEventIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": assignmentEventIndex at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": assignmentEventIndex at "+QString::number(i)+" out of range!\n");
             }
             if (!EventMode.contains(expressionsData.at(i).eventMode)){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid eventMode!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid eventMode!\n");
             }
         }
     }

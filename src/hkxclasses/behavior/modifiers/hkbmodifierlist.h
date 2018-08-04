@@ -3,37 +3,36 @@
 
 #include "hkbmodifier.h"
 
-class hkbModifierList: public hkbModifier
+class hkbModifierList final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class ModifierListUI;
 public:
     hkbModifierList(HkxFile *parent, long ref = 0);
-    virtual ~hkbModifierList();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbModifierList& operator=(const hkbModifierList&) = delete;
+    hkbModifierList(const hkbModifierList &) = delete;
+    ~hkbModifierList();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
-    int getIndexToInsertIcon() const;
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
     bool merge(HkxObject *recessiveObject);
-private:
-    QList <DataIconManager *> getChildren() const;
+    QVector <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int index, DataIconManager *obj);
     bool removeObjectAt(int index);
-    hkbModifierList& operator=(const hkbModifierList&);
-    hkbModifierList(const hkbModifierList &);
 private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
-    QList <HkxSharedPtr> modifiers;
+    QVector <HkxSharedPtr> modifiers;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBMODIFIERLIST_H

@@ -3,19 +3,21 @@
 
 #include "hkbmodifier.h"
 
-class hkbEvaluateExpressionModifier: public hkbModifier
+class hkbEvaluateExpressionModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class EvaluateExpressionModifierUI;
 public:
     hkbEvaluateExpressionModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbEvaluateExpressionModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbEvaluateExpressionModifier& operator=(const hkbEvaluateExpressionModifier&) = delete;
+    hkbEvaluateExpressionModifier(const hkbEvaluateExpressionModifier &) = delete;
+    ~hkbEvaluateExpressionModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfExpressions() const;
     bool isEventReferenced(int eventindex) const;
@@ -25,15 +27,13 @@ public:
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
 private:
-    hkbEvaluateExpressionModifier& operator=(const hkbEvaluateExpressionModifier&);
-    hkbEvaluateExpressionModifier(const hkbEvaluateExpressionModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
     HkxSharedPtr expressions;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBEVALUATEEXPRESSIONMODIFIER_H

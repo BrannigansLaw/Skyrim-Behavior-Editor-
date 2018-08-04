@@ -7,9 +7,9 @@
 
 uint hkbClipGenerator::refCount = 0;
 
-QString hkbClipGenerator::classname = "hkbClipGenerator";
+const QString hkbClipGenerator::classname = "hkbClipGenerator";
 
-QStringList hkbClipGenerator::PlaybackMode = {"MODE_SINGLE_PLAY", "MODE_LOOPING", "MODE_USER_CONTROLLED", "MODE_PING_PONG", "MODE_COUNT"};
+const QStringList hkbClipGenerator::PlaybackMode = {"MODE_SINGLE_PLAY", "MODE_LOOPING", "MODE_USER_CONTROLLED", "MODE_PING_PONG", "MODE_COUNT"};
 
 hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, bool addToAnimData, const QString &animationname)
     : hkbGenerator(parent, ref),
@@ -26,15 +26,11 @@ hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, bool addToAnimData
       flags("0")
 {
     setType(HKB_CLIP_GENERATOR, TYPE_GENERATOR);
-    BehaviorFile *par = static_cast<BehaviorFile *>(getParentFile());
-    if (!getParentFile()){
-        CRITICAL_ERROR_MESSAGE("hkbClipGenerator(): Parent file is nullptr!");
-    }
-    par->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "ClipGenerator"+QString::number(refCount);
+    name = "ClipGenerator_"+QString::number(refCount);
     if (animationname == ""){
-        animationName = par->getAnimationNameAt(0);
+        animationName = static_cast<BehaviorFile *>(parent)->getAnimationNameAt(0);
     }else {
         name = animationname;
     }
@@ -52,150 +48,129 @@ hkbClipGenerator::hkbClipGenerator(HkxFile *parent, long ref, bool addToAnimData
     }*/
 }
 
-QString hkbClipGenerator::getClassname(){
+const QString hkbClipGenerator::getClassname(){
     return classname;
 }
 
 QString hkbClipGenerator::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-bool hkbClipGenerator::readData(const HkxXmlReader &reader, long index){
+bool hkbClipGenerator::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "animationName"){
             animationName = reader.getElementValueAt(index);
-            if (animationName == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'animationName' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((animationName == ""), "animationName");
         }else if (text == "triggers"){
-            if (!triggers.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'triggers' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(triggers.readShdPtrReference(index, reader), "triggers");
         }else if (text == "cropStartAmountLocalTime"){
             cropStartAmountLocalTime = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'cropStartAmountLocalTime' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "cropStartAmountLocalTime");
         }else if (text == "cropEndAmountLocalTime"){
             cropEndAmountLocalTime = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'cropEndAmountLocalTime' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "cropEndAmountLocalTime");
         }else if (text == "startTime"){
             startTime = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'startTime' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "startTime");
         }else if (text == "playbackSpeed"){
             playbackSpeed = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'playbackSpeed' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "playbackSpeed");
         }else if (text == "enforcedDuration"){
             enforcedDuration = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enforcedDuration' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enforcedDuration");
         }else if (text == "userControlledTimeFraction"){
             userControlledTimeFraction = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userControlledTimeFraction' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userControlledTimeFraction");
         }else if (text == "animationBindingIndex"){
             animationBindingIndex = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'animationBindingIndex' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "animationBindingIndex");
         }else if (text == "mode"){
             mode = reader.getElementValueAt(index);
-            if (mode == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'mode' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(PlaybackMode.contains(mode), "mode");
         }else if (text == "flags"){
             flags = reader.getElementValueAt(index);
-            if (flags == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'flags' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((flags != ""), "flags");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbClipGenerator::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value, bool allownull){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value, allownull);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("animationName"), animationName);
-        if (triggers.data()){
-            refString = triggers.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("triggers"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("cropStartAmountLocalTime"), QString::number(cropStartAmountLocalTime, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("cropEndAmountLocalTime"), QString::number(cropEndAmountLocalTime, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("startTime"), QString::number(startTime, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("playbackSpeed"), QString::number(playbackSpeed, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enforcedDuration"), QString::number(enforcedDuration, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userControlledTimeFraction"), QString::number(userControlledTimeFraction, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("animationBindingIndex"), QString::number(animationBindingIndex));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("mode"), mode);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("flags"), flags);
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData), false);
+        writedatafield("name", name, false);
+        writedatafield("animationName", animationName, false);
+        writeref(triggers, "triggers");
+        writedatafield("cropStartAmountLocalTime", QString::number(cropStartAmountLocalTime, char('f'), 6), false);
+        writedatafield("cropEndAmountLocalTime", QString::number(cropEndAmountLocalTime, char('f'), 6), false);
+        writedatafield("startTime", QString::number(startTime, char('f'), 6), false);
+        writedatafield("playbackSpeed", QString::number(playbackSpeed, char('f'), 6), false);
+        writedatafield("enforcedDuration", QString::number(enforcedDuration, char('f'), 6), false);
+        writedatafield("userControlledTimeFraction", QString::number(userControlledTimeFraction, char('f'), 6), false);
+        writedatafield("animationBindingIndex", QString::number(animationBindingIndex), false);
+        writedatafield("mode", mode, false);
+        writedatafield("flags", flags, false);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        if (triggers.data() && !triggers.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'triggers'!!!");
-        }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        writechild(triggers, "triggers");
     }
     return true;
 }
 
 int hkbClipGenerator::getNumberOfTriggers() const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (triggers.data()){
-        return static_cast<hkbClipTriggerArray *>(triggers.data())->triggers.size();
+        return static_cast<hkbClipTriggerArray *>(triggers.data())->getNumberOfTriggers();
     }
     return 0;
 }
 
 QString hkbClipGenerator::getAnimationName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return animationName;
 }
 
 bool hkbClipGenerator::isEventReferenced(int eventindex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (triggers.constData() && triggers.constData()->isEventReferenced(eventindex)){
         return true;
     }
@@ -203,68 +178,68 @@ bool hkbClipGenerator::isEventReferenced(int eventindex) const{
 }
 
 void hkbClipGenerator::updateEventIndices(int eventindex){
+    std::lock_guard <std::mutex> guard(mutex);
     if (triggers.data()){
-        triggers.data()->updateEventIndices(eventindex);
+        triggers->updateEventIndices(eventindex);
     }
 }
 
 void hkbClipGenerator::mergeEventIndex(int oldindex, int newindex){
+    std::lock_guard <std::mutex> guard(mutex);
     if (triggers.data()){
-        triggers.data()->mergeEventIndex(oldindex, newindex);
+        triggers->mergeEventIndex(oldindex, newindex);
     }
 }
 
 void hkbClipGenerator::fixMergedEventIndices(BehaviorFile *dominantfile){
+    std::lock_guard <std::mutex> guard(mutex);
     if (triggers.data() && dominantfile){
-        triggers.data()->fixMergedEventIndices(dominantfile);
+        triggers->fixMergedEventIndices(dominantfile);
         dominantfile->addObjectToFile(triggers.data(), -1);
     }
 }
 
-bool hkbClipGenerator::merge(HkxObject *recessiveObject){
+bool hkbClipGenerator::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     hkbClipGenerator *obj = nullptr;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_CLIP_GENERATOR){
         obj = static_cast<hkbClipGenerator *>(recessiveObject);
         injectWhileMerging(obj);
         if (triggers.data()){
             if (obj->triggers.data()){
-                triggers.data()->merge(obj->triggers.data());
+                triggers->merge(obj->triggers.data());
             }
         }else if (obj->triggers.data()){
             triggers = obj->triggers;
-            obj->triggers.data()->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
+            obj->triggers->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
             getParentFile()->addObjectToFile(obj->triggers.data(), -1);
         }
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 void hkbClipGenerator::updateReferences(long &ref){
+    std::lock_guard <std::mutex> guard(mutex);
     setReference(ref);
-    ref++;
-    setBindingReference(ref);
-    if (triggers.data()){
-        ref++;
-        triggers.data()->setReference(ref);
-    }
+    setBindingReference(++ref);
+    triggers.data() ? triggers->setReference(++ref) : triggers;
 }
 
 QVector<HkxObject *> hkbClipGenerator::getChildrenOtherTypes() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QVector<HkxObject *> list;
-    if (triggers.data()){
-        list.append(triggers.data());
-    }
+    triggers.data() ? list.append(triggers.data()) : triggers;
     return list;
 }
 
 SkyrimClipGeneratoData hkbClipGenerator::getClipGeneratorAnimData(ProjectAnimData *parent, uint animationIndex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     QVector <SkyrimClipTrigger> animTrigs;
     qreal trigtime;
     hkbClipTriggerArray *trigs = static_cast<hkbClipTriggerArray *>(triggers.data());
     if (trigs){
-        for (int i = 0; i < trigs->triggers.size(); i++){
+        for (auto i = 0; i < trigs->triggers.size(); i++){
             if (trigs->triggers.at(i).relativeToEndOfClip){
                 trigtime = trigs->triggers.at(i).localTime + static_cast<BehaviorFile *>(getParentFile())->getAnimationDurationFromAnimData(animationName);
             }else{
@@ -277,38 +252,44 @@ SkyrimClipGeneratoData hkbClipGenerator::getClipGeneratorAnimData(ProjectAnimDat
 }
 
 void hkbClipGenerator::setName(const QString &oldclipname, const QString &newclipname){
+    std::lock_guard <std::mutex> guard(mutex);
     //static_cast<BehaviorFile *>(getParentFile())->setClipNameAnimData(oldclipname, newclipname);    //Unsafe...
     name = newclipname;
 }
 
 void hkbClipGenerator::setAnimationName(int index, const QString &animationname){
+    std::lock_guard <std::mutex> guard(mutex);
     animationName = animationname;
     //static_cast<BehaviorFile *>(getParentFile())->setAnimationIndexAnimData(index, name);    //Unsafe...
 }
 
 void hkbClipGenerator::setPlaybackSpeed(qreal speed){
+    std::lock_guard <std::mutex> guard(mutex);
     playbackSpeed = speed;
     //static_cast<BehaviorFile *>(getParentFile())->setPlaybackSpeedAnimData(name, speed);    //Unsafe...
 }
 
 void hkbClipGenerator::setCropStartAmountLocalTime(qreal time){
+    std::lock_guard <std::mutex> guard(mutex);
     cropStartAmountLocalTime = time;
     //static_cast<BehaviorFile *>(getParentFile())->setCropStartAmountLocalTimeAnimData(name, time);    //Unsafe...
 }
 
 void hkbClipGenerator::setCropEndAmountLocalTime(qreal time){
+    std::lock_guard <std::mutex> guard(mutex);
     cropEndAmountLocalTime = time;
     //static_cast<BehaviorFile *>(getParentFile())->setCropEndAmountLocalTimeAnimData(name, time);    //Unsafe...
 }
 
 bool hkbClipGenerator::link(){
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggers.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_CLIP_TRIGGER_ARRAY){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'triggers' data field is linked to invalid child!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'triggers' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
         }
         triggers = *ptr;
@@ -317,51 +298,53 @@ bool hkbClipGenerator::link(){
 }
 
 void hkbClipGenerator::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     triggers = HkxSharedPtr();
 }
 
 QString hkbClipGenerator::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     bool valid = true;
     QStringList list = static_cast<BehaviorFile *>(getParentFile())->getAnimationNames();
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     if (!list.contains(animationName, Qt::CaseInsensitive)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid animationName! Fixing!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid animationName! Fixing!\n");
         if (!list.isEmpty()){
             animationName = list.first();
         }
     }
     if (triggers.data()){
-        if (triggers.data()->getSignature() != HKB_CLIP_TRIGGER_ARRAY){
+        if (triggers->getSignature() != HKB_CLIP_TRIGGER_ARRAY){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid triggers type! Signature: "+QString::number(triggers.data()->getSignature(), 16)+" Setting null value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid triggers type! Signature: "+QString::number(triggers->getSignature(), 16)+" Setting null value!\n");
             triggers = HkxSharedPtr();
         }else if (static_cast<hkbClipTriggerArray *>(triggers.data())->triggers.size() < 1){
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": triggers has no triggers! Setting null value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": triggers has no triggers! Setting null value!\n");
             triggers = HkxSharedPtr();
-        }else if (triggers.data()->isDataValid() && triggers.data()->evaluateDataValidity() != ""){
+        }else if (triggers->isDataValid() && triggers->evaluateDataValidity() != ""){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid triggers data!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid triggers data!\n");
         }
     }
     if (!PlaybackMode.contains(mode)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid mode! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid mode! Setting default value!\n");
         mode = PlaybackMode.first();
     }
     if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){    //TO DO: Fix this...
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid flags!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid flags!\n");
     }
     setDataValidity(isvalid);
     return errors;

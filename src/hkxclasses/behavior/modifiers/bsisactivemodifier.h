@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class BSIsActiveModifier: public hkbModifier
+class BSIsActiveModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSIsActiveModifierUI;
 public:
     BSIsActiveModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSIsActiveModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSIsActiveModifier& operator=(const BSIsActiveModifier&) = delete;
+    BSIsActiveModifier(const BSIsActiveModifier &) = delete;
+    ~BSIsActiveModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    BSIsActiveModifier& operator=(const BSIsActiveModifier&);
-    BSIsActiveModifier(const BSIsActiveModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -36,6 +35,7 @@ private:
     bool bInvertActive3;
     bool bIsActive4;
     bool bInvertActive4;
+    mutable std::mutex mutex;
 };
 
 #endif // BSISACTIVEMODIFIER_H

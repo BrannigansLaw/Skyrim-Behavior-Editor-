@@ -3,20 +3,22 @@
 
 #include "hkbmodifier.h"
 
-class hkbFootIkControlsModifier: public hkbModifier
+class hkbFootIkControlsModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class LegUI;
     friend class FootIkControlsModifierUI;
 public:
     hkbFootIkControlsModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbFootIkControlsModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbFootIkControlsModifier& operator=(const hkbFootIkControlsModifier&) = delete;
+    hkbFootIkControlsModifier(const hkbFootIkControlsModifier &) = delete;
+    ~hkbFootIkControlsModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     int getNumberOfLegs()const;
     bool isEventReferenced(int eventindex) const;
@@ -26,9 +28,6 @@ public:
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
     bool merge(HkxObject *recessiveObject);
-private:
-    hkbFootIkControlsModifier& operator=(const hkbFootIkControlsModifier&);
-    hkbFootIkControlsModifier(const hkbFootIkControlsModifier &);
 private:
     struct hkControlData{
         hkControlData()
@@ -79,16 +78,17 @@ private:
         bool hitSomething;
         bool isPlantedMS;
     };
-
+private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
     hkControlData gains;
-    QList <hkLeg> legs;
+    QVector <hkLeg> legs;
     hkQuadVariable errorOutTranslation;
     hkQuadVariable alignWithGroundRotation;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBFOOTIKCONTROLSMODIFIER_H

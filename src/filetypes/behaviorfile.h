@@ -16,28 +16,20 @@ class hkbBoneWeightArray;
 class hkbStateMachine;
 class DataIconManager;
 
-class BehaviorFile: public HkxFile
+class BehaviorFile final: public HkxFile
 {
-    friend class hkbBehaviorGraphData;
-    friend class BehaviorGraphView;
-    friend class hkbBehaviorGraph;
-    friend class MainWindow;
-    friend class HkDataUI;
     friend class ProjectFile;
-    friend class hkbVariableBindingSet;
 public:
     BehaviorFile(MainWindow *window, ProjectFile *projectfile, CharacterFile *characterData, const QString & name);
     virtual ~BehaviorFile();
     bool doesBehaviorExist(const QString &behaviorname) const;
     void setFocusGeneratorIcon(int index);
     void setFocusModifierIcon(int index);
-    HkxSharedPtr * findHkxObject(long ref);
+    HkxSharedPtr *findHkxObject(long ref);
     HkxSharedPtr * findGenerator(long ref);
-    //HkxSharedPtr * findGeneratorChild(long ref);
     HkxSharedPtr * findModifier(long ref);
     HkxSharedPtr * findBehaviorGraph(long ref);
     QVector<int> removeGeneratorData();
-    //QVector<int> removeGeneratorChildrenData();
     QVector<int> removeModifierData();
     QVector<int> removeOtherData();
     int getIndexOfGenerator(const HkxSharedPtr & obj) const;
@@ -104,39 +96,42 @@ public:
     bool existsInBehavior(HkDynamicObject *object, int startindex = 0) const;
     HkxObject * getBehaviorGraphData() const;
     QStringList getErrors() const;
-protected:
+    HkxSharedPtr getVariableValues() const;
+    HkxSharedPtr getStringData() const;
+    HkxSharedPtr getGraphData() const;
+    hkbBehaviorGraph * getBehaviorGraph() const;
     bool parse();
+    void write();
+    void generateDefaultCharacterData();
+    void generateNewBehavior();
+    void mergedWrite();
+    QVector<DataIconManager *> merge(BehaviorFile *recessivefile, int &taskCount, std::mutex &mutex, std::condition_variable &conditionVar);
+    QVector<DataIconManager *> merge(BehaviorFile *recessivefile);
+protected:
     bool link();
 private:
     QStringList getRefedAnimations() const;
     QString detectErrorsMT(int &taskcount, std::mutex &mutex, std::condition_variable &conditionVar);
     QString detectErrors();
-    QVector<DataIconManager *> merge(BehaviorFile *recessivefile, int &taskCount, std::mutex &mutex, std::condition_variable &conditionVar);
-    QVector<DataIconManager *> merge(BehaviorFile *recessivefile);
     void mergeObjects(QVector<DataIconManager *> &recessiveobjects);
-    void generateDefaultCharacterData();
-    void generateNewBehavior();
-    hkbBehaviorGraph * getBehaviorGraph() const;
-    HkxObject * getRootStateMachine() const;
+    hkbStateMachine *getRootStateMachine() const;
     //TreeGraphicsItem * getRootIcon() const;
-    void write();
-    void mergedWrite();
     void removeBindings(int varIndex);
     bool checkForDuplicateReferencesNumbers() const;
 private:
-    //std::mutex mutex;
     ProjectFile *project;
     CharacterFile *character;
     HkxSharedPtr behaviorGraph;
     HkxSharedPtr stringData;
     HkxSharedPtr variableValues;
     HkxSharedPtr graphData;
-    QList <HkxSharedPtr> generators;
-    QList <HkxSharedPtr> modifiers;
-    QList <HkxSharedPtr> otherTypes;
+    QVector <HkxSharedPtr> generators;
+    QVector <HkxSharedPtr> modifiers;
+    QVector <HkxSharedPtr> otherTypes;
     QStringList referencedBehaviors;
     long largestRef;
     QStringList errorList;
+    mutable std::mutex mutex;
 };
 
 #endif // BEHAVIORFILE_H

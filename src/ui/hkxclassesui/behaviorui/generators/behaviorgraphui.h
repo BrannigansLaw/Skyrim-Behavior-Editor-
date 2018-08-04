@@ -12,26 +12,29 @@ class LineEdit;
 class ComboBox;
 class GenericTableWidget;
 
-class BehaviorGraphUI: QGroupBox
+class BehaviorGraphUI final: public QGroupBox
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     BehaviorGraphUI();
+    BehaviorGraphUI& operator=(const BehaviorGraphUI&) = delete;
+    BehaviorGraphUI(const BehaviorGraphUI &) = delete;
+    ~BehaviorGraphUI() = default;
     void loadData(HkxObject *data);
+    void connectToTables(GenericTableWidget *generators);
+    void setBehaviorView(BehaviorGraphView *view);
 signals:
     void generatorNameChanged(const QString & newName, int index);
     void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setVariableMode(int index);
     void viewSelectedChild(int row, int column);
     void setRootGenerator(int index, const QString &name);
 private:
-    void setBehaviorView(BehaviorGraphView *view);
-    void connectToTables(GenericTableWidget *generators);
+    void toggleSignals(bool toggleconnections);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     BehaviorGraphView *behaviorView;
     hkbBehaviorGraph *bsData;
     QGridLayout *topLyt;

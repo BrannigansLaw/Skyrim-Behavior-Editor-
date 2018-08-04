@@ -3,15 +3,11 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/projectfile.h"
 
-/*
- * CLASS: hkbProjectData
-*/
-
 uint hkbProjectData::refCount = 0;
 
-QString hkbProjectData::classname = "hkbProjectData";
+const QString hkbProjectData::classname = "hkbProjectData";
 
-QStringList hkbProjectData::EventMode = {"EVENT_MODE_IGNORE_FROM_GENERATOR"};
+const QStringList hkbProjectData::EventMode = {"EVENT_MODE_IGNORE_FROM_GENERATOR"};
 
 hkbProjectData::hkbProjectData(HkxFile *parent, long ref, hkbProjectStringData *stringdata)
     : HkxObject(parent, ref),
@@ -19,105 +15,107 @@ hkbProjectData::hkbProjectData(HkxFile *parent, long ref, hkbProjectStringData *
       defaultEventMode(EventMode.first())
 {
     setType(HKB_PROJECT_DATA, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
     if (stringdata){
         stringData = HkxSharedPtr(stringdata);
     }
 }
 
-QString hkbProjectData::getClassname(){
+const QString hkbProjectData::getClassname(){
     return classname;
 }
 
-bool hkbProjectData::readData(const HkxXmlReader &reader, long index){
+bool hkbProjectData::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "worldUpWS"){
             worldUpWS = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'worldUpWS' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "raycastDistanceUp");
         }else if (text == "stringData"){
-            if (!stringData.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'stringData' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(stringData.readShdPtrReference(index, reader), "stringData");
         }else if (text == "defaultEventMode"){
             defaultEventMode = reader.getElementValueAt(index);
-            if (!EventMode.contains(defaultEventMode)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'defaultEventMode' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(EventMode.contains(defaultEventMode), "defaultEventMode");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbProjectData::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    auto writedatafield = [&](const QString & name, const QString & value, bool allownull){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value, allownull);
+    };
+    std::lock_guard <std::mutex> guard(mutex);
+    auto result = true;
+    if (writer && !getIsWritten()){
         QString refString = "null";
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("worldUpWS"), worldUpWS.getValueAsString());
+        writedatafield("worldUpWS", worldUpWS.getValueAsString(), false);
         if (stringData.data()){
-            refString = stringData.data()->getReferenceString();
+            refString = stringData->getReferenceString();
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("stringData"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("defaultEventMode"), defaultEventMode);
+        writedatafield("stringData", refString, false);
+        writedatafield("defaultEventMode", defaultEventMode, false);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (stringData.data() && !stringData.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'stringData'!!!");
+        if (stringData.data() && !stringData->write(writer)){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write 'stringData'!!!");
+            result = false;
         }
     }
-    return true;
+    return result;
 }
 
 bool hkbProjectData::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     HkxSharedPtr *ptr;
     ProjectFile *file = dynamic_cast<ProjectFile *>(getParentFile());
     if (file){
         ptr = file->findProjectStringData(stringData.getShdPtrReference());
     }else{
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nParent file type is invalid!!!");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nParent file type is invalid!!!");
     }
     if (!ptr->data()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'stringData' data field!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'stringData' data field!\n");
         setDataValidity(false);
     }else if ((*ptr)->getSignature() != HKB_PROJECT_STRING_DATA){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'stringData' data field is linked to invalid child!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'stringData' data field is linked to invalid child!\n");
         setDataValidity(false);
         stringData = *ptr;
     }else{
         stringData = *ptr;
     }
-    //ptr = &file->stringData;
     return true;
 }
 
 void hkbProjectData::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     stringData = HkxSharedPtr();
 }
 
-QString hkbProjectData::evaluateDataValidity(){
+QString hkbProjectData::evaluateDataValidity(){   //TO DO...
+    /*std::lock_guard <std::mutex> guard(mutex);
     if (!EventMode.contains(defaultEventMode)){
-    }else if (!stringData.data() || stringData.data()->getSignature() != HKB_PROJECT_STRING_DATA){
+    }else if (!stringData.data() || stringData->getSignature() != HKB_PROJECT_STRING_DATA){
     }else{
         setDataValidity(true);
         return QString();
     }
-    setDataValidity(false);
+    setDataValidity(false);*/
     return QString();
 }
 

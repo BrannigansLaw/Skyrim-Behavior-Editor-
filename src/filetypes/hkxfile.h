@@ -27,13 +27,12 @@ public:
     QString getFileName() const;
     void setHKXFileName(const QString &name);
 protected:
-    std::unique_lock <std::mutex> lockNGuard() const;
     MainWindow *getUI() const;
     HkxSharedPtr & getRootObject();
     virtual bool parse();
     virtual bool link();
     void setRootObject(HkxSharedPtr & obj);
-    bool appendAndReadData(int index, HkxObject * obj);
+    bool appendAndReadData(long & index, HkxObject * obj);
     HkxXmlReader & getReader();
     HkxXMLWriter & getWriter();
     HkxSharedPtr rootObject;

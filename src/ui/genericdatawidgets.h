@@ -23,6 +23,10 @@
 #include <QSizePolicy>
 #include <QLabel>
 #include <QProgressDialog>
+#include <QDropEvent>
+
+class BehaviorGraphView;
+class hkbVariableBindingSet;
 
 class CheckBox: public QWidget
 {
@@ -233,7 +237,7 @@ public:
         if (rowCount() > row1 && rowCount() > row2 && row1 != row2 && row1 >= 0 && row2 >= 0){
             QTableWidgetItem *item1 = nullptr;
             QTableWidgetItem *item2 = nullptr;
-            for (int i = 0; i < columnCount(); i++){
+            for (auto i = 0; i < columnCount(); i++){
                 item1 = takeItem(row1, i);
                 item2 = takeItem(row2, i);
                 setItem(row2, i, item1);
@@ -450,5 +454,15 @@ private:
     //ComboBox *typeSelector;
     int lastSelectedRow;
 };
+
+namespace UIHelperFunctions{
+
+void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2, TableWidget *table);
+void setBinding(int index, int row, int column, const QString & variableName, const QString & path, hkVariableType type, bool isProperty, TableWidget *table, HkDynamicObject *bsData);
+void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path, TableWidget *table, HkxObject *bsData);
+void setGenerator(int index, const QString &name, DataIconManager *dynobj, hkbGenerator *child, HkxSignature sig, HkxObject::HkxType type, TableWidget *table, BehaviorGraphView *behaviorView, int row, int column);
+void setModifier(int index, const QString &name, DataIconManager *dynobj, hkbModifier *child, HkxSignature sig, HkxObject::HkxType type, TableWidget *table, BehaviorGraphView *behaviorView, int row, int column);
+
+}
 
 #endif // GENERICDATAWIDGETS_H

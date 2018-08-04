@@ -20,7 +20,7 @@
 #define TYPE_COLUMN 1
 #define VALUE_COLUMN 2
 
-QStringList BehaviorGraphUI::headerLabels = {
+const QStringList BehaviorGraphUI::headerLabels = {
     "Name",
     "Type",
     "Value"
@@ -49,64 +49,62 @@ BehaviorGraphUI::BehaviorGraphUI()
     table->setItem(ROOT_GENERATOR_ROW, VALUE_COLUMN, new TableWidgetItem("NONE", Qt::AlignCenter, QColor(219, 219, 219), QBrush(Qt::black), "Click to view the list of generators"));
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(variableMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setVariableMode(int)), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    toggleSignals(true);
+}
+
+void BehaviorGraphUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(variableMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setVariableMode(int)), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName()));
+        disconnect(variableMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setVariableMode(int)));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    }
 }
 
 void BehaviorGraphUI::loadData(HkxObject *data){
-    blockSignals(true);
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == HKB_BEHAVIOR_GRAPH){
             bsData = static_cast<hkbBehaviorGraph *>(data);
-            name->setText(bsData->name);
-            if (variableMode->count() == 0){
-                variableMode->insertItems(0, bsData->VariableMode);
-            }
-            variableMode->setCurrentIndex(bsData->VariableMode.indexOf(bsData->variableMode));
-            if (bsData->rootGenerator.data()){
-                table->item(ROOT_GENERATOR_ROW, VALUE_COLUMN)->setText(static_cast<hkbGenerator *>(bsData->rootGenerator.data())->getName());
-            }else{
-                table->item(ROOT_GENERATOR_ROW, VALUE_COLUMN)->setText("NONE");
-            }
+            name->setText(bsData->getName());
+            (variableMode->count() == 0) ? variableMode->insertItems(0, bsData->VariableMode) : NULL;
+            variableMode->setCurrentIndex(bsData->VariableMode.indexOf(bsData->getVariableMode()));
+            table->item(ROOT_GENERATOR_ROW, VALUE_COLUMN)->setText(bsData->getRootGeneratorName());
         }else{
             CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::loadData(): The data is an incorrect type!!");
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::loadData(): The data is nullptr!!");
     }
-    blockSignals(false);
+    toggleSignals(true);
 }
 
-void BehaviorGraphUI::setName(){
+void BehaviorGraphUI::setName(const QString & newname){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();//Make sure name is valid...
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
-        }
+        bsData->setName(newname);   //Make sure name is valid???
+        bsData->updateIconNames();
+        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("BehaviorGraphUI::setName(): The data is nullptr!!");
     }
 }
 
 void BehaviorGraphUI::setVariableMode(int index){
     if (bsData){
-        bsData->variableMode = bsData->VariableMode.at(index);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setVariableMode(bsData->VariableMode.at(index));
+        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::setVariableMode(): The data is nullptr!!");
+        LogFile::writeToLog("BehaviorGraphUI::setVariableMode(): The data is nullptr!!");
     }
 }
 
 void BehaviorGraphUI::viewSelectedChild(int row, int column){
     if (bsData){
         if (row == ROOT_GENERATOR_ROW && column == VALUE_COLUMN){
-            if (bsData->getParentFile()){
-                emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->rootGenerator) + 1, hkbStateMachine::getClassname(), QStringList());
-            }else{
-                CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::viewSelectedChild(): The parent file is nullptr!!");
-            }
+            emit viewGenerators(bsData->getIndexOfGenerator(bsData->rootGenerator) + 1, hkbStateMachine::getClassname(), QStringList());
         }
     }else{
         CRITICAL_ERROR_MESSAGE("StateMachineUI::viewSelectedChild(): The data is nullptr!!");
@@ -114,39 +112,7 @@ void BehaviorGraphUI::viewSelectedChild(int row, int column){
 }
 
 void BehaviorGraphUI::setRootGenerator(int index, const QString &name){
-    DataIconManager *ptr = nullptr;
-    if (bsData){
-        int indexOfGenerator = bsData->getIndexOfObj(static_cast<DataIconManager*>(bsData->rootGenerator.data()));
-        if (behaviorView){
-            ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
-            if (ptr){
-                if (name != ptr->getName()){
-                    CRITICAL_ERROR_MESSAGE("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
-                    return;
-                }else if (ptr->getSignature() != HKB_STATE_MACHINE){
-                    WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nThe selected object is not a hkbStateMachine!!!");
-                    return;
-                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->rootGenerator.data()), 0, ptr, false)){
-                    WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
-                    return;
-                }
-            }else{
-                if (behaviorView->getSelectedItem()){
-                    behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->rootGenerator.data())), indexOfGenerator);
-                }else{
-                    CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::setGenerator(): The selected icon is nullptr!!");
-                    return;
-                }
-            }
-            behaviorView->removeGeneratorData();
-            table->item(ROOT_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->setIsChanged(true);
-        }else{
-            CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BehaviorGraphUI::setGenerator(): The 'bsData' pointer is nullptr!!");
-    }
+    UIHelperFunctions::setGenerator(index, name, bsData, static_cast<hkbGenerator *>(bsData->rootGenerator.data()), HKB_STATE_MACHINE, HkxObject::TYPE_GENERATOR, table, behaviorView, ROOT_GENERATOR_ROW, VALUE_COLUMN);
 }
 
 void BehaviorGraphUI::setBehaviorView(BehaviorGraphView *view){

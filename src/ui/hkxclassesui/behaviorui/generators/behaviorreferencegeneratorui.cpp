@@ -18,9 +18,7 @@
 #define TYPE_COLUMN 1
 #define VALUE_COLUMN 2
 
-#define BINDING_ITEM_LABEL QString("Use Property     ")
-
-QStringList BehaviorReferenceGeneratorUI::headerLabels = {
+const QStringList BehaviorReferenceGeneratorUI::headerLabels = {
     "Name",
     "Type",
     "Value"
@@ -45,35 +43,33 @@ BehaviorReferenceGeneratorUI::BehaviorReferenceGeneratorUI()
     table->setCellWidget(BEHAVIOR_NAME_ROW, VALUE_COLUMN, behaviorName);
     topLyt->addWidget(table, 0, 0, 8, 3);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BehaviorReferenceGeneratorUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(behaviorName, SIGNAL(currentTextChanged(QString)), this, SLOT(setBehaviorName(QString)), Qt::UniqueConnection);
-}
-
-void BehaviorReferenceGeneratorUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(behaviorName, SIGNAL(currentTextChanged(QString)), this, SLOT(setBehaviorName(QString)));
+void BehaviorReferenceGeneratorUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(behaviorName, SIGNAL(currentTextChanged(QString)), this, SLOT(setBehaviorName(QString)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName()));
+        disconnect(behaviorName, SIGNAL(currentTextChanged(QString)), this, SLOT(setBehaviorName(QString)));
+    }
 }
 
 void BehaviorReferenceGeneratorUI::loadData(HkxObject *data){
-    disconnectSignals();
+    QStringList behaviors;
+    int index;
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == HKB_BEHAVIOR_REFERENCE_GENERATOR){
             bsData = static_cast<hkbBehaviorReferenceGenerator *>(data);
-            name->setText(bsData->name);
-            QStringList behaviors = static_cast<BehaviorFile *>(bsData->getParentFile())->getAllBehaviorFileNames();
-            if (behaviorName->count() != behaviors.size()){
-                behaviorName->clear();
-                behaviorName->insertItems(0, behaviors);
-            }
-            //bsData->behaviorName.replace("/", "\\");
-            auto index = behaviorName->findText(bsData->behaviorName, Qt::MatchFixedString);
+            name->setText(bsData->getName());
+            behaviors = static_cast<BehaviorFile *>(bsData->getParentFile())->getAllBehaviorFileNames();
+            (behaviorName->count() != behaviors.size()) ? behaviorName->clear(), behaviorName->insertItems(0, behaviors) : NULL;
+            index = behaviorName->findText(bsData->getBehaviorName(), Qt::MatchFixedString);
             if (index >= 0){
                 behaviorName->setCurrentIndex(index);
-                bsData->behaviorName = behaviorName->currentText();
+                bsData->setBehaviorName(behaviorName->currentText());
             }else{
                 WARNING_MESSAGE("BehaviorReferenceGeneratorUI::loadData(): The data has an invalid behavior name!!!");
             }
@@ -83,32 +79,30 @@ void BehaviorReferenceGeneratorUI::loadData(HkxObject *data){
     }else{
         CRITICAL_ERROR_MESSAGE("BehaviorReferenceGeneratorUI::loadData(): The data passed to the UI is nullptr!!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BehaviorReferenceGeneratorUI::setName(){
+void BehaviorReferenceGeneratorUI::setName(const QString & newname){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
-            emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-        }
+        bsData->setName(newname);   //Make sure name is valid???
+        bsData->updateIconNames();
+        bsData->setIsFileChanged(true);
+        emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("BehaviorReferenceGeneratorUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("BehaviorReferenceGeneratorUI::setName(): The data is nullptr!!");
     }
 }
 
 void BehaviorReferenceGeneratorUI::setBehaviorName(const QString & text){
     if (bsData){
-        if (bsData->getParentFile()->fileName().contains(text)){
+        if (bsData->getParentFilename().contains(text)){
+            toggleSignals(false);
+            behaviorName->setCurrentIndex(behaviorName->findText(bsData->getBehaviorName(), Qt::MatchFixedString));
+            toggleSignals(true);
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch!!!");
-            disconnectSignals();
-            behaviorName->setCurrentIndex(behaviorName->findText(bsData->behaviorName, Qt::MatchFixedString));
-            connectSignals();
         }else{
-            bsData->behaviorName = text;
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setBehaviorName(text);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BehaviorReferenceGeneratorUI::setBehaviorName(): The data is nullptr!!");
@@ -116,16 +110,13 @@ void BehaviorReferenceGeneratorUI::setBehaviorName(const QString & text){
 }
 
 void BehaviorReferenceGeneratorUI::behaviorRenamed(const QString &name, int index){
-    if (name == ""){
+    if (name != ""){
+        (index == behaviorName->currentIndex()) ? bsData->setBehaviorName(name) : NULL;
+        toggleSignals(false);
+        behaviorName->removeItem(index);
+        behaviorName->insertItem(--index, name);
+        toggleSignals(true);
+    }else{
         WARNING_MESSAGE("BehaviorReferenceGeneratorUI::behaviorRenamed(): The new variable name is the empty string!!");
     }
-    //index--;
-    if (index == behaviorName->currentIndex()){
-        bsData->behaviorName = name;
-    }
-    disconnectSignals();
-    behaviorName->removeItem(index);
-    index--;
-    behaviorName->insertItem(index, name);
-    connectSignals();
 }

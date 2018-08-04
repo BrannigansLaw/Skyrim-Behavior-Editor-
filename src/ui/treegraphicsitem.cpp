@@ -31,7 +31,7 @@ TreeGraphicsItem::TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *ob
     if (parentItem()){
         children = parentItem()->childItems();
         if (indexToInsert > -1 && indexToInsert < children.size()){
-            for (int i = 0; i < children.size(); i++){
+            for (auto i = 0; i < children.size(); i++){
                 children[i]->setParentItem(nullptr);
             }
             index = children.indexOf(this);
@@ -42,7 +42,7 @@ TreeGraphicsItem::TreeGraphicsItem(TreeGraphicsItem *parent, DataIconManager *ob
             if (index < children.size()){
                 children.removeAt(index);
             }
-            for (int i = 0; i < children.size(); i++){
+            for (auto i = 0; i < children.size(); i++){
                 children[i]->setParentItem(parent);
             }
         }
@@ -163,21 +163,21 @@ qreal TreeGraphicsItem::getYCoordinate(){
 
 bool TreeGraphicsItem::reorderChildren(){
     QList <QGraphicsItem *> children = childItems();
-    QList <DataIconManager *> dataChildren = itemData->getChildren();
-    //QList <DataIconManager *> reparentedData;
-    for (int j = 0; j < dataChildren.size(); j++){
+    QVector <DataIconManager *> dataChildren = itemData->getChildren();
+    //QVector <DataIconManager *> reparentedData;
+    for (auto j = 0; j < dataChildren.size(); j++){
         for (int k = j + 1; k < dataChildren.size(); k++){
             if (dataChildren.at(j) == dataChildren.at(k)){
                 dataChildren.removeAt(k);
             }
         }
     }
-    for (int i = 0; i < children.size(); i++){
+    for (auto i = 0; i < children.size(); i++){
         children[i]->setParentItem(nullptr);
     }
     if (children.size() <= dataChildren.size()){//Fix this...
-        for (int i = 0; i < dataChildren.size(); i++){
-            for (int k = 0; k < children.size(); k++){
+        for (auto i = 0; i < dataChildren.size(); i++){
+            for (auto k = 0; k < children.size(); k++){
                 if (((TreeGraphicsItem *)children.at(k))->itemData == dataChildren.at(i)/* && !reparentedData.contains(dataChildren.at(i))*/){
                     children[k]->setParentItem(this);
                     //reparentedData.append(dataChildren.at(i));
@@ -283,13 +283,13 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
     QGraphicsItem *oldParent = parentItem();
     if (oldParent){
         children = oldParent->childItems();
-        for (int i = 0; i < children.size(); i++){
+        for (auto i = 0; i < children.size(); i++){
             children[i]->setParentItem(nullptr);
         }
         if (children.removeAll(this) != 1){
             CRITICAL_ERROR_MESSAGE("TreeGraphicsItem::setParent(): Error!!!");
         }
-        for (int i = 0; i < children.size(); i++){
+        for (auto i = 0; i < children.size(); i++){
             children[i]->setParentItem(oldParent);
         }
         children.clear();
@@ -297,18 +297,18 @@ TreeGraphicsItem * TreeGraphicsItem::setParent(TreeGraphicsItem *newParent, int 
             children = newParent->childItems();
             index = newParent->getIndexofIconWithData(itemData);
             if (indexToInsert > -1 && indexToInsert < children.size()){
-                for (int i = 0; i < children.size(); i++){
+                for (auto i = 0; i < children.size(); i++){
                     children[i]->setParentItem(nullptr);
                 }
                 if (index < children.size()){
                     children.removeAt(index);
                 }
                 children.insert(indexToInsert, this);
-                for (int i = 0; i < children.size(); i++){
+                for (auto i = 0; i < children.size(); i++){
                     children[i]->setParentItem(newParent);
                 }
             }else{
-                for (int i = 0; i < children.size(); i++){
+                for (auto i = 0; i < children.size(); i++){
                     children[i]->setParentItem(newParent);
                 }
                 setParentItem(newParent);
@@ -369,7 +369,7 @@ int TreeGraphicsItem::getIconIndex(){
     parent = (TreeGraphicsItem *)parentItem();
     while (parent){
         children = parent->childItems();
-        for (int i = 0; i < children.size(); i++){
+        for (auto i = 0; i < children.size(); i++){
             if (children.at(i) == child){
                 break;
             }else if (((TreeGraphicsItem *)children.at(i))->hasSameData((TreeGraphicsItem *)this)){
@@ -394,7 +394,7 @@ int TreeGraphicsItem::getIconIndex(){
 //Returns the first child of "this" whose data is equal to "data"...
 TreeGraphicsItem *TreeGraphicsItem::getChildWithData(DataIconManager *data){
     QList <QGraphicsItem *> children = childItems();
-    for (int i = 0; i < children.size(); i++){
+    for (auto i = 0; i < children.size(); i++){
         if (((TreeGraphicsItem *)children.at(i))->itemData == data){
             return (TreeGraphicsItem *)children.at(i);
         }
@@ -426,7 +426,7 @@ TreeGraphicsItem *TreeGraphicsItem::getReplacementIcon(DataIconManager *data){
     parent = this;
     while (parent){
         children = parent->childItems();
-        for (int i = 0; i < children.size(); i++){
+        for (auto i = 0; i < children.size(); i++){
             if (children.at(i) == child){
                 break;
             }else if (((TreeGraphicsItem *)children.at(i))->hasSameData(data)){
@@ -478,7 +478,7 @@ int TreeGraphicsItem::getIndexOfChild(TreeGraphicsItem *child) const{
 int TreeGraphicsItem::getIndexofIconWithData(DataIconManager *data) const{
     if (data){
         QList <QGraphicsItem *> children = childItems();
-        for (int i = 0; i < children.size(); i++){
+        for (auto i = 0; i < children.size(); i++){
             if (((TreeGraphicsItem *)children.at(i))->hasSameData(data)){
                 return i;
             }
@@ -510,11 +510,11 @@ void TreeGraphicsItem::setPathToParent(){
     }
 }
 
-QList <TreeGraphicsItem *> TreeGraphicsItem::getAllIconsInBranch(TreeGraphicsItem *iconToFind) const{
-    QList <TreeGraphicsItem *> list;
+QVector <TreeGraphicsItem *> TreeGraphicsItem::getAllIconsInBranch(TreeGraphicsItem *iconToFind) const{
+    QVector <TreeGraphicsItem *> list;
     TreeGraphicsItem *branchTip = (TreeGraphicsItem *)this;
     if (iconToFind){
-        for (int i = 0; i < MAX_NUM_GRAPH_ICONS, branchTip; i++){
+        for (auto i = 0; i < MAX_NUM_GRAPH_ICONS, branchTip; i++){
             if (branchTip->parentItem()){
                 if (branchTip->parentItem()->childItems().contains(iconToFind)){
                     branchTip = nullptr;
@@ -527,7 +527,7 @@ QList <TreeGraphicsItem *> TreeGraphicsItem::getAllIconsInBranch(TreeGraphicsIte
             }
         }
     }else{
-        for (int i = 0; i < MAX_NUM_GRAPH_ICONS, branchTip; i++){
+        for (auto i = 0; i < MAX_NUM_GRAPH_ICONS, branchTip; i++){
             if (branchTip->parentItem()){
                 list.append((TreeGraphicsItem *)branchTip->parentItem());
                 branchTip = (TreeGraphicsItem *)branchTip->parentItem();

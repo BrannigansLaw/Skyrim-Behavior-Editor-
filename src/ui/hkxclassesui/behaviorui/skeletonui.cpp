@@ -44,7 +44,7 @@ void SkeletonUI::loadData(HkxObject *data, bool isRagdoll){
                 boneNames = static_cast<SkeletonFile *>(bsData->getParentFile())->getBonesFromSkeletonAt(0);
             }
         }
-        for (int i = 0; i < bsData->bones.size(), i < boneNames.size(); i++){
+        for (auto i = 0; i < bsData->bones.size(), i < boneNames.size(); i++){
             rowCount = bones->rowCount();
             if (rowCount > i){
                 bones->setRowHidden(i, false);
@@ -68,7 +68,7 @@ void SkeletonUI::loadData(HkxObject *data, bool isRagdoll){
                 //connect(static_cast<LineEdit *>(bones->cellWidget(i, 1)), SIGNAL(editingFinished()), mapper, SLOT(map()), Qt::UniqueConnection);
             }
         }
-        for (int j = bsData->bones.size(); j < bones->rowCount(); j++){
+        for (auto j = bsData->bones.size(); j < bones->rowCount(); j++){
             bones->setRowHidden(j, true);
         }
     }

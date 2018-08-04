@@ -3,13 +3,9 @@
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbexpressiondataarray.h"
 
-/*
- * CLASS: hkbEvaluateExpressionModifier
-*/
-
 uint hkbEvaluateExpressionModifier::refCount = 0;
 
-QString hkbEvaluateExpressionModifier::classname = "hkbEvaluateExpressionModifier";
+const QString hkbEvaluateExpressionModifier::classname = "hkbEvaluateExpressionModifier";
 
 hkbEvaluateExpressionModifier::hkbEvaluateExpressionModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -17,90 +13,85 @@ hkbEvaluateExpressionModifier::hkbEvaluateExpressionModifier(HkxFile *parent, lo
       enable(true)
 {
     setType(HKB_EVALUATE_EXPRESSION_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "EvaluateExpressionModifier"+QString::number(refCount);
+    name = "EvaluateExpressionModifier_"+QString::number(refCount);
 }
 
-QString hkbEvaluateExpressionModifier::getClassname(){
+const QString hkbEvaluateExpressionModifier::getClassname(){
     return classname;
 }
 
 QString hkbEvaluateExpressionModifier::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-bool hkbEvaluateExpressionModifier::readData(const HkxXmlReader &reader, long index){
+bool hkbEvaluateExpressionModifier::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "expressions"){
-            if (!expressions.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'expressions' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(expressions.readShdPtrReference(index, reader), "expressions");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbEvaluateExpressionModifier::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        if (expressions.data()){
-            refString = expressions.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("expressions"), refString);
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData));
+        writedatafield("name", name);
+        writedatafield("enable", getBoolAsString(enable));
+        writeref(expressions, "expressions");
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        if (expressions.data() && !expressions.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'expressions'!!!");
-        }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        writechild(expressions, "expressions");
     }
     return true;
 }
 
 int hkbEvaluateExpressionModifier::getNumberOfExpressions() const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (expressions.data()){
         return static_cast<hkbExpressionDataArray *>(expressions.data())->expressionsData.size();
     }
@@ -108,6 +99,7 @@ int hkbEvaluateExpressionModifier::getNumberOfExpressions() const{
 }
 
 bool hkbEvaluateExpressionModifier::isEventReferenced(int eventindex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (expressions.constData() && expressions.constData()->isEventReferenced(eventindex)){
         return true;
     }
@@ -115,24 +107,23 @@ bool hkbEvaluateExpressionModifier::isEventReferenced(int eventindex) const{
 }
 
 void hkbEvaluateExpressionModifier::updateEventIndices(int eventindex){
-    if (expressions.data()){
-        expressions.data()->updateEventIndices(eventindex);
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (expressions.data()) ? expressions->updateEventIndices(eventindex) : NULL;
 }
 
 void hkbEvaluateExpressionModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
-    if (expressions.data()){
-        expressions.data()->fixMergedEventIndices(dominantfile);
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (expressions.data()) ? expressions->fixMergedEventIndices(dominantfile) : NULL;
 }
 
-bool hkbEvaluateExpressionModifier::merge(HkxObject *recessiveObject){
+bool hkbEvaluateExpressionModifier::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     hkbEvaluateExpressionModifier *obj = nullptr;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_EVALUATE_EXPRESSION_MODIFIER){
         obj = static_cast<hkbEvaluateExpressionModifier *>(recessiveObject);
         if (expressions.data()){
             if (obj->expressions.data()){
-                expressions.data()->merge(obj->expressions.data());
+                expressions->merge(obj->expressions.data());
             }
         }else if (obj->expressions.data()){
             expressions = obj->expressions;
@@ -140,40 +131,32 @@ bool hkbEvaluateExpressionModifier::merge(HkxObject *recessiveObject){
         }
         injectWhileMerging(obj);
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 void hkbEvaluateExpressionModifier::updateReferences(long &ref){
+    std::lock_guard <std::mutex> guard(mutex);
     setReference(ref);
-    ref++;
-    setBindingReference(ref);
-    if (expressions.data()){
-        ref++;
-        expressions.data()->updateReferences(ref);
-    }
+    setBindingReference(++ref);
+    (expressions.data()) ? expressions->updateReferences(++ref) : NULL;
 }
 
 QVector<HkxObject *> hkbEvaluateExpressionModifier::getChildrenOtherTypes() const{
     QVector<HkxObject *> list;
-    if (expressions.data()){
-        list.append(expressions.data());
-    }
+    (expressions.data()) ? list.append(expressions.data()) : NULL;
     return list;
 }
 
 bool hkbEvaluateExpressionModifier::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(expressions.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_EXPRESSION_DATA_ARRAY){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'expressions' is not a HKB_EXPRESSION_DATA_ARRAY!");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": linkVar()!\nThe linked object 'expressions' is not a HKB_EXPRESSION_DATA_ARRAY!");
             setDataValidity(false);
         }
         expressions = *ptr;
@@ -182,36 +165,38 @@ bool hkbEvaluateExpressionModifier::link(){
 }
 
 void hkbEvaluateExpressionModifier::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     expressions = HkxSharedPtr();
 }
 
 QString hkbEvaluateExpressionModifier::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     if (expressions.data()){
-        if (expressions.data()->getSignature() != HKB_EXPRESSION_DATA_ARRAY){
+        if (expressions->getSignature() != HKB_EXPRESSION_DATA_ARRAY){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid expressions type! Signature: "+QString::number(expressions.data()->getSignature(), 16)+" Setting default value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid expressions type! Signature: "+QString::number(expressions->getSignature(), 16)+" Setting default value!\n");
             expressions = HkxSharedPtr();
         }else if (static_cast<hkbExpressionDataArray *>(expressions.data())->expressionsData.size() < 1){
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": expressions has no expressionsData! Setting null value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": expressions has no expressionsData! Setting null value!\n");
             expressions = HkxSharedPtr();
-        }else if (expressions.data()->isDataValid() && expressions.data()->evaluateDataValidity() != ""){
+        }else if (expressions->isDataValid() && expressions->evaluateDataValidity() != ""){
             isvalid = false;
-            //errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid expressions data!\n");
+            //errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid expressions data!\n");
         }
     }else if (!expressions.data()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null expressions!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null expressions!\n");
     }
     setDataValidity(isvalid);
     return errors;

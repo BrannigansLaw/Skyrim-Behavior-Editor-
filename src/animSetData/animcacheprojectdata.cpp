@@ -8,7 +8,7 @@ AnimCacheProjectData::AnimCacheProjectData(const QStringList & files, const QVec
 }
 
 AnimCacheProjectData::~AnimCacheProjectData(){
-    for (int i = 0; i < animSetData.size(); i++){
+    for (auto i = 0; i < animSetData.size(); i++){
         if (animSetData.at(i)){
             delete animSetData.at(i);
         }
@@ -57,10 +57,10 @@ bool AnimCacheProjectData::write(QFile *file, QTextStream & out) const{
         return false;
     }
     out << QString::number(fileNames.size()) << "\n";
-    for (int i = 0; i < fileNames.size(); i++){
+    for (auto i = 0; i < fileNames.size(); i++){
         out << fileNames.at(i) << "\n";
     }
-    for (int i = 0; i < animSetData.size(); i++){
+    for (auto i = 0; i < animSetData.size(); i++){
         if (!animSetData.at(i)->write(file, out)){
             return false;
         }

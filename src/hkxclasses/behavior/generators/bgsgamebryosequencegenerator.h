@@ -3,32 +3,38 @@
 
 #include "hkbgenerator.h"
 
-class BGSGamebryoSequenceGenerator: public hkbGenerator
+class BGSGamebryoSequenceGenerator final: public hkbGenerator
 {
-    friend class BehaviorGraphView;
     friend class BGSGamebryoSequenceGeneratorUI;
 public:
     BGSGamebryoSequenceGenerator(HkxFile *parent, long ref = 0);
-    virtual ~BGSGamebryoSequenceGenerator();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
-    void removeData(){}
+    BGSGamebryoSequenceGenerator& operator=(const BGSGamebryoSequenceGenerator&) = delete;
+    BGSGamebryoSequenceGenerator(const BGSGamebryoSequenceGenerator &) = delete;
+    ~BGSGamebryoSequenceGenerator();
     QString getName() const;
+    static const QString getClassname();
+private:
+    void setName(const QString &value);
+    void setPSequence(const QString &value);
+    void setEBlendModeFunction(int index);
+    void setFPercent(const qreal &value);
+    QString getPSequence() const;
+    QString getEBlendModeFunction() const;
+    qreal getFPercent() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
 private:
-    BGSGamebryoSequenceGenerator& operator=(const BGSGamebryoSequenceGenerator&);
-    BGSGamebryoSequenceGenerator(const BGSGamebryoSequenceGenerator &);
-private:
-    static QStringList BlendModeFunction;   //(BMF_NONE=0;BMF_PERCENT=1;BMF_ONE_MINUS_PERCENT=2)
+    static const QStringList BlendModeFunction;
+    static const QString classname;
     static uint refCount;
-    static QString classname;
     ulong userData;
     QString name;
     QString pSequence;
     QString eBlendModeFunction;
     qreal fPercent;
+    mutable std::mutex mutex;
 };
 
 #endif // BGSGAMEBRYOSEQUENCEGENERATOR_H

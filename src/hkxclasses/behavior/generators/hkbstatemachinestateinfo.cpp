@@ -4,13 +4,13 @@
 #include "src/hkxclasses/behavior/generators/hkbstatemachine.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
-/*
- * CLASS: hkbStateMachineStateInfo
-*/
+#include "src/hkxclasses/behavior/generators/hkbmodifiergenerator.h"
+#include "src/hkxclasses/behavior/generators/bsistatetagginggenerator.h"
+#include "src/hkxclasses/behavior/generators/hkbbehaviorreferencegenerator.h"
 
 uint hkbStateMachineStateInfo::refCount = 0;
 
-QString hkbStateMachineStateInfo::classname = "hkbStateMachineStateInfo";
+const QString hkbStateMachineStateInfo::classname = "hkbStateMachineStateInfo";
 
 hkbStateMachineStateInfo::hkbStateMachineStateInfo(HkxFile *parent, hkbStateMachine *parentsm, long ref)
     : hkbGenerator(parent, ref),
@@ -19,82 +19,130 @@ hkbStateMachineStateInfo::hkbStateMachineStateInfo(HkxFile *parent, hkbStateMach
       parentSM(parentsm)
 {
     setType(HKB_STATE_MACHINE_STATE_INFO, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);
-    if (parentSM){
-        stateId = parentsm->generateValidStateId();
-    }else{
-        stateId = refCount;
-    }
+    parent->addObjectToFile(this, ref);
+    parentSM ? stateId = parentsm->generateValidStateId() : stateId = refCount;
     name = "State"+QString::number(stateId);
     refCount++;
 }
 
-QString hkbStateMachineStateInfo::getClassname(){
+const QString hkbStateMachineStateInfo::getClassname(){
     return classname;
 }
 
-QString hkbStateMachineStateInfo::getStateName(ulong stateId) const{
-    if (parentSM){
-        return parentSM->getStateName(stateId);
-    }
-    return "";
+QString hkbStateMachineStateInfo::getStateName(int stateId) const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QString sname;
+    parentSM ? sname = parentSM->getStateName(stateId) : NULL;
+    return sname;
 }
 
-QString hkbStateMachineStateInfo::getNestedStateName(ulong stateId, ulong nestedStateId) const{
-    if (parentSM){
-        return parentSM->getNestedStateName(stateId, nestedStateId);
-    }
-    return "";
+QString hkbStateMachineStateInfo::getNestedStateName(int stateId, ulong nestedStateId) const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QString sname;
+    parentSM ? sname = parentSM->getNestedStateName(stateId, nestedStateId) : NULL;
+    return sname;
+}
+
+QString hkbStateMachineStateInfo::getStateNameNoLock(int stateId) const{
+    QString sname;
+    parentSM ? sname = parentSM->getStateName(stateId) : NULL;
+    return sname;
+}
+
+QString hkbStateMachineStateInfo::getNestedStateNameNoLock(int stateId, ulong nestedStateId) const{
+    QString sname;
+    parentSM ? sname = parentSM->getNestedStateName(stateId, nestedStateId) : NULL;
+    return sname;
 }
 
 QString hkbStateMachineStateInfo::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
 hkbStateMachine * hkbStateMachineStateInfo::getParentStateMachine() const{
-    if (parentSM){
-        return parentSM;
-    }else{
-        WARNING_MESSAGE(QString("The state "+getName()+" has no parent!!!"));
-    }
-    return nullptr;
+    std::lock_guard <std::mutex> guard(mutex);
+    hkbStateMachine *ptr = nullptr;
+    parentSM ? ptr = parentSM : LogFile::writeToLog(getParentFilename()+": "+getClassname()+": "+name+"' has no parent state machine!\n");
+    return ptr;
 }
 
-bool hkbStateMachineStateInfo::setStateId(ulong id){
+void hkbStateMachineStateInfo::setParentSM(hkbStateMachine *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    value ? parentSM = value: value;
+}
+
+int hkbStateMachineStateInfo::getStateId() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return stateId;
+}
+
+QString hkbStateMachineStateInfo::getNameNoLock() const{
+    return name;
+}
+
+int hkbStateMachineStateInfo::getStateIdNoLock() const{
+    return stateId;
+}
+
+void hkbStateMachineStateInfo::updateTransitionStateId(bool lock, int newid){
+    hkbStateMachineTransitionInfoArray *trans;
+    auto update = [&](){
+        trans = static_cast<hkbStateMachineTransitionInfoArray *>(transitions.data());
+        if (trans){
+            trans->updateTransitionStateId(stateId, newid);
+        }
+    };
+    if (lock){
+        std::lock_guard <std::mutex> guard(mutex);
+        update();
+    }else{
+        update();
+    }
+}
+
+void hkbStateMachineStateInfo::removeTransitions(){
+    std::lock_guard <std::mutex> guard(mutex);
+    transitions = HkxSharedPtr();
+}
+
+void hkbStateMachineStateInfo::removeTransitionsNoLock(){
+    transitions = HkxSharedPtr();
+}
+
+void hkbStateMachineStateInfo::removeTransitionToState(int id){
+    std::lock_guard <std::mutex> guard(mutex);
+    hkbStateMachineTransitionInfoArray *trans = static_cast<hkbStateMachineTransitionInfoArray *>(transitions.data());
+    trans ? trans->removeTransitionToState(id) : trans;
+}
+
+bool hkbStateMachineStateInfo::setStateId(int id){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbStateMachineStateInfo *state = nullptr;
-    hkbStateMachineTransitionInfoArray *trans = nullptr;
     if (parentSM){
-        for (int i = 0; i < parentSM->states.size(); i++){
-            state = static_cast<hkbStateMachineStateInfo *>(parentSM->states.at(i).data());
-            if (state && state->stateId == id){
+        auto states = parentSM->getChildren();
+        for (auto i = 0; i < states.size(); i++){
+            state = static_cast<hkbStateMachineStateInfo *>(states.at(i));
+            if (state && state->getStateId() == id){
                 return false;
             }
         }
-        for (int i = 0; i < parentSM->states.size(); i++){
-            state = static_cast<hkbStateMachineStateInfo *>(parentSM->states.at(i).data());
-            trans = static_cast<hkbStateMachineTransitionInfoArray *>(state->transitions.data());
-            if (trans){
-                for (int j = 0; j < trans->transitions.size(); j++){
-                    if (trans->transitions.at(j).toStateId == stateId){
-                        trans->transitions[j].toStateId = id;
-                    }
-                }
+        for (auto i = 0; i < states.size(); i++){
+            state = static_cast<hkbStateMachineStateInfo *>(states.at(i));
+            if (state != this){
+                state->updateTransitionStateId(true, id);
+            }else{
+                state->updateTransitionStateId(false, id);
             }
         }
-        trans = static_cast<hkbStateMachineTransitionInfoArray *>(parentSM->wildcardTransitions.data());
-        if (trans){
-            for (int i = 0; i < trans->transitions.size(); i++){
-                if (trans->transitions.at(i).toStateId == stateId){
-                    trans->transitions[i].toStateId = id;
-                }
-            }
-        }
+        parentSM->updateTransitionStateId(stateId, id);
     }
     stateId = id;
     return true;
 }
 
 bool hkbStateMachineStateInfo::hasChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (generator.data()){
         return true;
     }
@@ -102,322 +150,315 @@ bool hkbStateMachineStateInfo::hasChildren() const{
 }
 
 bool hkbStateMachineStateInfo::isEventReferenced(int eventindex) const{
-    if (enterNotifyEvents.constData() && enterNotifyEvents.constData()->isEventReferenced(eventindex)){
-        return true;
-    }
-    if (exitNotifyEvents.constData() && exitNotifyEvents.constData()->isEventReferenced(eventindex)){
-        return true;
-    }
-    if (transitions.constData() && transitions.constData()->isEventReferenced(eventindex)){
+    std::lock_guard <std::mutex> guard(mutex);
+    bool refed = false;
+    auto isrefed = [&](const HkxSharedPtr & shdptr){
+        if (shdptr.constData() && shdptr.constData()->isEventReferenced(eventindex))
+            refed = true;
+    };
+    isrefed(enterNotifyEvents);
+    isrefed(exitNotifyEvents);
+    isrefed(transitions);
+    return refed;
+}
+
+void hkbStateMachineStateInfo::updateEventIndices(int eventindex){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto updatref = [&](const HkxSharedPtr & shdptr){
+        if (shdptr.data())
+            shdptr->updateEventIndices(eventindex);
+    };
+    updatref(enterNotifyEvents);
+    updatref(exitNotifyEvents);
+    updatref(transitions);
+}
+
+void hkbStateMachineStateInfo::mergeEventIndex(int oldindex, int newindex){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto mergeindex = [&](const HkxSharedPtr & shdptr){
+        if (shdptr.data())
+            shdptr->mergeEventIndex(oldindex, newindex);
+    };
+    mergeindex(enterNotifyEvents);
+    mergeindex(exitNotifyEvents);
+    mergeindex(transitions);
+}
+
+void hkbStateMachineStateInfo::fixMergedEventIndices(BehaviorFile *dominantfile){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto fixmergedind = [&](const HkxSharedPtr & shdptr){
+        if (shdptr.data())
+            shdptr->fixMergedEventIndices(dominantfile);
+    };
+    fixmergedind(enterNotifyEvents);
+    fixmergedind(exitNotifyEvents);
+    fixmergedind(transitions);
+}
+
+bool hkbStateMachineStateInfo::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
+    hkbStateMachineStateInfo *obj = nullptr;
+    auto merge = [&](HkxObject *ptr, HkxSharedPtr & shdptr, HkxObject *recptr, const HkxSharedPtr & recshdptr){
+        if (ptr){
+            if (recptr){
+                ptr->merge(recptr);
+            }
+        }else if (recptr){
+            shdptr = recshdptr;
+            getParentFile()->addObjectToFile(recptr, 0);
+            recptr->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
+        }
+    };
+    if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
+        obj = static_cast<hkbStateMachineStateInfo *>(recessiveObject);
+        injectWhileMerging((obj));
+        merge(enterNotifyEvents.data(), enterNotifyEvents, obj->getEnterNotifyEventsData(), obj->getEnterNotifyEvents());
+        merge(exitNotifyEvents.data(), exitNotifyEvents, obj->getExitNotifyEventsData(), obj->getExitNotifyEvents());
+        merge(transitions.data(), transitions, obj->getTransitionsData(), obj->getTransitions());
         return true;
     }
     return false;
 }
 
-void hkbStateMachineStateInfo::updateEventIndices(int eventindex){
-    if (enterNotifyEvents.data()){
-        enterNotifyEvents.data()->updateEventIndices(eventindex);
-    }
-    if (exitNotifyEvents.data()){
-        exitNotifyEvents.data()->updateEventIndices(eventindex);
-    }
-    if (transitions.data()){
-        transitions.data()->updateEventIndices(eventindex);
-    }
-}
-
-void hkbStateMachineStateInfo::mergeEventIndex(int oldindex, int newindex){
-    if (enterNotifyEvents.data()){
-        enterNotifyEvents.data()->mergeEventIndex(oldindex, newindex);
-    }
-    if (exitNotifyEvents.data()){
-        exitNotifyEvents.data()->mergeEventIndex(oldindex, newindex);
-    }
-    if (transitions.data()){
-        transitions.data()->mergeEventIndex(oldindex, newindex);
-    }
-}
-
-void hkbStateMachineStateInfo::fixMergedEventIndices(BehaviorFile *dominantfile){
-    if (enterNotifyEvents.data()){
-        enterNotifyEvents.data()->fixMergedEventIndices(dominantfile);
-    }
-    if (exitNotifyEvents.data()){
-        exitNotifyEvents.data()->fixMergedEventIndices(dominantfile);
-    }
-    if (transitions.data()){
-        transitions.data()->fixMergedEventIndices(dominantfile);
-    }
-}
-
-bool hkbStateMachineStateInfo::merge(HkxObject *recessiveObject){
-    hkbStateMachineStateInfo *obj = nullptr;
-    if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
-        obj = static_cast<hkbStateMachineStateInfo *>(recessiveObject);
-        injectWhileMerging((obj));
-        if (enterNotifyEvents.data()){
-            if (obj->enterNotifyEvents.data()){
-                enterNotifyEvents.data()->merge(obj->enterNotifyEvents.data());
-            }
-        }else if (obj->enterNotifyEvents.data()){
-            enterNotifyEvents = obj->enterNotifyEvents;
-            getParentFile()->addObjectToFile(obj->enterNotifyEvents.data(), 0);
-            obj->enterNotifyEvents.data()->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
-        }
-        if (exitNotifyEvents.data()){
-            if (obj->exitNotifyEvents.data()){
-                exitNotifyEvents.data()->merge(obj->exitNotifyEvents.data());
-            }
-        }else if (obj->exitNotifyEvents.data()){
-            exitNotifyEvents = obj->exitNotifyEvents;
-            getParentFile()->addObjectToFile(obj->exitNotifyEvents.data(), 0);
-            obj->exitNotifyEvents.data()->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
-        }
-        if (transitions.data()){
-            if (obj->transitions.data()){
-                transitions.data()->merge(obj->transitions.data());
-            }
-        }else if (obj->transitions.data()){
-            transitions = obj->transitions;
-            getParentFile()->addObjectToFile(obj->transitions.data(), 0);
-            obj->transitions.data()->fixMergedEventIndices(static_cast<BehaviorFile *>(getParentFile()));
-        }
-        return true;
-    }else{
-        return false;
-    }
-}
-
 void hkbStateMachineStateInfo::updateReferences(long &ref){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto updateref = [&](const HkxSharedPtr & shdptr){
+        if (shdptr.data())
+            shdptr->updateReferences(++ref);
+    };
     setReference(ref);
-    ref++;
-    setBindingReference(ref);
-    if (enterNotifyEvents.data()){
-        ref++;
-        enterNotifyEvents.data()->updateReferences(ref);
-    }
-    if (exitNotifyEvents.data()){
-        ref++;
-        exitNotifyEvents.data()->updateReferences(ref);
-    }
-    if (transitions.data()){
-        ref++;
-        transitions.data()->updateReferences(ref);
-    }
+    setBindingReference(++ref);
+    updateref(enterNotifyEvents);
+    updateref(exitNotifyEvents);
+    updateref(transitions);
 }
 
 QVector<HkxObject *> hkbStateMachineStateInfo::getChildrenOtherTypes() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QVector<HkxObject *> list;
-    if (enterNotifyEvents.data()){
-        list.append(enterNotifyEvents.data());
-    }
-    if (exitNotifyEvents.data()){
-        list.append(exitNotifyEvents.data());
-    }
-    if (transitions.data()){
-        list.append(transitions.data());
-    }
+    auto getchildren = [&](const HkxSharedPtr & shdptr){
+        if (shdptr.data()){
+            list.append(shdptr.data());
+        }
+    };
+    getchildren(enterNotifyEvents);
+    getchildren(exitNotifyEvents);
+    getchildren(transitions);
     return list;
 }
 
-QList<DataIconManager *> hkbStateMachineStateInfo::getChildren() const{
-    QList<DataIconManager *> list;
+QVector<DataIconManager *> hkbStateMachineStateInfo::getChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QVector<DataIconManager *> list;
     if (generator.data()){
         list.append(static_cast<DataIconManager*>(generator.data()));
     }
     return list;
 }
 
+hkbStateMachine *hkbStateMachineStateInfo::getNestedStateMachine() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    HkxSignature sig;
+    QString behaviorname;
+    hkbGenerator *gen = static_cast<hkbGenerator *>(generator.data());
+    while (gen){
+        sig = gen->getSignature();
+        switch (sig){
+        case HKB_STATE_MACHINE:
+            return static_cast<hkbStateMachine *>(gen);
+        case HKB_MODIFIER_GENERATOR:
+            gen = static_cast<hkbGenerator *>(static_cast<hkbModifierGenerator *>(gen)->getChildren().last());
+            break;
+        case BS_I_STATE_TAGGING_GENERATOR:
+            gen = static_cast<hkbGenerator *>(static_cast<BSiStateTaggingGenerator *>(gen)->getChildren().first());
+            break;
+        case HKB_BEHAVIOR_REFERENCE_GENERATOR:
+            behaviorname = reinterpret_cast<hkbBehaviorReferenceGenerator *>(gen)->getBehaviorName();
+            return static_cast<BehaviorFile *>(getParentFile())->findRootStateMachineFromBehavior(behaviorname);
+        default:
+            return nullptr;
+        }
+    }
+    return nullptr;
+}
+
+void hkbStateMachineStateInfo::setTransitionsParentSM(hkbStateMachine *parSM){
+    std::lock_guard <std::mutex> guard(mutex);
+    hkbStateMachineTransitionInfoArray *trans = static_cast<hkbStateMachineTransitionInfoArray *>(transitions.data());
+    trans ? trans->setParentSM(parSM) : NULL;
+}
+
 int hkbStateMachineStateInfo::getIndexOfObj(DataIconManager *obj) const{
-    if (generator.data() == (HkxObject *)obj){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (generator.data() == obj){
         return 0;
     }
     return -1;
 }
 
 bool hkbStateMachineStateInfo::insertObjectAt(int , DataIconManager *obj){
-    if (((HkxObject *)obj)->getType() == TYPE_GENERATOR){
-        generator = HkxSharedPtr((HkxObject *)obj);
-    }else{
-        return false;
+    std::lock_guard <std::mutex> guard(mutex);
+    if (obj && obj->getType() == TYPE_GENERATOR){
+        generator = HkxSharedPtr(obj);
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool hkbStateMachineStateInfo::removeObjectAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
     if (index == 0 || index == -1){
         generator = HkxSharedPtr();
-    }else{
-        return false;
+        return true;
     }
-    return true;
+    return false;
 }
 
-bool hkbStateMachineStateInfo::readData(const HkxXmlReader &reader, long index){
+HkxObject *hkbStateMachineStateInfo::getEnterNotifyEventsData() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enterNotifyEvents.data();
+}
+
+HkxObject *hkbStateMachineStateInfo::getExitNotifyEventsData() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return exitNotifyEvents.data();
+}
+
+HkxObject *hkbStateMachineStateInfo::getTransitionsData() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return transitions.data();
+}
+
+HkxSharedPtr hkbStateMachineStateInfo::getTransitions() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return transitions;
+}
+
+HkxSharedPtr hkbStateMachineStateInfo::getExitNotifyEvents() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return exitNotifyEvents;
+}
+
+HkxSharedPtr hkbStateMachineStateInfo::getEnterNotifyEvents() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enterNotifyEvents;
+}
+
+bool hkbStateMachineStateInfo::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "enterNotifyEvents"){
-            if (!enterNotifyEvents.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enterNotifyEvents' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(enterNotifyEvents.readShdPtrReference(index, reader), "enterNotifyEvents");
         }else if (text == "exitNotifyEvents"){
-            if (!exitNotifyEvents.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'exitNotifyEvents' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(exitNotifyEvents.readShdPtrReference(index, reader), "exitNotifyEvents");
         }else if (text == "transitions"){
-            if (!transitions.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'transitions' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(transitions.readShdPtrReference(index, reader), "transitions");
         }else if (text == "generator"){
-            if (!generator.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'generator' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(generator.readShdPtrReference(index, reader), "generator");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "stateId"){
-            stateId = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'stateId' data field!\nObject Reference: "+ref);
-            }
+            stateId = reader.getElementValueAt(index).toInt(&ok);
+            checkvalue(ok, "stateId");
         }else if (text == "probability"){
             probability = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'probability' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "probability");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbStateMachineStateInfo::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value, bool allownull){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value, allownull);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
+        writeref(getVariableBindingSet(), "variableBindingSet");
         list1 = {writer->name, writer->numelements};
         list2 = {"listeners", "0"};
         writer->writeLine(writer->parameter, list1, list2, "");
-        if (enterNotifyEvents.data()){
-            refString = enterNotifyEvents.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enterNotifyEvents"), refString);
-        if (exitNotifyEvents.data()){
-            refString = exitNotifyEvents.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("exitNotifyEvents"), refString);
-        if (transitions.data()){
-            refString = transitions.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("transitions"), refString);
-        if (generator.data()){
-            refString = generator.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("generator"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("stateId"), QString::number(stateId));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("probability"), QString::number(probability, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
+        writeref(enterNotifyEvents, "enterNotifyEvents");
+        writeref(exitNotifyEvents, "exitNotifyEvents");
+        writeref(transitions, "transitions");
+        writeref(generator, "generator");
+        writedatafield("name", name, false);
+        writedatafield("stateId", QString::number(stateId), false);
+        writedatafield("probability", QString::number(probability, char('f'), 6), false);
+        writedatafield("enable", getBoolAsString(enable), false);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        if (enterNotifyEvents.data() && !enterNotifyEvents.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'enterNotifyEvents'!!!");
-        }
-        if (exitNotifyEvents.data() && !exitNotifyEvents.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'exitNotifyEvents'!!!");
-        }
-        if (transitions.data() && !transitions.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'transitions'!!!");
-        }
-        if (generator.data() && !generator.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'generator'!!!");
-        }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        writechild(enterNotifyEvents, "enterNotifyEvents");
+        writechild(exitNotifyEvents, "exitNotifyEvents");
+        writechild(transitions, "transitions");
+        writechild(generator, "generator");
     }
     return true;
 }
 
 bool hkbStateMachineStateInfo::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    HkxSharedPtr *ptr;
+    auto linkdata = [&](HkxType type, HkxSignature sig, HkxSharedPtr & shdptr, const QString & fieldname, bool nullallowed){
+        if (ptr){
+            if (!ptr->data()){
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link '"+fieldname+"' data field!");
+                setDataValidity(false);
+            }else if ((*ptr)->getType() != type || (sig != NULL_SIGNATURE && (*ptr)->getSignature() != sig) ||
+                      ((*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD))
+            {
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'"+fieldname+"' data field is linked to invalid child!");
+                setDataValidity(false);
+            }
+            shdptr = *ptr;
+        }else if (!nullallowed){
+            setDataValidity(false);
+        }
+    };
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(enterNotifyEvents.getShdPtrReference());
-    if (ptr){
-        if ((*ptr)->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'enterNotifyEvents' is not a HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY!");
-            setDataValidity(false);
-        }
-        enterNotifyEvents = *ptr;
-    }
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(enterNotifyEvents.getShdPtrReference());
+    linkdata(TYPE_OTHER, HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY, enterNotifyEvents, "enterNotifyEvents", false);
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(exitNotifyEvents.getShdPtrReference());
-    if (ptr){
-        if ((*ptr)->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'exitNotifyEvents' is not a HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY!");
-            setDataValidity(false);
-        }
-        exitNotifyEvents = *ptr;
-    }
+    linkdata(TYPE_OTHER, HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY, exitNotifyEvents, "exitNotifyEvents", false);
     ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(transitions.getShdPtrReference());
-    if (ptr){
-        if ((*ptr)->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'transitions' is not a HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY!");
-            setDataValidity(false);
-        }
-        transitions = *ptr;
-        static_cast<hkbStateMachineTransitionInfoArray *>(transitions.data())->parent = parentSM;
-    }
+    linkdata(TYPE_OTHER, HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY, transitions, "transitions", false);
     ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(generator.getShdPtrReference());
-    if (!ptr){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'generator' data field!\nObject Name: "+name);
-        setDataValidity(false);
-    }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'generator' data field is linked to invalid child!\nObject Name: "+name);
-        setDataValidity(false);
-        generator = *ptr;
-    }else{
-        generator = *ptr;
-    }
+    linkdata(TYPE_GENERATOR, NULL_SIGNATURE, generator, "generator", false);
     return true;
 }
 
 void hkbStateMachineStateInfo::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     parentSM = nullptr;
     enterNotifyEvents = HkxSharedPtr();
@@ -427,63 +468,45 @@ void hkbStateMachineStateInfo::unlink(){
 }
 
 QString hkbStateMachineStateInfo::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity();
+    QString temp;
+    auto checknfix = [&](HkxSharedPtr & shdptr, const QString & datafield, HkxSignature sig){
+        if (shdptr.data()){
+            if (shdptr->getSignature() != sig){
+                isvalid = false;
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid "+datafield+" type! Signature: "+QString::number(shdptr->getSignature(), 16)+" Setting null value!\n");
+                shdptr = HkxSharedPtr();
+            }else if ((sig == HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY && static_cast<hkbStateMachineEventPropertyArray *>(shdptr.data())->getNumOfEvents() < 1) ||
+                      (sig == HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY && static_cast<hkbStateMachineTransitionInfoArray *>(shdptr.data())->getNumTransitions() < 1))
+            {
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+datafield+" is empty! Setting null value!\n");
+                shdptr = HkxSharedPtr();
+            }/*else if (shdptr->isDataValid() && shdptr->evaluateDataValidity() != ""){
+                isvalid = false;
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid "+datafield+" data!\n");
+            }*/
+        }
+    };
+    temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
-    if (enterNotifyEvents.data()){
-        if (enterNotifyEvents.data()->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
-            isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid enterNotifyEvents type! Signature: "+QString::number(enterNotifyEvents.data()->getSignature(), 16)+" Setting null value!\n");
-            enterNotifyEvents = HkxSharedPtr();
-        }else if (static_cast<hkbStateMachineEventPropertyArray *>(enterNotifyEvents.data())->getNumOfEvents() < 1){
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": enterNotifyEvents has no events! Setting null value!\n");
-            enterNotifyEvents = HkxSharedPtr();
-        }else if (enterNotifyEvents.data()->isDataValid() && enterNotifyEvents.data()->evaluateDataValidity() != ""){
-            isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid enterNotifyEvents data!\n");
-        }
-    }
-    if (exitNotifyEvents.data()){
-        if (exitNotifyEvents.data()->getSignature() != HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
-            isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid exitNotifyEvents type! Signature: "+QString::number(exitNotifyEvents.data()->getSignature(), 16)+" Setting null value!\n");
-            exitNotifyEvents = HkxSharedPtr();
-        }else if (static_cast<hkbStateMachineEventPropertyArray *>(exitNotifyEvents.data())->getNumOfEvents() < 1){
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": exitNotifyEvents has no events! Setting null value!\n");
-            exitNotifyEvents = HkxSharedPtr();
-        }else if (exitNotifyEvents.data()->isDataValid() && exitNotifyEvents.data()->evaluateDataValidity() != ""){
-            isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid exitNotifyEvents data!\n");
-        }
-    }
-    if (transitions.data()){
-        if (transitions.data()->getSignature() != HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
-            isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid transitions type! Signature: "+QString::number(transitions.data()->getSignature(), 16)+" Setting null value!\n");
-            transitions = HkxSharedPtr();
-        }else if (static_cast<hkbStateMachineTransitionInfoArray *>(transitions.data())->getNumTransitions() < 1){
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": transitions has no transitions! Setting null value!\n");
-            transitions = HkxSharedPtr();
-        }else if (transitions.data()->isDataValid() && transitions.data()->evaluateDataValidity() != ""){
-            isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid transitions data!\n");
-            //transitions = HkxSignature(); TO DO: fix???
-        }
-    }
+    checknfix(enterNotifyEvents, "enterNotifyEvents", HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY);
+    checknfix(exitNotifyEvents, "exitNotifyEvents", HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY);
+    checknfix(transitions, "transitions", HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY);
     if (!generator.data()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null generator!\n");
-    }else if (generator.data()->getType() != HkxObject::TYPE_GENERATOR){
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null generator!\n");
+    }else if (generator->getType() != HkxObject::TYPE_GENERATOR){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid generator type! Signature: "+QString::number(generator.data()->getSignature(), 16)+" Setting null value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid generator type! Signature: "+QString::number(generator->getSignature(), 16)+" Setting null value!\n");
         generator = HkxSharedPtr();
     }
     if (!parentSM){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Null parentSM!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null parentSM!\n");
     }
     setDataValidity(isvalid);
     return errors;

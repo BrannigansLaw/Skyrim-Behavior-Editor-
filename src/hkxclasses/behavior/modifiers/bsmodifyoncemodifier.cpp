@@ -2,13 +2,9 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 
-/*
- * CLASS: BSModifyOnceModifier
-*/
-
 uint BSModifyOnceModifier::refCount = 0;
 
-QString BSModifyOnceModifier::classname = "BSModifyOnceModifier";
+const QString BSModifyOnceModifier::classname = "BSModifyOnceModifier";
 
 BSModifyOnceModifier::BSModifyOnceModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -16,42 +12,31 @@ BSModifyOnceModifier::BSModifyOnceModifier(HkxFile *parent, long ref)
       enable(true)
 {
     setType(BS_MODIFY_ONCE_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "ModifyOnceModifier"+QString::number(refCount);
+    name = "ModifyOnceModifier_"+QString::number(refCount);
 }
 
-QString BSModifyOnceModifier::getClassname(){
+const QString BSModifyOnceModifier::getClassname(){
     return classname;
 }
 
 QString BSModifyOnceModifier::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-int BSModifyOnceModifier::getIndexToInsertIcon() const{
-    if (!pOnActivateModifier.constData()){    //Not sure about this...
-        return 0;
-    }else if (!pOnDeactivateModifier.constData()){
-        return 1;
-    }
-    return -1;
-}
-
 bool BSModifyOnceModifier::insertObjectAt(int index, DataIconManager *obj){
-    if (((HkxObject *)obj)->getType() == TYPE_MODIFIER){
-        if (index == 1){
-            pOnDeactivateModifier = HkxSharedPtr((HkxObject *)obj);
-        }else{
-            pOnDeactivateModifier = HkxSharedPtr((HkxObject *)obj);
-        }
-    }else{
-        return false;
+    std::lock_guard <std::mutex> guard(mutex);
+    if (obj && obj->getType() == TYPE_MODIFIER){
+        (index == 1) ? pOnDeactivateModifier = HkxSharedPtr(obj): pOnDeactivateModifier = HkxSharedPtr(obj);
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool BSModifyOnceModifier::removeObjectAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
     if (index == 0){
         pOnActivateModifier = HkxSharedPtr();
     }else if (index == 1){
@@ -66,176 +51,160 @@ bool BSModifyOnceModifier::removeObjectAt(int index){
 }
 
 bool BSModifyOnceModifier::hasChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (pOnActivateModifier.data() || pOnDeactivateModifier.data()){
         return true;
     }
     return false;
 }
 
-QList<DataIconManager *> BSModifyOnceModifier::getChildren() const{
-    QList<DataIconManager *> list;
-    if (pOnActivateModifier.data()){
-        list.append(static_cast<DataIconManager*>(pOnActivateModifier.data()));
-    }
-    if (pOnDeactivateModifier.data()){
-        list.append(static_cast<DataIconManager*>(pOnDeactivateModifier.data()));
-    }
+QVector<DataIconManager *> BSModifyOnceModifier::getChildren() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QVector<DataIconManager *> list;
+    auto getchildren = [&](const HkxSharedPtr & shdptr){
+        (shdptr.data()) ? list.append(static_cast<DataIconManager*>(shdptr.data())) : NULL;
+    };
+    getchildren(pOnActivateModifier);
+    getchildren(pOnDeactivateModifier);
     return list;
 }
 
 int BSModifyOnceModifier::getIndexOfObj(DataIconManager *obj) const{
-    if (pOnActivateModifier.data() == (HkxObject *)obj){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (pOnActivateModifier.data() == obj){
         return 0;
-    }else if (pOnDeactivateModifier.data() == (HkxObject *)obj){
+    }else if (pOnDeactivateModifier.data() == obj){
         return 1;
     }
     return -1;
 }
 
-bool BSModifyOnceModifier::readData(const HkxXmlReader &reader, long index){
+bool BSModifyOnceModifier::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "pOnActivateModifier"){
-            if (!pOnActivateModifier.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'pOnActivateModifier' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(pOnActivateModifier.readShdPtrReference(index, reader), "pOnActivateModifier");
         }else if (text == "pOnDeactivateModifier"){
-            if (!pOnDeactivateModifier.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'pOnDeactivateModifier' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(pOnDeactivateModifier.readShdPtrReference(index, reader), "pOnDeactivateModifier");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool BSModifyOnceModifier::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        if (pOnActivateModifier.data()){
-            refString = pOnActivateModifier.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pOnActivateModifier"), refString);
-        if (pOnDeactivateModifier.data()){
-            refString = pOnDeactivateModifier.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("pOnDeactivateModifier"), refString);
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData));
+        writedatafield("name", name);
+        writedatafield("enable", getBoolAsString(enable));
+        writeref(pOnActivateModifier, "pOnActivateModifier");
+        writeref(pOnDeactivateModifier, "pOnDeactivateModifier");
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        if (pOnActivateModifier.data() && !pOnActivateModifier.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'pOnActivateModifier'!!!");
-        }
-        if (pOnDeactivateModifier.data() && !pOnDeactivateModifier.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'pOnDeactivateModifier'!!!");
-        }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        writechild(pOnActivateModifier, "pOnActivateModifier");
+        writechild(pOnDeactivateModifier, "pOnDeactivateModifier");
     }
     return true;
 }
 
 bool BSModifyOnceModifier::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    HkxSharedPtr *ptr;
+    auto linkmodifiers = [&](HkxSharedPtr & data, const QString & fieldname){
+        if (ptr){
+            if ((*ptr)->getType() != TYPE_MODIFIER){
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": linkVar()!\nThe linked object '"+fieldname+"' is not a modifier!");
+                setDataValidity(false);
+            }
+            data = *ptr;
+        }
+    };
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(pOnActivateModifier.getShdPtrReference());
-    if (ptr){
-        if ((*ptr)->getType() != TYPE_MODIFIER){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'pOnActivateModifier' is not a modifier!");
-            setDataValidity(false);
-        }
-        pOnActivateModifier = *ptr;
-    }
+    ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(pOnActivateModifier.getShdPtrReference());
+    linkmodifiers(pOnActivateModifier, "pOnActivateModifier");
     ptr = static_cast<BehaviorFile *>(getParentFile())->findModifier(pOnDeactivateModifier.getShdPtrReference());
-    if (ptr){
-        if ((*ptr)->getType() != TYPE_MODIFIER){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'pOnDeactivateModifier' is not a modifier!");
-            setDataValidity(false);
-        }
-        pOnDeactivateModifier = *ptr;
-    }
+    linkmodifiers(pOnDeactivateModifier, "pOnDeactivateModifier");
     return true;
 }
 
 void BSModifyOnceModifier::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     pOnActivateModifier = HkxSharedPtr();
     pOnDeactivateModifier = HkxSharedPtr();
 }
 
 QString BSModifyOnceModifier::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     if (!pOnActivateModifier.data()){
         if (!pOnDeactivateModifier.data()){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": pOnActivateModifier and pOnDeactivateModifier are both nullptr!\n");
-        }else if (pOnDeactivateModifier.data()->getType() != HkxObject::TYPE_MODIFIER){
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": pOnActivateModifier and pOnDeactivateModifier are both nullptr!\n");
+        }else if (pOnDeactivateModifier->getType() != HkxObject::TYPE_MODIFIER){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOnDeactivateModifier type! Signature: "+QString::number(pOnDeactivateModifier.data()->getSignature(), 16)+" Setting null value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid pOnDeactivateModifier type! Signature: "+QString::number(pOnDeactivateModifier->getSignature(), 16)+" Setting null value!\n");
             pOnDeactivateModifier = HkxSharedPtr();
         }
     }else{
-        if (pOnActivateModifier.data()->getType() != HkxObject::TYPE_MODIFIER){
+        if (pOnActivateModifier->getType() != HkxObject::TYPE_MODIFIER){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOnActivateModifier type! Signature: "+QString::number(pOnActivateModifier.data()->getSignature(), 16)+" Setting null value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid pOnActivateModifier type! Signature: "+QString::number(pOnActivateModifier->getSignature(), 16)+" Setting null value!\n");
             pOnActivateModifier = HkxSharedPtr();
         }
-        if (pOnDeactivateModifier.data() && pOnDeactivateModifier.data()->getType() != HkxObject::TYPE_MODIFIER){
+        if (pOnDeactivateModifier.data() && pOnDeactivateModifier->getType() != HkxObject::TYPE_MODIFIER){
             isvalid = false;
-            errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid pOnDeactivateModifier type! Signature: "+QString::number(pOnDeactivateModifier.data()->getSignature(), 16)+" Setting null value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid pOnDeactivateModifier type! Signature: "+QString::number(pOnDeactivateModifier->getSignature(), 16)+" Setting null value!\n");
             pOnDeactivateModifier = HkxSharedPtr();
         }
     }

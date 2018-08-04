@@ -3,13 +3,9 @@
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
-/*
- * CLASS: hkbDetectCloseToGroundModifier
-*/
-
 uint hkbDetectCloseToGroundModifier::refCount = 0;
 
-QString hkbDetectCloseToGroundModifier::classname = "hkbDetectCloseToGroundModifier";
+const QString hkbDetectCloseToGroundModifier::classname = "hkbDetectCloseToGroundModifier";
 
 hkbDetectCloseToGroundModifier::hkbDetectCloseToGroundModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -22,131 +18,114 @@ hkbDetectCloseToGroundModifier::hkbDetectCloseToGroundModifier(HkxFile *parent, 
       animBoneIndex(-1)
 {
     setType(HKB_DETECT_CLOSE_TO_GROUND_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "DetectCloseToGroundModifier"+QString::number(refCount);
+    name = "DetectCloseToGroundModifier_"+QString::number(refCount);
 }
 
-QString hkbDetectCloseToGroundModifier::getClassname(){
+const QString hkbDetectCloseToGroundModifier::getClassname(){
     return classname;
 }
 
 QString hkbDetectCloseToGroundModifier::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-bool hkbDetectCloseToGroundModifier::readData(const HkxXmlReader &reader, long index){
+bool hkbDetectCloseToGroundModifier::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "id"){
             closeToGroundEvent.id = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "id");
         }else if (text == "payload"){
-            if (!closeToGroundEvent.payload.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(closeToGroundEvent.payload.readShdPtrReference(index, reader), "payload");
         }else if (text == "closeToGroundHeight"){
             closeToGroundHeight = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'closeToGroundHeight' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "closeToGroundHeight");
         }else if (text == "raycastDistanceDown"){
             raycastDistanceDown = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'raycastDistanceDown' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "raycastDistanceDown");
         }else if (text == "collisionFilterInfo"){
             collisionFilterInfo = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'collisionFilterInfo' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "collisionFilterInfo");
         }else if (text == "boneIndex"){
             boneIndex = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'boneIndex' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "boneIndex");
         }else if (text == "animBoneIndex"){
             animBoneIndex = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'animBoneIndex' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "animBoneIndex");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbDetectCloseToGroundModifier::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("closeToGroundEvent"), "");
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData));
+        writedatafield("name", name);
+        writedatafield("enable", getBoolAsString(enable));
+        writedatafield("closeToGroundEvent", "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(closeToGroundEvent.id));
-        if (closeToGroundEvent.payload.data()){
-            refString = closeToGroundEvent.payload.data()->getReferenceString();
-        }else{
-            refString = "null";
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
+        writedatafield("id", QString::number(closeToGroundEvent.id));
+        writeref(closeToGroundEvent.payload, "payload");
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
         writer->writeLine(writer->object, false);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("closeToGroundHeight"), QString::number(closeToGroundHeight, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("raycastDistanceDown"), QString::number(raycastDistanceDown, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("collisionFilterInfo"), QString::number(collisionFilterInfo));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("boneIndex"), QString::number(boneIndex));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("animBoneIndex"), QString::number(animBoneIndex));
+        writedatafield("closeToGroundHeight", QString::number(closeToGroundHeight, char('f'), 6));
+        writedatafield("raycastDistanceDown", QString::number(raycastDistanceDown, char('f'), 6));
+        writedatafield("collisionFilterInfo", QString::number(collisionFilterInfo));
+        writedatafield("boneIndex", QString::number(boneIndex));
+        writedatafield("animBoneIndex", QString::number(animBoneIndex));
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        if (closeToGroundEvent.payload.data() && !closeToGroundEvent.payload.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'payload'!!!");
-        }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        writechild(closeToGroundEvent.payload, "payload");
     }
     return true;
 }
 
 bool hkbDetectCloseToGroundModifier::isEventReferenced(int eventindex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (closeToGroundEvent.id == eventindex){
         return true;
     }
@@ -154,18 +133,17 @@ bool hkbDetectCloseToGroundModifier::isEventReferenced(int eventindex) const{
 }
 
 void hkbDetectCloseToGroundModifier::updateEventIndices(int eventindex){
-    if (closeToGroundEvent.id > eventindex){
-        closeToGroundEvent.id--;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (closeToGroundEvent.id > eventindex) ? closeToGroundEvent.id-- : NULL;
 }
 
 void hkbDetectCloseToGroundModifier::mergeEventIndex(int oldindex, int newindex){
-    if (closeToGroundEvent.id == oldindex){
-        closeToGroundEvent.id = newindex;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (closeToGroundEvent.id == oldindex) ? closeToGroundEvent.id = newindex : NULL;
 }
 
 void hkbDetectCloseToGroundModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphData *recdata;
     hkbBehaviorGraphData *domdata;
     QString thiseventname;
@@ -191,24 +169,20 @@ void hkbDetectCloseToGroundModifier::fixMergedEventIndices(BehaviorFile *dominan
 }
 
 void hkbDetectCloseToGroundModifier::updateReferences(long &ref){
+    std::lock_guard <std::mutex> guard(mutex);
     setReference(ref);
-    ref++;
-    setBindingReference(ref);
-    if (closeToGroundEvent.payload.data()){
-        ref++;
-        closeToGroundEvent.payload.data()->updateReferences(ref);
-    }
+    setBindingReference(++ref);
+    (closeToGroundEvent.payload.data()) ? closeToGroundEvent.payload->updateReferences(++ref) : NULL;
 }
 
 QVector<HkxObject *> hkbDetectCloseToGroundModifier::getChildrenOtherTypes() const{
     QVector<HkxObject *> list;
-    if (closeToGroundEvent.payload.data()){
-        list.append(closeToGroundEvent.payload.data());
-    }
+    (closeToGroundEvent.payload.data()) ? list.append(closeToGroundEvent.payload.data()) : NULL;
     return list;
 }
 
-bool hkbDetectCloseToGroundModifier::merge(HkxObject *recessiveObject){
+bool hkbDetectCloseToGroundModifier::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     hkbDetectCloseToGroundModifier *recobj;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_DETECT_CLOSE_TO_GROUND_MODIFIER){
         recobj = static_cast<hkbDetectCloseToGroundModifier *>(recessiveObject);
@@ -217,22 +191,19 @@ bool hkbDetectCloseToGroundModifier::merge(HkxObject *recessiveObject){
             getParentFile()->addObjectToFile(recobj->closeToGroundEvent.payload.data(), -1);
         }
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 bool hkbDetectCloseToGroundModifier::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(closeToGroundEvent.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
             setDataValidity(false);
         }
         closeToGroundEvent.payload = *ptr;
@@ -241,49 +212,51 @@ bool hkbDetectCloseToGroundModifier::link(){
 }
 
 void hkbDetectCloseToGroundModifier::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     closeToGroundEvent.payload = HkxSharedPtr();
 }
 
 QString hkbDetectCloseToGroundModifier::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     if (closeToGroundEvent.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": closeToGroundEvent event id out of range! Setting to max index in range!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": closeToGroundEvent event id out of range! Setting to max index in range!\n");
         closeToGroundEvent.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
-    if (closeToGroundEvent.payload.data() && closeToGroundEvent.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+    if (closeToGroundEvent.payload.data() && closeToGroundEvent.payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid closeToGroundEvent.payload type! Signature: "+QString::number(closeToGroundEvent.payload.data()->getSignature(), 16)+" Setting null value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid closeToGroundEvent.payload type! Signature: "+QString::number(closeToGroundEvent.payload->getSignature(), 16)+" Setting null value!\n");
         closeToGroundEvent.payload = HkxSharedPtr();
     }
     if (boneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": boneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": boneIndex out of range! Setting to last bone index!\n");
         boneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
     }
     if (animBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": animBoneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": animBoneIndex out of range! Setting to last bone index!\n");
         animBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (boneIndex > -1 && animBoneIndex > -1){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": boneIndex and animBoneIndex are both in use at the same time! This will crash the game! Setting boneIndex to -1!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": boneIndex and animBoneIndex are both in use at the same time! This will crash the game! Setting boneIndex to -1!\n");
         boneIndex = -1;
     }
     if (boneIndex < 0 && animBoneIndex < 0 ){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Neither boneIndex and animBoneIndex are in use! Setting animBoneIndex to 0!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Neither boneIndex and animBoneIndex are in use! Setting animBoneIndex to 0!\n");
         animBoneIndex = 0;
     }
     setDataValidity(isvalid);

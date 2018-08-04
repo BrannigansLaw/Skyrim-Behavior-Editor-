@@ -1,92 +1,99 @@
 #include "hkbbehaviorreferencegenerator.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
-/*
- * CLASS: hkbBehaviorReferenceGenerator
-*/
 
 uint hkbBehaviorReferenceGenerator::refCount = 0;
 
-QString hkbBehaviorReferenceGenerator::classname = "hkbBehaviorReferenceGenerator";
+const QString hkbBehaviorReferenceGenerator::classname = "hkbBehaviorReferenceGenerator";
 
 hkbBehaviorReferenceGenerator::hkbBehaviorReferenceGenerator(HkxFile *parent, long ref)
     : hkbGenerator(parent, ref),
       userData(0)
 {
     setType(HKB_BEHAVIOR_REFERENCE_GENERATOR, TYPE_GENERATOR);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "BehaviorReferenceGenerator"+QString::number(refCount);
+    name = "BehaviorReferenceGenerator_"+QString::number(refCount);
 }
 
-QString hkbBehaviorReferenceGenerator::getClassname(){
+const QString hkbBehaviorReferenceGenerator::getClassname(){
     return classname;
 }
 
-bool hkbBehaviorReferenceGenerator::readData(const HkxXmlReader &reader, long index){
+bool hkbBehaviorReferenceGenerator::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "behaviorName"){
             behaviorName = reader.getElementValueAt(index);
-            if (behaviorName == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'behaviorName' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(static_cast<BehaviorFile *>(getParentFile())->getAllBehaviorFileNames().contains(behaviorName, Qt::CaseInsensitive), "behaviorName");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbBehaviorReferenceGenerator::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value, bool allownull){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value, allownull);
+    };
+    if (writer && !getIsWritten()){
         QString refString = "null";
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
+        if (getVariableBindingSetData()){
+            refString = getVariableBindingSet()->getReferenceString();
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("behaviorName"), QString(behaviorName).replace("/", "\\"), true);
+        writedatafield("variableBindingSet", refString, false);
+        writedatafield("userData", QString::number(userData), false);
+        writedatafield("name", name, false);
+        writedatafield("behaviorName", QString(behaviorName).replace("/", "\\"), true);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+        if (getVariableBindingSetData() && !getVariableBindingSet()->write(writer)){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
 }
 
+void hkbBehaviorReferenceGenerator::setName(const QString &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != "") ? name = value : NULL;
+}
+
+void hkbBehaviorReferenceGenerator::setBehaviorName(const QString &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != "") ? behaviorName = value : NULL;
+}
+
 QString hkbBehaviorReferenceGenerator::getBehaviorName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (behaviorName.contains("\\")){
         return behaviorName.section("\\", -1, -1);
     }else if (behaviorName.contains("/")){
         return behaviorName.section("/", -1, -1);
     }
-    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": getBehaviorName()!\nInvalid behaviorName!!!");
+    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": getBehaviorName()!\nInvalid behaviorName!!!");
     return behaviorName;
 }
 
@@ -95,26 +102,25 @@ bool hkbBehaviorReferenceGenerator::link(){
 }
 
 QString hkbBehaviorReferenceGenerator::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
 QString hkbBehaviorReferenceGenerator::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString behaviorname(behaviorName);
     behaviorname.replace("\\", "/");
     QString errors;
-    bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity();
-    if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
-    }
-    if (name == ""){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
-    }
-    if (!static_cast<BehaviorFile *>(getParentFile())->doesBehaviorExist(behaviorname)){
-        isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid behaviorName!: "+behaviorname+"\n");
-    }
+    auto isvalid = true;
+    auto appenderror = [&](bool value, const QString & fieldname){
+        if (!value){
+            isvalid = false;
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid '"+fieldname+"'!\n");
+        }
+    };
+    appenderror((HkDynamicObject::evaluateDataValidity() == ""), "hkbVariableBindingSet");
+    appenderror((name != ""), "name");
+    appenderror(static_cast<BehaviorFile *>(getParentFile())->doesBehaviorExist(behaviorname), "name");
     setDataValidity(isvalid);
     return errors;
 }

@@ -62,7 +62,7 @@ void HandIkDriverInfoUI::loadData(HkxObject *data){
             fadeInOutCurve->addItems(bsData->BlendCurve);
         }
         fadeInOutCurve->setCurrentIndex(bsData->BlendCurve.indexOf(bsData->fadeInOutCurve));
-        for (int i = 0, k; i < bsData->hands.size(); i++){
+        for (auto i = 0, k = 0; i < bsData->hands.size(); i++){
             k = i + BASE_NUMBER_OF_ROWS;
             if (k >= table->rowCount()){
                 table->setRowCount(table->rowCount() + 1);
@@ -75,7 +75,7 @@ void HandIkDriverInfoUI::loadData(HkxObject *data){
                 table->item(k, 1)->setText("hkbHandIkDriverInfoHand");
             }
         }
-        for (int j = bsData->hands.size() + BASE_NUMBER_OF_ROWS; j < table->rowCount(); j++){
+        for (auto j = bsData->hands.size() + BASE_NUMBER_OF_ROWS; j < table->rowCount(); j++){
             table->setRowHidden(j, true);
         }
     }
@@ -84,7 +84,7 @@ void HandIkDriverInfoUI::loadData(HkxObject *data){
 void HandIkDriverInfoUI::setFadeInOutCurve(int index){
     if (bsData){
         bsData->fadeInOutCurve = fadeInOutCurve->itemText(index);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }
 }
 
@@ -104,7 +104,7 @@ void HandIkDriverInfoUI::addHand(){
             table->item(result, 0)->setText("Hand "+QString::number(bsData->hands.size() - 1));
             table->item(result, 1)->setText("hkbHandIkDriverInfoHand");
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }
 }
 

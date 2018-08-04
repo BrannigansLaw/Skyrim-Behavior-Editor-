@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class BSDirectAtModifier: public hkbModifier
+class BSDirectAtModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSDirectAtModifierUI;
 public:
     BSDirectAtModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSDirectAtModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSDirectAtModifier& operator=(const BSDirectAtModifier&) = delete;
+    BSDirectAtModifier(const BSDirectAtModifier &) = delete;
+    ~BSDirectAtModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    BSDirectAtModifier& operator=(const BSDirectAtModifier&);
-    BSDirectAtModifier(const BSDirectAtModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -45,6 +44,7 @@ private:
     bool active;
     qreal currentHeadingOffset;
     qreal currentPitchOffset;
+    mutable std::mutex mutex;
 };
 
 #endif // BSDIRECTATMODIFIER_H

@@ -3,19 +3,21 @@
 
 #include "hkbmodifier.h"
 
-class BSEventOnDeactivateModifier: public hkbModifier
+class BSEventOnDeactivateModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSEventOnDeactivateModifierUI;
 public:
     BSEventOnDeactivateModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSEventOnDeactivateModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSEventOnDeactivateModifier& operator=(const BSEventOnDeactivateModifier&) = delete;
+    BSEventOnDeactivateModifier(const BSEventOnDeactivateModifier &) = delete;
+    ~BSEventOnDeactivateModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
@@ -25,15 +27,13 @@ public:
     QVector <HkxObject *> getChildrenOtherTypes() const;
     bool merge(HkxObject *recessiveObject);
 private:
-    BSEventOnDeactivateModifier& operator=(const BSEventOnDeactivateModifier&);
-    BSEventOnDeactivateModifier(const BSEventOnDeactivateModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
     hkEventPayload event;
+    mutable std::mutex mutex;
 };
 
 #endif // BSEVENTONDEACTIVATEMODIFIER_H

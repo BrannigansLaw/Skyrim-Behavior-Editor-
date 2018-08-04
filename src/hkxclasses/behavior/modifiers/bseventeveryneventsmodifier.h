@@ -3,19 +3,21 @@
 
 #include "hkbmodifier.h"
 
-class BSEventEveryNEventsModifier: public hkbModifier
+class BSEventEveryNEventsModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class BSEventEveryNEventsModifierUI;
 public:
     BSEventEveryNEventsModifier(HkxFile *parent, long ref = 0);
-    virtual ~BSEventEveryNEventsModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSEventEveryNEventsModifier& operator=(const BSEventEveryNEventsModifier&) = delete;
+    BSEventEveryNEventsModifier(const BSEventEveryNEventsModifier &) = delete;
+    ~BSEventEveryNEventsModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
@@ -25,11 +27,8 @@ public:
     QVector <HkxObject *> getChildrenOtherTypes() const;
     bool merge(HkxObject *recessiveObject);
 private:
-    BSEventEveryNEventsModifier& operator=(const BSEventEveryNEventsModifier&);
-    BSEventEveryNEventsModifier(const BSEventEveryNEventsModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -38,6 +37,7 @@ private:
     int numberOfEventsBeforeSend;
     int minimumNumberOfEventsBeforeSend;
     bool randomizeNumberOfEvents;
+    mutable std::mutex mutex;
 };
 
 #endif // BSEVENTEVERYNEVENTSMODIFIER_H

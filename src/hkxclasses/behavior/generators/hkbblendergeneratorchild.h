@@ -4,48 +4,54 @@
 #include "hkbgenerator.h"
 
 class hkbBlenderGenerator;
+class hkbBoneWeightArray;
 
-class hkbBlenderGeneratorChild: public hkbGenerator
+class hkbBlenderGeneratorChild final: public hkbGenerator
 {
-    friend class BehaviorGraphView;
-    friend class hkbBlenderGenerator;
-    friend class hkbPoseMatchingGenerator;
-    friend class BlenderGeneratorUI;
     friend class BlenderGeneratorChildUI;
-    friend class PoseMatchingGeneratorUI;
 public:
     hkbBlenderGeneratorChild(HkxFile *parent, hkbGenerator *parentBG, long ref = 0);
-    virtual ~hkbBlenderGeneratorChild();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
+    hkbBlenderGeneratorChild& operator=(const hkbBlenderGeneratorChild&) = delete;
+    hkbBlenderGeneratorChild(const hkbBlenderGeneratorChild &) = delete;
+    ~hkbBlenderGeneratorChild();
+    bool operator==(const hkbBlenderGeneratorChild & other);
+    QString getName() const;
+    int getThisIndex() const;
+    static const QString getClassname();
     void unlink();
+    bool merge(HkxObject *recessiveObject);
+    void setParentBG(hkbGenerator *blend);
+    QVector <DataIconManager *> getChildren() const;
+    HkxSharedPtr getGenerator() const;
+private:
+    void setBoneWeights(const HkxSharedPtr &value);
+    hkbBoneWeightArray * getBoneWeightsData() const;
+    QString getGeneratorName() const;
+    qreal getWeight() const;
+    void setWeight(const qreal &value);
+    qreal getWorldFromModelWeight() const;
+    void setWorldFromModelWeight(const qreal &value);
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
     bool isParametricBlend() const;
     bool hasChildren() const;
-    QString getName() const;
-    int getThisIndex() const;
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
-    bool merge(HkxObject *recessiveObject);
-    bool operator==(const hkbBlenderGeneratorChild & other);
-private:
-    QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int, DataIconManager *obj);
     bool removeObjectAt(int index);
     hkbGenerator *getParentGenerator() const;
-    hkbBlenderGeneratorChild& operator=(const hkbBlenderGeneratorChild&);
-    hkbBlenderGeneratorChild(const hkbBlenderGeneratorChild &);
 private:
     static uint refCount;
-    static QString classname;
-    HkxSharedPtr parentBG;  //TO DO: Change to raw ptr...
+    static const QString classname;
+    hkbGenerator *parentBG;
     HkxSharedPtr generator;
     HkxSharedPtr boneWeights;
     qreal weight;
     qreal worldFromModelWeight;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBBLENDERGENERATORCHILD_H

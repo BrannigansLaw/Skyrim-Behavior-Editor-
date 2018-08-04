@@ -39,7 +39,7 @@ private:
     void disconnectSignals();
     //bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
     //void setBindingVariable(int index, const QString & name);
-    //void loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path);
+    //void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
     //void selectTableToView(bool viewproperties, const QString & path);
     void eventRenamed(const QString & name, int index);
     //void variableRenamed(const QString & name, int index);

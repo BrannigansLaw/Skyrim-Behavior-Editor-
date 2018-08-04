@@ -256,7 +256,7 @@ void LookAtModifierUI::loadData(HkxObject *data){
             isOn->setChecked(bsData->isOn);
             individualLimitsOn->setChecked(bsData->individualLimitsOn);
             isTargetInsideLimitCone->setChecked(bsData->isTargetInsideLimitCone);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(ENABLE_ROW, BINDING_COLUMN, varBind, "enable");
                 loadBinding(TARGET_WS_ROW, BINDING_COLUMN, varBind, "targetWS");
@@ -312,7 +312,7 @@ void LookAtModifierUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
         }
     }else{
@@ -323,7 +323,7 @@ void LookAtModifierUI::setName(){
 void LookAtModifierUI::setEnable(){
     if (bsData){
         bsData->enable = enable->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setEnable(): The data is nullptr!!");
     }
@@ -333,7 +333,7 @@ void LookAtModifierUI::setTargetWS(){
     if (bsData){
         if (bsData->targetWS != targetWS->value()){
             bsData->targetWS = targetWS->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::settargetWS(): The data is nullptr!!");
@@ -344,7 +344,7 @@ void LookAtModifierUI::setHeadForwardLS(){
     if (bsData){
         if (bsData->headForwardLS != headForwardLS->value()){
             bsData->headForwardLS = headForwardLS->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setheadForwardLS(): The data is nullptr!!");
@@ -355,7 +355,7 @@ void LookAtModifierUI::setNeckForwardLS(){
     if (bsData){
         if (bsData->neckForwardLS != neckForwardLS->value()){
             bsData->neckForwardLS = neckForwardLS->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setneckForwardLS(): The data is nullptr!!");
@@ -366,7 +366,7 @@ void LookAtModifierUI::setNeckRightLS(){
     if (bsData){
         if (bsData->neckRightLS != neckRightLS->value()){
             bsData->neckRightLS = neckRightLS->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setneckRightLS(): The data is nullptr!!");
@@ -377,7 +377,7 @@ void LookAtModifierUI::setEyePositionHS(){
     if (bsData){
         if (bsData->eyePositionHS != eyePositionHS->value()){
             bsData->eyePositionHS = eyePositionHS->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::seteyePositionHS(): The data is nullptr!!");
@@ -388,7 +388,7 @@ void LookAtModifierUI::setNewTargetGain(){
     if (bsData){
         if (bsData->newTargetGain != newTargetGain->value()){
             bsData->newTargetGain = newTargetGain->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setnewTargetGain(): The data is nullptr!!");
@@ -399,7 +399,7 @@ void LookAtModifierUI::setOnGain(){
     if (bsData){
         if (bsData->onGain != onGain->value()){
             bsData->onGain = onGain->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setonGain(): The data is nullptr!!");
@@ -410,7 +410,7 @@ void LookAtModifierUI::setOffGain(){
     if (bsData){
         if (bsData->offGain != offGain->value()){
             bsData->offGain = offGain->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setoffGain(): The data is nullptr!!");
@@ -421,7 +421,7 @@ void LookAtModifierUI::setLimitAngleDegrees(){
     if (bsData){
         if (bsData->limitAngleDegrees != limitAngleDegrees->value()){
             bsData->limitAngleDegrees = limitAngleDegrees->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setLimitAngleDegrees(): The data is nullptr!!");
@@ -432,7 +432,7 @@ void LookAtModifierUI::setLimitAngleLeft(){
     if (bsData){
         if (bsData->limitAngleLeft != limitAngleLeft->value()){
             bsData->limitAngleLeft = limitAngleLeft->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setlimitAngleLeft(): The data is nullptr!!");
@@ -443,7 +443,7 @@ void LookAtModifierUI::setLimitAngleRight(){
     if (bsData){
         if (bsData->limitAngleRight != limitAngleRight->value()){
             bsData->limitAngleRight = limitAngleRight->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setlimitAngleRight(): The data is nullptr!!");
@@ -454,7 +454,7 @@ void LookAtModifierUI::setLimitAngleUp(){
     if (bsData){
         if (bsData->limitAngleUp != limitAngleUp->value()){
             bsData->limitAngleUp = limitAngleUp->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setlimitAngleUp(): The data is nullptr!!");
@@ -465,7 +465,7 @@ void LookAtModifierUI::setLimitAngleDown(){
     if (bsData){
         if (bsData->limitAngleDown != limitAngleDown->value()){
             bsData->limitAngleDown = limitAngleDown->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setlimitAngleDown(): The data is nullptr!!");
@@ -475,7 +475,7 @@ void LookAtModifierUI::setLimitAngleDown(){
 void LookAtModifierUI::setHeadIndex(int index){
     if (bsData){
         bsData->headIndex = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setheadIndex(): The data is nullptr!!");
     }
@@ -484,7 +484,7 @@ void LookAtModifierUI::setHeadIndex(int index){
 void LookAtModifierUI::setNeckIndex(int index){
     if (bsData){
         bsData->neckIndex = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setneckIndex(): The data is nullptr!!");
     }
@@ -493,7 +493,7 @@ void LookAtModifierUI::setNeckIndex(int index){
 void LookAtModifierUI::setIsOn(){
     if (bsData){
         bsData->isOn = isOn->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setisOn(): The data is nullptr!!");
     }
@@ -502,7 +502,7 @@ void LookAtModifierUI::setIsOn(){
 void LookAtModifierUI::setIndividualLimitsOn(){
     if (bsData){
         bsData->individualLimitsOn = individualLimitsOn->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setindividualLimitsOn(): The data is nullptr!!");
     }
@@ -511,7 +511,7 @@ void LookAtModifierUI::setIndividualLimitsOn(){
 void LookAtModifierUI::setIsTargetInsideLimitCone(){
     if (bsData){
         bsData->isTargetInsideLimitCone = isTargetInsideLimitCone->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setisTargetInsideLimitCone(): The data is nullptr!!");
     }
@@ -648,14 +648,14 @@ void LookAtModifierUI::viewSelected(int row, int column){
 void LookAtModifierUI::selectTableToView(bool viewisProperty, const QString & path){
     if (bsData){
         if (viewisProperty){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -668,7 +668,7 @@ void LookAtModifierUI::selectTableToView(bool viewisProperty, const QString & pa
 void LookAtModifierUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
         if (bind){
             int bindIndex = bind->getVariableIndexOfBinding("enable");
             if (bindIndex == index){
@@ -753,16 +753,16 @@ void LookAtModifierUI::variableRenamed(const QString & name, int index){
 }
 
 bool LookAtModifierUI::setBinding(int index, int row, const QString &variableName, const QString &path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -774,7 +774,7 @@ bool LookAtModifierUI::setBinding(int index, int row, const QString &variableNam
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -906,13 +906,13 @@ void LookAtModifierUI::setBindingVariable(int index, const QString &name){
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("LookAtModifierUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-void LookAtModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void LookAtModifierUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -920,7 +920,7 @@ void LookAtModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *v
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -928,7 +928,7 @@ void LookAtModifierUI::loadBinding(int row, int colunm, hkbVariableBindingSet *v
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("LookAtModifierUI::loadBinding(): The variable binding set is nullptr!!");
         }

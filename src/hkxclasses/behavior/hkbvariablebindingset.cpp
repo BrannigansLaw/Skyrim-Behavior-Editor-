@@ -5,35 +5,33 @@
 #include "hkbbehaviorgraphstringdata.h"
 #include "hkbvariablevalueset.h"
 
-/*
- * CLASS: hkbVariableBindingSet
-*/
-
 uint hkbVariableBindingSet::refCount = 0;
 
-QString hkbVariableBindingSet::classname = "hkbVariableBindingSet";
+const QString hkbVariableBindingSet::classname = "hkbVariableBindingSet";
 
 hkbVariableBindingSet::hkbVariableBindingSet(HkxFile *parent, long ref)
     : HkxObject(parent, ref),
       indexOfBindingToEnable(-1)
 {
     setType(HKB_VARIABLE_BINDING_SET, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
-QString hkbVariableBindingSet::getClassname(){
+const QString hkbVariableBindingSet::getClassname(){
     return classname;
 }
 
 int hkbVariableBindingSet::getNumberOfBindings() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return bindings.size();
 }
 
 bool hkbVariableBindingSet::addBinding(const QString & path, int varIndex, hkBinding::BindingType type){
-    int index = -1;
-    bool exists = false;
-    for (int i = 0; i < bindings.size(); i++){//Do this for below but remove the binding if the paths are the same...
+    std::lock_guard <std::mutex> guard(mutex);
+    auto index = -1;
+    auto exists = false;
+    for (auto i = 0; i < bindings.size(); i++){//Do this for below but remove the binding if the paths are the same...
         if (bindings.at(i).memberPath == path){
             if (type == hkBinding::BINDING_TYPE_VARIABLE){
                 bindings[i].variableIndex = varIndex;
@@ -66,37 +64,34 @@ bool hkbVariableBindingSet::addBinding(const QString & path, int varIndex, hkBin
         if (path == "enable"){
             indexOfBindingToEnable = bindings.size() - 1;
         }
-        return true;
     }
     return true;
 }
 
 void hkbVariableBindingSet::removeBinding(const QString & path){
-    for (int i = 0; i < bindings.size(); i++){
-        if (bindings.at(i).memberPath == path){
-            bindings.removeAt(i);
-        }
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < bindings.size(); i++){
+        (bindings.at(i).memberPath == path) ? bindings.removeAt(i) : NULL;
     }
 }
 
 void hkbVariableBindingSet::removeBinding(int varIndex){
-    for (int i = 0; i < bindings.size(); i++){
-        if (bindings.at(i).variableIndex == varIndex){
-            bindings.removeAt(i);
-        }
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < bindings.size(); i++){
+        (bindings.at(i).variableIndex == varIndex) ? bindings.removeAt(i) : NULL;
     }
 }
 
 QString hkbVariableBindingSet::getPathOfBindingAt(int index){
+    std::lock_guard <std::mutex> guard(mutex);
     QString path;
-    if (index < bindings.size() && index >= 0){
-        path = bindings.at(index).memberPath;
-    }
+    (index < bindings.size() && index >= 0) ? path = bindings.at(index).memberPath : NULL;
     return path;
 }
 
 int hkbVariableBindingSet::getVariableIndexOfBinding(const QString & path) const{
-    for (int i = 0; i < bindings.size(); i++){
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < bindings.size(); i++){
         if (bindings.at(i).memberPath == path){
             /*if (bindings.at(i).bindingType == hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                 //return static_cast<BehaviorFile *>(getParentFile())->findCharacterPropertyIndexFromCharacter(bindings.at(i).variableIndex);
@@ -111,6 +106,7 @@ int hkbVariableBindingSet::getVariableIndexOfBinding(const QString & path) const
 }
 
 hkbVariableBindingSet::hkBinding::BindingType hkbVariableBindingSet::getBindingType(int index) const{
+    std::lock_guard <std::mutex> guard(mutex);
     if (index < bindings.size() && index >= 0){
         return bindings.at(index).bindingType;
     }
@@ -118,7 +114,8 @@ hkbVariableBindingSet::hkBinding::BindingType hkbVariableBindingSet::getBindingT
 }
 
 hkbVariableBindingSet::hkBinding::BindingType hkbVariableBindingSet::getBindingType(const QString & path) const{
-    for (int i = 0; i < bindings.size(); i++){
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < bindings.size(); i++){
         if (bindings.at(i).memberPath == path){
             return bindings.at(i).bindingType;
         }
@@ -126,66 +123,64 @@ hkbVariableBindingSet::hkBinding::BindingType hkbVariableBindingSet::getBindingT
     return hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE;
 }
 
-bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long index){
+bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
+    int numbinds;
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    int numtrans = 0;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "bindings"){
-            numtrans = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                return false;
-            }
-            for (int j = 0; j < numtrans; j++){
+            numbinds = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            checkvalue(ok, "bindings");
+            (numbinds > 0) ? index++ : NULL;
+            for (auto j = 0; j < numbinds; j++, index++){
                 bindings.append(hkBinding());
-                while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-                    if (reader.getNthAttributeValueAt(index, 0) == "memberPath"){
+                for (; index < reader.getNumElements(); index++){
+                    text = reader.getNthAttributeValueAt(index, 0);
+                    if (text == "memberPath"){
                         bindings.last().memberPath = reader.getElementValueAt(index);
-                        if (bindings.last().memberPath == ""){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'memberPath' data field!\nObject Reference: "+ref);
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "variableIndex"){
+                        checkvalue((bindings.last().memberPath != ""), "bindings.at("+QString::number(j)+").memberPath");
+                    }else if (text == "variableIndex"){
                         bindings.last().variableIndex = reader.getElementValueAt(index).toInt(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableIndex' data field!\nObject Reference: "+ref);
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "bitIndex"){
+                        checkvalue(ok, "bindings.at("+QString::number(j)+").variableIndex");
+                    }else if (text == "bitIndex"){
                         bindings.last().bitIndex = reader.getElementValueAt(index).toInt(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'bitIndex' data field!\nObject Reference: "+ref);
-                        }
-                    }else if(reader.getNthAttributeValueAt(index, 0) == "bindingType"){
-                        if (reader.getElementValueAt(index) == "BINDING_TYPE_VARIABLE"){
+                        checkvalue(ok, "bindings.at("+QString::number(j)+").bitIndex");
+                    }else if (text == "bindingType"){
+                        text = reader.getElementValueAt(index);
+                        if (text == "BINDING_TYPE_VARIABLE"){
                             bindings.last().bindingType = hkBinding::BINDING_TYPE_VARIABLE;
-                        }else if (reader.getElementValueAt(index) == "BINDING_TYPE_CHARACTER_PROPERTY"){
+                        }else if (text == "BINDING_TYPE_CHARACTER_PROPERTY"){
                             bindings.last().bindingType = hkBinding::BINDING_TYPE_CHARACTER_PROPERTY;
                         }else{
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\n'bindingType' data field contains an invalid string!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'bindingType' data field contains an invalid string!\nObject Reference: "+ref);
                         }
-                        index++;
                         break;
+                    }else{
+                        //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                     }
-                    index++;
                 }
             }
+            (numbinds > 0) ? index-- : NULL;
         }else if (text == "indexOfBindingToEnable"){
             indexOfBindingToEnable = reader.getElementValueAt(index).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'indexOfBindingToEnable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "indexOfBindingToEnable");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbVariableBindingSet::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (writer && !getIsWritten()){
         QString string;
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
@@ -193,7 +188,7 @@ bool hkbVariableBindingSet::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"bindings", QString::number(bindings.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < bindings.size(); i++){
+        for (auto i = 0; i < bindings.size(); i++){
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("memberPath"), bindings.at(i).memberPath);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableIndex"), QString::number(bindings.at(i).variableIndex));
@@ -218,6 +213,7 @@ bool hkbVariableBindingSet::write(HkxXMLWriter *writer){
 }
 
 bool hkbVariableBindingSet::isVariableRefed(int variableindex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < bindings.size(); i++){
         if (bindings.at(i).variableIndex == variableindex && bindings.at(i).bindingType == hkBinding::BINDING_TYPE_VARIABLE){
             return true;
@@ -227,6 +223,7 @@ bool hkbVariableBindingSet::isVariableRefed(int variableindex) const{
 }
 
 void hkbVariableBindingSet::updateVariableIndices(int index){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < bindings.size(); i++){
         if (bindings.at(i).variableIndex > index && bindings.at(i).bindingType == hkBinding::BINDING_TYPE_VARIABLE){
             bindings[i].variableIndex--;
@@ -235,6 +232,7 @@ void hkbVariableBindingSet::updateVariableIndices(int index){
 }
 
 void hkbVariableBindingSet::mergeVariableIndex(int oldindex, int newindex){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < bindings.size(); i++){
         if (bindings.at(i).variableIndex == oldindex && bindings.at(i).bindingType == hkBinding::BINDING_TYPE_VARIABLE){
             bindings[i].variableIndex = newindex;
@@ -243,6 +241,7 @@ void hkbVariableBindingSet::mergeVariableIndex(int oldindex, int newindex){
 }
 
 bool hkbVariableBindingSet::fixMergedIndices(BehaviorFile *dominantfile){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphData *recdata;
     hkbBehaviorGraphData *domdata;
     QString thisvarname;
@@ -257,7 +256,7 @@ bool hkbVariableBindingSet::fixMergedIndices(BehaviorFile *dominantfile){
                 varindex = domdata->getIndexOfVariable(thisvarname);
                 if (varindex == -1){
                     domdata->addVariable(recdata->getVariableTypeAt(bindings.at(i).variableIndex), thisvarname);
-                    varindex = domdata->variableInfos.size() - 1;
+                    varindex = domdata->getNumberOfVariables() - 1;
                 }
                 bindings[i].variableIndex = varindex;
             }
@@ -271,7 +270,8 @@ bool hkbVariableBindingSet::fixMergedIndices(BehaviorFile *dominantfile){
     return true;
 }
 
-bool hkbVariableBindingSet::merge(HkxObject *recessiveObject){
+bool hkbVariableBindingSet::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     bool found;
     hkbVariableBindingSet *obj = nullptr;
     hkbBehaviorGraphData *thisdata;
@@ -282,8 +282,8 @@ bool hkbVariableBindingSet::merge(HkxObject *recessiveObject){
     //TO DO: Support character properties...
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_VARIABLE_BINDING_SET){
         obj = static_cast<hkbVariableBindingSet *>(recessiveObject);
-        thisdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->graphData.data());
-        otherdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(obj->getParentFile())->graphData.data());
+        thisdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(getParentFile())->getBehaviorGraphData());
+        otherdata = static_cast<hkbBehaviorGraphData *>(static_cast<BehaviorFile *>(obj->getParentFile())->getBehaviorGraphData());
         if (thisdata && otherdata){
             for (auto i = 0; i < obj->bindings.size(); i++){
                 found = false;
@@ -297,7 +297,7 @@ bool hkbVariableBindingSet::merge(HkxObject *recessiveObject){
                     varindex = thisdata->getIndexOfVariable(othervarname);
                     if (varindex == -1){
                         thisdata->addVariable(otherdata->getVariableTypeAt(obj->bindings.at(i).variableIndex), othervarname);
-                        varindex = thisdata->variableInfos.size() - 1;
+                        varindex = thisdata->getNumberOfVariables() - 1;
                         obj->bindings[i].variableIndex = varindex;
                         bindings.append(obj->bindings.at(i));
                     }
@@ -318,25 +318,26 @@ bool hkbVariableBindingSet::link(){
 }
 
 QString hkbVariableBindingSet::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     if (bindings.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": bindings is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": bindings is empty!\n");
     }else{
         for (auto i = 0; i < bindings.size(); i++){
             if (bindings.at(i).memberPath == ""){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": memberPath is null string!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": memberPath is null string!\n");
             }
             if (bindings.at(i).bindingType == hkBinding::BINDING_TYPE_VARIABLE && bindings.at(i).variableIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfVariables()){
                 //isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": variableIndex at "+QString::number(i)+" out of range! Setting to last variable index!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableIndex at "+QString::number(i)+" out of range! Setting to last variable index!\n");
                 bindings[i].variableIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfVariables() - 1;
             }
             /*if (bindings.at(i).bindingType == hkBinding::BINDING_TYPE_CHARACTER_PROPERTY && bindings.at(i).variableIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfCharacterProperties()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": variableIndex at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableIndex at "+QString::number(i)+" out of range!\n");
             }*/
         }
     }

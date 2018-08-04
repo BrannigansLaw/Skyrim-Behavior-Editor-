@@ -3,32 +3,30 @@
 
 #include "hkbgenerator.h"
 
-class BSOffsetAnimationGenerator: public hkbGenerator
+class BSOffsetAnimationGenerator final: public hkbGenerator
 {
-    friend class BehaviorGraphView;
     friend class BSOffsetAnimationGeneratorUI;
 public:
     BSOffsetAnimationGenerator(HkxFile *parent, long ref = 0);
-    virtual ~BSOffsetAnimationGenerator();
-    bool readData(const HkxXmlReader & reader, long index);
+    BSOffsetAnimationGenerator& operator=(const BSOffsetAnimationGenerator&) = delete;
+    BSOffsetAnimationGenerator(const BSOffsetAnimationGenerator &) = delete;
+    ~BSOffsetAnimationGenerator();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
-    int getIndexToInsertIcon() const;
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
-private:
-    QList <DataIconManager *> getChildren() const;
+    QVector <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int index, DataIconManager *obj);
     bool removeObjectAt(int index);
-    BSOffsetAnimationGenerator& operator=(const BSOffsetAnimationGenerator&);
-    BSOffsetAnimationGenerator(const BSOffsetAnimationGenerator &);
 private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     ulong userData;
     QString name;
     HkxSharedPtr pDefaultGenerator;
@@ -36,6 +34,7 @@ private:
     qreal fOffsetVariable;
     qreal fOffsetRangeStart;
     qreal fOffsetRangeEnd;
+    mutable std::mutex mutex;
 };
 
 #endif // BSOFFSETANIMATIONGENERATOR_H

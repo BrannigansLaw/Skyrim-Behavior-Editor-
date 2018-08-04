@@ -151,7 +151,7 @@ void BSCyclicBlendTransitionGeneratorUI::loadData(HkxObject *data){
             }else{
                 table->item(BLENDER_GENERATOR_ROW, VALUE_COLUMN)->setText("NONE");
             }
-            hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(BLEND_PARAMETER_ROW, BINDING_COLUMN, varBind, "fBlendParameter");
                 loadBinding(TRANSITION_DURATION_ROW, BINDING_COLUMN, varBind, "fTransitionDuration");
@@ -174,7 +174,7 @@ void BSCyclicBlendTransitionGeneratorUI::setName(){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSCyclicBlendTransitionGeneratorUI::setName(): The data is nullptr!!");
@@ -185,7 +185,7 @@ void BSCyclicBlendTransitionGeneratorUI::setBlendParameter(){
     if (bsData){
         if (bsData->fBlendParameter != fBlendParameter->value()){
             bsData->fBlendParameter = fBlendParameter->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setBlendParameter(): The data is nullptr!!");
@@ -196,7 +196,7 @@ void BSCyclicBlendTransitionGeneratorUI::setTransitionDuration(){
     if (bsData){
         if (bsData->fTransitionDuration != fTransitionDuration->value()){
             bsData->fTransitionDuration = fTransitionDuration->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setTransitionDuration(): The data is nullptr!!");
@@ -206,7 +206,7 @@ void BSCyclicBlendTransitionGeneratorUI::setTransitionDuration(){
 void BSCyclicBlendTransitionGeneratorUI::setBlendCurve(int index){
     if (bsData){
         bsData->eBlendCurve = bsData->BlendCurve.at(index);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSCyclicBlendTransitionGeneratorUI::setBlendCurve(): The data is nullptr!!");
     }
@@ -227,7 +227,7 @@ void BSCyclicBlendTransitionGeneratorUI::toggleEventToFreezeBlendValue(bool enab
             bsData->eventToFreezeBlendValue.id = -1;
             bsData->eventToFreezeBlendValue.payload = HkxSharedPtr();
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSCyclicBlendTransitionGeneratorUI::toggleEventToFreezeBlendValue(): The data is nullptr!!");
@@ -249,7 +249,7 @@ void BSCyclicBlendTransitionGeneratorUI::toggleEventToCrossBlend(bool enable){
             bsData->eventToCrossBlend.id = -1;
             bsData->eventToCrossBlend.payload = HkxSharedPtr();
             static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSCyclicBlendTransitionGeneratorUI::toggleEventToCrossBlend(): The data is nullptr!!");
@@ -259,14 +259,14 @@ void BSCyclicBlendTransitionGeneratorUI::toggleEventToCrossBlend(bool enable){
 void BSCyclicBlendTransitionGeneratorUI::selectTableToView(bool viewproperties, const QString & path){
     if (bsData){
         if (viewproperties){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -296,7 +296,7 @@ void BSCyclicBlendTransitionGeneratorUI::viewSelectedChild(int row, int column){
             }
         }else if (column == VALUE_COLUMN){
             if (row == BLENDER_GENERATOR_ROW){
-                emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pBlenderGenerator) + 1, hkbBlenderGenerator::getClassname(), QStringList());
+                emit viewGenerators(bsData->getIndexOfGenerator(bsData->pBlenderGenerator) + 1, hkbBlenderGenerator::getClassname(), QStringList());
             }
         }
     }else{
@@ -332,7 +332,7 @@ void BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(int index, const QS
             }
             behaviorView->removeGeneratorData();
             table->item(BLENDER_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             CRITICAL_ERROR_MESSAGE("BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(): The 'behaviorView' pointer is nullptr!!");
         }
@@ -341,7 +341,7 @@ void BSCyclicBlendTransitionGeneratorUI::setBlenderGenerator(int index, const QS
     }
 }
 
-void BSCyclicBlendTransitionGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void BSCyclicBlendTransitionGeneratorUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -349,7 +349,7 @@ void BSCyclicBlendTransitionGeneratorUI::loadBinding(int row, int colunm, hkbVar
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -357,7 +357,7 @@ void BSCyclicBlendTransitionGeneratorUI::loadBinding(int row, int colunm, hkbVar
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("BSCyclicBlendTransitionGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
         }
@@ -367,16 +367,16 @@ void BSCyclicBlendTransitionGeneratorUI::loadBinding(int row, int colunm, hkbVar
 }
 
 bool BSCyclicBlendTransitionGeneratorUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 varBind->addBinding(path, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY);
@@ -384,7 +384,7 @@ bool BSCyclicBlendTransitionGeneratorUI::setBinding(int index, int row, const QS
                 varBind->addBinding(path, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -415,7 +415,7 @@ void BSCyclicBlendTransitionGeneratorUI::setBindingVariable(int index, const QSt
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSCyclicBlendTransitionGeneratorUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
     }
@@ -462,7 +462,7 @@ void BSCyclicBlendTransitionGeneratorUI::variableRenamed(const QString & name, i
     }
     if (bsData){
         index--;
-        bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        bind = bsData->getVariableBindingSetData();
         if (bind){
             bindIndex = bind->getVariableIndexOfBinding("fBlendParameter");
             if (bindIndex == index){

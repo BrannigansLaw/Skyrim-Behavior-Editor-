@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class hkbTransformVectorModifier: public hkbModifier
+class hkbTransformVectorModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class TransformVectorModifierUI;
 public:
     hkbTransformVectorModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbTransformVectorModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbTransformVectorModifier& operator=(const hkbTransformVectorModifier&) = delete;
+    hkbTransformVectorModifier(const hkbTransformVectorModifier &) = delete;
+    ~hkbTransformVectorModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbTransformVectorModifier& operator=(const hkbTransformVectorModifier&);
-    hkbTransformVectorModifier(const hkbTransformVectorModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -34,6 +33,7 @@ private:
     bool inverse;
     bool computeOnActivate;
     bool computeOnModify;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBTRANSFORMVECTORMODIFIER_H

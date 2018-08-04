@@ -3,13 +3,9 @@
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
-/*
- * CLASS: hkbFootIkControlsModifier
-*/
-
 uint hkbFootIkControlsModifier::refCount = 0;
 
-QString hkbFootIkControlsModifier::classname = "hkbFootIkControlsModifier";
+const QString hkbFootIkControlsModifier::classname = "hkbFootIkControlsModifier";
 
 hkbFootIkControlsModifier::hkbFootIkControlsModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
@@ -17,195 +13,162 @@ hkbFootIkControlsModifier::hkbFootIkControlsModifier(HkxFile *parent, long ref)
       enable(true)
 {
     setType(HKB_FOOT_IK_CONTROLS_MODIFIER, TYPE_MODIFIER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
-    name = "FootIkControlsModifier"+QString::number(refCount);
+    name = "FootIkControlsModifier_"+QString::number(refCount);
 }
 
-QString hkbFootIkControlsModifier::getClassname(){
+const QString hkbFootIkControlsModifier::getClassname(){
     return classname;
 }
 
 QString hkbFootIkControlsModifier::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-bool hkbFootIkControlsModifier::readData(const HkxXmlReader &reader, long index){
+bool hkbFootIkControlsModifier::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
+    int numlegs;
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "userData"){
             userData = reader.getElementValueAt(index).toULong(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'userData' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "userData");
         }else if (text == "name"){
             name = reader.getElementValueAt(index);
-            if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
-            }
+            checkvalue((name != ""), "name");
         }else if (text == "enable"){
             enable = toBool(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'enable' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "onOffGain"){
             gains.onOffGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'onOffGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "enable");
         }else if (text == "groundAscendingGain"){
             gains.groundAscendingGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'groundAscendingGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "groundAscendingGain");
         }else if (text == "groundDescendingGain"){
             gains.groundDescendingGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'groundDescendingGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "groundDescendingGain");
         }else if (text == "footPlantedGain"){
             gains.footPlantedGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'footPlantedGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "footPlantedGain");
         }else if (text == "footRaisedGain"){
             gains.footRaisedGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'footRaisedGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "footRaisedGain");
         }else if (text == "footUnlockGain"){
             gains.footUnlockGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'footUnlockGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "footUnlockGain");
         }else if (text == "worldFromModelFeedbackGain"){
             gains.worldFromModelFeedbackGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'worldFromModelFeedbackGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "worldFromModelFeedbackGain");
         }else if (text == "errorUpDownBias"){
             gains.errorUpDownBias = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'errorUpDownBias' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "errorUpDownBias");
         }else if (text == "alignWorldFromModelGain"){
             gains.alignWorldFromModelGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'alignWorldFromModelGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "alignWorldFromModelGain");
         }else if (text == "hipOrientationGain"){
             gains.hipOrientationGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'hipOrientationGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "hipOrientationGain");
         }else if (text == "maxKneeAngleDifference"){
             gains.maxKneeAngleDifference = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'maxKneeAngleDifference' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "maxKneeAngleDifference");
         }else if (text == "ankleOrientationGain"){
             gains.ankleOrientationGain = reader.getElementValueAt(index).toDouble(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'ankleOrientationGain' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "ankleOrientationGain");
         }else if (text == "legs"){
-            int numlegs = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                return false;
-            }
-            for (int j = 0; j < numlegs; j++){
+            numlegs = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            checkvalue(ok, "legs");
+            (numlegs > 0) ? index++ : NULL;
+            for (auto j = 0; j < numlegs; j++, index++){
                 legs.append(hkLeg());
-                while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+                for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
+                    text = reader.getNthAttributeValueAt(index, 0);
                     if (text == "groundPosition"){
                         legs.last().groundPosition = readVector4(reader.getElementValueAt(index), &ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'groundPosition' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "legs.at("+QString::number(j)+").groundPosition");
                     }else if (text == "id"){
                         legs.last().id = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'id' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "legs.at("+QString::number(j)+").id");
                     }else if (text == "payload"){
-                        if (!legs.last().payload.readShdPtrReference(index, reader)){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'payload' reference!\nObject Reference: "+ref);
-                        }
+                        checkvalue(legs.last().payload.readShdPtrReference(index, reader), "legs.at("+QString::number(j)+").payload");
                     }else if (text == "verticalError"){
                         legs.last().verticalError = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'verticalError' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "legs.at("+QString::number(j)+").verticalError");
                     }else if (text == "hitSomething"){
                         legs.last().hitSomething = toBool(reader.getElementValueAt(index), &ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'hitSomething' data field!\nObject Reference: "+ref);
-                        }
+                        checkvalue(ok, "legs.at("+QString::number(j)+").hitSomething");
                     }else if (text == "isPlantedMS"){
                         legs.last().isPlantedMS = toBool(reader.getElementValueAt(index), &ok);
-                        if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'isPlantedMS' data field!\nObject Reference: "+ref);
-                        }
-                        index++;
+                        checkvalue(ok, "legs.at("+QString::number(j)+").isPlantedMS");
                         break;
+                    }else{
+                        //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                     }
-                    index++;
                 }
             }
+            (numlegs > 0) ? index-- : NULL;
         }else if (text == "errorOutTranslation"){
             errorOutTranslation = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'errorOutTranslation' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "errorOutTranslation");
         }else if (text == "alignWithGroundRotation"){
             alignWithGroundRotation = readVector4(reader.getElementValueAt(index), &ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'alignWithGroundRotation' data field!\nObject Reference: "+ref);
-            }
+            checkvalue(ok, "alignWithGroundRotation");
+        }else{
+            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbFootIkControlsModifier::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    auto writeref = [&](const HkxSharedPtr & shdptr, const QString & name){
         QString refString = "null";
+        (shdptr.data()) ? refString = shdptr->getReferenceString() : NULL;
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), refString);
+    };
+    auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
+        if (shdptr.data() && !shdptr->write(writer))
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+    };
+    if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
-        }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("userData"), QString::number(userData));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), name);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("enable"), getBoolAsString(enable));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("controlData"), "");
+        writeref(getVariableBindingSet(), "variableBindingSet");
+        writedatafield("userData", QString::number(userData));
+        writedatafield("name", name);
+        writedatafield("enable", getBoolAsString(enable));
+        writedatafield("controlData", "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("gains"), "");
+        writedatafield("gains", "");
         writer->writeLine(writer->object, true);
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("onOffGain"), QString::number(gains.onOffGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("groundAscendingGain"), QString::number(gains.groundAscendingGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("groundDescendingGain"), QString::number(gains.groundDescendingGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("footPlantedGain"), QString::number(gains.footPlantedGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("footRaisedGain"), QString::number(gains.footRaisedGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("footUnlockGain"), QString::number(gains.footUnlockGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("worldFromModelFeedbackGain"), QString::number(gains.worldFromModelFeedbackGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("errorUpDownBias"), QString::number(gains.errorUpDownBias, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("alignWorldFromModelGain"), QString::number(gains.alignWorldFromModelGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("hipOrientationGain"), QString::number(gains.hipOrientationGain, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("maxKneeAngleDifference"), QString::number(gains.maxKneeAngleDifference, char('f'), 6));
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("ankleOrientationGain"), QString::number(gains.ankleOrientationGain, char('f'), 6));
+        writedatafield("onOffGain", QString::number(gains.onOffGain, char('f'), 6));
+        writedatafield("groundAscendingGain", QString::number(gains.groundAscendingGain, char('f'), 6));
+        writedatafield("groundDescendingGain", QString::number(gains.groundDescendingGain, char('f'), 6));
+        writedatafield("footPlantedGain", QString::number(gains.footPlantedGain, char('f'), 6));
+        writedatafield("footRaisedGain", QString::number(gains.footRaisedGain, char('f'), 6));
+        writedatafield("footUnlockGain", QString::number(gains.footUnlockGain, char('f'), 6));
+        writedatafield("worldFromModelFeedbackGain", QString::number(gains.worldFromModelFeedbackGain, char('f'), 6));
+        writedatafield("errorUpDownBias", QString::number(gains.errorUpDownBias, char('f'), 6));
+        writedatafield("alignWorldFromModelGain", QString::number(gains.alignWorldFromModelGain, char('f'), 6));
+        writedatafield("hipOrientationGain", QString::number(gains.hipOrientationGain, char('f'), 6));
+        writedatafield("maxKneeAngleDifference", QString::number(gains.maxKneeAngleDifference, char('f'), 6));
+        writedatafield("ankleOrientationGain", QString::number(gains.ankleOrientationGain, char('f'), 6));
         writer->writeLine(writer->object, false);
         writer->writeLine(writer->parameter, false);
         writer->writeLine(writer->object, false);
@@ -213,46 +176,39 @@ bool hkbFootIkControlsModifier::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"legs", QString::number(legs.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < legs.size(); i++){
+        for (auto i = 0; i < legs.size(); i++){
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("fwdAxisLS"), legs[i].groundPosition.getValueAsString());
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(legs.at(i).id));
-            if (legs.at(i).payload.data()){
-                refString = legs.at(i).payload.data()->getReferenceString();
-            }else{
-                refString = "null";
-            }
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("verticalError"), QString::number(legs.at(i).verticalError, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("hitSomething"), getBoolAsString(legs.at(i).hitSomething));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("isPlantedMS"), getBoolAsString(legs.at(i).isPlantedMS));
+            writedatafield("fwdAxisLS", legs[i].groundPosition.getValueAsString());
+            writedatafield("id", QString::number(legs.at(i).id));
+            writeref(legs.at(i).payload, "legs.at("+QString::number(i)+").payload");
+            writedatafield("verticalError", QString::number(legs.at(i).verticalError, char('f'), 6));
+            writedatafield("hitSomething", getBoolAsString(legs.at(i).hitSomething));
+            writedatafield("isPlantedMS", getBoolAsString(legs.at(i).isPlantedMS));
             writer->writeLine(writer->object, false);
         }
         if (legs.size() > 0){
             writer->writeLine(writer->parameter, false);
         }
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("errorOutTranslation"), errorOutTranslation.getValueAsString());
-        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("alignWithGroundRotation"), alignWithGroundRotation.getValueAsString());
+        writedatafield("errorOutTranslation", errorOutTranslation.getValueAsString());
+        writedatafield("alignWithGroundRotation", alignWithGroundRotation.getValueAsString());
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
-        }
-        for (int i = 0; i < legs.size(); i++){
-            if (legs.at(i).payload.data() && !legs.at(i).payload.data()->write(writer)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
-            }
+        writechild(getVariableBindingSet(), "variableBindingSet");
+        for (auto i = 0; i < legs.size(); i++){
+            writechild(legs.at(i).payload, "legs.at("+QString::number(i)+").payload");
         }
     }
     return true;
 }
 
 int hkbFootIkControlsModifier::getNumberOfLegs() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return legs.size();
 }
 
 bool hkbFootIkControlsModifier::isEventReferenced(int eventindex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < legs.size(); i++){
         if (legs.at(i).id == eventindex){
             return true;
@@ -262,22 +218,21 @@ bool hkbFootIkControlsModifier::isEventReferenced(int eventindex) const{
 }
 
 void hkbFootIkControlsModifier::updateEventIndices(int eventindex){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < legs.size(); i++){
-        if (legs.at(i).id > eventindex){
-            legs[i].id--;
-        }
+        (legs.at(i).id > eventindex) ? legs[i].id-- : NULL;
     }
 }
 
 void hkbFootIkControlsModifier::mergeEventIndex(int oldindex, int newindex){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < legs.size(); i++){
-        if (legs.at(i).id == oldindex){
-            legs[i].id = newindex;
-        }
+        (legs.at(i).id == oldindex) ? legs[i].id = newindex : NULL;
     }
 }
 
 void hkbFootIkControlsModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphData *recdata;
     hkbBehaviorGraphData *domdata;
     QString thiseventname;
@@ -303,28 +258,25 @@ void hkbFootIkControlsModifier::fixMergedEventIndices(BehaviorFile *dominantfile
 
 
 void hkbFootIkControlsModifier::updateReferences(long &ref){
+    std::lock_guard <std::mutex> guard(mutex);
     setReference(ref);
-    ref++;
-    setBindingReference(ref);
+    setBindingReference(++ref);
     for (auto i = 0; i < legs.size(); i++){
-        if (legs.at(i).payload.data()){
-            ref++;
-            legs[i].payload.data()->updateReferences(ref);
-        }
+        (legs.at(i).payload.data()) ? legs[i].payload->updateReferences(++ref) : NULL;
     }
 }
 
 QVector<HkxObject *> hkbFootIkControlsModifier::getChildrenOtherTypes() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QVector<HkxObject *> list;
     for (auto i = 0; i < legs.size(); i++){
-        if (legs.at(i).payload.data()){
-            list.append(legs.at(i).payload.data());
-        }
+        (legs.at(i).payload.data()) ? list.append(legs.at(i).payload.data()) : NULL;
     }
     return list;
 }
 
-bool hkbFootIkControlsModifier::merge(HkxObject *recessiveObject){
+bool hkbFootIkControlsModifier::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+    std::lock_guard <std::mutex> guard(mutex);
     hkbFootIkControlsModifier *recobj;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_FOOT_IK_CONTROLS_MODIFIER){
         recobj = static_cast<hkbFootIkControlsModifier *>(recessiveObject);
@@ -337,20 +289,17 @@ bool hkbFootIkControlsModifier::merge(HkxObject *recessiveObject){
             }
         }
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 bool hkbFootIkControlsModifier::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
     HkxSharedPtr *ptr;
-    for (int i = 0; i < legs.size(); i++){
+    for (auto i = 0; i < legs.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(legs.at(i).payload.getShdPtrReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
@@ -363,39 +312,41 @@ bool hkbFootIkControlsModifier::link(){
 }
 
 void hkbFootIkControlsModifier::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
-    for (int i = 0; i < legs.size(); i++){
+    for (auto i = 0; i < legs.size(); i++){
         legs[i].payload = HkxSharedPtr();
     }
 }
 
 QString hkbFootIkControlsModifier::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     if (legs.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": legs is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": legs is empty!\n");
     }else{
         for (auto i = 0; i < legs.size(); i++){
             if (legs.at(i).id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": id in legs at "+QString::number(i)+" out of range! Setting to max index in range!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": id in legs at "+QString::number(i)+" out of range! Setting to max index in range!\n");
                 legs[i].id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
             }
-            if (legs.at(i).payload.data() && legs.at(i).payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+            if (legs.at(i).payload.data() && legs.at(i).payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid payload type! Signature: "+QString::number(legs.at(i).payload.data()->getSignature(), 16)+" Setting null value!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid payload type! Signature: "+QString::number(legs.at(i).payload->getSignature(), 16)+" Setting null value!\n");
                 legs[i].payload = HkxSharedPtr();
             }
         }
     }
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": "+getName()+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
     }
     setDataValidity(isvalid);
     return errors;

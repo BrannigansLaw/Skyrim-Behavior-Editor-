@@ -66,7 +66,7 @@ private:
     HkxSharedPtr handIkDriverInfo;
     HkxSharedPtr stringData;
     HkxSharedPtr mirroredSkeletonInfo;
-    QList <HkxSharedPtr> boneWeightArrays;
+    QVector <HkxSharedPtr> boneWeightArrays;
     long largestRef;
 };
 

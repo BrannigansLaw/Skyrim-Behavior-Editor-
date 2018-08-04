@@ -319,8 +319,6 @@ HkDataUI::HkDataUI(const QString &title)
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     stateUI->returnPB->setVisible(false);
-    blenderGeneratorChildUI->returnPB->setVisible(false);
-    boneSwitchChildUI->returnPB->setVisible(false);
 
     connect(stateMachineUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
     connect(stateUI, SIGNAL(generatorNameChanged(QString,int)), this, SLOT(generatorNameChanged(QString,int)), Qt::UniqueConnection);
@@ -521,7 +519,7 @@ void HkDataUI::generatorNameChanged(const QString & newName, int index){
     case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR:
         boneSwitchUI->generatorRenamed(newName, index);
         break;
-    case DATA_TYPE_LOADED::BS_BS_BONE_SWITCH_GENERATOR_CHILD:
+    case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR_CHILD:
         boneSwitchChildUI->generatorRenamed(newName, index);
         break;
     case DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR:
@@ -555,7 +553,7 @@ void HkDataUI::generatorRemoved(int index){
         boneSwitchUI->loadData(loadedData);
         //boneSwitchUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
         break;
-    case DATA_TYPE_LOADED::BS_BS_BONE_SWITCH_GENERATOR_CHILD:
+    case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR_CHILD:
         boneSwitchChildUI->loadData(loadedData, static_cast<BSBoneSwitchGeneratorBoneData *>(loadedData)->getThisIndex());
         //boneSwitchUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
         break;
@@ -572,7 +570,7 @@ void HkDataUI::generatorRemoved(int index){
         //stateMachineUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable, eventsTable);
         break;
     case DATA_TYPE_LOADED::STATE:
-        stateUI->loadData(loadedData, static_cast<hkbStateMachineStateInfo *>(loadedData)->stateId);
+        stateUI->loadData(loadedData, static_cast<hkbStateMachineStateInfo *>(loadedData)->getStateId());
         //stateUI->connectToTables(generatorsTable, eventsTable);
         break;
     case DATA_TYPE_LOADED::BS_I_STATE_TAG_GEN:
@@ -787,7 +785,7 @@ void HkDataUI::variableNameChanged(const QString & newName, int index){
     case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR:
         boneSwitchUI->variableRenamed(newName, index);
         break;
-    case DATA_TYPE_LOADED::BS_BS_BONE_SWITCH_GENERATOR_CHILD:
+    case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR_CHILD:
         boneSwitchChildUI->variableRenamed(newName, index);
         break;
     case DATA_TYPE_LOADED::BS_OFFSET_ANIMATION_GENERATOR:
@@ -963,7 +961,7 @@ void HkDataUI::variableRemoved(int index){
     case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR:
         boneSwitchUI->variableRenamed("NONE", index);
         break;
-    case DATA_TYPE_LOADED::BS_BS_BONE_SWITCH_GENERATOR_CHILD:
+    case DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR_CHILD:
         boneSwitchChildUI->variableRenamed("NONE", index);
         break;
     case DATA_TYPE_LOADED::STATE_MACHINE:
@@ -1170,7 +1168,7 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             if (loadedData != oldData){
                 boneSwitchChildUI->loadData(loadedData, static_cast<BSBoneSwitchGeneratorBoneData *>(loadedData)->getThisIndex());
             }
-            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_BS_BONE_SWITCH_GENERATOR_CHILD);
+            stack->setCurrentIndex(DATA_TYPE_LOADED::BS_BONE_SWITCH_GENERATOR_CHILD);
             boneSwitchChildUI->connectToTables(generatorsTable, variablesTable, characterPropertiesTable);
             break;
         case HkxSignature::HKB_MODIFIER_GENERATOR:
@@ -1217,7 +1215,7 @@ void HkDataUI::changeCurrentDataWidget(TreeGraphicsItem * icon){
             break;
         case HkxSignature::HKB_STATE_MACHINE_STATE_INFO:
             if (loadedData != oldData){
-                stateUI->loadData(loadedData, static_cast<hkbStateMachineStateInfo *>(loadedData)->stateId);
+                stateUI->loadData(loadedData, static_cast<hkbStateMachineStateInfo *>(loadedData)->getStateId());
             }
             stack->setCurrentIndex(DATA_TYPE_LOADED::STATE);
             stateUI->connectToTables(generatorsTable, eventsTable);
@@ -1630,13 +1628,13 @@ BehaviorGraphView *HkDataUI::loadBehaviorView(BehaviorGraphView *view){
     if (behaviorView){
         connect(behaviorView, SIGNAL(iconSelected(TreeGraphicsItem *)), this, SLOT(changeCurrentDataWidget(TreeGraphicsItem *)), Qt::UniqueConnection);
         connect(behaviorView, SIGNAL(disconnectTablesFromHkDataUI()), this, SLOT(disconnectTables()), Qt::UniqueConnection);
-        generatorsTable->loadTable(behaviorView->behavior->getGeneratorNames(), behaviorView->behavior->getGeneratorTypeNames(), "nullptr");
-        modifiersTable->loadTable(behaviorView->behavior->getModifierNames(), behaviorView->behavior->getModifierTypeNames(), "nullptr");
-        variablesTable->loadTable(behaviorView->behavior->getVariableNames(), behaviorView->behavior->getVariableTypenames(), "NONE");
-        animationsTable->loadTable(behaviorView->behavior->getAnimationNames(), "hkStringPtr"/*, "NONE"*/);//inefficient...
-        eventsTable->loadTable(behaviorView->behavior->getEventNames(), "", "NONE");
-        ragdollBonesTable->loadTable(behaviorView->behavior->getRagdollBoneNames(), "", "NONE");//inefficient...
-        characterPropertiesTable->loadTable(behaviorView->behavior->getCharacterPropertyNames(), behaviorView->behavior->getCharacterPropertyTypenames(), "NONE");//inefficient...
+        generatorsTable->loadTable(behaviorView->getBehavior()->getGeneratorNames(), behaviorView->getBehavior()->getGeneratorTypeNames(), "nullptr");
+        modifiersTable->loadTable(behaviorView->getBehavior()->getModifierNames(), behaviorView->getBehavior()->getModifierTypeNames(), "nullptr");
+        variablesTable->loadTable(behaviorView->getBehavior()->getVariableNames(), behaviorView->getBehavior()->getVariableTypenames(), "NONE");
+        animationsTable->loadTable(behaviorView->getBehavior()->getAnimationNames(), "hkStringPtr"/*, "NONE"*/);//inefficient...
+        eventsTable->loadTable(behaviorView->getBehavior()->getEventNames(), "", "NONE");
+        ragdollBonesTable->loadTable(behaviorView->getBehavior()->getRagdollBoneNames(), "", "NONE");//inefficient...
+        characterPropertiesTable->loadTable(behaviorView->getBehavior()->getCharacterPropertyNames(), behaviorView->getBehavior()->getCharacterPropertyTypenames(), "NONE");//inefficient...
         connect(behaviorView, SIGNAL(addedGenerator(QString,QString)), this, SLOT(generatorAdded(QString,QString)), Qt::UniqueConnection);
         connect(behaviorView, SIGNAL(addedModifier(QString,QString)), this, SLOT(modifierAdded(QString,QString)), Qt::UniqueConnection);
         connect(behaviorView, SIGNAL(removedGenerator(int)), this, SLOT(generatorRemoved(int)), Qt::UniqueConnection);

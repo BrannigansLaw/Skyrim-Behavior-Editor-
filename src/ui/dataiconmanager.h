@@ -2,7 +2,7 @@
 #define DATAICONMANAGER_H
 
 #include <QString>
-#include <QList>
+#include <QVector>
 
 #include "src/hkxclasses/hkxobject.h"
 
@@ -32,7 +32,7 @@ public:
     void setFocusOnTopIcon();
     bool isCircularLoop() const;
 protected:
-    virtual QList <DataIconManager *> getChildren() const;
+    virtual QVector <DataIconManager *> getChildren() const;
     virtual bool insertObjectAt(int , DataIconManager *);
     virtual bool removeObjectAt(int );//If index is -1 remove all...
     DataIconManager(HkxFile *parent, long ref = -1);
@@ -44,7 +44,7 @@ private:
     void appendIcon(TreeGraphicsItem *icon);
     void removeIcon(TreeGraphicsItem *icon);
 private:
-    QList <TreeGraphicsItem *> icons;
+    QVector <TreeGraphicsItem *> icons;
 };
 
 #endif // DATAICONMANAGER_H

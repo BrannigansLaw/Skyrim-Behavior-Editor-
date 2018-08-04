@@ -8,15 +8,15 @@ class TreeGraphicsItem;
 
 class hkbGenerator: public DataIconManager
 {
-    friend class BehaviorGraphView;
-    friend class TreeGraphicsItem;
 public:
-    virtual ~hkbGenerator();
+    ~hkbGenerator();
     bool link();
     virtual QString getName() const;
-   QString getClassname() const;
+    QString getClassname() const;
 protected:
     hkbGenerator(HkxFile *parent, long ref = -1);
+private:
+    mutable std::mutex mutex;
 };
 
 #endif // HKBGENERATOR_H

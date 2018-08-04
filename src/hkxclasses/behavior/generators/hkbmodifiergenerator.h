@@ -4,37 +4,35 @@
 #include "hkbgenerator.h"
 
 //Do not allow variables to be bound to this class in the editor...
-class hkbModifierGenerator: public hkbGenerator
+class hkbModifierGenerator final: public hkbGenerator
 {
-    friend class BehaviorGraphView;
     friend class ModifierGeneratorUI;
-    friend class hkbStateMachine;
 public:
     hkbModifierGenerator(HkxFile *parent, long ref = 0);
-    virtual ~hkbModifierGenerator();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbModifierGenerator& operator=(const hkbModifierGenerator&) = delete;
+    hkbModifierGenerator(const hkbModifierGenerator &) = delete;
+    ~hkbModifierGenerator();
+    QString getName() const;
+    static const QString getClassname();
+    QVector <DataIconManager *> getChildren() const;
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
-    int getIndexToInsertIcon(HkxObject *child) const;
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
-private:
-    QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int, DataIconManager *obj);
     bool removeObjectAt(int index);
-    hkbModifierGenerator& operator=(const hkbModifierGenerator&);
-    hkbModifierGenerator(const hkbModifierGenerator &);
 private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     HkxSharedPtr modifier;
     HkxSharedPtr generator;
+    mutable std::mutex mutex;
 };
 
 

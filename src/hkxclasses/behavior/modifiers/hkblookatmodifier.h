@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class hkbLookAtModifier: public hkbModifier
+class hkbLookAtModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class LookAtModifierUI;
 public:
     hkbLookAtModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbLookAtModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbLookAtModifier& operator=(const hkbLookAtModifier&) = delete;
+    hkbLookAtModifier(const hkbLookAtModifier &) = delete;
+    ~hkbLookAtModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbLookAtModifier& operator=(const hkbLookAtModifier&);
-    hkbLookAtModifier(const hkbLookAtModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -44,6 +43,7 @@ private:
     bool isOn;
     bool individualLimitsOn;
     bool isTargetInsideLimitCone;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBLOOKATMODIFIER_H

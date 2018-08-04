@@ -395,7 +395,7 @@ void PoseMatchingGeneratorUI::loadData(HkxObject *data){
                     mode->insertItems(0, bsData->Mode);
                 }
                 mode->setCurrentIndex(bsData->Mode.indexOf(bsData->mode));
-                varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+                varBind = bsData->getVariableBindingSetData();
                 if (varBind){
                     loadBinding(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN, varBind, "referencePoseWeightThreshold");
                     loadBinding(BLEND_PARAMETER_ROW, BINDING_COLUMN, varBind, "blendParameter");
@@ -450,7 +450,7 @@ void PoseMatchingGeneratorUI::loadDynamicTableRows(){
             table->setRowCount(temp);
         }
         hkbBlenderGeneratorChild *child = nullptr;
-        for (int i = ADD_CHILD_ROW + 1, j = 0; j < bsData->getNumberOfChildren(); i++, j++){
+        for (auto i = ADD_CHILD_ROW + 1, j = 0; j < bsData->getNumberOfChildren(); i++, j++){
             child = static_cast<hkbBlenderGeneratorChild *>(bsData->children.at(j).data());
             if (child){
                 setRowItems(i, "Child "+QString::number(j), child->getClassname(), "Remove", "Edit", "Double click to remove this child", "Double click to edit this child");
@@ -488,16 +488,16 @@ void PoseMatchingGeneratorUI::setRowItems(int row, const QString & name, const Q
 }
 
 bool PoseMatchingGeneratorUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -509,7 +509,7 @@ bool PoseMatchingGeneratorUI::setBinding(int index, int row, const QString & var
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -617,7 +617,7 @@ void PoseMatchingGeneratorUI::setBindingVariable(int index, const QString & name
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBindingVariable(): The data is nullptr!!");
     }
@@ -636,7 +636,7 @@ void PoseMatchingGeneratorUI::setName(){
                 }
             }
             emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setName(): The data is nullptr!!");
@@ -647,7 +647,7 @@ void PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(){
     if (bsData){
         if (bsData->referencePoseWeightThreshold != referencePoseWeightThreshold->value()){
             bsData->referencePoseWeightThreshold = referencePoseWeightThreshold->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setReferencePoseWeightThreshold(): The data is nullptr!!");
@@ -658,7 +658,7 @@ void PoseMatchingGeneratorUI::setBlendParameter(){
     if (bsData){
         if (bsData->blendParameter != blendParameter->value()){
             bsData->blendParameter = blendParameter->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBlendParameter(): The data is nullptr!!");
@@ -669,7 +669,7 @@ void PoseMatchingGeneratorUI::setMinCyclicBlendParameter(){
     if (bsData){
         if (bsData->minCyclicBlendParameter != minCyclicBlendParameter->value()){
             bsData->minCyclicBlendParameter = minCyclicBlendParameter->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMinCyclicBlendParameter(): The data is nullptr!!");
@@ -680,7 +680,7 @@ void PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(){
     if (bsData){
         if (bsData->maxCyclicBlendParameter != maxCyclicBlendParameter->value()){
             bsData->maxCyclicBlendParameter = maxCyclicBlendParameter->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMaxCyclicBlendParameter(): The data is nullptr!!");
@@ -691,7 +691,7 @@ void PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(){
     if (bsData){
         if (bsData->indexOfSyncMasterChild != indexOfSyncMasterChild->value()){
             bsData->indexOfSyncMasterChild = indexOfSyncMasterChild->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setIndexOfSyncMasterChild(): The data is nullptr!!");
@@ -815,7 +815,7 @@ void PoseMatchingGeneratorUI::setFlagForceDensePose(){
 void PoseMatchingGeneratorUI::setSubtractLastChild(){
     if (bsData){
         bsData->subtractLastChild = subtractLastChild->isChecked();
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setSubtractLastChild(): The data is nullptr!!");
     }
@@ -825,7 +825,7 @@ void PoseMatchingGeneratorUI::setWorldFromModelRotation(){
     if (bsData){
         if (bsData->worldFromModelRotation != worldFromModelRotation->value()){
             bsData->worldFromModelRotation = worldFromModelRotation->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setWorldFromModelRotation(): The data is nullptr!!");
@@ -836,7 +836,7 @@ void PoseMatchingGeneratorUI::setBlendSpeed(){
     if (bsData){
         if (bsData->blendSpeed != blendSpeed->value()){
             bsData->blendSpeed = blendSpeed->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setBlendSpeed(): The data is nullptr!!");
@@ -847,7 +847,7 @@ void PoseMatchingGeneratorUI::setMinSpeedToSwitch(){
     if (bsData){
         if (bsData->minSpeedToSwitch != minSpeedToSwitch->value()){
             bsData->minSpeedToSwitch = minSpeedToSwitch->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMinSpeedToSwitch(): The data is nullptr!!");
@@ -858,7 +858,7 @@ void PoseMatchingGeneratorUI::setMinSwitchTimeNoError(){
     if (bsData){
         if (bsData->minSwitchTimeNoError != minSwitchTimeNoError->value()){
             bsData->minSwitchTimeNoError = minSwitchTimeNoError->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMinSwitchTimeNoError(): The data is nullptr!!");
@@ -869,7 +869,7 @@ void PoseMatchingGeneratorUI::setMinSwitchTimeFullError(){
     if (bsData){
         if (bsData->minSwitchTimeFullError != minSwitchTimeFullError->value()){
             bsData->minSwitchTimeFullError = minSwitchTimeFullError->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMinSwitchTimeFullError(): The data is nullptr!!");
@@ -880,7 +880,7 @@ void PoseMatchingGeneratorUI::setStartPlayingEventId(int index, const QString &n
     if (bsData){
         bsData->startPlayingEventId = index - 1;
         table->item(START_PLAYING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setStartPlayingEventId(): The data is nullptr!!");
     }
@@ -890,7 +890,7 @@ void PoseMatchingGeneratorUI::setStartMatchingEventId(int index, const QString &
     if (bsData){
         bsData->startMatchingEventId = index - 1;
         table->item(START_MATCHING_EVENT_ID_ROW, VALUE_COLUMN)->setText(name);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setStartMatchingEventId(): The data is nullptr!!");
     }
@@ -899,7 +899,7 @@ void PoseMatchingGeneratorUI::setStartMatchingEventId(int index, const QString &
 void PoseMatchingGeneratorUI::setRootBoneIndex(int index){
     if (bsData){
         bsData->rootBoneIndex = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setRootBoneIndex(): The data is nullptr!!");
     }
@@ -908,7 +908,7 @@ void PoseMatchingGeneratorUI::setRootBoneIndex(int index){
 void PoseMatchingGeneratorUI::setOtherBoneIndex(int index){
     if (bsData){
         bsData->otherBoneIndex = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setOtherBoneIndex(): The data is nullptr!!");
     }
@@ -917,7 +917,7 @@ void PoseMatchingGeneratorUI::setOtherBoneIndex(int index){
 void PoseMatchingGeneratorUI::setAnotherBoneIndex(int index){
     if (bsData){
         bsData->anotherBoneIndex = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setAnotherBoneIndex(): The data is nullptr!!");
     }
@@ -926,7 +926,7 @@ void PoseMatchingGeneratorUI::setAnotherBoneIndex(int index){
 void PoseMatchingGeneratorUI::setPelvisIndex(int index){
     if (bsData){
         bsData->pelvisIndex = index - 1;
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setPelvisIndex(): The data is nullptr!!");
     }
@@ -935,24 +935,29 @@ void PoseMatchingGeneratorUI::setPelvisIndex(int index){
 void PoseMatchingGeneratorUI::setMode(int index){
     if (bsData){
         bsData->mode = bsData->Mode.at(index);
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::setMode(): The data is nullptr!!");
     }
 }
 
 void PoseMatchingGeneratorUI::swapGeneratorIndices(int index1, int index2){
+    HkxObject *gen1;
+    HkxObject *gen2;
     if (bsData){
         index1 = index1 - BASE_NUMBER_OF_ROWS;
         index2 = index2 - BASE_NUMBER_OF_ROWS;
         if (bsData->children.size() > index1 && bsData->children.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
-            bsData->children.swap(index1, index2);
+            gen1 = bsData->children.at(index1).data();
+            gen2 = bsData->children.at(index2).data();
+            bsData->children[index1] = HkxSharedPtr(gen2);
+            bsData->children[index2] = HkxSharedPtr(gen1);
             if (behaviorView->getSelectedItem()){
                 behaviorView->getSelectedItem()->reorderChildren();
             }else{
                 CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::swapGeneratorIndices(): No item selected!!");
             }
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("PoseMatchingGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!");
         }
@@ -1021,7 +1026,7 @@ void PoseMatchingGeneratorUI::removeChild(int index){
     if (bsData && behaviorView){
         if (index < bsData->children.size() && index >= 0){
             child = static_cast<hkbBlenderGeneratorChild *>(bsData->children.at(index).data());
-            behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->generator.data()), index);//Reorderchildren?
+            behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->getChildren().first()), index);//Reorderchildren?
             behaviorView->removeObjects();
         }else{
             WARNING_MESSAGE("PoseMatchingGeneratorUI::removeChild(): Invalid index of child to remove!!");
@@ -1241,7 +1246,7 @@ void PoseMatchingGeneratorUI::connectToTables(GenericTableWidget *generators, Ge
     }
 }
 
-void PoseMatchingGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void PoseMatchingGeneratorUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -1249,7 +1254,7 @@ void PoseMatchingGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindin
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -1257,7 +1262,7 @@ void PoseMatchingGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindin
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("PoseMatchingGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
         }
@@ -1269,14 +1274,14 @@ void PoseMatchingGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindin
 void PoseMatchingGeneratorUI::selectTableToView(bool viewproperties, const QString & path){
     if (bsData){
         if (viewproperties){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -1294,7 +1299,7 @@ void PoseMatchingGeneratorUI::variableRenamed(const QString & name, int index){
     }
     if (bsData){
         index--;
-        bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        bind = bsData->getVariableBindingSetData();
         if (bind){
             bindIndex = bind->getVariableIndexOfBinding("referencePoseWeightThreshold");
             if (bindIndex == index){

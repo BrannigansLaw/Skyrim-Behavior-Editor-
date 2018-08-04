@@ -3,34 +3,37 @@
 
 #include "hkbgenerator.h"
 
-class hkbStateMachine: public hkbGenerator
+class hkbStateMachine final: public hkbGenerator
 {
-    friend class BehaviorGraphView;
     friend class StateMachineUI;
-    friend class StateUI;
-    friend class hkbStateMachineStateInfo;
-    friend class BehaviorFile;
-    friend class hkbStateMachineTransitionInfoArray;
 public:
     hkbStateMachine(HkxFile *parent, long ref = 0);
-    virtual ~hkbStateMachine();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
-    void unlink();
+    hkbStateMachine& operator=(const hkbStateMachine&) = delete;
+    hkbStateMachine(const hkbStateMachine &) = delete;
+    ~hkbStateMachine();
     QString getName() const;
-    QString evaluateDataValidity();
-    static QString getClassname();
+    static const QString getClassname();
     QString getStateName(ulong stateId) const;
+    QString getStateNameNoLock(ulong stateId) const;
     int getStateId(const QString & statename) const;
     int getNestedStateId(const QString & statename, int stateId) const;
     QStringList getStateNames() const;
     int getNumberOfStates() const;
     QString getNestedStateName(ulong stateId, ulong nestedStateId) const;
+    QString getNestedStateNameNoLock(ulong stateId, ulong nestedStateId) const;
     QStringList getNestedStateNames(ulong stateId) const;
     int getNumberOfNestedStates(ulong stateId) const;
-    int getIndexToInsertIcon() const;
-    bool write(HkxXMLWriter *writer);
     int generateValidStateId();
+    void updateTransitionStateId(int oldid, int newid);
+    QVector <DataIconManager *> getChildren() const;
+    void removeWildcardTransitions();
+    void removeWildcardTransitionsNoLock();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
+    void unlink();
+    QString evaluateDataValidity();
+    bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
     bool isEventReferenced(int eventindex) const;
     void updateEventIndices(int eventindex);
@@ -39,35 +42,33 @@ public:
     bool merge(HkxObject *recessiveObject);
     void updateReferences(long &ref);
     QVector <HkxObject *> getChildrenOtherTypes() const;
-private:
-    QList <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int index, DataIconManager *obj);
     bool removeObjectAt(int index);
     hkbStateMachine * getNestedStateMachine(ulong stateId) const;
-    hkbStateMachine& operator=(const hkbStateMachine&);
-    hkbStateMachine(const hkbStateMachine &);
+    hkbStateMachine * getNestedStateMachineNoLock(ulong stateId) const;
 private:
-    static QStringList StartStateMode;  //{START_STATE_MODE_DEFAULT=0, START_STATE_MODE_SYNC=1, START_STATE_MODE_RANDOM=2, START_STATE_MODE_CHOOSER=3};
-    static QStringList SelfTransitionMode;  //{SELF_TRANSITION_MODE_NO_TRANSITION=0, SELF_TRANSITION_MODE_TRANSITION_TO_START_STATE=1, SELF_TRANSITION_MODE_FORCE_TRANSITION_TO_START_STATE=2};
     static uint refCount;
-    static QString classname;
+    static const QStringList StartStateMode;
+    static const QStringList SelfTransitionMode;
+    static const QString classname;
     ulong userData;
     QString name;
     //startStateChooser
     hkEventPayload eventToSendWhenStateOrTransitionChanges;
-    ulong startStateId;
+    int startStateId;
     int returnToPreviousStateEventId;
     int randomTransitionEventId;
     int transitionToNextHigherStateEventId;
     int transitionToNextLowerStateEventId;
     int syncVariableIndex;
     bool wrapAroundStateId;
-    ushort maxSimultaneousTransitions;  //Max 32, min 0.
+    ushort maxSimultaneousTransitions;
     QString startStateMode;
     QString selfTransitionMode;
-    QList <HkxSharedPtr> states;
+    QVector <HkxSharedPtr> states;
     HkxSharedPtr wildcardTransitions;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBSTATEMACHINE_H

@@ -1,71 +1,66 @@
 #include "hkbboneindexarray.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
-/*
- * CLASS: hkbBoneIndexArray
-*/
+#include "src/hkxclasses/behavior/hkbvariablebindingset.h"
 
 uint hkbBoneIndexArray::refCount = 0;
 
-QString hkbBoneIndexArray::classname = "hkbBoneIndexArray";
+const QString hkbBoneIndexArray::classname = "hkbBoneIndexArray";
 
 hkbBoneIndexArray::hkbBoneIndexArray(HkxFile *parent, long ref)
     : HkDynamicObject(parent, ref)
 {
     setType(HKB_BONE_INDEX_ARRAY, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
-QString hkbBoneIndexArray::getClassname(){
+const QString hkbBoneIndexArray::getClassname(){
     return classname;
 }
 
-bool hkbBoneIndexArray::readData(const HkxXmlReader &reader, long index){
+bool hkbBoneIndexArray::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
+    int numElems;
     bool ok;
-    int numElems = 0;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "variableBindingSet"){
-            if (!variableBindingSet.readShdPtrReference(index, reader)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'variableBindingSet' reference!\nObject Reference: "+ref);
-            }
+            checkvalue(getVariableBindingSet().readShdPtrReference(index, reader), "variableBindingSet");
         }else if (text == "boneIndices"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'boneIndices' data!\nObject Reference: "+ref);
-                return false;
-            }
-            if (numElems > 0 && !readIntegers(reader.getElementValueAt(index), boneIndices)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'boneIndices' data!\nObject Reference: "+ref);
-                return false;
-            }
+            checkvalue(ok, "boneIndices");
+            checkvalue((numElems > 0 && !readIntegers(reader.getElementValueAt(index), boneIndices)), "boneIndices");
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbBoneIndexArray::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    if (writer && !getIsWritten()){
         QString refString = "null";
         QString bones;
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
         writer->writeLine(writer->object, list1, list2, "");
-        if (variableBindingSet.data()){
-            refString = variableBindingSet.data()->getReferenceString();
+        if (getVariableBindingSetData()){
+            refString = getVariableBindingSet()->getReferenceString();
         }
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableBindingSet"), refString);
         list1 = {writer->name, writer->numelements};
         list2 = {"boneIndices", QString::number(boneIndices.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0, j = 1; i < boneIndices.size(); i++, j++){
+        for (auto i = 0, j = 1; i < boneIndices.size(); i++, j++){
             bones.append(QString::number(boneIndices.at(i)));
             if (j % 16 == 0){
                 bones.append("\n");
@@ -83,27 +78,24 @@ bool hkbBoneIndexArray::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        if (variableBindingSet.data() && !variableBindingSet.data()->write(writer)){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
+        if (getVariableBindingSetData() && !getVariableBindingSet()->write(writer)){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write 'variableBindingSet'!!!");
         }
     }
     return true;
 }
 
 QVector<HkxObject *> hkbBoneIndexArray::getChildrenOtherTypes() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QVector <HkxObject *> list;
-    if (variableBindingSet.data()){
-        list.append(variableBindingSet.data());
-    }
+    (getVariableBindingSetData()) ? list.append(getVariableBindingSetData()) : NULL;
     return list;
 }
 
 bool hkbBoneIndexArray::link(){
-    if (!getParentFile()){
-        return false;
-    }
-    if (!this->linkVar()){
-        LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\n");
+    std::lock_guard <std::mutex> guard(mutex);
+    if (!linkVar()){
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\n");
     }
     return true;
 }

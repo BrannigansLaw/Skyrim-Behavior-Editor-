@@ -15,7 +15,7 @@ SkeletonFile::SkeletonFile(MainWindow *window, const QString & name)
 }
 
 HkxSharedPtr * SkeletonFile::findSkeleton(long ref){
-    for (int i = 0; i < skeletons.size(); i++){
+    for (auto i = 0; i < skeletons.size(); i++){
         if (skeletons.at(i).data() && skeletons.at(i).getShdPtrReference() == ref){
             return &skeletons[i];
         }
@@ -24,7 +24,7 @@ HkxSharedPtr * SkeletonFile::findSkeleton(long ref){
 }
 
 HkxSharedPtr * SkeletonFile::findLocalFrame(long ref){
-    for (int i = 0; i < localFrames.size(); i++){
+    for (auto i = 0; i < localFrames.size(); i++){
         if (localFrames.at(i).data() && localFrames.at(i).getShdPtrReference() == ref){
             return &localFrames[i];
         }
@@ -58,9 +58,9 @@ int SkeletonFile::getNumberOfBones(bool ragdoll) const{
 
 QStringList SkeletonFile::getLocalFrameNames() const{
     QStringList names;
-    for (int i = 0; i < localFrames.size(); i++){
+    for (auto i = 0; i < localFrames.size(); i++){
         if (localFrames.at(i).data()){
-            names.append(static_cast<hkSimpleLocalFrame *>(localFrames.at(i).data())->name);
+            names.append(static_cast<hkSimpleLocalFrame *>(localFrames.at(i).data())->getName());
         }
     }
     return names;
@@ -90,7 +90,7 @@ bool SkeletonFile::parse(){
     if (!getReader().parse()){
         return false;
     }
-    int index = 2;
+    long index = 2;
     bool ok = true;
     HkxSignature signature;
     QByteArray value;
@@ -152,7 +152,7 @@ bool SkeletonFile::link(){
         //LogFile::writeToLog("SkeletonFile: link() failed!\nThe root object of this character file is NOT a hkRootLevelContainer!\nThe root object signature is: "+QString::number(getRootObject()->getSignature(), 16));
         return false;
     }
-    if (!getRootObject().data()->link()){
+    if (!getRootObject()->link()){
         //LogFile::writeToLog("SkeletonFile: link() failed!\nThe root object of this character file failed to link to it's children!");
         return false;
     }
@@ -162,7 +162,7 @@ bool SkeletonFile::link(){
 
 void SkeletonFile::write(){
     ulong ref = 1;
-    getRootObject().data()->setReference(ref);
+    getRootObject()->setReference(ref);
     ref++;
     getWriter().setFile(this);
     getWriter().writeToXMLFile();

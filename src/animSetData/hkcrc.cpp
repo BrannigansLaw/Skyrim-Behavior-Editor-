@@ -46,7 +46,7 @@ QByteArray HkCRC::compute(const QByteArray & input){
     //int init[] = {0,0,0,0,0,0,0,0};
     int crc[] = {0,0,0,0,0,0,0,0,0};
     int xor[] = {0,0,0,0,0,0,0,0};
-    order = this->crc_order;
+    order = crc_order;
 
     // generate bit mask
     counter = order;

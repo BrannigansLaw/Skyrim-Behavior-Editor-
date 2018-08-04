@@ -3,39 +3,47 @@
 
 #include "hkbgenerator.h"
 
-class hkbBehaviorGraph: public hkbGenerator
+class hkbStateMachine;
+class hkbBehaviorGraphData;
+
+class hkbBehaviorGraph final: public hkbGenerator
 {
-    friend class BehaviorGraphView;
     friend class BehaviorGraphUI;
-    friend class BehaviorFile;
 public:
     hkbBehaviorGraph(HkxFile *parent, long ref = 0);
-    virtual ~hkbBehaviorGraph();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbBehaviorGraph& operator=(const hkbBehaviorGraph&) = delete;
+    hkbBehaviorGraph(const hkbBehaviorGraph &) = delete;
+    ~hkbBehaviorGraph();
+    QString getName() const;
+    static const QString getClassname();
+    void setData(hkbBehaviorGraphData *graphdata);
+    hkbStateMachine * getRootGenerator() const;
+    void setName(const QString & newname);
+    void setVariableMode(const QString &value);
+private:
+    //hkbStateMachine * getRootGeneratorData() const;
+    QString getRootGeneratorName() const;
+    QString getVariableMode() const;
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
-    int getIndexToInsertIcon() const;
     bool write(HkxXMLWriter *writer);
     bool hasChildren() const;
-private:
-    QList <DataIconManager *> getChildren() const;
+    QVector <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int, DataIconManager *obj);
     bool removeObjectAt(int index);
-    hkbBehaviorGraph& operator=(const hkbBehaviorGraph&);
-    hkbBehaviorGraph(const hkbBehaviorGraph &);
 private:
     static uint refCount;
-    static QString classname;
-    static QStringList VariableMode;    //{VARIABLE_MODE_DISCARD_WHEN_INACTIVE=0, VARIABLE_MODE_MAINTAIN_VALUES_WHEN_INACTIVE=1};
+    static const QString classname;
+    static const QStringList VariableMode;
     qint64 userData;
     QString name;
     QString variableMode;
     HkxSharedPtr rootGenerator;
     HkxSharedPtr data;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBBEHAVIORGRAPH_H

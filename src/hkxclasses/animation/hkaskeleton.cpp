@@ -15,7 +15,7 @@ hkaSkeleton::hkaSkeleton(HkxFile *parent, long ref)
     : HkxObject(parent, ref)
 {
     setType(HKA_SKELETON, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
@@ -25,25 +25,25 @@ QString hkaSkeleton::getClassname(){
 
 QStringList hkaSkeleton::getBoneNames() const{
     QStringList list;
-    for (int i = 0; i < bones.size(); i++){
+    for (auto i = 0; i < bones.size(); i++){
         list.append(bones.at(i).name);
     }
     return list;
 }
 
 QString hkaSkeleton::getLocalFrameName(int boneIndex) const{
-    for (int i = 0; i < localFrames.size(); i++){
+    for (auto i = 0; i < localFrames.size(); i++){
         if (boneIndex == localFrames.at(i).boneIndex && localFrames.at(i).localFrame.data() && localFrames.at(i).localFrame->getSignature() == HK_SIMPLE_LOCAL_FRAME){
-            return static_cast<hkSimpleLocalFrame *>(localFrames.at(i).localFrame.data())->name;
+            return static_cast<hkSimpleLocalFrame *>(localFrames.at(i).localFrame.data())->getName();
         }
     }
     return "";
 }
 
 bool hkaSkeleton::addLocalFrame(const QString & name){
-    for (int i = 0; i < localFrames.size(); i++){
+    for (auto i = 0; i < localFrames.size(); i++){
         if (localFrames.at(i).localFrame.data() && localFrames.at(i).localFrame->getSignature() == HK_SIMPLE_LOCAL_FRAME){
-            if (static_cast<hkSimpleLocalFrame *>(localFrames[i].localFrame.data())->name == name){
+            if (static_cast<hkSimpleLocalFrame *>(localFrames[i].localFrame.data())->getName() == name){
                 return false;
             }
         }
@@ -54,13 +54,13 @@ bool hkaSkeleton::addLocalFrame(const QString & name){
 }
 
 void hkaSkeleton::setLocalFrameName(int boneIndex, const QString & name){
-    for (int i = 0; i < localFrames.size(); i++){
+    for (auto i = 0; i < localFrames.size(); i++){
         if (boneIndex == localFrames.at(i).boneIndex && localFrames.at(i).localFrame.data() && localFrames.at(i).localFrame->getSignature() == HK_SIMPLE_LOCAL_FRAME){
             if (name == ""){
                 static_cast<SkeletonFile *>(getParentFile())->localFrames.removeAll(localFrames.at(i).localFrame);
                 localFrames.removeAt(i);
             }else{
-                static_cast<hkSimpleLocalFrame *>(localFrames[i].localFrame.data())->name = name;
+                static_cast<hkSimpleLocalFrame *>(localFrames[i].localFrame.data())->setName(name);
             }
             return;
         }
@@ -68,7 +68,7 @@ void hkaSkeleton::setLocalFrameName(int boneIndex, const QString & name){
 }
 
 bool hkaSkeleton::removeLocalFrame(int boneIndex){
-    for (int i = 0; i < localFrames.size(); i++){
+    for (auto i = 0; i < localFrames.size(); i++){
         if (boneIndex == localFrames.at(i).boneIndex){
             static_cast<SkeletonFile *>(getParentFile())->localFrames.removeAll(localFrames.at(i).localFrame);
             localFrames.removeAt(i);
@@ -78,7 +78,7 @@ bool hkaSkeleton::removeLocalFrame(int boneIndex){
     return false;
 }
 
-bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){
+bool hkaSkeleton::readData(const HkxXmlReader &reader, long & index){
     bool ok;
     int numElems = 0;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
@@ -89,16 +89,16 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){
         if (text == "name"){
             name = reader.getElementValueAt(index);
             if (name == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
             }
         }else if (text == "parentIndices"){
             int numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'parentIndices' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'parentIndices' data!\nObject Reference: "+ref);
                 return false;
             }
             if (numElems > 0 && !readIntegers(reader.getElementValueAt(index), parentIndices)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'parentIndices' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'parentIndices' data!\nObject Reference: "+ref);
                 return false;
             }
         }else if (text == "bones"){
@@ -106,18 +106,18 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){
             if (!ok){
                 return false;
             }
-            for (int j = 0; j < numtrans; j++){
+            for (auto j = 0; j < numtrans; j++){
                 bones.append(hkBone());
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                     if (reader.getNthAttributeValueAt(index, 0) == "name"){
                         bones.last().name = reader.getElementValueAt(index);
                         if (bones.last().name == ""){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'name' data field!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "lockTranslation"){
                         bones.last().lockTranslation = toBool(reader.getElementValueAt(index), &ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'lockTranslation' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'lockTranslation' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -128,29 +128,29 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){
         }else if (text == "referencePose"){
             referencePose = reader.getElementValueAt(index);
             if (referencePose == ""){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'referencePose' data field!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'referencePose' data field!\nObject Reference: "+ref);
             }
         }else if (text == "referenceFloats"){
             int numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'referenceFloats' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'referenceFloats' data!\nObject Reference: "+ref);
                 return false;
             }
             if (numElems > 0 && !readDoubles(reader.getElementValueAt(index), referenceFloats)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'referenceFloats' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'referenceFloats' data!\nObject Reference: "+ref);
                 return false;
             }
         }else if (text == "floatSlots"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'floatSlots' data!\nObject Reference: "+ref);
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'floatSlots' data!\nObject Reference: "+ref);
                 return false;
             }
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'eventNames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'eventNames' data!\nObject Reference: "+ref);
                     return false;
                 }
                 floatSlots.append(reader.getElementValueAt(index));
@@ -161,17 +161,17 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){
             if (!ok){
                 return false;
             }
-            for (int j = 0; j < numtrans; j++){
+            for (auto j = 0; j < numtrans; j++){
                 localFrames.append(hkLocalFrame());
                 while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
                     if (text == "localFrame"){
                         if (!localFrames.last().localFrame.readShdPtrReference(index, reader)){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'localFrame' reference!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'localFrame' reference!\nObject Reference: "+ref);
                         }
                     }else if (reader.getNthAttributeValueAt(index, 0) == "lockTranslation"){
                         localFrames.last().boneIndex = reader.getElementValueAt(index).toInt(&ok);
                         if (!ok){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'boneIndex' data field!\nObject Reference: "+ref);
+                            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'boneIndex' data field!\nObject Reference: "+ref);
                         }
                         index++;
                         break;
@@ -182,6 +182,7 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long index){
         }
         index++;
     }
+    index--;
     return true;
 }
 
@@ -198,7 +199,7 @@ bool hkaSkeleton::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"parentIndices", QString::number(parentIndices.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0, j = 1; i < parentIndices.size(); i++, j++){
+        for (auto i = 0, j = 1; i < parentIndices.size(); i++, j++){
             bonesS.append(QString::number(parentIndices.at(i), char('f'), 6));
             if (j % 16 == 0){
                 bonesS.append("\n");
@@ -216,7 +217,7 @@ bool hkaSkeleton::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"bones", QString::number(bones.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < bones.size(); i++){
+        for (auto i = 0; i < bones.size(); i++){
             writer->writeLine(writer->object, true);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("name"), bones.at(i).name);
             writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("variableIndex"), getBoolAsString(bones.at(i).lockTranslation));
@@ -229,7 +230,7 @@ bool hkaSkeleton::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"referenceFloats", QString::number(referenceFloats.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0, j = 1; i < referenceFloats.size(); i++, j++){
+        for (auto i = 0, j = 1; i < referenceFloats.size(); i++, j++){
             bonesS.append(QString::number(referenceFloats.at(i), char('f'), 6));
             if (j % 16 == 0){
                 bonesS.append("\n");
@@ -247,7 +248,7 @@ bool hkaSkeleton::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"floatSlots", QString::number(floatSlots.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < floatSlots.size(); i++){
+        for (auto i = 0; i < floatSlots.size(); i++){
             writer->writeLine(writer->string, QStringList(), QStringList(), floatSlots.at(i));
         }
         if (floatSlots.size() > 0){
@@ -257,10 +258,10 @@ bool hkaSkeleton::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"localFrames", QString::number(localFrames.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < localFrames.size(); i++){
+        for (auto i = 0; i < localFrames.size(); i++){
             writer->writeLine(writer->object, true);
             if (localFrames.at(i).localFrame.data()){
-                refString = localFrames.at(i).localFrame.data()->getReferenceString();
+                refString = localFrames.at(i).localFrame->getReferenceString();
             }else{
                 refString = "null";
             }
@@ -274,9 +275,9 @@ bool hkaSkeleton::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        for (int i = 0; i < localFrames.size(); i++){
+        for (auto i = 0; i < localFrames.size(); i++){
             if (localFrames.at(i).localFrame.data() && !localFrames.at(i).localFrame->write(writer)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'localFrame' at: "+QString::number(i)+"!!!");
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write 'localFrame' at: "+QString::number(i)+"!!!");
             }
         }
     }
@@ -288,13 +289,13 @@ bool hkaSkeleton::link(){
         return false;
     }
     HkxSharedPtr *ptr;
-    for (int i = 0; i < localFrames.size(); i++){
+    for (auto i = 0; i < localFrames.size(); i++){
         ptr = static_cast<SkeletonFile *>(getParentFile())->findLocalFrame(localFrames.at(i).localFrame.getShdPtrReference());
-        if (!ptr){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\nFailed to properly link 'localFrames' data field!\nObject Name: "+name);
+        if (!ptr || !ptr->data()){
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'localFrames' data field!\nObject Name: "+name);
             setDataValidity(false);
         }else if (!(*ptr).data() || (*ptr)->getSignature() != HK_SIMPLE_LOCAL_FRAME){
-            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": link()!\n'localFrames' data field is linked to invalid child!\nObject Name: "+name);
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'localFrames' data field is linked to invalid child!\nObject Name: "+name);
             setDataValidity(false);
             localFrames[i].localFrame = *ptr;
         }else{
@@ -305,14 +306,14 @@ bool hkaSkeleton::link(){
 }
 
 void hkaSkeleton::unlink(){
-    for (int i = 0; i < localFrames.size(); i++){
+    for (auto i = 0; i < localFrames.size(); i++){
         localFrames[i].localFrame = HkxSharedPtr();
     }
 }
 
 QString hkaSkeleton::evaluateDataValidity(){
-    for (int i = 0; i < localFrames.size(); i++){
-        if (!localFrames.at(i).localFrame.data() || localFrames.at(i).localFrame.data()->getSignature() != HK_SIMPLE_LOCAL_FRAME){
+    for (auto i = 0; i < localFrames.size(); i++){
+        if (!localFrames.at(i).localFrame.data() || localFrames.at(i).localFrame->getSignature() != HK_SIMPLE_LOCAL_FRAME){
             setDataValidity(false);
             return QString();
         }

@@ -121,7 +121,7 @@ void ManualSelectorGeneratorUI::loadData(HkxObject *data){
             name->setText(bsData->name);
             selectedGeneratorIndex->setValue(bsData->selectedGeneratorIndex);
             currentGeneratorIndex->setValue(bsData->currentGeneratorIndex);
-            varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(SELECTED_GENERATOR_INDEX_ROW, BINDING_COLUMN, varBind, "selectedGeneratorIndex");
                 loadBinding(CURRENT_GENERATOR_INDEX_ROW, BINDING_COLUMN, varBind, "currentGeneratorIndex");
@@ -147,7 +147,7 @@ void ManualSelectorGeneratorUI::loadDynamicTableRows(){
             table->setRowCount(temp);
         }
         hkbGenerator *child = nullptr;
-        for (int i = ADD_GENERATOR_ROW + 1, j = 0; j < bsData->generators.size(); i++, j++){
+        for (auto i = ADD_GENERATOR_ROW + 1, j = 0; j < bsData->generators.size(); i++, j++){
             child = static_cast<hkbGenerator *>(bsData->generators.at(j).data());
             if (child){
                 setRowItems(i, child->getName(), child->getClassname(), "Remove", "Edit", "Double click to remove this generator", VIEW_GENERATORS_TABLE_TIP);
@@ -202,16 +202,16 @@ void ManualSelectorGeneratorUI::connectToTables(GenericTableWidget *generators, 
 }
 
 void ManualSelectorGeneratorUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -223,7 +223,7 @@ void ManualSelectorGeneratorUI::setBinding(int index, int row, const QString & v
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -252,13 +252,13 @@ void ManualSelectorGeneratorUI::setBindingVariable(int index, const QString & na
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-void ManualSelectorGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void ManualSelectorGeneratorUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -266,7 +266,7 @@ void ManualSelectorGeneratorUI::loadBinding(int row, int colunm, hkbVariableBind
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -274,7 +274,7 @@ void ManualSelectorGeneratorUI::loadBinding(int row, int colunm, hkbVariableBind
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
         }
@@ -291,7 +291,7 @@ void ManualSelectorGeneratorUI::variableRenamed(const QString &name, int index){
     }
     if (bsData){
         index--;
-        bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        bind = bsData->getVariableBindingSetData();
         if (bind){
             bindIndex = bind->getVariableIndexOfBinding("selectedGeneratorIndex");
             if (bindIndex == index){
@@ -330,14 +330,14 @@ void ManualSelectorGeneratorUI::setBehaviorView(BehaviorGraphView *view){
 void ManualSelectorGeneratorUI::selectTableToView(bool viewproperties, const QString &path){
     if (bsData){
         if (viewproperties){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -352,7 +352,7 @@ void ManualSelectorGeneratorUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
@@ -364,7 +364,7 @@ void ManualSelectorGeneratorUI::setSelectedGeneratorIndex(){
     if (bsData){
         if (bsData->selectedGeneratorIndex != selectedGeneratorIndex->value()){
             bsData->selectedGeneratorIndex = selectedGeneratorIndex->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setSelectedGeneratorIndex(): The data is nullptr!!");
@@ -375,7 +375,7 @@ void ManualSelectorGeneratorUI::setCurrentGeneratorIndex(){
     if (bsData){
         if (bsData->currentGeneratorIndex != currentGeneratorIndex->value()){
             bsData->currentGeneratorIndex = currentGeneratorIndex->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setCurrentGeneratorIndex(): The data is nullptr!!");
@@ -410,7 +410,7 @@ void ManualSelectorGeneratorUI::viewSelectedChild(int row, int column){
             if (bsData->generators.size() > result && result >= 0){
                 if (column == VALUE_COLUMN){
                     QStringList list = {hkbStateMachineStateInfo::getClassname(), hkbBlenderGeneratorChild::getClassname(), BSBoneSwitchGeneratorBoneData::getClassname()};
-                    emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->generators.at(result)) + 1, QString(), list);
+                    emit viewGenerators(bsData->getIndexOfGenerator(bsData->generators.at(result)) + 1, QString(), list);
                 }else if (column == BINDING_COLUMN){
                     if (MainWindow::yesNoDialogue("Are you sure you want to remove the generator \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
                         removeGenerator(result);
@@ -426,11 +426,16 @@ void ManualSelectorGeneratorUI::viewSelectedChild(int row, int column){
 }
 
 void ManualSelectorGeneratorUI::swapGeneratorIndices(int index1, int index2){
+    HkxObject *gen1;
+    HkxObject *gen2;
     if (bsData){
         index1 = index1 - BASE_NUMBER_OF_ROWS;
         index2 = index2 - BASE_NUMBER_OF_ROWS;
         if (bsData->generators.size() > index1 && bsData->generators.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
-            bsData->generators.swap(index1, index2);
+            gen1 = bsData->generators.at(index1).data();
+            gen2 = bsData->generators.at(index2).data();
+            bsData->generators[index1] = HkxSharedPtr(gen2);
+            bsData->generators[index2] = HkxSharedPtr(gen1);
             if (behaviorView->getSelectedItem()){
                 behaviorView->getSelectedItem()->reorderChildren();
             }else{
@@ -446,7 +451,7 @@ void ManualSelectorGeneratorUI::swapGeneratorIndices(int index1, int index2){
             }else if (bsData->currentGeneratorIndex == index2){
                 bsData->currentGeneratorIndex = index1;
             }
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("ManualSelectorGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!");
         }
@@ -480,7 +485,7 @@ void ManualSelectorGeneratorUI::setGenerator(int index, const QString &name){
                 }
                 behaviorView->removeGeneratorData();
                 table->item(table->currentRow(), NAME_COLUMN)->setText(name);
-                bsData->getParentFile()->setIsChanged(true);
+                bsData->setIsFileChanged(true);
                 loadDynamicTableRows();
             }else{
                 CRITICAL_ERROR_MESSAGE("ManualSelectorGeneratorUI::setGenerator(): Invalid generator index selected!!");

@@ -3,26 +3,25 @@
 
 #include "hkbmodifier.h"
 
-class hkbCombineTransformsModifier: public hkbModifier
+class hkbCombineTransformsModifier final: public hkbModifier
 {
-    friend class BehaviorGraphView;
     friend class CombineTransformsModifierUI;
 public:
     hkbCombineTransformsModifier(HkxFile *parent, long ref = 0);
-    virtual ~hkbCombineTransformsModifier();
-    bool readData(const HkxXmlReader & reader, long index);
+    hkbCombineTransformsModifier& operator=(const hkbCombineTransformsModifier&) = delete;
+    hkbCombineTransformsModifier(const hkbCombineTransformsModifier &) = delete;
+    ~hkbCombineTransformsModifier();
+    QString getName() const;
+    static const QString getClassname();
+private:
+    bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
-    QString getName() const;
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkbCombineTransformsModifier& operator=(const hkbCombineTransformsModifier&);
-    hkbCombineTransformsModifier(const hkbCombineTransformsModifier &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     long userData;
     QString name;
     bool enable;
@@ -35,6 +34,7 @@ private:
     bool invertLeftTransform;
     bool invertRightTransform;
     bool invertResult;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBCOMBINETRANSFORMSMODIFIER_H

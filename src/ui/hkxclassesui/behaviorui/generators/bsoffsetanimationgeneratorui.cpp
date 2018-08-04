@@ -122,7 +122,7 @@ void BSOffsetAnimationGeneratorUI::setName(){
         if (bsData->name != name->text()){
             bsData->name = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
         }
     }else{
@@ -134,7 +134,7 @@ void BSOffsetAnimationGeneratorUI::setFOffsetVariable(){
     if (bsData){
         if (bsData->fOffsetVariable != fOffsetVariable->value()){
             bsData->fOffsetVariable = fOffsetVariable->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setFOffsetVariable(): The data is nullptr!!");
@@ -145,7 +145,7 @@ void BSOffsetAnimationGeneratorUI::setFOffsetRangeStart(){
     if (bsData){
         if (bsData->fOffsetRangeStart != fOffsetRangeStart->value()){
             bsData->fOffsetRangeStart = fOffsetRangeStart->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setFOffsetRangeStart(): The data is nullptr!!");
@@ -156,7 +156,7 @@ void BSOffsetAnimationGeneratorUI::setFOffsetRangeEnd(){
     if (bsData){
         if (bsData->fOffsetRangeEnd != fOffsetRangeEnd->value()){
             bsData->fOffsetRangeEnd = fOffsetRangeEnd->value();
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setFOffsetRangeEnd(): The data is nullptr!!");
@@ -164,16 +164,16 @@ void BSOffsetAnimationGeneratorUI::setFOffsetRangeEnd(){
 }
 
 bool BSOffsetAnimationGeneratorUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
     if (bsData){
         if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->variableBindingSet = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
+            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
         }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
                   (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
             if (!varBind){
                 varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->variableBindingSet = HkxSharedPtr(varBind);
+                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
             }
             if (isProperty){
                 if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
@@ -185,7 +185,7 @@ bool BSOffsetAnimationGeneratorUI::setBinding(int index, int row, const QString 
                 }
             }
             table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
         }
@@ -221,13 +221,13 @@ void BSOffsetAnimationGeneratorUI::setBindingVariable(int index, const QString &
         default:
             return;
         }
-        bsData->getParentFile()->setIsChanged(true);
+        bsData->setIsFileChanged(true);
     }else{
         CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
-void BSOffsetAnimationGeneratorUI::loadBinding(int row, int colunm, hkbVariableBindingSet *varBind, const QString &path){
+void BSOffsetAnimationGeneratorUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
     if (bsData){
         if (varBind){
             int index = varBind->getVariableIndexOfBinding(path);
@@ -235,7 +235,7 @@ void BSOffsetAnimationGeneratorUI::loadBinding(int row, int colunm, hkbVariableB
             if (index != -1){
                 if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, colunm)->setCheckState(Qt::Checked);
+                    table->item(row, column)->setCheckState(Qt::Checked);
                 }else{
                     varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
                 }
@@ -243,7 +243,7 @@ void BSOffsetAnimationGeneratorUI::loadBinding(int row, int colunm, hkbVariableB
             if (varName == ""){
                 varName = "NONE";
             }
-            table->item(row, colunm)->setText(BINDING_ITEM_LABEL+varName);
+            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
         }else{
             CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
         }
@@ -271,7 +271,7 @@ void BSOffsetAnimationGeneratorUI::loadData(HkxObject *data){
             }else{
                 table->item(POFFSET_CLIP_GENERATOR_ROW, VALUE_COLUMN)->setText("NONE");
             }
-            hkbVariableBindingSet *varBind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+            hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
             if (varBind){
                 loadBinding(FOFFSET_VARIABLE_ROW, BINDING_COLUMN, varBind, "fOffsetVariable");
                 loadBinding(FOFFSET_RANGE_START_ROW, BINDING_COLUMN, varBind, "fOffsetRangeStart");
@@ -327,7 +327,7 @@ void BSOffsetAnimationGeneratorUI::setGenerator(int index, const QString & name)
             }
             behaviorView->removeGeneratorData();
             table->item(row, VALUE_COLUMN)->setText(name);
-            bsData->getParentFile()->setIsChanged(true);
+            bsData->setIsFileChanged(true);
         }else{
             CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setGenerator(): The 'behaviorView' pointer is nullptr!!");
         }
@@ -363,9 +363,9 @@ void BSOffsetAnimationGeneratorUI::viewSelected(int row, int column){
         }else if (column == VALUE_COLUMN){
             if (row == PDEFAULT_GENERATOR_ROW){
                 QStringList list = {hkbStateMachineStateInfo::getClassname(), hkbBlenderGeneratorChild::getClassname(), BSBoneSwitchGeneratorBoneData::getClassname()};
-                emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pDefaultGenerator) + 1, QString(), list);
+                emit viewGenerators(bsData->getIndexOfGenerator(bsData->pDefaultGenerator) + 1, QString(), list);
             }else if (row == POFFSET_CLIP_GENERATOR_ROW){
-                emit viewGenerators(static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pOffsetClipGenerator) + 1, hkbClipGenerator::getClassname(), QStringList());
+                emit viewGenerators(bsData->getIndexOfGenerator(bsData->pOffsetClipGenerator) + 1, hkbClipGenerator::getClassname(), QStringList());
             }
         }
     }else{
@@ -376,14 +376,14 @@ void BSOffsetAnimationGeneratorUI::viewSelected(int row, int column){
 void BSOffsetAnimationGeneratorUI::selectTableToView(bool viewproperties, const QString & path){
     if (bsData){
         if (viewproperties){
-            if (bsData->variableBindingSet.data()){
-                emit viewProperties(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewProperties(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewProperties(0, QString(), QStringList());
             }
         }else{
-            if (bsData->variableBindingSet.data()){
-                emit viewVariables(static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data())->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
+            if (bsData->getVariableBindingSetData()){
+                emit viewVariables(bsData->getVariableBindingSetData()->getVariableIndexOfBinding(path) + 1, QString(), QStringList());
             }else{
                 emit viewVariables(0, QString(), QStringList());
             }
@@ -396,7 +396,7 @@ void BSOffsetAnimationGeneratorUI::selectTableToView(bool viewproperties, const 
 void BSOffsetAnimationGeneratorUI::variableRenamed(const QString & name, int index){
     if (bsData){
         index--;
-        hkbVariableBindingSet *bind = static_cast<hkbVariableBindingSet *>(bsData->variableBindingSet.data());
+        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
         if (bind){
             int bindIndex = bind->getVariableIndexOfBinding("fOffsetVariable");
             if (bindIndex == index){

@@ -5,27 +5,11 @@
 
 class hkbBlenderGeneratorChild;
 
-class hkbBlenderGenerator: public hkbGenerator
+class hkbBlenderGenerator final: public hkbGenerator
 {
-    friend class BehaviorGraphView;
     friend class BlenderGeneratorUI;
-    friend class BlenderGeneratorChildUI;
+    //friend class BlenderGeneratorChildUI;
 public:
-    hkbBlenderGenerator(HkxFile *parent, long ref = 0);
-    virtual ~hkbBlenderGenerator();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
-    void unlink();
-    QString getName() const;
-    QString evaluateDataValidity();
-    static QString getClassname();
-    int getNumberOfChildren() const;
-    int getIndexToInsertIcon() const;
-    bool write(HkxXMLWriter *writer);
-    bool hasChildren() const;
-    int getIndexOfChild(hkbBlenderGeneratorChild *child) const;
-    bool isParametricBlend() const;
-    bool merge(HkxObject *recessiveObject);
     enum BlenderFlag{
         FLAG_NONE = 0,
         FLAG_SYNC = 1,
@@ -37,17 +21,49 @@ public:
         INVALID_FLAG = 128
     };
     Q_DECLARE_FLAGS(BlenderFlags, BlenderFlag)
+public:
+    hkbBlenderGenerator(HkxFile *parent, long ref = 0);
+    hkbBlenderGenerator& operator=(const hkbBlenderGenerator&) = delete;
+    hkbBlenderGenerator(const hkbBlenderGenerator &) = delete;
+    ~hkbBlenderGenerator();
+    QString getName() const;
+    static const QString getClassname();
+    bool isParametricBlend() const;
 private:
-    QList <DataIconManager *> getChildren() const;
+    bool swapChildren(int index1, int index2);
+    void setName(const QString &value);
+    void updateChildIconNames() const;
+    QString getFlags() const;
+    void setFlags(const QString &value);
+    hkbBlenderGeneratorChild * getChildDataAt(int index) const;
+    bool getSubtractLastChild() const;
+    void setSubtractLastChild(bool value);
+    qreal getReferencePoseWeightThreshold() const;
+    void setReferencePoseWeightThreshold(const qreal &value);
+    qreal getBlendParameter() const;
+    void setBlendParameter(const qreal &value);
+    qreal getMinCyclicBlendParameter() const;
+    void setMinCyclicBlendParameter(const qreal &value);
+    qreal getMaxCyclicBlendParameter() const;
+    void setMaxCyclicBlendParameter(const qreal &value);
+    int getIndexOfSyncMasterChild() const;
+    void setIndexOfSyncMasterChild(int value);
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
+    void unlink();
+    QString evaluateDataValidity();
+    int getNumberOfChildren() const;
+    bool write(HkxXMLWriter *writer);
+    bool hasChildren() const;
+    int getIndexOfChild(hkbBlenderGeneratorChild *child) const;
+    bool merge(HkxObject *recessiveObject);
+    QVector <DataIconManager *> getChildren() const;
     int getIndexOfObj(DataIconManager *obj) const;
     bool insertObjectAt(int index, DataIconManager *obj);
     bool removeObjectAt(int index);
-    hkbBlenderGenerator& operator=(const hkbBlenderGenerator&);
-    hkbBlenderGenerator(const hkbBlenderGenerator &);
-    //int generatorCount(hkbGenerator *gen);
 private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     ulong userData;
     QString name;
     qreal referencePoseWeightThreshold;
@@ -57,7 +73,8 @@ private:
     int indexOfSyncMasterChild;
     QString flags;
     bool subtractLastChild;
-    QList <HkxSharedPtr> children;
+    QVector <HkxSharedPtr> children;
+    mutable std::mutex mutex;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(hkbBlenderGenerator::BlenderFlags)

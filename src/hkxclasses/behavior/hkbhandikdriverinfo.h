@@ -3,25 +3,23 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkbHandIkDriverInfo: public HkxObject
+class hkbHandIkDriverInfo final: public HkxObject
 {
-    friend class BehaviorGraphView;
     friend class HandIkDriverInfoUI;
     friend class HandIkDriverInfoHandUI;
 public:
     hkbHandIkDriverInfo(HkxFile *parent, long ref = 0);
-    virtual ~hkbHandIkDriverInfo();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
-    void unlink();
-    QString evaluateDataValidity();
-    static QString getClassname();
-    bool write(HkxXMLWriter *writer);
+    hkbHandIkDriverInfo& operator=(const hkbHandIkDriverInfo&) = delete;
+    hkbHandIkDriverInfo(const hkbHandIkDriverInfo &) = delete;
+    ~hkbHandIkDriverInfo();
+    static const QString getClassname();
 private:
+    bool readData(const HkxXmlReader & reader, long & index);
+    bool link();
+    QString evaluateDataValidity();
+    bool write(HkxXMLWriter *writer);
     void addHand();
     void removeHandAt(int index);
-    hkbHandIkDriverInfo& operator=(const hkbHandIkDriverInfo&);
-    hkbHandIkDriverInfo(const hkbHandIkDriverInfo &);
 private:
     struct hkbHandIkDriverInfoHand{
         hkbHandIkDriverInfoHand()
@@ -37,7 +35,6 @@ private:
         {
             //
         }
-
         hkQuadVariable elbowAxisLS;
         hkQuadVariable backHandNormalLS;
         hkQuadVariable handOffsetLS;
@@ -53,14 +50,14 @@ private:
         bool enforceEndRotation;
         QString localFrameName;
     };
-
     hkbHandIkDriverInfoHand * getHandAt(int index);
-
-    static QStringList BlendCurve;  //BLEND_CURVE_SMOOTH=0;BLEND_CURVE_LINEAR=1;BLEND_CURVE_LINEAR_TO_SMOOTH=2;BLEND_CURVE_SMOOTH_TO_LINEAR=3
+private:
     static uint refCount;
-    static QString classname;
-    QList <hkbHandIkDriverInfoHand> hands;
+    static const QString classname;
+    static const QStringList BlendCurve;
+    QVector <hkbHandIkDriverInfoHand> hands;
     QString fadeInOutCurve;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBHANDIKDRIVERINFO_H

@@ -2,13 +2,10 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
-/**
- * hkbEventRangeDataArray
- */
 
 uint hkbEventRangeDataArray::refCount = 0;
 
-QString hkbEventRangeDataArray::classname = "hkbEventRangeDataArray";
+const QString hkbEventRangeDataArray::classname = "hkbEventRangeDataArray";
 
 const QStringList hkbEventRangeDataArray::hkbEventRangeData::EventRangeMode = {"EVENT_MODE_SEND_ON_ENTER_RANGE", "EVENT_MODE_SEND_WHEN_IN_RANGE"};
 
@@ -16,85 +13,83 @@ hkbEventRangeDataArray::hkbEventRangeDataArray(HkxFile *parent, long ref)
     : HkxObject(parent, ref)
 {
     setType(HKB_EVENT_RANGE_DATA_ARRAY, TYPE_OTHER);
-    getParentFile()->addObjectToFile(this, ref);
+    parent->addObjectToFile(this, ref);
     refCount++;
 }
 
-QString hkbEventRangeDataArray::getClassname(){
+const QString hkbEventRangeDataArray::getClassname(){
     return classname;
 }
 
 void hkbEventRangeDataArray::addEventData(const hkbEventRangeData & data){
+    std::lock_guard <std::mutex> guard(mutex);
     eventData.append(data);
 }
 
 void hkbEventRangeDataArray::setEventDataId(int index, int id){
-    if (eventData.size() > index){
-        eventData[index].event.id = id;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (eventData.size() > index) ? eventData[index].event.id = id : NULL;
 }
 
 void hkbEventRangeDataArray::removeEventData(int index){
-    if (eventData.size() > index){
-        eventData.removeAt(index);
-    }
+    std::lock_guard <std::mutex> guard(mutex);
+    (eventData.size() > index) ? eventData.removeAt(index) : NULL;
 }
 
 int hkbEventRangeDataArray::getLastEventDataIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return eventData.size() - 1;
 }
 
-bool hkbEventRangeDataArray::readData(const HkxXmlReader &reader, long index){
+bool hkbEventRangeDataArray::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
+    int numranges;
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto checkvalue = [&](bool value, const QString & fieldname){
+        (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
+    };
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "eventData"){
-            int numtriggers = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
-            if (!ok){
-                return false;
-            }
-            for (int j = 0; j < numtriggers; j++){
+            numranges = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
+            checkvalue(ok, "eventData");
+            (numranges > 0) ? index++ : NULL;
+            for (auto j = 0; j < numranges; j++, index++){
                 eventData.append(hkbEventRangeData());
-                while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
-                    if (reader.getNthAttributeValueAt(index, 0) == "upperBound"){
+                for (; index < reader.getNumElements(); index++){
+                    text = reader.getNthAttributeValueAt(index, 0);
+                    if (text == "localTime"){
                         eventData.last().upperBound = reader.getElementValueAt(index).toDouble(&ok);
-                        if (!ok){
-                            return false;
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "id"){
+                        checkvalue(ok, "eventData.at("+QString::number(j)+").upperBound");
+                    }else if (text == "id"){
                         eventData.last().event.id = reader.getElementValueAt(index).toInt(&ok);
-                        if (!ok){
-                            return false;
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "payload"){
-                        if (!eventData.last().event.payload.readShdPtrReference(index, reader)){
-                            return false;
-                        }
-                    }else if (reader.getNthAttributeValueAt(index, 0) == "eventMode"){
+                        checkvalue(ok, "eventData.at("+QString::number(j)+").id");
+                    }else if (text == "payload"){
+                        checkvalue(eventData.last().event.payload.readShdPtrReference(index, reader), "eventData.at("+QString::number(j)+").payload");
+                    }else if (text == "eventMode"){
                         eventData.last().eventMode = reader.getElementValueAt(index);
-                        if (!eventData.last().EventRangeMode.contains(eventData.last().eventMode)){
-                            LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": readData()!\nFailed to properly read 'eventMode' data field!\nObject Reference: "+ref);
-                        }
-                        index++;
+                        checkvalue(eventData.last().EventRangeMode.contains(eventData.last().eventMode), "eventData.at("+QString::number(j)+").eventMode");
                         break;
+                    }else{
+                        //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                     }
-                    index++;
                 }
             }
-            return true;
+            (numranges > 0) ? index-- : NULL;
         }
-        index++;
     }
+    index--;
     return true;
 }
 
 bool hkbEventRangeDataArray::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    auto writedatafield = [&](const QString & name, const QString & value){
+        writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
+    };
+    if (writer && !getIsWritten()){
         QString refString;
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
@@ -102,21 +97,21 @@ bool hkbEventRangeDataArray::write(HkxXMLWriter *writer){
         list1 = {writer->name, writer->numelements};
         list2 = {"eventData", QString::number(eventData.size())};
         writer->writeLine(writer->parameter, list1, list2, "");
-        for (int i = 0; i < eventData.size(); i++){
+        for (auto i = 0; i < eventData.size(); i++){
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("upperBound"), QString::number(eventData.at(i).upperBound, char('f'), 6));
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("event"), "");
+            writedatafield("upperBound", QString::number(eventData.at(i).upperBound, char('f'), 6));
+            writedatafield("event", "");
             writer->writeLine(writer->object, true);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("id"), QString::number(eventData.at(i).event.id));
+            writedatafield("id", QString::number(eventData.at(i).event.id));
             if (eventData.at(i).event.payload.data()){
-                refString = eventData.at(i).event.payload.data()->getReferenceString();
+                refString = eventData.at(i).event.payload->getReferenceString();
             }else{
                 refString = "null";
             }
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("payload"), refString);
+            writedatafield("payload", refString);
             writer->writeLine(writer->object, false);
             writer->writeLine(writer->parameter, false);
-            writer->writeLine(writer->parameter, QStringList(writer->name), QStringList("eventMode"), eventData.at(i).eventMode);
+            writedatafield("eventMode", eventData.at(i).eventMode);
             writer->writeLine(writer->object, false);
         }
         if (eventData.size() > 0){
@@ -125,9 +120,9 @@ bool hkbEventRangeDataArray::write(HkxXMLWriter *writer){
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
-        for (int i = 0; i < eventData.size(); i++){
-            if (eventData.at(i).event.payload.data() && !eventData.at(i).event.payload.data()->write(writer)){
-                LogFile::writeToLog(getParentFile()->getFileName()+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
+        for (auto i = 0; i < eventData.size(); i++){
+            if (eventData.at(i).event.payload.data() && !eventData.at(i).event.payload->write(writer)){
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write 'payload' at"+QString::number(i)+"!!!");
             }
         }
     }
@@ -135,10 +130,12 @@ bool hkbEventRangeDataArray::write(HkxXMLWriter *writer){
 }
 
 int hkbEventRangeDataArray::getNumberOfRanges() const{
+    std::lock_guard <std::mutex> guard(mutex);
     return eventData.size();
 }
 
 bool hkbEventRangeDataArray::isEventReferenced(int eventindex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < eventData.size(); i++){
         if (eventData.at(i).event.id == eventindex){
             return true;
@@ -148,22 +145,21 @@ bool hkbEventRangeDataArray::isEventReferenced(int eventindex) const{
 }
 
 void hkbEventRangeDataArray::updateEventIndices(int eventindex){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < eventData.size(); i++){
-        if (eventData.at(i).event.id > eventindex){
-            eventData[i].event.id--;
-        }
+        (eventData.at(i).event.id > eventindex) ? eventData[i].event.id-- : NULL;
     }
 }
 
 void hkbEventRangeDataArray::mergeEventIndex(int oldindex, int newindex){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < eventData.size(); i++){
-        if (eventData.at(i).event.id == oldindex){
-            eventData[i].event.id = newindex;
-        }
+        (eventData.at(i).event.id == oldindex) ? eventData[i].event.id = newindex : NULL;
     }
 }
 
 void hkbEventRangeDataArray::fixMergedEventIndices(BehaviorFile *dominantfile){
+    std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphData *recdata;
     hkbBehaviorGraphData *domdata;
     QString thiseventname;
@@ -188,31 +184,26 @@ void hkbEventRangeDataArray::fixMergedEventIndices(BehaviorFile *dominantfile){
 }
 
 void hkbEventRangeDataArray::updateReferences(long &ref){
+    std::lock_guard <std::mutex> guard(mutex);
     setReference(ref);
     for (auto i = 0; i < eventData.size(); i++){
-        if (eventData.at(i).event.payload.data()){
-            ref++;
-            eventData[i].event.payload.data()->updateReferences(ref);
-        }
+        (eventData.at(i).event.payload.data()) ? eventData[i].event.payload->updateReferences(++ref) : NULL;
     }
 }
 
 QVector<HkxObject *> hkbEventRangeDataArray::getChildrenOtherTypes() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QVector<HkxObject *> list;
     for (auto i = 0; i < eventData.size(); i++){
-        if (eventData.at(i).event.payload.data()){
-            list.append(eventData.at(i).event.payload.data());
-        }
+        (eventData.at(i).event.payload.data()) ? list.append(eventData.at(i).event.payload.data()) : NULL;
     }
     return list;
 }
 
 bool hkbEventRangeDataArray::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     HkxSharedPtr *ptr;
-    for (int i = 0; i < eventData.size(); i++){
+    for (auto i = 0; i < eventData.size(); i++){
         ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(eventData.at(i).event.payload.getShdPtrReference());
         if (ptr){
             if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
@@ -225,26 +216,27 @@ bool hkbEventRangeDataArray::link(){
 }
 
 QString hkbEventRangeDataArray::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
     if (eventData.isEmpty()){
         isvalid = false;
-        errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": eventData is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": eventData is empty!\n");
     }else{
         for (auto i = 0; i < eventData.size(); i++){
             if (eventData.at(i).event.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": id in eventData at "+QString::number(i)+" out of range! Setting to max index in range!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": id in eventData at "+QString::number(i)+" out of range! Setting to max index in range!\n");
                 eventData[i].event.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
             }
-            if (eventData.at(i).event.payload.data() && eventData.at(i).event.payload.data()->getSignature() != HKB_STRING_EVENT_PAYLOAD){
+            if (eventData.at(i).event.payload.data() && eventData.at(i).event.payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(eventData.at(i).event.payload.data()->getSignature(), 16)+" Setting null value!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(eventData.at(i).event.payload->getSignature(), 16)+" Setting null value!\n");
                 eventData[i].event.payload = HkxSharedPtr();
             }
             if (!hkbEventRangeData::EventRangeMode.contains(eventData.at(i).eventMode)){
                 isvalid = false;
-                errors.append(getParentFile()->getFileName()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid eventMode! Setting default value!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid eventMode! Setting default value!\n");
                 eventData[i].eventMode = hkbEventRangeData::EventRangeMode.first();
             }
         }

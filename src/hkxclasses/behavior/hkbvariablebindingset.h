@@ -7,7 +7,7 @@ class BehaviorFile;
 
 class hkbVariableBindingSet: public HkxObject
 {
-    friend class StateMachineUI;
+    friend class HkDynamicObject;
 public:
     struct hkBinding
     {
@@ -24,34 +24,34 @@ public:
     };
 public:
     hkbVariableBindingSet(HkxFile *parent, long ref = -1);
-    virtual ~hkbVariableBindingSet();
-    bool readData(const HkxXmlReader & reader, long index);
-    bool link();
-    QString evaluateDataValidity();
-    static QString getClassname();
-    int getNumberOfBindings() const;
-    bool addBinding(const QString & path, int varIndex, hkBinding::BindingType type = hkBinding::BINDING_TYPE_VARIABLE);
-    void removeBinding(const QString & path);
-    void removeBinding(int varIndex);
-    QString getPathOfBindingAt(int index);
+    hkbVariableBindingSet& operator=(const hkbVariableBindingSet&) = delete;
+    hkbVariableBindingSet(const hkbVariableBindingSet &) = delete;
+    ~hkbVariableBindingSet();
+    static const QString getClassname();
     int getVariableIndexOfBinding(const QString & path) const;
     hkBinding::BindingType getBindingType(int index) const;
     hkBinding::BindingType getBindingType(const QString & path) const;
-    bool write(HkxXMLWriter *writer);
+    int getNumberOfBindings() const;
     bool isVariableRefed(int variableindex) const;
+    void removeBinding(const QString & path);
+    bool addBinding(const QString & path, int varIndex, hkBinding::BindingType type = hkBinding::BINDING_TYPE_VARIABLE);
+    void removeBinding(int varIndex);
     void updateVariableIndices(int index);
     void mergeVariableIndex(int oldindex, int newindex);
+private:
+    bool link();
+    QString evaluateDataValidity();
+    bool readData(const HkxXmlReader & reader, long & index);
+    QString getPathOfBindingAt(int index);
+    bool write(HkxXMLWriter *writer);
     bool merge(HkxObject *recessiveObject);
     bool fixMergedIndices(BehaviorFile *dominantfile);
-protected:
-private:
-    hkbVariableBindingSet& operator=(const hkbVariableBindingSet&);
-    hkbVariableBindingSet(const hkbVariableBindingSet &);
 private:
     static uint refCount;
-    static QString classname;
-    QList <hkBinding> bindings;
+    static const QString classname;
+    QVector <hkBinding> bindings;
     int indexOfBindingToEnable;
+    mutable std::mutex mutex;
 };
 
 #endif // HKBVARIABLEBINDINGSET_H
