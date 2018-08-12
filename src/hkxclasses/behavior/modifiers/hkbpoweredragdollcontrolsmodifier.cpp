@@ -87,8 +87,6 @@ bool hkbPoweredRagdollControlsModifier::readData(const HkxXmlReader &reader, lon
             checkvalue(Mode.contains(mode), "mode");
         }else if (text == "boneWeights"){
             checkvalue(boneWeights.readShdPtrReference(index, reader), "boneWeights");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -107,7 +105,7 @@ bool hkbPoweredRagdollControlsModifier::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -239,34 +237,34 @@ QString hkbPoweredRagdollControlsModifier::evaluateDataValidity(){
     auto checkbones = [&](int & boneindex, const QString & fieldname){
         if (boneindex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+fieldname+" bone id out of range! Setting to max index in range!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+fieldname+" bone id out of range! Setting to max index in range!");
             boneindex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
         }
     };
     auto checktype = [&](HkxSharedPtr & shdptr, const QString & fieldname, HkxSignature sig){
         if (!shdptr.data()){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null "+fieldname+"!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null "+fieldname+"!");
         }else if (shdptr->getSignature() != sig){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid "+fieldname+" type! Signature: "+QString::number(shdptr->getSignature(), 16)+" Setting null value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid "+fieldname+" type! Signature: "+QString::number(shdptr->getSignature(), 16)+" Setting null value!");
             shdptr = HkxSharedPtr();
         }
     };
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     checkbones(poseMatchingBone0, "poseMatchingBone0");
     checkbones(poseMatchingBone1, "poseMatchingBone1");
     checkbones(poseMatchingBone2, "poseMatchingBone2");
     if (!Mode.contains(mode)){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid mode! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid mode! Setting default value!");
         mode = Mode.first();
     }
     checktype(bones, "bones", HKB_BONE_INDEX_ARRAY);

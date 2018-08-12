@@ -60,8 +60,6 @@ bool BSComputeAddBoneAnimModifier::readData(const HkxXmlReader &reader, long & i
         }else if (text == "scaleLSOut"){
             scaleLSOut = readVector4(reader.getElementValueAt(index), &ok);
             checkvalue(ok, "scaleLSOut");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -117,15 +115,15 @@ QString BSComputeAddBoneAnimModifier::evaluateDataValidity(){
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     if (boneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": boneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": boneIndex out of range! Setting to last bone index!");
         boneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     setDataValidity(isvalid);

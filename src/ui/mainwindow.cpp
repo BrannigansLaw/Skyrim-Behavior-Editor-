@@ -60,7 +60,6 @@ MainWindow::MainWindow()
       setGameModeA(new QAction("Set Game Mode", this)),
       tabs(new QTabWidget),
       projectFile(nullptr),
-      //characterFile(nullptr),
       skeletonFile(nullptr),
       projectUI(new ProjectUI(nullptr)),
       iconGBLyt(new QVBoxLayout(this)),
@@ -154,7 +153,7 @@ MainWindow::MainWindow()
     topMB->addMenu(donateM);
     eventsWid->setHkDataUI(objectDataWid);
     variablesWid->setHkDataUI(objectDataWid);
-    objectDataWid->setEventsVariablesAnimationsUI(eventsWid, variablesWid, projectUI->animations);
+    objectDataWid->setEventsVariablesAnimationsUI(eventsWid, variablesWid, projectUI->getAnimations());
     iconGBLyt->addWidget(tabs);
     behaviorGraphViewGB->setLayout(iconGBLyt);
     objectDataSA->setWidgetResizable(true);
@@ -172,7 +171,7 @@ MainWindow::MainWindow()
         WARNING_MESSAGE("The TESV executable was not found!");
     }
     if (!findGameDirectory(QString("Skyrim Special Edition"), skyrimSpecialEdtionDirectory)){
-        LogFile::writeToLog("The SSE executable was not found!");
+        WARNING_MESSAGE("The SSE executable was not found!");
     }else{
         skyrimBehaviorUpdateToolFullPath = skyrimSpecialEdtionDirectory+"/Tools/HavokBehaviorPostProcess/HavokBehaviorPostProcess.exe";
         if (!QFile(skyrimBehaviorUpdateToolFullPath).exists()){
@@ -249,7 +248,7 @@ void MainWindow::changedTabs(int index){
                 topLyt->removeWidget(behaviorGraphViewGB);
                 topLyt->addWidget(behaviorGraphViewGB, 1, 0, 9, 10);
             }else{
-                int graphindex = getBehaviorGraphIndex(tabs->tabText(index));
+                auto graphindex = getBehaviorGraphIndex(tabs->tabText(index));
                 if (graphindex < projectFile->behaviorFiles.size() && graphindex < behaviorGraphs.size() && graphindex > -1){
                     objectDataWid->changeCurrentDataWidget(nullptr);
                     objectDataWid->loadBehaviorView(behaviorGraphs.at(graphindex));
@@ -266,7 +265,7 @@ void MainWindow::changedTabs(int index){
                     eventsWid->show();
                     objectDataSA->show();
                 }else{
-                    WARNING_MESSAGE("MainWindow::changedTabs(): The tab index is out of sync with the behavior files or behavior graphs!");
+                    LogFile::writeToLog("The tab index is out of sync with the behavior files or behavior graphs!");
                 }
             }
         }
@@ -278,7 +277,7 @@ void MainWindow::changedTabs(int index){
 void MainWindow::expandBranches(){
     if (projectFile){
         int index = tabs->currentIndex() - 1;
-        if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
+        if (index >= 0 && index < behaviorGraphs.size()){
             behaviorGraphs.at(index)->expandBranch();
         }else{
             if (tabs->count() < 2){
@@ -295,7 +294,7 @@ void MainWindow::expandBranches(){
 void MainWindow::collapseBranches(){
     if (projectFile){
         int index = tabs->currentIndex() - 1;
-        if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
+        if (index >= 0 && index < behaviorGraphs.size()){
             behaviorGraphs.at(index)->contractBranch();
             //behaviorGraphs.at(index)->selectRoot();
         }else{
@@ -314,7 +313,7 @@ void MainWindow::refocus(){
     if (projectFile){
         int index = tabs->currentIndex() - 1;
         if (index != -1){
-            if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
+            if (index >= 0 && index < behaviorGraphs.size()){
                 if (!behaviorGraphs.at(index)->refocus()){
                     LogFile::writeToLog("MainWindow::refocus(): No behavior graph item is currently selected!");
                 }
@@ -715,7 +714,7 @@ void MainWindow::sendGIBS(){
 void MainWindow::findGenerator(){
     if (projectFile){
         int index = tabs->currentIndex() - 1;
-        if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
+        if (index >= 0 && index < behaviorGraphs.size()){
             if (objectDataWid){
                 objectDataWid->connectToGeneratorTable();
             }
@@ -734,7 +733,7 @@ void MainWindow::findGenerator(){
 void MainWindow::findModifier(){
     if (projectFile){
         int index = tabs->currentIndex() - 1;
-        if (index >= 0 && index < projectFile->behaviorFiles.size() && index < behaviorGraphs.size()){
+        if (index >= 0 && index < behaviorGraphs.size()){
             if (objectDataWid){
                 objectDataWid->connectToModifierTable();
             }
@@ -800,35 +799,29 @@ void MainWindow::closeTab(int index){
 }
 
 QString MainWindow::generateUniqueBehaviorName(){
-    if (projectFile->character){
-        QString name = "Behavior_0.hkx";
-        int num = 1;
-        int index;
-        QStringList behaviornames;
-        QDirIterator it(lastFileSelectedPath+"/"+projectFile->character->getBehaviorDirectoryName());
-        while (it.hasNext()){
-            if (QFileInfo(it.next()).fileName().contains(".hkx")){
-                behaviornames.append(it.fileInfo().fileName());
-            }
+    QString name = "Behavior_0.hkx";
+    int num = 1;
+    int index;
+    QStringList behaviornames;
+    QDirIterator it(lastFileSelectedPath+"/"+projectFile->getBehaviorDirectoryName());
+    while (it.hasNext()){
+        if (QFileInfo(it.next()).fileName().contains(".hkx")){
+            behaviornames.append(it.fileInfo().fileName());
         }
-        for (auto i = 0; i < behaviornames.size(); i++){
-            if (behaviornames.at(i) == name){
-                index = name.lastIndexOf('_');
-                if (index > -1){
-                    name.remove(index + 1, name.size());
-                }
-                name.append(QString::number(num)+".hkx");
-                num++;
-                if (num > 1){
-                    i = 0;
-                }
-            }
-        }
-        return lastFileSelectedPath+"/"+projectFile->character->getBehaviorDirectoryName()+"/"+name;
-    }else{
-        LogFile::writeToLog("MainWindow::generateUniqueBehaviorName(): Null projectFile->character!");
     }
-    return "";
+    for (auto i = 0; i < behaviornames.size(); i++){
+        if (behaviornames.at(i) == name){
+            index = name.lastIndexOf('_');
+            if (index > -1){
+                name.remove(index + 1, name.size());
+            }
+            name.append(QString::number(num)+".hkx");
+            if (++num > 1){
+                i = 0;
+            }
+        }
+    }
+    return lastFileSelectedPath+"/"+projectFile->getBehaviorDirectoryName()+"/"+name;
 }
 
 void MainWindow::addNewBehavior(bool initData){
@@ -921,16 +914,16 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata,
         LogFile::writeToLog("Time taken to open file \""+filepath+"\" is approximately "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds\n");
         progress.setProgress("Loading character data...", 50);
         timeelapsed = timer.elapsed();
-        projectFile->character = new CharacterFile(this, projectFile, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));
-        if (projectFile->character->parse()){
-            projectFile->setCharacterFile(projectFile->character);
+        CharacterFile *character = new CharacterFile(this, projectFile, lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0));
+        if (character->parse()){
+            projectFile->setCharacterFile(character);
             projectFile->loadEncryptedAnimationNames();
             LogFile::writeToLog("Time taken to open file \""+lastFileSelectedPath+"/"+projectFile->getCharacterFilePathAt(0)+"\" is approximately "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds\n");
             timeelapsed = timer.elapsed();
             progress.setProgress("Loading skeleton data...", 50);
-            skeletonFile = new SkeletonFile(this, lastFileSelectedPath+"/"+projectFile->character->getRigName());
+            skeletonFile = new SkeletonFile(this, lastFileSelectedPath+"/"+character->getRigName());
             if (skeletonFile->parse() || isFNIS){
-                projectFile->character->setSkeletonFile(skeletonFile);
+                character->setSkeletonFile(skeletonFile);
                 if (loadui){
                     projectUI->setFilePath(lastFileSelectedPath);
                     tabs->addTab(projectUI, "Character Data");
@@ -938,7 +931,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata,
                     projectUI->loadData();
                     projectUI->setDisabled(false);
                 }
-                LogFile::writeToLog("Time taken to open file \""+lastFileSelectedPath+"/"+projectFile->character->getRigName()+"\" is approximately "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds\n");
+                LogFile::writeToLog("Time taken to open file \""+lastFileSelectedPath+"/"+character->getRigName()+"\" is approximately "+QString::number(timer.elapsed() - timeelapsed)+" milliseconds\n");
                 //Get behavior filenames...
                 QDirIterator it(lastFileSelectedPath+"/behaviors"); //Wont work for dogs, wolves!!!
                 while (it.hasNext()){
@@ -979,7 +972,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata,
                 }
                 for (auto i = 0; i < futures.size(); i++){
                     if (!futures.at(i).get()){
-                        LogFile::writeToLog("Open project failed! \""+behaviornames.at(i)+"\" failed to parse!\n");
+                        LogFile::writeToLog("Open project failed! \""+behaviornames.at(i)+"\" failed to parse!");
                         cleanup();
                         return;
                     }
@@ -1030,7 +1023,7 @@ void MainWindow::openProject(QString & filepath, bool loadui, bool loadanimdata,
                 }
                 progress.setProgress("Project loaded sucessfully!!!", progress.maximum());
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The skeleton file "+projectFile->character->getRigName()+" could not be parsed!!!").toLocal8Bit().data());
+                CRITICAL_ERROR_MESSAGE(QString("MainWindow::openProject(): The skeleton file "+character->getRigName()+" could not be parsed!!!").toLocal8Bit().data());
                 cleanup();
             }
             if (loadui){

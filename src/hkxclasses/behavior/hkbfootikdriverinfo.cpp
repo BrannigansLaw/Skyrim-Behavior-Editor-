@@ -103,8 +103,6 @@ bool hkbFootIkDriverInfo::readData(const HkxXmlReader &reader, long & index){
                         legs.last().ankleIndex = reader.getElementValueAt(index).toInt(&ok);
                         checkvalue(ok, "legs.at("+QString::number(j)+").ankleIndex");
                         break;
-                    }else{
-                        //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                     }
                 }
             }
@@ -145,8 +143,6 @@ bool hkbFootIkDriverInfo::readData(const HkxXmlReader &reader, long & index){
         }else if (text == "isQuadrupedNarrow"){
             isQuadrupedNarrow = toBool(reader.getElementValueAt(index), &ok);
             checkvalue(ok, "isQuadrupedNarrow");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;

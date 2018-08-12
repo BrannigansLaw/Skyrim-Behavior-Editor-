@@ -203,8 +203,6 @@ bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long
                 }else if (text == "payload"){
                     checkvalue(eventToFreezeBlendValue.payload.readShdPtrReference(index, reader), "eventToFreezeBlendValue.payload");
                     break;
-                }else{
-                    //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                 }
             }
             index--;
@@ -218,8 +216,6 @@ bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long
                 }else if (text == "payload"){
                     checkvalue(eventToCrossBlend.payload.readShdPtrReference(index, reader), "eventToCrossBlend.payload");
                     break;
-                }else{
-                    //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                 }
             }
             index--;
@@ -232,8 +228,6 @@ bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long
         }else if (text == "eBlendCurve"){
             eBlendCurve = reader.getElementValueAt(index);
             checkvalue(BlendCurve.contains(eBlendCurve), "eBlendCurve");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -252,7 +246,7 @@ bool BSCyclicBlendTransitionGenerator::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -262,7 +256,7 @@ bool BSCyclicBlendTransitionGenerator::write(HkxXMLWriter *writer){
         writedatafield("userData", QString::number(userData), false);
         writedatafield("name", name, false);
         writeref(pBlenderGenerator, "pBlenderGenerator");
-        writedatafield("EventToFreezeBlendValue", "", true);
+        writedatafield("EventToFreezeBlendValue", "", false);
         writer->writeLine(writer->object, true);
         writedatafield("id", QString::number(eventToFreezeBlendValue.id), false);
         writeref(eventToFreezeBlendValue.payload, "payload");

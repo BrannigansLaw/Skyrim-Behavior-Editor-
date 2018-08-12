@@ -155,8 +155,6 @@ bool hkbEventDrivenModifier::readData(const HkxXmlReader &reader, long & index){
         }else if (text == "activeByDefault"){
             activeByDefault = toBool(reader.getElementValueAt(index), &ok);
             checkvalue(ok, "activeByDefault");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -175,7 +173,7 @@ bool hkbEventDrivenModifier::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -226,28 +224,28 @@ QString hkbEventDrivenModifier::evaluateDataValidity(){
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     if (activateEventId >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": activateEventId event id out of range! Setting to max index in range!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": activateEventId event id out of range! Setting to max index in range!");
         activateEventId = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (deactivateEventId >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": deactivateEventId event id out of range! Setting to max index in range!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": deactivateEventId event id out of range! Setting to max index in range!");
         deactivateEventId = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (!modifier.data()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null modifier!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null modifier!");
     }else if (modifier->getType() != HkxObject::TYPE_MODIFIER){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid modifier type! Signature: "+QString::number(modifier->getSignature(), 16)+" Setting null value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid modifier type! Signature: "+QString::number(modifier->getSignature(), 16)+" Setting null value!");
         modifier = HkxSharedPtr();
     }
     setDataValidity(isvalid);

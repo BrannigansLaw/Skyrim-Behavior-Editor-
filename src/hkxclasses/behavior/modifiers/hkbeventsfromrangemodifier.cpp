@@ -58,8 +58,6 @@ bool hkbEventsFromRangeModifier::readData(const HkxXmlReader &reader, long & ind
             checkvalue(ok, "lowerBound");
         }else if (text == "eventRanges"){
             checkvalue(eventRanges.readShdPtrReference(index, reader), "eventRanges");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -78,7 +76,7 @@ bool hkbEventsFromRangeModifier::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -197,27 +195,27 @@ QString hkbEventsFromRangeModifier::evaluateDataValidity(){
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     if (eventRanges.data()){
         if (eventRanges->getSignature() != HKB_EVENT_RANGE_DATA_ARRAY){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid eventRanges type! Signature: "+QString::number(eventRanges->getSignature(), 16)+" Setting default value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid eventRanges type! Signature: "+QString::number(eventRanges->getSignature(), 16)+" Setting default value!");
             eventRanges = HkxSharedPtr();
         }else if (static_cast<hkbEventRangeDataArray *>(eventRanges.data())->eventData.size() < 1){
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": eventRanges has no eventData! Setting null value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": eventRanges has no eventData! Setting null value!");
             eventRanges = HkxSharedPtr();
         }else if (eventRanges->isDataValid() && eventRanges->evaluateDataValidity() != ""){
             isvalid = false;
-            //errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid eventRanges data!\n");
+            //errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid eventRanges data!");
         }
     }else if (!eventRanges.data()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null eventRanges! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null eventRanges! Setting default value!");
         eventRanges = HkxSharedPtr();
     }
     setDataValidity(isvalid);

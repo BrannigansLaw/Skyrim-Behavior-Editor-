@@ -294,8 +294,6 @@ bool hkbBlenderGenerator::readData(const HkxXmlReader &reader, long & index){
             checkvalue(ok, "subtractLastChild");
         }else if (text == "children"){
             checkvalue(readReferences(reader.getElementValueAt(index), children), "children");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -309,7 +307,7 @@ bool hkbBlenderGenerator::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QString refString = "null";
@@ -403,7 +401,7 @@ QString hkbBlenderGenerator::evaluateDataValidity(){
     auto appenderror = [&](bool value, const QString & fieldname){
         if (!value){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid '"+fieldname+"'!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid '"+fieldname+"'!");
         }
     };
     appenderror((HkDynamicObject::evaluateDataValidity() == ""), "hkbVariableBindingSet");
@@ -412,22 +410,22 @@ QString hkbBlenderGenerator::evaluateDataValidity(){
     for (auto i = children.size() - 1; i >= 0; i--){
         if (!children.at(i).data()){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": children at index '"+QString::number(i)+"' is null! Removing child!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": children at index '"+QString::number(i)+"' is null! Removing child!");
             children.removeAt(i);
         }else if (children.at(i)->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid child! Signature: "+QString::number(children.at(i)->getSignature(), 16)+" Removing child!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid child! Signature: "+QString::number(children.at(i)->getSignature(), 16)+" Removing child!");
             children.removeAt(i);
         }
     }
     if (indexOfSyncMasterChild >= children.size()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": indexOfSyncMasterChild is out of range! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": indexOfSyncMasterChild is out of range! Setting default value!");
         indexOfSyncMasterChild = -1;
     }
     if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid flags!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid flags!");
         //TO DO: fix flag here!
     }
     setDataValidity(isvalid);

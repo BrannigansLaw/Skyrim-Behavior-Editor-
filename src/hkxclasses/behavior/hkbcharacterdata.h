@@ -5,11 +5,17 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
+class hkbCharacterStringData;
+class hkbVariableValueSet;
+class hkbMirroredSkeletonInfo;
+class hkbFootIkDriverInfo;
+class hkbHandIkDriverInfo;
+
 class hkbCharacterData final: public HkxObject
 {
     friend class CharacterFile;
 public:
-    hkbCharacterData(HkxFile *parent, long ref = 0);
+    hkbCharacterData(HkxFile *parent, long ref = 0, hkbCharacterStringData *strings = nullptr, hkbVariableValueSet *values = nullptr, hkbMirroredSkeletonInfo *mirrorskelinfo = nullptr);
     hkbCharacterData& operator=(const hkbCharacterData&) = delete;
     hkbCharacterData(const hkbCharacterData &) = delete;
     ~hkbCharacterData();
@@ -31,6 +37,8 @@ public:
     void setWordVariableValueAt(int index, int value);
     void setQuadVariableValueAt(int index, hkQuadVariable value);
 private:
+    void setHandIkDriverInfo(hkbHandIkDriverInfo *value);
+    void setFootIkDriverInfo(hkbFootIkDriverInfo *fooik);
     QString evaluateDataValidity();
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
@@ -39,7 +47,6 @@ private:
 private:
     struct hkVariableInfo
     {
-        hkVariableInfo(){}
         struct hkRole
         {
             hkRole(): role("ROLE_DEFAULT"), flags("0"){}

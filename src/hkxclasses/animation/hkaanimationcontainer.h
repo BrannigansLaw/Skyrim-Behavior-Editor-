@@ -3,24 +3,24 @@
 
 #include "src/hkxclasses/hkxobject.h"
 
-class hkaAnimationContainer: public HkxObject
+class hkaAnimationContainer final: public HkxObject
 {
 public:
     hkaAnimationContainer(HkxFile *parent, long ref = 0);
-    virtual ~hkaAnimationContainer();
+    hkaAnimationContainer& operator=(const hkaAnimationContainer&) = delete;
+    hkaAnimationContainer(const hkaAnimationContainer &) = delete;
+    ~hkaAnimationContainer();
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     QString evaluateDataValidity();
-    static QString getClassname();
+    static const QString getClassname();
     bool write(HkxXMLWriter *writer);
 private:
-    hkaAnimationContainer& operator=(const hkaAnimationContainer&);
-    hkaAnimationContainer(const hkaAnimationContainer &);
-private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     QVector <HkxSharedPtr> skeletons;
     //animations, bindings, attachments, skins, etc...
+    mutable std::mutex mutex;
 };
 
 #endif // HKAANIMATIONCONTAINER_H

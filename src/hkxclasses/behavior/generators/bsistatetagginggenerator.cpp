@@ -96,8 +96,6 @@ bool BSiStateTaggingGenerator::readData(const HkxXmlReader &reader, long & index
         }else if (text == "iPriority"){
             iPriority = reader.getElementValueAt(index).toInt(&ok);
             checkvalue(ok, "iPriority");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -116,7 +114,7 @@ bool BSiStateTaggingGenerator::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -168,18 +166,18 @@ QString BSiStateTaggingGenerator::evaluateDataValidity(){
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     if (!pDefaultGenerator.data()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null pDefaultGenerator!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null pDefaultGenerator!");
     }else if (pDefaultGenerator->getType() != HkxObject::TYPE_GENERATOR){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid pDefaultGenerator type! Signature: "+QString::number(pDefaultGenerator->getSignature(), 16)+" Setting null value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid pDefaultGenerator type! Signature: "+QString::number(pDefaultGenerator->getSignature(), 16)+" Setting null value!");
         pDefaultGenerator = HkxSharedPtr();
     }
     setDataValidity(isvalid);

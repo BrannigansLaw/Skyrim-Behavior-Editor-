@@ -107,8 +107,6 @@ bool hkbClipGenerator::readData(const HkxXmlReader &reader, long & index){
         }else if (text == "flags"){
             flags = reader.getElementValueAt(index);
             checkvalue((flags != ""), "flags");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -127,7 +125,7 @@ bool hkbClipGenerator::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -311,15 +309,15 @@ QString hkbClipGenerator::evaluateDataValidity(){
     QStringList list = static_cast<BehaviorFile *>(getParentFile())->getAnimationNames();
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     if (!list.contains(animationName, Qt::CaseInsensitive)){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid animationName! Fixing!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid animationName! Fixing!");
         if (!list.isEmpty()){
             animationName = list.first();
         }
@@ -327,24 +325,24 @@ QString hkbClipGenerator::evaluateDataValidity(){
     if (triggers.data()){
         if (triggers->getSignature() != HKB_CLIP_TRIGGER_ARRAY){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid triggers type! Signature: "+QString::number(triggers->getSignature(), 16)+" Setting null value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid triggers type! Signature: "+QString::number(triggers->getSignature(), 16)+" Setting null value!");
             triggers = HkxSharedPtr();
         }else if (static_cast<hkbClipTriggerArray *>(triggers.data())->triggers.size() < 1){
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": triggers has no triggers! Setting null value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": triggers has no triggers! Setting null value!");
             triggers = HkxSharedPtr();
         }else if (triggers->isDataValid() && triggers->evaluateDataValidity() != ""){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid triggers data!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid triggers data!");
         }
     }
     if (!PlaybackMode.contains(mode)){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid mode! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid mode! Setting default value!");
         mode = PlaybackMode.first();
     }
     if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){    //TO DO: Fix this...
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid flags!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid flags!");
     }
     setDataValidity(isvalid);
     return errors;

@@ -75,8 +75,6 @@ bool hkbExpressionDataArray::readData(const HkxXmlReader &reader, long & index){
                         expressionsData.last().eventMode = reader.getElementValueAt(index);
                         checkvalue(EventMode.contains(expressionsData.last().eventMode), "expressionsData.at("+QString::number(j)+").eventMode");
                         break;
-                    }else{
-                        //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                     }
                 }
             }
@@ -201,24 +199,24 @@ QString hkbExpressionDataArray::evaluateDataValidity(){
     bool isvalid = true;
     if (expressionsData.isEmpty()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": expression is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": expression is empty!");
     }else{
         for (auto i = 0; i < expressionsData.size(); i++){
             if (expressionsData.at(i).expression == ""){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": expression is null string!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": expression is null string!");
             }
             if (expressionsData.at(i).assignmentVariableIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfVariables()){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": assignmentVariableIndex at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": assignmentVariableIndex at "+QString::number(i)+" out of range!");
             }
             if (expressionsData.at(i).assignmentEventIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": assignmentEventIndex at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": assignmentEventIndex at "+QString::number(i)+" out of range!");
             }
             if (!EventMode.contains(expressionsData.at(i).eventMode)){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid eventMode!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid eventMode!");
             }
         }
     }

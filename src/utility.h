@@ -131,6 +131,7 @@ enum HkxSignature: unsigned long long {
     BS_TWEENER_MODIFIER = 0x0d2d9a04,
     HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER = 0x7cb54065,
     HKB_PROXY_MODIFIER = 0x8a41554f,
+    HKB_FOOT_IK_MODIFIER = 0xed8966c0,
     //Behavior::Other
     HKB_STRING_CONDITION = 0x5ab50487,
     HKB_EVENT_RANGE_DATA_ARRAY = 0x330a56ee,
@@ -166,7 +167,7 @@ public:
     static void writeToLog(const QString & message){
         std::lock_guard <std::mutex> guard(mutex);
         //logFile.open(QDir::currentPath().toStdString()+"/DebugLog.txt", std::ios::out | std::ios::trunc);
-        logFile << message.toStdString() << "\n";
+        logFile << message.toStdString() << "\n\n";
     }
 
     static void writeToLog(const QStringList & messages){
@@ -226,6 +227,12 @@ struct hkTransform
 
 struct hkQsTransform
 {
+    QString getValueAsString() const{
+        return "("+QString::number(v1.x, char('f'), 6)+" "+QString::number(v1.y, char('f'), 6)+" "+QString::number(v1.z, char('f'), 6)+")("+
+                QString::number(v2.x, char('f'), 6)+" "+QString::number(v2.y, char('f'), 6)+" "+QString::number(v2.z, char('f'), 6)+" "+QString::number(v2.w, char('f'), 6)+")("+
+                QString::number(v3.x, char('f'), 6)+" "+QString::number(v3.y, char('f'), 6)+" "+QString::number(v3.z, char('f'), 6)+")";
+    }
+
     hkVector3 v1;
     hkQuadVariable v2;
     hkVector3 v3;

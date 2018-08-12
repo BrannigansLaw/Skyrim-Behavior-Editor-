@@ -3,13 +3,9 @@
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/skeletonfile.h"
 
-/*
- * CLASS: hkaSkeleton
-*/
-
 uint hkaSkeleton::refCount = 0;
 
-QString hkaSkeleton::classname = "hkaSkeleton";
+const QString hkaSkeleton::classname = "hkaSkeleton";
 
 hkaSkeleton::hkaSkeleton(HkxFile *parent, long ref)
     : HkxObject(parent, ref)
@@ -19,11 +15,12 @@ hkaSkeleton::hkaSkeleton(HkxFile *parent, long ref)
     refCount++;
 }
 
-QString hkaSkeleton::getClassname(){
+const QString hkaSkeleton::getClassname(){
     return classname;
 }
 
 QStringList hkaSkeleton::getBoneNames() const{
+    std::lock_guard <std::mutex> guard(mutex);
     QStringList list;
     for (auto i = 0; i < bones.size(); i++){
         list.append(bones.at(i).name);
@@ -32,6 +29,7 @@ QStringList hkaSkeleton::getBoneNames() const{
 }
 
 QString hkaSkeleton::getLocalFrameName(int boneIndex) const{
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < localFrames.size(); i++){
         if (boneIndex == localFrames.at(i).boneIndex && localFrames.at(i).localFrame.data() && localFrames.at(i).localFrame->getSignature() == HK_SIMPLE_LOCAL_FRAME){
             return static_cast<hkSimpleLocalFrame *>(localFrames.at(i).localFrame.data())->getName();
@@ -41,6 +39,7 @@ QString hkaSkeleton::getLocalFrameName(int boneIndex) const{
 }
 
 bool hkaSkeleton::addLocalFrame(const QString & name){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < localFrames.size(); i++){
         if (localFrames.at(i).localFrame.data() && localFrames.at(i).localFrame->getSignature() == HK_SIMPLE_LOCAL_FRAME){
             if (static_cast<hkSimpleLocalFrame *>(localFrames[i].localFrame.data())->getName() == name){
@@ -54,6 +53,7 @@ bool hkaSkeleton::addLocalFrame(const QString & name){
 }
 
 void hkaSkeleton::setLocalFrameName(int boneIndex, const QString & name){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < localFrames.size(); i++){
         if (boneIndex == localFrames.at(i).boneIndex && localFrames.at(i).localFrame.data() && localFrames.at(i).localFrame->getSignature() == HK_SIMPLE_LOCAL_FRAME){
             if (name == ""){
@@ -68,6 +68,7 @@ void hkaSkeleton::setLocalFrameName(int boneIndex, const QString & name){
 }
 
 bool hkaSkeleton::removeLocalFrame(int boneIndex){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < localFrames.size(); i++){
         if (boneIndex == localFrames.at(i).boneIndex){
             static_cast<SkeletonFile *>(getParentFile())->localFrames.removeAll(localFrames.at(i).localFrame);
@@ -79,6 +80,7 @@ bool hkaSkeleton::removeLocalFrame(int boneIndex){
 }
 
 bool hkaSkeleton::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     int numElems = 0;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
@@ -187,10 +189,8 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long & index){
 }
 
 bool hkaSkeleton::write(HkxXMLWriter *writer){
-    if (!writer){
-        return false;
-    }
-    if (!getIsWritten()){
+    std::lock_guard <std::mutex> guard(mutex);
+    if (writer && !getIsWritten()){
         QString bonesS;
         QStringList list1 = {writer->name, writer->clas, writer->signature};
         QStringList list2 = {getReferenceString(), getClassname(), "0x"+QString::number(getSignature(), 16)};
@@ -285,9 +285,7 @@ bool hkaSkeleton::write(HkxXMLWriter *writer){
 }
 
 bool hkaSkeleton::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     HkxSharedPtr *ptr;
     for (auto i = 0; i < localFrames.size(); i++){
         ptr = static_cast<SkeletonFile *>(getParentFile())->findLocalFrame(localFrames.at(i).localFrame.getShdPtrReference());
@@ -306,12 +304,14 @@ bool hkaSkeleton::link(){
 }
 
 void hkaSkeleton::unlink(){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < localFrames.size(); i++){
         localFrames[i].localFrame = HkxSharedPtr();
     }
 }
 
 QString hkaSkeleton::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < localFrames.size(); i++){
         if (!localFrames.at(i).localFrame.data() || localFrames.at(i).localFrame->getSignature() != HK_SIMPLE_LOCAL_FRAME){
             setDataValidity(false);

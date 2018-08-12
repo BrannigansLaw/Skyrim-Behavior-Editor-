@@ -121,8 +121,6 @@ bool BSSynchronizedClipGenerator::readData(const HkxXmlReader &reader, long & in
         }else if (text == "sAnimationBindingIndex"){
             sAnimationBindingIndex = reader.getElementValueAt(index).toInt(&ok);
             checkvalue(ok, "sAnimationBindingIndex");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -141,7 +139,7 @@ bool BSSynchronizedClipGenerator::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};

@@ -131,8 +131,6 @@ bool hkbSenseHandleModifier::readData(const HkxXmlReader &reader, long & index){
         }else if (text == "foundHandleOut"){
             foundHandleOut = toBool(reader.getElementValueAt(index), &ok);
             checkvalue(ok, "foundHandleOut");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -151,7 +149,7 @@ bool hkbSenseHandleModifier::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -324,12 +322,12 @@ QString hkbSenseHandleModifier::evaluateDataValidity(){
     bool isvalid = true;
     if (ranges.isEmpty()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": ranges is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": ranges is empty!");
     }else{
         for (auto i = 0; i < ranges.size(); i++){
             if (ranges.at(i).event.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": id in ranges at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": id in ranges at "+QString::number(i)+" out of range!");
             }
             if (ranges.at(i).event.payload.data() && ranges.at(i).event.payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 isvalid = false;
@@ -337,34 +335,34 @@ QString hkbSenseHandleModifier::evaluateDataValidity(){
             }
         }
     }
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");}
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     if (!SensingMode.contains(sensingMode)){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid sensingMode! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid sensingMode! Setting default value!");
         sensingMode = SensingMode.first();
     }
     if (sensorRagdollBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": sensorRagdollBoneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": sensorRagdollBoneIndex out of range! Setting to last bone index!");
         sensorRagdollBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
     }
     if (sensorAnimationBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": sensorAnimationBoneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": sensorAnimationBoneIndex out of range! Setting to last bone index!");
         sensorAnimationBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (sensorRagdollBoneIndex > -1 && sensorAnimationBoneIndex > -1){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": sensorRagdollBoneIndex and sensorAnimationBoneIndex are both in use at the same time! This will crash the game! Setting sensorRagdollBoneIndex to -1!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": sensorRagdollBoneIndex and sensorAnimationBoneIndex are both in use at the same time! This will crash the game! Setting sensorRagdollBoneIndex to -1!");
         sensorRagdollBoneIndex = -1;
     }
     if (sensorRagdollBoneIndex < 0 && sensorAnimationBoneIndex < 0 ){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Neither sensorRagdollBoneIndex and sensorAnimationBoneIndex are in use! Setting sensorAnimationBoneIndex to 0!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Neither sensorRagdollBoneIndex and sensorAnimationBoneIndex are in use! Setting sensorAnimationBoneIndex to 0!");
         sensorAnimationBoneIndex = 0;
     }
     setDataValidity(isvalid);

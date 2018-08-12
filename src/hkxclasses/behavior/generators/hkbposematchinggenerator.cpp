@@ -247,8 +247,6 @@ bool hkbPoseMatchingGenerator::readData(const HkxXmlReader &reader, long & index
         }else if (text == "mode"){
             mode = reader.getElementValueAt(index);
             checkvalue(Mode.contains(mode), "mode");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -262,7 +260,7 @@ bool hkbPoseMatchingGenerator::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QString refString = "null";
@@ -367,70 +365,70 @@ QString hkbPoseMatchingGenerator::evaluateDataValidity(){
     auto valid = true;
     if (children.isEmpty()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": children is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": children is empty!");
     }else{
         for (auto i = children.size() - 1; i >= 0; i--){
             if (!children.at(i).data()){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": children at index '"+QString::number(i)+"' is null! Removing child!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": children at index '"+QString::number(i)+"' is null! Removing child!");
                 children.removeAt(i);
             }else if (children.at(i)->getSignature() != HKB_BLENDER_GENERATOR_CHILD){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid child! Signature: "+QString::number(children.at(i)->getSignature(), 16)+" Removing child!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid child! Signature: "+QString::number(children.at(i)->getSignature(), 16)+" Removing child!");
                 children.removeAt(i);
             }
         }
     }
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     if (flags.toUInt(&valid) >= INVALID_FLAG || !valid){    //TO DO: fix
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid flags!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid flags!");
     }
     if (indexOfSyncMasterChild >= children.size()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": indexOfSyncMasterChild is out of range! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": indexOfSyncMasterChild is out of range! Setting default value!");
         indexOfSyncMasterChild = -1;
     }
     if (!Mode.contains(mode)){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid mode! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid mode! Setting default value!");
         mode = Mode.first();
     }
     if (startPlayingEventId >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": startPlayingEventId event id out of range! Setting to last event index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": startPlayingEventId event id out of range! Setting to last event index!");
         startPlayingEventId = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (startMatchingEventId >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": startMatchingEventId event id out of range! Setting to last event index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": startMatchingEventId event id out of range! Setting to last event index!");
         startMatchingEventId = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (rootBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": rootBoneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": rootBoneIndex out of range! Setting to last bone index!");
         rootBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (otherBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": otherBoneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": otherBoneIndex out of range! Setting to last bone index!");
         otherBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (anotherBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": anotherBoneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": anotherBoneIndex out of range! Setting to last bone index!");
         anotherBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (pelvisIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": pelvisIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": pelvisIndex out of range! Setting to last bone index!");
         pelvisIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     setDataValidity(isvalid);

@@ -84,8 +84,6 @@ bool BSEventEveryNEventsModifier::readData(const HkxXmlReader &reader, long & in
         }else if (text == "randomizeNumberOfEvents"){
             randomizeNumberOfEvents = toBool(reader.getElementValueAt(index), &ok);
             checkvalue(ok, "randomizeNumberOfEvents");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -104,7 +102,7 @@ bool BSEventEveryNEventsModifier::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -267,12 +265,12 @@ QString BSEventEveryNEventsModifier::evaluateDataValidity(){
     auto checkevents = [&](int & id, HkxSharedPtr & payload, const QString & fieldname){
         if (id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+fieldname+" event id out of range! Setting to max index in range!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+fieldname+" event id out of range! Setting to max index in range!");
             id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
         }
         if (payload.data() && payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid "+fieldname+" type! Signature: "+QString::number(payload->getSignature(), 16)+" Setting null value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid "+fieldname+" type! Signature: "+QString::number(payload->getSignature(), 16)+" Setting null value!");
             payload = HkxSharedPtr();
         }
     };
@@ -280,7 +278,7 @@ QString BSEventEveryNEventsModifier::evaluateDataValidity(){
     (temp != "") ? errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n"): NULL;
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     checkevents(eventToCheckFor.id, eventToCheckFor.payload, "eventToCheckFor");
     checkevents(eventToSend.id, eventToSend.payload, "eventToSend");

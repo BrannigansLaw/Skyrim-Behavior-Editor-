@@ -37,14 +37,14 @@ bool hkbProjectStringData::readData(const HkxXmlReader &reader, long & index){
     auto getstrings = [&](QStringList & strings, const QString & fieldname){
         numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
         if (!ok){
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read '"+fieldname+"' data!\nObject Reference: "+ref);
+            LogFile::writeToLog(": "+getClassname()+": readData()!\nFailed to properly read '"+fieldname+"' data!\nObject Reference: "+ref);
         }
         if (numElems > 0){
             index++;
             numElems = numElems + index;
             for (; index < numElems; index++){
                 if (reader.getElementNameAt(index) != "hkcstring" || index >= reader.getNumElements()){
-                    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'behaviorFilenames' data!\nObject Reference: "+ref);
+                    LogFile::writeToLog(": "+getClassname()+": readData()!\nFailed to properly read 'behaviorFilenames' data!\nObject Reference: "+ref);
                 }
                 strings.append(reader.getElementValueAt(index));
             }
@@ -53,7 +53,7 @@ bool hkbProjectStringData::readData(const HkxXmlReader &reader, long & index){
     auto getpath = [&](QString & field, const QString & fieldname){
         field = reader.getElementValueAt(index);
         if (field == ""){
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read '"+fieldname+"' data field!\nObject Reference: "+ref);
+            LogFile::writeToLog(": "+getClassname()+": readData()!\nFailed to properly read '"+fieldname+"' data field!\nObject Reference: "+ref);
         }
     };
     for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
@@ -74,8 +74,6 @@ bool hkbProjectStringData::readData(const HkxXmlReader &reader, long & index){
             getpath(characterPath, "characterPath");
         }else if (text == "fullPathToSource"){
             getpath(fullPathToSource, "fullPathToSource");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -150,7 +148,7 @@ QString hkbProjectStringData::evaluateDataValidity(){
         for (auto i = 0; i < list.size(); i++){
             if (list.at(i) == ""){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid "+fieldname+" at "+QString::number(i)+"!\n");
+                errors.append(": "+getClassname()+": Ref: "+getReferenceString()+": Invalid "+fieldname+" at "+QString::number(i)+"!");
             }
         }
     };

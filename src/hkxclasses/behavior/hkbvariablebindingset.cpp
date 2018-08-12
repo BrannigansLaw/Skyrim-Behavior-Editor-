@@ -161,8 +161,6 @@ bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long & index){
                             LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'bindingType' data field contains an invalid string!\nObject Reference: "+ref);
                         }
                         break;
-                    }else{
-                        //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                     }
                 }
             }
@@ -170,8 +168,6 @@ bool hkbVariableBindingSet::readData(const HkxXmlReader &reader, long & index){
         }else if (text == "indexOfBindingToEnable"){
             indexOfBindingToEnable = reader.getElementValueAt(index).toInt(&ok);
             checkvalue(ok, "indexOfBindingToEnable");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -323,21 +319,21 @@ QString hkbVariableBindingSet::evaluateDataValidity(){
     bool isvalid = true;
     if (bindings.isEmpty()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": bindings is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": bindings is empty!");
     }else{
         for (auto i = 0; i < bindings.size(); i++){
             if (bindings.at(i).memberPath == ""){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": memberPath is null string!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": memberPath is null string!");
             }
             if (bindings.at(i).bindingType == hkBinding::BINDING_TYPE_VARIABLE && bindings.at(i).variableIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfVariables()){
                 //isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableIndex at "+QString::number(i)+" out of range! Setting to last variable index!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableIndex at "+QString::number(i)+" out of range! Setting to last variable index!");
                 bindings[i].variableIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfVariables() - 1;
             }
             /*if (bindings.at(i).bindingType == hkBinding::BINDING_TYPE_CHARACTER_PROPERTY && bindings.at(i).variableIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfCharacterProperties()){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableIndex at "+QString::number(i)+" out of range!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableIndex at "+QString::number(i)+" out of range!");
             }*/
         }
     }

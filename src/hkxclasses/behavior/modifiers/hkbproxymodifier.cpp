@@ -179,8 +179,6 @@ bool hkbProxyModifier::readData(const HkxXmlReader &reader, long & index){
         }else if (text == "isTouchingGround"){
             isTouchingGround = toBool(reader.getElementValueAt(index), &ok);
             checkvalue(ok, "isTouchingGround");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;

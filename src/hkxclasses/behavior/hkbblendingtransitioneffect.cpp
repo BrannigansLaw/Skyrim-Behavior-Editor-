@@ -135,8 +135,6 @@ bool hkbBlendingTransitionEffect::readData(const HkxXmlReader &reader, long & in
         }else if (text == "blendCurve"){
             blendCurve = reader.getElementValueAt(index);
             checkvalue(BlendCurve.contains(blendCurve), "blendCurve");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -196,17 +194,17 @@ QString hkbBlendingTransitionEffect::evaluateDataValidity(){
     auto checkstrings = [&](QString & datafield, const QStringList & list, const QString & fieldname){
         if (!list.contains(datafield)){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid "+fieldname+"! Setting default value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid "+fieldname+"! Setting default value!");
             datafield = list.first();
         }
     };
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     checkstrings(selfTransitionMode, SelfTransitionMode, "selfTransitionMode");
     checkstrings(eventMode, EventMode, "eventMode");

@@ -50,6 +50,7 @@
 #include "src/hkxclasses/behavior/modifiers/hkbtwistmodifier.h"
 #include "src/hkxclasses/behavior/modifiers/hkbeventdrivenmodifier.h"
 #include "src/hkxclasses/behavior/modifiers/hkbfootikcontrolsmodifier.h"
+#include "src/hkxclasses/behavior/modifiers/hkbfootikmodifier.h"
 #include "src/hkxclasses/behavior/modifiers/hkbevaluateexpressionmodifier.h"
 #include "src/hkxclasses/behavior/modifiers/hkbrotatecharactermodifier.h"
 #include "src/hkxclasses/behavior/modifiers/hkbdampingmodifier.h"
@@ -531,6 +532,7 @@ void BehaviorFile::generateDefaultCharacterData(){
 }*/
 
 QStringList BehaviorFile::getAllBehaviorFileNames() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     QStringList list;
     QDirIterator it(QFileInfo(*this).absolutePath()+"/");
     while (it.hasNext()){
@@ -542,18 +544,17 @@ QStringList BehaviorFile::getAllBehaviorFileNames() const{
 }
 
 void BehaviorFile::setLocalTimeForClipGenAnimData(const QString &clipname, int triggerindex, qreal time){
-    if (project){
-        project->setLocalTimeForClipGenAnimData(clipname, triggerindex, time);
-    }
+    //std::lock_guard <std::mutex> guard(mutex);
+    (project) ? project->setLocalTimeForClipGenAnimData(clipname, triggerindex, time) : LogFile::writeToLog(fileName()+" has no associated project!");
 }
 
 void BehaviorFile::setEventNameForClipGenAnimData(const QString &clipname, int triggerindex, int eventid){
-    if (project){
-        project->setEventNameForClipGenAnimData(clipname, triggerindex, getEventNameAt(eventid));
-    }
+    //std::lock_guard <std::mutex> guard(mutex);
+    (project) ? project->setEventNameForClipGenAnimData(clipname, triggerindex, getEventNameAt(eventid)) : LogFile::writeToLog(fileName()+" has no associated project!");
 }
 
 bool BehaviorFile::isClipGenNameTaken(const QString & name) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < generators.size() - 1; i++){
         if (generators.at(i)->getSignature() == HKB_CLIP_GENERATOR && name == static_cast<hkbClipGenerator *>(generators.at(i).data())->getName()){
             return true;
@@ -563,6 +564,7 @@ bool BehaviorFile::isClipGenNameTaken(const QString & name) const{
 }
 
 bool BehaviorFile::isClipGenNameAvailable(const QString &name) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (project){
         return !project->isClipGenNameTaken(name);
     }
@@ -570,13 +572,15 @@ bool BehaviorFile::isClipGenNameAvailable(const QString &name) const{
 }
 
 bool BehaviorFile::addClipGenToAnimationData(const QString &name){
-    if (!isClipGenNameAvailable(name) || !project){
+    //std::lock_guard <std::mutex> guard(mutex);
+    if (!project->isClipGenNameTaken(name) || !project){
         return false;
     }
     return project->appendClipGeneratorAnimData(name);
 }
 
 bool BehaviorFile::removeClipGenFromAnimData(const QString & animationname, const QString & clipname, const QString & variablename){
+    //std::lock_guard <std::mutex> guard(mutex);
     if (project){
         return project->removeClipGenFromAnimData(animationname, clipname, variablename);
     }
@@ -584,85 +588,74 @@ bool BehaviorFile::removeClipGenFromAnimData(const QString & animationname, cons
 }
 
 void BehaviorFile::setClipNameAnimData(const QString &oldclipname, const QString &newclipname){
-    if (project){
-        project->setClipNameAnimData(oldclipname, newclipname);
-    }
+    //std::lock_guard <std::mutex> guard(mutex);
+    (project) ? project->setClipNameAnimData(oldclipname, newclipname) : LogFile::writeToLog(fileName()+" has no associated project!");
 }
 
 void BehaviorFile::setAnimationIndexAnimData(int index, const QString &clipGenName){
-    if (project){
-        project->setAnimationIndexForClipGen(index, clipGenName);
-    }
+    //std::lock_guard <std::mutex> guard(mutex);
+    (project) ? project->setAnimationIndexForClipGen(index, clipGenName) : LogFile::writeToLog(fileName()+" has no associated project!");
 }
 
 void BehaviorFile::setPlaybackSpeedAnimData(const QString &clipGenName, qreal speed){
-    if (project){
-        project->setPlaybackSpeedAnimData(clipGenName, speed);
-    }
+    //std::lock_guard <std::mutex> guard(mutex);
+    (project) ? project->setPlaybackSpeedAnimData(clipGenName, speed) : LogFile::writeToLog(fileName()+" has no associated project!");
 }
 
 void BehaviorFile::setCropStartAmountLocalTimeAnimData(const QString &clipGenName, qreal time){
-    if (project){
-        project->setCropStartAmountLocalTimeAnimData(clipGenName, time);
-    }
+    //std::lock_guard <std::mutex> guard(mutex);
+    (project) ? project->setCropStartAmountLocalTimeAnimData(clipGenName, time) : LogFile::writeToLog(fileName()+" has no associated project!");
 }
 
 void BehaviorFile::setCropEndAmountLocalTimeAnimData(const QString &clipGenName, qreal time){
-    if (project){
-        project->setCropEndAmountLocalTimeAnimData(clipGenName, time);
-    }
+    //std::lock_guard <std::mutex> guard(mutex);
+    (project) ? project->setCropEndAmountLocalTimeAnimData(clipGenName, time) : LogFile::writeToLog(fileName()+" has no associated project!");
 }
 
 void BehaviorFile::appendClipTriggerToAnimData(const QString &clipGenName){
-    if (project){
-        project->appendClipTriggerToAnimData(clipGenName, getEventNameAt(0));
-    }
+    //std::lock_guard <std::mutex> guard(mutex);
+    (project) ? project->appendClipTriggerToAnimData(clipGenName, getEventNameAt(0)) : LogFile::writeToLog(fileName()+" has no associated project!");
 }
 
 void BehaviorFile::removeClipTriggerToAnimDataAt(const QString &clipGenName, int index){
-    if (project){
-        project->removeClipTriggerToAnimDataAt(clipGenName, index);
-    }
+    //std::lock_guard <std::mutex> guard(mutex);
+    (project) ? project->removeClipTriggerToAnimDataAt(clipGenName, index) : LogFile::writeToLog(fileName()+" has no associated project!");
 }
 
 QString BehaviorFile::isEventReferenced(int eventindex) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
     QString objnames;
     int size;
+    auto getreferencedevents = [&](const QVector <HkxSharedPtr> & list){
+        for (auto i = 0; i < list.size(); i++){
+            if (list.at(i).constData()->isEventReferenced(eventindex)){
+                objnames.append(static_cast<const DataIconManager *>(list.at(i).constData())->getName()+"\n");
+            }
+            if (objnames.size() > MAX_ERROR_STRING_SIZE){
+                objnames.append("...");
+                break;
+            }
+        }
+    };
     if (stringdata && stringdata->eventNames.size() > eventindex && eventindex > -1){
         objnames = "The event \""+stringdata->getEventNameAt(eventindex)+" \" is referenced by the following objects: \n";
         size = objnames.size();
-        for (auto i = 0; i < generators.size(); i++){
-            if (generators.at(i).constData()->isEventReferenced(eventindex)){
-                objnames.append(static_cast<const hkbGenerator *>(generators.at(i).constData())->getName()+"\n");
-            }
-            if (objnames.size() > MAX_ERROR_STRING_SIZE){
-                objnames.append("...");
-                break;
-            }
-        }
-        for (auto i = 0; i < modifiers.size(); i++){
-            if (modifiers.at(i).constData()->isEventReferenced(eventindex)){
-                objnames.append(static_cast<const hkbGenerator *>(modifiers.at(i).constData())->getName()+"\n");
-            }
-            if (objnames.size() > MAX_ERROR_STRING_SIZE){
-                objnames.append("...");
-                break;
-            }
-        }
+        getreferencedevents(generators);
+        getreferencedevents(modifiers);
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BehaviorFile::isEventReferenced(): stringdata null or invalid variable index!!!"));
+        LogFile::writeToLog(fileName()+": stringdata null or invalid event index!!!");
     }
     if (objnames.size() > size){
         return objnames;
-    }else{
-        return "";
     }
+    return "";
 }
 
 void BehaviorFile::updateEventIndices(int index){
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
-    if (stringdata && stringdata->eventNames.size() >= index && index > -1){
+    if (stringdata && stringdata->getNumberOfEvents() >= index && index > -1){
         for (auto i = 0; i < generators.size(); i++){
             generators.at(i)->updateEventIndices(index);
         }
@@ -670,117 +663,103 @@ void BehaviorFile::updateEventIndices(int index){
             modifiers.at(i)->updateEventIndices(index);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BehaviorFile::updateEventIndices(): stringdata null or invalid event index!!!"));
+        LogFile::writeToLog(fileName()+": stringdata null or invalid event index!!!");
     }
 }
 
 QString BehaviorFile::isVariableReferenced(int variableindex) const{
-    hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
-    QString objnames;
+    //std::lock_guard <std::mutex> guard(mutex);
     int size;
-    if (stringdata && stringdata->variableNames.size() > variableindex && variableindex > -1){
+    QString objnames;
+    hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
+    auto getreferencedvars = [&](const QVector <HkxSharedPtr> & list){
+        for (auto i = 0; i < list.size(); i++){
+            if (list.at(i).constData()->isVariableReferenced(variableindex)){
+                objnames.append(static_cast<const DataIconManager *>(list.at(i).constData())->getName()+"\n");
+            }
+            if (objnames.size() > MAX_ERROR_STRING_SIZE){
+                objnames.append("...");
+                break;
+            }
+        }
+    };
+    if (stringdata && stringdata->getNumberOfVariables() > variableindex && variableindex > -1){
         objnames = "The variable \""+stringdata->getVariableNameAt(variableindex)+" \" is referenced by the following objects: \n";
         size = objnames.size();
-        for (auto i = 0; i < generators.size(); i++){
-            if (generators.at(i).constData()->isVariableReferenced(variableindex)){
-                objnames.append(static_cast<const hkbGenerator *>(generators.at(i).constData())->getName()+"\n");
-            }
-            if (objnames.size() > MAX_ERROR_STRING_SIZE){
-                objnames.append("...");
-                break;
-            }
-        }
-        for (auto i = 0; i < modifiers.size(); i++){
-            if (modifiers.at(i).constData()->isVariableReferenced(variableindex)){
-                objnames.append(static_cast<const hkbGenerator *>(modifiers.at(i).constData())->getName()+"\n");
-            }
-            if (objnames.size() > MAX_ERROR_STRING_SIZE){
-                objnames.append("...");
-                break;
-            }
-        }
+        getreferencedvars(generators);
+        getreferencedvars(modifiers);
         for (auto i = 0; i < otherTypes.size(); i++){
-            if (otherTypes.at(i).constData()->getSignature() == HKB_VARIABLE_BINDING_SET){
-                const hkbVariableBindingSet *tempptr = static_cast<const hkbVariableBindingSet *>(otherTypes.at(i).constData());
-                tempptr->getSignature();
-            }
             if (otherTypes.at(i).constData()->getSignature() == HKB_BLENDING_TRANSITION_EFFECT && otherTypes.at(i).constData()->isVariableReferenced(variableindex)){
                 objnames.append(static_cast<const hkbBlendingTransitionEffect *>(otherTypes.at(i).constData())->getName()+"\n");
-            }/*else if (otherTypes.at(i).constData()->getSignature() != HKB_VARIABLE_BINDING_SET){
-                objnames.append(QString::number(otherTypes.at(i).constData()->getSignature(), 16)+"\n");
-            }*/
+            }
             if (objnames.size() > MAX_ERROR_STRING_SIZE){
                 objnames.append("...");
                 break;
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BehaviorFile::isVariableReferenced(): stringdata null or invalid variable index!!!"));
+        LogFile::writeToLog(fileName()+": stringdata null or invalid variable index!!!");
     }
     if (objnames.size() > size){
         return objnames;
-    }else{
-        return "";
     }
+    return "";
 }
 
 void BehaviorFile::updateVariableIndices(int index){
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphStringData *stringdata = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
-    if (stringdata && stringdata->variableNames.size() >= index && index > -1){
+    if (stringdata && stringdata->getNumberOfVariables() >= index && index > -1){
         for (auto i = 0; i < otherTypes.size(); i++){
             if (otherTypes.at(i)->getSignature() == HKB_VARIABLE_BINDING_SET){
                 static_cast<hkbVariableBindingSet *>(otherTypes.at(i).data())->updateVariableIndices(index);
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE(QString("BehaviorFile::updateVariableIndices(): stringdata null or invalid variable index!!!"));
+        LogFile::writeToLog(fileName()+":  stringdata null or invalid variable index!!!");
     }
 }
 
 void BehaviorFile::removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *gentoignore){
-    if (project){
-        project->removeUnreferencedFiles(gentoignore);
-    }
+    //std::lock_guard <std::mutex> guard(mutex);
+    (project) ? project->removeUnreferencedFiles(gentoignore) : LogFile::writeToLog(fileName()+" has no associated project!");
 }
 
 QStringList BehaviorFile::getReferencedBehaviors(const hkbBehaviorReferenceGenerator *gentoignore) const{
-    QStringList list;
+    //std::lock_guard <std::mutex> guard(mutex);
     QString name;
+    QStringList list;
     for (auto i = 0; i < generators.size(); i++){
         if (generators.at(i)->getSignature() == HKB_BEHAVIOR_REFERENCE_GENERATOR && gentoignore != generators.at(i).constData()){
             name = static_cast<hkbBehaviorReferenceGenerator *>(generators.at(i).data())->getBehaviorName();
-            if (!list.contains(name)){
-                list.append(name);
-            }
+            (!list.contains(name)) ? list.append(name) : NULL;
         }
     }
     return list;
 }
 
 void BehaviorFile::removeAllData(){
-    removeGeneratorData();
-    removeModifierData();
-    removeOtherData();
+    //std::lock_guard <std::mutex> guard(mutex);
+    removeDataNoLock(generators);
+    removeDataNoLock(modifiers);
+    removeDataNoLock(otherTypes);
 }
 
 void BehaviorFile::getCharacterPropertyBoneWeightArray(const QString &name, hkbBoneWeightArray *ptrtosetdata) const{
-    if (character){
-        static_cast<CharacterFile *>(character)->getCharacterPropertyBoneWeightArray(name, ptrtosetdata);
-    }
+    //std::lock_guard <std::mutex> guard(mutex);
+    (character) ? static_cast<CharacterFile *>(character)->getCharacterPropertyBoneWeightArray(name, ptrtosetdata) : LogFile::writeToLog(fileName()+" has no associated character file!");
 }
 
 hkbStateMachine *BehaviorFile::findRootStateMachineFromBehavior(const QString behaviorname) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (project){
-        for (auto i = 0; i < project->behaviorFiles.size(); i++){
-            if (project->behaviorFiles.at(i)->fileName().contains(QString(behaviorname).replace("\\", "/"), Qt::CaseInsensitive)){
-                return static_cast<hkbStateMachine *>(project->behaviorFiles.at(i)->getRootStateMachine());
-            }
-        }
+        return project->findRootStateMachineFromBehavior(behaviorname);
     }
     return nullptr;
 }
 
 qreal BehaviorFile::getAnimationDurationFromAnimData(const QString &animationname) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (project){
         return project->getAnimationDurationFromAnimData(animationname);
     }
@@ -788,24 +767,7 @@ qreal BehaviorFile::getAnimationDurationFromAnimData(const QString &animationnam
 }
 
 void BehaviorFile::mergeEventIndices(int oldindex, int newindex){
-    /*QVector <DataIconManager *> objects = static_cast<DataIconManager *>(behaviorGraph.data())->getChildren();
-    QVector <DataIconManager *> children;
-    hkbGenerator *generator = nullptr;
-    hkbModifier *modifier = nullptr;
-    while (!objects.isEmpty()){
-        if (objects.last()->getType() == HkxObject::TYPE_GENERATOR){
-            generator = static_cast<hkbGenerator *>(objects.last());
-            generator->mergeEventIndex(oldindex, newindex);
-            children = generator->getChildren();
-        }else if (objects.last()->getType() == HkxObject::TYPE_MODIFIER){
-            modifier = static_cast<hkbModifier *>(objects.last());
-            modifier->mergeEventIndex(oldindex, newindex);
-            children = modifier->getChildren();
-        }
-        objects.removeLast();
-        objects = objects + children;
-        children.clear();
-    }*/
+    //std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < generators.size(); i++){
         generators.at(i)->mergeEventIndex(oldindex, newindex);
     }
@@ -815,24 +777,7 @@ void BehaviorFile::mergeEventIndices(int oldindex, int newindex){
 }
 
 void BehaviorFile::mergeVariableIndices(int oldindex, int newindex){
-    /*QVector <DataIconManager *> objects = static_cast<DataIconManager *>(behaviorGraph.data())->getChildren();
-    QVector <DataIconManager *> children;
-    hkbGenerator *generator = nullptr;
-    hkbModifier *modifier = nullptr;
-    while (!objects.isEmpty()){
-        if (objects.last()->getType() == HkxObject::TYPE_GENERATOR){
-            generator = static_cast<hkbGenerator *>(objects.last());
-            generator->mergeVariableIndices(oldindex, newindex);
-            children = generator->getChildren();
-        }else if (objects.last()->getType() == HkxObject::TYPE_MODIFIER){
-            modifier = static_cast<hkbModifier *>(objects.last());
-            modifier->mergeVariableIndices(oldindex, newindex);
-            children = modifier->getChildren();
-        }
-        objects.removeLast();
-        objects = objects + children;
-        children.clear();
-    }*/
+    //std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < otherTypes.size(); i++){
         if (otherTypes.at(i)->getSignature() == HKB_VARIABLE_BINDING_SET){
             static_cast<hkbVariableBindingSet *>(otherTypes.at(i).data())->mergeVariableIndex(oldindex, newindex);
@@ -841,15 +786,14 @@ void BehaviorFile::mergeVariableIndices(int oldindex, int newindex){
 }
 
 bool BehaviorFile::isNameUniqueInProject(HkxObject *object) const{
-    if (project){
-        return project->isNameUniqueInProject(object, fileName());
-    }
-    WARNING_MESSAGE("BehaviorFile::isNameUniqueInProject(): project is nullptr!!!");
-    return true;
+    //std::lock_guard <std::mutex> guard(mutex);
+    auto value = false;
+    (project) ? value = project->isNameUniqueInProject(object, fileName()) : LogFile::writeToLog(fileName()+" has no associated project!");
+    return value;
 }
 
 bool BehaviorFile::existsInBehavior(HkDynamicObject *object, int startindex) const{
-
+    //std::lock_guard <std::mutex> guard(mutex);
     bool found = false;
     HkxObject::HkxType type;
     DataIconManager *obj;
@@ -904,13 +848,14 @@ bool BehaviorFile::existsInBehavior(HkDynamicObject *object, int startindex) con
 }
 
 hkbStateMachine * BehaviorFile::getRootStateMachine() const{
-    if (behaviorGraph.data()){
-        return static_cast<hkbBehaviorGraph *>(behaviorGraph.data())->getRootGenerator();
-    }
-    return nullptr;
+    //std::lock_guard <std::mutex> guard(mutex);
+    hkbStateMachine *ptr = nullptr;
+    behaviorGraph.data() ? ptr = static_cast<hkbBehaviorGraph *>(behaviorGraph.data())->getRootGenerator() : LogFile::writeToLog(fileName()+" behaviorGraph is nullptr!");
+    return ptr;
 }
 
 hkbBehaviorGraph * BehaviorFile::getBehaviorGraph() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (behaviorGraph.data()){
         return static_cast<hkbBehaviorGraph *>(behaviorGraph.data());
     }
@@ -918,6 +863,7 @@ hkbBehaviorGraph * BehaviorFile::getBehaviorGraph() const{
 }
 
 QStringList BehaviorFile::getRigBoneNames() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (character){
         return character->getRigBoneNames();
     }
@@ -925,6 +871,7 @@ QStringList BehaviorFile::getRigBoneNames() const{
 }
 
 int BehaviorFile::getNumberOfBones(bool ragdoll) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (character){
         return character->getNumberOfBones(ragdoll);
     }
@@ -932,28 +879,15 @@ int BehaviorFile::getNumberOfBones(bool ragdoll) const{
 }
 
 QStringList BehaviorFile::getRagdollBoneNames() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (character){
         return character->getRagdollBoneNames();
     }
     return QStringList();
 }
 
-/*TreeGraphicsItem * BehaviorFile::getRootIcon() const{
-    hkRootLevelContainer *root = static_cast<hkRootLevelContainer *>(rootObject.data());
-    hkbBehaviorGraph *graph = nullptr;
-    if (!root->namedVariants.isEmpty() && root->namedVariants.at(0).variant.data() && root->namedVariants.at(0).variant->getSignature() == HKB_BEHAVIOR_GRAPH){
-        graph = static_cast<hkbBehaviorGraph *>(root->namedVariants.at(0).variant.data());
-        if (!graph->icons.isEmpty()){
-            return graph->icons.first();
-        }else{
-            graph->appendIcon(new TreeGraphicsItem(graph, graph->getName()));
-            return graph->icons.first();
-        }
-    }
-    return nullptr;
-}*/
-
 bool BehaviorFile::addObjectToFile(HkxObject *obj, long ref){
+    //std::lock_guard <std::mutex> guard(mutex);
     if (obj){
         if (ref < 1){
             largestRef++;
@@ -971,415 +905,247 @@ bool BehaviorFile::addObjectToFile(HkxObject *obj, long ref){
         }else if (obj->getType() == HkxObject::TYPE_OTHER){
             otherTypes.append(HkxSharedPtr(obj, ref));
         }else{
-            WARNING_MESSAGE("BehaviorFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16));
+            LogFile::writeToLog(fileName()+": addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16));
             return false;
         }
         obj->setParentFile(this);
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 bool BehaviorFile::parse(){
-    if (!getReader().parse()){
-        return false;
-    }
+    ////std::lock_guard <std::mutex> guard(mutex);
     long index = 2;
-    bool ok = true;
+    auto ok = false;
     HkxSignature signature;
     QByteArray value;
-    long ref = 0;
-    //setProgressData("Creating HKX objects...", 60);
-    while (index < getReader().getNumElements()){
-        value = getReader().getNthAttributeNameAt(index, 1);
-        if (value == "class"){
-            value = getReader().getNthAttributeValueAt(index, 2);
-            if (value != ""){
-                ref = getReader().getNthAttributeValueAt(index, 0).remove(0, 1).toLong(&ok);
-                if (!ok){
-                    LogFile::writeToLog("BehaviorFile: parse() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!");
-                    return false;
-                }
-                signature = (HkxSignature)value.toULongLong(&ok, 16);
-                if (!ok){
-                    LogFile::writeToLog("BehaviorFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!");
-                    return false;
-                }
-                if (signature == HKB_STATE_MACHINE_STATE_INFO){
-                    if (!appendAndReadData(index, new hkbStateMachineStateInfo(this, nullptr, ref))){
-                        return false;
+    auto ref = 0;
+    auto appendnread = [&](HkxObject *obj, const QString & nameoftype){
+        (!appendAndReadData(index, obj)) ? LogFile::writeToLog("BehaviorFile: parse(): Failed to read a "+nameoftype+" object! Ref: "+QString::number(ref)) : NULL;
+    };
+    if (getReader().parse()){
+        for (; index < getReader().getNumElements(); index++){
+            value = getReader().getNthAttributeNameAt(index, 1);
+            if (value == "class"){
+                value = getReader().getNthAttributeValueAt(index, 2);
+                if (value != ""){
+                    ref = getReader().getNthAttributeValueAt(index, 0).remove(0, 1).toLong(&ok);
+                    (!ok) ? LogFile::writeToLog("BehaviorFile: parse() failed! The object reference string contained invalid characters and failed to convert to an integer!") : NULL;
+                    signature = (HkxSignature)value.toULongLong(&ok, 16);
+                    (!ok) ? LogFile::writeToLog("BehaviorFile: parse() failed! The object signature string contained invalid characters and failed to convert to an integer!") : NULL;
+                    switch (signature){
+                    case HKB_STATE_MACHINE_STATE_INFO:
+                        appendnread(new hkbStateMachineStateInfo(this, nullptr, ref), "HKB_STATE_MACHINE_STATE_INFO"); break;
+                    case HKB_STATE_MACHINE:
+                        appendnread(new hkbStateMachine(this, ref), "HKB_STATE_MACHINE"); break;
+                    case HKB_VARIABLE_BINDING_SET:
+                        appendnread(new hkbVariableBindingSet(this, ref), "HKB_VARIABLE_BINDING_SET"); break;
+                    case HKB_CLIP_GENERATOR:
+                        appendnread(new hkbClipGenerator(this, ref), "HKB_CLIP_GENERATOR"); break;
+                    case HKB_CLIP_TRIGGER_ARRAY:
+                        appendnread(new hkbClipTriggerArray(this, ref), "HKB_CLIP_TRIGGER_ARRAY"); break;
+                    case HKB_BLENDER_GENERATOR_CHILD:
+                        appendnread(new hkbBlenderGeneratorChild(this, nullptr, ref), "HKB_BLENDER_GENERATOR_CHILD"); break;
+                    case HKB_BLENDER_GENERATOR:
+                        appendnread(new hkbBlenderGenerator(this, ref), "HKB_BLENDER_GENERATOR"); break;
+                    case HKB_BONE_WEIGHT_ARRAY:
+                        appendnread(new hkbBoneWeightArray(this, ref), "HKB_BONE_WEIGHT_ARRAY"); break;
+                    case HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY:
+                        appendnread(new hkbStateMachineTransitionInfoArray(this, nullptr, ref), "HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY"); break;
+                    case HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY:
+                        appendnread(new hkbStateMachineEventPropertyArray(this, ref), "HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY"); break;
+                    case HKB_MODIFIER_GENERATOR:
+                        appendnread(new hkbModifierGenerator(this, ref), "HKB_MODIFIER_GENERATOR"); break;
+                    case BS_I_STATE_TAGGING_GENERATOR:
+                        appendnread(new BSiStateTaggingGenerator(this, ref), "BS_I_STATE_TAGGING_GENERATOR"); break;
+                    case BS_CYCLIC_BLEND_TRANSITION_GENERATOR:
+                        appendnread(new BSCyclicBlendTransitionGenerator(this, ref), "BS_CYCLIC_BLEND_TRANSITION_GENERATOR"); break;
+                    case BS_BONE_SWITCH_GENERATOR:
+                        appendnread(new BSBoneSwitchGenerator(this, ref), "BS_BONE_SWITCH_GENERATOR"); break;
+                    case BS_BONE_SWITCH_GENERATOR_BONE_DATA:
+                        appendnread(new BSBoneSwitchGeneratorBoneData(this, nullptr, ref), "BS_BONE_SWITCH_GENERATOR_BONE_DATA"); break;
+                    case BS_SYNCHRONIZED_CLIP_GENERATOR:
+                        appendnread(new BSSynchronizedClipGenerator(this, ref), "BS_SYNCHRONIZED_CLIP_GENERATOR"); break;
+                    case HKB_MANUAL_SELECTOR_GENERATOR:
+                        appendnread(new hkbManualSelectorGenerator(this, ref), "HKB_MANUAL_SELECTOR_GENERATOR"); break;
+                    case HKB_MODIFIER_LIST:
+                        appendnread(new hkbModifierList(this, ref), "HKB_MODIFIER_LIST"); break;
+                    case HKB_BLENDING_TRANSITION_EFFECT:
+                        appendnread(new hkbBlendingTransitionEffect(this, ref), "HKB_BLENDING_TRANSITION_EFFECT"); break;
+                    case HKB_EXPRESSION_CONDITION:
+                        appendnread(new hkbExpressionCondition(this, "", ref), "HKB_EXPRESSION_CONDITION"); break;
+                    case HKB_STRING_CONDITION:
+                        appendnread(new hkbStringCondition(this, "", ref), "HKB_STRING_CONDITION"); break;
+                    case HKB_BEHAVIOR_REFERENCE_GENERATOR:
+                        appendnread(new hkbBehaviorReferenceGenerator(this, ref), "HKB_BEHAVIOR_REFERENCE_GENERATOR"); break;
+                    case BS_OFFSET_ANIMATION_GENERATOR:
+                        appendnread(new BSOffsetAnimationGenerator(this, ref), "BS_OFFSET_ANIMATION_GENERATOR"); break;
+                    case HKB_EVALUATE_EXPRESSION_MODIFIER:
+                        appendnread(new hkbEvaluateExpressionModifier(this, ref), "HKB_EVALUATE_EXPRESSION_MODIFIER"); break;
+                    case HKB_EXPRESSION_DATA_ARRAY:
+                        appendnread(new hkbExpressionDataArray(this, ref), "HKB_EXPRESSION_DATA_ARRAY"); break;
+                    case HKB_TWIST_MODIFIER:
+                        appendnread(new hkbTwistModifier(this, ref), "HKB_TWIST_MODIFIER"); break;
+                    case HKB_EVENT_DRIVEN_MODIFIER:
+                        appendnread(new hkbEventDrivenModifier(this, ref), "HKB_EVENT_DRIVEN_MODIFIER"); break;
+                    case BS_IS_ACTIVE_MODIFIER:
+                        appendnread(new BSIsActiveModifier(this, ref), "BS_IS_ACTIVE_MODIFIER"); break;
+                    case BS_DIRECT_AT_MODIFIER:
+                        appendnread(new BSDirectAtModifier(this, ref), "BS_DIRECT_AT_MODIFIER"); break;
+                    case BS_TIMER_MODIFIER:
+                        appendnread(new BSTimerModifier(this, ref), "BS_TIMER_MODIFIER"); break;
+                    case BS_EVENT_ON_DEACTIVATE_MODIFIER:
+                        appendnread(new BSEventOnDeactivateModifier(this, ref), "BS_EVENT_ON_DEACTIVATE_MODIFIER"); break;
+                    case BS_EVENT_EVERY_N_EVENTS_MODIFIER:
+                        appendnread(new BSEventEveryNEventsModifier(this, ref), "BS_EVENT_EVERY_N_EVENTS_MODIFIER"); break;
+                    case BS_LOOK_AT_MODIFIER:
+                        appendnread(new BSLookAtModifier(this, ref), "BS_LOOK_AT_MODIFIER"); break;
+                    case BS_LIMB_IK_MODIFIER:
+                        appendnread(new BSLimbIKModifier(this, ref), "BS_LIMB_IK_MODIFIER"); break;
+                    case BS_INTERP_VALUE_MODIFIER:
+                        appendnread(new BSInterpValueModifier(this, ref), "BS_INTERP_VALUE_MODIFIER"); break;
+                    case BS_GET_TIME_STEP_MODIFIER:
+                        appendnread(new BSGetTimeStepModifier(this, ref), "BS_GET_TIME_STEP_MODIFIER"); break;
+                    case HKB_GET_HANDLE_ON_BONE_MODIFIER:
+                        appendnread(new hkbGetHandleOnBoneModifier(this, ref), "HKB_GET_HANDLE_ON_BONE_MODIFIER"); break;
+                    case HKB_TRANSFORM_VECTOR_MODIFIER:
+                        appendnread(new hkbTransformVectorModifier(this, ref), "HKB_TRANSFORM_VECTOR_MODIFIER"); break;
+                    case HKB_EVENT_RANGE_DATA_ARRAY:
+                        appendnread(new hkbEventRangeDataArray(this, ref), "HKB_EVENT_RANGE_DATA_ARRAY"); break;
+                    case HKB_EVALUATE_HANDLE_MODIFIER:
+                        appendnread(new hkbEvaluateHandleModifier(this, ref), "HKB_EVALUATE_HANDLE_MODIFIER"); break;
+                    case HKB_COMBINE_TRANSFORMS_MODIFIER:
+                        appendnread(new hkbCombineTransformsModifier(this, ref), "HKB_COMBINE_TRANSFORMS_MODIFIER"); break;
+                    case HKB_COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER:
+                        appendnread(new hkbComputeRotationFromAxisAngleModifier(this, ref), "HKB_COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER"); break;
+                    case HKB_COMPUTE_ROTATION_TO_TARGET_MODIFIER:
+                        appendnread(new hkbComputeRotationToTargetModifier(this, ref), "HKB_COMPUTE_ROTATION_TO_TARGET_MODIFIER"); break;
+                    case HKB_EVENTS_FROM_RANGE_MODIFIER:
+                        appendnread(new hkbEventsFromRangeModifier(this, ref), "HKB_EVENTS_FROM_RANGE_MODIFIER"); break;
+                    case HKB_MOVE_CHARACTER_MODIFIER:
+                        appendnread(new hkbMoveCharacterModifier(this, ref), "HKB_MOVE_CHARACTER_MODIFIER"); break;
+                    case HKB_EXTRACT_RAGDOLL_POSE_MODIFIER:
+                        appendnread(new hkbExtractRagdollPoseModifier(this, ref), "HKB_EXTRACT_RAGDOLL_POSE_MODIFIER"); break;
+                    case BS_MODIFY_ONCE_MODIFIER:
+                        appendnread(new BSModifyOnceModifier(this, ref), "BS_MODIFY_ONCE_MODIFIER"); break;
+                    case HKB_STRING_EVENT_PAYLOAD:
+                        appendnread(new hkbStringEventPayload(this, "", ref), "HKB_STRING_EVENT_PAYLOAD"); break;
+                    case BS_RAGDOLL_CONTACT_LISTENER_MODIFIER:
+                        appendnread(new BSRagdollContactListenerModifier(this, ref), "BS_RAGDOLL_CONTACT_LISTENER_MODIFIER"); break;
+                    case HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER:
+                        appendnread(new hkbPoweredRagdollControlsModifier(this, ref), "HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER"); break;
+                    case BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER:
+                        appendnread(new BSEventOnFalseToTrueModifier(this, ref), "BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER"); break;
+                    case BS_DIST_TRIGGER_MODIFER:
+                        appendnread(new BSDistTriggerModifier(this, ref), "BS_DIST_TRIGGER_MODIFER"); break;
+                    case BS_DECOMPOSE_VECTOR_MODIFIER:
+                        appendnread(new BSDecomposeVectorModifier(this, ref), "BS_DECOMPOSE_VECTOR_MODIFIER"); break;
+                    case BS_COMPUTE_ADD_BONE_ANIM_MODIFIER:
+                        appendnread(new BSComputeAddBoneAnimModifier(this, ref), "BS_COMPUTE_ADD_BONE_ANIM_MODIFIER"); break;
+                    case BS_TWEENER_MODIFIER:
+                        appendnread(new BSTweenerModifier(this, ref), "BS_TWEENER_MODIFIER"); break;
+                    case BS_I_STATE_MANAGER_MODIFIER:
+                        appendnread(new BSIStateManagerModifier(this, ref), "BS_I_STATE_MANAGER_MODIFIER"); break;
+                    case HKB_TIMER_MODIFIER:
+                        appendnread(new hkbTimerModifier(this, ref), "HKB_TIMER_MODIFIER"); break;
+                    case HKB_ROTATE_CHARACTER_MODIFIER:
+                        appendnread(new hkbRotateCharacterModifier(this, ref), "HKB_ROTATE_CHARACTER_MODIFIER"); break;
+                    case HKB_DAMPING_MODIFIER:
+                        appendnread(new hkbDampingModifier(this, ref), "HKB_DAMPING_MODIFIER"); break;
+                    case HKB_DELAYED_MODIFIER:
+                        appendnread(new hkbDelayedModifier(this, ref), "HKB_DELAYED_MODIFIER"); break;
+                    case HKB_GET_UP_MODIFIER:
+                        appendnread(new hkbGetUpModifier(this, ref), "HKB_GET_UP_MODIFIER"); break;
+                    case HKB_BONE_INDEX_ARRAY:
+                        appendnread(new hkbBoneIndexArray(this, ref), "HKB_BONE_INDEX_ARRAY"); break;
+                    case HKB_KEY_FRAME_BONES_MODIFIER:
+                        appendnread(new hkbKeyframeBonesModifier(this, ref), "HKB_KEY_FRAME_BONES_MODIFIER"); break;
+                    case HKB_COMPUTE_DIRECTION_MODIFIER:
+                        appendnread(new hkbComputeDirectionModifier(this, ref), "HKB_COMPUTE_DIRECTION_MODIFIER"); break;
+                    case HKB_MIRROR_MODIFIER:
+                        appendnread(new hkbMirrorModifier(this, ref), "HKB_MIRROR_MODIFIER"); break;
+                    case HKB_GET_WORLD_FROM_MODEL_MODIFIER:
+                        appendnread(new hkbGetWorldFromModelModifier(this, ref), "HKB_GET_WORLD_FROM_MODEL_MODIFIER"); break;
+                    case HKB_SENSE_HANDLE_MODIFIER:
+                        appendnread(new hkbSenseHandleModifier(this, ref), "HKB_SENSE_HANDLE_MODIFIER"); break;
+                    case HKB_RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER:
+                        appendnread(new hkbRigidBodyRagdollControlsModifier(this, ref), "HKB_RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER"); break;
+                    case HKB_POSE_MATCHING_GENERATOR:
+                        appendnread(new hkbPoseMatchingGenerator(this, ref), "HKB_POSE_MATCHING_GENERATOR"); break;
+                    case HKB_GENERATOR_TRANSITION_EFFECT:
+                        appendnread(new hkbGeneratorTransitionEffect(this, ref), "HKB_GENERATOR_TRANSITION_EFFECT"); break;
+                    case BS_SPEED_SAMPLER_MODIFIER:
+                        appendnread(new BSSpeedSamplerModifier(this, ref), "BS_SPEED_SAMPLER_MODIFIER"); break;
+                    case HKB_FOOT_IK_CONTROLS_MODIFIER:
+                        appendnread(new hkbFootIkControlsModifier(this, ref), "HKB_FOOT_IK_CONTROLS_MODIFIER"); break;
+                    case HKB_FOOT_IK_MODIFIER:
+                        appendnread(new hkbFootIkModifier(this, ref), "HKB_FOOT_IK_MODIFIER"); break;
+                    case HKB_DETECT_CLOSE_TO_GROUND_MODIFIER:
+                        appendnread(new hkbDetectCloseToGroundModifier(this, ref), "HKB_DETECT_CLOSE_TO_GROUND_MODIFIER"); break;
+                    case BS_PASS_BY_TARGET_TRIGGER_MODIFIER:
+                        appendnread(new BSLookAtModifier(this, ref), "BS_PASS_BY_TARGET_TRIGGER_MODIFIER"); break;
+                    case HKB_HAND_IK_CONTROLS_MODIFIER:
+                        appendnread(new hkbHandIkControlsModifier(this, ref), "HKB_HAND_IK_CONTROLS_MODIFIER"); break;
+                    case HKB_ATTACHMENT_MODIFIER:
+                        appendnread(new hkbAttachmentModifier(this, ref), "HKB_ATTACHMENT_MODIFIER"); break;
+                    case HKB_ATTRIBUTE_MODIFIER:
+                        appendnread(new hkbAttributeModifier(this, ref), "HKB_ATTRIBUTE_MODIFIER"); break;
+                    case HKB_PROXY_MODIFIER:
+                        appendnread(new hkbProxyModifier(this, ref), "HKB_PROXY_MODIFIER"); break;
+                    case HKB_LOOK_AT_MODIFIER:
+                        appendnread(new hkbLookAtModifier(this, ref), "HKB_LOOK_AT_MODIFIER"); break;
+                    case BGS_GAMEBYRO_SEQUENCE_GENERATOR:
+                        appendnread(new BGSGamebryoSequenceGenerator(this, ref), "BGS_GAMEBYRO_SEQUENCE_GENERATOR"); break;
+                    case HKB_BEHAVIOR_GRAPH:
+                        appendnread(new hkbBehaviorGraph(this, ref), "HKB_BEHAVIOR_GRAPH");
+                        behaviorGraph = generators.last();
+                        generators.removeLast();
+                        break;
+                    case HKB_BEHAVIOR_GRAPH_DATA:
+                        appendnread(new hkbBehaviorGraphData(this, ref), "HKB_BEHAVIOR_GRAPH_DATA");
+                        graphData = otherTypes.last();
+                        otherTypes.removeLast();
+                        break;
+                    case HKB_BEHAVIOR_GRAPH_STRING_DATA:
+                        appendnread(new hkbBehaviorGraphStringData(this, ref), "HKB_BEHAVIOR_GRAPH_STRING_DATA");
+                        stringData = otherTypes.last();
+                        otherTypes.removeLast();
+                        break;
+                    case HKB_VARIABLE_VALUE_SET:
+                        appendnread(new hkbVariableValueSet(this, ref), "HKB_VARIABLE_VALUE_SET");
+                        variableValues = otherTypes.last();
+                        otherTypes.removeLast();
+                        break;
+                    case HK_ROOT_LEVEL_CONTAINER:
+                        appendnread(new hkRootLevelContainer(this, ref), "HK_ROOT_LEVEL_CONTAINER");
+                        setRootObject(otherTypes.last());
+                        otherTypes.removeLast();
+                        break;
+                    default:
+                        LogFile::writeToLog(fileName()+": Unknown signature detected! Unknown object class name is: "+getReader().getNthAttributeValueAt(index, 1)+" Unknown object signature is: "+QString::number(signature, 16));
                     }
-                }else if (signature == HKB_STATE_MACHINE){
-                    if (!appendAndReadData(index, new hkbStateMachine(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_VARIABLE_BINDING_SET){
-                    if (!appendAndReadData(index, new hkbVariableBindingSet(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_MODIFIER_GENERATOR){
-                    if (!appendAndReadData(index, new hkbModifierGenerator(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_I_STATE_TAGGING_GENERATOR){
-                    if (!appendAndReadData(index, new BSiStateTaggingGenerator(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_CYCLIC_BLEND_TRANSITION_GENERATOR){
-                    if (!appendAndReadData(index, new BSCyclicBlendTransitionGenerator(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_BONE_SWITCH_GENERATOR){
-                    if (!appendAndReadData(index, new BSBoneSwitchGenerator(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_BONE_SWITCH_GENERATOR_BONE_DATA){
-                    if (!appendAndReadData(index, new BSBoneSwitchGeneratorBoneData(this, nullptr, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_SYNCHRONIZED_CLIP_GENERATOR){
-                    if (!appendAndReadData(index, new BSSynchronizedClipGenerator(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_MANUAL_SELECTOR_GENERATOR){
-                    if (!appendAndReadData(index, new hkbManualSelectorGenerator(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_BLENDER_GENERATOR_CHILD){
-                    if (!appendAndReadData(index, new hkbBlenderGeneratorChild(this, nullptr, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_BONE_WEIGHT_ARRAY){
-                    if (!appendAndReadData(index, new hkbBoneWeightArray(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_MODIFIER_LIST){
-                    if (!appendAndReadData(index, new hkbModifierList(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_BLENDER_GENERATOR){
-                    if (!appendAndReadData(index, new hkbBlenderGenerator(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_BLENDING_TRANSITION_EFFECT){
-                    if (!appendAndReadData(index, new hkbBlendingTransitionEffect(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_EXPRESSION_CONDITION){
-                    if (!appendAndReadData(index, new hkbExpressionCondition(this, "", ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_STRING_CONDITION){
-                    if (!appendAndReadData(index, new hkbStringCondition(this, "", ref))){
-                        return false;
-                    }
-                }else if (signature == BS_OFFSET_ANIMATION_GENERATOR){
-                    if (!appendAndReadData(index, new BSOffsetAnimationGenerator(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_TWIST_MODIFIER){
-                    if (!appendAndReadData(index, new hkbTwistModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_EVENT_DRIVEN_MODIFIER){
-                    if (!appendAndReadData(index, new hkbEventDrivenModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_IS_ACTIVE_MODIFIER){
-                    if (!appendAndReadData(index, new BSIsActiveModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_LIMB_IK_MODIFIER){
-                    if (!appendAndReadData(index, new BSLimbIKModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_INTERP_VALUE_MODIFIER){
-                    if (!appendAndReadData(index, new BSInterpValueModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_GET_TIME_STEP_MODIFIER){
-                    if (!appendAndReadData(index, new BSGetTimeStepModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_FOOT_IK_CONTROLS_MODIFIER){
-                    if (!appendAndReadData(index, new hkbFootIkControlsModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_GET_HANDLE_ON_BONE_MODIFIER){
-                    if (!appendAndReadData(index, new hkbGetHandleOnBoneModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_TRANSFORM_VECTOR_MODIFIER){
-                    if (!appendAndReadData(index, new hkbTransformVectorModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_PROXY_MODIFIER){
-                    if (!appendAndReadData(index, new hkbProxyModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_LOOK_AT_MODIFIER){
-                    if (!appendAndReadData(index, new hkbLookAtModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_EVENT_RANGE_DATA_ARRAY){
-                    if (!appendAndReadData(index, new hkbEventRangeDataArray(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_MIRROR_MODIFIER){
-                    if (!appendAndReadData(index, new hkbMirrorModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_GET_WORLD_FROM_MODEL_MODIFIER){
-                    if (!appendAndReadData(index, new hkbGetWorldFromModelModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_SENSE_HANDLE_MODIFIER){
-                    if (!appendAndReadData(index, new hkbSenseHandleModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_EVALUATE_EXPRESSION_MODIFIER){
-                    if (!appendAndReadData(index, new hkbEvaluateExpressionModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_EVALUATE_HANDLE_MODIFIER){
-                    if (!appendAndReadData(index, new hkbEvaluateHandleModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_ATTACHMENT_MODIFIER){
-                    if (!appendAndReadData(index, new hkbAttachmentModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_ATTRIBUTE_MODIFIER){
-                    if (!appendAndReadData(index, new hkbAttributeModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_COMBINE_TRANSFORMS_MODIFIER){
-                    if (!appendAndReadData(index, new hkbCombineTransformsModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER){
-                    if (!appendAndReadData(index, new hkbComputeRotationFromAxisAngleModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_COMPUTE_ROTATION_TO_TARGET_MODIFIER){
-                    if (!appendAndReadData(index, new hkbComputeRotationToTargetModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_EVENTS_FROM_RANGE_MODIFIER){
-                    if (!appendAndReadData(index, new hkbEventsFromRangeModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_MOVE_CHARACTER_MODIFIER){
-                    if (!appendAndReadData(index, new hkbMoveCharacterModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_EXTRACT_RAGDOLL_POSE_MODIFIER){
-                    if (!appendAndReadData(index, new hkbExtractRagdollPoseModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_MODIFY_ONCE_MODIFIER){
-                    if (!appendAndReadData(index, new BSModifyOnceModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_EVENT_ON_DEACTIVATE_MODIFIER){
-                    if (!appendAndReadData(index, new BSEventOnDeactivateModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_EVENT_EVERY_N_EVENTS_MODIFIER){
-                    if (!appendAndReadData(index, new BSEventEveryNEventsModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_RAGDOLL_CONTACT_LISTENER_MODIFIER){
-                    if (!appendAndReadData(index, new BSRagdollContactListenerModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_POWERED_RAGDOLL_CONTROLS_MODIFIER){
-                    if (!appendAndReadData(index, new hkbPoweredRagdollControlsModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_EVENT_ON_FALSE_TO_TRUE_MODIFIER){
-                    if (!appendAndReadData(index, new BSEventOnFalseToTrueModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_DIRECT_AT_MODIFIER){
-                    if (!appendAndReadData(index, new BSDirectAtModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_DIST_TRIGGER_MODIFER){
-                    if (!appendAndReadData(index, new BSDistTriggerModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_DECOMPOSE_VECTOR_MODIFIER){
-                    if (!appendAndReadData(index, new BSDecomposeVectorModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_COMPUTE_ADD_BONE_ANIM_MODIFIER){
-                    if (!appendAndReadData(index, new BSComputeAddBoneAnimModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_TWEENER_MODIFIER){
-                    if (!appendAndReadData(index, new BSTweenerModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_I_STATE_MANAGER_MODIFIER){
-                    if (!appendAndReadData(index, new BSIStateManagerModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_TIMER_MODIFIER){
-                    if (!appendAndReadData(index, new hkbTimerModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_ROTATE_CHARACTER_MODIFIER){
-                    if (!appendAndReadData(index, new hkbRotateCharacterModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_DAMPING_MODIFIER){
-                    if (!appendAndReadData(index, new hkbDampingModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_DELAYED_MODIFIER){
-                    if (!appendAndReadData(index, new hkbDelayedModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_GET_UP_MODIFIER){
-                    if (!appendAndReadData(index, new hkbGetUpModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_EXPRESSION_DATA_ARRAY){
-                    if (!appendAndReadData(index, new hkbExpressionDataArray(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_BONE_INDEX_ARRAY){
-                    if (!appendAndReadData(index, new hkbBoneIndexArray(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_KEY_FRAME_BONES_MODIFIER){
-                    if (!appendAndReadData(index, new hkbKeyframeBonesModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_COMPUTE_DIRECTION_MODIFIER){
-                    if (!appendAndReadData(index, new hkbComputeDirectionModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_RIGID_BODY_RAGDOLL_CONTROLS_MODIFIER){
-                    if (!appendAndReadData(index, new hkbRigidBodyRagdollControlsModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_POSE_MATCHING_GENERATOR){
-                    if (!appendAndReadData(index, new hkbPoseMatchingGenerator(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_CLIP_GENERATOR){
-                    if (!appendAndReadData(index, new hkbClipGenerator(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_CLIP_TRIGGER_ARRAY){
-                    if (!appendAndReadData(index, new hkbClipTriggerArray(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_GENERATOR_TRANSITION_EFFECT){
-                    if (!appendAndReadData(index, new hkbGeneratorTransitionEffect(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_BEHAVIOR_REFERENCE_GENERATOR){
-                    if (!appendAndReadData(index, new hkbBehaviorReferenceGenerator(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY){
-                    if (!appendAndReadData(index, new hkbStateMachineTransitionInfoArray(this, nullptr, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY){
-                    if (!appendAndReadData(index, new hkbStateMachineEventPropertyArray(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_STRING_EVENT_PAYLOAD){
-                    if (!appendAndReadData(index, new hkbStringEventPayload(this, "", ref))){
-                        return false;
-                    }
-                }else if (signature == BS_SPEED_SAMPLER_MODIFIER){
-                    if (!appendAndReadData(index, new BSSpeedSamplerModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_DETECT_CLOSE_TO_GROUND_MODIFIER){
-                    if (!appendAndReadData(index, new hkbDetectCloseToGroundModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_PASS_BY_TARGET_TRIGGER_MODIFIER){
-                    if (!appendAndReadData(index, new BSLookAtModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_HAND_IK_CONTROLS_MODIFIER){
-                    if (!appendAndReadData(index, new hkbHandIkControlsModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_TIMER_MODIFIER){
-                    if (!appendAndReadData(index, new BSTimerModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BS_LOOK_AT_MODIFIER){
-                    if (!appendAndReadData(index, new BSLookAtModifier(this, ref))){
-                        return false;
-                    }
-                }else if (signature == BGS_GAMEBYRO_SEQUENCE_GENERATOR){
-                    if (!appendAndReadData(index, new BGSGamebryoSequenceGenerator(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HKB_BEHAVIOR_GRAPH){
-                    if (!appendAndReadData(index, new hkbBehaviorGraph(this, ref))){
-                        return false;
-                    }
-                    behaviorGraph = generators.last();
-                    generators.removeLast();
-                }else if (signature == HKB_BEHAVIOR_GRAPH_DATA){
-                    if (!appendAndReadData(index, new hkbBehaviorGraphData(this, ref))){
-                        return false;
-                    }
-                    graphData = otherTypes.last();
-                    otherTypes.removeLast();
-                }else if (signature == HKB_BEHAVIOR_GRAPH_STRING_DATA){
-                    if (!appendAndReadData(index, new hkbBehaviorGraphStringData(this, ref))){
-                        return false;
-                    }
-                    stringData = otherTypes.last();
-                    otherTypes.removeLast();
-                }else if (signature == HKB_VARIABLE_VALUE_SET){
-                    if (!appendAndReadData(index, new hkbVariableValueSet(this, ref))){
-                        return false;
-                    }
-                    variableValues = otherTypes.last();
-                    otherTypes.removeLast();
-                }else if (signature == HK_ROOT_LEVEL_CONTAINER){
-                    if (!appendAndReadData(index, new hkRootLevelContainer(this, ref))){
-                        return false;
-                    }
-                    setRootObject(otherTypes.last());
-                    otherTypes.removeLast();
-                }else{
-                    WARNING_MESSAGE("BehaviorFile: parse()!\nUnknown signature detected!\nUnknown object class name is: "+getReader().getNthAttributeValueAt(index, 1)+"\nUnknown object signature is: "+QString::number(signature, 16));
                 }
             }
         }
-        index++;
-    }
-    closeFile();
-    getReader().clear();
-    if (!checkForDuplicateReferencesNumbers()){
-        if (!link()){
-            LogFile::writeToLog("BehaviorFile: parse() failed because link() failed!");
-            return false;
-        }
+        closeFile();
+        getReader().clear();
+        //if (checkForDuplicateReferencesNumbersNoLock()){
+            (link()) ? ok = true : LogFile::writeToLog(fileName()+": failed to link!!!");
+        /*}else{
+            LogFile::writeToLog(fileName()+": Duplicate References Found!!!");
+        }*/
     }else{
-        return false;
+        LogFile::writeToLog(fileName()+": failed to parse!!!");
     }
-    return true;
+    return ok;
 }
 
 bool BehaviorFile::link(){
-    auto linkobjs = [](QVector <HkxSharedPtr> & list){
+    auto result = true;
+    auto linkobjs = [&](QVector <HkxSharedPtr> & list){
         for (auto i = 0; i < list.size(); i++){
-            list.at(i)->link();
+            (!list.at(i)->link()) ? result = false : NULL;
         }
     };
     if (getRootObject().constData()){
@@ -1387,22 +1153,34 @@ bool BehaviorFile::link(){
         linkobjs(generators);
         linkobjs(modifiers);
         linkobjs(otherTypes);
-        behaviorGraph->link();
-        variableValues->link();
-        graphData->link();
+        (!behaviorGraph->link()) ? result = false : NULL;
+        (variableValues->link()) ? result = false : NULL;
+        (graphData->link()) ? result = false : NULL;
         HkxSignature sig;
         for (auto i = 0; i < generators.size(); i++){
             sig = generators.at(i)->getSignature();
-            (sig == HKB_STATE_MACHINE || sig == HKB_BLENDER_GENERATOR || sig == BS_BONE_SWITCH_GENERATOR) ? generators.at(i)->link() : NULL;
+            (sig == HKB_STATE_MACHINE || sig == HKB_BLENDER_GENERATOR || sig == BS_BONE_SWITCH_GENERATOR) ? ((generators.at(i)->link()) ? result = false : NULL) : NULL;
         }
+        return result;
     }else{
         LogFile::writeToLog("BehaviorFile: link() failed!\nThe root object of this behavior file is nullptr!");
-        return false;
     }
-    return true;
+    return false;
+}
+
+QVector <int> BehaviorFile::removeDataNoLock(QVector <HkxSharedPtr> & objects){
+    QVector <int> removedIndices;
+    for (auto i = objects.size() - 1; i >= 0; i--){
+        if (objects.at(i).data()->ref < 2){
+            objects.removeAt(i);
+            removedIndices.append(i);
+        }
+    }
+    return removedIndices;
 }
 
 QStringList BehaviorFile::getRefedAnimations() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     QStringList refedanimations;
     QString temp;
     for (auto i = 0; i < generators.size(); i++){
@@ -1463,10 +1241,11 @@ QString BehaviorFile::detectErrorsMT(int & taskcount, std::mutex & mutex, std::c
 }
 
 QString BehaviorFile::detectErrors(){
-    QString error;
+    //std::lock_guard <std::mutex> guard(mutex);
     errorList.clear();
-    bool errors = false;
+    QString error;
     HkxObject *obj;
+    auto errors = false;
     auto checkError = [&](QVector <HkxSharedPtr> & objects, int index){
         obj = static_cast<HkxObject *>(objects.at(index).data());
         if (obj){
@@ -1508,6 +1287,7 @@ QString BehaviorFile::detectErrors(){
 }
 
 QVector <DataIconManager *> BehaviorFile::merge(BehaviorFile *recessivefile, int & taskCount, std::mutex & mutex, std::condition_variable & conditionVar){
+    //std::lock_guard <std::mutex> guard(mutex);
     bool found;
     QVector <DataIconManager *> objectsnotfound;
     auto gensize = generators.size();
@@ -1557,7 +1337,7 @@ QVector <DataIconManager *> BehaviorFile::merge(BehaviorFile *recessivefile, int
         searchMergeForward(generators, gensize, recessivefile->generators);
         searchMergeForward(modifiers, modsize, recessivefile->modifiers);
     }else{
-        LogFile::writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
+        LogFile::writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!");
     }
     for (auto i = objectsnotfound.size() - 1; i >= 0; i--){
         found = false;
@@ -1576,8 +1356,9 @@ QVector <DataIconManager *> BehaviorFile::merge(BehaviorFile *recessivefile, int
 }
 
 QVector <DataIconManager *> BehaviorFile::merge(BehaviorFile *recessivefile){
-    bool found;
+    //std::lock_guard <std::mutex> guard(mutex);
     QVector <DataIconManager *> objectsnotfound;
+    bool found;
     auto gensize = generators.size();
     auto modsize = modifiers.size();
     auto searchMergeForward = [&](const QVector <HkxSharedPtr> & domlist, int domsize, const QVector <HkxSharedPtr> & reclist){
@@ -1612,12 +1393,13 @@ QVector <DataIconManager *> BehaviorFile::merge(BehaviorFile *recessivefile){
         checkobjects(generators);
         checkobjects(modifiers);
     }else{
-        LogFile::writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
+        LogFile::writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!");
     }
     return objectsnotfound;
 }
 
 void BehaviorFile::mergeObjects(QVector <DataIconManager *> & recessiveobjects){
+    //std::lock_guard <std::mutex> guard(mutex);
     bool found;
     auto gensize = generators.size();
     auto modsize = modifiers.size();
@@ -1645,14 +1427,16 @@ void BehaviorFile::mergeObjects(QVector <DataIconManager *> & recessiveobjects){
 }
 
 void BehaviorFile::mergedWrite(){
-    if (rootObject.data()){
-        long ref = 100;
-        rootObject->setIsWritten(false);
+    //std::lock_guard <std::mutex> guard(mutex);
+    long ref = 100;
+    HkxObject *root = getRootObject().data();
+    if (root){
+        root->setIsWritten(false);
         stringData->setIsWritten(false);
         variableValues->setIsWritten(false);
         graphData->setIsWritten(false);
         behaviorGraph->setIsWritten(false);
-        rootObject->setReference(ref);
+        root->setReference(ref);
         ref++;
         stringData->setReference(ref);
         ref++;
@@ -1679,26 +1463,18 @@ void BehaviorFile::mergedWrite(){
             ref++;
         }
         ref++;
-        for (auto i = 0; i < generators.size(); i++, ref++){
-            if (!generators.at(i)->getRefsUpdated()){
-                generators.at(i)->setIsWritten(false);
-                generators.at(i)->setReference(ref);
+        auto prepforwrite = [&](const QVector <HkxSharedPtr> & list){
+            for (auto i = 0; i < list.size(); i++, ref++){
+                if (!list.at(i)->getRefsUpdated()){
+                    list.at(i)->setIsWritten(false);
+                    list.at(i)->setReference(ref);
+                }
             }
-        }
-        ref++;
-        for (auto i = 0; i < modifiers.size(); i++, ref++){
-            if (!modifiers.at(i)->getRefsUpdated()){
-                modifiers.at(i)->setIsWritten(false);
-                modifiers.at(i)->setReference(ref);
-            }
-        }
-        ref++;
-        for (auto i = 0; i < otherTypes.size(); i++, ref++){
-            if (!otherTypes.at(i)->getRefsUpdated()){
-                otherTypes.at(i)->setIsWritten(false);
-                otherTypes.at(i)->setReference(ref);
-            }
-        }
+            ref++;
+        };
+        prepforwrite(generators);
+        prepforwrite(modifiers);
+        prepforwrite(otherTypes);
         getWriter().setFile(this);
         if (!getWriter().writeToXMLFile()){
             CRITICAL_ERROR_MESSAGE("BehaviorFile::write(): writeToXMLFile() failed!!");
@@ -1709,37 +1485,30 @@ void BehaviorFile::mergedWrite(){
 }
 
 void BehaviorFile::write(){
-    if (rootObject.data()){
-        long ref = 100;
-        rootObject->setIsWritten(false);
+    //std::lock_guard <std::mutex> guard(mutex);
+    long ref = 100;
+    HkxObject *root = getRootObject().data();
+    if (root){
+        root->setIsWritten(false);
         stringData->setIsWritten(false);
         variableValues->setIsWritten(false);
         graphData->setIsWritten(false);
         behaviorGraph->setIsWritten(false);
-        rootObject->setReference(ref);
-        ref++;
-        stringData->setReference(ref);
-        ref++;
-        variableValues->setReference(ref);
-        ref++;
-        graphData->setReference(ref);
-        ref++;
-        behaviorGraph->setReference(ref);
-        ref++;
-        for (auto i = 0; i < generators.size(); i++, ref++){
-            generators.at(i)->setIsWritten(false);
-            generators.at(i)->setReference(ref);
-        }
-        ref++;
-        for (auto i = 0; i < modifiers.size(); i++, ref++){
-            modifiers.at(i)->setIsWritten(false);
-            modifiers.at(i)->setReference(ref);
-        }
-        ref++;
-        for (auto i = 0; i < otherTypes.size(); i++, ref++){
-            otherTypes.at(i)->setIsWritten(false);
-            otherTypes.at(i)->setReference(ref);
-        }
+        root->setReference(ref++);
+        stringData->setReference(ref++);
+        variableValues->setReference(ref++);
+        graphData->setReference(ref++);
+        behaviorGraph->setReference(ref++);
+        auto prepforwrite = [&](const QVector <HkxSharedPtr> & list){
+            for (auto i = 0; i < list.size(); i++, ref++){
+                list.at(i)->setIsWritten(false);
+                list.at(i)->setReference(ref);
+            }
+            ref++;
+        };
+        prepforwrite(generators);
+        prepforwrite(modifiers);
+        prepforwrite(otherTypes);
         getWriter().setFile(this);
         if (!getWriter().writeToXMLFile()){
             CRITICAL_ERROR_MESSAGE("BehaviorFile::write(): writeToXMLFile() failed!!");
@@ -1750,42 +1519,43 @@ void BehaviorFile::write(){
 }
 
 HkxSharedPtr * BehaviorFile::findGenerator(long ref){
-    if (ref < 0){
-        return nullptr;
-    }
-    for (auto i = 0; i < generators.size(); i++){
-        if (ref == generators.at(i).getShdPtrReference()){
-            return &generators[i];
+    //std::lock_guard <std::mutex> guard(mutex);
+    if (ref > 0){
+        for (auto i = 0; i < generators.size(); i++){
+            if (ref == generators.at(i).getShdPtrReference()){
+                return &generators[i];
+            }
         }
     }
     return nullptr;
 }
 
 HkxSharedPtr * BehaviorFile::findModifier(long ref){
-    if (ref < 0){
-        return nullptr;
-    }
-    for (auto i = 0; i < modifiers.size(); i++){
-        if (ref == modifiers.at(i).getShdPtrReference()){
-            return &modifiers[i];
+    //std::lock_guard <std::mutex> guard(mutex);
+    if (ref > 0){
+        for (auto i = 0; i < modifiers.size(); i++){
+            if (ref == modifiers.at(i).getShdPtrReference()){
+                return &modifiers[i];
+            }
         }
     }
     return nullptr;
 }
 
 HkxSharedPtr * BehaviorFile::findHkxObject(long ref){
-    if (ref < 0){
-        return nullptr;
-    }
-    for (auto i = 0; i < otherTypes.size(); i++){
-        if (ref == otherTypes.at(i).getShdPtrReference()){
-            return &otherTypes[i];
+    //std::lock_guard <std::mutex> guard(mutex);
+    if (ref > 0){
+        for (auto i = 0; i < otherTypes.size(); i++){
+            if (ref == otherTypes.at(i).getShdPtrReference()){
+                return &otherTypes[i];
+            }
         }
     }
     return nullptr;
 }
 
 int BehaviorFile::addCharacterProperty(int index){
+    //std::lock_guard <std::mutex> guard(mutex);
     if (graphData.data()){
         return static_cast<hkbBehaviorGraphData *>(graphData.data())->addVariable(character->getCharacterPropertyTypeAt(index), character->getCharacterPropertyNameAt(index), true);
     }
@@ -1793,6 +1563,7 @@ int BehaviorFile::addCharacterProperty(int index){
 }
 
 QString BehaviorFile::getVariableNameAt(int index) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (stringData.data()){
         return static_cast<hkbBehaviorGraphStringData *>(stringData.data())->getVariableNameAt(index);
     }
@@ -1800,6 +1571,7 @@ QString BehaviorFile::getVariableNameAt(int index) const{
 }
 
 QString BehaviorFile::getEventNameAt(int index) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (stringData.data()){
         return static_cast<hkbBehaviorGraphStringData *>(stringData.data())->getEventNameAt(index);
     }
@@ -1807,6 +1579,7 @@ QString BehaviorFile::getEventNameAt(int index) const{
 }
 
 QString BehaviorFile::getCharacterPropertyNameAt(int index, bool fromBehaviorFile) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (fromBehaviorFile){
         if (graphData.data()){
             return static_cast<hkbBehaviorGraphData *>(graphData.data())->getCharacterPropertyNameAt(index);
@@ -1820,6 +1593,7 @@ QString BehaviorFile::getCharacterPropertyNameAt(int index, bool fromBehaviorFil
 }
 
 QStringList BehaviorFile::getAnimationNames() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (character){
         return character->getAnimationNames();
     }
@@ -1827,6 +1601,7 @@ QStringList BehaviorFile::getAnimationNames() const{
 }
 
 QString BehaviorFile::getAnimationNameAt(int index) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (character){
         return character->getAnimationNameAt(index);
     }
@@ -1834,13 +1609,15 @@ QString BehaviorFile::getAnimationNameAt(int index) const{
 }
 
 QStringList BehaviorFile::getLocalFrameNames() const{
-    if (character && character->skeleton){
-        return character->skeleton->getLocalFrameNames();
+    //std::lock_guard <std::mutex> guard(mutex);
+    if (character){
+        return character->getLocalFrameNames();
     }
     return QStringList();
 }
 
 void BehaviorFile::removeBindings(int varIndex){
+    //std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < otherTypes.size(); i++){
         if (otherTypes.at(i)->getSignature() == HKB_VARIABLE_BINDING_SET){
             static_cast<hkbVariableBindingSet *>(otherTypes.at(i).data())->removeBinding(varIndex);
@@ -1848,7 +1625,7 @@ void BehaviorFile::removeBindings(int varIndex){
     }
 }
 
-bool BehaviorFile::checkForDuplicateReferencesNumbers() const{
+bool BehaviorFile::checkForDuplicateReferencesNumbersNoLock() const{
     auto duplicates = false;
     auto ref1 = 0;
     auto ref2 = 0;
@@ -1861,7 +1638,7 @@ bool BehaviorFile::checkForDuplicateReferencesNumbers() const{
                         ref2 = list.at(j)->getReference();
                         if (ref1 == ref2 && j != i){
                             duplicates = true;
-                            LogFile::writeToLog(getFileName()+"Reference "+QString::number(ref2)+" is duplicated!\n");
+                            LogFile::writeToLog(getFileName()+"Reference "+QString::number(ref2)+" is duplicated!");
                         }
                     }
                 }
@@ -1875,21 +1652,22 @@ bool BehaviorFile::checkForDuplicateReferencesNumbers() const{
 }
 
 HkxSharedPtr BehaviorFile::getGraphData() const{
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     return graphData;
 }
 
 HkxSharedPtr BehaviorFile::getStringData() const{
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     return stringData;
 }
 
 HkxSharedPtr BehaviorFile::getVariableValues() const{
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     return variableValues;
 }
 
 HkxSharedPtr * BehaviorFile::findBehaviorGraph(long ref){
+    //std::lock_guard <std::mutex> guard(mutex);
     if (behaviorGraph.getShdPtrReference() == ref){
         return &behaviorGraph;
     }
@@ -1897,46 +1675,22 @@ HkxSharedPtr * BehaviorFile::findBehaviorGraph(long ref){
 }
 
 QVector<int> BehaviorFile::removeGeneratorData(){
-    QVector<int> removedIndices;
-    HkxObject *obj = nullptr;
-    for (auto i = generators.size() - 1; i >= 0; i--){
-        obj = generators.at(i).data();
-        if (obj){
-            if (obj->ref < 2){
-                generators.removeAt(i);
-                removedIndices.append(i);
-                /*if (obj->getSignature() == HKB_BEHAVIOR_REFERENCE_GENERATOR){
-                    removeUnreferencedFiles((const hkbBehaviorReferenceGenerator *)obj);
-                }*/
-            }
-        }
-    }
-    return removedIndices;
+    //std::lock_guard <std::mutex> guard(mutex);
+    return removeDataNoLock(generators);
 }
 
 QVector<int> BehaviorFile::removeModifierData(){
-    QVector<int> removedIndices;
-    for (auto i = modifiers.size() - 1; i >= 0; i--){
-        if (modifiers.at(i).constData() && modifiers.at(i).constData()->ref < 2){
-            modifiers.removeAt(i);
-            removedIndices.append(i);
-        }
-    }
-    return removedIndices;
+    //std::lock_guard <std::mutex> guard(mutex);
+    return removeDataNoLock(modifiers);
 }
 
 QVector<int> BehaviorFile::removeOtherData(){
-    QVector<int> removedIndices;
-    for (auto i = otherTypes.size() - 1; i >= 0; i--){
-        if (otherTypes.at(i).constData() && otherTypes.at(i).constData()->ref < 2){
-            otherTypes.removeAt(i);
-            removedIndices.append(i);
-        }
-    }
-    return removedIndices;
+    //std::lock_guard <std::mutex> guard(mutex);
+    return removeDataNoLock(otherTypes);
 }
 
 hkVariableType BehaviorFile::getVariableTypeAt(int index) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (graphData.data()){
         return static_cast<hkbBehaviorGraphData *>(graphData.data())->getVariableTypeAt(index);
     }
@@ -1944,6 +1698,7 @@ hkVariableType BehaviorFile::getVariableTypeAt(int index) const{
 }
 
 QStringList BehaviorFile::getGeneratorNames() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     QStringList list;
     for (auto i = 0; i < generators.size(); i++){
         list.append(static_cast<hkbGenerator *>(generators.at(i).data())->getName());
@@ -1952,6 +1707,7 @@ QStringList BehaviorFile::getGeneratorNames() const{
 }
 
 QStringList BehaviorFile::getGeneratorTypeNames() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     QStringList list;
     for (auto i = 0; i < generators.size(); i++){
         list.append(static_cast<hkbGenerator *>(generators.at(i).data())->getClassname());
@@ -1960,6 +1716,7 @@ QStringList BehaviorFile::getGeneratorTypeNames() const{
 }
 
 QStringList BehaviorFile::getModifierNames() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     QStringList list;
     for (auto i = 0; i < modifiers.size(); i++){
         list.append(static_cast<hkbGenerator *>(modifiers.at(i).data())->getName());
@@ -1968,6 +1725,7 @@ QStringList BehaviorFile::getModifierNames() const{
 }
 
 QStringList BehaviorFile::getModifierTypeNames() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     QStringList list;
     for (auto i = 0; i < modifiers.size(); i++){
         list.append(static_cast<hkbModifier *>(modifiers.at(i).data())->getClassname());
@@ -1976,6 +1734,7 @@ QStringList BehaviorFile::getModifierTypeNames() const{
 }
 
 int BehaviorFile::getCharacterPropertyIndexFromBehavior(const QString &name) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphStringData *strings = nullptr;
     if (stringData.data()){
         strings = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
@@ -1989,28 +1748,24 @@ int BehaviorFile::getCharacterPropertyIndexFromBehavior(const QString &name) con
 }
 
 int BehaviorFile::getCharacterPropertyIndex(const QString &name) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterStringData *strings = nullptr;
-    if (character && character->stringData.data()){
-        strings = static_cast<hkbCharacterStringData *>(character->stringData.data());
-        return strings->getCharacterPropertyIndex(name);
+    if (character){
+        return character->getCharacterPropertyIndex(name);
     }
     return -1;
 }
 
 int BehaviorFile::findCharacterPropertyIndexFromCharacter(int indexOfBehaviorProperty) const{
-    hkbCharacterStringData *strings = nullptr;
-    QString name;
-    hkbBehaviorGraphStringData *behaviorstrings = nullptr;
+    //std::lock_guard <std::mutex> guard(mutex);
     if (character && stringData.data()){
-        strings = static_cast<hkbCharacterStringData *>(character->stringData.data());
-        behaviorstrings = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
-        name = behaviorstrings->getCharacterPropertyNameAt(indexOfBehaviorProperty);
-        return strings->getCharacterPropertyIndex(name);
+        return character->getCharacterPropertyIndex(static_cast<hkbBehaviorGraphStringData *>(stringData.data())->getCharacterPropertyNameAt(indexOfBehaviorProperty));
     }
     return -1;
 }
 
 QStringList BehaviorFile::getCharacterPropertyNames() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (character){
         return character->getCharacterPropertyNames();
     }
@@ -2018,6 +1773,7 @@ QStringList BehaviorFile::getCharacterPropertyNames() const{
 }
 
 QStringList BehaviorFile::getAllReferencedBehaviorFilePaths() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     QStringList list;
     hkbBehaviorReferenceGenerator *ptr = nullptr;
     for (auto i = 0; i < generators.size(); i++){
@@ -2030,18 +1786,22 @@ QStringList BehaviorFile::getAllReferencedBehaviorFilePaths() const{
 }
 
 HkxObject * BehaviorFile::getBehaviorGraphData() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     return graphData.data();
 }
 
 QStringList BehaviorFile::getErrors() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     return errorList;
 }
 
 int BehaviorFile::getIndexOfGenerator(const HkxSharedPtr & obj) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     return generators.indexOf(obj);
 }
 
 bool BehaviorFile::setGeneratorData(HkxSharedPtr & ptrToSet, int index){
+    //std::lock_guard <std::mutex> guard(mutex);
     if (index >= 0 && index < generators.size()){
         ptrToSet = generators.at(index);
         return true;
@@ -2050,6 +1810,7 @@ bool BehaviorFile::setGeneratorData(HkxSharedPtr & ptrToSet, int index){
 }
 
 hkbGenerator *BehaviorFile::getGeneratorDataAt(int index){
+    //std::lock_guard <std::mutex> guard(mutex);
     if (index >= 0 && index < generators.size()){
         return static_cast<hkbGenerator *>(generators[index].data());
     }
@@ -2057,10 +1818,12 @@ hkbGenerator *BehaviorFile::getGeneratorDataAt(int index){
 }
 
 int BehaviorFile::getIndexOfModifier(const HkxSharedPtr & obj) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     return modifiers.indexOf(obj);
 }
 
 bool BehaviorFile::setModifierData(HkxSharedPtr & ptrToSet, int index){
+    //std::lock_guard <std::mutex> guard(mutex);
     if (index >= 0 && index < modifiers.size()){
         ptrToSet = modifiers.at(index);
         return true;
@@ -2069,6 +1832,7 @@ bool BehaviorFile::setModifierData(HkxSharedPtr & ptrToSet, int index){
 }
 
 hkbModifier* BehaviorFile::getModifierDataAt(int index){
+    //std::lock_guard <std::mutex> guard(mutex);
     if (index >= 0 && index < modifiers.size()){
         return static_cast<hkbModifier *>(modifiers[index].data());
     }
@@ -2076,6 +1840,7 @@ hkbModifier* BehaviorFile::getModifierDataAt(int index){
 }
 
 QStringList BehaviorFile::getVariableTypenames() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (graphData.data()){
         return static_cast<hkbBehaviorGraphData *>(graphData.data())->getVariableTypeNames();
     }
@@ -2083,6 +1848,7 @@ QStringList BehaviorFile::getVariableTypenames() const{
 }
 
 QStringList BehaviorFile::getCharacterPropertyTypenames() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (character){
         return static_cast<CharacterFile *>(character)->getCharacterPropertyTypenames();
     }
@@ -2090,6 +1856,7 @@ QStringList BehaviorFile::getCharacterPropertyTypenames() const{
 }
 
 hkVariableType BehaviorFile::getCharacterPropertyTypeAt(int index) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (character){
         return static_cast<CharacterFile *>(character)->getCharacterPropertyTypeAt(index);
     }
@@ -2097,6 +1864,7 @@ hkVariableType BehaviorFile::getCharacterPropertyTypeAt(int index) const{
 }
 
 QStringList BehaviorFile::getVariableNames() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (graphData.data()){
         return static_cast<hkbBehaviorGraphData *>(graphData.data())->getVariableNames();
     }
@@ -2104,6 +1872,7 @@ QStringList BehaviorFile::getVariableNames() const{
 }
 
 int BehaviorFile::getNumberOfVariables() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (graphData.data()){
         return static_cast<hkbBehaviorGraphData *>(graphData.data())->getNumberOfVariables();
     }
@@ -2111,6 +1880,7 @@ int BehaviorFile::getNumberOfVariables() const{
 }
 
 QStringList BehaviorFile::getEventNames() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (graphData.data()){
         return static_cast<hkbBehaviorGraphData *>(graphData.data())->getEventNames();
     }
@@ -2118,17 +1888,15 @@ QStringList BehaviorFile::getEventNames() const{
 }
 
 int BehaviorFile::getNumberOfEvents() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (graphData.data()){
         return static_cast<hkbBehaviorGraphData *>(graphData.data())->getNumberOfEvents();
     }
     return -1;
 }
 
-BehaviorFile::~BehaviorFile(){
-    //
-}
-
 bool BehaviorFile::doesBehaviorExist(const QString &behaviorname) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (project){
         return project->doesBehaviorExist(behaviorname);
     }
@@ -2136,6 +1904,7 @@ bool BehaviorFile::doesBehaviorExist(const QString &behaviorname) const{
 }
 
 void BehaviorFile::setFocusGeneratorIcon(int index){
+    //std::lock_guard <std::mutex> guard(mutex);
     index--;
     if (index < generators.size() && index > -1){
         static_cast<DataIconManager *>(generators.at(index).data())->setFocusOnTopIcon();
@@ -2143,8 +1912,13 @@ void BehaviorFile::setFocusGeneratorIcon(int index){
 }
 
 void BehaviorFile::setFocusModifierIcon(int index){
+    //std::lock_guard <std::mutex> guard(mutex);
     index--;
     if (index < modifiers.size() && index > -1){
         static_cast<DataIconManager *>(modifiers.at(index).data())->setFocusOnTopIcon();
     }
+}
+
+BehaviorFile::~BehaviorFile(){
+    //
 }

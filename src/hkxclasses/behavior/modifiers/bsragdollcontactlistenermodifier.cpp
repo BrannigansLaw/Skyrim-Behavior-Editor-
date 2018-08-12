@@ -55,8 +55,6 @@ bool BSRagdollContactListenerModifier::readData(const HkxXmlReader &reader, long
             checkvalue(contactEvent.payload.readShdPtrReference(index, reader), "payload");
         }else if (text == "bones"){
             checkvalue(bones.readShdPtrReference(index, reader), "bones");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -75,7 +73,7 @@ bool BSRagdollContactListenerModifier::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -221,28 +219,28 @@ QString BSRagdollContactListenerModifier::evaluateDataValidity(){
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     if (contactEvent.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": contactEvent event id out of range! Setting to max index in range!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": contactEvent event id out of range! Setting to max index in range!");
         contactEvent.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (contactEvent.payload.data() && contactEvent.payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid contactEvent.payload type! Signature: "+QString::number(contactEvent.payload->getSignature(), 16)+" Setting null value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid contactEvent.payload type! Signature: "+QString::number(contactEvent.payload->getSignature(), 16)+" Setting null value!");
         contactEvent.payload = HkxSharedPtr();
     }
     if (!bones.data()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null bones!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null bones!");
     }else if (bones->getSignature() != HKB_BONE_INDEX_ARRAY){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid bones type! Signature: "+QString::number(bones->getSignature(), 16)+" Setting null value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid bones type! Signature: "+QString::number(bones->getSignature(), 16)+" Setting null value!");
         bones = HkxSharedPtr();
     }
     setDataValidity(isvalid);

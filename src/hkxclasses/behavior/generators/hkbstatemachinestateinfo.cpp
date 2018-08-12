@@ -63,7 +63,7 @@ QString hkbStateMachineStateInfo::getName() const{
 hkbStateMachine * hkbStateMachineStateInfo::getParentStateMachine() const{
     std::lock_guard <std::mutex> guard(mutex);
     hkbStateMachine *ptr = nullptr;
-    parentSM ? ptr = parentSM : LogFile::writeToLog(getParentFilename()+": "+getClassname()+": "+name+"' has no parent state machine!\n");
+    parentSM ? ptr = parentSM : LogFile::writeToLog(getParentFilename()+": "+getClassname()+": "+name+"' has no parent state machine!");
     return ptr;
 }
 
@@ -394,7 +394,7 @@ bool hkbStateMachineStateInfo::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -476,37 +476,37 @@ QString hkbStateMachineStateInfo::evaluateDataValidity(){
         if (shdptr.data()){
             if (shdptr->getSignature() != sig){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid "+datafield+" type! Signature: "+QString::number(shdptr->getSignature(), 16)+" Setting null value!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid "+datafield+" type! Signature: "+QString::number(shdptr->getSignature(), 16)+" Setting null value!");
                 shdptr = HkxSharedPtr();
             }else if ((sig == HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY && static_cast<hkbStateMachineEventPropertyArray *>(shdptr.data())->getNumOfEvents() < 1) ||
                       (sig == HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY && static_cast<hkbStateMachineTransitionInfoArray *>(shdptr.data())->getNumTransitions() < 1))
             {
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+datafield+" is empty! Setting null value!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+datafield+" is empty! Setting null value!");
                 shdptr = HkxSharedPtr();
             }/*else if (shdptr->isDataValid() && shdptr->evaluateDataValidity() != ""){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid "+datafield+" data!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid "+datafield+" data!");
             }*/
         }
     };
     temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     checknfix(enterNotifyEvents, "enterNotifyEvents", HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY);
     checknfix(exitNotifyEvents, "exitNotifyEvents", HKB_STATE_MACHINE_EVENT_PROPERTY_ARRAY);
     checknfix(transitions, "transitions", HKB_STATE_MACHINE_TRANSITION_INFO_ARRAY);
     if (!generator.data()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null generator!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null generator!");
     }else if (generator->getType() != HkxObject::TYPE_GENERATOR){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid generator type! Signature: "+QString::number(generator->getSignature(), 16)+" Setting null value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid generator type! Signature: "+QString::number(generator->getSignature(), 16)+" Setting null value!");
         generator = HkxSharedPtr();
     }
     if (!parentSM){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null parentSM!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null parentSM!");
     }
     setDataValidity(isvalid);
     return errors;

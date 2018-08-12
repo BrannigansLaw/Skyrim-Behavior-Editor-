@@ -12,32 +12,30 @@ class MainWindow;
 
 class HkxFile: public QFile
 {
-    friend class MainWindow;
-    friend class BehaviorGraphView;
-    friend class HkxXMLWriter;
-    friend class ProjectFile;
 public:
-    HkxFile(MainWindow *window, const QString & name);
-    virtual ~HkxFile();
+    HkxFile& operator=(const HkxFile&) = delete;
+    HkxFile(const HkxFile &) = delete;
+    virtual ~HkxFile() = default;
     void closeFile();
     virtual bool addObjectToFile(HkxObject *obj, long ref) = 0;
-    QString getRootObjectReferenceString();
+    QString getRootObjectReferenceString() const;
     bool getIsChanged() const;
-    void setIsChanged(bool wasEdited);
     QString getFileName() const;
+    void setIsChanged(bool wasEdited);
     void setHKXFileName(const QString &name);
-protected:
-    MainWindow *getUI() const;
     HkxSharedPtr & getRootObject();
+protected:
+    HkxFile(MainWindow *window, const QString & name);
+    MainWindow *getUI() const;
     virtual bool parse();
     virtual bool link();
     void setRootObject(HkxSharedPtr & obj);
     bool appendAndReadData(long & index, HkxObject * obj);
     HkxXmlReader & getReader();
     HkxXMLWriter & getWriter();
-    HkxSharedPtr rootObject;
 private:
     MainWindow *ui;
+    HkxSharedPtr rootObject;
     HkxXmlReader reader;
     HkxXMLWriter writer;
     bool changed;

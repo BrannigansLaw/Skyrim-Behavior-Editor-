@@ -77,8 +77,6 @@ bool hkbTwistModifier::readData(const HkxXmlReader &reader, long & index){
         }else if (text == "isAdditive"){
             isAdditive = toBool(reader.getElementValueAt(index), &ok);
             checkvalue(ok, "isAdditive");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -139,28 +137,28 @@ QString hkbTwistModifier::evaluateDataValidity(){
     auto checkbones = [&](int & boneindex, const QString & fieldname){
         if (boneindex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+fieldname+" bone id out of range! Setting to max index in range!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+fieldname+" bone id out of range! Setting to max index in range!");
             boneindex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
         }
     };
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     checkbones(startBoneIndex, "startBoneIndex");
     checkbones(endBoneIndex, "endBoneIndex");
     if (!SetAngleMethod.contains(setAngleMethod)){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid setAngleMethod! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid setAngleMethod! Setting default value!");
         setAngleMethod = SetAngleMethod.first();
     }
     if (!RotationAxisCoordinates.contains(rotationAxisCoordinates)){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid rotationAxisCoordinates! Setting default value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid rotationAxisCoordinates! Setting default value!");
         rotationAxisCoordinates = RotationAxisCoordinates.first();
     }
     setDataValidity(isvalid);

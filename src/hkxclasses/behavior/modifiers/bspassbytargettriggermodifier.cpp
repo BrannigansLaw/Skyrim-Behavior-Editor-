@@ -63,8 +63,6 @@ bool BSPassByTargetTriggerModifier::readData(const HkxXmlReader &reader, long & 
             checkvalue(ok, "triggerEvent.id");
         }else if (text == "payload"){
             checkvalue(triggerEvent.payload.readShdPtrReference(index, reader), "payload");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -83,7 +81,7 @@ bool BSPassByTargetTriggerModifier::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -211,20 +209,20 @@ QString BSPassByTargetTriggerModifier::evaluateDataValidity(){
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     if (triggerEvent.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": triggerEvent event id out of range! Setting to max index in range!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": triggerEvent event id out of range! Setting to max index in range!");
         triggerEvent.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (triggerEvent.payload.data() && triggerEvent.payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid triggerEvent.payload type! Signature: "+QString::number(triggerEvent.payload->getSignature(), 16)+" Setting null value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid triggerEvent.payload type! Signature: "+QString::number(triggerEvent.payload->getSignature(), 16)+" Setting null value!");
         triggerEvent.payload = HkxSharedPtr();
     }
     setDataValidity(isvalid);

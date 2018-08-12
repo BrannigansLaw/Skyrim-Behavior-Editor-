@@ -298,26 +298,28 @@ void BehaviorVariablesUI::loadData(HkxObject *data){
         loadedData = static_cast<hkbBehaviorGraphData *>(data);
         int row;
         hkbBehaviorGraphStringData *varNames = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        for (auto i = 0; i < varNames->variableNames.size(); i++){
-            row = table->rowCount();
-            if (table->rowCount() > i){
-                table->setRowHidden(i, false);
-                if (table->item(row, 0)){
-                    table->item(row, 0)->setText(varNames->variableNames.at(i));
+        if (varNames){
+            for (auto i = 0; i < varNames->variableNames.size(); i++){
+                row = table->rowCount();
+                if (table->rowCount() > i){
+                    table->setRowHidden(i, false);
+                    if (table->item(row, 0)){
+                        table->item(row, 0)->setText(varNames->variableNames.at(i));
+                    }else{
+                        table->setItem(row, 0, new QTableWidgetItem(varNames->variableNames.at(i)));
+                    }
                 }else{
+                    table->setRowCount(row + 1);
                     table->setItem(row, 0, new QTableWidgetItem(varNames->variableNames.at(i)));
+                    table->setItem(row, 1, new QTableWidgetItem(loadedData->variableInfos.at(i).type.section("_", -1, -1)));
+                    table->setItem(row, 2, new QTableWidgetItem("Edit"));
                 }
-            }else{
-                table->setRowCount(row + 1);
-                table->setItem(row, 0, new QTableWidgetItem(varNames->variableNames.at(i)));
-                table->setItem(row, 1, new QTableWidgetItem(loadedData->variableInfos.at(i).type.section("_", -1, -1)));
-                table->setItem(row, 2, new QTableWidgetItem("Edit"));
             }
+            for (auto j = varNames->variableNames.size(); j < table->rowCount(); j++){
+                table->setRowHidden(j, true);
+            }
+            table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
         }
-        for (auto j = varNames->variableNames.size(); j < table->rowCount(); j++){
-            table->setRowHidden(j, true);
-        }
-        table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     }
 }
 

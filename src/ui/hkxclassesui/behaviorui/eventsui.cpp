@@ -97,24 +97,26 @@ void EventsUI::loadData(HkxObject *data){
         loadedData = static_cast<hkbBehaviorGraphData *>(data);
         int row;
         hkbBehaviorGraphStringData *events = static_cast<hkbBehaviorGraphStringData *>(loadedData->stringData.data());
-        for (auto i = 0; i < events->eventNames.size(); i++){
-            row = table->rowCount();
-            if (table->rowCount() > i){
-                table->setRowHidden(i, false);
-                if (table->item(row, 0)){
-                    table->item(row, 0)->setText(events->eventNames.at(i));
+        if (events){
+            for (auto i = 0; i < events->eventNames.size(); i++){
+                row = table->rowCount();
+                if (table->rowCount() > i){
+                    table->setRowHidden(i, false);
+                    if (table->item(row, 0)){
+                        table->item(row, 0)->setText(events->eventNames.at(i));
+                    }else{
+                        table->setItem(row, 0, new QTableWidgetItem(events->eventNames.at(i)));
+                    }
                 }else{
+                    table->setRowCount(row + 1);
                     table->setItem(row, 0, new QTableWidgetItem(events->eventNames.at(i)));
+                    table->setItem(row, 1, new QTableWidgetItem("hkEvent"));
+                    table->setItem(row, 2, new QTableWidgetItem("Edit"));
                 }
-            }else{
-                table->setRowCount(row + 1);
-                table->setItem(row, 0, new QTableWidgetItem(events->eventNames.at(i)));
-                table->setItem(row, 1, new QTableWidgetItem("hkEvent"));
-                table->setItem(row, 2, new QTableWidgetItem("Edit"));
             }
-        }
-        for (auto j = events->eventNames.size(); j < table->rowCount(); j++){
-            table->setRowHidden(j, true);
+            for (auto j = events->eventNames.size(); j < table->rowCount(); j++){
+                table->setRowHidden(j, true);
+            }
         }
     }
 }

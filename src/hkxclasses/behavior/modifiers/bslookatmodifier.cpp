@@ -184,7 +184,7 @@ bool BSLookAtModifier::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -363,39 +363,39 @@ QString BSLookAtModifier::evaluateDataValidity(){
     bool isvalid = true;
     if (bones.isEmpty()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": bones is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": bones is empty!");
     }else{
         for (auto i = bones.size() - 1; i >= 0; i--){
             if (bones.at(i).index >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid bones at index: "+QString::number(i)+" Removing bone!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid bones at index: "+QString::number(i)+" Removing bone!");
                 bones.removeAt(i);
             }
         }
         for (auto i = eyeBones.size() - 1; i >= 0; i--){
             if (eyeBones.at(i).index >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid bones at index: "+QString::number(i)+" Removing bone!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid bones at index: "+QString::number(i)+" Removing bone!");
                 eyeBones.removeAt(i);
             }
         }
     }
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     if (id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": event id out of range! Setting to max index in range!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": event id out of range! Setting to max index in range!");
         id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (payload.data() && payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid payload type! Signature: "+QString::number(payload->getSignature(), 16)+" Setting null value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid payload type! Signature: "+QString::number(payload->getSignature(), 16)+" Setting null value!");
         payload = HkxSharedPtr();
     }
     setDataValidity(isvalid);

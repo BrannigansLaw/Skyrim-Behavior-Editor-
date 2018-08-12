@@ -1,33 +1,51 @@
-#include "hkbfootikcontrolsmodifier.h"
+#include "hkbfootikmodifier.h"
 #include "src/xml/hkxxmlreader.h"
 #include "src/filetypes/behaviorfile.h"
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 
-uint hkbFootIkControlsModifier::refCount = 0;
+uint hkbFootIkModifier::refCount = 0;
 
-const QString hkbFootIkControlsModifier::classname = "hkbFootIkControlsModifier";
+const QString hkbFootIkModifier::classname = "hkbFootIkModifier";
 
-hkbFootIkControlsModifier::hkbFootIkControlsModifier(HkxFile *parent, long ref)
+const QStringList hkbFootIkModifier::AlignMode = {
+    "ALIGN_MODE_FORWARD_RIGHT",
+    "ALIGN_MODE_FORWARD"
+};
+
+hkbFootIkModifier::hkbFootIkModifier(HkxFile *parent, long ref)
     : hkbModifier(parent, ref),
       userData(0),
-      enable(true)
+      enable(true),
+      raycastDistanceUp(0),
+      raycastDistanceDown(0),
+      originalGroundHeightMS(0),
+      errorOut(0),
+      verticalOffset(0),
+      collisionFilterInfo(0),
+      forwardAlignFraction(0),
+      sidewaysAlignFraction(0),
+      sidewaysSampleWidth(0),
+      useTrackData(false),
+      lockFeetWhenPlanted(false),
+      useCharacterUpVector(true),
+      alignMode(AlignMode.first())
 {
-    setType(HKB_FOOT_IK_CONTROLS_MODIFIER, TYPE_MODIFIER);
+    setType(HKB_FOOT_IK_MODIFIER, TYPE_MODIFIER);
     parent->addObjectToFile(this, ref);
     refCount++;
-    name = "FootIkControlsModifier_"+QString::number(refCount);
+    name = "FootIkModifier_"+QString::number(refCount);
 }
 
-const QString hkbFootIkControlsModifier::getClassname(){
+const QString hkbFootIkModifier::getClassname(){
     return classname;
 }
 
-QString hkbFootIkControlsModifier::getName() const{
+QString hkbFootIkModifier::getName() const{
     std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
 
-bool hkbFootIkControlsModifier::readData(const HkxXmlReader &reader, long & index){
+bool hkbFootIkModifier::readData(const HkxXmlReader &reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
     int numlegs;
     bool ok;
@@ -93,41 +111,119 @@ bool hkbFootIkControlsModifier::readData(const HkxXmlReader &reader, long & inde
                 legs.append(hkLeg());
                 for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
                     text = reader.getNthAttributeValueAt(index, 0);
-                    if (text == "groundPosition"){
-                        legs.last().groundPosition = readVector4(reader.getElementValueAt(index), &ok);
-                        checkvalue(ok, "legs.at("+QString::number(j)+").groundPosition");
+                    if (text == "originalAnkleTransformMS"){
+                        legs.last().originalAnkleTransformMS = readQsTransform(reader.getElementValueAt(index), &ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").originalAnkleTransformMS");
+                    }else if (text == "kneeAxisLS"){
+                        legs.last().kneeAxisLS = readVector4(reader.getElementValueAt(index), &ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").kneeAxisLS");
+                    }else if (text == "footEndLS"){
+                        legs.last().footEndLS = readVector4(reader.getElementValueAt(index), &ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").footEndLS");
                     }else if (text == "id"){
                         legs.last().id = reader.getElementValueAt(index).toDouble(&ok);
                         checkvalue(ok, "legs.at("+QString::number(j)+").id");
                     }else if (text == "payload"){
                         checkvalue(legs.last().payload.readShdPtrReference(index, reader), "legs.at("+QString::number(j)+").payload");
+                    }else if (text == "footPlantedAnkleHeightMS"){
+                        legs.last().footPlantedAnkleHeightMS = reader.getElementValueAt(index).toDouble(&ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").footPlantedAnkleHeightMS");
+                    }else if (text == "footRaisedAnkleHeightMS"){
+                        legs.last().footRaisedAnkleHeightMS = reader.getElementValueAt(index).toDouble(&ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").footRaisedAnkleHeightMS");
+                    }else if (text == "maxAnkleHeightMS"){
+                        legs.last().maxAnkleHeightMS = reader.getElementValueAt(index).toDouble(&ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").maxAnkleHeightMS");
+                    }else if (text == "minAnkleHeightMS"){
+                        legs.last().minAnkleHeightMS = reader.getElementValueAt(index).toDouble(&ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").minAnkleHeightMS");
+                    }else if (text == "maxKneeAngleDegrees"){
+                        legs.last().maxKneeAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").maxKneeAngleDegrees");
+                    }else if (text == "minKneeAngleDegrees"){
+                        legs.last().minKneeAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").minKneeAngleDegrees");
                     }else if (text == "verticalError"){
                         legs.last().verticalError = reader.getElementValueAt(index).toDouble(&ok);
                         checkvalue(ok, "legs.at("+QString::number(j)+").verticalError");
+                    }else if (text == "maxAnkleAngleDegrees"){
+                        legs.last().maxAnkleAngleDegrees = reader.getElementValueAt(index).toDouble(&ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").maxAnkleAngleDegrees");
+                    }else if (text == "hipIndex"){
+                        legs.last().hipIndex = reader.getElementValueAt(index).toInt(&ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").hipIndex");
+                    }else if (text == "kneeIndex"){
+                        legs.last().kneeIndex = reader.getElementValueAt(index).toInt(&ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").kneeIndex");
+                    }else if (text == "ankleIndex"){
+                        legs.last().ankleIndex = reader.getElementValueAt(index).toInt(&ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").ankleIndex");
                     }else if (text == "hitSomething"){
                         legs.last().hitSomething = toBool(reader.getElementValueAt(index), &ok);
                         checkvalue(ok, "legs.at("+QString::number(j)+").hitSomething");
                     }else if (text == "isPlantedMS"){
                         legs.last().isPlantedMS = toBool(reader.getElementValueAt(index), &ok);
                         checkvalue(ok, "legs.at("+QString::number(j)+").isPlantedMS");
+                    }else if (text == "isOriginalAnkleTransformMSSet"){
+                        legs.last().isOriginalAnkleTransformMSSet = toBool(reader.getElementValueAt(index), &ok);
+                        checkvalue(ok, "legs.at("+QString::number(j)+").isOriginalAnkleTransformMSSet");
                         break;
                     }
                 }
             }
             (numlegs > 0) ? index-- : NULL;
+        }else if (text == "raycastDistanceUp"){
+            raycastDistanceUp = reader.getElementValueAt(index).toDouble(&ok);
+            checkvalue(ok, "raycastDistanceUp");
+        }else if (text == "raycastDistanceDown"){
+            raycastDistanceDown = reader.getElementValueAt(index).toDouble(&ok);
+            checkvalue(ok, "raycastDistanceDown");
+        }else if (text == "originalGroundHeightMS"){
+            originalGroundHeightMS = reader.getElementValueAt(index).toDouble(&ok);
+            checkvalue(ok, "originalGroundHeightMS");
+        }else if (text == "errorOut"){
+            errorOut = reader.getElementValueAt(index).toDouble(&ok);
+            checkvalue(ok, "errorOut");
         }else if (text == "errorOutTranslation"){
             errorOutTranslation = readVector4(reader.getElementValueAt(index), &ok);
             checkvalue(ok, "errorOutTranslation");
         }else if (text == "alignWithGroundRotation"){
             alignWithGroundRotation = readVector4(reader.getElementValueAt(index), &ok);
             checkvalue(ok, "alignWithGroundRotation");
+        }else if (text == "verticalOffset"){
+            verticalOffset = reader.getElementValueAt(index).toDouble(&ok);
+            checkvalue(ok, "verticalOffset");
+        }else if (text == "collisionFilterInfo"){
+            collisionFilterInfo = reader.getElementValueAt(index).toInt(&ok);
+            checkvalue(ok, "collisionFilterInfo");
+        }else if (text == "forwardAlignFraction"){
+            forwardAlignFraction = reader.getElementValueAt(index).toDouble(&ok);
+            checkvalue(ok, "forwardAlignFraction");
+        }else if (text == "sidewaysAlignFraction"){
+            sidewaysAlignFraction = reader.getElementValueAt(index).toDouble(&ok);
+            checkvalue(ok, "sidewaysAlignFraction");
+        }else if (text == "sidewaysSampleWidth"){
+            sidewaysSampleWidth = reader.getElementValueAt(index).toDouble(&ok);
+            checkvalue(ok, "sidewaysSampleWidth");
+        }else if (text == "useTrackData"){
+            useTrackData = toBool(reader.getElementValueAt(index), &ok);
+            checkvalue(ok, "useTrackData");
+        }else if (text == "lockFeetWhenPlanted"){
+            lockFeetWhenPlanted = toBool(reader.getElementValueAt(index), &ok);
+            checkvalue(ok, "lockFeetWhenPlanted");
+        }else if (text == "useCharacterUpVector"){
+            useCharacterUpVector = toBool(reader.getElementValueAt(index), &ok);
+            checkvalue(ok, "useCharacterUpVector");
+        }else if (text == "alignMode"){
+            alignMode = reader.getElementValueAt(index);
+            checkvalue(AlignMode.contains(alignMode), "alignMode");
         }
     }
     index--;
     return true;
 }
 
-bool hkbFootIkControlsModifier::write(HkxXMLWriter *writer){
+bool hkbFootIkModifier::write(HkxXMLWriter *writer){
     std::lock_guard <std::mutex> guard(mutex);
     auto writedatafield = [&](const QString & name, const QString & value){
         writer->writeLine(writer->parameter, QStringList(writer->name), QStringList(name), value);
@@ -174,19 +270,45 @@ bool hkbFootIkControlsModifier::write(HkxXMLWriter *writer){
         writer->writeLine(writer->parameter, list1, list2, "");
         for (auto i = 0; i < legs.size(); i++){
             writer->writeLine(writer->object, true);
-            writedatafield("fwdAxisLS", legs[i].groundPosition.getValueAsString());
+            writedatafield("originalAnkleTransformMS", legs[i].originalAnkleTransformMS.getValueAsString());
+            writedatafield("kneeAxisLS", legs[i].kneeAxisLS.getValueAsString());
+            writedatafield("footEndLS", legs[i].footEndLS.getValueAsString());
             writedatafield("id", QString::number(legs.at(i).id));
             writeref(legs.at(i).payload, "legs.at("+QString::number(i)+").payload");
+            writedatafield("footPlantedAnkleHeightMS", QString::number(legs.at(i).footPlantedAnkleHeightMS, char('f'), 6));
+            writedatafield("footRaisedAnkleHeightMS", QString::number(legs.at(i).footRaisedAnkleHeightMS, char('f'), 6));
+            writedatafield("maxAnkleHeightMS", QString::number(legs.at(i).maxAnkleHeightMS, char('f'), 6));
+            writedatafield("minAnkleHeightMS", QString::number(legs.at(i).minAnkleHeightMS, char('f'), 6));
+            writedatafield("maxKneeAngleDegrees", QString::number(legs.at(i).maxKneeAngleDegrees, char('f'), 6));
+            writedatafield("minKneeAngleDegrees", QString::number(legs.at(i).minKneeAngleDegrees, char('f'), 6));
             writedatafield("verticalError", QString::number(legs.at(i).verticalError, char('f'), 6));
+            writedatafield("maxAnkleAngleDegrees", QString::number(legs.at(i).maxAnkleAngleDegrees, char('f'), 6));
+            writedatafield("hipIndex", QString::number(legs.at(i).hipIndex));
+            writedatafield("kneeIndex", QString::number(legs.at(i).kneeIndex));
+            writedatafield("ankleIndex", QString::number(legs.at(i).ankleIndex));
             writedatafield("hitSomething", getBoolAsString(legs.at(i).hitSomething));
             writedatafield("isPlantedMS", getBoolAsString(legs.at(i).isPlantedMS));
+            writedatafield("isOriginalAnkleTransformMSSet", getBoolAsString(legs.at(i).isOriginalAnkleTransformMSSet));
             writer->writeLine(writer->object, false);
         }
         if (legs.size() > 0){
             writer->writeLine(writer->parameter, false);
         }
+        writedatafield("raycastDistanceUp", QString::number(raycastDistanceUp, char('f'), 6));
+        writedatafield("raycastDistanceDown", QString::number(raycastDistanceDown, char('f'), 6));
+        writedatafield("originalGroundHeightMS", QString::number(originalGroundHeightMS, char('f'), 6));
+        writedatafield("errorOut", QString::number(errorOut, char('f'), 6));
         writedatafield("errorOutTranslation", errorOutTranslation.getValueAsString());
         writedatafield("alignWithGroundRotation", alignWithGroundRotation.getValueAsString());
+        writedatafield("verticalOffset", QString::number(verticalOffset, char('f'), 6));
+        writedatafield("collisionFilterInfo", QString::number(collisionFilterInfo));
+        writedatafield("forwardAlignFraction", QString::number(forwardAlignFraction, char('f'), 6));
+        writedatafield("sidewaysAlignFraction", QString::number(sidewaysAlignFraction, char('f'), 6));
+        writedatafield("sidewaysSampleWidth", QString::number(sidewaysSampleWidth, char('f'), 6));
+        writedatafield("useTrackData", getBoolAsString(useTrackData));
+        writedatafield("lockFeetWhenPlanted", getBoolAsString(lockFeetWhenPlanted));
+        writedatafield("useCharacterUpVector", getBoolAsString(useCharacterUpVector));
+        writedatafield("alignMode", alignMode);
         writer->writeLine(writer->object, false);
         setIsWritten();
         writer->writeLine("\n");
@@ -198,12 +320,12 @@ bool hkbFootIkControlsModifier::write(HkxXMLWriter *writer){
     return true;
 }
 
-int hkbFootIkControlsModifier::getNumberOfLegs() const{
+int hkbFootIkModifier::getNumberOfLegs() const{
     std::lock_guard <std::mutex> guard(mutex);
     return legs.size();
 }
 
-bool hkbFootIkControlsModifier::isEventReferenced(int eventindex) const{
+bool hkbFootIkModifier::isEventReferenced(int eventindex) const{
     std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < legs.size(); i++){
         if (legs.at(i).id == eventindex){
@@ -213,21 +335,21 @@ bool hkbFootIkControlsModifier::isEventReferenced(int eventindex) const{
     return false;
 }
 
-void hkbFootIkControlsModifier::updateEventIndices(int eventindex){
+void hkbFootIkModifier::updateEventIndices(int eventindex){
     std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < legs.size(); i++){
         (legs.at(i).id > eventindex) ? legs[i].id-- : NULL;
     }
 }
 
-void hkbFootIkControlsModifier::mergeEventIndex(int oldindex, int newindex){
+void hkbFootIkModifier::mergeEventIndex(int oldindex, int newindex){
     std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < legs.size(); i++){
         (legs.at(i).id == oldindex) ? legs[i].id = newindex : NULL;
     }
 }
 
-void hkbFootIkControlsModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
+void hkbFootIkModifier::fixMergedEventIndices(BehaviorFile *dominantfile){
     std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphData *recdata;
     hkbBehaviorGraphData *domdata;
@@ -253,7 +375,7 @@ void hkbFootIkControlsModifier::fixMergedEventIndices(BehaviorFile *dominantfile
 }
 
 
-void hkbFootIkControlsModifier::updateReferences(long &ref){
+void hkbFootIkModifier::updateReferences(long &ref){
     std::lock_guard <std::mutex> guard(mutex);
     setReference(ref);
     setBindingReference(++ref);
@@ -262,7 +384,7 @@ void hkbFootIkControlsModifier::updateReferences(long &ref){
     }
 }
 
-QVector<HkxObject *> hkbFootIkControlsModifier::getChildrenOtherTypes() const{
+QVector<HkxObject *> hkbFootIkModifier::getChildrenOtherTypes() const{
     std::lock_guard <std::mutex> guard(mutex);
     QVector<HkxObject *> list;
     for (auto i = 0; i < legs.size(); i++){
@@ -271,11 +393,11 @@ QVector<HkxObject *> hkbFootIkControlsModifier::getChildrenOtherTypes() const{
     return list;
 }
 
-bool hkbFootIkControlsModifier::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
+bool hkbFootIkModifier::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
     std::lock_guard <std::mutex> guard(mutex);
-    hkbFootIkControlsModifier *recobj;
-    if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_FOOT_IK_CONTROLS_MODIFIER){
-        recobj = static_cast<hkbFootIkControlsModifier *>(recessiveObject);
+    hkbFootIkModifier *recobj;
+    if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_FOOT_IK_MODIFIER){
+        recobj = static_cast<hkbFootIkModifier *>(recessiveObject);
         injectWhileMerging(recobj);
         for (auto i = 0; i < legs.size(); i++){
             if (legs.at(i).payload.data()){
@@ -289,7 +411,7 @@ bool hkbFootIkControlsModifier::merge(HkxObject *recessiveObject){ //TO DO: Make
     return false;
 }
 
-bool hkbFootIkControlsModifier::link(){
+bool hkbFootIkModifier::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
@@ -307,7 +429,7 @@ bool hkbFootIkControlsModifier::link(){
     return true;
 }
 
-void hkbFootIkControlsModifier::unlink(){
+void hkbFootIkModifier::unlink(){
     std::lock_guard <std::mutex> guard(mutex);
     HkDynamicObject::unlink();
     for (auto i = 0; i < legs.size(); i++){
@@ -315,7 +437,7 @@ void hkbFootIkControlsModifier::unlink(){
     }
 }
 
-QString hkbFootIkControlsModifier::evaluateDataValidity(){
+QString hkbFootIkModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
@@ -348,6 +470,6 @@ QString hkbFootIkControlsModifier::evaluateDataValidity(){
     return errors;
 }
 
-hkbFootIkControlsModifier::~hkbFootIkControlsModifier(){
+hkbFootIkModifier::~hkbFootIkModifier(){
     refCount--;
 }

@@ -19,7 +19,18 @@ const QString hkbBehaviorGraphStringData::getClassname(){
     return classname;
 }
 
+int hkbBehaviorGraphStringData::getNumberOfEvents() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return eventNames.size();
+}
+
+int hkbBehaviorGraphStringData::getNumberOfVariables() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return variableNames.size();
+}
+
 bool hkbBehaviorGraphStringData::readData(const HkxXmlReader &reader, long & index){
+    std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     int numElems = 0;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
@@ -293,7 +304,7 @@ QString hkbBehaviorGraphStringData::evaluateDataValidity(){
         for (auto i = 0; i < list.size(); i++){
             if (list.at(i) == ""){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid "+fieldname+" at "+QString::number(i)+"!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid "+fieldname+" at "+QString::number(i)+"!");
             }
         }
     };

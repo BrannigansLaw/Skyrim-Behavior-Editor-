@@ -63,7 +63,7 @@ int hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name,
             }
         }
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or variableInitialValues are nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or variableInitialValues are nullptr!");
     }
     return index;
 }
@@ -116,7 +116,7 @@ void hkbBehaviorGraphData::addVariable(hkVariableType type){
         varData->addWordVariableValue(0);
         variableInfos.append(varInfo);
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or variableInitialValues are nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or variableInitialValues are nullptr!");
     }
 }
 
@@ -143,7 +143,7 @@ void hkbBehaviorGraphData::removeVariable(int index){
             variableInfos.removeAt(index);
         }
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or variableInitialValues are nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or variableInitialValues are nullptr!");
     }
 }
 
@@ -155,7 +155,7 @@ void hkbBehaviorGraphData::addEvent(const QString &name){
         strData->addEventName(name, &wasadded);
         (wasadded) ? eventInfos.append("0") : NULL;
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
     }
 }
 
@@ -166,7 +166,7 @@ void hkbBehaviorGraphData::addEvent(){
         strData->generateAppendEventName();
         eventInfos.append("0");
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
     }
 }
 
@@ -178,7 +178,7 @@ void hkbBehaviorGraphData::removeEvent(int index){
             (strData->removeEventNameAt(index)) ? eventInfos.removeAt(index) : NULL;
         }
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
     }
 }
 
@@ -188,7 +188,7 @@ void hkbBehaviorGraphData::setEventNameAt(int index, const QString & name){
     if (strData){
         strData->setEventNameAt(index, name);
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
     }
 }
 
@@ -215,7 +215,7 @@ QString hkbBehaviorGraphData::getVariableNameAt(int index) const{
     if (strData){
         return strData->getVariableNameAt(index);
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
     }
     return "";
 }
@@ -226,7 +226,7 @@ QString hkbBehaviorGraphData::getEventNameAt(int index) const{
     if (strData){
         return strData->getEventNameAt(index);
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
     }
     return "";
 }
@@ -237,7 +237,7 @@ void hkbBehaviorGraphData::setVariableNameAt(int index, const QString & name){
     if (strData){
         strData->setVariableNameAt(index, name);
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
     }
 }
 
@@ -247,7 +247,7 @@ void hkbBehaviorGraphData::setWordVariableValueAt(int index, int value){
     if (varData){
         varData->setWordVariableAt(index, value);
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableInitialValues is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableInitialValues is nullptr!");
     }
 }
 
@@ -267,7 +267,7 @@ void hkbBehaviorGraphData::setQuadVariableValueAt(int index, hkQuadVariable valu
             }
         }
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": varData is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": varData is nullptr!");
     }
 }
 
@@ -285,7 +285,7 @@ hkQuadVariable hkbBehaviorGraphData::getQuadVariable(int index, bool *ok) const{
             }
         }
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableInitialValues is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableInitialValues is nullptr!");
     }
     (ok) ? ok = false : NULL;
     return hkQuadVariable();
@@ -304,10 +304,10 @@ HkxObject * hkbBehaviorGraphData::getVariantVariable(int index) const{
                 return variableValues->getVariantVariableValueAt(count);
             }
         }else{
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": getVariantVariable(): Index out of range!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": getVariantVariable(): Index out of range!");
         }
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableInitialValues is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableInitialValues is nullptr!");
     }
     return nullptr;
 }
@@ -328,7 +328,7 @@ QString hkbBehaviorGraphData::getCharacterPropertyNameAt(int index) const{
     if (strdata){
         return strdata->getCharacterPropertyNameAt(index);
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
     }
     return "";
 }
@@ -501,7 +501,7 @@ bool hkbBehaviorGraphData::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -588,7 +588,7 @@ int hkbBehaviorGraphData::getIndexOfVariable(const QString & name) const{
     if (strData){
         return strData->getIndexOfVariableName(name);
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
     }
     return -1;
 }
@@ -599,7 +599,7 @@ int hkbBehaviorGraphData::getIndexOfEvent(const QString &name) const{
     if (strData){
         return strData->getIndexOfEventName(name);
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
     }
     return -1;
 }
@@ -674,10 +674,10 @@ bool hkbBehaviorGraphData::link(){
     HkxSharedPtr *ptr;
     auto link = [&](HkxSharedPtr & shdptr, const QString & fieldname, HkxSignature sig){
         if (!ptr || !ptr->data()){
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link '"+fieldname+"' data field!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link '"+fieldname+"' data field!");
             setDataValidity(false);
         }else if ((*ptr)->getSignature() != sig){
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'"+fieldname+"' data field is linked to invalid child!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'"+fieldname+"' data field is linked to invalid child!");
             setDataValidity(false);
             shdptr = *ptr;
         }else{

@@ -4,6 +4,9 @@
 #include "src/filetypes/projectfile.h"
 #include "src/hkxclasses/behavior/hkbcharacterstringdata.h"
 #include "src/hkxclasses/behavior/hkbvariablevalueset.h"
+#include "src/hkxclasses/behavior/hkbmirroredskeletoninfo.h"
+#include "src/hkxclasses/behavior/hkbfootikdriverinfo.h"
+#include "src/hkxclasses/behavior/hkbhandikdriverinfo.h"
 
 uint hkbCharacterData::refCount = 0;
 
@@ -20,12 +23,15 @@ const QStringList hkbCharacterData::Type = {
     "VARIABLE_TYPE_QUATERNION"
 };
 
-hkbCharacterData::hkbCharacterData(HkxFile *parent, long ref)
+hkbCharacterData::hkbCharacterData(HkxFile *parent, long ref, hkbCharacterStringData *strings, hkbVariableValueSet *values, hkbMirroredSkeletonInfo *mirrorskelinfo)
     : HkxObject(parent, ref),
       modelUpMS(0, 0, 1, 0),
       modelForwardMS(0, 1, 0, 0),
       modelRightMS(1, 0, 0, 0),
-      scale(1)
+      scale(1),
+      stringData(strings),
+      characterPropertyValues(values),
+      mirroredSkeletonInfo(mirrorskelinfo)
 {
     setType(HKB_CHARACTER_DATA, TYPE_OTHER);
     parent->addObjectToFile(this, ref);
@@ -37,18 +43,17 @@ const QString hkbCharacterData::getClassname(){
 }
 
 int hkbCharacterData::getWordVariableValueAt(int index){
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbVariableValueSet *variableValues = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
     if (variableValues){
         return variableValues->getWordVariableAt(index);
-    }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": characterPropertyValues is nullptr!\n");
     }
+    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": characterPropertyValues is nullptr!");
     return -1;
 }
 
 HkxObject * hkbCharacterData::getVariantVariable(int index) const{
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbVariableValueSet *variableValues = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
     if (variableValues){
         if (characterPropertyInfos.size() > index){
@@ -60,16 +65,16 @@ HkxObject * hkbCharacterData::getVariantVariable(int index) const{
                 return variableValues->getVariantVariableValueAt(count);
             }
         }else{
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": getVariantVariable(): Index out of range!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": getVariantVariable(): Index out of range!");
         }
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": characterPropertyValues is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": characterPropertyValues is nullptr!");
     }
     return nullptr;
 }
 
 void hkbCharacterData::addVariable(hkVariableType type, const QString & name){
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
     auto index = -1;
@@ -90,12 +95,12 @@ void hkbCharacterData::addVariable(hkVariableType type, const QString & name){
             }
         }
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or characterPropertyValues are nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or characterPropertyValues are nullptr!");
     }
 }
 
 void hkbCharacterData::addVariable(hkVariableType type){
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
     hkVariableInfo varInfo;
@@ -105,12 +110,12 @@ void hkbCharacterData::addVariable(hkVariableType type){
         varData->addWordVariableValue(0);
         characterPropertyInfos.append(varInfo);
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or variableInitialValues are nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or variableInitialValues are nullptr!");
     }
 }
 
 void hkbCharacterData::removeVariable(int index){
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
     auto count = -1;
@@ -132,12 +137,12 @@ void hkbCharacterData::removeVariable(int index){
             characterPropertyInfos.removeAt(index);
         }
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or variableInitialValues are nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData and/or variableInitialValues are nullptr!");
     }
 }
 
 hkVariableType hkbCharacterData::getVariableTypeAt(int index) const{
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     int type;
     if (characterPropertyInfos.size() > index && index > -1){
         type = Type.indexOf(characterPropertyInfos.at(index).type);
@@ -147,27 +152,27 @@ hkVariableType hkbCharacterData::getVariableTypeAt(int index) const{
 }
 
 void hkbCharacterData::setCharacterPropertyNameAt(int index, const QString & name){
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
     if (strData){
         strData->setCharacterPropertyNameAt(index, name);
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
     }
 }
 
 void hkbCharacterData::setWordVariableValueAt(int index, int value){
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
     if (varData){
         varData->setWordVariableAt(index, value);
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": characterPropertyValues is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": characterPropertyValues is nullptr!");
     }
 }
 
 void hkbCharacterData::setQuadVariableValueAt(int index, hkQuadVariable value){
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
     auto count = -1;
     if (varData){
@@ -182,12 +187,17 @@ void hkbCharacterData::setQuadVariableValueAt(int index, hkQuadVariable value){
             }
         }
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": varData is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": varData is nullptr!");
     }
 }
 
+void hkbCharacterData::setFootIkDriverInfo(hkbFootIkDriverInfo *fooik){
+    //std::lock_guard <std::mutex> guard(mutex);
+    footIkDriverInfo = HkxSharedPtr(fooik);
+}
+
 hkQuadVariable hkbCharacterData::getQuadVariable(int index, bool *ok) const{
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbVariableValueSet *variableValues = static_cast<hkbVariableValueSet *>(characterPropertyValues.data());
     if (variableValues){
         if (characterPropertyInfos.size() > index){
@@ -200,7 +210,7 @@ hkQuadVariable hkbCharacterData::getQuadVariable(int index, bool *ok) const{
             }
         }
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableInitialValues is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": variableInitialValues is nullptr!");
     }
     (ok) ? ok = false : NULL;
     return hkQuadVariable();
@@ -208,7 +218,7 @@ hkQuadVariable hkbCharacterData::getQuadVariable(int index, bool *ok) const{
 
 
 bool hkbCharacterData::readData(const HkxXmlReader &reader, long & index){
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     int numElems;
     bool ok;
     QByteArray text;
@@ -292,9 +302,9 @@ bool hkbCharacterData::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     if (writer && !getIsWritten()){
         QString refString = "null";
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -348,63 +358,60 @@ bool hkbCharacterData::write(HkxXMLWriter *writer){
 }
 
 bool hkbCharacterData::link(){
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     HkxSharedPtr *ptr;
     auto linkptr = [&](HkxSignature sig, HkxSharedPtr & shdptr, const QString & fieldname){
         if (!(*ptr).data() || (*ptr)->getSignature() != sig){
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'"+fieldname+"' data field is linked to invalid child!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'"+fieldname+"' data field is linked to invalid child!");
             setDataValidity(false);
         }
         shdptr = *ptr;
     };
-    ptr = &static_cast<CharacterFile *>(getParentFile())->characterPropertyValues;
+    ptr = &static_cast<CharacterFile *>(getParentFile())->getCharacterPropertyValues();
     linkptr(HKB_VARIABLE_VALUE_SET, characterPropertyValues, "characterPropertyValues");
-    ptr = &static_cast<CharacterFile *>(getParentFile())->footIkDriverInfo;
+    ptr = &static_cast<CharacterFile *>(getParentFile())->getFootIkDriverInfo();
     linkptr(HKB_FOOT_IK_DRIVER_INFO, footIkDriverInfo, "footIkDriverInfo");
-    ptr = &static_cast<CharacterFile *>(getParentFile())->handIkDriverInfo;
+    ptr = &static_cast<CharacterFile *>(getParentFile())->getHandIkDriverInfo();
     linkptr(HKB_HAND_IK_DRIVER_INFO, handIkDriverInfo, "handIkDriverInfo");
-    ptr = &static_cast<CharacterFile *>(getParentFile())->stringData;
+    ptr = &static_cast<CharacterFile *>(getParentFile())->getStringData();
     linkptr(HKB_CHARACTER_STRING_DATA, stringData, "stringData");
-    ptr = &static_cast<CharacterFile *>(getParentFile())->mirroredSkeletonInfo;
+    ptr = &static_cast<CharacterFile *>(getParentFile())->getMirroredSkeletonInfo();
     linkptr(HKB_MIRRORED_SKELETON_INFO, mirroredSkeletonInfo, "mirroredSkeletonInfo");
     return true;
 }
 
 QStringList hkbCharacterData::getCharacterPropertyNames() const{
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
     if (strData){
         return strData->getCharacterPropertyNames();
-    }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
     }
+    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
     return QStringList();
 }
 
 QString hkbCharacterData::getCharacterPropertyNameAt(int index) const{
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
     if (strData){
         return strData->getCharacterPropertyNameAt(index);
-    }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
     }
+    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
     return "";
 }
 
 QString hkbCharacterData::getLastCharacterPropertyName() const{
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterStringData *strData = static_cast<hkbCharacterStringData *>(stringData.data());
     if (strData){
         return strData->getLastCharacterPropertyName();
-    }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!\n");
     }
+    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": stringData is nullptr!");
     return "";
 }
 
 QStringList hkbCharacterData::getCharacterPropertyTypenames() const{
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     QStringList list;
     for (auto i = 0; i < characterPropertyInfos.size(); i++){
         list.append(characterPropertyInfos.at(i).type);
@@ -413,7 +420,7 @@ QStringList hkbCharacterData::getCharacterPropertyTypenames() const{
 }
 
 bool hkbCharacterData::merge(HkxObject *recessiveobj){
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     hkbCharacterData *otherdata;
     hkbCharacterStringData *otherstrings;
     hkbVariableValueSet *othervalues;
@@ -439,7 +446,7 @@ bool hkbCharacterData::merge(HkxObject *recessiveobj){
                 }
                 if (!found){
                     strings->animationNames.append(otherstrings->animationNames.at(i));
-                    static_cast<CharacterFile *>(getParentFile())->project->appendAnimation(&static_cast<CharacterFile *>(recessiveobj->getParentFile())->project->getAnimationMotionData(i));
+                    static_cast<CharacterFile *>(getParentFile())->appendAnimation(&static_cast<CharacterFile *>(recessiveobj->getParentFile())->getAnimationMotionData(i));
                     //static_cast<BehaviorFile *>(otherdata->getParentFile())->mergeEventIndices(i, eventInfos.size() - 1);
                 }
             }
@@ -478,8 +485,13 @@ bool hkbCharacterData::merge(HkxObject *recessiveobj){
     return false;
 }
 
+void hkbCharacterData::setHandIkDriverInfo(hkbHandIkDriverInfo *value){
+    //std::lock_guard <std::mutex> guard(mutex);
+    handIkDriverInfo = HkxSharedPtr(value);
+}
+
 hkVariableType hkbCharacterData::getCharacterPropertyTypeAt(int index) const{
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     int type;
     if (characterPropertyInfos.size() > index && index > -1){
         type = Type.indexOf(characterPropertyInfos.at(index).type);
@@ -489,7 +501,7 @@ hkVariableType hkbCharacterData::getCharacterPropertyTypeAt(int index) const{
 }
 
 QString hkbCharacterData::evaluateDataValidity(){   //TO DO: finish....
-    std::lock_guard <std::mutex> guard(mutex);
+    //std::lock_guard <std::mutex> guard(mutex);
     if ((!characterPropertyValues.data() || characterPropertyValues->getSignature() != HKB_VARIABLE_VALUE_SET) || (footIkDriverInfo.data() && footIkDriverInfo->getSignature() != HKB_FOOT_IK_DRIVER_INFO) ||
             (handIkDriverInfo.data() && handIkDriverInfo->getSignature() != HKB_HAND_IK_DRIVER_INFO) || (!stringData.data() || stringData->getSignature() != HKB_CHARACTER_STRING_DATA) ||
             (!mirroredSkeletonInfo.data() || mirroredSkeletonInfo->getSignature() != HKB_MIRRORED_SKELETON_INFO))

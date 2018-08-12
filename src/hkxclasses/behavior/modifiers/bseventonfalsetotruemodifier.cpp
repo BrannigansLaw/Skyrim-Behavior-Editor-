@@ -71,8 +71,6 @@ bool BSEventOnFalseToTrueModifier::readData(const HkxXmlReader &reader, long & i
                 }else if (text == "payload"){
                     checkvalue(eventToSend1.payload.readShdPtrReference(index, reader), "eventToSend1.payload");
                     break;
-                }else{
-                    //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                 }
             }
         }else if (text == "bEnableEvent2"){
@@ -91,8 +89,6 @@ bool BSEventOnFalseToTrueModifier::readData(const HkxXmlReader &reader, long & i
                 }else if (text == "payload"){
                     checkvalue(eventToSend2.payload.readShdPtrReference(index, reader), "eventToSend2.payload");
                     break;
-                }else{
-                    //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                 }
             }
         }else if (text == "bEnableEvent3"){
@@ -111,12 +107,8 @@ bool BSEventOnFalseToTrueModifier::readData(const HkxXmlReader &reader, long & i
                 }else if (text == "payload"){
                     checkvalue(eventToSend3.payload.readShdPtrReference(index, reader), "eventToSend3.payload");
                     break;
-                }else{
-                    //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                 }
             }
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -135,7 +127,7 @@ bool BSEventOnFalseToTrueModifier::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -315,7 +307,7 @@ QString BSEventOnFalseToTrueModifier::evaluateDataValidity(){
     bool isvalid = true;
     auto setinvalid = [&](const QString & message){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!");
     };
     QString temp = HkDynamicObject::evaluateDataValidity();
     (temp != "") ? errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n"): NULL;

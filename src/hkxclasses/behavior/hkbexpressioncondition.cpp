@@ -64,7 +64,7 @@ QString hkbExpressionCondition::evaluateDataValidity(){ //TO DO...
     std::lock_guard <std::mutex> guard(mutex);
     if (expression == ""){
         setDataValidity(false);
-        return QString(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid "+expression+"!\n");
+        return QString(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid "+expression+"!");
     }else{
         setDataValidity(true);
         return QString();

@@ -18,6 +18,10 @@
 #include "src/hkxclasses/hkrootlevelcontainer.h"
 #include "src/hkxclasses/behavior/generators/hkbclipgenerator.h"
 #include "src/hkxclasses/behavior/generators/hkbbehaviorreferencegenerator.h"
+#include "src/hkxclasses/behavior/hkbfootikdriverinfo.h"
+#include "src/hkxclasses/behavior/hkbhandikdriverinfo.h"
+#include "src/hkxclasses/behavior/hkbcharacterdata.h"
+
 #include <mutex>
 #include <thread>
 
@@ -42,10 +46,12 @@ ProjectFile::ProjectFile(MainWindow *window, const QString & name, bool autogene
 }
 
 void ProjectFile::setCharacterFile(CharacterFile *file){
+    //std::lock_guard <std::mutex> guard(mutex);
     character = file;
 }
 
 bool ProjectFile::isClipGenNameTaken(const QString &name) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < behaviorFiles.size(); i++){
         if (behaviorFiles.at(i)->isClipGenNameTaken(name)){
             return true;
@@ -55,66 +61,77 @@ bool ProjectFile::isClipGenNameTaken(const QString &name) const{
 }
 
 bool ProjectFile::readAnimationData(const QString & filename, const QStringList & behaviorfilenames){
-    QFile *animfile = new QFile(filename);
-    QString projectname = getFileName();
-    if (!animfile->exists()){
-        delete animfile;
-        animfile = new QFile(QDir::currentPath()+"/animationdatasinglefile.txt");
+    //std::lock_guard <std::mutex> guard(mutex);
+    auto result = false;
+    if (skyrimAnimData){
+        QFile *animfile = new QFile(filename);
+        QString projectname = getFileName();
         if (!animfile->exists()){
-            CRITICAL_ERROR_MESSAGE("animationdatasinglefile.txt is missing from the application directory!");
+            delete animfile;
+            animfile = new QFile(QDir::currentPath()+"/animationdatasinglefile.txt");
+            (!animfile->exists()) ? LogFile::writeToLog("'animationdatasinglefile.txt' is missing from the application directory!") : NULL;
         }
-    }
-    bool result = true;
-    if (!behaviorfilenames.isEmpty()){
-        result = skyrimAnimData->parse(animfile, projectname, behaviorfilenames);
-    }else{
-        result = skyrimAnimData->parse(animfile);
-    }
-    if (!result){
+        (!behaviorfilenames.isEmpty()) ? result = skyrimAnimData->parse(animfile, projectname, behaviorfilenames) : result = skyrimAnimData->parse(animfile);
+        (!result) ? LogFile::writeToLog(": The project animation data file could not be parsed!!!") : NULL;
         delete animfile;
-        CRITICAL_ERROR_MESSAGE("ProjectFile::readAnimationData(): The project animation data file could not be parsed!!!");
+        projectIndex = skyrimAnimData->getProjectIndex(projectname);
+    }else{
+        LogFile::writeToLog(": 'skyrimAnimData' is nullptr!!!");
     }
-    delete animfile;
-    projectIndex = skyrimAnimData->getProjectIndex(projectname);
-    return true;
+    return result;
 }
 
 bool ProjectFile::readAnimationSetData(const QString & filename){
-    QFile *animsetfile = new QFile(QString(filename).replace("animationdatasinglefile.txt", "animationsetdatasinglefile.txt"));
-    if (!animsetfile->exists()){
-        delete animsetfile;
-        animsetfile = new QFile(QDir::currentPath()+"/animationsetdatasinglefile.txt");
+    //std::lock_guard <std::mutex> guard(mutex);
+    auto result = false;
+    if (skyrimAnimData && skyrimAnimSetData){
+        QFile *animsetfile = new QFile(QString(filename).replace("animationdatasinglefile.txt", "animationsetdatasinglefile.txt"));
         if (!animsetfile->exists()){
-            CRITICAL_ERROR_MESSAGE("animationsetdatasinglefile.txt is missing from the application directory!");
+            delete animsetfile;
+            animsetfile = new QFile(QDir::currentPath()+"/animationsetdatasinglefile.txt");
+            (!animsetfile->exists()) ? LogFile::writeToLog(": 'animationsetdatasinglefile.txt' is missing from the application directory!") : NULL;
         }
-    }
-    if (!skyrimAnimSetData->parse(animsetfile)){
+        (!skyrimAnimSetData->parse(animsetfile)) ? LogFile::writeToLog(": The project animation set data file could not be parsed!!!") : result = true;
         delete animsetfile;
-        CRITICAL_ERROR_MESSAGE("ProjectFile::readAnimationSetData(): The project animation set data file could not be parsed!!!");
+    }else{
+        LogFile::writeToLog(": 'skyrimAnimData' or 'skyrimAnimSetData' are nullptr!!!");
     }
-    delete animsetfile;
-    return true;
+    return result;
 }
 
 bool ProjectFile::removeClipGenFromAnimData(const QString & animationname, const QString & clipname, const QString & variablename){
-    bool result = skyrimAnimData->removeClipGenerator(projectName+".txt", clipname);
-    skyrimAnimSetData->removeAnimationFromCache(projectName+".txt", animationname, variablename, clipname);
+    //std::lock_guard <std::mutex> guard(mutex);
+    auto result = false;
+    if (skyrimAnimData && skyrimAnimSetData){
+        result = skyrimAnimData->removeClipGenerator(projectName+".txt", clipname);
+        skyrimAnimSetData->removeAnimationFromCache(projectName+".txt", animationname, variablename, clipname);
+    }else{
+        LogFile::writeToLog(": 'skyrimAnimData' or 'skyrimAnimSetData' are nullptr!!!");
+    }
     return result;
 }
 
 bool ProjectFile::removeAnimationFromAnimData(const QString &name){
-    return skyrimAnimData->removeAnimation(projectName+".txt", character->getAnimationNames().indexOf(name));    //Unsafe...
+    //std::lock_guard <std::mutex> guard(mutex);
+    auto result = false;
+    if (skyrimAnimData && character){
+        return skyrimAnimData->removeAnimation(projectName+".txt", character->getAnimationNames().indexOf(name));
+    }else{
+        LogFile::writeToLog(": 'skyrimAnimData' or 'character' are nullptr!!!");
+    }
+    return result;
 }
 
 
 QString ProjectFile::getCharacterFilePathAt(int index) const{
-    if (!stringData.data()){
-        return "";
-    }
-    return static_cast<hkbProjectStringData *>(stringData.data())->getCharacterFilePathAt(index);
+    //std::lock_guard <std::mutex> guard(mutex);
+    QString path;
+    (stringData.data()) ? path = static_cast<hkbProjectStringData *>(stringData.data())->getCharacterFilePathAt(index) : LogFile::writeToLog(":'stringData' is nullptr!");
+    return path;
 }
 
 HkxSharedPtr * ProjectFile::findProjectData(long ref){
+    //std::lock_guard <std::mutex> guard(mutex);
     if (projectData.getShdPtrReference() == ref){
         return &projectData;
     }
@@ -122,6 +139,7 @@ HkxSharedPtr * ProjectFile::findProjectData(long ref){
 }
 
 HkxSharedPtr * ProjectFile::findProjectStringData(long ref){
+    //std::lock_guard <std::mutex> guard(mutex);
     if (stringData.getShdPtrReference() == ref){
         return &stringData;
     }
@@ -129,78 +147,65 @@ HkxSharedPtr * ProjectFile::findProjectStringData(long ref){
 }
 
 bool ProjectFile::addObjectToFile(HkxObject *obj, long ref){
-    if (ref > largestRef){
-        largestRef = ref;
-    }else{
-        largestRef++;
+    ////std::lock_guard <std::mutex> guard(mutex);
+    if (obj){
+        (ref > largestRef) ? largestRef = ref : largestRef++;
+        obj->setReference(largestRef);
+        if (obj->getSignature() == HKB_PROJECT_DATA){
+            projectData = HkxSharedPtr(obj, ref);
+        }else if (obj->getSignature() == HKB_PROJECT_STRING_DATA){
+            stringData = HkxSharedPtr(obj, ref);
+        }else if (obj->getSignature() == HK_ROOT_LEVEL_CONTAINER){
+            setRootObject(HkxSharedPtr(obj, ref));
+        }else{
+            LogFile::writeToLog("ProjectFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16));
+            return false;
+        }
+        return true;
     }
-    obj->setReference(largestRef);
-    if (obj->getSignature() == HKB_PROJECT_DATA){
-        projectData = HkxSharedPtr(obj, ref);
-    }else if (obj->getSignature() == HKB_PROJECT_STRING_DATA){
-        stringData = HkxSharedPtr(obj, ref);
-    }else if (obj->getSignature() == HK_ROOT_LEVEL_CONTAINER){
-        setRootObject(HkxSharedPtr(obj, ref));
-    }else{
-        LogFile::writeToLog("ProjectFile: addObjectToFile() failed!\nInvalid type enum for this object!\nObject signature is: "+QString::number(obj->getSignature(), 16));
-        return false;
-    }
-    return true;
+    return false;
 }
 
 bool ProjectFile::parse(){
-    if (!getReader().parse()){
-        return false;
-    }
+    //std::lock_guard <std::mutex> guard(mutex);
     long index = 2;
-    bool ok = true;
+    auto ok = false;
     HkxSignature signature;
     QByteArray value;
-    long ref = 0;
-    //setProgressData("Creating HKX objects...", 60);
-    while (index < getReader().getNumElements()){
-        value = getReader().getNthAttributeNameAt(index, 1);
-        if (value == "class"){
-            value = getReader().getNthAttributeValueAt(index, 2);
-            if (value != ""){
-                ref = getReader().getNthAttributeValueAt(index, 0).remove(0, 1).toLong(&ok);
-                if (!ok){
-                    LogFile::writeToLog("ProjectFile: parse() failed!\nThe object reference string contained invalid characters and failed to convert to an integer!");
-                    return false;
-                }
-                signature = (HkxSignature)value.toULongLong(&ok, 16);
-                if (!ok){
-                    LogFile::writeToLog("ProjectFile: parse() failed!\nThe object signature string contained invalid characters and failed to convert to an integer!");
-                    return false;
-                }
-                if (signature == HKB_PROJECT_DATA){
-                    if (!appendAndReadData(index, new hkbProjectData(this, ref))){
-                        return false;
+    auto ref = 0;
+    auto appendnread = [&](HkxObject *obj, const QString & nameoftype){
+        (!appendAndReadData(index, obj)) ? LogFile::writeToLog("BehaviorFile: parse(): Failed to read a "+nameoftype+" object! Ref: "+QString::number(ref)) : NULL;
+    };
+    if (getReader().parse()){
+        for (; index < getReader().getNumElements(); index++){
+            value = getReader().getNthAttributeNameAt(index, 1);
+            if (value == "class"){
+                value = getReader().getNthAttributeValueAt(index, 2);
+                if (value != ""){
+                    ref = getReader().getNthAttributeValueAt(index, 0).remove(0, 1).toLong(&ok);
+                    (!ok) ? LogFile::writeToLog("BehaviorFile: parse() failed! The object reference string contained invalid characters and failed to convert to an integer!") : NULL;
+                    signature = (HkxSignature)value.toULongLong(&ok, 16);
+                    (!ok) ? LogFile::writeToLog("BehaviorFile: parse() failed! The object signature string contained invalid characters and failed to convert to an integer!") : NULL;
+                    switch (signature){
+                    case HKB_PROJECT_DATA:
+                        appendnread(new hkbProjectData(this, ref), "HKB_PROJECT_DATA"); break;
+                    case HKB_PROJECT_STRING_DATA:
+                        appendnread(new hkbProjectStringData(this, ref), "HKB_PROJECT_STRING_DATA"); break;
+                    case HK_ROOT_LEVEL_CONTAINER:
+                        appendnread(new hkRootLevelContainer(this, ref), "HK_ROOT_LEVEL_CONTAINER"); break;
+                    default:
+                        LogFile::writeToLog(fileName()+": Unknown signature detected! Unknown object class name is: "+getReader().getNthAttributeValueAt(index, 1)+" Unknown object signature is: "+QString::number(signature, 16));
                     }
-                }else if (signature == HKB_PROJECT_STRING_DATA){
-                    if (!appendAndReadData(index, new hkbProjectStringData(this, ref))){
-                        return false;
-                    }
-                }else if (signature == HK_ROOT_LEVEL_CONTAINER){
-                    if (!appendAndReadData(index, new hkRootLevelContainer(this, ref))){
-                        return false;
-                    }
-                }else{
-                    //LogFile::writeToLog("ProjectFile: parse()!\nUnknown signature detected!\nUnknown object class name is: "+getReader().getNthAttributeValueAt(index, 1)+"\nUnknown object signature is: "+QString::number(signature, 16));
-                    return false;
                 }
             }
         }
-        index++;
+        closeFile();
+        getReader().clear();
+        (link()) ? ok = true : LogFile::writeToLog(fileName()+": failed to link!!!");
+    }else{
+        LogFile::writeToLog(fileName()+": failed to parse!!!");
     }
-    closeFile();
-    getReader().clear();
-    //setProgressData("Linking HKX objects...", 80);
-    if (!link()){
-        LogFile::writeToLog("ProjectFile: parse() failed because link() failed!");
-        return false;
-    }
-    return true;
+    return ok;
 }
 
 bool ProjectFile::link(){
@@ -216,13 +221,76 @@ bool ProjectFile::link(){
         return false;
     }
     if (!projectData || !projectData->link()){
-        LogFile::writeToLog("ProjectFile: link() failed!\nprojectData failed to link to it's children!\n");
+        LogFile::writeToLog("ProjectFile: link() failed!\nprojectData failed to link to it's children!");
         return false;
     }
     return true;
 }
 
+void ProjectFile::addFootIK(){
+    //std::lock_guard <std::mutex> guard(mutex);
+    (character) ? character->addFootIK() : LogFile::writeToLog(":'character' is nullptr!");
+}
+
+void ProjectFile::disableHandIK(){
+    //std::lock_guard <std::mutex> guard(mutex);
+    (character) ? character->disableHandIK() : LogFile::writeToLog(":'character' is nullptr!");
+}
+
+void ProjectFile::disableFootIK(){
+    //std::lock_guard <std::mutex> guard(mutex);
+    (character) ? character->disableFootIK() : LogFile::writeToLog(":'character' is nullptr!");
+}
+
+void ProjectFile::addHandIK(){
+    //std::lock_guard <std::mutex> guard(mutex);
+    (character) ? character->addHandIK() : LogFile::writeToLog(":'character' is nullptr!");
+}
+
+hkbHandIkDriverInfo *ProjectFile::getHandIkDriverInfo() const{
+    //std::lock_guard <std::mutex> guard(mutex);
+    hkbHandIkDriverInfo *handdriver = nullptr;
+    (character) ? handdriver = static_cast<hkbHandIkDriverInfo *>(character->getHandIkDriverInfo().data()) : LogFile::writeToLog(":'character' is nullptr!");
+    return handdriver;
+}
+
+hkbFootIkDriverInfo *ProjectFile::getFootIkDriverInfo() const{
+    //std::lock_guard <std::mutex> guard(mutex);
+    hkbFootIkDriverInfo *footdriver = nullptr;
+    (character) ? footdriver = static_cast<hkbFootIkDriverInfo *>(character->getFootIkDriverInfo().data()) : LogFile::writeToLog(":'character' is nullptr!");
+    return footdriver;
+}
+
+hkaSkeleton *ProjectFile::getSkeleton(bool isragdoll) const{
+    //std::lock_guard <std::mutex> guard(mutex);
+    hkaSkeleton *skel = nullptr;
+    (character) ? skel = character->getSkeleton(isragdoll) : LogFile::writeToLog(":'character' is nullptr!");
+    return skel;
+}
+
+ProjectAnimData *ProjectFile::getAnimDataAt(const QString & projectname) const{
+    //std::lock_guard <std::mutex> guard(mutex);
+    ProjectAnimData *animdata = nullptr;
+    (skyrimAnimData) ? animdata = skyrimAnimData->getProjectAnimData(projectname) : LogFile::writeToLog(":'skyrimAnimData' is nullptr!");
+    return animdata;
+}
+
+HkxObject *ProjectFile::getCharacterStringData() const{
+    //std::lock_guard <std::mutex> guard(mutex);
+    HkxObject *obj = nullptr;
+    (character) ? obj = character->getCharacterStringData() : LogFile::writeToLog(":'character' is nullptr!");
+    return obj;
+}
+
+HkxObject *ProjectFile::getCharacterData() const{
+    //std::lock_guard <std::mutex> guard(mutex);
+    HkxObject *obj = nullptr;
+    (character) ? obj = character->getCharacterData() : LogFile::writeToLog(":'character' is nullptr!");
+    return obj;
+}
+
 QString ProjectFile::detectErrorsInProject(){
+    //std::lock_guard <std::mutex> guard(mutex);
     ProgressDialog progress("Detecting possible errors...", "", 0, 100, getUI());
     progress.setWindowModality(Qt::WindowModal);
     std::vector <std::future<QString>> futures;
@@ -257,14 +325,15 @@ QString ProjectFile::detectErrorsInProject(){
     for (auto i = 0; i < futures.size(); i++){
         errorstring = errorstring + futures.at(i).get();
     }*/
-    QString errorstring("\n\n");
+    QString errorstrings;
     for (auto i = 0; i < behaviorFiles.size(); i++){
-        errorstring = errorstring + behaviorFiles.at(i)->detectErrors();
+        errorstrings = errorstrings + behaviorFiles.at(i)->detectErrors();
     }
-    return errorstring+"\nCheck 'DebugLog.txt' in the application directory for details...";
+    return errorstrings+"\nCheck 'DebugLog.txt' in the application directory for details...";
 }
 
 QString ProjectFile::detectErrorsInBehavior(const QString &filename){
+    //std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < behaviorFiles.size(); i++){
         if (!behaviorFiles.at(i)->fileName().compare(filename, Qt::CaseInsensitive)){
             return behaviorFiles.at(i)->detectErrors();
@@ -275,6 +344,7 @@ QString ProjectFile::detectErrorsInBehavior(const QString &filename){
 }
 
 void ProjectFile::removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *gentoignore){
+    //std::lock_guard <std::mutex> guard(mutex);
     QStringList filestoremove;
     QStringList referencedbehaviors;
     QVector <int> behaviorindices;
@@ -303,13 +373,14 @@ void ProjectFile::removeUnreferencedFiles(const hkbBehaviorReferenceGenerator *g
             }
         }
     }
-    ui->removeBehaviorGraphs(filestoremove);
+    getUI()->removeBehaviorGraphs(filestoremove);
     for (auto i = filestoremove.size() - 1; i > -1; i--){
         skyrimAnimData->removeBehaviorFromProject(projectName, filestoremove.at(i));
     }
 }
 
 void ProjectFile::ensureAllRefedAnimationsExist(){
+    //std::lock_guard <std::mutex> guard(mutex);
     if (character && !behaviorFiles.isEmpty()){
         QStringList animations = character->getAnimationNames();
         QStringList refedAnimations;
@@ -325,6 +396,7 @@ void ProjectFile::ensureAllRefedAnimationsExist(){
 }
 
 bool ProjectFile::merge(ProjectFile *recessiveproject, bool isFNIS){ //Make sure to update event and variable indices when merging!!!
+    //std::lock_guard <std::mutex> guard(mutex);
     bool value = false;
     bool found;
     if (recessiveproject){
@@ -385,54 +457,60 @@ bool ProjectFile::merge(ProjectFile *recessiveproject, bool isFNIS){ //Make sure
             percent = 0;
             progress.setProgress("Merging animation caches...", percent);
             /*if (!mergeAnimationCaches(recessiveproject)){
-                LogFile::writeToLog("ProjectFile: merge() failed!\nmergeAnimationCaches() failed!\n");
+                LogFile::writeToLog("ProjectFile: merge() failed!\nmergeAnimationCaches() failed!");
             }*/
             progress.setProgress("Done!!!", progress.maximum());
         }else{
-            LogFile::writeToLog("ProjectFile: merge() failed!\nProject names are different!\n");
+            LogFile::writeToLog("ProjectFile: merge() failed!\nProject names are different!");
         }
     }else{
-        LogFile::writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
+        LogFile::writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!");
     }
     return value;
 }
 
 bool ProjectFile::mergeAnimationCaches(ProjectFile *recessiveproject){  //TO DO: Need to check each animation index with animation name and inject if not found???
+    //std::lock_guard <std::mutex> guard(mutex);
     if (recessiveproject){
         if (skyrimAnimSetData && recessiveproject->skyrimAnimSetData){
             if (skyrimAnimSetData->mergeAnimationCaches(projectName, recessiveproject->projectName, recessiveproject->skyrimAnimSetData)){
                 return true;
             }
         }else{
-            LogFile::writeToLog("ProjectFile: merge() failed!\n skyrimAnimSetData or recessiveproject->skyrimAnimSetData is nullptr!\n");
+            LogFile::writeToLog("ProjectFile: merge() failed!\n skyrimAnimSetData or recessiveproject->skyrimAnimSetData is nullptr!");
         }
     }else{
-        LogFile::writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!\n");
+        LogFile::writeToLog("ProjectFile: merge() failed!\nrecessiveproject is nullptr!");
     }
     return false;
 }
 
-void ProjectFile::addProjectToAnimData(){   //Unsafe...
-    QStringList projectfiles;
-    projectfiles.append(behaviorFiles.first()->fileName().section("/", -2, -1).replace("/", "\\"));
-    projectfiles.append(character->fileName().section("/", -2, -1).replace("/", "\\"));
-    projectfiles.append("character assets\\"+character->skeleton->getFileName().replace("/", "\\"));
-    auto index = skyrimAnimData->addNewProject(projectName+".txt", projectfiles);
-    if (index == -1){
-        WARNING_MESSAGE(QString("ProjectFile::addProjectToAnimData(): Project: "+projectName+".txt"+" already exists in the animation data!!!"));
+void ProjectFile::addProjectToAnimData(){
+    //std::lock_guard <std::mutex> guard(mutex);
+    if (skyrimAnimSetData && skyrimAnimData){
+        QStringList projectfiles;
+        projectfiles.append(behaviorFiles.first()->fileName().section("/", -2, -1).replace("/", "\\"));
+        projectfiles.append(character->fileName().section("/", -2, -1).replace("/", "\\"));
+        projectfiles.append("character assets\\"+character->getSkeletonFileName().replace("/", "\\"));
+        auto index = skyrimAnimData->addNewProject(projectName+".txt", projectfiles);
+        (index == -1) ? LogFile::writeToLog(": Project: "+projectName+".txt"+" already exists in the animation data!!!") : projectIndex = index;
+        if (!skyrimAnimSetData->addNewProject(projectName+"ProjectData\\"+projectName+".txt")){
+            LogFile::writeToLog(": Project: "+projectName+".txt"+" failed to append to the animation set data!!!");
+        }
     }else{
-        projectIndex = index;
-    }
-    if (!skyrimAnimSetData->addNewProject(projectName+"ProjectData\\"+projectName+".txt")){
-        WARNING_MESSAGE(QString("ProjectFile::addProjectToAnimData(): Project: "+projectName+".txt"+" already exists in the animation set data!!!"));
+        LogFile::writeToLog(": 'skyrimAnimData' or 'skyrimAnimSetData' are nullptr!!!");
     }
 }
 
 AnimCacheProjectData *ProjectFile::getProjectCacheData() const{
-    return skyrimAnimSetData->getProjectCacheData(projectName);
+    //std::lock_guard <std::mutex> guard(mutex);
+    AnimCacheProjectData *projdata = nullptr;
+    (skyrimAnimSetData) ? projdata = skyrimAnimSetData->getProjectCacheData(projectName) : LogFile::writeToLog(":'skyrimAnimSetData' is nullptr!!!");
+    return projdata;
 }
 
 void ProjectFile::setAnimationIndexDuration(int indexofanimationlist, int animationindex, qreal duration){
+    //std::lock_guard <std::mutex> guard(mutex);
     ProjectAnimData *project = skyrimAnimData->getProjectAnimData(projectName);
     if (project){
         if (indexofanimationlist == -1){
@@ -443,11 +521,12 @@ void ProjectFile::setAnimationIndexDuration(int indexofanimationlist, int animat
             project->animationMotionData.at(indexofanimationlist)->duration = duration;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ProjectFile::setAnimationIndexDuration(): skyrimAnimData->getProjectAnimData Failed!");
+        LogFile::writeToLog("'projectName' was not found in the animation data!");
     }
 }
 
 void ProjectFile::generateAnimClipDataForProject(){
+    //std::lock_guard <std::mutex> guard(mutex);
     HkxObject *generator;
     SkyrimClipGeneratoData *clipGenDataPtr;
     for (auto i = 0; i < behaviorFiles.size(); i++){
@@ -464,6 +543,7 @@ void ProjectFile::generateAnimClipDataForProject(){
 }
 
 void ProjectFile::loadEncryptedAnimationNames(){
+    //std::lock_guard <std::mutex> guard(mutex);
     HkCRC encryptor;
     QStringList list = getAnimationNames();
     for (auto i = 0; i < list.size(); i++){
@@ -472,28 +552,24 @@ void ProjectFile::loadEncryptedAnimationNames(){
 }
 
 void ProjectFile::addEncryptedAnimationName(const QString &unencryptedname){
-    bool ok;
+    //std::lock_guard <std::mutex> guard(mutex);
     QString animationhash = HkCRC().compute(unencryptedname.section("/", -1, -1).toLower().replace(".hkx", "").toLocal8Bit());
+    bool ok;
     animationhash = QString::number(animationhash.toULong(&ok, 16));
-    if (!ok){
-        CRITICAL_ERROR_MESSAGE("AnimCacheAnimSetData::removeAnimationFromCache(): animation hash is invalid!!!");
-    }
-    encryptedAnimationNames.append(animationhash);
+    (ok) ? encryptedAnimationNames.append(animationhash) : LogFile::writeToLog(":Animation hash is invalid!!!");
 }
 
 void ProjectFile::removeEncryptedAnimationName(int index){
-    if (index > -1 && index < encryptedAnimationNames.size()){
-        encryptedAnimationNames.removeAt(index);
-    }
+    //std::lock_guard <std::mutex> guard(mutex);
+    (index > -1 && index < encryptedAnimationNames.size()) ? encryptedAnimationNames.removeAt(index) : LogFile::writeToLog(":Invalid 'encryptedAnimationNames' index!");
 }
 
 void ProjectFile::deleteBehaviorFile(const QString &filename){
+    //std::lock_guard <std::mutex> guard(mutex);
     for (auto i = behaviorFiles.size() - 1; i > -1; i--){
         if (filename == behaviorFiles.at(i)->fileName()){
             skyrimAnimData->removeBehaviorFromProject(projectName, behaviorFiles.at(i)->fileName().section("/", -2, -1).replace("/", "\\"));
-            if (!behaviorFiles.at(i)->remove()){
-                WARNING_MESSAGE("ProjectFile::deleteBehaviorFile(): File \""+behaviorFiles.at(i)->fileName()+"\" was not deleted from the file system!");
-            }
+            (!behaviorFiles.at(i)->remove()) ? LogFile::writeToLog(": File \""+behaviorFiles.at(i)->fileName()+"\" was not deleted from the file system!") : NULL;
             delete behaviorFiles.at(i);
             behaviorFiles.removeAt(i);
         }
@@ -501,13 +577,14 @@ void ProjectFile::deleteBehaviorFile(const QString &filename){
 }
 
 int ProjectFile::getAnimationIndex(const QString & name) const{
-    if (character){
-        return character->getAnimationIndex(name);
-    }
-    return -1;
+    //std::lock_guard <std::mutex> guard(mutex);
+    auto index = -1;
+    (character) ? index = character->getAnimationIndex(name) : LogFile::writeToLog(":'character' is nullptr!");
+    return index;
 }
 
-bool ProjectFile::isAnimationUsed(const QString &animationname){
+bool ProjectFile::isAnimationUsed(const QString &animationname) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     HkxObject *generator;
     for (auto i = 0; i < behaviorFiles.size(); i++){
         for (auto j = 0; j < behaviorFiles.at(i)->generators.size(); j++){
@@ -524,31 +601,26 @@ bool ProjectFile::isAnimationUsed(const QString &animationname){
 }
 
 QStringList ProjectFile::getAnimationNames() const{
-    if (character){
-        return character->getAnimationNames();
-    }
-    return QStringList();
+    //std::lock_guard <std::mutex> guard(mutex);
+    QStringList names;
+    (character) ? names = character->getAnimationNames() : LogFile::writeToLog(":'character' is nullptr!");
+    return names;
 }
 
 QString ProjectFile::findAnimationNameFromEncryptedData(const QString &encryptedname) const{
-    bool ok = true;
+    //std::lock_guard <std::mutex> guard(mutex);
+    auto ok = true;
     ULONGLONG value1;
     ULONGLONG value2 = encryptedname.toULongLong(&ok, 10);
     if (!ok){
         value2 = encryptedname.toULongLong(&ok, 16);
-        if (!ok){
-            CRITICAL_ERROR_MESSAGE("ProjectFile::findAnimationNameFromEncryptedData(): encryptedname.toULong(&ok, 10) Failed!");
-        }
+        (!ok) ? LogFile::writeToLog("ProjectFile::findAnimationNameFromEncryptedData(): encryptedname.toULong(&ok, 10) Failed!") : NULL;
     }
     for (auto i = 0; i < encryptedAnimationNames.size(); i++){
         value1 = encryptedAnimationNames.at(i).toULongLong(&ok, 16);
-        if (!ok){
-            CRITICAL_ERROR_MESSAGE("ProjectFile::findAnimationNameFromEncryptedData(): encryptedAnimationNames.at(i).toULong(&ok, 16) Failed!");
-        }
+        (!ok) ? LogFile::writeToLog("ProjectFile::findAnimationNameFromEncryptedData(): encryptedAnimationNames.at(i).toULong(&ok, 16) Failed!") : NULL;
         if (value1 == value2){
-            if (!character){
-                CRITICAL_ERROR_MESSAGE("ProjectFile::findAnimationNameFromEncryptedData(): character is nullptr!");
-            }
+            (!character) ? LogFile::writeToLog("ProjectFile::findAnimationNameFromEncryptedData(): character is nullptr!") : NULL;
             return character->getAnimationNameAt(i).toLower().section("\\", -1, -1).replace(".hkx", "");
         }
     }
@@ -556,32 +628,40 @@ QString ProjectFile::findAnimationNameFromEncryptedData(const QString &encrypted
 }
 
 bool ProjectFile::isProjectNameTaken() const{
-    return skyrimAnimData->isProjectNameTaken(projectName);
+    //std::lock_guard <std::mutex> guard(mutex);
+    auto value = false;
+    (skyrimAnimData) ? value = skyrimAnimData->isProjectNameTaken(projectName) : LogFile::writeToLog(":'skyrimAnimData' is nullptr!");
+    return value;
 }
 
 QString ProjectFile::getProjectName() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     return projectName;
 }
 
 qreal ProjectFile::getAnimationDurationFromAnimData(const QString &animationname) const{
-    if (character){
-        return skyrimAnimData->getAnimationDurationFromAnimData(projectName, character->getAnimationIndex(animationname));
-    }
-    return 0;
+    //std::lock_guard <std::mutex> guard(mutex);
+    qreal value = 0;
+    (skyrimAnimData && character) ? value = skyrimAnimData->getAnimationDurationFromAnimData(projectName, character->getAnimationIndex(animationname)) : LogFile::writeToLog(":'skyrimAnimData' or 'character' are nullptr!");
+    return value;
 }
 
 bool ProjectFile::appendAnimation(SkyrimAnimationMotionData *motiondata){
-    if (!motiondata){
-        return false;
-    }
-    return skyrimAnimData->appendAnimation(projectName, motiondata);
+    //std::lock_guard <std::mutex> guard(mutex);
+    auto value = false;
+    (skyrimAnimData) ? value = skyrimAnimData->appendAnimation(projectName, motiondata) : LogFile::writeToLog(":'skyrimAnimData' is nullptr!");
+    return value;
 }
 
 SkyrimAnimationMotionData ProjectFile::getAnimationMotionData(int animationindex) const{
-    return skyrimAnimData->getAnimationMotionData(projectName, animationindex);
+    //std::lock_guard <std::mutex> guard(mutex);
+    SkyrimAnimationMotionData value(nullptr);
+    (skyrimAnimData) ? value = skyrimAnimData->getAnimationMotionData(projectName, animationindex) : LogFile::writeToLog(":'skyrimAnimData' is nullptr!");
+    return value;
 }
 
 bool ProjectFile::isNameUniqueInProject(HkxObject *object, const QString &filenametoignore) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (object){
         if (object->getType() == HkxObject::TYPE_GENERATOR){
             for (auto i = 0; i < behaviorFiles.size(); i++){
@@ -609,98 +689,124 @@ bool ProjectFile::isNameUniqueInProject(HkxObject *object, const QString &filena
 }
 
 bool ProjectFile::hasAnimData() const{
+    //std::lock_guard <std::mutex> guard(mutex);
+    auto value = false;
     if (skyrimAnimData){
-        if (!skyrimAnimData->isEmpty()){
-            return true;
-        }else{
-            return false;
-        }
-    }else{
-        return false;
+        (!skyrimAnimData->isEmpty()) ? value = true : value = false;
     }
+    return value;
 }
 
 bool ProjectFile::hasAnimSetData() const{
+    //std::lock_guard <std::mutex> guard(mutex);
+    auto value = false;
     if (skyrimAnimData){
-        if (!skyrimAnimData->isEmpty()){
-            return true;
-        }else{
-            return false;
-        }
-    }else{
-        return false;
+        (!skyrimAnimData->isEmpty()) ? value = true : value = false;
     }
+    return value;
 }
 
 void ProjectFile::writeOrderOfFiles() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < behaviorFiles.size(); i++){
         LogFile::writeToLog("File at index "+QString::number(i)+" is "+behaviorFiles.at(i)->getFileName());
     }
 }
 
-bool ProjectFile::appendClipGeneratorAnimData(const QString &name){
-    if (name == ""){
-        return false;
+hkbStateMachine *ProjectFile::findRootStateMachineFromBehavior(const QString behaviorname) const{
+    //std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < behaviorFiles.size(); i++){
+        if (behaviorFiles.at(i)->fileName().contains(QString(behaviorname).replace("\\", "/"), Qt::CaseInsensitive)){
+            return static_cast<hkbStateMachine *>(behaviorFiles.at(i)->getRootStateMachine());
+        }
     }
-    return skyrimAnimData->appendClipGenerator(projectName, new SkyrimClipGeneratoData(skyrimAnimData->getProjectAnimData(projectName), name));
+    return nullptr;
+}
+
+QString ProjectFile::getBehaviorDirectoryName() const{
+    //std::lock_guard <std::mutex> guard(mutex);
+    QString name;
+    (character) ? name = character->getBehaviorDirectoryName() : LogFile::writeToLog(": 'character' is nullptr!");
+    return name;
+}
+
+QString ProjectFile::getProjectAnimationsPath() const{
+    //std::lock_guard <std::mutex> guard(mutex);
+    return projectAnimationsPath;
+}
+
+bool ProjectFile::appendClipGeneratorAnimData(const QString &name){
+    //std::lock_guard <std::mutex> guard(mutex);
+    auto value = false;
+    (skyrimAnimData) ? value = skyrimAnimData->appendClipGenerator(projectName, new SkyrimClipGeneratoData(skyrimAnimData->getProjectAnimData(projectName), name)) : LogFile::writeToLog(":'skyrimAnimData' is nullptr!");
+    return value;
 }
 
 void ProjectFile::setLocalTimeForClipGenAnimData(const QString &clipname, int triggerindex, qreal time){
-    skyrimAnimData->setLocalTimeForClipGenAnimData(projectName, clipname, triggerindex, time);
+    //std::lock_guard <std::mutex> guard(mutex);
+    (skyrimAnimData) ? skyrimAnimData->setLocalTimeForClipGenAnimData(projectName, clipname, triggerindex, time) : LogFile::writeToLog(":'skyrimAnimData' is nullptr!");
 }
 
 void ProjectFile::setEventNameForClipGenAnimData(const QString &clipname, int triggerindex, const QString &eventname){
-    skyrimAnimData->setEventNameForClipGenAnimData(projectName, clipname, triggerindex, eventname);
+    //std::lock_guard <std::mutex> guard(mutex);
+    (skyrimAnimData) ? skyrimAnimData->setEventNameForClipGenAnimData(projectName, clipname, triggerindex, eventname) : LogFile::writeToLog(":'skyrimAnimData' is nullptr!");
 }
 
 void ProjectFile::setClipNameAnimData(const QString &oldclipname, const QString &newclipname){
-    skyrimAnimData->setClipNameAnimData(projectName, oldclipname, newclipname);
+    //std::lock_guard <std::mutex> guard(mutex);
+    (skyrimAnimData) ? skyrimAnimData->setClipNameAnimData(projectName, oldclipname, newclipname) : LogFile::writeToLog(":'skyrimAnimData' is nullptr!");
 }
 
 void ProjectFile::setAnimationIndexForClipGen(int index, const QString &clipGenName){
-    skyrimAnimData->setAnimationIndexForClipGen(projectName, clipGenName, index);
+    //std::lock_guard <std::mutex> guard(mutex);
+    (skyrimAnimData) ? skyrimAnimData->setAnimationIndexForClipGen(projectName, clipGenName, index) : LogFile::writeToLog(":'skyrimAnimData' is nullptr!");
 }
 
 void ProjectFile::setPlaybackSpeedAnimData(const QString &clipGenName, qreal speed){
-    skyrimAnimData->setPlaybackSpeedAnimData(projectName, clipGenName, speed);
+    //std::lock_guard <std::mutex> guard(mutex);
+    (skyrimAnimData) ? skyrimAnimData->setPlaybackSpeedAnimData(projectName, clipGenName, speed) : LogFile::writeToLog(":'skyrimAnimData' is nullptr!");
 }
 
 void ProjectFile::setCropStartAmountLocalTimeAnimData(const QString &clipGenName, qreal time){
-    skyrimAnimData->setCropStartAmountLocalTimeAnimData(projectName, clipGenName, time);
+    //std::lock_guard <std::mutex> guard(mutex);
+    (skyrimAnimData) ? skyrimAnimData->setCropStartAmountLocalTimeAnimData(projectName, clipGenName, time) : LogFile::writeToLog(":'skyrimAnimData' is nullptr!");
 }
 
 void ProjectFile::setCropEndAmountLocalTimeAnimData(const QString &clipGenName, qreal time){
-    skyrimAnimData->setCropEndAmountLocalTimeAnimData(projectName, clipGenName, time);
+    //std::lock_guard <std::mutex> guard(mutex);
+    (skyrimAnimData) ? skyrimAnimData->setCropEndAmountLocalTimeAnimData(projectName, clipGenName, time) : LogFile::writeToLog(":'skyrimAnimData' is nullptr!");
 }
 
 void ProjectFile::appendClipTriggerToAnimData(const QString &clipGenName, const QString &eventname){
-    skyrimAnimData->appendClipTriggerToAnimData(projectName, clipGenName, eventname);
+    //std::lock_guard <std::mutex> guard(mutex);
+    (skyrimAnimData) ? skyrimAnimData->appendClipTriggerToAnimData(projectName, clipGenName, eventname) : LogFile::writeToLog(":'skyrimAnimData' is nullptr!");
 }
 
 void ProjectFile::removeClipTriggerToAnimDataAt(const QString &clipGenName, int index){
-    skyrimAnimData->removeClipTriggerToAnimDataAt(projectName, clipGenName, index);
+    //std::lock_guard <std::mutex> guard(mutex);
+    (skyrimAnimData) ? skyrimAnimData->removeClipTriggerToAnimDataAt(projectName, clipGenName, index) : LogFile::writeToLog(":'skyrimAnimData' is nullptr!");
 }
 
-/*SkyrimAnimData *ProjectFile::getAnimData() const{
-    return skyrimAnimData;
-}*/
-
 void ProjectFile::write(){
-    ulong ref = 1;
-    getRootObject()->setReference(ref);
-    //getRootObject()->setIsWritten(false);
-    ref++;
-    stringData->setReference(ref);
-    //stringData->setIsWritten(false);
-    ref++;
-    projectData->setReference(ref);
-    //projectData->setIsWritten(false);
-    ref++;
-    getWriter().setFile(this);
-    getWriter().writeToXMLFile();
+    //std::lock_guard <std::mutex> guard(mutex);
+    if (stringData && projectData){
+        ulong ref = 100;
+        getRootObject()->setReference(ref);
+        getRootObject()->setIsWritten(false);
+        ref++;
+        stringData->setReference(ref++);
+        stringData->setIsWritten(false);
+        projectData->setReference(ref++);
+        projectData->setIsWritten(false);
+        getWriter().setFile(this);
+        getWriter().writeToXMLFile();
+    }else{
+        LogFile::writeToLog(":'stringData' or 'projectData' are nullptr!");
+    }
 }
 
 bool ProjectFile::doesBehaviorExist(const QString &behaviorname) const{
+    //std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < behaviorFiles.size(); i++){
         if (behaviorFiles.at(i)->fileName().contains(behaviorname, Qt::CaseInsensitive)){
             return true;
@@ -711,17 +817,9 @@ bool ProjectFile::doesBehaviorExist(const QString &behaviorname) const{
 
 ProjectFile::~ProjectFile(){
     for (auto i = 0; i < behaviorFiles.size(); i++){
-        if (behaviorFiles.at(i)){
-            delete behaviorFiles.at(i);
-        }
+        (behaviorFiles.at(i)) ? delete behaviorFiles.at(i) : NULL;
     }
-    if (character){
-        delete character;
-    }
-    if (skyrimAnimData){
-        delete skyrimAnimData;
-    }
-    if (skyrimAnimSetData){
-        delete skyrimAnimSetData;
-    }
+    (character) ? delete character : NULL;
+    (skyrimAnimData) ? delete skyrimAnimData : NULL;
+    (skyrimAnimSetData) ? delete skyrimAnimSetData : NULL;
 }

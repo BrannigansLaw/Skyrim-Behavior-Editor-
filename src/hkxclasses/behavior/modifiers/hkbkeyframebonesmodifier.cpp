@@ -69,16 +69,12 @@ bool hkbKeyframeBonesModifier::readData(const HkxXmlReader &reader, long & index
                         keyframeInfo.last().isValid = toBool(reader.getElementValueAt(index), &ok);
                         checkvalue(ok, "legs.at("+QString::number(j)+").isValid");
                         break;
-                    }else{
-                        //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                     }
                 }
             }
             (numexp > 0) ? index-- : NULL;
         }else if (text == "keyframedBonesList"){
             checkvalue(keyframedBonesList.readShdPtrReference(index, reader), "keyframedBonesList");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -97,7 +93,7 @@ bool hkbKeyframeBonesModifier::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -197,33 +193,33 @@ QString hkbKeyframeBonesModifier::evaluateDataValidity(){
     bool isvalid = true;
     if (keyframeInfo.isEmpty()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": keyframeInfo is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": keyframeInfo is empty!");
     }else{
         for (auto i = 0; i < keyframeInfo.size(); i++){
             if (keyframeInfo.at(i).boneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": boneIndex at "+QString::number(i)+" out of range! Setting to last bone index!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": boneIndex at "+QString::number(i)+" out of range! Setting to last bone index!");
                 keyframeInfo[i].boneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
             }
         }
     }
-    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");}
+    QString temp = HkDynamicObject::evaluateDataValidity(); if (temp != ""){errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");}
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     if (keyframedBonesList.data()){
         if (keyframedBonesList->getSignature() != HKB_BONE_INDEX_ARRAY){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid keyframedBonesList type! Signature: "+QString::number(keyframedBonesList->getSignature(), 16)+" Setting null value!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid keyframedBonesList type! Signature: "+QString::number(keyframedBonesList->getSignature(), 16)+" Setting null value!");
             keyframedBonesList = HkxSharedPtr();    //TO DO: add here?
         }else if (keyframedBonesList->isDataValid() && keyframedBonesList->evaluateDataValidity() != ""){
             isvalid = false;
-            //errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid keyframedBonesList data!\n");
+            //errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid keyframedBonesList data!");
         }
     }else if (!keyframedBonesList.data()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null keyframedBonesList!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Null keyframedBonesList!");
     }
     setDataValidity(isvalid);
     return errors;

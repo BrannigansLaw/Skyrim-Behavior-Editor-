@@ -122,8 +122,6 @@ bool BSDirectAtModifier::readData(const HkxXmlReader &reader, long & index){
         }else if (text == "currentPitchOffset"){
             currentPitchOffset = reader.getElementValueAt(index).toDouble(&ok);
             checkvalue(ok, "currentPitchOffset");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -195,7 +193,7 @@ QString BSDirectAtModifier::evaluateDataValidity(){
     auto evaluateindices = [&](int & bone, const QString & fieldname){
         if (bone >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+fieldname+" out of range! Setting to last bone index!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+fieldname+" out of range! Setting to last bone index!");
             bone = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
         }
     };
@@ -203,7 +201,7 @@ QString BSDirectAtModifier::evaluateDataValidity(){
     (temp != "") ? errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n"): NULL;
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     evaluateindices(sourceBoneIndex, "sourceBoneIndex");
     evaluateindices(startBoneIndex, "startBoneIndex");

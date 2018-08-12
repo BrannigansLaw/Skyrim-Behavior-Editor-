@@ -10,6 +10,8 @@
 #include "src/filetypes/skeletonfile.h"
 #include "src/hkxclasses/behavior/hkbcharacterdata.h"
 #include "src/hkxclasses/animation/hkaskeleton.h"
+#include "src/hkxclasses/behavior/hkbfootikdriverinfo.h"
+#include "src/hkxclasses/behavior/hkbhandikdriverinfo.h"
 
 #include <QGridLayout>
 #include <QFileSystemModel>
@@ -101,63 +103,72 @@ void ProjectUI::setDisabled(bool disable){
 
 void ProjectUI::setProject(ProjectFile *file){
     project = file;
-    if (project && project->character){
-        fileView->setRootIndex(fileSys->setRootPath(lastFileSelectedPath+"/"+project->character->getBehaviorDirectoryName()));
+    if (project){
+        fileView->setRootIndex(fileSys->setRootPath(lastFileSelectedPath+"/"+project->getBehaviorDirectoryName()));
     }
 }
 
 void ProjectUI::loadData(){
-    if (project && project->character && project->character->skeleton && !project->character->skeleton->skeletons.isEmpty()){
+    QStringList bonenames;
+    HkxObject *footik;
+    HkxObject *handik;
+    hkaSkeleton *skeletondata;
+    if (project){
         setTitle(project->fileName());
-        characterProperties->loadData(project->character->getCharacterData());
-        int index = project->skyrimAnimData->getProjectIndex(project->getFileName());
-        if (index == -1){
-            CRITICAL_ERROR_MESSAGE("ProjectUI::loadData(): getProjectIndex failed!");
-        }
-        animations->loadData(project->character->stringData.data(), project->skyrimAnimData->animData.at(index));//UNSAFE....
-        skeleton->loadData(project->character->skeleton->skeletons.first().data());
-        if (project->character->footIkDriverInfo.data()){
-            footIK->loadData(project->character->footIkDriverInfo.data());
+        characterProperties->loadData(project->getCharacterData());
+        animations->loadData(project->getCharacterStringData(), project->getAnimDataAt(project->getProjectName()));
+        skeletondata = project->getSkeleton();
+        skeleton->loadData(skeletondata);
+        footik = project->getFootIkDriverInfo();
+        if (footik){
+            footIK->loadData(footik);
             enableFootIKCB->setChecked(true);
         }else{
             footIK->setDisabled(true);
         }
-        footIK->loadBoneList(static_cast<hkaSkeleton *>(project->character->skeleton->skeletons.first().data())->getBoneNames());
-        if (project->character->handIkDriverInfo.data()){
-            handIK->loadData(project->character->handIkDriverInfo.data());
+        bonenames = skeletondata->getBoneNames();
+        footIK->loadBoneList(bonenames);
+        handik = project->getHandIkDriverInfo();
+        if (handik){
+            handIK->loadData(handik);
             enableHandIKCB->setChecked(true);
         }else{
             handIK->setDisabled(true);
         }
-        handIK->loadBoneList(static_cast<hkaSkeleton *>(project->character->skeleton->skeletons.first().data())->getBoneNames());
+        handIK->loadBoneList(bonenames);
         animationCacheUI->loadData(project);
     }
 }
 
 void ProjectUI::toggleFootIK(bool toggle){
     footIK->setEnabled(toggle);
-    if (project && project->character && !project->character->footIkDriverInfo.data()){
+    if (project){
         if (toggle){
-            project->character->addFootIK();
-            footIK->loadData(project->character->footIkDriverInfo.data());
+            project->addFootIK();
+            footIK->loadData(project->getFootIkDriverInfo());
         }else{
-            project->character->disableFootIK();
+            project->disableFootIK();
         }
     }
 }
 
 void ProjectUI::toggleHandIK(bool toggle){
     handIK->setEnabled(toggle);
-    if (project && project->character && !project->character->handIkDriverInfo.data()){
+    if (project){
         if (toggle){
-            project->character->addHandIK();
-            handIK->loadData(project->character->handIkDriverInfo.data());
+            project->addHandIK();
+            handIK->loadData(project->getHandIkDriverInfo());
         }else{
-            project->character->disableHandIK();
+            project->disableHandIK();
         }
     }
 }
 
 void ProjectUI::addNewBehaviorFile(){
     emit addBehavior(initializeWithCharacterData->isChecked());
+}
+
+AnimationsUI *ProjectUI::getAnimations() const
+{
+    return animations;
 }

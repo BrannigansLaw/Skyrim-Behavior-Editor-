@@ -172,12 +172,12 @@ QString BSIStateManagerModifier::evaluateDataValidity(){
     bool isvalid = true;
     if (stateData.isEmpty()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": stateData is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": stateData is empty!");
     }else{
         for (auto i = 0; i < stateData.size(); i++){
             if (!stateData.at(i).pStateMachine.data()){ //TO DO: remove statedata...
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": stateData at index '"+QString::number(i)+"' is null!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": stateData at index '"+QString::number(i)+"' is null!");
             }else if (stateData.at(i).pStateMachine->getSignature() != HKB_STATE_MACHINE){
                 isvalid = false;
                 errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid stateData! Signature: "+QString::number(stateData.at(i).pStateMachine->getSignature(), 16)+"\n");
@@ -186,11 +186,11 @@ QString BSIStateManagerModifier::evaluateDataValidity(){
     }
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     setDataValidity(isvalid);
     return errors;

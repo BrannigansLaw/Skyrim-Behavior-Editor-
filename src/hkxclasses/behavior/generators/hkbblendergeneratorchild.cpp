@@ -87,8 +87,6 @@ bool hkbBlenderGeneratorChild::readData(const HkxXmlReader &reader, long & index
         }else if (text == "worldFromModelWeight"){
             worldFromModelWeight = reader.getElementValueAt(index).toDouble(&ok);
             checkvalue(ok, "worldFromModelWeight");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -107,7 +105,7 @@ bool hkbBlenderGeneratorChild::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};

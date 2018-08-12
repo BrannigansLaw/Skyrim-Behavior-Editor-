@@ -95,7 +95,7 @@ QVector<HkxObject *> hkbBoneIndexArray::getChildrenOtherTypes() const{
 bool hkbBoneIndexArray::link(){
     std::lock_guard <std::mutex> guard(mutex);
     if (!linkVar()){
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!");
     }
     return true;
 }

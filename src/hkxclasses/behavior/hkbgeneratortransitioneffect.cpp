@@ -78,8 +78,6 @@ bool hkbGeneratorTransitionEffect::readData(const HkxXmlReader &reader, long & i
         }else if (text == "syncToGeneratorStartTime"){
             syncToGeneratorStartTime = toBool(reader.getElementValueAt(index), &ok);
             checkvalue(ok, "syncToGeneratorStartTime");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -98,7 +96,7 @@ bool hkbGeneratorTransitionEffect::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};

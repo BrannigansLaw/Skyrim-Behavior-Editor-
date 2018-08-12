@@ -106,8 +106,6 @@ bool hkbModifierGenerator::readData(const HkxXmlReader &reader, long & index){
             checkvalue(modifier.readShdPtrReference(index, reader), "modifier");
         }else if (text == "generator"){
             checkvalue(generator.readShdPtrReference(index, reader), "generator");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -126,7 +124,7 @@ bool hkbModifierGenerator::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};

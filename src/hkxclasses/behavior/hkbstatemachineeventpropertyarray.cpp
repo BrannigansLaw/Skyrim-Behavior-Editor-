@@ -64,8 +64,6 @@ bool hkbStateMachineEventPropertyArray::readData(const HkxXmlReader &reader, lon
                     }else if (text == "payload"){
                         checkvalue(events.last().payload.readShdPtrReference(index, reader), "events.at("+QString::number(j)+").payload");
                         break;
-                    }else{
-                        //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                     }
                 }
             }
@@ -248,17 +246,17 @@ QString hkbStateMachineEventPropertyArray::evaluateDataValidity(){
     bool isvalid = true;
     if (events.isEmpty()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": events is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": events is empty!");
     }else{
         for (auto i = 0; i < events.size(); i++){
             if (events.at(i).id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": id in events at "+QString::number(i)+" out of range! Setting to last event index!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": id in events at "+QString::number(i)+" out of range! Setting to last event index!");
                 events[i].id  = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
             }
             if (events.at(i).payload.data() && events.at(i).payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(events.at(i).payload->getSignature(), 16)+" Setting null value!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid payload type! Signature: "+QString::number(events.at(i).payload->getSignature(), 16)+" Setting null value!");
                 events[i].payload = HkxSharedPtr();
             }
         }

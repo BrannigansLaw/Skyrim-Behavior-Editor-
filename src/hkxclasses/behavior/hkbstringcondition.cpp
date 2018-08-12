@@ -60,7 +60,7 @@ QString hkbStringCondition::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     if (conditionString == ""){
         setDataValidity(false);
-        return QString(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid 'conditionstring': "+conditionString+"!\n");
+        return QString(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid 'conditionstring': "+conditionString+"!");
     }
     setDataValidity(true);
     return QString();

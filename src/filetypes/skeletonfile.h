@@ -3,32 +3,34 @@
 
 #include "src/filetypes/hkxfile.h"
 
-class SkeletonFile: public HkxFile
+class hkaSkeleton;
+
+class SkeletonFile final: public HkxFile
 {
-    friend class MainWindow;
-    friend class ProjectUI;
     friend class hkaSkeleton;
-    friend class hkaAnimationContainer;
-    friend class hkRootLevelContainer;
 public:
     SkeletonFile(MainWindow *window, const QString & name);
-    virtual ~SkeletonFile();
+    SkeletonFile& operator=(const SkeletonFile&) = delete;
+    SkeletonFile(const SkeletonFile &) = delete;
+    ~SkeletonFile() = default;
     bool addObjectToFile(HkxObject *obj, long ref = -1);
     void write();
     QString getRootObjectReferenceString();
     QStringList getBonesFromSkeletonAt(int index) const;
     int getNumberOfBones(bool ragdoll = false) const;
     QStringList getLocalFrameNames() const;
-protected:
+    hkaSkeleton *getSkeleton(bool isragdoll) const;
     bool parse();
+    HkxSharedPtr * findSkeleton(long ref);
+protected:
     bool link();
 private:
-    HkxSharedPtr * findSkeleton(long ref);
     HkxSharedPtr * findLocalFrame(long ref);
 private:
     QVector <HkxSharedPtr> skeletons;
     QVector <HkxSharedPtr> localFrames;
     long largestRef;
+    mutable std::mutex mutex;
 };
 
 #endif // SKELETONFILE_H

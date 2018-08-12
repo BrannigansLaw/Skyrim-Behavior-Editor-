@@ -7,42 +7,41 @@
 
 class BehaviorFile;
 
-class hkaSkeleton: public HkxObject
+class hkaSkeleton final: public HkxObject
 {
     friend class SkeletonUI;
     friend class SkeletonFile;
 public:
     hkaSkeleton(HkxFile *parent, long ref = 0);
-    virtual ~hkaSkeleton();
+    hkaSkeleton& operator=(const hkaSkeleton&) = delete;
+    hkaSkeleton(const hkaSkeleton &) = delete;
+    ~hkaSkeleton();
+    static const QString getClassname();
+    QStringList getBoneNames() const;
+    QString getLocalFrameName(int boneIndex) const;
+private:
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
     QString evaluateDataValidity();
-    static QString getClassname();
     bool write(HkxXMLWriter *writer);
-    QStringList getBoneNames() const;
-    QString getLocalFrameName(int boneIndex) const;
     bool addLocalFrame(const QString & name);
     bool removeLocalFrame(int boneIndex);
     void setLocalFrameName(int boneIndex, const QString & name);
-private:
-    hkaSkeleton& operator=(const hkaSkeleton&);
-    hkaSkeleton(const hkaSkeleton &);
 private:
     struct hkBone{
         hkBone():lockTranslation(false){}
         QString name;
         bool lockTranslation;
     };
-
     struct hkLocalFrame{
         hkLocalFrame():boneIndex(-1){}
         HkxSharedPtr localFrame;
         int boneIndex;
     };
-
+private:
     static uint refCount;
-    static QString classname;
+    static const QString classname;
     QString name;
     QVector <int> parentIndices;
     QVector <hkBone> bones;
@@ -50,6 +49,7 @@ private:
     QVector <qreal> referenceFloats;
     QStringList floatSlots;
     QVector <hkLocalFrame> localFrames;
+    mutable std::mutex mutex;
 };
 
 #endif // HKASKELETON_H

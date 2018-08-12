@@ -60,8 +60,6 @@ bool hkbGetHandleOnBoneModifier::readData(const HkxXmlReader &reader, long & ind
         }else if (text == "animationBoneIndex"){
             animationBoneIndex = reader.getElementValueAt(index).toInt(&ok);
             checkvalue(ok, "animationBoneIndex");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -80,7 +78,7 @@ bool hkbGetHandleOnBoneModifier::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -121,34 +119,34 @@ QString hkbGetHandleOnBoneModifier::evaluateDataValidity(){
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     if (localFrameName == ""){  //TO DO: check local frames...
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid localFrameName!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid localFrameName!");
     }
     if (animationBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": animationBoneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": animationBoneIndex out of range! Setting to last bone index!");
         animationBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (ragdollBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": ragdollBoneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": ragdollBoneIndex out of range! Setting to last bone index!");
         ragdollBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
     }
     if (animationBoneIndex > -1 && ragdollBoneIndex > -1){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": animationBoneIndex and ragdollBoneIndex are both in use at the same time! This will crash the game! Setting ragdollBoneIndex to -1!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": animationBoneIndex and ragdollBoneIndex are both in use at the same time! This will crash the game! Setting ragdollBoneIndex to -1!");
         ragdollBoneIndex = -1;
     }
     if (animationBoneIndex < 0 && ragdollBoneIndex < 0 ){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Neither animationBoneIndex and ragdollBoneIndex are in use! Setting animationBoneIndex to 0!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Neither animationBoneIndex and ragdollBoneIndex are in use! Setting animationBoneIndex to 0!");
         animationBoneIndex = 0;
     }
     setDataValidity(isvalid);

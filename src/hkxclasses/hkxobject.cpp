@@ -342,6 +342,64 @@ hkQuadVariable HkxObject::readVector4(const QByteArray &lineIn, bool *ok) const{
     return vector;
 }
 
+hkQsTransform HkxObject::readQsTransform(const QByteArray &lineIn, bool *ok) const{
+    enum {V3_1_X, V3_1_Y, V3_1_Z, V4_X, V4_Y, V4_Z, V4_W, V3_2_X, V3_2_Y, V3_2_Z};
+    hkQsTransform transform;
+    qreal number = 0;
+    auto size = V3_2_Z + 1;
+    auto leftparcount = 0;
+    auto rightparcount = 0;
+    auto dotcount = 0;
+    auto lineindex = 0;
+    QByteArray value("", size);
+    for (auto transformindex = 0; transformindex <= V3_2_Z; transformindex++){
+        auto valueindex = 0;
+        for (; lineindex < lineIn.size(); lineindex++, valueindex++){
+            valueindex >= size ? size = size*2, value.resize(size) : NULL;
+            if ((lineIn.at(lineindex) >= '0' && lineIn.at(lineindex) <= '9') || (lineIn.at(lineindex) == '-' && valueindex != 0)){
+                value[valueindex] = lineIn.at(lineindex);
+            }else if (lineIn.at(lineindex) == '.' && (dotcount == 0 && valueindex > 0)){
+                value[valueindex] = lineIn.at(lineindex);
+                ++dotcount;
+            }else if (lineIn.at(lineindex) == '('){
+                ++leftparcount;
+            }else if (lineIn.at(lineindex) == ')'){
+                (leftparcount != ++rightparcount) ? (ok ? *ok = false : NULL) : valueindex = size;
+            }else if (lineIn.at(lineindex) == ' '){
+                valueindex = size;
+            }else{
+                ok ? *ok = false : NULL;
+                return hkQsTransform();
+            }
+        }
+        value.truncate(valueindex);
+        number = value.toDouble();
+        switch (transformindex){
+        case V3_1_X:
+            transform.v1.x = number; break;
+        case V3_1_Y:
+            transform.v1.y = number; break;
+        case V3_1_Z:
+            transform.v1.z = number; break;
+        case V4_X:
+            transform.v2.x = number; break;
+        case V4_Y:
+            transform.v2.y = number; break;
+        case V4_Z:
+            transform.v2.z = number; break;
+        case V4_W:
+            transform.v2.w = number; break;
+        case V3_2_X:
+            transform.v3.x = number; break;
+        case V3_2_Y:
+            transform.v3.y = number; break;
+        case V3_2_Z:
+            transform.v3.z = number; break;
+        }
+    }
+    return transform;
+}
+
 bool HkxObject::readMultipleVector4(const QByteArray &lineIn,  QVector <hkQuadVariable> & vectors) const{
     enum {X = 1, Y = 2, Z = 3, W = 4};
     auto size = 0;
@@ -591,7 +649,7 @@ QString HkDynamicObject::evaluateDataValidity(){
             return QString(getParentFilename()+": HkDynamicObject: Ref: "+getReferenceString()+": variableBindingSet is invalid type! Signature: "+QString::number(variableBindingSet->getSignature(), 16)+"\n");
         }else if (static_cast<hkbVariableBindingSet *>(variableBindingSet.data())->getNumberOfBindings() < 1){
             variableBindingSet = HkxSharedPtr();
-            return QString(getParentFilename()+": HkDynamicObject: Ref: "+getReferenceString()+": variableBindingSet has no bindings! Setting null value!\n");
+            return QString(getParentFilename()+": HkDynamicObject: Ref: "+getReferenceString()+": variableBindingSet has no bindings! Setting null value!");
         }
     }
     setDataValidity(true);

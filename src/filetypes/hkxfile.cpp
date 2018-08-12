@@ -1,44 +1,41 @@
 #include "hkxfile.h"
 #include "src/ui/mainwindow.h"
 
-/**
- * Class: HkxFile
- *
- */
-
 HkxFile::HkxFile(MainWindow *window, const QString & name)
     : QFile(name),
       ui(window),
       changed(false)
 {
     fileNameWithoutPath = name.section("/", -1, -1);
-    parse();
 }
 
 void HkxFile::closeFile(){
-    if (isOpen()){
-        close();
-    }
+    (isOpen()) ? close() : NULL;
 }
 
 bool HkxFile::getIsChanged() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     return changed;
 }
 
 void HkxFile::setIsChanged(bool wasEdited){
+    //std::lock_guard <std::mutex> guard(mutex);
     changed = wasEdited;
 }
 
 QString HkxFile::getFileName() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     return fileNameWithoutPath;
 }
 
 void HkxFile::setHKXFileName(const QString &name){
+    //std::lock_guard <std::mutex> guard(mutex);
     QFile::setFileName(name);
     fileNameWithoutPath = name.section("/", -1, -1);
 }
 
 HkxSharedPtr & HkxFile::getRootObject(){
+    //std::lock_guard <std::mutex> guard(mutex);
     return rootObject;
 }
 
@@ -51,10 +48,12 @@ bool HkxFile::link(){
 }
 
 void HkxFile::setRootObject(HkxSharedPtr & obj){
+    //std::lock_guard <std::mutex> guard(mutex);
     rootObject = obj;
 }
 
-QString HkxFile::getRootObjectReferenceString(){
+QString HkxFile::getRootObjectReferenceString() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     if (rootObject.data()){
         return rootObject->getReferenceString();
     }
@@ -62,25 +61,25 @@ QString HkxFile::getRootObjectReferenceString(){
 }
 
 bool HkxFile::appendAndReadData(long &index, HkxObject *obj){
-    index++;    //Skip the current line.
-    if (!obj->readData(getReader(), index)){
+    //std::lock_guard <std::mutex> guard(mutex);
+    if (!obj->readData(reader, ++index)){
         return false;
     }
     return true;
 }
 
 HkxXmlReader & HkxFile::getReader(){
+    //std::lock_guard <std::mutex> guard(mutex);
     return reader;
 }
 
 HkxXMLWriter & HkxFile::getWriter(){
+    //std::lock_guard <std::mutex> guard(mutex);
     return writer;
 }
 
 MainWindow *HkxFile::getUI() const{
+    //std::lock_guard <std::mutex> guard(mutex);
     return ui;
 }
 
-HkxFile::~HkxFile(){
-    //
-}

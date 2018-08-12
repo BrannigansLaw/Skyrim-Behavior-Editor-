@@ -160,8 +160,6 @@ bool hkbModifierList::readData(const HkxXmlReader &reader, long & index){
             checkvalue(ok, "enable");
         }else if (text == "modifiers"){
             checkvalue(readReferences(reader.getElementValueAt(index), modifiers), "modifiers");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -175,7 +173,7 @@ bool hkbModifierList::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QString refString = "null";
@@ -255,27 +253,27 @@ QString hkbModifierList::evaluateDataValidity(){
     bool isvalid = true;
     if (modifiers.isEmpty()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": modifiers is empty!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": modifiers is empty!");
     }else{
         for (auto i = modifiers.size() - 1; i >= 0; i--){
             if (!modifiers.at(i).data()){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": modifiers at index '"+QString::number(i)+"' is null! Removing child!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": modifiers at index '"+QString::number(i)+"' is null! Removing child!");
                 modifiers.removeAt(i);
             }else if (modifiers.at(i)->getType() != HkxObject::TYPE_MODIFIER){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid state! Signature: "+QString::number(modifiers.at(i)->getSignature(), 16)+" Removing child!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid state! Signature: "+QString::number(modifiers.at(i)->getSignature(), 16)+" Removing child!");
                 modifiers.removeAt(i);
             }
         }
     }
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     setDataValidity(isvalid);
     return errors;

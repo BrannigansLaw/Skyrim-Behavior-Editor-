@@ -151,7 +151,7 @@ QString BSIsActiveModifier::evaluateDataValidity(){
     bool isvalid = true;
     auto setinvalid = [&](const QString & message){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!");
     };
     QString temp = HkDynamicObject::evaluateDataValidity();
     (temp != "") ? errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n"): NULL;

@@ -29,6 +29,7 @@ public:
     HkxObject(const HkxObject &obj) = delete;
     HkxObject& operator=(const HkxObject&) = delete;
 public:
+    void setIsWritten(bool written = true);
     int getIndexOfGenerator(const HkxSharedPtr & gen) const;
     QString getParentFilename() const;
     HkxFile * getParentFile() const;
@@ -58,7 +59,6 @@ protected:
 protected:
     void setDataValidity(bool isValid);
     void setType(HkxSignature sig, HkxType type);
-    void setIsWritten(bool written = true);
     void setIsMerged(bool value);
     void setRefsUpdated(bool value);
     void setParentFile(HkxFile *parent);
@@ -73,6 +73,7 @@ protected:
     bool readDoubles(const QByteArray &line, QVector<qreal> & doubles) const;
     hkVector3 readVector3(const QByteArray &lineIn, bool *ok) const;
     hkQuadVariable readVector4(const QByteArray &lineIn, bool *ok) const;
+    hkQsTransform readQsTransform(const QByteArray &lineIn, bool *ok) const;
 private:
     HkxFile *parentFile;
     long reference;

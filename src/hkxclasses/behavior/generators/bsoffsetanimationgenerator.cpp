@@ -119,8 +119,6 @@ bool BSOffsetAnimationGenerator::readData(const HkxXmlReader &reader, long & ind
         }else if (text == "fOffsetRangeEnd"){
             fOffsetRangeEnd = reader.getElementValueAt(index).toDouble(&ok);
             checkvalue(ok, "fOffsetRangeEnd");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -139,7 +137,7 @@ bool BSOffsetAnimationGenerator::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};

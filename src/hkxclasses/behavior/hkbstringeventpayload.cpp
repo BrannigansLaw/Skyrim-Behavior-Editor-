@@ -65,7 +65,7 @@ QString hkbStringEventPayload::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     if (data == ""){
         setDataValidity(false);
-        return QString(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid 'data': "+data+"!\n");
+        return QString(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid 'data': "+data+"!");
     }
     setDataValidity(true);
     return QString();

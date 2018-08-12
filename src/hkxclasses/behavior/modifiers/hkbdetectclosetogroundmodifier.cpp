@@ -73,8 +73,6 @@ bool hkbDetectCloseToGroundModifier::readData(const HkxXmlReader &reader, long &
         }else if (text == "animBoneIndex"){
             animBoneIndex = reader.getElementValueAt(index).toInt(&ok);
             checkvalue(ok, "animBoneIndex");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -93,7 +91,7 @@ bool hkbDetectCloseToGroundModifier::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -223,40 +221,40 @@ QString hkbDetectCloseToGroundModifier::evaluateDataValidity(){
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     if (closeToGroundEvent.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": closeToGroundEvent event id out of range! Setting to max index in range!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": closeToGroundEvent event id out of range! Setting to max index in range!");
         closeToGroundEvent.id = static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents() - 1;
     }
     if (closeToGroundEvent.payload.data() && closeToGroundEvent.payload->getSignature() != HKB_STRING_EVENT_PAYLOAD){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid closeToGroundEvent.payload type! Signature: "+QString::number(closeToGroundEvent.payload->getSignature(), 16)+" Setting null value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid closeToGroundEvent.payload type! Signature: "+QString::number(closeToGroundEvent.payload->getSignature(), 16)+" Setting null value!");
         closeToGroundEvent.payload = HkxSharedPtr();
     }
     if (boneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true)){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": boneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": boneIndex out of range! Setting to last bone index!");
         boneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
     }
     if (animBoneIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": animBoneIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": animBoneIndex out of range! Setting to last bone index!");
         animBoneIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones() - 1;
     }
     if (boneIndex > -1 && animBoneIndex > -1){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": boneIndex and animBoneIndex are both in use at the same time! This will crash the game! Setting boneIndex to -1!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": boneIndex and animBoneIndex are both in use at the same time! This will crash the game! Setting boneIndex to -1!");
         boneIndex = -1;
     }
     if (boneIndex < 0 && animBoneIndex < 0 ){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Neither boneIndex and animBoneIndex are in use! Setting animBoneIndex to 0!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Neither boneIndex and animBoneIndex are in use! Setting animBoneIndex to 0!");
         animBoneIndex = 0;
     }
     setDataValidity(isvalid);

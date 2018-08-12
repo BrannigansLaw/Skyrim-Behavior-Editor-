@@ -320,7 +320,7 @@ QString hkbCharacterStringData::evaluateDataValidity(){
         for (auto i = 0; i < list.size(); i++){
             if (list.at(i) == ""){
                 isvalid = false;
-                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid "+fieldname+" at "+QString::number(i)+"!\n");
+                errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid "+fieldname+" at "+QString::number(i)+"!");
             }
         }
     };

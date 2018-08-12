@@ -3,13 +3,9 @@
 #include "src/filetypes/skeletonfile.h"
 #include "src/filetypes/characterfile.h"
 
-/*
- * CLASS: hkaAnimationContainer
-*/
-
 uint hkaAnimationContainer::refCount = 0;
 
-QString hkaAnimationContainer::classname = "hkaAnimationContainer";
+const QString hkaAnimationContainer::classname = "hkaAnimationContainer";
 
 hkaAnimationContainer::hkaAnimationContainer(HkxFile *parent, long ref)
     : HkxObject(parent, ref)
@@ -19,35 +15,36 @@ hkaAnimationContainer::hkaAnimationContainer(HkxFile *parent, long ref)
     refCount++;
 }
 
-QString hkaAnimationContainer::getClassname(){
+const QString hkaAnimationContainer::getClassname(){
     return classname;
 }
 
 bool hkaAnimationContainer::readData(const HkxXmlReader &reader, long & index){
-    bool ok;
-    int numElems = 0;
+    std::lock_guard <std::mutex> guard(mutex);
+    auto ok = false;
+    auto numElems = 0;
     QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
-    while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
+    for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);
         if (text == "skeletons"){
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             if (!ok){
                 LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'skeletons' data!\nObject Reference: "+ref);
-                return false;
             }
             if (numElems > 0 && !readReferences(reader.getElementValueAt(index), skeletons)){
                 LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nFailed to properly read 'skeletons' data!\nObject Reference: "+ref);
-                return false;
+            }else{
+                ok = true;
             }
         }
-        index++;
     }
     index--;
     return true;
 }
 
 bool hkaAnimationContainer::write(HkxXMLWriter *writer){
+    std::lock_guard <std::mutex> guard(mutex);
     if (!writer){
         return false;
     }
@@ -90,17 +87,15 @@ bool hkaAnimationContainer::write(HkxXMLWriter *writer){
 }
 
 bool hkaAnimationContainer::link(){
-    if (!getParentFile()){
-        return false;
-    }
+    std::lock_guard <std::mutex> guard(mutex);
     HkxSharedPtr *ptr = nullptr;
     for (auto i = 0; i < skeletons.size(); i++){
         ptr = static_cast<SkeletonFile *>(getParentFile())->findSkeleton(skeletons.at(i).getShdPtrReference());
         if (!ptr || !ptr->data()){
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'skeletons' data field!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'skeletons' data field!");
             setDataValidity(false);
         }else if (!(*ptr).data() || (*ptr)->getSignature() != HKA_SKELETON){
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'skeletons' data field is linked to invalid child!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'skeletons' data field is linked to invalid child!");
             setDataValidity(false);
             skeletons[i] = *ptr;
         }else{
@@ -111,6 +106,7 @@ bool hkaAnimationContainer::link(){
 }
 
 QString hkaAnimationContainer::evaluateDataValidity(){
+    std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < skeletons.size(); i++){
         if (!skeletons.at(i).data() || skeletons.at(i)->getSignature() != HKA_SKELETON){
             setDataValidity(false);

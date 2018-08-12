@@ -203,10 +203,10 @@ bool hkbVariableValueSet::merge(HkxObject *recessiveobj){
         if (getSignature() == recessiveobj->getSignature()){
             //
         }else{
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": merge()!\n'recessiveobj' is not the correct type!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": merge()!\n'recessiveobj' is not the correct type!");
         }
     }else{
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": merge()!\n'recessiveobj' is nullptr!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": merge()!\n'recessiveobj' is nullptr!");
     }
     return true;
 }
@@ -222,10 +222,10 @@ bool hkbVariableValueSet::link(){
         if (file){
             ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variantVariableValues.at(i).getShdPtrReference());
             if (!ptr || !ptr->data()){
-                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!");
                 setDataValidity(false);
             }else if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
+                LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!");
                 setDataValidity(false);
                 variantVariableValues[i] = *ptr;
             }else{
@@ -236,10 +236,10 @@ bool hkbVariableValueSet::link(){
             if (file){
                 ptr = static_cast<CharacterFile *>(getParentFile())->findCharacterPropertyValues(variantVariableValues.at(i).getShdPtrReference());
                 if (!ptr || !ptr->data()){
-                    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!\n");
+                    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variantVariableValues' data field!");
                     setDataValidity(false);
                 }else if ((*ptr)->getSignature() != HKB_BONE_WEIGHT_ARRAY){
-                    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!\n");
+                    LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'variantVariableValues' data field is linked to invalid child!");
                     setDataValidity(false);
                     variantVariableValues[i] = *ptr;
                 }else{

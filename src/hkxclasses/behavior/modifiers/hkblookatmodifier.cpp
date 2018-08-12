@@ -114,8 +114,6 @@ bool hkbLookAtModifier::readData(const HkxXmlReader &reader, long & index){
         }else if (text == "isTargetInsideLimitCone"){
             isTargetInsideLimitCone = toBool(reader.getElementValueAt(index), &ok);
             checkvalue(ok, "isTargetInsideLimitCone");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -186,20 +184,20 @@ QString hkbLookAtModifier::evaluateDataValidity(){
     bool isvalid = true;
     QString temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
-        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n");
+        errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }
     if (name == ""){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid name!");
     }
     if (headIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": headIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": headIndex out of range! Setting to last bone index!");
         headIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
     }
     if (neckIndex >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": neckIndex out of range! Setting to last bone index!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": neckIndex out of range! Setting to last bone index!");
         neckIndex = static_cast<BehaviorFile *>(getParentFile())->getNumberOfBones(true) - 1;
     }
     setDataValidity(isvalid);

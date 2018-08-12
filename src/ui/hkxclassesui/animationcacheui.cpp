@@ -477,9 +477,9 @@ void CacheWidget::setAnimationNameAt(int row, int column){
             if (name.count("\\") > 0){
                 name = animations->item(row, column)->text().section("\\", -1, -1);
                 QString pathextension = animations->item(row, column)->text().remove("\\"+name);
-                bsData->animations[row]->setAnimationData(projectData->projectAnimationsPath+"/"+pathextension, name, true);
+                bsData->animations[row]->setAnimationData(projectData->getProjectAnimationsPath()+"/"+pathextension, name, true);
             }else{
-                bsData->animations[row]->setAnimationData(projectData->projectAnimationsPath, name, true);
+                bsData->animations[row]->setAnimationData(projectData->getProjectAnimationsPath(), name, true);
             }
         }else{
             CRITICAL_ERROR_MESSAGE("CacheWidget::setAnimationNameAt(): Mismatch between data and UI!!");
@@ -499,7 +499,7 @@ void CacheWidget::addAnimation(){
             if (path != ""){
                 path = "/"+path;
             }
-            bsData->animations.append(new AnimCacheAnimationInfo(projectData->projectAnimationsPath+path, name, true));
+            bsData->animations.append(new AnimCacheAnimationInfo(projectData->getProjectAnimationsPath()+path, name, true));
             animations->setRowCount(index + 1);
             if (animations->item(index, 0)){
                 animations->item(index, 0)->setText(projectData->findAnimationNameFromEncryptedData(bsData->animations.back()->crcAnimationName));

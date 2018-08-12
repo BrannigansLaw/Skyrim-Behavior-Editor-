@@ -53,8 +53,6 @@ bool BSEventOnDeactivateModifier::readData(const HkxXmlReader &reader, long & in
             checkvalue(ok, "event.id");
         }else if (text == "payload"){
             checkvalue(event.payload.readShdPtrReference(index, reader), "event.payload");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -73,7 +71,7 @@ bool BSEventOnDeactivateModifier::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};
@@ -199,7 +197,7 @@ QString BSEventOnDeactivateModifier::evaluateDataValidity(){
     bool isvalid = true;
     auto setinvalid = [&](const QString & message){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!");
     };
     QString temp = HkDynamicObject::evaluateDataValidity();
     (temp != "") ? errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n"): NULL;

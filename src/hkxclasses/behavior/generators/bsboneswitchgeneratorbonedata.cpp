@@ -43,8 +43,6 @@ bool BSBoneSwitchGeneratorBoneData::readData(const HkxXmlReader &reader, long & 
             checkvalue(pGenerator.readShdPtrReference(index, reader), "pGenerator");
         }else if (text == "spBoneWeight"){
             checkvalue(spBoneWeight.readShdPtrReference(index, reader), "spBoneWeight");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -60,7 +58,7 @@ bool BSBoneSwitchGeneratorBoneData::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QStringList list1 = {writer->name, writer->clas, writer->signature};

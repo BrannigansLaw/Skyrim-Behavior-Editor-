@@ -44,8 +44,6 @@ bool hkbProjectData::readData(const HkxXmlReader &reader, long & index){
         }else if (text == "defaultEventMode"){
             defaultEventMode = reader.getElementValueAt(index);
             checkvalue(EventMode.contains(defaultEventMode), "defaultEventMode");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -90,10 +88,10 @@ bool hkbProjectData::link(){
         LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nParent file type is invalid!!!");
     }
     if (!ptr->data()){
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'stringData' data field!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'stringData' data field!");
         setDataValidity(false);
     }else if ((*ptr)->getSignature() != HKB_PROJECT_STRING_DATA){
-        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'stringData' data field is linked to invalid child!\n");
+        LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'stringData' data field is linked to invalid child!");
         setDataValidity(false);
         stringData = *ptr;
     }else{

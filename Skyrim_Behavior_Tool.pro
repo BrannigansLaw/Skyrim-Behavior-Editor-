@@ -440,7 +440,8 @@ SOURCES += \
     src/animSetData/animcacheanimsetdata.cpp \
     src/animSetData/animcacheprojectdata.cpp \
     src/filetypes/animationfile.cpp \
-    src/ui/hkxclassesui/animationcacheui.cpp
+    src/ui/hkxclassesui/animationcacheui.cpp \
+    src/hkxclasses/behavior/modifiers/hkbfootikmodifier.cpp
 
 HEADERS  += \
     src/filetypes/hkxfile.h \
@@ -865,4 +866,5 @@ HEADERS  += \
     src/animSetData/animcacheanimsetdata.h \
     src/animSetData/animcacheprojectdata.h \
     src/filetypes/animationfile.h \
-    src/ui/hkxclassesui/animationcacheui.h
+    src/ui/hkxclassesui/animationcacheui.h \
+    src/hkxclasses/behavior/modifiers/hkbfootikmodifier.h

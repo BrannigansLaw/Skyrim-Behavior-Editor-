@@ -19,7 +19,7 @@ class AnimationCacheUI;
 class ProjectUI: public QGroupBox
 {
     Q_OBJECT
-    friend class MainWindow;
+    //friend class MainWindow;
 public:
     ProjectUI(ProjectFile *file);
     virtual ~ProjectUI();
@@ -27,6 +27,7 @@ public:
     void loadData();
     void setFilePath(const QString & path);
     void setDisabled(bool disable);
+    AnimationsUI *getAnimations() const;
 signals:
     void openFile(const QModelIndex & index);
     void addBehavior(bool initData);

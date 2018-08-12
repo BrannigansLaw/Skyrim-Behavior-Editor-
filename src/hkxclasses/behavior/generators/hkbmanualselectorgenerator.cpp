@@ -127,8 +127,6 @@ bool hkbManualSelectorGenerator::readData(const HkxXmlReader &reader, long & ind
         }else if (text == "currentGeneratorIndex"){
             currentGeneratorIndex = reader.getElementValueAt(index).toShort(&ok);
             checkvalue(ok, "currentGeneratorIndex");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -142,7 +140,7 @@ bool hkbManualSelectorGenerator::write(HkxXMLWriter *writer){
     };
     auto writechild = [&](const HkxSharedPtr & shdptr, const QString & datafield){
         if (shdptr.data() && !shdptr->write(writer))
-            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!\n");
+            LogFile::writeToLog(getParentFilename()+": "+getClassname()+": write()!\nUnable to write '"+datafield+"'!!!");
     };
     if (writer && !getIsWritten()){
         QString refString = "null";
@@ -229,7 +227,7 @@ QString hkbManualSelectorGenerator::evaluateDataValidity(){
     auto appenderror = [&](bool value, const QString & fieldname){
         if (!value){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid '"+fieldname+"'!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid '"+fieldname+"'!");
         }
     };
     appenderror((HkDynamicObject::evaluateDataValidity() == ""), "hkbVariableBindingSet");
@@ -238,22 +236,22 @@ QString hkbManualSelectorGenerator::evaluateDataValidity(){
     for (auto i = generators.size() - 1; i >= 0; i--){
         if (!generators.at(i).data()){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": generators at index '"+QString::number(i)+"' is null! Removing child!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": generators at index '"+QString::number(i)+"' is null! Removing child!");
             generators.removeAt(i);
         }else if (generators.at(i)->getType() != HkxObject::TYPE_GENERATOR){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid generator! Signature: "+QString::number(generators.at(i)->getSignature(), 16)+" Removing child!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid generator! Signature: "+QString::number(generators.at(i)->getSignature(), 16)+" Removing child!");
             generators.removeAt(i);
         }
     }
     if (selectedGeneratorIndex >= generators.size()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": selectedGeneratorIndex is out of range! Setting max value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": selectedGeneratorIndex is out of range! Setting max value!");
         selectedGeneratorIndex = generators.size() - 1;
     }
     if (currentGeneratorIndex >= generators.size()){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": currentGeneratorIndex is out of range! Setting max value!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": currentGeneratorIndex is out of range! Setting max value!");
         currentGeneratorIndex = generators.size() - 1;
     }
     setDataValidity(isvalid);

@@ -33,72 +33,20 @@ class ProjectFile;
 class SkeletonFile;
 class ProjectUI;
 
-class MainWindow : public QWidget
+class MainWindow final: public QWidget
 {
     Q_OBJECT
 public:
     static QMessageBox::StandardButton yesNoDialogue(const QString & message);
+public:
     MainWindow();
-    virtual ~MainWindow();
+    MainWindow& operator=(const MainWindow&) = delete;
+    MainWindow(const MainWindow &other) = delete;
+    ~MainWindow();
     void removeBehaviorGraphs(const QStringList & filenames);
 protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
     void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
-private:
-    static const int zoomFactor = 120;
-    QString hkxcmdPath;
-    QString skyrimDirectory;
-    QString skyrimSpecialEdtionDirectory;
-    QString skyrimBehaviorUpdateToolFullPath;
-    QString projectExportPath;
-    QGridLayout *topLyt;
-    QMenuBar *topMB;
-    QMenu *fileM;
-    QAction *newProjectA;
-    QAction *openPackedProjectA;
-    QAction *openUnpackedProjectA;
-    QAction *saveA;
-    QAction *exportToSkyrimDirA;
-    QAction *exportCurrentFileA;
-    QAction *saveProjectA;
-    QAction *exitA;
-    QMenu *viewM;
-    QAction *zoomInA;
-    QAction *zoomOutA;
-    QAction *expandA;
-    QAction *collapseA;
-    QAction *refocusA;
-    QAction *findGeneratorA;
-    QAction *findModifierA;
-    QMenu *mergeM;
-    QAction *mergeBehaviorsA;
-    QAction *mergeProjectsA;
-    QAction *generateFNISPatchA;
-    QMenu *settingsM;
-    QAction *setPathToGameFolderA;
-    QAction *setProjectExportPathA;
-    QAction *setGameModeA;
-    QMenu *documentationM;
-    QAction *classReferenceHubA;
-    QMenu *donateM;
-    QAction *sendGibsA;
-    QTabWidget *tabs;
-    ProjectFile *projectFile;
-    //CharacterFile *characterFile;
-    SkeletonFile *skeletonFile;
-    QVector <BehaviorGraphView *> behaviorGraphs;
-    ProjectUI *projectUI;
-    QGroupBox *behaviorGraphViewGB;
-    QVBoxLayout *iconGBLyt;
-    HkDataUI *objectDataWid;
-    QScrollArea *objectDataSA;
-    BehaviorVariablesUI *variablesWid;
-    EventsUI *eventsWid;
-    QString lastFileSelected;
-    QString lastFileSelectedPath;
-    std::mutex mutex;
-    std::condition_variable conditionVar;
-    LogFile logfile;
 private slots:
     void createNewProject();
     void openPackedProject();
@@ -150,6 +98,60 @@ private:
     QMessageBox::StandardButton closeAllDialogue();
     QMessageBox::StandardButton closeFileDialogue();
     bool closeAll();
+private:
+    static const int zoomFactor = 120;
+    QString hkxcmdPath;
+    QString skyrimDirectory;
+    QString skyrimSpecialEdtionDirectory;
+    QString skyrimBehaviorUpdateToolFullPath;
+    QString projectExportPath;
+    QGridLayout *topLyt;
+    QMenuBar *topMB;
+    QMenu *fileM;
+    QAction *newProjectA;
+    QAction *openPackedProjectA;
+    QAction *openUnpackedProjectA;
+    QAction *saveA;
+    QAction *exportToSkyrimDirA;
+    QAction *exportCurrentFileA;
+    QAction *saveProjectA;
+    QAction *exitA;
+    QMenu *viewM;
+    QAction *zoomInA;
+    QAction *zoomOutA;
+    QAction *expandA;
+    QAction *collapseA;
+    QAction *refocusA;
+    QAction *findGeneratorA;
+    QAction *findModifierA;
+    QMenu *mergeM;
+    QAction *mergeBehaviorsA;
+    QAction *mergeProjectsA;
+    QAction *generateFNISPatchA;
+    QMenu *settingsM;
+    QAction *setPathToGameFolderA;
+    QAction *setProjectExportPathA;
+    QAction *setGameModeA;
+    QMenu *documentationM;
+    QAction *classReferenceHubA;
+    QMenu *donateM;
+    QAction *sendGibsA;
+    QTabWidget *tabs;
+    ProjectFile *projectFile;
+    SkeletonFile *skeletonFile;
+    QVector <BehaviorGraphView *> behaviorGraphs;
+    ProjectUI *projectUI;
+    QGroupBox *behaviorGraphViewGB;
+    QVBoxLayout *iconGBLyt;
+    HkDataUI *objectDataWid;
+    QScrollArea *objectDataSA;
+    BehaviorVariablesUI *variablesWid;
+    EventsUI *eventsWid;
+    QString lastFileSelected;
+    QString lastFileSelectedPath;
+    std::mutex mutex;
+    std::condition_variable conditionVar;
+    LogFile logfile;
 };
 
 #endif // MAINWINDOW_H

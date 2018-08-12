@@ -106,8 +106,6 @@ bool hkbHandIkDriverInfo::readData(const HkxXmlReader &reader, long & index){
                         hands.last().localFrameName = reader.getElementValueAt(index);
                         //checkvalue((hands.last().localFrameName != "", "hands.at("+QString::number(j)+").localFrameName");
                         break;
-                    }else{
-                        //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
                     }
                 }
             }
@@ -115,8 +113,6 @@ bool hkbHandIkDriverInfo::readData(const HkxXmlReader &reader, long & index){
         }else if (text == "fadeInOutCurve"){
             fadeInOutCurve = reader.getElementValueAt(index);
             checkvalue(BlendCurve.contains(fadeInOutCurve), "fadeInOutCurve");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;

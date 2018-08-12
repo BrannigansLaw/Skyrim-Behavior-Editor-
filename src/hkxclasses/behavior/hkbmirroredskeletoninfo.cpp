@@ -41,8 +41,6 @@ bool hkbMirroredSkeletonInfo::readData(const HkxXmlReader &reader, long & index)
             numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);
             checkvalue(ok, "bonePairMap");
             checkvalue((numElems > 0 && !readIntegers(reader.getElementValueAt(index), bonePairMap)), "bonePairMap");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;

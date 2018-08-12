@@ -41,8 +41,6 @@ bool hkbBehaviorReferenceGenerator::readData(const HkxXmlReader &reader, long & 
         }else if (text == "behaviorName"){
             behaviorName = reader.getElementValueAt(index);
             checkvalue(static_cast<BehaviorFile *>(getParentFile())->getAllBehaviorFileNames().contains(behaviorName, Qt::CaseInsensitive), "behaviorName");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -115,7 +113,7 @@ QString hkbBehaviorReferenceGenerator::evaluateDataValidity(){
     auto appenderror = [&](bool value, const QString & fieldname){
         if (!value){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid '"+fieldname+"'!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid '"+fieldname+"'!");
         }
     };
     appenderror((HkDynamicObject::evaluateDataValidity() == ""), "hkbVariableBindingSet");

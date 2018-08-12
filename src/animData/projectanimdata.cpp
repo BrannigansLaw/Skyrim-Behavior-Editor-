@@ -179,14 +179,17 @@ bool ProjectAnimData::removeClipGenerator(const QString &clipname){
 }
 
 bool ProjectAnimData::appendAnimation(SkyrimAnimationMotionData * motiondata){
-    for (auto i = 0; i < animationMotionData.size(); i++){
-        if (animationMotionData.at(i)->animationIndex == motiondata->animationIndex){
-            return false;
+    if (motiondata){
+        for (auto i = 0; i < animationMotionData.size(); i++){
+            if (animationMotionData.at(i)->animationIndex == motiondata->animationIndex){
+                return false;
+            }
         }
+        animationMotionData.append(motiondata);
+        animationMotionDataLines = animationMotionDataLines + motiondata->lineCount();
+        return true;
     }
-    animationMotionData.append(motiondata);
-    animationMotionDataLines = animationMotionDataLines + motiondata->lineCount();
-    return true;
+    return false;
 }
 
 bool ProjectAnimData::removeAnimation(int animationindex){

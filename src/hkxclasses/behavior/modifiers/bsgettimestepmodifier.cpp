@@ -51,8 +51,6 @@ bool BSGetTimeStepModifier::readData(const HkxXmlReader &reader, long & index){
         }else if (text == "timeStep"){
             timeStep = reader.getElementValueAt(index).toDouble(&ok);
             checkvalue(ok, "timeStep");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -106,7 +104,7 @@ QString BSGetTimeStepModifier::evaluateDataValidity(){
     bool isvalid = true;
     auto setinvalid = [&](const QString & message){
         isvalid = false;
-        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!\n");
+        errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!");
     };
     QString temp = HkDynamicObject::evaluateDataValidity();
     (temp != "") ? errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n"): NULL;

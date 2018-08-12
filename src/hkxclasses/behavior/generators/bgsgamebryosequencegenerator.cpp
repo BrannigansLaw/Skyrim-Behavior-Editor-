@@ -49,8 +49,6 @@ bool BGSGamebryoSequenceGenerator::readData(const HkxXmlReader &reader, long & i
         }else if (text == "fPercent"){
             fPercent = reader.getElementValueAt(index).toDouble(&ok);
             checkvalue(ok, "fPercent");
-        }else{
-            //LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\nUnknown field '"+text+"' found!\nObject Reference: "+ref);
         }
     }
     index--;
@@ -138,7 +136,7 @@ QString BGSGamebryoSequenceGenerator::evaluateDataValidity(){
     auto appenderror = [&](bool value, const QString & fieldname){
         if (!value){
             isvalid = false;
-            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid '"+fieldname+"'!\n");
+            errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid '"+fieldname+"'!");
         }
     };
     appenderror((HkDynamicObject::evaluateDataValidity() == ""), "hkbVariableBindingSet");

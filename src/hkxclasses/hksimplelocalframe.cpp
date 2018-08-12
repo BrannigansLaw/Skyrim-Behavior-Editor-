@@ -82,7 +82,7 @@ QString hkSimpleLocalFrame::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     if (name == ""){
         setDataValidity(false);
-        return QString(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid 'name': "+name+"!\n");
+        return QString(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": Invalid 'name': "+name+"!");
     }
     setDataValidity(true);
     return QString();
