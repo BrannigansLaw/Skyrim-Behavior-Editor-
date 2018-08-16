@@ -32,7 +32,7 @@ bool hkbProjectStringData::readData(const HkxXmlReader &reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
     auto ok = true;
     auto numElems = 0;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     auto getstrings = [&](QStringList & strings, const QString & fieldname){
         numElems = reader.getNthAttributeValueAt(index, 1).toInt(&ok);

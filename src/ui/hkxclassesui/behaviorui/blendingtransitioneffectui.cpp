@@ -143,7 +143,7 @@ void BlendingTransitionEffectUI::loadData(HkxObject *data){
     hkbVariableBindingSet *varBind = nullptr;
     if (data && data->getSignature() == HKB_BLENDING_TRANSITION_EFFECT){
         bsData = static_cast<hkbBlendingTransitionEffect *>(data);
-        name->setText(bsData->name);
+        name->setText(bsData->getName());
         if (selfTransitionMode->count() == 0){
             selfTransitionMode->insertItems(0, bsData->SelfTransitionMode);
         }
@@ -201,10 +201,10 @@ void BlendingTransitionEffectUI::loadData(HkxObject *data){
 
 void BlendingTransitionEffectUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             bsData->setIsFileChanged(true);
-            emit transitionEffectRenamed(bsData->name);
+            emit transitionEffectRenamed(bsData->getName());
         }
     }else{
         CRITICAL_ERROR_MESSAGE("BlendingTransitionEffectUI::setName(): The data is nullptr!!");

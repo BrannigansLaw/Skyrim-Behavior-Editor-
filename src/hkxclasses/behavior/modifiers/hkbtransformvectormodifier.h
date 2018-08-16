@@ -11,6 +11,7 @@ public:
     hkbTransformVectorModifier& operator=(const hkbTransformVectorModifier&) = delete;
     hkbTransformVectorModifier(const hkbTransformVectorModifier &) = delete;
     ~hkbTransformVectorModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

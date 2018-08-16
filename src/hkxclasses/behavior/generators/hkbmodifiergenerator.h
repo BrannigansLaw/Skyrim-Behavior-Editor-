@@ -12,6 +12,7 @@ public:
     hkbModifierGenerator& operator=(const hkbModifierGenerator&) = delete;
     hkbModifierGenerator(const hkbModifierGenerator &) = delete;
     ~hkbModifierGenerator();
+public:
     QString getName() const;
     static const QString getClassname();
     QVector <DataIconManager *> getChildren() const;

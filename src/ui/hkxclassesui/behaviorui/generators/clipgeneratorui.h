@@ -4,11 +4,11 @@
 #include <QStackedWidget>
 
 #include "src/utility.h"
+#include "src/hkxclasses/behavior/generators/hkbclipgenerator.h"
 
 class HkxObject;
 class QGridLayout;
 class TableWidget;
-class hkbClipGenerator;
 class LineEdit;
 class DoubleSpinBox;
 class CheckBox;
@@ -20,14 +20,19 @@ class ClipTriggerUI;
 class QGroupBox;
 class MainWindow;
 
-class ClipGeneratorUI: public QStackedWidget
+class ClipGeneratorUI final: public QStackedWidget
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     ClipGeneratorUI();
-    virtual ~ClipGeneratorUI(){}
+    ClipGeneratorUI& operator=(const ClipGeneratorUI&) = delete;
+    ClipGeneratorUI(const ClipGeneratorUI &) = delete;
+    ~ClipGeneratorUI() = default;
+public:
     void loadData(HkxObject *data);
+    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events, GenericTableWidget *animations);
+    void variableRenamed(const QString & name, int index);
+    void eventRenamed(const QString & name, int index);
 signals:
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
@@ -35,7 +40,7 @@ signals:
     void viewAnimations(const QString & name);
     void generatorNameChanged(const QString & newName, int index);
 private slots:
-    void setName();
+    void setName(const QString & newname);
     void setAnimationName(int index, const QString & name);
     void setCropStartAmountLocalTime();
     void setCropEndAmountLocalTime();
@@ -55,25 +60,19 @@ private slots:
     void setBindingVariable(int index, const QString & name);
     void returnToWidget();
 private:
-    void connectSignals();
-    void disconnectSignals();
-    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2);
+    void toggleSignals(bool toggleconnections);
     void addTrigger();
     void removeTrigger(int index);
-    void eventRenamed(const QString & name, int index);
-    //void animationRenamed(const QString & name, int index);
     void loadDynamicTableRows();
-    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *events, GenericTableWidget *animations);
-    void variableRenamed(const QString & name, int index);
     void selectTableToView(bool viewproperties, const QString & path);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString & path);
+    void setFlag(CheckBox *flagcheckbox, hkbClipGenerator::ClipFlag flagtoset);
 private:
     enum ACTIVE_WIDGET {
         MAIN_WIDGET = 0,
         CHILD_WIDGET = 1
     };
-    static QStringList headerLabels;
+private:
+    static const QStringList headerLabels;
     hkbClipGenerator *bsData;
     QGridLayout *topLyt;
     TableWidget *table;

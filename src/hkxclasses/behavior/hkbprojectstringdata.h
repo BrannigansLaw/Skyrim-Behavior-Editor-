@@ -14,6 +14,7 @@ public:
     hkbProjectStringData& operator=(const hkbProjectStringData&) = delete;
     hkbProjectStringData(const hkbProjectStringData &) = delete;
     ~hkbProjectStringData();
+public:
     static const QString getClassname();
     QString getCharacterFilePathAt(int index) const;
 private:

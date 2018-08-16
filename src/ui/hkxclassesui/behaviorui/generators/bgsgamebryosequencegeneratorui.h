@@ -19,6 +19,7 @@ public:
     BGSGamebryoSequenceGeneratorUI& operator=(const BGSGamebryoSequenceGeneratorUI&) = delete;
     BGSGamebryoSequenceGeneratorUI(const BGSGamebryoSequenceGeneratorUI &) = delete;
     ~BGSGamebryoSequenceGeneratorUI() = default;
+public:
     void loadData(HkxObject *data);
 signals:
     void generatorNameChanged(const QString & newName, int index);

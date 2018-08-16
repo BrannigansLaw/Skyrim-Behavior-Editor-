@@ -5,12 +5,16 @@
 
 #include "animcacheanimsetdata.h"
 
-class AnimCacheProjectData{
+class AnimCacheProjectData final
+{
     friend class AnimationCacheUI;
     friend class SkyrimAnimSetData;
 public:
     AnimCacheProjectData(const QStringList & files = QStringList(), const QVector<AnimCacheAnimSetData *> &animdata = QVector <AnimCacheAnimSetData *>());
+    AnimCacheProjectData& operator=(const AnimCacheProjectData&) = delete;
+    AnimCacheProjectData(const AnimCacheProjectData &) = delete;
     ~AnimCacheProjectData();
+public:
     bool read(QFile * file);
     bool write(QFile *file, QTextStream &out) const;
     bool merge(AnimCacheProjectData *recessiveproject);

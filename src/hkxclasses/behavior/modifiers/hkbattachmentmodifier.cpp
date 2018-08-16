@@ -31,7 +31,7 @@ QString hkbAttachmentModifier::getName() const{
 bool hkbAttachmentModifier::readData(const HkxXmlReader &reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);
@@ -350,7 +350,7 @@ QString hkbAttachmentModifier::evaluateDataValidity(){
             payload = HkxSharedPtr();
         }
     };
-    QString temp = HkDynamicObject::evaluateDataValidity();
+    auto temp = HkDynamicObject::evaluateDataValidity();
     (temp != "") ? errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n"): NULL;
     if (name == ""){
         isvalid = false;

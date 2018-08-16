@@ -16,6 +16,7 @@ public:
     HkxFile& operator=(const HkxFile&) = delete;
     HkxFile(const HkxFile &) = delete;
     virtual ~HkxFile() = default;
+public:
     void closeFile();
     virtual bool addObjectToFile(HkxObject *obj, long ref) = 0;
     QString getRootObjectReferenceString() const;

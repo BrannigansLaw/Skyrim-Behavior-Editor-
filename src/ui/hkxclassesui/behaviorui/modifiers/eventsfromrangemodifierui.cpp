@@ -151,7 +151,7 @@ void EventsFromRangeModifierUI::loadData(HkxObject *data){
     if (data){
         if (data->getSignature() == HKB_EVENTS_FROM_RANGE_MODIFIER){
             bsData = static_cast<hkbEventsFromRangeModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             inputValue->setValue(bsData->inputValue);
             lowerBound->setValue(bsData->lowerBound);
@@ -290,10 +290,10 @@ void EventsFromRangeModifierUI::returnToWidget(){
 
 void EventsFromRangeModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            emit modifierNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
+            emit modifierNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
             bsData->setIsFileChanged(true);
         }
     }else{

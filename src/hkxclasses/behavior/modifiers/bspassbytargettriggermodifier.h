@@ -11,6 +11,7 @@ public:
     BSPassByTargetTriggerModifier& operator=(const BSPassByTargetTriggerModifier&) = delete;
     BSPassByTargetTriggerModifier(const BSPassByTargetTriggerModifier &) = delete;
     ~BSPassByTargetTriggerModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

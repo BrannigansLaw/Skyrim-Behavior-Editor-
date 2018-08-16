@@ -3,20 +3,26 @@
 
 #include <QtCore>
 
-class AnimCacheAnimationInfo{
+class AnimCacheAnimationInfo final
+{
     friend class CacheWidget;
-    friend class AnimCacheAnimSetData;
 public:
     AnimCacheAnimationInfo(const QString & path = "", const QString & name = "", bool compute = false);
-    AnimCacheAnimationInfo(const AnimCacheAnimationInfo & other);
+    AnimCacheAnimationInfo& operator=(const AnimCacheAnimationInfo&) = default;
+    AnimCacheAnimationInfo(const AnimCacheAnimationInfo &) = default;
+    ~AnimCacheAnimationInfo() = default;
+public:
     bool operator ==(const AnimCacheAnimationInfo &other) const;
+public:
+    QString getCrcAnimationName() const;
     bool read(QFile * file);
     bool write(QFile * file, QTextStream & out) const;
+private:
     void setAnimationData(const QString & path, const QString & name, bool compute);
 private:
+    static const QString XKH;
     QString crcPath;
     QString crcAnimationName;
-    //const QString xkh = "7891816";
 };
 
 #endif // ANIMCACHEANIMATIONINFO_H

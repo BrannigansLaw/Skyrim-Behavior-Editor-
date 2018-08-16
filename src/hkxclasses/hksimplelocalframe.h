@@ -10,6 +10,7 @@ public:
     hkSimpleLocalFrame& operator=(const hkSimpleLocalFrame&) = delete;
     hkSimpleLocalFrame(const hkSimpleLocalFrame &) = delete;
     ~hkSimpleLocalFrame();
+public:
     static const QString getClassname();
     QString getName() const;
     void setName(const QString &value);

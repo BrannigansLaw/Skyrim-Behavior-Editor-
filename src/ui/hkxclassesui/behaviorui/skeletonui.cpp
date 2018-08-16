@@ -33,7 +33,7 @@ SkeletonUI::~SkeletonUI(){
 void SkeletonUI::loadData(HkxObject *data, bool isRagdoll){
     if (data && data->getSignature() == HKA_SKELETON){
         bsData = static_cast<hkaSkeleton *>(data);
-        setTitle(bsData->name);
+        setTitle(bsData->getName());
         SkeletonFile *file = static_cast<SkeletonFile *>(bsData->getParentFile());
         int rowCount = 0;
         QStringList boneNames;

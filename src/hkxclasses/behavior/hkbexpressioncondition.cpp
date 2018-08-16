@@ -26,7 +26,7 @@ QString hkbExpressionCondition::getExpression() const{
 
 bool hkbExpressionCondition::readData(const HkxXmlReader & reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     for (; index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"; index++){
         text = reader.getNthAttributeValueAt(index, 0);

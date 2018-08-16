@@ -47,7 +47,7 @@ bool hkbGeneratorTransitionEffect::readData(const HkxXmlReader &reader, long & i
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };
@@ -125,7 +125,7 @@ bool hkbGeneratorTransitionEffect::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         LogFile::writeToLog(getParentFilename()+": "+getClassname()+":  link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(transitionGenerator.getShdPtrReference());
+    auto ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(transitionGenerator.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getType() != TYPE_GENERATOR){
             LogFile::writeToLog(getParentFilename()+": "+getClassname()+": linkVar()!\nThe linked object is not a TYPE_GENERATOR!");

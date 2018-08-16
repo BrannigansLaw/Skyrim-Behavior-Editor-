@@ -106,7 +106,7 @@ void ComputeRotationFromAxisAngleModifierUI::loadData(HkxObject *data){
         if (data->getSignature() == HKB_COMPUTE_ROTATION_FROM_AXIS_ANGLE_MODIFIER){
             hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbComputeRotationFromAxisAngleModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             rotationOut->setValue(bsData->rotationOut);
             axis->setValue(bsData->axis);
@@ -134,8 +134,8 @@ void ComputeRotationFromAxisAngleModifierUI::loadData(HkxObject *data){
 
 void ComputeRotationFromAxisAngleModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));

@@ -5,13 +5,13 @@
 
 class hkbFootIkModifier final: public hkbModifier
 {
-    //friend class LegUI;
     //friend class FootIkModifierUI;
 public:
     hkbFootIkModifier(HkxFile *parent, long ref = 0);
     hkbFootIkModifier& operator=(const hkbFootIkModifier&) = delete;
     hkbFootIkModifier(const hkbFootIkModifier &) = delete;
     ~hkbFootIkModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

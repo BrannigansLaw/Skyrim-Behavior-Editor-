@@ -4,22 +4,28 @@
 #include "skyrimclipgeneratodata.h"
 #include "skyrimanimationmotiondata.h"
 
-class ProjectAnimData{
+class ProjectAnimData final
+{
     friend class ProjectFile;
-    friend class AnimationsUI;
-    friend class SkyrimClipGeneratoData;
-    friend class SkyrimAnimationMotionData;
     friend class SkyrimAnimData;
 public:
     ProjectAnimData();
+    ProjectAnimData& operator=(const ProjectAnimData&) = delete;
+    ProjectAnimData(const ProjectAnimData &) = delete;
+    ~ProjectAnimData();
+public:
+    qreal getAnimationDuration(int animationindex) const;
+    SkyrimAnimationMotionData getAnimationMotionData(int animationindex) const;
+    void merge(ProjectAnimData *recessiveanimdata);
+    SkyrimAnimationMotionData * findMotionData(int animationindex);
+    bool appendAnimation(SkyrimAnimationMotionData *motiondata);
+    bool removeAnimation(int animationindex);
+private:
     bool read(QFile * file);
     bool readMotionOnly(QFile *file);
     bool write(QFile &file, QTextStream &output);
     bool appendClipGenerator(SkyrimClipGeneratoData *animData);
     bool removeClipGenerator(const QString & clipname);
-    bool appendAnimation(SkyrimAnimationMotionData *motiondata);
-    bool removeAnimation(int animationindex);
-    SkyrimAnimationMotionData * findMotionData(int animationindex);
     void setLocalTimeForClipGenAnimData(const QString &clipname, int triggerindex, qreal time);
     void setEventNameForClipGenAnimData(const QString &clipname, int triggerindex, const QString &eventname);
     void setClipNameAnimData(const QString &oldclipname, const QString &newclipname);
@@ -30,17 +36,13 @@ public:
     void appendClipTriggerToAnimData(const QString & clipGenName, const QString & eventname);
     void removeClipTriggerToAnimDataAt(const QString & clipGenName, int index);
     bool removeBehaviorFromProject(const QString &behaviorname);
-    qreal getAnimationDuration(int animationindex) const;
-    SkyrimAnimationMotionData getAnimationMotionData(int animationindex) const;
-    void merge(ProjectAnimData *recessiveanimdata);
-private:
     void fixNumberAnimationLines();
+private:
     ulong animationDataLines;
     ulong animationMotionDataLines;
     QStringList projectFiles;
     QVector <SkyrimClipGeneratoData *> animationData;
     QVector <SkyrimAnimationMotionData *> animationMotionData;
-    bool chopLine(QFile *file, QByteArray &line, ulong &linecount);
 };
 
 #endif // PROJECTANIMDATA_H

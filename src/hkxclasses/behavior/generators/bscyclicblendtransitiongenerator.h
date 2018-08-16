@@ -11,9 +11,21 @@ public:
     BSCyclicBlendTransitionGenerator& operator=(const BSCyclicBlendTransitionGenerator&) = delete;
     BSCyclicBlendTransitionGenerator(const BSCyclicBlendTransitionGenerator &) = delete;
     ~BSCyclicBlendTransitionGenerator();
+public:
     static const QString getClassname();
     QString getName() const;
 private:
+    void nullEventToCrossBlend();
+    void nullEventToFreezeBlendValue();
+    void setEBlendCurve(int index);
+    void setFTransitionDuration(const qreal &value);
+    void setFBlendParameter(const qreal &value);
+    void setName(const QString &newname);
+    QString getBlenderGeneratorName() const;
+    qreal getFTransitionDuration() const;
+    QString getEBlendCurve() const;
+    int getEventToFreezeBlendValueId() const;
+    int getEventToCrossBlendId() const;
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();
@@ -32,9 +44,9 @@ private:
     bool insertObjectAt(int, DataIconManager *obj);
     bool removeObjectAt(int index);
 private:
-    static const QStringList BlendCurve;
     static uint refCount;
     static const QString classname;
+    static const QStringList BlendCurve;
     ulong userData;
     QString name;
     HkxSharedPtr pBlenderGenerator;

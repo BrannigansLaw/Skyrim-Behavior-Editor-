@@ -19,6 +19,7 @@ public:
     hkbCharacterData& operator=(const hkbCharacterData&) = delete;
     hkbCharacterData(const hkbCharacterData &) = delete;
     ~hkbCharacterData();
+public:
     QStringList getVariableNames() const;
     static const QString getClassname();
     int getWordVariableValueAt(int index);

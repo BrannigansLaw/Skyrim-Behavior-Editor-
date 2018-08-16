@@ -11,6 +11,7 @@ public:
     hkbMirrorModifier& operator=(const hkbMirrorModifier&) = delete;
     hkbMirrorModifier(const hkbMirrorModifier &) = delete;
     ~hkbMirrorModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

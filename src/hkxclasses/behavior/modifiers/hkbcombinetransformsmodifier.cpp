@@ -33,7 +33,7 @@ bool hkbCombineTransformsModifier::readData(const HkxXmlReader &reader, long & i
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };
@@ -136,7 +136,7 @@ QString hkbCombineTransformsModifier::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity();
+    auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }

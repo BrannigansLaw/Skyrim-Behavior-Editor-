@@ -11,6 +11,7 @@ public:
     hkbEvaluateExpressionModifier& operator=(const hkbEvaluateExpressionModifier&) = delete;
     hkbEvaluateExpressionModifier(const hkbEvaluateExpressionModifier &) = delete;
     ~hkbEvaluateExpressionModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

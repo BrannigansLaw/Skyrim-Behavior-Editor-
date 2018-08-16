@@ -144,7 +144,7 @@ void ModifierListUI::loadData(HkxObject *data){
     if (data){
         if (data->getSignature() == HKB_MODIFIER_LIST){
             bsData = static_cast<hkbModifierList *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             varBind = bsData->getVariableBindingSetData();
             if (varBind){
@@ -362,8 +362,8 @@ void ModifierListUI::selectTableToView(bool viewproperties, const QString &path)
 
 void ModifierListUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));

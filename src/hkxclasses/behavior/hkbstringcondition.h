@@ -10,6 +10,7 @@ public:
     hkbStringCondition& operator=(const hkbStringCondition&) = delete;
     hkbStringCondition(const hkbStringCondition &) = delete;
     ~hkbStringCondition();
+public:
     static const QString getClassname();
     QString getExpression() const;
 private:

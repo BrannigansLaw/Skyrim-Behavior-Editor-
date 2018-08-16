@@ -11,6 +11,7 @@ public:
     hkbDampingModifier& operator=(const hkbDampingModifier&) = delete;
     hkbDampingModifier(const hkbDampingModifier &) = delete;
     ~hkbDampingModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

@@ -10,15 +10,17 @@ public:
     hkbExpressionCondition& operator=(const hkbExpressionCondition&) = delete;
     hkbExpressionCondition(const hkbExpressionCondition &) = delete;
     ~hkbExpressionCondition();
-    static const QString getClassname();
-    QString getExpression() const;
-    void setExpression(const QString &value);
+public:
     bool operator ==(const hkbExpressionCondition & other){
         if (expression != other.expression){
             return false;
         }
         return true;
     }
+public:
+    static const QString getClassname();
+    QString getExpression() const;
+    void setExpression(const QString &value);
 private:
     bool readData(const HkxXmlReader & reader, long & index);
     QString evaluateDataValidity();

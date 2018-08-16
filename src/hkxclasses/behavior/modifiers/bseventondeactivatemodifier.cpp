@@ -31,7 +31,7 @@ bool BSEventOnDeactivateModifier::readData(const HkxXmlReader &reader, long & in
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };
@@ -174,7 +174,7 @@ bool BSEventOnDeactivateModifier::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(event.payload.getShdPtrReference());
+    auto ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(event.payload.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_STRING_EVENT_PAYLOAD){
             LogFile::writeToLog(getParentFilename()+": "+getClassname()+": linkVar()!\nThe linked object 'payload' is not a HKB_STRING_EVENT_PAYLOAD!");
@@ -199,7 +199,7 @@ QString BSEventOnDeactivateModifier::evaluateDataValidity(){
         isvalid = false;
         errors.append(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": "+message+"!");
     };
-    QString temp = HkDynamicObject::evaluateDataValidity();
+    auto temp = HkDynamicObject::evaluateDataValidity();
     (temp != "") ? errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!\n"): NULL;
     (name == "") ? setinvalid("Invalid name") : NULL;
     if (event.id >= static_cast<BehaviorFile *>(getParentFile())->getNumberOfEvents()){

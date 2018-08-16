@@ -11,10 +11,17 @@ public:
     BSiStateTaggingGenerator& operator=(const BSiStateTaggingGenerator&) = delete;
     BSiStateTaggingGenerator(const BSiStateTaggingGenerator &) = delete;
     ~BSiStateTaggingGenerator();
+public:
     QVector <DataIconManager *> getChildren() const;
     static const QString getClassname();
     QString getName() const;
 private:
+    void setName(const QString &newname);
+    void setIStateToSetAs(int value);
+    void setIPriority(int value);
+    QString getDefaultGeneratorName() const;
+    int getIStateToSetAs() const;
+    int getIPriority() const;
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

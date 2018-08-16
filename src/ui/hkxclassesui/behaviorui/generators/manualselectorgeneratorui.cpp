@@ -118,7 +118,7 @@ void ManualSelectorGeneratorUI::loadData(HkxObject *data){
     if (data){
         if (data->getSignature() == HKB_MANUAL_SELECTOR_GENERATOR){
             bsData = static_cast<hkbManualSelectorGenerator *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             selectedGeneratorIndex->setValue(bsData->selectedGeneratorIndex);
             currentGeneratorIndex->setValue(bsData->currentGeneratorIndex);
             varBind = bsData->getVariableBindingSetData();
@@ -349,8 +349,8 @@ void ManualSelectorGeneratorUI::selectTableToView(bool viewproperties, const QSt
 
 void ManualSelectorGeneratorUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));

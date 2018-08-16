@@ -236,7 +236,7 @@ void FootIkControlsModifierUI::loadData(HkxObject *data){
         if (data->getSignature() == HKB_FOOT_IK_CONTROLS_MODIFIER){
             hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbFootIkControlsModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             onOffGain->setValue(bsData->gains.onOffGain);
             groundAscendingGain->setValue(bsData->gains.groundAscendingGain);
@@ -478,10 +478,10 @@ void FootIkControlsModifierUI::returnToWidget(){
 
 void FootIkControlsModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            emit modifierNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
+            emit modifierNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
             bsData->setIsFileChanged(true);
         }
     }else{

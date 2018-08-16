@@ -58,6 +58,57 @@ bool BSOffsetAnimationGenerator::removeObjectAt(int index){
     return true;
 }
 
+void BSOffsetAnimationGenerator::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
+qreal BSOffsetAnimationGenerator::getFOffsetRangeEnd() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return fOffsetRangeEnd;
+}
+
+void BSOffsetAnimationGenerator::setFOffsetRangeEnd(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != fOffsetRangeEnd) ? fOffsetRangeEnd = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'fOffsetRangeEnd' was not set!");
+}
+
+qreal BSOffsetAnimationGenerator::getFOffsetRangeStart() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return fOffsetRangeStart;
+}
+
+void BSOffsetAnimationGenerator::setFOffsetRangeStart(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != fOffsetRangeStart) ? fOffsetRangeStart = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'fOffsetRangeStart' was not set!");
+}
+
+qreal BSOffsetAnimationGenerator::getFOffsetVariable() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return fOffsetVariable;
+}
+
+void BSOffsetAnimationGenerator::setFOffsetVariable(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != fOffsetVariable) ? fOffsetVariable = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'fOffsetVariable' was not set!");
+}
+
+QString BSOffsetAnimationGenerator::getDefaultGeneratorName() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QString genname("NONE");
+    hkbGenerator *gen = static_cast<hkbGenerator *>(pDefaultGenerator.data());
+    (gen) ? genname = gen->getName() : NULL;
+    return genname;
+}
+
+QString BSOffsetAnimationGenerator::getOffsetClipGeneratorName() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QString genname("NONE");
+    hkbGenerator *gen = static_cast<hkbGenerator *>(pOffsetClipGenerator.data());
+    (gen) ? genname = gen->getName() : NULL;
+    return genname;
+}
+
 bool BSOffsetAnimationGenerator::hasChildren() const{
     std::lock_guard <std::mutex> guard(mutex);
     if (pDefaultGenerator.data() || pOffsetClipGenerator.data()){
@@ -92,7 +143,7 @@ bool BSOffsetAnimationGenerator::readData(const HkxXmlReader &reader, long & ind
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };

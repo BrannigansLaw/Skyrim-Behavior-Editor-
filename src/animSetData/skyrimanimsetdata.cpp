@@ -2,11 +2,6 @@
 #include "src/utility.h"
 #include <QTextStream>
 
-SkyrimAnimSetData::SkyrimAnimSetData()
-{
-    //
-}
-
 SkyrimAnimSetData::~SkyrimAnimSetData(){
     for (auto i = 0; i < projects.size(); i++){
         if (projects.at(i)){
@@ -20,38 +15,37 @@ bool SkyrimAnimSetData::parse(QFile *file){
         return false;
     }
     QByteArray line;
-    bool ok = false;
-    uint size = 0;
-    //Get project names...
-    while (!file->atEnd()){
+    auto ok = false;
+    auto size = 0U;
+    while (!file->atEnd()){ //Get project names...
         line = file->readLine();
         line.chop(1);
         size = line.toUInt(&ok);
         if (ok){
-            for (uint i = 0; i < size; i++){
+            for (auto i = 0U; i < size; i++){
                 if (!file->atEnd()){
                     line = file->readLine();
                     line.chop(1);
                     if (line.contains(".txt")){
                         projectNames.append(line);
                     }else{
-                        CRITICAL_ERROR_MESSAGE("SkyrimAnimSetData::parse(): Corrupted project filename does not have 'txt' extension!");
+                        LogFile::writeToLog("SkyrimAnimSetData::parse(): Corrupted project filename does not have 'txt' extension!");
                         return false;
                     }
                 }else{
-                    CRITICAL_ERROR_MESSAGE("SkyrimAnimSetData::parse(): Unexpected EOF!");
+                    LogFile::writeToLog("SkyrimAnimSetData::parse(): Unexpected EOF!");
                     return false;
                 }
             }
             for (auto i = 0; i < projectNames.size(); i++){
                 projects.append(new AnimCacheProjectData());
                 if (!projects.last()->read(file)){
-                    CRITICAL_ERROR_MESSAGE("SkyrimAnimSetData::parse(): ProjectAnimSetData read failed!");
+                    LogFile::writeToLog("SkyrimAnimSetData::parse(): ProjectAnimSetData read failed!");
                     return false;
                 }
             }
         }else{
-            CRITICAL_ERROR_MESSAGE("SkyrimAnimSetData::parse(): Corrupted length of current block!");
+            LogFile::writeToLog("SkyrimAnimSetData::parse(): Corrupted length of current block!");
             return false;
         }
     }
@@ -88,8 +82,8 @@ bool SkyrimAnimSetData::addNewProject(const QString &projectname){
 }
 
 bool SkyrimAnimSetData::addAnimationToCache(const QString &projectname, const QString & eventname, const QVector<AnimCacheAnimationInfo *> &animations, const QVector<AnimCacheVariable *> &vars, const QVector<AnimCacheClipInfo *> &clips){
-    int count = 0;
-    int index = projectNames.indexOf(projectname);
+    auto count = 0;
+    auto index = projectNames.indexOf(projectname);
     if (index < 0 || index >= projects.size()){
         return false;
     }
@@ -108,7 +102,7 @@ bool SkyrimAnimSetData::addAnimationToCache(const QString &projectname, const QS
 }
 
 bool SkyrimAnimSetData::removeAnimationFromCache(const QString & projectname, const QString &animationname, const QString &variablename, const QString &clipname){
-    int index = projectNames.indexOf(projectname);
+    auto index = projectNames.indexOf(projectname);
     if (index < 0 || index >= projects.size()){
         return false;
     }
@@ -124,7 +118,7 @@ AnimCacheProjectData *SkyrimAnimSetData::getProjectCacheData(const QString & nam
             return projects.at(i);
         }
     }
-    CRITICAL_ERROR_MESSAGE("SkyrimAnimSetData::getProjectCacheData(): getProjectCacheData() failed!");
+    LogFile::writeToLog("SkyrimAnimSetData::getProjectCacheData(): getProjectCacheData() failed!");
     return nullptr;
 }
 
@@ -152,16 +146,6 @@ bool SkyrimAnimSetData::mergeAnimationCaches(const QString &projectname, const Q
 bool SkyrimAnimSetData::isEmpty() const{
     if (projectNames.isEmpty()){
         return true;
-    }else{
-        return false;
-    }
-}
-/*bool SkyrimAnimSetData::extractProject(const QString &projectname){
-    int index = 0;
-    for (; index < projectNames.size(); index++){
-        if (projectNames.at(index) == projectname){
-            return projects.at(index).write(projectname);
-        }
     }
     return false;
-}*/
+}

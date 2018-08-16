@@ -12,6 +12,7 @@ public:
     hkbHandIkDriverInfo& operator=(const hkbHandIkDriverInfo&) = delete;
     hkbHandIkDriverInfo(const hkbHandIkDriverInfo &) = delete;
     ~hkbHandIkDriverInfo();
+public:
     static const QString getClassname();
 private:
     bool readData(const HkxXmlReader & reader, long & index);

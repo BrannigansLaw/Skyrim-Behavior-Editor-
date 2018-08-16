@@ -18,6 +18,7 @@ public:
     BehaviorReferenceGeneratorUI& operator=(const BehaviorReferenceGeneratorUI&) = delete;
     BehaviorReferenceGeneratorUI(const BehaviorReferenceGeneratorUI &) = delete;
     ~BehaviorReferenceGeneratorUI() = default;
+public:
     void loadData(HkxObject *data);
 signals:
     void generatorNameChanged(const QString & newName, int index);

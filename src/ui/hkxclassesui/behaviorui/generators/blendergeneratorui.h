@@ -30,6 +30,7 @@ public:
     BlenderGeneratorUI& operator=(const BlenderGeneratorUI&) = delete;
     BlenderGeneratorUI(const BlenderGeneratorUI &) = delete;
     ~BlenderGeneratorUI() = default;
+public:
     void loadData(HkxObject *data);
     void setBehaviorView(BehaviorGraphView *view);
     void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
@@ -66,8 +67,6 @@ private:
     void selectTableToView(bool viewproperties, const QString & path);
     void loadDynamicTableRows();
     void setBindingVariable(int index, const QString & name);
-    void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString & path);
     void setFlag(CheckBox *flagcheckbox, hkbBlenderGenerator::BlenderFlag flagtoset);
 private:
     enum ACTIVE_WIDGET {

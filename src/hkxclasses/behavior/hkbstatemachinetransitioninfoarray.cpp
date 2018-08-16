@@ -132,7 +132,7 @@ bool hkbStateMachineTransitionInfoArray::readData(const HkxXmlReader &reader, lo
     int numtrans = 0;
     QStringList list;
     Interval_Type intervalType;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };

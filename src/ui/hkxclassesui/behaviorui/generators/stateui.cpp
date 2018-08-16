@@ -162,7 +162,7 @@ void StateUI::loadData(HkxObject *data, int stateindex){
     if (data && data->getSignature() == HKB_STATE_MACHINE_STATE_INFO){
         bsData = static_cast<hkbStateMachineStateInfo *>(data);
         stateIndex = stateindex;
-        name->setText(bsData->name);
+        name->setText(bsData->getName());
         stateId->setValue(bsData->stateId);
         probability->setValue(bsData->probability);
         enable->setChecked(bsData->enable);
@@ -318,8 +318,8 @@ void StateUI::connectToTables(GenericTableWidget *generators, GenericTableWidget
 
 void StateUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             bsData->setIsFileChanged(true);
             emit stateNameChanged(name->text(), stateIndex);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
@@ -332,7 +332,7 @@ void StateUI::setName(){
 void StateUI::setStateId(int id){
     if (bsData){
         if (bsData->setStateId(id)){
-            emit stateIdChanged(stateIndex, bsData->stateId, bsData->name);
+            emit stateIdChanged(stateIndex, bsData->stateId, bsData->getName());
             bsData->setIsFileChanged(true);
         }else{
             WARNING_MESSAGE("StateUI::setStateId(): Another state has the selected state ID!!! The state ID for this state was not changed!!!");

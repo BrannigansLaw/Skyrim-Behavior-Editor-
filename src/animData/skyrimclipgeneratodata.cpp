@@ -1,17 +1,6 @@
 #include "skyrimclipgeneratodata.h"
 #include "projectanimdata.h"
-
-bool SkyrimClipGeneratoData::chopLine(QFile * file, QByteArray & line, ulong & linecount){
-    if (file){
-        if (!file->atEnd()){
-            line = file->readLine();
-            line.chop(1);
-            linecount++;
-            return true;
-        }
-    }
-    return false;
-}
+#include "src/utility.h"
 
 SkyrimClipGeneratoData::SkyrimClipGeneratoData(ProjectAnimData *par, const QString & name, uint ind, qreal speed, qreal startcrop, qreal endcrop, const QVector <SkyrimClipTrigger> & trigs)
     : parent(par), clipGeneratorName(name), animationIndex(ind), playbackSpeed(speed), cropStartTime(startcrop), cropEndTime(endcrop), triggers(trigs)
@@ -19,25 +8,15 @@ SkyrimClipGeneratoData::SkyrimClipGeneratoData(ProjectAnimData *par, const QStri
     //
 }
 
-SkyrimClipGeneratoData::SkyrimClipGeneratoData(const SkyrimClipGeneratoData & other){
-    parent = other.parent;
-    clipGeneratorName = other.clipGeneratorName;
-    animationIndex = other.animationIndex;
-    playbackSpeed = other.playbackSpeed;
-    cropStartTime = other.cropStartTime;
-    cropEndTime = other.cropEndTime;
-    triggers = other.triggers;
-}
-
 void SkyrimClipGeneratoData::addTrigger(const SkyrimClipTrigger & trig){
     triggers.append(trig);
-    parent->animationDataLines++;
+    //parent->animationDataLines++;
 }
 
 bool SkyrimClipGeneratoData::removeTrigger(int index){
     if (index >= 0 && index < triggers.size()){
         triggers.removeAt(index);
-        parent->animationDataLines--;
+        //parent->animationDataLines--;
         return true;
     }
     return false;
@@ -45,20 +24,6 @@ bool SkyrimClipGeneratoData::removeTrigger(int index){
 
 QString SkyrimClipGeneratoData::getClipGeneratorName() const{
     return clipGeneratorName;
-}
-
-QString SkyrimClipGeneratoData::trimFloat(QString & string) const{
-    for (auto i = string.size() - 1; i >= 0; i--){
-        if (string.at(i) == '0'){
-            string.remove(i, 1);
-        }else if (string.at(i) == '.'){
-            string.remove(i, 1);
-            break;
-        }else{
-            break;
-        }
-    }
-    return string;
 }
 
 void SkyrimClipGeneratoData::rearrangeTriggers(){

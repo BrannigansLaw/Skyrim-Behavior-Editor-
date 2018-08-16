@@ -11,6 +11,7 @@ public:
     BSInterpValueModifier& operator=(const BSInterpValueModifier&) = delete;
     BSInterpValueModifier(const BSInterpValueModifier &) = delete;
     ~BSInterpValueModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

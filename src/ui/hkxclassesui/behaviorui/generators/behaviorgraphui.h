@@ -20,6 +20,7 @@ public:
     BehaviorGraphUI& operator=(const BehaviorGraphUI&) = delete;
     BehaviorGraphUI(const BehaviorGraphUI &) = delete;
     ~BehaviorGraphUI() = default;
+public:
     void loadData(HkxObject *data);
     void connectToTables(GenericTableWidget *generators);
     void setBehaviorView(BehaviorGraphView *view);

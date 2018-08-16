@@ -14,7 +14,9 @@ public:
     hkbBlenderGeneratorChild& operator=(const hkbBlenderGeneratorChild&) = delete;
     hkbBlenderGeneratorChild(const hkbBlenderGeneratorChild &) = delete;
     ~hkbBlenderGeneratorChild();
+public:
     bool operator==(const hkbBlenderGeneratorChild & other);
+public:
     QString getName() const;
     int getThisIndex() const;
     static const QString getClassname();

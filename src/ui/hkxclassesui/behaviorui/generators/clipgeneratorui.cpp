@@ -44,7 +44,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList ClipGeneratorUI::headerLabels = {
+const QStringList ClipGeneratorUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -156,308 +156,183 @@ ClipGeneratorUI::ClipGeneratorUI()
     //Order here must correspond with the ACTIVE_WIDGET Enumerated type!!!
     addWidget(groupBox);
     addWidget(triggerUI);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void ClipGeneratorUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(cropStartAmountLocalTime, SIGNAL(editingFinished()), this, SLOT(setCropStartAmountLocalTime()), Qt::UniqueConnection);
-    connect(cropEndAmountLocalTime, SIGNAL(editingFinished()), this, SLOT(setCropEndAmountLocalTime()), Qt::UniqueConnection);
-    connect(startTime, SIGNAL(editingFinished()), this, SLOT(setStartTime()), Qt::UniqueConnection);
-    connect(playbackSpeed, SIGNAL(editingFinished()), this, SLOT(setPlaybackSpeed()), Qt::UniqueConnection);
-    connect(enforcedDuration, SIGNAL(editingFinished()), this, SLOT(setEnforcedDuration()), Qt::UniqueConnection);
-    connect(userControlledTimeFraction, SIGNAL(editingFinished()), this, SLOT(setUserControlledTimeFraction()), Qt::UniqueConnection);
-    connect(animationBindingIndex, SIGNAL(editingFinished()), this, SLOT(setAnimationBindingIndex()), Qt::UniqueConnection);
-    connect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)), Qt::UniqueConnection);
-    connect(flagContinueMotionAtEnd, SIGNAL(released()), this, SLOT(setFlagContinueMotionAtEnd()), Qt::UniqueConnection);
-    connect(flagSyncHalfCycleInPingPongMode, SIGNAL(released()), this, SLOT(setFlagSyncHalfCycleInPingPongMode()), Qt::UniqueConnection);
-    connect(flagMirror, SIGNAL(released()), this, SLOT(setFlagMirror()), Qt::UniqueConnection);
-    connect(flagForceDensePose, SIGNAL(released()), this, SLOT(setFlagForceDensePose()), Qt::UniqueConnection);
-    connect(flagDontConvertAnnotationsToTriggers, SIGNAL(released()), this, SLOT(setFlagDontConvertAnnotationsToTriggers()), Qt::UniqueConnection);
-    connect(flagIgnoreMotion, SIGNAL(released()), this, SLOT(setFlagIgnoreMotion()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-    connect(triggerUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
-    connect(triggerUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
-}
-
-void ClipGeneratorUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(cropStartAmountLocalTime, SIGNAL(editingFinished()), this, SLOT(setCropStartAmountLocalTime()));
-    disconnect(cropEndAmountLocalTime, SIGNAL(editingFinished()), this, SLOT(setCropEndAmountLocalTime()));
-    disconnect(startTime, SIGNAL(editingFinished()), this, SLOT(setStartTime()));
-    disconnect(playbackSpeed, SIGNAL(editingFinished()), this, SLOT(setPlaybackSpeed()));
-    disconnect(enforcedDuration, SIGNAL(editingFinished()), this, SLOT(setEnforcedDuration()));
-    disconnect(userControlledTimeFraction, SIGNAL(editingFinished()), this, SLOT(setUserControlledTimeFraction()));
-    disconnect(animationBindingIndex, SIGNAL(editingFinished()), this, SLOT(setAnimationBindingIndex()));
-    disconnect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)));
-    disconnect(flagContinueMotionAtEnd, SIGNAL(released()), this, SLOT(setFlagContinueMotionAtEnd()));
-    disconnect(flagSyncHalfCycleInPingPongMode, SIGNAL(released()), this, SLOT(setFlagSyncHalfCycleInPingPongMode()));
-    disconnect(flagMirror, SIGNAL(released()), this, SLOT(setFlagMirror()));
-    disconnect(flagForceDensePose, SIGNAL(released()), this, SLOT(setFlagForceDensePose()));
-    disconnect(flagDontConvertAnnotationsToTriggers, SIGNAL(released()), this, SLOT(setFlagDontConvertAnnotationsToTriggers()));
-    disconnect(flagIgnoreMotion, SIGNAL(released()), this, SLOT(setFlagIgnoreMotion()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
-    disconnect(triggerUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
-    disconnect(triggerUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+void ClipGeneratorUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(cropStartAmountLocalTime, SIGNAL(editingFinished()), this, SLOT(setCropStartAmountLocalTime()), Qt::UniqueConnection);
+        connect(cropEndAmountLocalTime, SIGNAL(editingFinished()), this, SLOT(setCropEndAmountLocalTime()), Qt::UniqueConnection);
+        connect(startTime, SIGNAL(editingFinished()), this, SLOT(setStartTime()), Qt::UniqueConnection);
+        connect(playbackSpeed, SIGNAL(editingFinished()), this, SLOT(setPlaybackSpeed()), Qt::UniqueConnection);
+        connect(enforcedDuration, SIGNAL(editingFinished()), this, SLOT(setEnforcedDuration()), Qt::UniqueConnection);
+        connect(userControlledTimeFraction, SIGNAL(editingFinished()), this, SLOT(setUserControlledTimeFraction()), Qt::UniqueConnection);
+        connect(animationBindingIndex, SIGNAL(editingFinished()), this, SLOT(setAnimationBindingIndex()), Qt::UniqueConnection);
+        connect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)), Qt::UniqueConnection);
+        connect(flagContinueMotionAtEnd, SIGNAL(released()), this, SLOT(setFlagContinueMotionAtEnd()), Qt::UniqueConnection);
+        connect(flagSyncHalfCycleInPingPongMode, SIGNAL(released()), this, SLOT(setFlagSyncHalfCycleInPingPongMode()), Qt::UniqueConnection);
+        connect(flagMirror, SIGNAL(released()), this, SLOT(setFlagMirror()), Qt::UniqueConnection);
+        connect(flagForceDensePose, SIGNAL(released()), this, SLOT(setFlagForceDensePose()), Qt::UniqueConnection);
+        connect(flagDontConvertAnnotationsToTriggers, SIGNAL(released()), this, SLOT(setFlagDontConvertAnnotationsToTriggers()), Qt::UniqueConnection);
+        connect(flagIgnoreMotion, SIGNAL(released()), this, SLOT(setFlagIgnoreMotion()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+        connect(triggerUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)), Qt::UniqueConnection);
+        connect(triggerUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(cropStartAmountLocalTime, SIGNAL(editingFinished()), this, SLOT(setCropStartAmountLocalTime()));
+        disconnect(cropEndAmountLocalTime, SIGNAL(editingFinished()), this, SLOT(setCropEndAmountLocalTime()));
+        disconnect(startTime, SIGNAL(editingFinished()), this, SLOT(setStartTime()));
+        disconnect(playbackSpeed, SIGNAL(editingFinished()), this, SLOT(setPlaybackSpeed()));
+        disconnect(enforcedDuration, SIGNAL(editingFinished()), this, SLOT(setEnforcedDuration()));
+        disconnect(userControlledTimeFraction, SIGNAL(editingFinished()), this, SLOT(setUserControlledTimeFraction()));
+        disconnect(animationBindingIndex, SIGNAL(editingFinished()), this, SLOT(setAnimationBindingIndex()));
+        disconnect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(setMode(int)));
+        disconnect(flagContinueMotionAtEnd, SIGNAL(released()), this, SLOT(setFlagContinueMotionAtEnd()));
+        disconnect(flagSyncHalfCycleInPingPongMode, SIGNAL(released()), this, SLOT(setFlagSyncHalfCycleInPingPongMode()));
+        disconnect(flagMirror, SIGNAL(released()), this, SLOT(setFlagMirror()));
+        disconnect(flagForceDensePose, SIGNAL(released()), this, SLOT(setFlagForceDensePose()));
+        disconnect(flagDontConvertAnnotationsToTriggers, SIGNAL(released()), this, SLOT(setFlagDontConvertAnnotationsToTriggers()));
+        disconnect(flagIgnoreMotion, SIGNAL(released()), this, SLOT(setFlagIgnoreMotion()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+        disconnect(triggerUI, SIGNAL(viewEvents(int,QString,QStringList)), this, SIGNAL(viewEvents(int,QString,QStringList)));
+        disconnect(triggerUI, SIGNAL(returnToParent()), this, SLOT(returnToWidget()));
+    }
 }
 
 void ClipGeneratorUI::addTrigger(){
-    hkbClipTriggerArray *triggers = nullptr;
     if (bsData){
-        triggers = static_cast<hkbClipTriggerArray *>(bsData->triggers.data());
+        auto triggers = bsData->getTriggers();
         if (!triggers){
             triggers = new hkbClipTriggerArray(bsData->getParentFile(), -1);
             bsData->triggers = HkxSharedPtr(triggers);
         }
         triggers->addTrigger();
-        triggers->triggers.last().event.id = 0;
-        //static_cast<BehaviorFile *>(bsData->getParentFile())->appendClipTriggerToAnimData(bsData->name);
-        bsData->setIsFileChanged(true);
+        //triggers->triggers.last().event.id = 0;
+        //static_cast<BehaviorFile *>(bsData->getParentFile())->appendClipTriggerToAnimData(bsData->getName());
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::addTrigger(): The data is nullptr!!");
+        LogFile::writeToLog("ClipGeneratorUI::addTrigger(): The data is nullptr!!");
     }
 }
 
 void ClipGeneratorUI::removeTrigger(int index){
     hkbClipTriggerArray *triggers = nullptr;
     if (bsData){
-        triggers = static_cast<hkbClipTriggerArray *>(bsData->triggers.data());
+        triggers = bsData->getTriggers();
         if (triggers){
             if (index < triggers->triggers.size() && index >= 0){
                 triggers->removeTrigger(index);
-                //static_cast<BehaviorFile *>(bsData->getParentFile())->removeClipTriggerToAnimDataAt(bsData->name, index);
+                //static_cast<BehaviorFile *>(bsData->getParentFile())->removeClipTriggerToAnimDataAt(bsData->getName(), index);
+                if (!triggers->getNumberOfTriggers()){
+                    bsData->setTriggers(nullptr);
+                    static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
+                }
+                loadDynamicTableRows();
             }else{
                 WARNING_MESSAGE("ClipGeneratorUI::removeTrigger(): Invalid row index selected!!");
-                return;
             }
-            bsData->setIsFileChanged(true);
-            if (triggers->triggers.isEmpty()){
-                bsData->triggers = HkxSharedPtr();
-                static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();
-            }
-            loadDynamicTableRows();
         }else{
-            WARNING_MESSAGE("ClipGeneratorUI::removeTrigger(): Event data is nullptr!!");
-            return;
+            LogFile::writeToLog("ClipGeneratorUI::removeTrigger(): Event data is nullptr!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::removeTrigger(): The data is nullptr!!");
+        LogFile::writeToLog("ClipGeneratorUI::removeTrigger(): The data is nullptr!!");
     }
 }
 
 void ClipGeneratorUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     setCurrentIndex(MAIN_WIDGET);
-    hkbVariableBindingSet *varBind = nullptr;
     if (data){
         if (data->getSignature() == HKB_CLIP_GENERATOR){
             bsData = static_cast<hkbClipGenerator *>(data);
-            name->setText(bsData->name);
-            table->item(ANIMATION_NAME_ROW, VALUE_COLUMN)->setText(bsData->animationName);
-            cropStartAmountLocalTime->setValue(bsData->cropStartAmountLocalTime);
-            cropEndAmountLocalTime->setValue(bsData->cropEndAmountLocalTime);
-            startTime->setValue(bsData->startTime);
-            playbackSpeed->setValue(bsData->playbackSpeed);
-            enforcedDuration->setValue(bsData->enforcedDuration);
-            userControlledTimeFraction->setValue(bsData->userControlledTimeFraction);
-            animationBindingIndex->setValue(bsData->animationBindingIndex);
-            enforcedDuration->setValue(bsData->enforcedDuration);
-            bool ok = true;
+            name->setText(bsData->getName());
+            table->item(ANIMATION_NAME_ROW, VALUE_COLUMN)->setText(bsData->getAnimationName());
+            cropStartAmountLocalTime->setValue(bsData->getCropStartAmountLocalTime());
+            cropEndAmountLocalTime->setValue(bsData->getCropEndAmountLocalTime());
+            startTime->setValue(bsData->getStartTime());
+            playbackSpeed->setValue(bsData->getPlaybackSpeed());
+            enforcedDuration->setValue(bsData->getEnforcedDuration());
+            userControlledTimeFraction->setValue(bsData->getUserControlledTimeFraction());
+            animationBindingIndex->setValue(bsData->getAnimationBindingIndex());
+            enforcedDuration->setValue(bsData->getEnforcedDuration());
+            auto ok = true;
             hkbClipGenerator::ClipFlags flags(bsData->flags.toInt(&ok));
+            auto testflag = [&](CheckBox * checkbox, hkbClipGenerator::ClipFlag flagtotest){
+                (flags.testFlag(flagtotest)) ? checkbox->setChecked(true) : checkbox->setChecked(false);
+            };
             if (ok){
-                if (flags.testFlag(hkbClipGenerator::FLAG_CONTINUE_MOTION_AT_END)){
-                    flagContinueMotionAtEnd->setChecked(true);
-                }else{
-                    flagContinueMotionAtEnd->setChecked(false);
-                }
-                if (flags.testFlag(hkbClipGenerator::FLAG_SYNC_HALF_CYCLE_IN_PING_PONG_MODE)){
-                    flagSyncHalfCycleInPingPongMode->setChecked(true);
-                }else{
-                    flagSyncHalfCycleInPingPongMode->setChecked(false);
-                }
-                if (flags.testFlag(hkbClipGenerator::FLAG_MIRROR)){
-                    flagMirror->setChecked(true);
-                }else{
-                    flagMirror->setChecked(false);
-                }
-                if (flags.testFlag(hkbClipGenerator::FLAG_FORCE_DENSE_POSE)){
-                    flagForceDensePose->setChecked(true);
-                }else{
-                    flagForceDensePose->setChecked(false);
-                }
-                if (flags.testFlag(hkbClipGenerator::FLAG_DONT_CONVERT_ANNOTATIONS_TO_TRIGGERS)){
-                    flagDontConvertAnnotationsToTriggers->setChecked(true);
-                }else{
-                    flagDontConvertAnnotationsToTriggers->setChecked(false);
-                }
-                if (flags.testFlag(hkbClipGenerator::FLAG_IGNORE_MOTION)){
-                    flagIgnoreMotion->setChecked(true);
-                }else{
-                    flagIgnoreMotion->setChecked(false);
-                }
-                if (mode->count() == 0){
-                    mode->insertItems(0, bsData->PlaybackMode);
-                }
-                mode->setCurrentIndex(bsData->PlaybackMode.indexOf(bsData->mode));
-                varBind = bsData->getVariableBindingSetData();
-                if (varBind){
-                    loadBinding(CROP_START_AMOUNT_LOCAL_TIME_ROW, BINDING_COLUMN, varBind, "cropStartAmountLocalTime");
-                    loadBinding(CROP_END_AMOUNT_LOCAL_TIME_ROW, BINDING_COLUMN, varBind, "cropEndAmountLocalTime");
-                    loadBinding(START_TIME_ROW, BINDING_COLUMN, varBind, "startTime");
-                    loadBinding(PLAYBACK_SPEED_ROW, BINDING_COLUMN, varBind, "playbackSpeed");
-                    loadBinding(ENFORCED_DURATION_ROW, BINDING_COLUMN, varBind, "enforcedDuration");
-                    loadBinding(USER_CONTROLLED_TIME_FRACTION_ROW, BINDING_COLUMN, varBind, "userControlledTimeFraction");
-                    loadBinding(ANIMATION_BINDING_INDEX_ROW, BINDING_COLUMN, varBind, "animationBindingIndex");
-                }else{
-                    table->item(CROP_START_AMOUNT_LOCAL_TIME_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(CROP_END_AMOUNT_LOCAL_TIME_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(START_TIME_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(PLAYBACK_SPEED_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(ENFORCED_DURATION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(USER_CONTROLLED_TIME_FRACTION_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(ANIMATION_BINDING_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                }
-                loadDynamicTableRows();
+                testflag(flagContinueMotionAtEnd, hkbClipGenerator::FLAG_CONTINUE_MOTION_AT_END);
+                testflag(flagSyncHalfCycleInPingPongMode, hkbClipGenerator::FLAG_SYNC_HALF_CYCLE_IN_PING_PONG_MODE);
+                testflag(flagMirror, hkbClipGenerator::FLAG_MIRROR);
+                testflag(flagForceDensePose, hkbClipGenerator::FLAG_FORCE_DENSE_POSE);
+                testflag(flagDontConvertAnnotationsToTriggers, hkbClipGenerator::FLAG_DONT_CONVERT_ANNOTATIONS_TO_TRIGGERS);
+                testflag(flagIgnoreMotion, hkbClipGenerator::FLAG_IGNORE_MOTION);
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("ClipGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+                LogFile::writeToLog(QString("ClipGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
             }
+            (mode->count() == 0) ? mode->insertItems(0, bsData->PlaybackMode) : NULL;
+            mode->setCurrentIndex(bsData->PlaybackMode.indexOf(bsData->mode));
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(CROP_START_AMOUNT_LOCAL_TIME_ROW, BINDING_COLUMN, varBind, "cropStartAmountLocalTime", table, bsData);
+            UIHelper::loadBinding(CROP_END_AMOUNT_LOCAL_TIME_ROW, BINDING_COLUMN, varBind, "cropEndAmountLocalTime", table, bsData);
+            UIHelper::loadBinding(START_TIME_ROW, BINDING_COLUMN, varBind, "startTime", table, bsData);
+            UIHelper::loadBinding(PLAYBACK_SPEED_ROW, BINDING_COLUMN, varBind, "playbackSpeed", table, bsData);
+            UIHelper::loadBinding(ENFORCED_DURATION_ROW, BINDING_COLUMN, varBind, "enforcedDuration", table, bsData);
+            UIHelper::loadBinding(USER_CONTROLLED_TIME_FRACTION_ROW, BINDING_COLUMN, varBind, "userControlledTimeFraction", table, bsData);
+            UIHelper::loadBinding(ANIMATION_BINDING_INDEX_ROW, BINDING_COLUMN, varBind, "animationBindingIndex", table, bsData);
+            loadDynamicTableRows();
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("ClipGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            LogFile::writeToLog(QString("ClipGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::loadData(): Attempting to load a null pointer!!");
+        LogFile::writeToLog("ClipGeneratorUI::loadData(): Attempting to load a null pointer!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
 void ClipGeneratorUI::loadDynamicTableRows(){
-    //table->setSortingEnabled(false);//Not sure...
     if (bsData){
-        int temp = ADD_TRIGGER_ROW + bsData->getNumberOfTriggers() + 1;
-        if (table->rowCount() != temp){
-            table->setRowCount(temp);
-        }
-        hkbClipTriggerArray *triggers = static_cast<hkbClipTriggerArray *>(bsData->triggers.data());
+        auto temp = ADD_TRIGGER_ROW + bsData->getNumberOfTriggers() + 1;
+        (table->rowCount() != temp) ? table->setRowCount(temp) : NULL;
+        auto triggers = static_cast<hkbClipTriggerArray *>(bsData->triggers.data());
         if (triggers){
             for (auto i = ADD_TRIGGER_ROW + 1, j = 0; j < bsData->getNumberOfTriggers(); i++, j++){
-                setRowItems(i, static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(triggers->triggers.at(j).event.id), triggers->getClassname(), "Remove", "Edit", "Double click to remove this trigger", "Double click to edit this trigger");
+                UIHelper::setRowItems(i, static_cast<BehaviorFile *>(bsData->getParentFile())->getEventNameAt(triggers->triggers.at(j).event.id), triggers->getClassname(), "Remove", "Edit", "Double click to remove this trigger", "Double click to edit this trigger", table);
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::loadDynamicTableRows(): The data is nullptr!!");
+        LogFile::writeToLog("ClipGeneratorUI::loadDynamicTableRows(): The data is nullptr!!");
     }
-    //table->setSortingEnabled(true);
-}
-
-void ClipGeneratorUI::setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2){
-    if (table->item(row, NAME_COLUMN)){
-        table->item(row, NAME_COLUMN)->setText(name);
-    }else{
-        table->setItem(row, NAME_COLUMN, new TableWidgetItem(name));
-    }
-    if (table->item(row, TYPE_COLUMN)){
-        table->item(row, TYPE_COLUMN)->setText(classname);
-    }else{
-        table->setItem(row, TYPE_COLUMN, new TableWidgetItem(classname, Qt::AlignCenter));
-    }
-    if (table->item(row, BINDING_COLUMN)){
-        table->item(row, BINDING_COLUMN)->setText(bind);
-    }else{
-        table->setItem(row, BINDING_COLUMN, new TableWidgetItem(bind, Qt::AlignCenter, QColor(Qt::red), QBrush(Qt::black), tip1));
-    }
-    if (table->item(row, VALUE_COLUMN)){
-        table->item(row, VALUE_COLUMN)->setText(value);
-    }else{
-        table->setItem(row, VALUE_COLUMN, new TableWidgetItem(value, Qt::AlignCenter, QColor(Qt::lightGray), QBrush(Qt::black), tip2));
-    }
-}
-
-bool ClipGeneratorUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY)){
-                    CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }else{
-                if (!varBind->addBinding(path, index - 1, hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE)){
-                    CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setBinding(): The attempt to add a binding to this object's hkbVariableBindingSet failed!!");
-                }
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\n\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setBinding(): The data is nullptr!!");
-    }
-    return true;
 }
 
 void ClipGeneratorUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto isProperty = false;
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : NULL;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case CROP_START_AMOUNT_LOCAL_TIME_ROW:
-            if (table->item(CROP_START_AMOUNT_LOCAL_TIME_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "cropStartAmountLocalTime", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(CROP_START_AMOUNT_LOCAL_TIME_ROW, "cropStartAmountLocalTime", VARIABLE_TYPE_REAL); break;
         case CROP_END_AMOUNT_LOCAL_TIME_ROW:
-            if (table->item(CROP_END_AMOUNT_LOCAL_TIME_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "cropEndAmountLocalTime", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(CROP_END_AMOUNT_LOCAL_TIME_ROW, "cropEndAmountLocalTime", VARIABLE_TYPE_REAL); break;
         case START_TIME_ROW:
-            if (table->item(START_TIME_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "startTime", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(START_TIME_ROW, "startTime", VARIABLE_TYPE_REAL); break;
         case PLAYBACK_SPEED_ROW:
-            if (table->item(PLAYBACK_SPEED_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "playbackSpeed", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(PLAYBACK_SPEED_ROW, "playbackSpeed", VARIABLE_TYPE_REAL); break;
         case ENFORCED_DURATION_ROW:
-            if (table->item(ENFORCED_DURATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "enforcedDuration", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(ENFORCED_DURATION_ROW, "enforcedDuration", VARIABLE_TYPE_REAL); break;
         case USER_CONTROLLED_TIME_FRACTION_ROW:
-            if (table->item(USER_CONTROLLED_TIME_FRACTION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "userControlledTimeFraction", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(USER_CONTROLLED_TIME_FRACTION_ROW, "userControlledTimeFraction", VARIABLE_TYPE_REAL); break;
         case ANIMATION_BINDING_INDEX_ROW:
-            if (table->item(ANIMATION_BINDING_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "animationBindingIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
-        default:
-            return;
+            checkisproperty(ANIMATION_BINDING_INDEX_ROW, "animationBindingIndex", VARIABLE_TYPE_INT32); break;
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setBindingVariable(): The data is nullptr!!");
+        LogFile::writeToLog("ClipGeneratorUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
@@ -466,307 +341,142 @@ void ClipGeneratorUI::returnToWidget(){
     setCurrentIndex(MAIN_WIDGET);
 }
 
-void ClipGeneratorUI::setName(){
+void ClipGeneratorUI::setName(const QString & newname){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->setName(bsData->name, name->text());
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-            bsData->setIsFileChanged(true);
-            /*if (static_cast<BehaviorFile *>(bsData->getParentFile())->isClipGenNameAvailable(name->text())){
-                bsData->setName(bsData->name, name->text());
-                static_cast<DataIconManager*>((bsData))->updateIconNames();
-                emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-                bsData->setIsFileChanged(true);
-            }else{
-                disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-                name->setText(bsData->name);
-                connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-                WARNING_MESSAGE("ClipGeneratorUI::setName(): This clip generator name is already is use elsewhere in the project!!");
-            }*/
-        }
+        bsData->setName(bsData->getName(), newname);
+        bsData->updateIconNames();
+        emit generatorNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
+        /*if (static_cast<BehaviorFile *>(bsData->getParentFile())->isClipGenNameAvailable(name->text())){
+            bsData->setName(bsData->getName(), name->text());
+            bsData->updateIconNames();
+            emit generatorNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
+        }else{
+            disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
+            name->setText(bsData->getName());
+            connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
+            WARNING_MESSAGE("ClipGeneratorUI::setName(): This clip generator name is already is use elsewhere in the project!!");
+        }*/
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("ClipGeneratorUI::setName(): The data is nullptr!!");
     }
 }
 
 void ClipGeneratorUI::setAnimationName(int index, const QString &name){
     if (bsData){
-        if (bsData->animationName != name){
-            bsData->setAnimationName(index, name);
-            table->item(ANIMATION_NAME_ROW, VALUE_COLUMN)->setText(name);
-            bsData->setIsFileChanged(true);
-        }
+        bsData->setAnimationName(index, name);
+        auto item = table->item(ANIMATION_NAME_ROW, VALUE_COLUMN);
+        (item) ? item->setText(name) : LogFile::writeToLog("ClipGeneratorUI::setAnimationName(): The table item at 'ANIMATION_NAME_ROW' is nullptr!!");
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setAnimationName(): The data is nullptr!!");
+        LogFile::writeToLog("ClipGeneratorUI::setAnimationName(): The data is nullptr!!");
     }
 }
 
 void ClipGeneratorUI::setCropStartAmountLocalTime(){
-    if (bsData){
-        if (bsData->cropStartAmountLocalTime != cropStartAmountLocalTime->value()){
-            bsData->setCropStartAmountLocalTime(cropStartAmountLocalTime->value());
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setCropStartAmountLocalTime(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setCropStartAmountLocalTime(cropStartAmountLocalTime->value()) : LogFile::writeToLog("ClipGeneratorUI::setCropStartAmountLocalTime(): The data is nullptr!!");
 }
 
 void ClipGeneratorUI::setCropEndAmountLocalTime(){
-    if (bsData){
-        if (bsData->cropEndAmountLocalTime != cropEndAmountLocalTime->value()){
-            bsData->setCropEndAmountLocalTime(cropEndAmountLocalTime->value());
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setCropEndAmountLocalTime(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setCropEndAmountLocalTime(cropEndAmountLocalTime->value()) : LogFile::writeToLog("ClipGeneratorUI::setCropEndAmountLocalTime(): The data is nullptr!!");
 }
 
 void ClipGeneratorUI::setStartTime(){
-    if (bsData){
-        if (bsData->startTime != startTime->value()){
-            bsData->startTime = startTime->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setStartTime(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setStartTime(startTime->value()) : LogFile::writeToLog("ClipGeneratorUI::setStartTime(): The data is nullptr!!");
 }
 
 void ClipGeneratorUI::setPlaybackSpeed(){
-    if (bsData){
-        if (bsData->playbackSpeed != playbackSpeed->value()){
-            bsData->setPlaybackSpeed(playbackSpeed->value());
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setPlaybackSpeed(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setPlaybackSpeed(playbackSpeed->value()) : LogFile::writeToLog("ClipGeneratorUI::setPlaybackSpeed(): The data is nullptr!!");
 }
 
 void ClipGeneratorUI::setEnforcedDuration(){
-    if (bsData){
-        if (bsData->enforcedDuration != enforcedDuration->value()){
-            bsData->enforcedDuration = enforcedDuration->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setEnforcedDuration(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setEnforcedDuration(enforcedDuration->value()) : LogFile::writeToLog("ClipGeneratorUI::setEnforcedDuration(): The data is nullptr!!");
 }
 
 void ClipGeneratorUI::setUserControlledTimeFraction(){
-    if (bsData){
-        if (bsData->userControlledTimeFraction != userControlledTimeFraction->value()){
-            bsData->userControlledTimeFraction = userControlledTimeFraction->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setUserControlledTimeFraction(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setUserControlledTimeFraction(userControlledTimeFraction->value()) : LogFile::writeToLog("ClipGeneratorUI::setUserControlledTimeFraction(): The data is nullptr!!");
 }
 
 void ClipGeneratorUI::setAnimationBindingIndex(){
-    if (bsData){
-        if (bsData->animationBindingIndex != animationBindingIndex->value()){
-            bsData->animationBindingIndex = animationBindingIndex->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setAnimationBindingIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setAnimationBindingIndex(animationBindingIndex->value()) : LogFile::writeToLog("ClipGeneratorUI::setAnimationBindingIndex(): The data is nullptr!!");
 }
 
 void ClipGeneratorUI::setMode(int index){
+    (bsData) ? bsData->setMode(index) : LogFile::writeToLog("ClipGeneratorUI::setMode(): The data is nullptr!!");
+}
+
+void ClipGeneratorUI::setFlag(CheckBox *flagcheckbox, hkbClipGenerator::ClipFlag flagtoset){
     if (bsData){
-        if (bsData->mode != bsData->PlaybackMode.at(index)){
-            bsData->mode = bsData->PlaybackMode.at(index);
-            bsData->setIsFileChanged(true);
+        auto ok = true;
+        hkbClipGenerator::ClipFlags flags(bsData->getFlags().toInt(&ok));
+        if (ok){
+            (flagcheckbox->isChecked()) ? flags |= flagtoset : flags &= ~(flagtoset);
+            bsData->setFlags(QString::number(flags));
+        }else{
+            LogFile::writeToLog(QString("ClipGeneratorUI::setFlag(): The flags string is invalid!!!\nString: "+bsData->getFlags()).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setMode(): The data is nullptr!!");
+        LogFile::writeToLog("ClipGeneratorUI::setFlag(): The data is nullptr!!");
     }
 }
 
 void ClipGeneratorUI::setFlagContinueMotionAtEnd(){
-    if (bsData){
-        bool ok = true;
-        hkbClipGenerator::ClipFlags flags(bsData->flags.toInt(&ok));
-        if (ok){
-            if (flagContinueMotionAtEnd->isChecked()){
-                flags |= hkbClipGenerator::FLAG_CONTINUE_MOTION_AT_END;
-            }else{
-                flags &= ~(hkbClipGenerator::FLAG_CONTINUE_MOTION_AT_END);
-            }
-            bsData->flags = QString::number(flags);
-            bsData->setIsFileChanged(true);
-        }else{
-            CRITICAL_ERROR_MESSAGE(QString("ClipGeneratorUI::setFlagContinueMotionAtEnd(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setFlagContinueMotionAtEnd(): The data is nullptr!!");
-    }
+    setFlag(flagContinueMotionAtEnd, hkbClipGenerator::FLAG_CONTINUE_MOTION_AT_END);
 }
 
 void ClipGeneratorUI::setFlagSyncHalfCycleInPingPongMode(){
-    if (bsData){
-        bool ok = true;
-        hkbClipGenerator::ClipFlags flags(bsData->flags.toInt(&ok));
-        if (ok){
-            if (flagSyncHalfCycleInPingPongMode->isChecked()){
-                flags |= hkbClipGenerator::FLAG_SYNC_HALF_CYCLE_IN_PING_PONG_MODE;
-            }else{
-                flags &= ~(hkbClipGenerator::FLAG_SYNC_HALF_CYCLE_IN_PING_PONG_MODE);
-            }
-            bsData->flags = QString::number(flags);
-            bsData->setIsFileChanged(true);
-        }else{
-            CRITICAL_ERROR_MESSAGE(QString("ClipGeneratorUI::setFlagSyncHalfCycleInPingPongMode(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setFlagSyncHalfCycleInPingPongMode(): The data is nullptr!!");
-    }
+    setFlag(flagSyncHalfCycleInPingPongMode, hkbClipGenerator::FLAG_SYNC_HALF_CYCLE_IN_PING_PONG_MODE);
 }
 
 void ClipGeneratorUI::setFlagMirror(){
-    if (bsData){
-        bool ok = true;
-        hkbClipGenerator::ClipFlags flags(bsData->flags.toInt(&ok));
-        if (ok){
-            if (flagMirror->isChecked()){
-                flags |= hkbClipGenerator::FLAG_MIRROR;
-            }else{
-                flags &= ~(hkbClipGenerator::FLAG_MIRROR);
-            }
-            bsData->flags = QString::number(flags);
-            bsData->setIsFileChanged(true);
-        }else{
-            CRITICAL_ERROR_MESSAGE(QString("ClipGeneratorUI::setFlagMirror(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setFlagMirror(): The data is nullptr!!");
-    }
+    setFlag(flagMirror, hkbClipGenerator::FLAG_MIRROR);
 }
 
 void ClipGeneratorUI::setFlagForceDensePose(){
-    if (bsData){
-        bool ok = true;
-        hkbClipGenerator::ClipFlags flags(bsData->flags.toInt(&ok));
-        if (ok){
-            if (flagForceDensePose->isChecked()){
-                flags |= hkbClipGenerator::FLAG_FORCE_DENSE_POSE;
-            }else{
-                flags &= ~(hkbClipGenerator::FLAG_FORCE_DENSE_POSE);
-            }
-            bsData->flags = QString::number(flags);
-            bsData->setIsFileChanged(true);
-        }else{
-            CRITICAL_ERROR_MESSAGE(QString("ClipGeneratorUI::setFlagForceDensePose(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setFlagForceDensePose(): The data is nullptr!!");
-    }
+    setFlag(flagForceDensePose, hkbClipGenerator::FLAG_FORCE_DENSE_POSE);
 }
 
 void ClipGeneratorUI::setFlagDontConvertAnnotationsToTriggers(){
-    if (bsData){
-        bool ok = true;
-        hkbClipGenerator::ClipFlags flags(bsData->flags.toInt(&ok));
-        if (ok){
-            if (flagDontConvertAnnotationsToTriggers->isChecked()){
-                flags |= hkbClipGenerator::FLAG_DONT_CONVERT_ANNOTATIONS_TO_TRIGGERS;
-            }else{
-                flags &= ~(hkbClipGenerator::FLAG_DONT_CONVERT_ANNOTATIONS_TO_TRIGGERS);
-            }
-            bsData->flags = QString::number(flags);
-            bsData->setIsFileChanged(true);
-        }else{
-            CRITICAL_ERROR_MESSAGE(QString("ClipGeneratorUI::setFlagDontConvertAnnotationsToTriggers(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setFlagDontConvertAnnotationsToTriggers(): The data is nullptr!!");
-    }
+    setFlag(flagDontConvertAnnotationsToTriggers, hkbClipGenerator::FLAG_DONT_CONVERT_ANNOTATIONS_TO_TRIGGERS);
 }
 
 void ClipGeneratorUI::setFlagIgnoreMotion(){
-    if (bsData){
-        bool ok = true;
-        hkbClipGenerator::ClipFlags flags(bsData->flags.toInt(&ok));
-        if (ok){
-            if (flagIgnoreMotion->isChecked()){
-                flags |= hkbClipGenerator::FLAG_IGNORE_MOTION;
-            }else{
-                flags &= ~(hkbClipGenerator::FLAG_IGNORE_MOTION);
-            }
-            bsData->flags = QString::number(flags);
-            bsData->setIsFileChanged(true);
-        }else{
-            CRITICAL_ERROR_MESSAGE(QString("ClipGeneratorUI::setFlagIgnoreMotion(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::setFlagIgnoreMotion(): The data is nullptr!!");
-    }
+    setFlag(flagIgnoreMotion, hkbClipGenerator::FLAG_IGNORE_MOTION);
 }
 
 void ClipGeneratorUI::viewSelectedChild(int row, int column){
-    int result = -1;
-    bool properties = false;
+    auto checkisproperty = [&](int row, const QString & fieldname){
+        auto properties = false;
+        (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : NULL;
+        selectTableToView(properties, fieldname);
+    };
     if (bsData){
         if (row < ADD_TRIGGER_ROW && row >= 0){
             if (column == BINDING_COLUMN){
                 switch (row){
                 case CROP_START_AMOUNT_LOCAL_TIME_ROW:
-                    if (table->item(CROP_START_AMOUNT_LOCAL_TIME_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "cropStartAmountLocalTime");
-                    break;
+                    checkisproperty(CROP_START_AMOUNT_LOCAL_TIME_ROW, "cropStartAmountLocalTime"); break;
                 case CROP_END_AMOUNT_LOCAL_TIME_ROW:
-                    if (table->item(CROP_END_AMOUNT_LOCAL_TIME_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "cropEndAmountLocalTime");
-                    break;
+                    checkisproperty(CROP_END_AMOUNT_LOCAL_TIME_ROW, "cropEndAmountLocalTime"); break;
                 case START_TIME_ROW:
-                    if (table->item(START_TIME_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "startTime");
+                    checkisproperty(START_TIME_ROW, "startTime"); break;
                 case PLAYBACK_SPEED_ROW:
-                    if (table->item(PLAYBACK_SPEED_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "playbackSpeed");
-                    break;
+                    checkisproperty(PLAYBACK_SPEED_ROW, "playbackSpeed"); break;
                 case ENFORCED_DURATION_ROW:
-                    if (table->item(ENFORCED_DURATION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "enforcedDuration");
-                    break;
+                    checkisproperty(ENFORCED_DURATION_ROW, "enforcedDuration"); break;
                 case USER_CONTROLLED_TIME_FRACTION_ROW:
-                    if (table->item(USER_CONTROLLED_TIME_FRACTION_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "userControlledTimeFraction");
+                    checkisproperty(USER_CONTROLLED_TIME_FRACTION_ROW, "userControlledTimeFraction"); break;
                 case ANIMATION_BINDING_INDEX_ROW:
-                    if (table->item(ANIMATION_BINDING_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                        properties = true;
-                    }
-                    selectTableToView(properties, "animationBindingIndex");
+                    checkisproperty(ANIMATION_BINDING_INDEX_ROW, "animationBindingIndex"); break;
                 }
             }else if (row == ANIMATION_NAME_ROW && column == VALUE_COLUMN){
-                emit viewAnimations(bsData->animationName);
+                emit viewAnimations(bsData->getAnimationName());
             }
         }else if (row == ADD_TRIGGER_ROW && column == NAME_COLUMN){
             addTrigger();
         }else if (row > ADD_TRIGGER_ROW && row < ADD_TRIGGER_ROW + bsData->getNumberOfTriggers() + 1){
-            result = row - BASE_NUMBER_OF_ROWS;
+            auto result = row - BASE_NUMBER_OF_ROWS;
             if (bsData->getNumberOfTriggers() > result && result >= 0){
                 if (column == VALUE_COLUMN){
-                    triggerUI->loadData((BehaviorFile *)(bsData->triggers->getParentFile()), bsData, result, &static_cast<hkbClipTriggerArray *>(bsData->triggers.data())->triggers[result]);
+                    triggerUI->loadData((BehaviorFile *)(bsData->getParentFile()), bsData, result, &static_cast<hkbClipTriggerArray *>(bsData->triggers.data())->triggers[result]); //TO DO...
                     setCurrentIndex(CHILD_WIDGET);
                 }else if (column == BINDING_COLUMN){
                     if (MainWindow::yesNoDialogue("Are you sure you want to remove the trigger \""+table->item(row, NAME_COLUMN)->text()+"\"?") == QMessageBox::Yes){
@@ -774,11 +484,11 @@ void ClipGeneratorUI::viewSelectedChild(int row, int column){
                     }
                 }
             }else{
-                CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::viewSelectedChild(): Invalid index of child to view!!");
+                LogFile::writeToLog("ClipGeneratorUI::viewSelectedChild(): Invalid index of child to view!!");
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("ClipGeneratorUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -797,32 +507,7 @@ void ClipGeneratorUI::connectToTables(GenericTableWidget *variables, GenericTabl
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewAnimations(QString)), animations, SLOT(showTable(QString)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
-    }
-}
-
-void ClipGeneratorUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::loadBinding(): The data is nullptr!!");
+        LogFile::writeToLog("ClipGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
@@ -842,69 +527,38 @@ void ClipGeneratorUI::selectTableToView(bool viewproperties, const QString & pat
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("ClipGeneratorUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void ClipGeneratorUI::eventRenamed(const QString & name, int index){
     if (bsData){
-        if (currentIndex() == CHILD_WIDGET){
-            triggerUI->eventRenamed(name, index);
-        }
+        (currentIndex() == CHILD_WIDGET) ? triggerUI->eventRenamed(name, index) : NULL;
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::eventRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("ClipGeneratorUI::eventRenamed(): The data is nullptr!!");
     }
 }
-
-/*void ClipGeneratorUI::animationRenamed(const QString &name, int index){
-    if (bsData){
-        //if ()
-    }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::animationRenamed(): The data is nullptr!!");
-    }
-}*/
 
 void ClipGeneratorUI::variableRenamed(const QString & name, int index){
-    int bindIndex = -1;
-    hkbVariableBindingSet *bind = nullptr;
-    if (name == ""){
-        WARNING_MESSAGE("ClipGeneratorUI::variableRenamed(): The new variable name is the empty string!!");
-    }
     if (bsData){
-        index--;
-        bind = bsData->getVariableBindingSetData();
-        if (bind){
-            bindIndex = bind->getVariableIndexOfBinding("cropStartAmountLocalTime");
-            if (bindIndex == index){
-                table->item(CROP_START_AMOUNT_LOCAL_TIME_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("cropEndAmountLocalTime");
-            if (bindIndex == index){
-                table->item(CROP_END_AMOUNT_LOCAL_TIME_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("startTime");
-            if (bindIndex == index){
-                table->item(START_TIME_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("playbackSpeed");
-            if (bindIndex == index){
-                table->item(PLAYBACK_SPEED_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("enforcedDuration");
-            if (bindIndex == index){
-                table->item(ENFORCED_DURATION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("userControlledTimeFraction");
-            if (bindIndex == index){
-                table->item(USER_CONTROLLED_TIME_FRACTION_ROW, BINDING_COLUMN)->setText(name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("animationBindingIndex");
-            if (bindIndex == index){
-                table->item(ANIMATION_BINDING_INDEX_ROW, BINDING_COLUMN)->setText(name);
+        if (name != ""){
+            index--;
+            auto bind = bsData->getVariableBindingSetData();
+            if (bind){
+                auto setname = [&](const QString & fieldname, int row){
+                    auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                    (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+                };
+                setname("cropStartAmountLocalTime", CROP_START_AMOUNT_LOCAL_TIME_ROW);
+                setname("cropEndAmountLocalTime", CROP_END_AMOUNT_LOCAL_TIME_ROW);
+                setname("startTime", START_TIME_ROW);
+                setname("playbackSpeed", PLAYBACK_SPEED_ROW);
+                setname("enforcedDuration", ENFORCED_DURATION_ROW);
+                setname("userControlledTimeFraction", USER_CONTROLLED_TIME_FRACTION_ROW);
+                setname("animationBindingIndex", ANIMATION_BINDING_INDEX_ROW);
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("ClipGeneratorUI::variableRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("ClipGeneratorUI::variableRenamed(): The data is nullptr!!");
     }
 }
-

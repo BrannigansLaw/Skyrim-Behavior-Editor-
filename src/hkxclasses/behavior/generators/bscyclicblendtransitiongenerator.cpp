@@ -31,6 +31,22 @@ QString BSCyclicBlendTransitionGenerator::getName() const{
     return name;
 }
 
+void BSCyclicBlendTransitionGenerator::nullEventToCrossBlend(){
+    std::lock_guard <std::mutex> guard(mutex);
+    eventToCrossBlend.id = -1;
+    eventToCrossBlend.payload = HkxSharedPtr();
+    static_cast<BehaviorFile *>(getParentFile())->removeOtherData();
+    setIsFileChanged(true);
+}
+
+void BSCyclicBlendTransitionGenerator::nullEventToFreezeBlendValue(){
+    std::lock_guard <std::mutex> guard(mutex);
+    eventToFreezeBlendValue.id = -1;
+    eventToFreezeBlendValue.payload = HkxSharedPtr();
+    static_cast<BehaviorFile *>(getParentFile())->removeOtherData();
+    setIsFileChanged(true);
+}
+
 bool BSCyclicBlendTransitionGenerator::insertObjectAt(int , DataIconManager *obj){
     std::lock_guard <std::mutex> guard(mutex);
     if (obj){
@@ -49,6 +65,54 @@ bool BSCyclicBlendTransitionGenerator::removeObjectAt(int index){
         return true;
     }
     return false;
+}
+
+void BSCyclicBlendTransitionGenerator::setEBlendCurve(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < BlendCurve.size() && eBlendCurve != BlendCurve.at(index)) ? eBlendCurve = BlendCurve.at(index), getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'eBlendCurve' was not set!");
+}
+
+void BSCyclicBlendTransitionGenerator::setFTransitionDuration(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != fTransitionDuration) ? fTransitionDuration = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'fTransitionDuration' was not set!");
+}
+
+void BSCyclicBlendTransitionGenerator::setFBlendParameter(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != fBlendParameter) ? fBlendParameter = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'fBlendParameter' was not set!");
+}
+
+void BSCyclicBlendTransitionGenerator::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
+QString BSCyclicBlendTransitionGenerator::getBlenderGeneratorName() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QString genname("NONE");
+    hkbGenerator *gen = static_cast<hkbGenerator *>(pBlenderGenerator.data());
+    (gen) ? genname = gen->getName() : NULL;
+    return genname;
+}
+
+QString BSCyclicBlendTransitionGenerator::getEBlendCurve() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return eBlendCurve;
+}
+
+qreal BSCyclicBlendTransitionGenerator::getFTransitionDuration() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return fTransitionDuration;
+}
+
+int BSCyclicBlendTransitionGenerator::getEventToCrossBlendId() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return eventToCrossBlend.id;
+}
+
+int BSCyclicBlendTransitionGenerator::getEventToFreezeBlendValueId() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return eventToFreezeBlendValue.id;
 }
 
 bool BSCyclicBlendTransitionGenerator::hasChildren() const{
@@ -177,7 +241,7 @@ bool BSCyclicBlendTransitionGenerator::readData(const HkxXmlReader &reader, long
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };

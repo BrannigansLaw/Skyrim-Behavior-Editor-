@@ -11,10 +11,11 @@ public:
     BGSGamebryoSequenceGenerator& operator=(const BGSGamebryoSequenceGenerator&) = delete;
     BGSGamebryoSequenceGenerator(const BGSGamebryoSequenceGenerator &) = delete;
     ~BGSGamebryoSequenceGenerator();
+public:
     QString getName() const;
     static const QString getClassname();
 private:
-    void setName(const QString &value);
+    void setName(const QString &newname);
     void setPSequence(const QString &value);
     void setEBlendModeFunction(int index);
     void setFPercent(const qreal &value);

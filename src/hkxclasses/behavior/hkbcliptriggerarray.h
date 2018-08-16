@@ -15,6 +15,7 @@ public:
     hkbClipTriggerArray& operator=(const hkbClipTriggerArray&) = delete;
     hkbClipTriggerArray(const hkbClipTriggerArray &) = delete;
     ~hkbClipTriggerArray();
+public:
     int getNumberOfTriggers() const;
     static const QString getClassname();
     int getLastTriggerIndex() const;

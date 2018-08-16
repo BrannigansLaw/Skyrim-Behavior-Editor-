@@ -20,8 +20,8 @@ bool AnimCacheProjectData::read(QFile *file){
         return false;
     }
     QByteArray line;
-    bool ok = false;
-    uint numFiles = 0;
+    auto ok = false;
+    auto numFiles = 0U;
     if (file->atEnd()){
         return false;
     }
@@ -31,7 +31,7 @@ bool AnimCacheProjectData::read(QFile *file){
     if (!ok){
         return false;
     }
-    for (uint i = 0; i < numFiles; i++){
+    for (auto i = 0U; i < numFiles; i++){
         if (file->atEnd()){
             return false;
         }
@@ -43,7 +43,7 @@ bool AnimCacheProjectData::read(QFile *file){
         fileNames.append(line);
     }
     //Read individual project's animsetdata...
-    for (uint i = 0; i < numFiles; i++){
+    for (auto i = 0U; i < numFiles; i++){
         animSetData.append(new AnimCacheAnimSetData());
         if (!animSetData.last()->read(file)){
             return false;
@@ -69,7 +69,7 @@ bool AnimCacheProjectData::write(QFile *file, QTextStream & out) const{
 }
 
 bool AnimCacheProjectData::merge(AnimCacheProjectData *recessiveproject){
-    int size = fileNames.size();
+    auto size = fileNames.size();
     bool found;
     if (recessiveproject){
         for (auto i = 0; i < size; i++){

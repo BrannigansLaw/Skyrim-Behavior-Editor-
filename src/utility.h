@@ -240,6 +240,32 @@ struct hkQsTransform
 
 namespace {
 
+bool chopLine(QFile * file, QByteArray & line, ulong & linecount){
+    if (file){
+        if (!file->atEnd()){
+            line = file->readLine();
+            line.chop(1);
+            linecount++;
+            return true;
+        }
+    }
+    return false;
+}
+
+QString trimFloat(QString & string){
+    for (auto i = string.size() - 1; i >= 0; i--){
+        if (string.at(i) == '0'){
+            string.remove(i, 1);
+        }else if (string.at(i) == '.'){
+            string.remove(i, 1);
+            break;
+        }else{
+            break;
+        }
+    }
+    return string;
+}
+
 void generateAppendStringToList(QStringList & list, QString & newname, const QChar & wheretoappend){
     for (auto i = 0, num = 0, index = 0; i < list.size() - 1; i++){
         if (list.at(i) == newname){

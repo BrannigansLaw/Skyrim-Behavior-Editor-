@@ -15,6 +15,7 @@ public:
     hkbEventRangeDataArray& operator=(const hkbEventRangeDataArray&) = delete;
     hkbEventRangeDataArray(const hkbEventRangeDataArray &) = delete;
     ~hkbEventRangeDataArray();
+public:
     static const QString getClassname();
     int getLastEventDataIndex() const;
     int getNumberOfRanges() const;

@@ -3,13 +3,14 @@
 
 #include <QtCore>
 
-class SkyrimClipTrigger
+class SkyrimClipTrigger final
 {
-    friend class SkyrimClipGeneratoData;
-    friend class ProjectAnimData;
 public:
     SkyrimClipTrigger(qreal t = 0, const QString & trigname = "");
-private:
+    SkyrimClipTrigger& operator=(const SkyrimClipTrigger&) = default;
+    SkyrimClipTrigger(const SkyrimClipTrigger &) = default;
+    ~SkyrimClipTrigger() = default;
+public:
     QString name;
     qreal time;
 };

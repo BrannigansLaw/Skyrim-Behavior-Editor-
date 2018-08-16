@@ -17,23 +17,29 @@ class hkbVariableBindingSet;
 class CheckBox;
 class SpinBox;
 
-class BSSynchronizedClipGeneratorUI: public QGroupBox
+class BSSynchronizedClipGeneratorUI final: public QGroupBox
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     BSSynchronizedClipGeneratorUI();
-    virtual ~BSSynchronizedClipGeneratorUI(){}
+    BSSynchronizedClipGeneratorUI& operator=(const BSSynchronizedClipGeneratorUI&) = delete;
+    BSSynchronizedClipGeneratorUI(const BSSynchronizedClipGeneratorUI &) = delete;
+    ~BSSynchronizedClipGeneratorUI() = default;
+public:
     void loadData(HkxObject *data);
+    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
+    void variableRenamed(const QString & name, int index);
+    void generatorRenamed(const QString & name, int index);
+    void setBehaviorView(BehaviorGraphView *view);
 signals:
     void generatorNameChanged(const QString & newName, int index);
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setClipGenerator(int index, const QString & name);
-    void setSyncAnimPrefix();
+    void setSyncAnimPrefix(const QString &newname);
     void setSyncClipIgnoreMarkPlacement();
     void setGetToMarkTime();
     void setMarkErrorThreshold();
@@ -44,17 +50,10 @@ private slots:
     void viewSelectedChild(int row, int column);
     void setBindingVariable(int index, const QString & name);
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
     void selectTableToView(bool viewproperties, const QString & path);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
-    bool setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
-    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
-    void variableRenamed(const QString & name, int index);
-    void generatorRenamed(const QString & name, int index);
-    void setBehaviorView(BehaviorGraphView *view);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     BehaviorGraphView *behaviorView;
     BSSynchronizedClipGenerator *bsData;
     QGridLayout *topLyt;

@@ -25,6 +25,7 @@ public:
     BehaviorFile& operator=(const BehaviorFile&) = delete;
     BehaviorFile(const BehaviorFile &) = delete;
     ~BehaviorFile();
+public:
     bool doesBehaviorExist(const QString &behaviorname) const;
     int getIndexOfGenerator(const HkxSharedPtr & obj) const;
     int getIndexOfModifier(const HkxSharedPtr & obj) const;

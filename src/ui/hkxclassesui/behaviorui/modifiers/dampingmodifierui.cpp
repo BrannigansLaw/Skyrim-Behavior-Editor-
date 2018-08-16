@@ -186,7 +186,7 @@ void DampingModifierUI::loadData(HkxObject *data){
         if (data->getSignature() == HKB_DAMPING_MODIFIER){
             hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbDampingModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             kP->setValue(bsData->kP);
             kI->setValue(bsData->kI);
@@ -244,8 +244,8 @@ void DampingModifierUI::loadData(HkxObject *data){
 
 void DampingModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));

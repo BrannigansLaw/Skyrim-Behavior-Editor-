@@ -92,7 +92,7 @@ void ModifierGeneratorUI::loadData(HkxObject *data){
     if (data){
         if (data->getSignature() == HKB_MODIFIER_GENERATOR){
             bsData = static_cast<hkbModifierGenerator *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             if (bsData->modifier.data()){
                 table->item(MODIFIER_ROW, VALUE_COLUMN)->setText(static_cast<hkbModifier *>(bsData->modifier.data())->getName());
             }else{
@@ -114,8 +114,8 @@ void ModifierGeneratorUI::loadData(HkxObject *data){
 
 void ModifierGeneratorUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));

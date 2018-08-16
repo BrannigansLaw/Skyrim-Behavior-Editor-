@@ -26,6 +26,7 @@ public:
     ProjectFile& operator=(const ProjectFile&) = delete;
     ProjectFile(const ProjectFile &) = delete;
     ~ProjectFile();
+public:
     bool doesBehaviorExist(const QString &behaviorname) const;
     QString getCharacterFilePathAt(int index) const;
     bool isClipGenNameTaken(const QString & name) const;

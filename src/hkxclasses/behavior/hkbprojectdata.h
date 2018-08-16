@@ -14,6 +14,7 @@ public:
     hkbProjectData& operator=(const hkbProjectData&) = delete;
     hkbProjectData(const hkbProjectData &) = delete;
     ~hkbProjectData();
+public:
     static const QString getClassname();
 private:
     bool readData(const HkxXmlReader & reader, long & index);

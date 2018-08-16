@@ -10,6 +10,7 @@ public:
     hkbStringEventPayload& operator=(const hkbStringEventPayload&) = delete;
     hkbStringEventPayload(const hkbStringEventPayload &) = delete;
     ~hkbStringEventPayload();
+public:
     static const QString getClassname();
     QString getData() const;
     void setData(const QString &value);

@@ -11,6 +11,7 @@ public:
     hkbEventDrivenModifier& operator=(const hkbEventDrivenModifier&) = delete;
     hkbEventDrivenModifier(const hkbEventDrivenModifier &) = delete;
     ~hkbEventDrivenModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

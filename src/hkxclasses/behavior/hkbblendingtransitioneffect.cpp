@@ -100,7 +100,7 @@ bool hkbBlendingTransitionEffect::readData(const HkxXmlReader &reader, long & in
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };
@@ -198,7 +198,7 @@ QString hkbBlendingTransitionEffect::evaluateDataValidity(){
             datafield = list.first();
         }
     };
-    QString temp = HkDynamicObject::evaluateDataValidity();
+    auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }

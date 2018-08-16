@@ -11,6 +11,7 @@ public:
     BSComputeAddBoneAnimModifier& operator=(const BSComputeAddBoneAnimModifier&) = delete;
     BSComputeAddBoneAnimModifier(const BSComputeAddBoneAnimModifier &) = delete;
     ~BSComputeAddBoneAnimModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

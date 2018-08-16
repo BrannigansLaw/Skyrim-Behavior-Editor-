@@ -11,6 +11,7 @@ public:
     hkbExtractRagdollPoseModifier& operator=(const hkbExtractRagdollPoseModifier&) = delete;
     hkbExtractRagdollPoseModifier(const hkbExtractRagdollPoseModifier &) = delete;
     ~hkbExtractRagdollPoseModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

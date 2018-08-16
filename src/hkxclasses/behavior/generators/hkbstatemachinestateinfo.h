@@ -13,6 +13,7 @@ public:
     hkbStateMachineStateInfo& operator=(const hkbStateMachineStateInfo&) = delete;
     hkbStateMachineStateInfo(const hkbStateMachineStateInfo &) = delete;
     ~hkbStateMachineStateInfo();
+public:
     void removeTransitions();
     void removeTransitionsNoLock();
     void removeTransitionToState(int id);

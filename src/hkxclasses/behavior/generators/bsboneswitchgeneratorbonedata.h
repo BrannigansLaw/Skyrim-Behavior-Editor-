@@ -13,7 +13,9 @@ public:
     BSBoneSwitchGeneratorBoneData& operator=(const BSBoneSwitchGeneratorBoneData&) = delete;
     BSBoneSwitchGeneratorBoneData(const BSBoneSwitchGeneratorBoneData &) = delete;
     ~BSBoneSwitchGeneratorBoneData();
+public:
     bool operator==(const BSBoneSwitchGeneratorBoneData & other);
+public:
     static const QString getClassname();
     int getThisIndex() const;
     QString getName() const;

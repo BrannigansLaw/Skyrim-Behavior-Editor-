@@ -11,6 +11,7 @@ public:
     hkbLookAtModifier& operator=(const hkbLookAtModifier&) = delete;
     hkbLookAtModifier(const hkbLookAtModifier &) = delete;
     ~hkbLookAtModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

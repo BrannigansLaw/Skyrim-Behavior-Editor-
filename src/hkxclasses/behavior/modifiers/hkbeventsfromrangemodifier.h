@@ -11,6 +11,7 @@ public:
     hkbEventsFromRangeModifier& operator=(const hkbEventsFromRangeModifier&) = delete;
     hkbEventsFromRangeModifier(const hkbEventsFromRangeModifier &) = delete;
     ~hkbEventsFromRangeModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

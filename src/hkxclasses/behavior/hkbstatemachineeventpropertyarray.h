@@ -11,6 +11,7 @@ public:
     hkbStateMachineEventPropertyArray& operator=(const hkbStateMachineEventPropertyArray&) = delete;
     hkbStateMachineEventPropertyArray(const hkbStateMachineEventPropertyArray &) = delete;
     ~hkbStateMachineEventPropertyArray();
+public:
     static const QString getClassname();
     int getNumOfEvents() const;
     int getLastEventIndex() const;

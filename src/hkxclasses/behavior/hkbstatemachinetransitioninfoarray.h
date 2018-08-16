@@ -95,6 +95,7 @@ public:
     hkbStateMachineTransitionInfoArray& operator=(const hkbStateMachineTransitionInfoArray&) = delete;
     hkbStateMachineTransitionInfoArray(const hkbStateMachineTransitionInfoArray &) = delete;
     ~hkbStateMachineTransitionInfoArray();
+public:
     static const QString getClassname();
     void updateTransitionStateId(int oldid, int newid);
     void removeTransitionToState(ulong stateId);

@@ -11,6 +11,7 @@ public:
     hkbGetUpModifier& operator=(const hkbGetUpModifier&) = delete;
     hkbGetUpModifier(const hkbGetUpModifier &) = delete;
     ~hkbGetUpModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

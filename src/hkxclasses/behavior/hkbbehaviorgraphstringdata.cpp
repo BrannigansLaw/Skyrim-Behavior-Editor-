@@ -33,7 +33,7 @@ bool hkbBehaviorGraphStringData::readData(const HkxXmlReader &reader, long & ind
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     int numElems = 0;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);

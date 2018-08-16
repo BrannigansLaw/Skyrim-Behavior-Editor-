@@ -16,6 +16,7 @@ public:
     hkbCharacterStringData& operator=(const hkbCharacterStringData&) = delete;
     hkbCharacterStringData(const hkbCharacterStringData &) = delete;
     ~hkbCharacterStringData();
+public:
     int getAnimationIndex(const QString & name) const;
     QStringList getAnimationNames() const;
     QString getCharacterPropertyNameAt(int index) const;

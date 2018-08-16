@@ -30,6 +30,7 @@ public:
     BlenderGeneratorChildUI& operator=(const BlenderGeneratorChildUI&) = delete;
     BlenderGeneratorChildUI(const BlenderGeneratorChildUI &) = delete;
     ~BlenderGeneratorChildUI() = default;
+public:
     void loadData(HkxObject *data, int childindex);
     void setBehaviorView(BehaviorGraphView *view);
     void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
@@ -52,10 +53,8 @@ private slots:
 private:
     void toggleSignals(bool toggleconnections);
     void setGenerator(int index, const QString & name);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
     void setBindingVariable(int index, const QString & name);
     void selectTableToView(bool viewproperties, const QString & path);
-    void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
 private:
     enum ACTIVE_WIDGET {
         MAIN_WIDGET,

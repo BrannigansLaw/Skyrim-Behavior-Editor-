@@ -11,6 +11,7 @@ public:
     BSRagdollContactListenerModifier& operator=(const BSRagdollContactListenerModifier&) = delete;
     BSRagdollContactListenerModifier(const BSRagdollContactListenerModifier &) = delete;
     ~BSRagdollContactListenerModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

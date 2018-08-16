@@ -10,6 +10,7 @@ public:
     hkbAttributeModifier& operator=(const hkbAttributeModifier&) = delete;
     hkbAttributeModifier(const hkbAttributeModifier &) = delete;
     ~hkbAttributeModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

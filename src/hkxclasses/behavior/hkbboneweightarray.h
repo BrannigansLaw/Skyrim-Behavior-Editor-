@@ -13,6 +13,7 @@ public:
     hkbBoneWeightArray& operator=(const hkbBoneWeightArray&) = delete;
     hkbBoneWeightArray(const hkbBoneWeightArray &other) = delete;
     ~hkbBoneWeightArray();
+public:
     void copyBoneWeights(const hkbBoneWeightArray *other);
 private:
     qreal getBoneWeightAt(int index, bool *ok = nullptr) const;

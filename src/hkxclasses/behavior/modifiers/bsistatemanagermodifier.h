@@ -10,6 +10,7 @@ public:
     BSIStateManagerModifier& operator=(const BSIStateManagerModifier&) = delete;
     BSIStateManagerModifier(const BSIStateManagerModifier &) = delete;
     ~BSIStateManagerModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

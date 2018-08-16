@@ -21,38 +21,38 @@ class ComboBox;
 class GenericTableWidget;
 class hkbVariableBindingSet;
 
-class BSBoneSwitchGeneratorUI: public QStackedWidget
+class BSBoneSwitchGeneratorUI final: public QStackedWidget
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     BSBoneSwitchGeneratorUI();
-    virtual ~BSBoneSwitchGeneratorUI(){}
+    BSBoneSwitchGeneratorUI& operator=(const BSBoneSwitchGeneratorUI&) = delete;
+    BSBoneSwitchGeneratorUI(const BSBoneSwitchGeneratorUI &) = delete;
+    ~BSBoneSwitchGeneratorUI() = default;
+public:
     void loadData(HkxObject *data);
+    void variableRenamed(const QString & name, int index);
+    void generatorRenamed(const QString & name, int index);
+    void setBehaviorView(BehaviorGraphView *view);
+    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
 signals:
     void generatorNameChanged(const QString & newName, int index);
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void viewSelectedChild(int row, int column);
     void returnToWidget(bool reloadData);
     void variableTableElementSelected(int index, const QString &name);
     void generatorTableElementSelected(int index, const QString &name);
     void swapGeneratorIndices(int index1, int index2);
 private:
-    void connectSignals();
-    void disconnectSignals();
+    void toggleSignals(bool toggleconnections);
     void setDefaultGenerator(int index, const QString & name);
     void addChildWithGenerator();
     void removeChild(int index);
     void loadDynamicTableRows();
-    void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString &tip1, const QString &tip2);
-    void connectToTables(GenericTableWidget *generators, GenericTableWidget *variables, GenericTableWidget *properties);
-    void variableRenamed(const QString & name, int index);
-    void generatorRenamed(const QString & name, int index);
-    void setBehaviorView(BehaviorGraphView *view);
 private:
     enum ACTIVE_WIDGET {
         MAIN_WIDGET = 0,
@@ -73,8 +73,9 @@ private:
         BEHAVIOR_REFERENCE_GENERATOR,
         GAMEBYRO_SEQUENCE_GENERATOR
     };
-    static QStringList types;
-    static QStringList headerLabels;
+private:
+    static const QStringList types;
+    static const QStringList headerLabels;
     BehaviorGraphView *behaviorView;
     BSBoneSwitchGenerator *bsData;
     QGroupBox *groupBox;

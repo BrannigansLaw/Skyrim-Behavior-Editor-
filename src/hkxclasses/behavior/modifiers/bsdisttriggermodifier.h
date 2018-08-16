@@ -11,6 +11,7 @@ public:
     BSDistTriggerModifier& operator=(const BSDistTriggerModifier&) = delete;
     BSDistTriggerModifier(const BSDistTriggerModifier &) = delete;
     ~BSDistTriggerModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

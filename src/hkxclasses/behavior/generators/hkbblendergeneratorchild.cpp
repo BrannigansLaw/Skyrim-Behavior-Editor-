@@ -19,7 +19,7 @@ hkbBlenderGeneratorChild::hkbBlenderGeneratorChild(HkxFile *parent, hkbGenerator
     parent->addObjectToFile(this, ref);
     refCount++;
     if (parentBG && (parentBG->getSignature() != HKB_BLENDER_GENERATOR && parentBG->getSignature() != HKB_POSE_MATCHING_GENERATOR)){
-        CRITICAL_ERROR_MESSAGE("hkbBlenderGeneratorChild::hkbBlenderGeneratorChild: parentBG is incorrect type!!!");
+        LogFile::writeToLog("hkbBlenderGeneratorChild::hkbBlenderGeneratorChild: parentBG is incorrect type!!!");
     }
 }
 
@@ -52,7 +52,7 @@ qreal hkbBlenderGeneratorChild::getWorldFromModelWeight() const{
 
 void hkbBlenderGeneratorChild::setWorldFromModelWeight(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    worldFromModelWeight = value;
+    (value != worldFromModelWeight) ? worldFromModelWeight = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'worldFromModelWeight' was not set!");
 }
 
 qreal hkbBlenderGeneratorChild::getWeight() const{
@@ -62,14 +62,14 @@ qreal hkbBlenderGeneratorChild::getWeight() const{
 
 void hkbBlenderGeneratorChild::setWeight(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    weight = value;
+    (value != weight) ? weight = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'weight' was not set!");
 }
 
 bool hkbBlenderGeneratorChild::readData(const HkxXmlReader &reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };
@@ -285,7 +285,7 @@ bool hkbBlenderGeneratorChild::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         baddata("hkbVariableBindingSet");
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(generator.getShdPtrReference());
+    auto ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(generator.getShdPtrReference());
     if (!ptr || !ptr->data()){
         baddata("generator");
     }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){

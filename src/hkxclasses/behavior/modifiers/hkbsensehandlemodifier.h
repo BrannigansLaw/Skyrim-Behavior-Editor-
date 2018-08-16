@@ -12,6 +12,7 @@ public:
     hkbSenseHandleModifier& operator=(const hkbSenseHandleModifier&) = delete;
     hkbSenseHandleModifier(const hkbSenseHandleModifier &) = delete;
     ~hkbSenseHandleModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

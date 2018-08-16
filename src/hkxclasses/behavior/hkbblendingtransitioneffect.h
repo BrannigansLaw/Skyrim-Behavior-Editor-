@@ -11,7 +11,9 @@ public:
     hkbBlendingTransitionEffect& operator=(const hkbBlendingTransitionEffect&) = delete;
     hkbBlendingTransitionEffect(const hkbBlendingTransitionEffect &) = delete;
     ~hkbBlendingTransitionEffect();
+public:
     bool operator ==(const hkbBlendingTransitionEffect & other) const;
+public:
     QString getName() const;
 private:
     bool link();

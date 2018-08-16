@@ -15,38 +15,37 @@ class SpinBox;
 class GenericTableWidget;
 class hkbVariableBindingSet;
 
-class BSiStateTaggingGeneratorUI: public QGroupBox
+class BSiStateTaggingGeneratorUI final: public QGroupBox
 {
     Q_OBJECT
-    friend class HkDataUI;
 public:
     BSiStateTaggingGeneratorUI();
-    virtual ~BSiStateTaggingGeneratorUI(){}
+    BSiStateTaggingGeneratorUI& operator=(const BSiStateTaggingGeneratorUI&) = delete;
+    BSiStateTaggingGeneratorUI(const BSiStateTaggingGeneratorUI &) = delete;
+    ~BSiStateTaggingGeneratorUI() = default;
+public:
     void loadData(HkxObject *data);
+    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *generators);
+    void variableRenamed(const QString & name, int index);
+    void generatorRenamed(const QString & name, int index);
+    void setBehaviorView(BehaviorGraphView *view);
 signals:
     void viewVariables(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewGenerators(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void viewProperties(int index, const QString & typeallowed, const QStringList &typesdisallowed);
     void generatorNameChanged(const QString & newName, int index);
 private slots:
-    void setName();
+    void setName(const QString &newname);
     void setIStateToSetAs();
     void setIPriority();
     void setBindingVariable(int index, const QString & name);
     void viewSelected(int row, int column);
     void setDefaultGenerator(int index, const QString & name);
 private:
-    void connectSignals();
-    void disconnectSignals();
-    void connectToTables(GenericTableWidget *variables, GenericTableWidget *properties, GenericTableWidget *generators);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
-    void variableRenamed(const QString & name, int index);
-    void generatorRenamed(const QString & name, int index);
-    void setBehaviorView(BehaviorGraphView *view);
+    void toggleSignals(bool toggleconnections);
     void selectTableToView(bool viewproperties, const QString & path);
-    void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
 private:
-    static QStringList headerLabels;
+    static const QStringList headerLabels;
     BehaviorGraphView *behaviorView;
     BSiStateTaggingGenerator *bsData;
     QGridLayout *topLyt;

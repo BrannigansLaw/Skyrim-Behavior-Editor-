@@ -12,6 +12,7 @@ public:
     hkbFootIkDriverInfo& operator=(const hkbFootIkDriverInfo&) = delete;
     hkbFootIkDriverInfo(const hkbFootIkDriverInfo &) = delete;
     ~hkbFootIkDriverInfo();
+public:
     static const QString getClassname();
 private:
     struct hkbFootIkDriverInfoLeg{

@@ -14,6 +14,7 @@ public:
     hkbBehaviorGraph& operator=(const hkbBehaviorGraph&) = delete;
     hkbBehaviorGraph(const hkbBehaviorGraph &) = delete;
     ~hkbBehaviorGraph();
+public:
     QString getName() const;
     static const QString getClassname();
     void setData(hkbBehaviorGraphData *graphdata);
@@ -21,7 +22,6 @@ public:
     void setName(const QString & newname);
     void setVariableMode(const QString &value);
 private:
-    //hkbStateMachine * getRootGeneratorData() const;
     QString getRootGeneratorName() const;
     QString getVariableMode() const;
     bool readData(const HkxXmlReader & reader, long & index);

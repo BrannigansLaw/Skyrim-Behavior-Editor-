@@ -9,34 +9,17 @@
 
 class HkxFile;
 
-class HkxXmlReader
+class HkxXmlReader final
 {
 public:
-    enum HkxXmlParseLine {
-        NoError = 0,
-        //NullPointerArgs,
-        EmptyLineEndFile = -1,
-        OrphanedCharacter = -2,
-        InvalidElementName = -3,
-        InvalidElementValue = -4,
-        //ElementValueSplitOnMutipleLines = -5,
-        InvalidAttributeName = -6,
-        InvalidAttributeValue = -7,
-        OrphanedAttribute = -8,
-        MalformedAttribute = -9,
-        OrphanedElementTag = -10,
-        MalformedComment = -11,
-        UnexpectedNewlineCharacter = -12,
-        EmptyLine = -13,
-        MalformedEndElementTag = -14,
-        UnknownError = -50
-    };
     HkxXmlReader(HkxFile *file = nullptr);
-    bool parse();
-    virtual ~HkxXmlReader();
+    HkxXmlReader& operator=(const HkxXmlReader&) = delete;
+    HkxXmlReader(const HkxXmlReader &) = delete;
+    ~HkxXmlReader() = default;
+public:
     void setFile(HkxFile *file);
-    bool atEnd() const;
-    int getLastElementIndex() const;
+    bool parse();
+    void clear();
     int getNumElements() const;
     int getNumAttributesAt(int index) const;
     QByteArray getElementNameAt(int index) const;
@@ -44,9 +27,34 @@ public:
     QByteArray getNthAttributeNameAt(int index, int nth) const;
     QByteArray getNthAttributeValueAt(int index, int nth) const;
     QByteArray findFirstValueWithAttributeValue(const QString & attributevalue) const;
-    HkxXmlParseLine readNextLine();
-    void clear();
 private:
+    enum HkxXmlParseLine {
+        NoError,
+        //NullPointerArgs,
+        EmptyLineEndFile,
+        OrphanedCharacter,
+        InvalidElementName,
+        InvalidElementValue,
+        //ElementValueSplitOnMutipleLines,
+        InvalidAttributeName,
+        InvalidAttributeValue,
+        OrphanedAttribute,
+        MalformedAttribute,
+        OrphanedElementTag,
+        MalformedComment,
+        UnexpectedNewlineCharacter,
+        EmptyLine,
+        MalformedEndElementTag,
+        UnknownError
+    };
+    enum {
+        AVERAGE_ATTRIBUTE_LENGTH = 5,
+        AVERAGE_ELEMENT_TAG_LENGTH = 9,
+        AVERAGE_VALUE_LENGTH = 9,
+        AVERAGE_ATTRIBUTE_VALUE_LENGTH = 14
+    };
+private:
+    HkxXmlParseLine readNextLine();
     int skipComment(const QByteArray & line, int index);
     int readValue(const QByteArray & line, int startIndex, bool isSplitOnMultipleLines);
     int readAttribute(const QByteArray & line, int startIndex);
@@ -58,17 +66,18 @@ private:
         QByteArray value;
     };
     struct Element{
-        Element(const QByteArray & elem): name(elem), isContainedOnOneLine(true)/*, isClosed(false)*/{}
+        Element(const QByteArray & elem): name(elem), isContainedOnOneLine(true){}
         QByteArray name;
         QByteArray value;
         QList <Attribute> attributeList;
         bool isContainedOnOneLine;
     };
+private:
     HkxFile *hkxXmlFile;
     QList <Element> elementList;
-    bool isEOF;
     QVector <long> indexOfElemTags;
     ulong lineNumber;
+    bool isEOF;
 };
 
 #endif // HKXXMLREADER_H

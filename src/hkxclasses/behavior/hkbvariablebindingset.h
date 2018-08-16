@@ -27,6 +27,7 @@ public:
     hkbVariableBindingSet& operator=(const hkbVariableBindingSet&) = delete;
     hkbVariableBindingSet(const hkbVariableBindingSet &) = delete;
     ~hkbVariableBindingSet();
+public:
     static const QString getClassname();
     int getVariableIndexOfBinding(const QString & path) const;
     hkBinding::BindingType getBindingType(int index) const;

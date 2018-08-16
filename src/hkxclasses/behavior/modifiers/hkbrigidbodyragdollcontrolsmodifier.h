@@ -11,6 +11,7 @@ public:
     hkbRigidBodyRagdollControlsModifier& operator=(const hkbRigidBodyRagdollControlsModifier&) = delete;
     hkbRigidBodyRagdollControlsModifier(const hkbRigidBodyRagdollControlsModifier &) = delete;
     ~hkbRigidBodyRagdollControlsModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

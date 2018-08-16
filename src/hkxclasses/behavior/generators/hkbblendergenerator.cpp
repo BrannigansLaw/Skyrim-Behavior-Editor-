@@ -70,9 +70,9 @@ bool hkbBlenderGenerator::removeObjectAt(int index){
     return true;
 }
 
-void hkbBlenderGenerator::setName(const QString &value){
+void hkbBlenderGenerator::setName(const QString &newname){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != "") ? name = value : NULL;
+    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 QString hkbBlenderGenerator::getFlags() const{
@@ -82,7 +82,7 @@ QString hkbBlenderGenerator::getFlags() const{
 
 void hkbBlenderGenerator::setFlags(const QString &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != "") ? flags = value : NULL;
+    (value != flags) ? flags = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'flags' was not set!");
 }
 
 void hkbBlenderGenerator::setSubtractLastChild(bool value){
@@ -102,7 +102,7 @@ int hkbBlenderGenerator::getIndexOfSyncMasterChild() const{
 
 void hkbBlenderGenerator::setIndexOfSyncMasterChild(int value){
     std::lock_guard <std::mutex> guard(mutex);
-    indexOfSyncMasterChild = value;
+    (value != indexOfSyncMasterChild) ? indexOfSyncMasterChild = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'indexOfSyncMasterChild' was not set!");
 }
 
 qreal hkbBlenderGenerator::getMaxCyclicBlendParameter() const{
@@ -112,7 +112,7 @@ qreal hkbBlenderGenerator::getMaxCyclicBlendParameter() const{
 
 void hkbBlenderGenerator::setMaxCyclicBlendParameter(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    maxCyclicBlendParameter = value;
+    (value != maxCyclicBlendParameter) ? maxCyclicBlendParameter = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'maxCyclicBlendParameter' was not set!");
 }
 
 qreal hkbBlenderGenerator::getMinCyclicBlendParameter() const{
@@ -122,7 +122,7 @@ qreal hkbBlenderGenerator::getMinCyclicBlendParameter() const{
 
 void hkbBlenderGenerator::setMinCyclicBlendParameter(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    minCyclicBlendParameter = value;
+    (value != minCyclicBlendParameter) ? minCyclicBlendParameter = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'minCyclicBlendParameter' was not set!");
 }
 
 qreal hkbBlenderGenerator::getBlendParameter() const{
@@ -132,7 +132,7 @@ qreal hkbBlenderGenerator::getBlendParameter() const{
 
 void hkbBlenderGenerator::setBlendParameter(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    blendParameter = value;
+    (value != blendParameter) ? blendParameter = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'blendParameter' was not set!");
 }
 
 qreal hkbBlenderGenerator::getReferencePoseWeightThreshold() const{
@@ -142,7 +142,7 @@ qreal hkbBlenderGenerator::getReferencePoseWeightThreshold() const{
 
 void hkbBlenderGenerator::setReferencePoseWeightThreshold(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    referencePoseWeightThreshold = value;
+    (value != referencePoseWeightThreshold) ? referencePoseWeightThreshold = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'referencePoseWeightThreshold' was not set!");
 }
 
 bool hkbBlenderGenerator::hasChildren() const{
@@ -191,6 +191,7 @@ bool hkbBlenderGenerator::swapChildren(int index1, int index2){
         gen2 = children.at(index2).data();
         children[index1] = HkxSharedPtr(gen2);
         children[index2] = HkxSharedPtr(gen1);
+        getParentFile()->setIsChanged(true);
     }else{
         return false;
     }
@@ -257,7 +258,7 @@ bool hkbBlenderGenerator::readData(const HkxXmlReader &reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };

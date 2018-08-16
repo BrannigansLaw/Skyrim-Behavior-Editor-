@@ -12,6 +12,7 @@ public:
     BSLookAtModifier& operator=(const BSLookAtModifier&) = delete;
     BSLookAtModifier(const BSLookAtModifier &) = delete;
     ~BSLookAtModifier();
+public:
     static const QString getClassname();
     QString getName() const;
 private:

@@ -11,6 +11,7 @@ public:
     hkbComputeRotationToTargetModifier& operator=(const hkbComputeRotationToTargetModifier&) = delete;
     hkbComputeRotationToTargetModifier(const hkbComputeRotationToTargetModifier &) = delete;
     ~hkbComputeRotationToTargetModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

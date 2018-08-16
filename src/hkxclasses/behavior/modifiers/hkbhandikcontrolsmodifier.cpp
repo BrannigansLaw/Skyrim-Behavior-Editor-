@@ -36,7 +36,7 @@ bool hkbHandIkControlsModifier::readData(const HkxXmlReader &reader, long & inde
     int numhands;
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };
@@ -208,7 +208,7 @@ QString hkbHandIkControlsModifier::evaluateDataValidity(){
             }
         }
     }
-    QString temp = HkDynamicObject::evaluateDataValidity();
+    auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }

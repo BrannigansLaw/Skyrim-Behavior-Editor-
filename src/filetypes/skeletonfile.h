@@ -13,6 +13,7 @@ public:
     SkeletonFile& operator=(const SkeletonFile&) = delete;
     SkeletonFile(const SkeletonFile &) = delete;
     ~SkeletonFile() = default;
+public:
     bool addObjectToFile(HkxObject *obj, long ref = -1);
     void write();
     QString getRootObjectReferenceString();

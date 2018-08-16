@@ -11,11 +11,16 @@ public:
     BSBoneSwitchGenerator& operator=(const BSBoneSwitchGenerator&) = delete;
     BSBoneSwitchGenerator(const BSBoneSwitchGenerator &) = delete;
     ~BSBoneSwitchGenerator();
+public:
     static const QString getClassname();
     bool hasGenerator() const;
+    QString getDefaultGeneratorName() const;
     QString getName() const;
     int getIndexOfObj(DataIconManager *obj) const;
 private:
+    bool swapChildren(int index1, int index2);
+    void setName(const QString &newname);
+    void updateChildIconNames() const;
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

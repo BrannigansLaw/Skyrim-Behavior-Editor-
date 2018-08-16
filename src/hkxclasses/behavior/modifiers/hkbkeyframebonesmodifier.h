@@ -12,6 +12,7 @@ public:
     hkbKeyframeBonesModifier& operator=(const hkbKeyframeBonesModifier&) = delete;
     hkbKeyframeBonesModifier(const hkbKeyframeBonesModifier &) = delete;
     ~hkbKeyframeBonesModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

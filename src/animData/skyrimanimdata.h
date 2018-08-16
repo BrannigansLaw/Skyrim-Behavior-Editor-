@@ -9,18 +9,27 @@
 
 class QTextStream;
 
-class SkyrimAnimData
+class SkyrimAnimData final
 {
-    friend class ProjectUI;
+    friend class ProjectFile;
 public:
-    SkyrimAnimData();
-    virtual ~SkyrimAnimData();
-    bool parse(QFile * file, const QString &projectToIgnore = "", const QStringList & behaviorfilenames = QStringList());
-    //bool extract(const QString & projectname);
-    bool write(const QString & filename);
+    SkyrimAnimData() = default;
+    SkyrimAnimData& operator=(const SkyrimAnimData&) = default;
+    SkyrimAnimData(const SkyrimAnimData &) = default;
+    ~SkyrimAnimData();
+public:
     int getProjectIndex(const QString & projectname) const;
-    int addNewProject(const QString &projectname, const QStringList &projectfilerelativepaths);
     ProjectAnimData * getProjectAnimData(const QString & projectname) const;
+    bool isProjectNameTaken(const QString &name) const;
+    qreal getAnimationDurationFromAnimData(const QString &projectname, int animationindex) const;
+    SkyrimAnimationMotionData getAnimationMotionData(const QString &projectname, int animationindex) const;
+    void merge(SkyrimAnimData *recessiveanimdata, const QString &projecttomerge);
+    bool isEmpty() const;
+    bool write(const QString & filename);
+private:
+    int addNewProject(const QString &projectname, const QStringList &projectfilerelativepaths);
+    bool removeBehaviorFromProject(const QString &projectname,  const QString & behaviorfilename);
+    bool parse(QFile * file, const QString &projectToIgnore = "", const QStringList & behaviorfilenames = QStringList());
     bool appendClipGenerator(const QString &projectname, SkyrimClipGeneratoData *animdata);
     bool removeClipGenerator(const QString & projectname, const QString & clipname);
     bool appendAnimation(const QString & projectname, SkyrimAnimationMotionData *motiondata);
@@ -34,12 +43,6 @@ public:
     void setCropEndAmountLocalTimeAnimData(const QString & projectname, const QString & clipGenName, qreal time);
     void appendClipTriggerToAnimData(const QString & projectname, const QString & clipGenName, const QString &eventname);
     void removeClipTriggerToAnimDataAt(const QString & projectname, const QString & clipGenName, int index);
-    bool isProjectNameTaken(const QString &name) const;
-    bool removeBehaviorFromProject(const QString &projectname,  const QString & behaviorfilename);
-    qreal getAnimationDurationFromAnimData(const QString &projectname, int animationindex) const;
-    SkyrimAnimationMotionData getAnimationMotionData(const QString &projectname, int animationindex) const;
-    void merge(SkyrimAnimData *recessiveanimdata, const QString &projecttomerge);
-    bool isEmpty() const;
 private:
     QStringList projectNames;
     QVector <ProjectAnimData *> animData;

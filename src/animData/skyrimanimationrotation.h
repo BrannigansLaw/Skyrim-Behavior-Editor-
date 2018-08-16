@@ -3,13 +3,14 @@
 
 #include <QtCore>
 
-class SkyrimAnimationRotation
+class SkyrimAnimationRotation final
 {
-    friend class AnimationRotationUI;
-    friend class SkyrimAnimationMotionData;
 public:
     SkyrimAnimationRotation(qreal time = 0, qreal c2 = 0, qreal c3 = 0, qreal c4 = 0, qreal c5 = 0);
-private:
+    SkyrimAnimationRotation& operator=(const SkyrimAnimationRotation&) = default;
+    SkyrimAnimationRotation(const SkyrimAnimationRotation &) = default;
+    ~SkyrimAnimationRotation() = default;
+public:
     qreal localTime;
     float x;
     float y;

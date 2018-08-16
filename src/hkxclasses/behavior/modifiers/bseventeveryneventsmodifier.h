@@ -11,6 +11,7 @@ public:
     BSEventEveryNEventsModifier& operator=(const BSEventEveryNEventsModifier&) = delete;
     BSEventEveryNEventsModifier(const BSEventEveryNEventsModifier &) = delete;
     ~BSEventEveryNEventsModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

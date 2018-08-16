@@ -45,6 +45,39 @@ bool BSiStateTaggingGenerator::removeObjectAt(int index){
     return false;
 }
 
+void BSiStateTaggingGenerator::setIPriority(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != iPriority) ? iPriority = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'iPriority' was not set!");
+}
+
+void BSiStateTaggingGenerator::setIStateToSetAs(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != iStateToSetAs) ? iStateToSetAs = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'iStateToSetAs' was not set!");
+}
+
+void BSiStateTaggingGenerator::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
+int BSiStateTaggingGenerator::getIPriority() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return iPriority;
+}
+
+int BSiStateTaggingGenerator::getIStateToSetAs() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return iStateToSetAs;
+}
+
+QString BSiStateTaggingGenerator::getDefaultGeneratorName() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QString genname("NONE");
+    hkbGenerator *gen = static_cast<hkbGenerator *>(pDefaultGenerator.data());
+    (gen) ? genname = gen->getName() : NULL;
+    return genname;
+}
+
 bool BSiStateTaggingGenerator::hasChildren() const{
     std::lock_guard <std::mutex> guard(mutex);
     if (pDefaultGenerator.data()){
@@ -74,7 +107,7 @@ bool BSiStateTaggingGenerator::readData(const HkxXmlReader &reader, long & index
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };
@@ -140,7 +173,7 @@ bool BSiStateTaggingGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         LogFile::writeToLog(getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getShdPtrReference());
+    auto ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pDefaultGenerator.getShdPtrReference());
     if (!ptr || !ptr->data()){
         LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'pDefaultGenerator' data field!\nObject Name: "+name);
         setDataValidity(false);
@@ -164,7 +197,7 @@ QString BSiStateTaggingGenerator::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
     bool isvalid = true;
-    QString temp = HkDynamicObject::evaluateDataValidity();
+    auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }

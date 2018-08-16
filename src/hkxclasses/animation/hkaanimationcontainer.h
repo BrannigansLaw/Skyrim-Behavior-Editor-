@@ -10,6 +10,7 @@ public:
     hkaAnimationContainer& operator=(const hkaAnimationContainer&) = delete;
     hkaAnimationContainer(const hkaAnimationContainer &) = delete;
     ~hkaAnimationContainer();
+public:
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     QString evaluateDataValidity();

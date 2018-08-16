@@ -11,6 +11,7 @@ public:
     hkbMoveCharacterModifier& operator=(const hkbMoveCharacterModifier&) = delete;
     hkbMoveCharacterModifier(const hkbMoveCharacterModifier &) = delete;
     ~hkbMoveCharacterModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

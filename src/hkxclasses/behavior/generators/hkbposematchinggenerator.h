@@ -13,6 +13,7 @@ public:
     hkbPoseMatchingGenerator& operator=(const hkbPoseMatchingGenerator&) = delete;
     hkbPoseMatchingGenerator(const hkbPoseMatchingGenerator &) = delete;
     ~hkbPoseMatchingGenerator();
+public:
     QString getName() const;
     static const QString getClassname();
     enum BlenderFlag{

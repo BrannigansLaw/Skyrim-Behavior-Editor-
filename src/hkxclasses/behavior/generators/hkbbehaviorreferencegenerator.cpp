@@ -24,7 +24,7 @@ bool hkbBehaviorReferenceGenerator::readData(const HkxXmlReader &reader, long & 
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };
@@ -74,14 +74,14 @@ bool hkbBehaviorReferenceGenerator::write(HkxXMLWriter *writer){
     return true;
 }
 
-void hkbBehaviorReferenceGenerator::setName(const QString &value){
+void hkbBehaviorReferenceGenerator::setName(const QString &newname){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != "") ? name = value : NULL;
+    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
-void hkbBehaviorReferenceGenerator::setBehaviorName(const QString &value){
+void hkbBehaviorReferenceGenerator::setBehaviorName(const QString &newname){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != "") ? behaviorName = value : NULL;
+    (newname != behaviorName && newname != "") ? behaviorName = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'behaviorName' was not set!");
 }
 
 QString hkbBehaviorReferenceGenerator::getBehaviorName() const{

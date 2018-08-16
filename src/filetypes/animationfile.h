@@ -9,6 +9,8 @@ public:
     AnimationFile(MainWindow *window, const QString & name);
     AnimationFile& operator=(const AnimationFile&) = delete;
     AnimationFile(const AnimationFile &) = delete;
+    ~AnimationFile() = default;
+public:
     qreal getDuration() const;
     bool parse();
 protected:

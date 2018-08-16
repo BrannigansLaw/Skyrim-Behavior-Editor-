@@ -14,6 +14,7 @@ public:
     hkbMirroredSkeletonInfo& operator=(const hkbMirroredSkeletonInfo&) = delete;
     hkbMirroredSkeletonInfo(const hkbMirroredSkeletonInfo &) = delete;
     ~hkbMirroredSkeletonInfo();
+public:
     static const QString getClassname();
 private:
     bool readData(const HkxXmlReader & reader, long & index);

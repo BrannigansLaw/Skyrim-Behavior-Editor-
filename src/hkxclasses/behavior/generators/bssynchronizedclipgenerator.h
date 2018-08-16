@@ -11,9 +11,28 @@ public:
     BSSynchronizedClipGenerator& operator=(const BSSynchronizedClipGenerator&) = delete;
     BSSynchronizedClipGenerator(const BSSynchronizedClipGenerator &) = delete;
     ~BSSynchronizedClipGenerator();
+public:
     QString getName() const;
     static const QString getClassname();
 private:
+    QString getClipGeneratorName() const;
+    void setName(const QString &newname);
+    QString getSyncAnimPrefix() const;
+    void setSyncAnimPrefix(const QString &value);
+    bool getBSyncClipIgnoreMarkPlacement() const;
+    void setBSyncClipIgnoreMarkPlacement(bool value);
+    qreal getFGetToMarkTime() const;
+    void setFGetToMarkTime(const qreal &value);
+    qreal getFMarkErrorThreshold() const;
+    void setFMarkErrorThreshold(const qreal &value);
+    bool getBLeadCharacter() const;
+    void setBLeadCharacter(bool value);
+    bool getBReorientSupportChar() const;
+    void setBReorientSupportChar(bool value);
+    bool getBApplyMotionFromRoot() const;
+    void setBApplyMotionFromRoot(bool value);
+    int getSAnimationBindingIndex() const;
+    void setSAnimationBindingIndex(int value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

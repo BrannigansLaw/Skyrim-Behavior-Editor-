@@ -21,7 +21,7 @@ const QString hkbClipTriggerArray::getClassname(){
 
 void hkbClipTriggerArray::addTrigger(const HkTrigger & trigger){
     std::lock_guard <std::mutex> guard(mutex);
-    triggers.append(trigger);
+    triggers.append(trigger), getParentFile()->setIsChanged(true);
 }
 
 void hkbClipTriggerArray::setTriggerId(int index, int id){
@@ -36,7 +36,7 @@ void hkbClipTriggerArray::setLocalTime(int index, qreal time){
 
 void hkbClipTriggerArray::removeTrigger(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    (triggers.size() > index) ? triggers.removeAt(index) : NULL;
+    (triggers.size() > index) ? triggers.removeAt(index), getParentFile()->setIsChanged(true) : NULL;
 }
 
 int hkbClipTriggerArray::getLastTriggerIndex() const{
@@ -49,7 +49,7 @@ bool hkbClipTriggerArray::readData(const HkxXmlReader &reader, long & index){
     int numtriggers;
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };

@@ -36,7 +36,7 @@
 
 #define BINDING_ITEM_LABEL QString("Use Property     ")
 
-QStringList BSSynchronizedClipGeneratorUI::headerLabels = {
+const QStringList BSSynchronizedClipGeneratorUI::headerLabels = {
     "Name",
     "Type",
     "Bound Variable",
@@ -108,180 +108,107 @@ BSSynchronizedClipGeneratorUI::BSSynchronizedClipGeneratorUI()
     table->setCellWidget(ANIMATION_BINDING_INDEX_ROW, VALUE_COLUMN, sAnimationBindingIndex);
     topLyt->addWidget(table, 1, 0, 8, 3);
     setLayout(topLyt);
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BSSynchronizedClipGeneratorUI::connectSignals(){
-    connect(name, SIGNAL(editingFinished()), this, SLOT(setName()), Qt::UniqueConnection);
-    connect(syncAnimPrefix, SIGNAL(editingFinished()), this, SLOT(setSyncAnimPrefix()), Qt::UniqueConnection);
-    connect(bSyncClipIgnoreMarkPlacement, SIGNAL(released()), this, SLOT(setSyncClipIgnoreMarkPlacement()), Qt::UniqueConnection);
-    connect(fGetToMarkTime, SIGNAL(editingFinished()), this, SLOT(setGetToMarkTime()), Qt::UniqueConnection);
-    connect(fMarkErrorThreshold, SIGNAL(editingFinished()), this, SLOT(setMarkErrorThreshold()), Qt::UniqueConnection);
-    connect(bLeadCharacter, SIGNAL(released()), this, SLOT(setLeadCharacter()), Qt::UniqueConnection);
-    connect(bReorientSupportChar, SIGNAL(released()), this, SLOT(setReorientSupportChar()), Qt::UniqueConnection);
-    connect(bApplyMotionFromRoot, SIGNAL(released()), this, SLOT(setApplyMotionFromRoot()), Qt::UniqueConnection);
-    connect(sAnimationBindingIndex, SIGNAL(editingFinished()), this, SLOT(setAnimationBindingIndex()), Qt::UniqueConnection);
-    connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
-}
-
-void BSSynchronizedClipGeneratorUI::disconnectSignals(){
-    disconnect(name, SIGNAL(editingFinished()), this, SLOT(setName()));
-    disconnect(syncAnimPrefix, SIGNAL(editingFinished()), this, SLOT(setSyncAnimPrefix()));
-    disconnect(bSyncClipIgnoreMarkPlacement, SIGNAL(released()), this, SLOT(setSyncClipIgnoreMarkPlacement()));
-    disconnect(fGetToMarkTime, SIGNAL(editingFinished()), this, SLOT(setGetToMarkTime()));
-    disconnect(fMarkErrorThreshold, SIGNAL(editingFinished()), this, SLOT(setMarkErrorThreshold()));
-    disconnect(bLeadCharacter, SIGNAL(released()), this, SLOT(setLeadCharacter()));
-    disconnect(bReorientSupportChar, SIGNAL(released()), this, SLOT(setReorientSupportChar()));
-    disconnect(bApplyMotionFromRoot, SIGNAL(released()), this, SLOT(setApplyMotionFromRoot()));
-    disconnect(sAnimationBindingIndex, SIGNAL(editingFinished()), this, SLOT(setAnimationBindingIndex()));
-    disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+void BSSynchronizedClipGeneratorUI::toggleSignals(bool toggleconnections){
+    if (toggleconnections){
+        connect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)), Qt::UniqueConnection);
+        connect(syncAnimPrefix, SIGNAL(textEdited(QString)), this, SLOT(setSyncAnimPrefix(QString)), Qt::UniqueConnection);
+        connect(bSyncClipIgnoreMarkPlacement, SIGNAL(released()), this, SLOT(setSyncClipIgnoreMarkPlacement()), Qt::UniqueConnection);
+        connect(fGetToMarkTime, SIGNAL(editingFinished()), this, SLOT(setGetToMarkTime()), Qt::UniqueConnection);
+        connect(fMarkErrorThreshold, SIGNAL(editingFinished()), this, SLOT(setMarkErrorThreshold()), Qt::UniqueConnection);
+        connect(bLeadCharacter, SIGNAL(released()), this, SLOT(setLeadCharacter()), Qt::UniqueConnection);
+        connect(bReorientSupportChar, SIGNAL(released()), this, SLOT(setReorientSupportChar()), Qt::UniqueConnection);
+        connect(bApplyMotionFromRoot, SIGNAL(released()), this, SLOT(setApplyMotionFromRoot()), Qt::UniqueConnection);
+        connect(sAnimationBindingIndex, SIGNAL(editingFinished()), this, SLOT(setAnimationBindingIndex()), Qt::UniqueConnection);
+        connect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)), Qt::UniqueConnection);
+    }else{
+        disconnect(name, SIGNAL(textEdited(QString)), this, SLOT(setName(QString)));
+        disconnect(syncAnimPrefix, SIGNAL(textEdited(QString)), this, SLOT(setSyncAnimPrefix(QString)));
+        disconnect(bSyncClipIgnoreMarkPlacement, SIGNAL(released()), this, SLOT(setSyncClipIgnoreMarkPlacement()));
+        disconnect(fGetToMarkTime, SIGNAL(editingFinished()), this, SLOT(setGetToMarkTime()));
+        disconnect(fMarkErrorThreshold, SIGNAL(editingFinished()), this, SLOT(setMarkErrorThreshold()));
+        disconnect(bLeadCharacter, SIGNAL(released()), this, SLOT(setLeadCharacter()));
+        disconnect(bReorientSupportChar, SIGNAL(released()), this, SLOT(setReorientSupportChar()));
+        disconnect(bApplyMotionFromRoot, SIGNAL(released()), this, SLOT(setApplyMotionFromRoot()));
+        disconnect(sAnimationBindingIndex, SIGNAL(editingFinished()), this, SLOT(setAnimationBindingIndex()));
+        disconnect(table, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(viewSelectedChild(int,int)));
+    }
 }
 
 void BSSynchronizedClipGeneratorUI::loadData(HkxObject *data){
-    disconnectSignals();
+    toggleSignals(false);
     if (data){
         if (data->getSignature() == BS_SYNCHRONIZED_CLIP_GENERATOR){
             bsData = static_cast<BSSynchronizedClipGenerator *>(data);
-            name->setText(bsData->name);
-            syncAnimPrefix->setText(bsData->syncAnimPrefix);
-            bSyncClipIgnoreMarkPlacement->setChecked(bsData->bSyncClipIgnoreMarkPlacement);
-            fGetToMarkTime->setValue(bsData->fGetToMarkTime);
-            fMarkErrorThreshold->setValue(bsData->fMarkErrorThreshold);
-            bLeadCharacter->setChecked(bsData->bLeadCharacter);
-            bReorientSupportChar->setChecked(bsData->bReorientSupportChar);
-            bApplyMotionFromRoot->setChecked(bsData->bApplyMotionFromRoot);
-            sAnimationBindingIndex->setValue(bsData->sAnimationBindingIndex);
-            if (bsData->pClipGenerator.data()){
-                table->item(CLIP_GENERATOR_ROW, VALUE_COLUMN)->setText(static_cast<hkbGenerator *>(bsData->pClipGenerator.data())->getName());
-            }else{
-                table->item(CLIP_GENERATOR_ROW, VALUE_COLUMN)->setText("NONE");
-            }
-            hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(SYNC_CLIP_IGNORE_MARK_PLACEMENT_ROW, BINDING_COLUMN, varBind, "bSyncClipIgnoreMarkPlacement");
-                loadBinding(GET_TO_MARK_TIME_ROW, BINDING_COLUMN, varBind, "fGetToMarkTime");
-                loadBinding(MARK_ERROR_THRESHOLD_ROW, BINDING_COLUMN, varBind, "fMarkErrorThreshold");
-                loadBinding(LEAD_CHARACTER_ROW, BINDING_COLUMN, varBind, "bLeadCharacter");
-                loadBinding(REORIENT_SUPPORT_CHAR_ROW, BINDING_COLUMN, varBind, "bReorientSupportChar");
-                loadBinding(APPLY_MOTION_FROM_ROOT_ROW, BINDING_COLUMN, varBind, "bApplyMotionFromRoot");
-                loadBinding(ANIMATION_BINDING_INDEX_ROW, BINDING_COLUMN, varBind, "sAnimationBindingIndex");
-            }else{
-                table->item(SYNC_CLIP_IGNORE_MARK_PLACEMENT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(GET_TO_MARK_TIME_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(MARK_ERROR_THRESHOLD_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(LEAD_CHARACTER_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(REORIENT_SUPPORT_CHAR_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(APPLY_MOTION_FROM_ROOT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                table->item(ANIMATION_BINDING_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            name->setText(bsData->getName());
+            syncAnimPrefix->setText(bsData->getSyncAnimPrefix());
+            bSyncClipIgnoreMarkPlacement->setChecked(bsData->getBSyncClipIgnoreMarkPlacement());
+            fGetToMarkTime->setValue(bsData->getFGetToMarkTime());
+            fMarkErrorThreshold->setValue(bsData->getFMarkErrorThreshold());
+            bLeadCharacter->setChecked(bsData->getBLeadCharacter());
+            bReorientSupportChar->setChecked(bsData->getBReorientSupportChar());
+            bApplyMotionFromRoot->setChecked(bsData->getBApplyMotionFromRoot());
+            sAnimationBindingIndex->setValue(bsData->getSAnimationBindingIndex());
+            table->item(CLIP_GENERATOR_ROW, VALUE_COLUMN)->setText(bsData->getClipGeneratorName());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(SYNC_CLIP_IGNORE_MARK_PLACEMENT_ROW, BINDING_COLUMN, varBind, "bSyncClipIgnoreMarkPlacement", table, bsData);
+            UIHelper::loadBinding(GET_TO_MARK_TIME_ROW, BINDING_COLUMN, varBind, "fGetToMarkTime", table, bsData);
+            UIHelper::loadBinding(MARK_ERROR_THRESHOLD_ROW, BINDING_COLUMN, varBind, "fMarkErrorThreshold", table, bsData);
+            UIHelper::loadBinding(LEAD_CHARACTER_ROW, BINDING_COLUMN, varBind, "bLeadCharacter", table, bsData);
+            UIHelper::loadBinding(REORIENT_SUPPORT_CHAR_ROW, BINDING_COLUMN, varBind, "bReorientSupportChar", table, bsData);
+            UIHelper::loadBinding(APPLY_MOTION_FROM_ROOT_ROW, BINDING_COLUMN, varBind, "bApplyMotionFromRoot", table, bsData);
+            UIHelper::loadBinding(ANIMATION_BINDING_INDEX_ROW, BINDING_COLUMN, varBind, "sAnimationBindingIndex", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSSynchronizedClipGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            LogFile::writeToLog(QString("BSSynchronizedClipGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::loadData(): Attempting to load a null pointer!!");
+        LogFile::writeToLog("BSSynchronizedClipGeneratorUI::loadData(): Attempting to load a null pointer!!");
     }
-    connectSignals();
+    toggleSignals(true);
 }
 
-void BSSynchronizedClipGeneratorUI::setName(){
+void BSSynchronizedClipGeneratorUI::setName(const QString &newname){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
-            static_cast<DataIconManager*>((bsData))->updateIconNames();
-            emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
-            bsData->setIsFileChanged(true);
-        }
+        bsData->setName(newname);
+        bsData->updateIconNames();
+        emit generatorNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("BSSynchronizedClipGeneratorUI::setName(): The data is nullptr!!");
     }
 }
 
-void BSSynchronizedClipGeneratorUI::setSyncAnimPrefix(){
-    if (bsData){
-        if (bsData->syncAnimPrefix != syncAnimPrefix->text()){
-            bsData->syncAnimPrefix = syncAnimPrefix->text();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::setSyncAnimPrefix(): The data is nullptr!!");
-    }
+void BSSynchronizedClipGeneratorUI::setSyncAnimPrefix(const QString &newname){
+    (bsData) ? bsData->setSyncAnimPrefix(newname) : LogFile::writeToLog("BSSynchronizedClipGeneratorUI::setSyncAnimPrefix(): The data is nullptr!!");
 }
 
 void BSSynchronizedClipGeneratorUI::setSyncClipIgnoreMarkPlacement(){
-    if (bsData){
-        if (bsData->bSyncClipIgnoreMarkPlacement != bSyncClipIgnoreMarkPlacement->isChecked()){
-            bsData->bSyncClipIgnoreMarkPlacement = bSyncClipIgnoreMarkPlacement->isChecked();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setSyncClipIgnoreMarkPlacement(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBSyncClipIgnoreMarkPlacement(bSyncClipIgnoreMarkPlacement->isChecked()) : LogFile::writeToLog("BSSynchronizedClipGeneratorUI::setSyncClipIgnoreMarkPlacement(): The data is nullptr!!");
 }
 
 void BSSynchronizedClipGeneratorUI::setGetToMarkTime(){
-    if (bsData){
-        if (bsData->fGetToMarkTime != fGetToMarkTime->value()){
-            bsData->fGetToMarkTime = fGetToMarkTime->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setGetToMarkTime(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setFGetToMarkTime(fGetToMarkTime->value()) : LogFile::writeToLog("BSSynchronizedClipGeneratorUI::setGetToMarkTime(): The data is nullptr!!");
 }
 
 void BSSynchronizedClipGeneratorUI::setMarkErrorThreshold(){
-    if (bsData){
-        if (bsData->fMarkErrorThreshold != fMarkErrorThreshold->value()){
-            bsData->fMarkErrorThreshold = fMarkErrorThreshold->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setMarkErrorThreshold(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setFMarkErrorThreshold(fMarkErrorThreshold->value()) : LogFile::writeToLog("BSSynchronizedClipGeneratorUI::setMarkErrorThreshold(): The data is nullptr!!");
 }
 
 void BSSynchronizedClipGeneratorUI::setLeadCharacter(){
-    if (bsData){
-        if (bsData->bLeadCharacter != bLeadCharacter->isChecked()){
-            bsData->bLeadCharacter = bLeadCharacter->isChecked();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setLeadCharacter(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBLeadCharacter(bLeadCharacter->isChecked()) : LogFile::writeToLog("BSSynchronizedClipGeneratorUI::setLeadCharacter(): The data is nullptr!!");
 }
 
 void BSSynchronizedClipGeneratorUI::setReorientSupportChar(){
-    if (bsData){
-        if (bsData->bReorientSupportChar != bReorientSupportChar->isChecked()){
-            bsData->bReorientSupportChar = bReorientSupportChar->isChecked();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setReorientSupportChar(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBReorientSupportChar(bReorientSupportChar->isChecked()) : LogFile::writeToLog("BSSynchronizedClipGeneratorUI::setReorientSupportChar(): The data is nullptr!!");
 }
 
 void BSSynchronizedClipGeneratorUI::setApplyMotionFromRoot(){
-    if (bsData){
-        if (bsData->bApplyMotionFromRoot != bApplyMotionFromRoot->isChecked()){
-            bsData->bApplyMotionFromRoot = bApplyMotionFromRoot->isChecked();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setApplyMotionFromRoot(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBApplyMotionFromRoot(bApplyMotionFromRoot->isChecked()) : LogFile::writeToLog("BSSynchronizedClipGeneratorUI::setApplyMotionFromRoot(): The data is nullptr!!");
 }
 
 void BSSynchronizedClipGeneratorUI::setAnimationBindingIndex(){
-    if (bsData){
-        if (bsData->sAnimationBindingIndex != sAnimationBindingIndex->value()){
-            bsData->sAnimationBindingIndex = sAnimationBindingIndex->value();
-            bsData->setIsFileChanged(true);
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::setAnimationBindingIndex(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setSAnimationBindingIndex(sAnimationBindingIndex->value()) : LogFile::writeToLog("BSSynchronizedClipGeneratorUI::setAnimationBindingIndex(): The data is nullptr!!");
 }
 
 void BSSynchronizedClipGeneratorUI::selectTableToView(bool viewproperties, const QString & path){
@@ -300,57 +227,33 @@ void BSSynchronizedClipGeneratorUI::selectTableToView(bool viewproperties, const
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSOffsetAnimationGeneratorUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("BSOffsetAnimationGeneratorUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void BSSynchronizedClipGeneratorUI::viewSelectedChild(int row, int column){
     if (bsData){
-        bool properties = false;
+        auto properties = false;
+        auto checkisproperty = [&](int row, const QString & fieldname){
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : NULL;
+            selectTableToView(properties, fieldname);
+        };
         if (column == BINDING_COLUMN){
             switch (row){
             case SYNC_CLIP_IGNORE_MARK_PLACEMENT_ROW:
-                if (table->item(SYNC_CLIP_IGNORE_MARK_PLACEMENT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "bSyncClipIgnoreMarkPlacement");
-                break;
+                checkisproperty(SYNC_CLIP_IGNORE_MARK_PLACEMENT_ROW, "bSyncClipIgnoreMarkPlacement"); break;
             case GET_TO_MARK_TIME_ROW:
-                if (table->item(GET_TO_MARK_TIME_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "fGetToMarkTime");
-                break;
+                checkisproperty(GET_TO_MARK_TIME_ROW, "fGetToMarkTime"); break;
             case MARK_ERROR_THRESHOLD_ROW:
-                if (table->item(MARK_ERROR_THRESHOLD_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "fMarkErrorThreshold");
-                break;
+                checkisproperty(MARK_ERROR_THRESHOLD_ROW, "fMarkErrorThreshold"); break;
             case LEAD_CHARACTER_ROW:
-                if (table->item(LEAD_CHARACTER_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "bLeadCharacter");
-                break;
+                checkisproperty(LEAD_CHARACTER_ROW, "bLeadCharacter"); break;
             case REORIENT_SUPPORT_CHAR_ROW:
-                if (table->item(REORIENT_SUPPORT_CHAR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "bReorientSupportChar");
-                break;
+                checkisproperty(REORIENT_SUPPORT_CHAR_ROW, "bReorientSupportChar"); break;
             case APPLY_MOTION_FROM_ROOT_ROW:
-                if (table->item(APPLY_MOTION_FROM_ROOT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "bApplyMotionFromRoot");
-                break;
+                checkisproperty(APPLY_MOTION_FROM_ROOT_ROW, "bApplyMotionFromRoot"); break;
             case ANIMATION_BINDING_INDEX_ROW:
-                if (table->item(ANIMATION_BINDING_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                    properties = true;
-                }
-                selectTableToView(properties, "sAnimationBindingIndex");
-                break;
+                checkisproperty(ANIMATION_BINDING_INDEX_ROW, "sAnimationBindingIndex"); break;
             }
         }else if (column == VALUE_COLUMN){
             if (row == CLIP_GENERATOR_ROW){
@@ -358,154 +261,40 @@ void BSSynchronizedClipGeneratorUI::viewSelectedChild(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("BSSynchronizedClipGeneratorUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
 void BSSynchronizedClipGeneratorUI::setClipGenerator(int index, const QString & name){
-    DataIconManager *ptr = nullptr;
-    int indexOfGenerator = -1;
-    if (bsData){
-        if (behaviorView){
-            ptr = static_cast<BehaviorFile *>(bsData->getParentFile())->getGeneratorDataAt(index - 1);
-            indexOfGenerator = bsData->getIndexOfObj(static_cast<DataIconManager*>(bsData->pClipGenerator.data()));
-            if (ptr){
-                if (name != ptr->getName()){
-                    CRITICAL_ERROR_MESSAGE("::setDefaultGenerator():The name of the selected object does not match it's name in the object selection table!!!");
-                    return;
-                }else if (ptr->getSignature() != HKB_CLIP_GENERATOR){
-                    WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nInvalid object type selected! You must select a clip generator for the 'pClipGenerator' data field!!!");
-                    return;
-                }else if (ptr == bsData || !behaviorView->reconnectIcon(behaviorView->getSelectedItem(), static_cast<DataIconManager*>(bsData->pClipGenerator.data()), 0, ptr, false)){
-                    WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to create a circular branch or dead end!!!");
-                    return;
-                }
-            }else{
-                if (behaviorView->getSelectedItem()){
-                    behaviorView->removeItemFromGraph(behaviorView->getSelectedItem()->getChildWithData(static_cast<DataIconManager*>(bsData->pClipGenerator.data())), indexOfGenerator);
-                }else{
-                    CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::setClipGenerator(): The selected icon is nullptr!!");
-                    return;
-                }
-            }
-            behaviorView->removeGeneratorData();
-            table->item(CLIP_GENERATOR_ROW, VALUE_COLUMN)->setText(name);
-            bsData->setIsFileChanged(true);
-        }else{
-            CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::setClipGenerator(): The 'behaviorView' pointer is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::setClipGenerator(): The 'bsData' pointer is nullptr!!");
-    }
-}
-
-void BSSynchronizedClipGeneratorUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    if (bsData){
-        if (varBind){
-            int index = varBind->getVariableIndexOfBinding(path);
-            QString varName;
-            if (index != -1){
-                if (varBind->getBindingType(path) == hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY){
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyNameAt(index, true);
-                    table->item(row, column)->setCheckState(Qt::Checked);
-                }else{
-                    varName = static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableNameAt(index);
-                }
-            }
-            if (varName == ""){
-                varName = "NONE";
-            }
-            table->item(row, column)->setText(BINDING_ITEM_LABEL+varName);
-        }else{
-            CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::loadBinding(): The variable binding set is nullptr!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::loadBinding(): The data is nullptr!!");
-    }
-}
-
-bool BSSynchronizedClipGeneratorUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    hkbVariableBindingSet *varBind = bsData->getVariableBindingSetData();
-    if (bsData){
-        if (index == 0){
-            varBind->removeBinding(path);if (varBind->getNumberOfBindings() == 0){static_cast<HkDynamicObject *>(bsData)->getVariableBindingSet() = HkxSharedPtr(); static_cast<BehaviorFile *>(bsData->getParentFile())->removeOtherData();}
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-        }else if ((!isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getVariableTypeAt(index - 1), type)) ||
-                  (isProperty && areVariableTypesCompatible(static_cast<BehaviorFile *>(bsData->getParentFile())->getCharacterPropertyTypeAt(index - 1), type))){
-            if (!varBind){
-                varBind = new hkbVariableBindingSet(bsData->getParentFile());
-                bsData->getVariableBindingSet() = HkxSharedPtr(varBind);
-            }
-            if (isProperty){
-                varBind->addBinding(path, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_CHARACTER_PROPERTY);
-            }else{
-                varBind->addBinding(path, index - 1,hkbVariableBindingSet::hkBinding::BINDING_TYPE_VARIABLE);
-            }
-            table->item(row, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+variableName);
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("I'M SORRY HAL BUT I CAN'T LET YOU DO THAT.\nYou are attempting to bind a variable of an invalid type for this data field!!!");
-        }
-    }else{
-        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::setBinding(): The 'bsData' pointer is nullptr!!");
-        return false;
-    }
-    return true;
+    UIHelper::setGenerator(index, name, bsData, static_cast<hkbGenerator *>(bsData->pClipGenerator.data()), HKB_CLIP_GENERATOR, HkxObject::TYPE_GENERATOR, table, behaviorView, CLIP_GENERATOR_ROW, VALUE_COLUMN);
 }
 
 void BSSynchronizedClipGeneratorUI::setBindingVariable(int index, const QString & name){
     if (bsData){
-        bool isProperty = false;
-        int row = table->currentRow();
+        auto isProperty = false;
+        auto row = table->currentRow();
+        auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
+            (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : NULL;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
+        };
         switch (row){
         case SYNC_CLIP_IGNORE_MARK_PLACEMENT_ROW:
-            if (table->item(SYNC_CLIP_IGNORE_MARK_PLACEMENT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "bSyncClipIgnoreMarkPlacement", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(SYNC_CLIP_IGNORE_MARK_PLACEMENT_ROW, "bSyncClipIgnoreMarkPlacement", VARIABLE_TYPE_BOOL); break;
         case GET_TO_MARK_TIME_ROW:
-            if (table->item(GET_TO_MARK_TIME_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "fGetToMarkTime", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(GET_TO_MARK_TIME_ROW, "fGetToMarkTime", VARIABLE_TYPE_REAL); break;
         case MARK_ERROR_THRESHOLD_ROW:
-            if (table->item(MARK_ERROR_THRESHOLD_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "fMarkErrorThreshold", VARIABLE_TYPE_REAL, isProperty);
-            break;
+            checkisproperty(MARK_ERROR_THRESHOLD_ROW, "fMarkErrorThreshold", VARIABLE_TYPE_REAL); break;
         case LEAD_CHARACTER_ROW:
-            if (table->item(LEAD_CHARACTER_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "bLeadCharacter", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(LEAD_CHARACTER_ROW, "bLeadCharacter", VARIABLE_TYPE_BOOL); break;
         case REORIENT_SUPPORT_CHAR_ROW:
-            if (table->item(REORIENT_SUPPORT_CHAR_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "bReorientSupportChar", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(REORIENT_SUPPORT_CHAR_ROW, "bReorientSupportChar", VARIABLE_TYPE_BOOL); break;
         case APPLY_MOTION_FROM_ROOT_ROW:
-            if (table->item(APPLY_MOTION_FROM_ROOT_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "bApplyMotionFromRoot", VARIABLE_TYPE_BOOL, isProperty);
-            break;
+            checkisproperty(APPLY_MOTION_FROM_ROOT_ROW, "bApplyMotionFromRoot", VARIABLE_TYPE_BOOL); break;
         case ANIMATION_BINDING_INDEX_ROW:
-            if (table->item(ANIMATION_BINDING_INDEX_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
-                isProperty = true;
-            }
-            setBinding(index, row, name, "sAnimationBindingIndex", VARIABLE_TYPE_INT32, isProperty);
-            break;
-        default:
-            return;
+            checkisproperty(ANIMATION_BINDING_INDEX_ROW, "sAnimationBindingIndex", VARIABLE_TYPE_INT32); break;
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSSynchronizedClipGeneratorUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -521,58 +310,33 @@ void BSSynchronizedClipGeneratorUI::connectToTables(GenericTableWidget *generato
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("BSSynchronizedClipGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }
 
 void BSSynchronizedClipGeneratorUI::variableRenamed(const QString & name, int index){
-    int bindIndex = -1;
-    hkbVariableBindingSet *bind = nullptr;
-    if (name == ""){
-        WARNING_MESSAGE("BSSynchronizedClipGeneratorUI::variableRenamed(): The new variable name is the empty string!!");
-    }
     if (bsData){
         index--;
-        bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
-            bindIndex = bind->getVariableIndexOfBinding("bSyncClipIgnoreMarkPlacement");
-            if (bindIndex == index){
-                table->item(SYNC_CLIP_IGNORE_MARK_PLACEMENT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("fGetToMarkTime");
-            if (bindIndex == index){
-                table->item(GET_TO_MARK_TIME_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("fMarkErrorThreshold");
-            if (bindIndex == index){
-                table->item(MARK_ERROR_THRESHOLD_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("bLeadCharacter");
-            if (bindIndex == index){
-                table->item(LEAD_CHARACTER_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("bReorientSupportChar");
-            if (bindIndex == index){
-                table->item(REORIENT_SUPPORT_CHAR_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("bApplyMotionFromRoot");
-            if (bindIndex == index){
-                table->item(APPLY_MOTION_FROM_ROOT_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
-            bindIndex = bind->getVariableIndexOfBinding("sAnimationBindingIndex");
-            if (bindIndex == index){
-                table->item(ANIMATION_BINDING_INDEX_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+name);
-            }
+            auto setname = [&](const QString & fieldname, int row){
+                auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
+            };
+            setname("bSyncClipIgnoreMarkPlacement", SYNC_CLIP_IGNORE_MARK_PLACEMENT_ROW);
+            setname("fGetToMarkTime", GET_TO_MARK_TIME_ROW);
+            setname("fMarkErrorThreshold", MARK_ERROR_THRESHOLD_ROW);
+            setname("bLeadCharacter", LEAD_CHARACTER_ROW);
+            setname("bReorientSupportChar", REORIENT_SUPPORT_CHAR_ROW);
+            setname("bApplyMotionFromRoot", APPLY_MOTION_FROM_ROOT_ROW);
+            setname("sAnimationBindingIndex", ANIMATION_BINDING_INDEX_ROW);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSSynchronizedClipGeneratorUI::variableRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("BSSynchronizedClipGeneratorUI::variableRenamed(): The data is nullptr!!");
     }
 }
 
 void BSSynchronizedClipGeneratorUI::generatorRenamed(const QString &name, int index){
-    if (name == ""){
-        WARNING_MESSAGE("BSSynchronizedClipGeneratorUI::generatorRenamed(): The new variable name is the empty string!!");
-    }
     index--;
     if (index == static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData->pClipGenerator)){
         table->item(CLIP_GENERATOR_ROW, VALUE_COLUMN)->setText(name);

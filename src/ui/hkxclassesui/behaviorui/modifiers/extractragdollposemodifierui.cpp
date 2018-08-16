@@ -114,7 +114,7 @@ void ExtractRagdollPoseModifierUI::loadData(HkxObject *data){
             QStringList boneNames("None");
             hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbExtractRagdollPoseModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             if (poseMatchingBone0->count() == 0){
                 boneNames = boneNames + static_cast<BehaviorFile *>(bsData->getParentFile())->getRigBoneNames();
@@ -157,8 +157,8 @@ void ExtractRagdollPoseModifierUI::loadData(HkxObject *data){
 
 void ExtractRagdollPoseModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));

@@ -11,12 +11,13 @@ public:
     hkbBehaviorReferenceGenerator& operator=(const hkbBehaviorReferenceGenerator&) = delete;
     hkbBehaviorReferenceGenerator(const hkbBehaviorReferenceGenerator &) = delete;
     ~hkbBehaviorReferenceGenerator();
+public:
     QString getName() const;
     static const QString getClassname();
     QString getBehaviorName() const;
 private:
-    void setName(const QString &value);
-    void setBehaviorName(const QString &value);
+    void setName(const QString &newname);
+    void setBehaviorName(const QString &newname);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     QString evaluateDataValidity();

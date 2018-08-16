@@ -26,7 +26,7 @@ bool BGSGamebryoSequenceGenerator::readData(const HkxXmlReader &reader, long & i
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };
@@ -90,22 +90,22 @@ bool BGSGamebryoSequenceGenerator::link(){
 
 void BGSGamebryoSequenceGenerator::setFPercent(const qreal &value){
     std::lock_guard <std::mutex> guard(mutex);
-    fPercent = value;
+    (value != fPercent) ? fPercent = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'fPercent' was not set!");
 }
 
 void BGSGamebryoSequenceGenerator::setEBlendModeFunction(int index){
     std::lock_guard <std::mutex> guard(mutex);
-    (index >= 0 && index < BlendModeFunction.size()) ? eBlendModeFunction = BlendModeFunction.at(index) : NULL;
+    (index >= 0 && index < BlendModeFunction.size() && eBlendModeFunction != BlendModeFunction.at(index)) ? eBlendModeFunction = BlendModeFunction.at(index), getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'eBlendModeFunction' was not set!");
 }
 
 void BGSGamebryoSequenceGenerator::setPSequence(const QString &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != "") ? pSequence = value : NULL;
+    (value != pSequence && value != "") ? pSequence = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'pSequence' was not set!");
 }
 
-void BGSGamebryoSequenceGenerator::setName(const QString &value){
+void BGSGamebryoSequenceGenerator::setName(const QString &newname){
     std::lock_guard <std::mutex> guard(mutex);
-    (value != "") ? name = value : NULL;
+    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
 
 qreal BGSGamebryoSequenceGenerator::getFPercent() const{

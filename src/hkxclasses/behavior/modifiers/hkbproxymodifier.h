@@ -10,6 +10,7 @@ public:
     hkbProxyModifier& operator=(const hkbProxyModifier&) = delete;
     hkbProxyModifier(const hkbProxyModifier &) = delete;
     ~hkbProxyModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

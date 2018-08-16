@@ -11,6 +11,7 @@ public:
     BSGetTimeStepModifier& operator=(const BSGetTimeStepModifier&) = delete;
     BSGetTimeStepModifier(const BSGetTimeStepModifier &) = delete;
     ~BSGetTimeStepModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

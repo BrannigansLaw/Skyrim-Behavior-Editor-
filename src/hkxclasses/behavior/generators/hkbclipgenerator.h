@@ -4,6 +4,8 @@
 #include "hkbgenerator.h"
 #include "src/animData/skyrimclipgeneratodata.h"
 
+class hkbClipTriggerArray;
+
 class hkbClipGenerator final: public hkbGenerator
 {
     friend class ClipGeneratorUI;
@@ -12,6 +14,7 @@ public:
     hkbClipGenerator& operator=(const hkbClipGenerator&) = delete;
     hkbClipGenerator(const hkbClipGenerator &) = delete;
     ~hkbClipGenerator();
+public:
     QString getName() const;
     static const QString getClassname();
     SkyrimClipGeneratoData getClipGeneratorAnimData(ProjectAnimData *parent, uint animationIndex) const;
@@ -28,6 +31,23 @@ public:
     };
     Q_DECLARE_FLAGS(ClipFlags, ClipFlag)
 private:
+    hkbClipTriggerArray* getTriggers() const;
+    qreal getCropStartAmountLocalTime() const;
+    qreal getCropEndAmountLocalTime() const;
+    qreal getStartTime() const;
+    void setStartTime(const qreal &value);
+    qreal getPlaybackSpeed() const;
+    qreal getEnforcedDuration() const;
+    void setEnforcedDuration(const qreal &value);
+    qreal getUserControlledTimeFraction() const;
+    void setUserControlledTimeFraction(const qreal &value);
+    int getAnimationBindingIndex() const;
+    void setAnimationBindingIndex(int value);
+    QString getMode() const;
+    void setMode(int index);
+    QString getFlags() const;
+    void setFlags(const QString &value);
+    void setTriggers(hkbClipTriggerArray *value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

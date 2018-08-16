@@ -5,11 +5,6 @@
 
 #define MIN_NUM_LINES 3
 
-SkyrimAnimData::SkyrimAnimData()
-{
-    //
-}
-
 SkyrimAnimData::~SkyrimAnimData()
 {
     for (auto i = 0; i < animData.size(); i++){
@@ -24,8 +19,8 @@ bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore, const Q
         return false;
     }
     QByteArray line;
-    bool ok = false;
-    int size = 0;
+    auto ok = false;
+    auto size = 0;
     int indexToIgnore;
     int blocksize;
     QString name = projectToIgnore;
@@ -145,16 +140,6 @@ bool SkyrimAnimData::parse(QFile *file, const QString & projectToIgnore, const Q
     return true;
 }
 
-/*bool SkyrimAnimData::extract(const QString & projectname){
-    int index = 0;
-    for (; index < projectNames.size(); index++){
-        if (!QString::compare(projectNames.at(index), projectname.section("/", -1, -1), Qt::CaseInsensitive)){
-            return animData.at(index).write(projectname);
-        }
-    }
-    return false;
-}*/
-
 bool SkyrimAnimData::write(const QString &filename){
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
@@ -190,7 +175,7 @@ int SkyrimAnimData::getProjectIndex(const QString &projectname) const{
 }
 
 ProjectAnimData *SkyrimAnimData::getProjectAnimData(const QString &projectname) const{
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index > -1 && index < animData.size()){
         return animData.at(index);
     }
@@ -213,7 +198,7 @@ int SkyrimAnimData::addNewProject(const QString &projectname, const QStringList 
 }
 
 bool SkyrimAnimData::appendClipGenerator(const QString & projectname, SkyrimClipGeneratoData * animdata){
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         LogFile::writeToLog("SkyrimAnimData::appendClipGenerator(): The project was not found!");
         return false;
@@ -222,16 +207,16 @@ bool SkyrimAnimData::appendClipGenerator(const QString & projectname, SkyrimClip
 }
 
 bool SkyrimAnimData::removeClipGenerator(const QString &projectname, const QString &name){
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
-        //LogFile::writeToLog("SkyrimAnimData::removeClipGenerator(): The project was not found!");
+        LogFile::writeToLog("SkyrimAnimData::removeClipGenerator(): The project was not found!");
         return false;
     }
     return animData.at(index)->removeClipGenerator(name);
 }
 
 bool SkyrimAnimData::appendAnimation(const QString &projectname, SkyrimAnimationMotionData * motiondata){
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         LogFile::writeToLog("SkyrimAnimData::appendAnimation(): The project was not found!");
         return false;
@@ -240,7 +225,7 @@ bool SkyrimAnimData::appendAnimation(const QString &projectname, SkyrimAnimation
 }
 
 bool SkyrimAnimData::removeAnimation(const QString &projectname, int animationindex){
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         LogFile::writeToLog("SkyrimAnimData::removeAnimation(): The project was not found!");
         return false;
@@ -249,7 +234,7 @@ bool SkyrimAnimData::removeAnimation(const QString &projectname, int animationin
 }
 
 void SkyrimAnimData::setLocalTimeForClipGenAnimData(const QString &projectname, const QString &clipname, int triggerindex, qreal time){
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         LogFile::writeToLog("SkyrimAnimData::setLocalTimeForClipGenAnimData(): The project was not found!");
         return;
@@ -258,7 +243,7 @@ void SkyrimAnimData::setLocalTimeForClipGenAnimData(const QString &projectname, 
 }
 
 void SkyrimAnimData::setEventNameForClipGenAnimData(const QString &projectname, const QString &clipname, int triggerindex, const QString &eventname){
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         LogFile::writeToLog("SkyrimAnimData::setEventNameForClipGenAnimData(): The project was not found!");
         return;
@@ -267,7 +252,7 @@ void SkyrimAnimData::setEventNameForClipGenAnimData(const QString &projectname, 
 }
 
 void SkyrimAnimData::setClipNameAnimData(const QString &projectname, const QString &oldclipname, const QString &newclipname){
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         LogFile::writeToLog("SkyrimAnimData::setClipNameAnimData(): The project was not found!");
         return;
@@ -277,7 +262,7 @@ void SkyrimAnimData::setClipNameAnimData(const QString &projectname, const QStri
 
 
 void SkyrimAnimData::setAnimationIndexForClipGen(const QString &projectname, const QString &clipGenName, int animationindex){
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         LogFile::writeToLog("SkyrimAnimData::setAnimationIndexForClipGen(): The project was not found!");
         return;
@@ -286,7 +271,7 @@ void SkyrimAnimData::setAnimationIndexForClipGen(const QString &projectname, con
 }
 
 void SkyrimAnimData::setPlaybackSpeedAnimData(const QString &projectname, const QString &clipGenName, qreal speed){
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         LogFile::writeToLog("SkyrimAnimData::setPlaybackSpeedAnimData(): Project was not found!");
         return;
@@ -295,7 +280,7 @@ void SkyrimAnimData::setPlaybackSpeedAnimData(const QString &projectname, const 
 }
 
 void SkyrimAnimData::setCropStartAmountLocalTimeAnimData(const QString &projectname, const QString &clipGenName, qreal time){
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         LogFile::writeToLog("SkyrimAnimData::setCropStartAmountLocalTimeAnimData(): Project was not found!");
         return;
@@ -304,7 +289,7 @@ void SkyrimAnimData::setCropStartAmountLocalTimeAnimData(const QString &projectn
 }
 
 void SkyrimAnimData::setCropEndAmountLocalTimeAnimData(const QString &projectname, const QString &clipGenName, qreal time){
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         LogFile::writeToLog("SkyrimAnimData::setCropEndAmountLocalTimeAnimData(): Project was not found!");
         return;
@@ -313,7 +298,7 @@ void SkyrimAnimData::setCropEndAmountLocalTimeAnimData(const QString &projectnam
 }
 
 void SkyrimAnimData::appendClipTriggerToAnimData(const QString &projectname, const QString &clipGenName, const QString & eventname){
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         LogFile::writeToLog("SkyrimAnimData::appendClipTriggerToAnimData(): Project was not found!");
         return;
@@ -340,7 +325,7 @@ bool SkyrimAnimData::isProjectNameTaken(const QString & name) const{
 }
 
 bool SkyrimAnimData::removeBehaviorFromProject(const QString &projectname, const QString &behaviorfilename){
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         LogFile::writeToLog("SkyrimAnimData::removeBehaviorFromProject(): Project was not found!");
         return false;
@@ -350,7 +335,7 @@ bool SkyrimAnimData::removeBehaviorFromProject(const QString &projectname, const
 }
 
 qreal SkyrimAnimData::getAnimationDurationFromAnimData(const QString &projectname, int animationindex) const{
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         LogFile::writeToLog("SkyrimAnimData::getAnimationDurationFromAnimData(): Project was not found!");
         return 0;
@@ -359,7 +344,7 @@ qreal SkyrimAnimData::getAnimationDurationFromAnimData(const QString &projectnam
 }
 
 SkyrimAnimationMotionData SkyrimAnimData::getAnimationMotionData(const QString &projectname, int animationindex) const{
-    int index = getProjectIndex(projectname);
+    auto index = getProjectIndex(projectname);
     if (index < 0 || index >= animData.size()){
         LogFile::writeToLog("SkyrimAnimData::getAnimationMotionData(): Project was not found!");
         return SkyrimAnimationMotionData(nullptr);
@@ -401,8 +386,7 @@ void SkyrimAnimData::merge(SkyrimAnimData *recessiveanimdata, const QString & pr
 bool SkyrimAnimData::isEmpty() const{
     if (projectNames.isEmpty()){
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 

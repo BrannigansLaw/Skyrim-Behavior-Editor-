@@ -138,7 +138,7 @@ void KeyframeBonesModifierUI::loadData(HkxObject *data){
         if (data->getSignature() == HKB_KEY_FRAME_BONES_MODIFIER){
             hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbKeyframeBonesModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             if (bsData->keyframedBonesList.data()){
                 keyframedBonesList->setChecked(true);
@@ -261,10 +261,10 @@ void KeyframeBonesModifierUI::returnToWidget(){
 
 void KeyframeBonesModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            emit modifierNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
+            emit modifierNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
             bsData->setIsFileChanged(true);
         }
     }else{

@@ -61,3 +61,7 @@ bool AnimCacheVariable::write(QFile *file, QTextStream &out) const{
     out << QString::number(maxValue) << "\n";
     return true;
 }
+
+QString AnimCacheVariable::getName() const{
+    return name;
+}

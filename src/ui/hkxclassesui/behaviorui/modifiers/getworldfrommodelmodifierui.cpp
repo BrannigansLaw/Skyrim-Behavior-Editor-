@@ -98,7 +98,7 @@ void GetWorldFromModelModifierUI::loadData(HkxObject *data){
         if (data->getSignature() == HKB_GET_WORLD_FROM_MODEL_MODIFIER){
             hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbGetWorldFromModelModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             translationOut->setValue(bsData->translationOut);
             rotationOut->setValue(bsData->rotationOut);
@@ -123,8 +123,8 @@ void GetWorldFromModelModifierUI::loadData(HkxObject *data){
 
 void GetWorldFromModelModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));

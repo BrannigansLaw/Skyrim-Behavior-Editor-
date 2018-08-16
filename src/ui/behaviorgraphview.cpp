@@ -483,8 +483,7 @@ void BehaviorGraphView::deleteAllObjectBranches(){
     }
 }
 
-BehaviorFile *BehaviorGraphView::getBehavior() const
-{
+BehaviorFile *BehaviorGraphView::getBehavior() const{
     return behavior;
 }
 

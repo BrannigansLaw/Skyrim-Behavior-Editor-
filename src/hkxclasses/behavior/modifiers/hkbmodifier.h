@@ -8,9 +8,11 @@ class TreeGraphicsItem;
 
 class hkbModifier: public DataIconManager
 {
-    friend class TreeGraphicsItem;
 public:
-    ~hkbModifier();
+    ~hkbModifier() = default;
+    hkbModifier& operator=(const hkbModifier&) = delete;
+    hkbModifier(const hkbModifier &) = delete;
+public:
     bool link();
     virtual QString getName() const;
     QString getClassname() const;

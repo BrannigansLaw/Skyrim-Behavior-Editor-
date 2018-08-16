@@ -514,11 +514,11 @@ void ProjectFile::setAnimationIndexDuration(int indexofanimationlist, int animat
     ProjectAnimData *project = skyrimAnimData->getProjectAnimData(projectName);
     if (project){
         if (indexofanimationlist == -1){
-            project->animationMotionData.last()->animationIndex = animationindex;
-            project->animationMotionData.last()->duration = duration;
+            project->animationMotionData.last()->setAnimationIndex(animationindex);
+            project->animationMotionData.last()->setDuration(duration);
         }else if (indexofanimationlist < project->animationMotionData.size()){
-            project->animationMotionData.at(indexofanimationlist)->animationIndex = animationindex;
-            project->animationMotionData.at(indexofanimationlist)->duration = duration;
+            project->animationMotionData.at(indexofanimationlist)->setAnimationIndex(animationindex);
+            project->animationMotionData.at(indexofanimationlist)->setDuration(duration);
         }
     }else{
         LogFile::writeToLog("'projectName' was not found in the animation data!");

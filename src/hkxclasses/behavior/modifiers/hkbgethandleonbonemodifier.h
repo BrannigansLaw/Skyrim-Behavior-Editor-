@@ -11,6 +11,7 @@ public:
     hkbGetHandleOnBoneModifier& operator=(const hkbGetHandleOnBoneModifier&) = delete;
     hkbGetHandleOnBoneModifier(const hkbGetHandleOnBoneModifier &) = delete;
     ~hkbGetHandleOnBoneModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

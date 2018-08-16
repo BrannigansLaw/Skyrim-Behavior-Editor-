@@ -11,6 +11,7 @@ public:
     hkbTwistModifier& operator=(const hkbTwistModifier&) = delete;
     hkbTwistModifier(const hkbTwistModifier &) = delete;
     ~hkbTwistModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

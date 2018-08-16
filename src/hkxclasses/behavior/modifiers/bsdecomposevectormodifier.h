@@ -11,6 +11,7 @@ public:
     BSDecomposeVectorModifier& operator=(const BSDecomposeVectorModifier&) = delete;
     BSDecomposeVectorModifier(const BSDecomposeVectorModifier &) = delete;
     ~BSDecomposeVectorModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

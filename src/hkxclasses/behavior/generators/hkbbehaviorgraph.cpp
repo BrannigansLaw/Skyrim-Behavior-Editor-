@@ -4,11 +4,6 @@
 #include "src/hkxclasses/behavior/hkbbehaviorgraphdata.h"
 #include "src/hkxclasses/behavior/generators/hkbstatemachine.h"
 
-//#include <QExplicitlySharedDataPointer>
-/*
- * CLASS: hkbBehaviorGraph
-*/
-
 uint hkbBehaviorGraph::refCount = 0;
 
 const QString hkbBehaviorGraph::classname = "hkbBehaviorGraph";
@@ -47,13 +42,8 @@ hkbStateMachine *hkbBehaviorGraph::getRootGenerator() const{
 
 void hkbBehaviorGraph::setName(const QString &newname){
     std::lock_guard <std::mutex> guard(mutex);
-    (newname != "") ? name = newname : name;
+    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
 }
-
-/*hkbStateMachine *hkbBehaviorGraph::getRootGeneratorData() const{
-    std::lock_guard <std::mutex> guard(mutex);
-    return static_cast<hkbStateMachine *>(rootGenerator.data());
-}*/
 
 QString hkbBehaviorGraph::getRootGeneratorName() const{
     std::lock_guard <std::mutex> guard(mutex);
@@ -67,14 +57,6 @@ QString hkbBehaviorGraph::getName() const{
     std::lock_guard <std::mutex> guard(mutex);
     return name;
 }
-
-/*int hkbBehaviorGraph::getIndexToInsertIcon() const{
-    std::lock_guard <std::mutex> guard(mutex);
-    if (!rootGenerator.constData()){
-        return 0;
-    }
-    return -1;
-}*/
 
 bool hkbBehaviorGraph::insertObjectAt(int , DataIconManager *obj){
     std::lock_guard <std::mutex> guard(mutex);
@@ -96,7 +78,7 @@ bool hkbBehaviorGraph::removeObjectAt(int index){
 
 void hkbBehaviorGraph::setVariableMode(const QString &value){
     std::lock_guard <std::mutex> guard(mutex);
-    (VariableMode.contains(value)) ? variableMode = value : NULL;
+    (value != variableMode && VariableMode.contains(value)) ? variableMode = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'variableMode' was not set!");
 }
 
 QString hkbBehaviorGraph::getVariableMode() const{
@@ -133,7 +115,7 @@ bool hkbBehaviorGraph::readData(const HkxXmlReader &reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };

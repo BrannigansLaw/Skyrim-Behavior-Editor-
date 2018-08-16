@@ -210,7 +210,7 @@ bool CharacterFile::merge(CharacterFile *recessivefile){    //TO DO: merge chara
     //std::lock_guard <std::mutex> guard(mutex);
     if (recessivefile){
         if (!static_cast<hkbCharacterData *>(characterData.data())->merge(recessivefile->characterData.data())){
-            WARNING_MESSAGE("CharacterFile: merge() failed!\hkbCharacterData failed to merge!");
+            WARNING_MESSAGE("CharacterFile: merge() failed! hkbCharacterData failed to merge!");
         }else{
             return true;
         }

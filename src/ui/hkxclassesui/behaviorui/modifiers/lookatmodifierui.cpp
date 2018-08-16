@@ -228,7 +228,7 @@ void LookAtModifierUI::loadData(HkxObject *data){
             QStringList boneNames("None");
             hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbLookAtModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             targetWS->setValue(bsData->targetWS);
             headForwardLS->setValue(bsData->headForwardLS);
@@ -309,8 +309,8 @@ void LookAtModifierUI::loadData(HkxObject *data){
 
 void LookAtModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));

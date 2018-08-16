@@ -16,10 +16,12 @@ public:
     hkaSkeleton& operator=(const hkaSkeleton&) = delete;
     hkaSkeleton(const hkaSkeleton &) = delete;
     ~hkaSkeleton();
+public:
     static const QString getClassname();
     QStringList getBoneNames() const;
     QString getLocalFrameName(int boneIndex) const;
 private:
+    QString getName() const;
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

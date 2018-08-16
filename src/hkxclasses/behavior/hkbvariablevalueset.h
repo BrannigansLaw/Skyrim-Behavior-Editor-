@@ -11,12 +11,12 @@ class hkbVariableValueSet final: public HkxObject
     friend class hkbCharacterData;
     friend class BehaviorVariablesUI;
     friend class CharacterPropertiesUI;
-    //friend class CharacterFile;
 public:
     hkbVariableValueSet(HkxFile *parent, long ref = 0);
     hkbVariableValueSet& operator=(const hkbVariableValueSet&) = delete;
     hkbVariableValueSet(const hkbVariableValueSet &) = delete;
     ~hkbVariableValueSet();
+public:
     static const QString getClassname();
 private:
     int getWordVariableAt(int index) const;

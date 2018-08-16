@@ -133,7 +133,7 @@ void EvaluateExpressionModifierUI::loadData(HkxObject *data){
     if (data){
         if (data->getSignature() == HKB_EVALUATE_EXPRESSION_MODIFIER){
             bsData = static_cast<hkbEvaluateExpressionModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             varBind = bsData->getVariableBindingSetData();
             if (varBind){
@@ -252,10 +252,10 @@ void EvaluateExpressionModifierUI::returnToWidget(){
 
 void EvaluateExpressionModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            emit modifierNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
+            emit modifierNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
             bsData->setIsFileChanged(true);
         }
     }else{

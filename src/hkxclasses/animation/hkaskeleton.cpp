@@ -67,6 +67,11 @@ void hkaSkeleton::setLocalFrameName(int boneIndex, const QString & name){
     }
 }
 
+QString hkaSkeleton::getName() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return name;
+}
+
 bool hkaSkeleton::removeLocalFrame(int boneIndex){
     std::lock_guard <std::mutex> guard(mutex);
     for (auto i = 0; i < localFrames.size(); i++){
@@ -83,7 +88,7 @@ bool hkaSkeleton::readData(const HkxXmlReader &reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     int numElems = 0;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     int numtrans = 0;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){

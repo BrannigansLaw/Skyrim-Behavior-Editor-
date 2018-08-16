@@ -213,7 +213,6 @@ void BlenderGeneratorUI::toggleSignals(bool toggleconnections){
 }
 
 void BlenderGeneratorUI::loadData(HkxObject *data){
-    hkbVariableBindingSet *varBind = nullptr;
     toggleSignals(false);
     setCurrentIndex(MAIN_WIDGET);
     if (data){
@@ -237,32 +236,23 @@ void BlenderGeneratorUI::loadData(HkxObject *data){
                 testflag(flagParametricBlend, hkbBlenderGenerator::FLAG_PARAMETRIC_BLEND);
                 testflag(flagIsParametricBlendCyclic, hkbBlenderGenerator::FLAG_IS_PARAMETRIC_BLEND_CYCLIC);
                 testflag(flagForceDensePose, hkbBlenderGenerator::FLAG_FORCE_DENSE_POSE);
-                subtractLastChild->setChecked(bsData->getSubtractLastChild());
-                varBind = bsData->getVariableBindingSetData();
-                if (varBind){
-                    loadBinding(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN, varBind, "referencePoseWeightThreshold");
-                    loadBinding(BLEND_PARAMETER_ROW, BINDING_COLUMN, varBind, "blendParameter");
-                    loadBinding(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN, varBind, "minCyclicBlendParameter");
-                    loadBinding(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN, varBind, "maxCyclicBlendParameter");
-                    loadBinding(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN, varBind, "indexOfSyncMasterChild");
-                    loadBinding(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN, varBind, "subtractLastChild");
-                }else{
-                    table->item(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                    table->item(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-                }
-                loadDynamicTableRows();
             }else{
-                CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
+                LogFile::writeToLog(QString("BlenderGeneratorUI::loadData(): The flags string is invalid!!!\nString: "+bsData->flags).toLocal8Bit().data());
             }
+            subtractLastChild->setChecked(bsData->getSubtractLastChild());
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, BINDING_COLUMN, varBind, "referencePoseWeightThreshold", table, bsData);
+            UIHelper::loadBinding(BLEND_PARAMETER_ROW, BINDING_COLUMN, varBind, "blendParameter", table, bsData);
+            UIHelper::loadBinding(MIN_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN, varBind, "minCyclicBlendParameter", table, bsData);
+            UIHelper::loadBinding(MAX_CYCLIC_BLEND_PARAMETER_ROW, BINDING_COLUMN, varBind, "maxCyclicBlendParameter", table, bsData);
+            UIHelper::loadBinding(INDEX_OF_SYNC_MASTER_CHILD_ROW, BINDING_COLUMN, varBind, "indexOfSyncMasterChild", table, bsData);
+            UIHelper::loadBinding(SUBTRACT_LAST_CHILD_ROW, BINDING_COLUMN, varBind, "subtractLastChild", table, bsData);
+            loadDynamicTableRows();
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            LogFile::writeToLog(QString("BlenderGeneratorUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::loadData(): Attempting to load a null pointer!!");
+        LogFile::writeToLog("BlenderGeneratorUI::loadData(): Attempting to load a null pointer!!");
     }
     toggleSignals(true);
 }
@@ -271,22 +261,17 @@ void BlenderGeneratorUI::loadDynamicTableRows(){
     if (bsData){
         auto temp = ADD_CHILD_ROW + bsData->getNumberOfChildren() + 1;
         (table->rowCount() != temp) ? table->setRowCount(temp) : NULL;
-        hkbBlenderGeneratorChild *child = nullptr;
         for (auto i = ADD_CHILD_ROW + 1, j = 0; j < bsData->getNumberOfChildren(); i++, j++){
-            child = bsData->getChildDataAt(j);
+            auto child = bsData->getChildDataAt(j);
             if (child){
-                UIHelperFunctions::setRowItems(i, "Child "+QString::number(j), child->getClassname(), "Remove", "Edit", "Double click to remove this child", "Double click to edit this child", table);
+                UIHelper::setRowItems(i, "Child "+QString::number(j), child->getClassname(), "Remove", "Edit", "Double click to remove this child", "Double click to edit this child", table);
             }else{
-                CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::loadData(): Null child found!!!");
+                LogFile::writeToLog("BlenderGeneratorUI::loadData(): Null child found!!!");
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::loadDynamicTableRows(): The data is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorUI::loadDynamicTableRows(): The data is nullptr!!");
     }
-}
-
-void BlenderGeneratorUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    UIHelperFunctions::setBinding(index, row, BINDING_COLUMN, variableName, path, type, isProperty, table, bsData);
 }
 
 void BlenderGeneratorUI::setBindingVariable(int index, const QString & name){
@@ -295,91 +280,56 @@ void BlenderGeneratorUI::setBindingVariable(int index, const QString & name){
         auto row = table->currentRow();
         auto checkisproperty = [&](int row, const QString & fieldname, hkVariableType type){
             (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? isProperty = true : NULL;
-            setBinding(index, row, name, fieldname, type, isProperty);
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, fieldname, type, isProperty, table, bsData);
         };
         switch (row){
         case REFERENCE_POSE_WEIGHT_THRESHOLD_ROW:
-            checkisproperty(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, "referencePoseWeightThreshold", VARIABLE_TYPE_REAL);
-            break;
+            checkisproperty(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, "referencePoseWeightThreshold", VARIABLE_TYPE_REAL); break;
         case BLEND_PARAMETER_ROW:
-            checkisproperty(BLEND_PARAMETER_ROW, "blendParameter", VARIABLE_TYPE_REAL);
-            break;
+            checkisproperty(BLEND_PARAMETER_ROW, "blendParameter", VARIABLE_TYPE_REAL); break;
         case MIN_CYCLIC_BLEND_PARAMETER_ROW:
-            checkisproperty(MIN_CYCLIC_BLEND_PARAMETER_ROW, "minCyclicBlendParameter", VARIABLE_TYPE_REAL);
-            break;
+            checkisproperty(MIN_CYCLIC_BLEND_PARAMETER_ROW, "minCyclicBlendParameter", VARIABLE_TYPE_REAL); break;
         case MAX_CYCLIC_BLEND_PARAMETER_ROW:
-            checkisproperty(MAX_CYCLIC_BLEND_PARAMETER_ROW, "maxCyclicBlendParameter", VARIABLE_TYPE_REAL);
-            break;
+            checkisproperty(MAX_CYCLIC_BLEND_PARAMETER_ROW, "maxCyclicBlendParameter", VARIABLE_TYPE_REAL); break;
         case INDEX_OF_SYNC_MASTER_CHILD_ROW:
-            checkisproperty(INDEX_OF_SYNC_MASTER_CHILD_ROW, "indexOfSyncMasterChild", VARIABLE_TYPE_INT32);
-            break;
+            checkisproperty(INDEX_OF_SYNC_MASTER_CHILD_ROW, "indexOfSyncMasterChild", VARIABLE_TYPE_INT32); break;
         case SUBTRACT_LAST_CHILD_ROW:
-            checkisproperty(SUBTRACT_LAST_CHILD_ROW, "subtractLastChild", VARIABLE_TYPE_BOOL);
-            break;
-        default:
-            return;
+            checkisproperty(SUBTRACT_LAST_CHILD_ROW, "subtractLastChild", VARIABLE_TYPE_BOOL); break;
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setBindingVariable(): The data is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorUI::setBindingVariable(): The data is nullptr!!");
     }
 }
 
 void BlenderGeneratorUI::setName(const QString &newname){
     if (bsData){
-        bsData->setName(newname);   //Make sure name is valid???
+        bsData->setName(newname);
         bsData->updateIconNames();
         bsData->updateChildIconNames();
-        bsData->setIsFileChanged(true);
         emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setName(): The data is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorUI::setName(): The data is nullptr!!");
     }
 }
 
 void BlenderGeneratorUI::setReferencePoseWeightThreshold(){
-    if (bsData){
-        bsData->setReferencePoseWeightThreshold(referencePoseWeightThreshold->value());
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setReferencePoseWeightThreshold(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setReferencePoseWeightThreshold(referencePoseWeightThreshold->value()) : LogFile::writeToLog("BlenderGeneratorUI::setReferencePoseWeightThreshold(): The data is nullptr!!");
 }
 
 void BlenderGeneratorUI::setBlendParameter(){
-    if (bsData){
-        bsData->setBlendParameter(blendParameter->value());
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setBlendParameter(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setBlendParameter(blendParameter->value()) : LogFile::writeToLog("BlenderGeneratorUI::setBlendParameter(): The data is nullptr!!");
 }
 
 void BlenderGeneratorUI::setMinCyclicBlendParameter(){
-    if (bsData){
-        bsData->setMinCyclicBlendParameter(minCyclicBlendParameter->value());
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setMinCyclicBlendParameter(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setMinCyclicBlendParameter(minCyclicBlendParameter->value()) : LogFile::writeToLog("BlenderGeneratorUI::setMinCyclicBlendParameter(): The data is nullptr!!");
 }
 
 void BlenderGeneratorUI::setMaxCyclicBlendParameter(){
-    if (bsData){
-        bsData->setMaxCyclicBlendParameter(maxCyclicBlendParameter->value());
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setMaxCyclicBlendParameter(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setMaxCyclicBlendParameter(maxCyclicBlendParameter->value()) : LogFile::writeToLog("BlenderGeneratorUI::setMaxCyclicBlendParameter(): The data is nullptr!!");
 }
 
 void BlenderGeneratorUI::setIndexOfSyncMasterChild(){
-    if (bsData){
-        bsData->setIndexOfSyncMasterChild(indexOfSyncMasterChild->value());
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setIndexOfSyncMasterChild(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setIndexOfSyncMasterChild(indexOfSyncMasterChild->value()) : LogFile::writeToLog("BlenderGeneratorUI::setIndexOfSyncMasterChild(): The data is nullptr!!");
 }
 
 void BlenderGeneratorUI::setFlag(CheckBox *flagcheckbox, hkbBlenderGenerator::BlenderFlag flagtoset){
@@ -390,10 +340,10 @@ void BlenderGeneratorUI::setFlag(CheckBox *flagcheckbox, hkbBlenderGenerator::Bl
             (flagcheckbox->isChecked()) ? flags |= flagtoset : flags &= ~(flagtoset);
             bsData->setFlags(QString::number(flags));
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BlenderGeneratorUI::setFlag(): The flags string is invalid!!!\nString: "+bsData->getFlags()).toLocal8Bit().data());
+            LogFile::writeToLog(QString("BlenderGeneratorUI::setFlag(): The flags string is invalid!!!\nString: "+bsData->getFlags()).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setFlag(): The data is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorUI::setFlag(): The data is nullptr!!");
     }
 }
 
@@ -422,25 +372,18 @@ void BlenderGeneratorUI::setFlagForceDensePose(){
 }
 
 void BlenderGeneratorUI::setSubtractLastChild(){
-    if (bsData){
-        bsData->setSubtractLastChild(subtractLastChild->isChecked());
-        bsData->setIsFileChanged(true);
-    }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setSubtractLastChild(): The data is nullptr!!");
-    }
+    (bsData) ? bsData->setSubtractLastChild(subtractLastChild->isChecked()) : LogFile::writeToLog("BlenderGeneratorUI::setSubtractLastChild(): The data is nullptr!!");
 }
 
 void BlenderGeneratorUI::swapGeneratorIndices(int index1, int index2){
     if (bsData){
         index1 = index1 - BASE_NUMBER_OF_ROWS;
         index2 = index2 - BASE_NUMBER_OF_ROWS;
-        if (bsData->swapChildren(index1, index2)){
-            bsData->setIsFileChanged(true);
-        }else{
-            WARNING_MESSAGE("BlenderGeneratorUI::swapGeneratorIndices(): Cannot swap these rows!!");
+        if (!bsData->swapChildren(index1, index2)){
+            WARNING_MESSAGE("Cannot swap these rows!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::swapGeneratorIndices(): The data is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorUI::swapGeneratorIndices(): The data is nullptr!!");
     }
 }
 
@@ -451,51 +394,38 @@ void BlenderGeneratorUI::addChildWithGenerator(){
         behaviorView->appendBlenderGeneratorChild();
         switch (typeEnum){
         case STATE_MACHINE:
-            behaviorView->appendStateMachine();
-            break;
+            behaviorView->appendStateMachine(); break;
         case MANUAL_SELECTOR_GENERATOR:
-            behaviorView->appendManualSelectorGenerator();
-            break;
+            behaviorView->appendManualSelectorGenerator(); break;
         case BLENDER_GENERATOR:
-            behaviorView->appendBlenderGenerator();
-            break;
+            behaviorView->appendBlenderGenerator(); break;
         case I_STATE_TAGGING_GENERATOR:
-            behaviorView->appendIStateTaggingGenerator();
-            break;
+            behaviorView->appendIStateTaggingGenerator(); break;
         case BONE_SWITCH_GENERATOR:
-            behaviorView->appendBoneSwitchGenerator();
-            break;
+            behaviorView->appendBoneSwitchGenerator(); break;
         case CYCLIC_BLEND_TRANSITION_GENERATOR:
-            behaviorView->appendCyclicBlendTransitionGenerator();
-            break;
+            behaviorView->appendCyclicBlendTransitionGenerator(); break;
         case SYNCHRONIZED_CLIP_GENERATOR:
-            behaviorView->appendSynchronizedClipGenerator();
-            break;
+            behaviorView->appendSynchronizedClipGenerator(); break;
         case MODIFIER_GENERATOR:
-            behaviorView->appendModifierGenerator();
-            break;
+            behaviorView->appendModifierGenerator(); break;
         case OFFSET_ANIMATION_GENERATOR:
-            behaviorView->appendOffsetAnimationGenerator();
-            break;
+            behaviorView->appendOffsetAnimationGenerator(); break;
         case POSE_MATCHING_GENERATOR:
-            behaviorView->appendPoseMatchingGenerator();
-            break;
+            behaviorView->appendPoseMatchingGenerator(); break;
         case CLIP_GENERATOR:
-            behaviorView->appendClipGenerator();
-            break;
+            behaviorView->appendClipGenerator(); break;
         case BEHAVIOR_REFERENCE_GENERATOR:
-            behaviorView->appendBehaviorReferenceGenerator();
-            break;
+            behaviorView->appendBehaviorReferenceGenerator(); break;
         case GAMEBYRO_SEQUENCE_GENERATOR:
-            behaviorView->appendBGSGamebryoSequenceGenerator();
-            break;
+            behaviorView->appendBGSGamebryoSequenceGenerator(); break;
         default:
-            CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::addChild(): Invalid typeEnum!!");
+            LogFile::writeToLog("BlenderGeneratorUI::addChild(): Invalid typeEnum!!");
             return;
         }
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::addChild(): The data or behavior graph pointer is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorUI::addChild(): The data or behavior graph pointer is nullptr!!");
     }
 }
 
@@ -507,18 +437,17 @@ void BlenderGeneratorUI::removeChild(int index){
             behaviorView->removeItemFromGraph(behaviorView->getSelectedIconsChildIcon(child->getChildren().first()), index);
             behaviorView->removeObjects();
         }else{
-            WARNING_MESSAGE("BlenderGeneratorUI::removeChild(): Invalid index of child to remove!!");
+            WARNING_MESSAGE("Invalid index of child to remove!!");
         }
         loadDynamicTableRows();
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::removeChild(): The data or behavior graph pointer is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorUI::removeChild(): The data or behavior graph pointer is nullptr!!");
     }
 }
 
 void BlenderGeneratorUI::viewSelectedChild(int row, int column){
-    auto result = -1;
-    auto properties = false;
     auto checkisproperty = [&](int row, const QString & fieldname){
+        auto properties = false;
         (table->item(row, BINDING_COLUMN)->checkState() != Qt::Unchecked) ? properties = true : NULL;
         selectTableToView(properties, fieldname);
     };
@@ -527,29 +456,23 @@ void BlenderGeneratorUI::viewSelectedChild(int row, int column){
             if (column == BINDING_COLUMN){
                 switch (row){
                 case REFERENCE_POSE_WEIGHT_THRESHOLD_ROW:
-                    checkisproperty(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, "referencePoseWeightThreshold");
-                    break;
+                    checkisproperty(REFERENCE_POSE_WEIGHT_THRESHOLD_ROW, "referencePoseWeightThreshold"); break;
                 case BLEND_PARAMETER_ROW:
-                    checkisproperty(BLEND_PARAMETER_ROW, "blendParameter");
-                    break;
+                    checkisproperty(BLEND_PARAMETER_ROW, "blendParameter"); break;
                 case MIN_CYCLIC_BLEND_PARAMETER_ROW:
-                    checkisproperty(MIN_CYCLIC_BLEND_PARAMETER_ROW, "minCyclicBlendParameter");
-                    break;
+                    checkisproperty(MIN_CYCLIC_BLEND_PARAMETER_ROW, "minCyclicBlendParameter"); break;
                 case MAX_CYCLIC_BLEND_PARAMETER_ROW:
-                    checkisproperty(MAX_CYCLIC_BLEND_PARAMETER_ROW, "maxCyclicBlendParameter");
-                    break;
+                    checkisproperty(MAX_CYCLIC_BLEND_PARAMETER_ROW, "maxCyclicBlendParameter"); break;
                 case INDEX_OF_SYNC_MASTER_CHILD_ROW:
-                    checkisproperty(INDEX_OF_SYNC_MASTER_CHILD_ROW, "indexOfSyncMasterChild");
-                    break;
+                    checkisproperty(INDEX_OF_SYNC_MASTER_CHILD_ROW, "indexOfSyncMasterChild"); break;
                 case SUBTRACT_LAST_CHILD_ROW:
-                    checkisproperty(SUBTRACT_LAST_CHILD_ROW, "subtractLastChild");
-                    break;
+                    checkisproperty(SUBTRACT_LAST_CHILD_ROW, "subtractLastChild"); break;
                 }
             }
         }else if (row == ADD_CHILD_ROW && column == NAME_COLUMN){
             addChildWithGenerator();
         }else if (row > ADD_CHILD_ROW && row < ADD_CHILD_ROW + bsData->getNumberOfChildren() + 1){
-            result = row - BASE_NUMBER_OF_ROWS;
+            auto result = row - BASE_NUMBER_OF_ROWS;
             if (column == VALUE_COLUMN){
                 childUI->loadData(bsData->getChildDataAt(result), result);
                 setCurrentIndex(CHILD_WIDGET);
@@ -560,7 +483,7 @@ void BlenderGeneratorUI::viewSelectedChild(int row, int column){
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::viewSelectedChild(): The data is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorUI::viewSelectedChild(): The data is nullptr!!");
     }
 }
 
@@ -572,11 +495,9 @@ void BlenderGeneratorUI::returnToWidget(bool reloadData){
 void BlenderGeneratorUI::variableTableElementSelected(int index, const QString &name){
     switch (currentIndex()){
     case MAIN_WIDGET:
-        setBindingVariable(index, name);
-        break;
+        setBindingVariable(index, name); break;
     case CHILD_WIDGET:
-        childUI->setBindingVariable(index, name);
-        break;
+        childUI->setBindingVariable(index, name); break;
     default:
         WARNING_MESSAGE("BlenderGeneratorUI::variableTableElementSelected(): An unwanted element selected event was recieved!!");
     }
@@ -585,8 +506,7 @@ void BlenderGeneratorUI::variableTableElementSelected(int index, const QString &
 void BlenderGeneratorUI::generatorTableElementSelected(int index, const QString &name){
     switch (currentIndex()){
     case CHILD_WIDGET:
-        childUI->setGenerator(index, name);
-        break;
+        childUI->setGenerator(index, name); break;
     default:
         WARNING_MESSAGE("BlenderGeneratorUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!");
     }
@@ -604,12 +524,8 @@ void BlenderGeneratorUI::connectToTables(GenericTableWidget *generators, Generic
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorUI::connectToTables(): One or more arguments are nullptr!!");
     }
-}
-
-void BlenderGeneratorUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    UIHelperFunctions::loadBinding(row, column, varBind, path, table, bsData);
 }
 
 void BlenderGeneratorUI::selectTableToView(bool viewproperties, const QString & path){
@@ -628,20 +544,18 @@ void BlenderGeneratorUI::selectTableToView(bool viewproperties, const QString & 
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
 void BlenderGeneratorUI::variableRenamed(const QString & name, int index){
-    hkbVariableBindingSet *bind = nullptr;
-    int bindIndex;
     if (bsData){
         if (name != ""){
             index--;
-            bind = bsData->getVariableBindingSetData();
+            auto bind = bsData->getVariableBindingSetData();
             if (bind){
                 auto setname = [&](const QString & fieldname, int row){
-                    bindIndex = bind->getVariableIndexOfBinding(fieldname);
+                    auto bindIndex = bind->getVariableIndexOfBinding(fieldname);
                     (bindIndex == index) ? table->item(row, BINDING_COLUMN)->setText(name) : NULL;
                 };
                 setname("referencePoseWeightThreshold", REFERENCE_POSE_WEIGHT_THRESHOLD_ROW);
@@ -656,15 +570,14 @@ void BlenderGeneratorUI::variableRenamed(const QString & name, int index){
             WARNING_MESSAGE("BlenderGeneratorUI::variableRenamed(): The new variable name is the empty string!!");
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::variableRenamed(): The data is nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorUI::variableRenamed(): The data is nullptr!!");
     }
 }
 
 void BlenderGeneratorUI::generatorRenamed(const QString &name, int index){
     switch (currentIndex()){
     case CHILD_WIDGET:
-        childUI->generatorRenamed(name, index);
-        break;
+        childUI->generatorRenamed(name, index); break;
     }
 }
 

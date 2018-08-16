@@ -11,6 +11,7 @@ public:
     BSIsActiveModifier& operator=(const BSIsActiveModifier&) = delete;
     BSIsActiveModifier(const BSIsActiveModifier &) = delete;
     ~BSIsActiveModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

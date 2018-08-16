@@ -221,7 +221,7 @@ void BSLookAtModifierUI::loadData(HkxObject *data){
         bsData = static_cast<BSLookAtModifier *>(data);
         hkbVariableBindingSet *varBind = nullptr;
         hkbStringEventPayload *payload = static_cast<hkbStringEventPayload *>(bsData->payload.data());
-        name->setText(bsData->name);
+        name->setText(bsData->getName());
         enable->setChecked(bsData->enable);
         lookAtTarget->setChecked(bsData->lookAtTarget);
         limitAngleDegrees->setValue(bsData->limitAngleDegrees);
@@ -352,8 +352,8 @@ void BSLookAtModifierUI::setRowItems(int row, const QString & name, const QStrin
 
 void BSLookAtModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));

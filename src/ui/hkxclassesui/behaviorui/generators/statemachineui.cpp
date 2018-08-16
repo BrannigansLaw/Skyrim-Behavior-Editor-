@@ -229,7 +229,7 @@ void StateMachineUI::loadData(HkxObject *data){
         //statenames.append("None");
         bsData = static_cast<hkbStateMachine *>(data);
         statenames = statenames + bsData->getStateNames();
-        name->setText(bsData->name);
+        name->setText(bsData->getName());
         if (bsData->eventToSendWhenStateOrTransitionChanges.id > -1){
             eventToSendWhenStateOrTransitionChanges->setChecked(true);
         }else{
@@ -338,8 +338,8 @@ void StateMachineUI::setRowItems(int row, const QString & name, const QString & 
 
 void StateMachineUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit generatorNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));

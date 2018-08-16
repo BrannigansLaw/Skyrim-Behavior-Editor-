@@ -455,7 +455,7 @@ private:
     int lastSelectedRow;
 };
 
-namespace UIHelperFunctions{
+namespace UIHelper{
 
 void setRowItems(int row, const QString & name, const QString & classname, const QString & bind, const QString & value, const QString & tip1, const QString & tip2, TableWidget *table);
 void setBinding(int index, int row, int column, const QString & variableName, const QString & path, hkVariableType type, bool isProperty, TableWidget *table, HkDynamicObject *bsData);

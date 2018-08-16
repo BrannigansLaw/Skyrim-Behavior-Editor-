@@ -146,7 +146,7 @@ void TransformVectorModifierUI::loadData(HkxObject *data){
         if (data->getSignature() == HKB_TRANSFORM_VECTOR_MODIFIER){
             hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbTransformVectorModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             rotation->setValue(bsData->rotation);
             translation->setValue(bsData->translation);
@@ -189,8 +189,8 @@ void TransformVectorModifierUI::loadData(HkxObject *data){
 
 void TransformVectorModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));

@@ -11,6 +11,7 @@ public:
     hkbCombineTransformsModifier& operator=(const hkbCombineTransformsModifier&) = delete;
     hkbCombineTransformsModifier(const hkbCombineTransformsModifier &) = delete;
     ~hkbCombineTransformsModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

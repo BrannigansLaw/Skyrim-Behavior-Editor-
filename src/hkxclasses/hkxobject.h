@@ -26,8 +26,8 @@ public:
     };
 public:
     virtual ~HkxObject() = default;
-    HkxObject(const HkxObject &obj) = delete;
     HkxObject& operator=(const HkxObject&) = delete;
+    HkxObject(const HkxObject &obj) = delete;
 public:
     void setIsWritten(bool written = true);
     int getIndexOfGenerator(const HkxSharedPtr & gen) const;

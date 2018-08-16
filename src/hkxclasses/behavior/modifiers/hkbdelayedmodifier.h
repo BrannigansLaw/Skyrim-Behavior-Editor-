@@ -11,6 +11,7 @@ public:
     hkbDelayedModifier& operator=(const hkbDelayedModifier&) = delete;
     hkbDelayedModifier(const hkbDelayedModifier &) = delete;
     ~hkbDelayedModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

@@ -11,6 +11,7 @@ public:
     hkbGetWorldFromModelModifier& operator=(const hkbGetWorldFromModelModifier&) = delete;
     hkbGetWorldFromModelModifier(const hkbGetWorldFromModelModifier &) = delete;
     ~hkbGetWorldFromModelModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

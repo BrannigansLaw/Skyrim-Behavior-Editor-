@@ -10,6 +10,7 @@ public:
     hkbGeneratorTransitionEffect& operator=(const hkbGeneratorTransitionEffect&) = delete;
     hkbGeneratorTransitionEffect(const hkbGeneratorTransitionEffect &) = delete;
     ~hkbGeneratorTransitionEffect();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

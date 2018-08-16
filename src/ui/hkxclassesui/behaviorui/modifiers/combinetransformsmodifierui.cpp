@@ -154,7 +154,7 @@ void CombineTransformsModifierUI::loadData(HkxObject *data){
         if (data->getSignature() == HKB_COMBINE_TRANSFORMS_MODIFIER){
             hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbCombineTransformsModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             translationOut->setValue(bsData->translationOut);
             rotationOut->setValue(bsData->rotationOut);
@@ -200,8 +200,8 @@ void CombineTransformsModifierUI::loadData(HkxObject *data){
 
 void CombineTransformsModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));

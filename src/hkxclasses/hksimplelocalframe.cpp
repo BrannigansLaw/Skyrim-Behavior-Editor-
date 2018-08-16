@@ -26,7 +26,7 @@ QString hkSimpleLocalFrame::getName() const{
 
 bool hkSimpleLocalFrame::readData(const HkxXmlReader & reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);

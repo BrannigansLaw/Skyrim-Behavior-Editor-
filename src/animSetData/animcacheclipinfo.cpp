@@ -24,8 +24,8 @@ bool AnimCacheClipInfo::read(QFile *file){
         return false;
     }
     QByteArray line;
-    uint numclips = 0;
-    bool ok = false;
+    auto numclips = 0U;
+    auto ok = false;
     if (file->atEnd()){
         return false;
     }
@@ -50,7 +50,7 @@ bool AnimCacheClipInfo::read(QFile *file){
     if (!ok){
         return false;
     }
-    for (uint i = 0; i < numclips; i++){
+    for (auto i = 0U; i < numclips; i++){
         if (file->atEnd()){
             return false;
         }
@@ -72,4 +72,12 @@ bool AnimCacheClipInfo::write(QFile *file, QTextStream &out) const{
         out << clipGenerators.at(i) << "\n";
     }
     return true;
+}
+
+void AnimCacheClipInfo::removeClipGenerator(const QString &clipname){
+    clipGenerators.removeAll(clipname);
+}
+
+QString AnimCacheClipInfo::getEventName() const{
+    return eventName;
 }

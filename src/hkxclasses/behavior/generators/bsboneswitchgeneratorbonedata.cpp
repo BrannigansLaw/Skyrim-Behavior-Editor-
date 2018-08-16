@@ -31,7 +31,7 @@ const QString BSBoneSwitchGeneratorBoneData::getClassname(){
 bool BSBoneSwitchGeneratorBoneData::readData(const HkxXmlReader &reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };
@@ -207,7 +207,7 @@ bool BSBoneSwitchGeneratorBoneData::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         baddata("hkbVariableBindingSet");
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pGenerator.getShdPtrReference());
+    auto ptr = static_cast<BehaviorFile *>(getParentFile())->findGenerator(pGenerator.getShdPtrReference());
     if (!ptr || !ptr->data()){
         baddata("pGenerator");
     }else if ((*ptr)->getType() != TYPE_GENERATOR || (*ptr)->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA || (*ptr)->getSignature() == HKB_STATE_MACHINE_STATE_INFO || (*ptr)->getSignature() == HKB_BLENDER_GENERATOR_CHILD){

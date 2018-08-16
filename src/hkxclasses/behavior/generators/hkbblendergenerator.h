@@ -8,7 +8,6 @@ class hkbBlenderGeneratorChild;
 class hkbBlenderGenerator final: public hkbGenerator
 {
     friend class BlenderGeneratorUI;
-    //friend class BlenderGeneratorChildUI;
 public:
     enum BlenderFlag{
         FLAG_NONE = 0,
@@ -26,12 +25,13 @@ public:
     hkbBlenderGenerator& operator=(const hkbBlenderGenerator&) = delete;
     hkbBlenderGenerator(const hkbBlenderGenerator &) = delete;
     ~hkbBlenderGenerator();
+public:
     QString getName() const;
     static const QString getClassname();
     bool isParametricBlend() const;
 private:
     bool swapChildren(int index1, int index2);
-    void setName(const QString &value);
+    void setName(const QString &newname);
     void updateChildIconNames() const;
     QString getFlags() const;
     void setFlags(const QString &value);

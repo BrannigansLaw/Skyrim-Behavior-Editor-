@@ -11,6 +11,7 @@ public:
     BSSpeedSamplerModifier& operator=(const BSSpeedSamplerModifier&) = delete;
     BSSpeedSamplerModifier(const BSSpeedSamplerModifier &) = delete;
     ~BSSpeedSamplerModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

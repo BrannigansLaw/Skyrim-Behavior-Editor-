@@ -11,9 +11,19 @@ public:
     BSOffsetAnimationGenerator& operator=(const BSOffsetAnimationGenerator&) = delete;
     BSOffsetAnimationGenerator(const BSOffsetAnimationGenerator &) = delete;
     ~BSOffsetAnimationGenerator();
+public:
     QString getName() const;
     static const QString getClassname();
 private:
+    QString getDefaultGeneratorName() const;
+    QString getOffsetClipGeneratorName() const;
+    void setName(const QString &newname);
+    qreal getFOffsetVariable() const;
+    void setFOffsetVariable(const qreal &value);
+    qreal getFOffsetRangeStart() const;
+    void setFOffsetRangeStart(const qreal &value);
+    qreal getFOffsetRangeEnd() const;
+    void setFOffsetRangeEnd(const qreal &value);
     bool readData(const HkxXmlReader & reader, long & index);
     bool link();
     void unlink();

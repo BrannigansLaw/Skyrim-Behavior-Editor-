@@ -4,7 +4,7 @@
 #include <QByteArray>
 
 //Courtesy of Aerisarn...
-class HkCRC
+class HkCRC final
 {
 public:
     HkCRC();

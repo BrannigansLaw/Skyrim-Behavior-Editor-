@@ -11,6 +11,7 @@ public:
     BSLimbIKModifier& operator=(const BSLimbIKModifier&) = delete;
     BSLimbIKModifier(const BSLimbIKModifier &) = delete;
     ~BSLimbIKModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

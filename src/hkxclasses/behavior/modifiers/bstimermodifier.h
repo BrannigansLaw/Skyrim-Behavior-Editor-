@@ -11,6 +11,7 @@ public:
     BSTimerModifier& operator=(const BSTimerModifier&) = delete;
     BSTimerModifier(const BSTimerModifier &) = delete;
     ~BSTimerModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

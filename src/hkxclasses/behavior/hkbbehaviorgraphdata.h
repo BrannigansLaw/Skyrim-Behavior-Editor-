@@ -17,8 +17,8 @@ public:
     hkbBehaviorGraphData& operator=(const hkbBehaviorGraphData&) = delete;
     hkbBehaviorGraphData(const hkbBehaviorGraphData &) = delete;
     ~hkbBehaviorGraphData();
+public:
     int addVariable(hkVariableType type, const QString & name, bool isProperty = false);
-    //int addVariable(const QString & type, const QString & name, bool isProperty = false);
     void addVariable(hkVariableType type);
     void addEvent(const QString &name);
     HkxObject * getVariantVariable(int index) const;

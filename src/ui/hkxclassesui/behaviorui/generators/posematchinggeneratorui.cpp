@@ -321,7 +321,7 @@ void PoseMatchingGeneratorUI::loadData(HkxObject *data){
     if (data){
         if (data->getSignature() == HKB_POSE_MATCHING_GENERATOR){
             bsData = static_cast<hkbPoseMatchingGenerator *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             referencePoseWeightThreshold->setValue(bsData->referencePoseWeightThreshold);
             blendParameter->setValue(bsData->blendParameter);
             minCyclicBlendParameter->setValue(bsData->minCyclicBlendParameter);
@@ -625,8 +625,8 @@ void PoseMatchingGeneratorUI::setBindingVariable(int index, const QString & name
 
 void PoseMatchingGeneratorUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             for (auto i = 0; i < bsData->children.size(); i++){
                 if (bsData->children.at(i).data()){
@@ -635,7 +635,7 @@ void PoseMatchingGeneratorUI::setName(){
                     CRITICAL_ERROR_MESSAGE("BlenderGeneratorUI::setName():\n Children contain nullptr's!!!");
                 }
             }
-            emit generatorNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
+            emit generatorNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));
             bsData->setIsFileChanged(true);
         }
     }else{

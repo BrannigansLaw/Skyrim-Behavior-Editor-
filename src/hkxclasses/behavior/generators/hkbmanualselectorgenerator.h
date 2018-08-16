@@ -11,6 +11,7 @@ public:
     hkbManualSelectorGenerator& operator=(const hkbManualSelectorGenerator&) = delete;
     hkbManualSelectorGenerator(const hkbManualSelectorGenerator &) = delete;
     ~hkbManualSelectorGenerator();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

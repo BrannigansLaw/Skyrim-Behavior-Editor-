@@ -3,13 +3,14 @@
 
 #include <QtCore>
 
-class SkyrimAnimationTranslation
+class SkyrimAnimationTranslation final
 {
-    friend class AnimationTranslationUI;
-    friend class SkyrimAnimationMotionData;
 public:
     SkyrimAnimationTranslation(qreal x = 0, qreal y = 0, qreal z = 0, qreal w = 0);
-private:
+    SkyrimAnimationTranslation& operator=(const SkyrimAnimationTranslation&) = default;
+    SkyrimAnimationTranslation(const SkyrimAnimationTranslation &) = default;
+    ~SkyrimAnimationTranslation() = default;
+public:
     qreal localTime;
     qreal x;
     qreal y;

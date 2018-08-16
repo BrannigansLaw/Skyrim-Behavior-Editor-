@@ -623,7 +623,7 @@ bool HkDynamicObject::fixMergedIndices(BehaviorFile *dominantfile){
 
 bool HkDynamicObject::linkVar(){
     std::lock_guard <std::mutex> guard(mutex);
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variableBindingSet.getShdPtrReference());
+    auto ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(variableBindingSet.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_VARIABLE_BINDING_SET){
             LogFile::writeToLog("HkDynamicObject: linkVar()!\nThe linked object is not a HKB_VARIABLE_BINDING_SET!\nRemoving the link to the invalid object!");

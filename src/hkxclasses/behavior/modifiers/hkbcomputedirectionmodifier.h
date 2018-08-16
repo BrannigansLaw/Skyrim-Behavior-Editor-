@@ -11,6 +11,7 @@ public:
     hkbComputeDirectionModifier& operator=(const hkbComputeDirectionModifier&) = delete;
     hkbComputeDirectionModifier(const hkbComputeDirectionModifier &) = delete;
     ~hkbComputeDirectionModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

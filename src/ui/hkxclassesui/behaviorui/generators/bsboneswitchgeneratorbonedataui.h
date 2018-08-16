@@ -29,6 +29,7 @@ public:
     BSBoneSwitchGeneratorBoneDataUI& operator=(const BSBoneSwitchGeneratorBoneDataUI&) = delete;
     BSBoneSwitchGeneratorBoneDataUI(const BSBoneSwitchGeneratorBoneDataUI &) = delete;
     ~BSBoneSwitchGeneratorBoneDataUI() = default;
+public:
     void loadData(HkxObject *data, int childindex);
     void variableRenamed(const QString & name, int index);
     void generatorRenamed(const QString & name, int index);
@@ -49,10 +50,8 @@ private slots:
 private:
     void toggleSignals(bool toggleconnections);
     void setGenerator(int index, const QString & name);
-    void loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path);
     void setBindingVariable(int index, const QString & name);
     void selectTableToView(bool viewproperties, const QString & path);
-    void setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty);
 private:
     enum ACTIVE_WIDGET {
         MAIN_WIDGET,

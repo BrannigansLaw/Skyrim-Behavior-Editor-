@@ -11,6 +11,7 @@ public:
     BSTweenerModifier& operator=(const BSTweenerModifier&) = delete;
     BSTweenerModifier(const BSTweenerModifier &) = delete;
     ~BSTweenerModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

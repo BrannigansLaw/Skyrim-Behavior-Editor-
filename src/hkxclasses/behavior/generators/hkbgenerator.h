@@ -9,7 +9,10 @@ class TreeGraphicsItem;
 class hkbGenerator: public DataIconManager
 {
 public:
-    ~hkbGenerator();
+    ~hkbGenerator() = default;
+    hkbGenerator& operator=(const hkbGenerator&) = delete;
+    hkbGenerator(const hkbGenerator &) = delete;
+public:
     bool link();
     virtual QString getName() const;
     QString getClassname() const;

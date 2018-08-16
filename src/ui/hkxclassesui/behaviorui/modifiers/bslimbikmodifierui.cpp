@@ -131,7 +131,7 @@ void BSLimbIKModifierUI::loadData(HkxObject *data){
             boneNames.append("None");
             hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<BSLimbIKModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             limitAngleDegrees->setValue(bsData->limitAngleDegrees);
             if (startBoneIndex->count() == 0){
@@ -176,8 +176,8 @@ void BSLimbIKModifierUI::loadData(HkxObject *data){
 
 void BSLimbIKModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));

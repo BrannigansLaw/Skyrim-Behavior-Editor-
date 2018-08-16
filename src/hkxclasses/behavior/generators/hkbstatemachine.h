@@ -11,6 +11,7 @@ public:
     hkbStateMachine& operator=(const hkbStateMachine&) = delete;
     hkbStateMachine(const hkbStateMachine &) = delete;
     ~hkbStateMachine();
+public:
     QString getName() const;
     static const QString getClassname();
     QString getStateName(ulong stateId) const;

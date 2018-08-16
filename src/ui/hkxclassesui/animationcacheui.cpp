@@ -42,7 +42,7 @@ void CacheVariableWidget::loadData(AnimCacheVariable *data){
     if (data){
         bsData = data;
         disconnectSignals();
-        name->setText(bsData->name);
+        name->setText(bsData->getName());
         minValue->setValue(bsData->minValue);
         maxValue->setValue(bsData->maxValue);
         connectSignals();
@@ -53,7 +53,7 @@ void CacheVariableWidget::loadData(AnimCacheVariable *data){
 
 void CacheVariableWidget::setName(const QString & newname){
     if (bsData){
-        bsData->name = newname;
+        bsData->getName() = newname;
     }else{
         CRITICAL_ERROR_MESSAGE("CacheVariableWidget::setName(): The data is nullptr!!");
     }
@@ -346,18 +346,18 @@ void CacheWidget::loadData(AnimCacheAnimSetData *data, ProjectFile *project){
         behaviorVariables->setRowCount(bsData->behaviorVariables.size());
         for (auto i = 0; i < bsData->behaviorVariables.size(); i++){
             if (behaviorVariables->item(i, 0)){
-                behaviorVariables->item(i, 0)->setText(bsData->behaviorVariables.at(i)->name);
+                behaviorVariables->item(i, 0)->setText(bsData->behaviorVariables.at(i)->getName());
             }else{
-                behaviorVariables->setItem(i, 0, new TableWidgetItem(bsData->behaviorVariables.at(i)->name));
+                behaviorVariables->setItem(i, 0, new TableWidgetItem(bsData->behaviorVariables.at(i)->getName()));
                 behaviorVariables->setItem(i, 1, new TableWidgetItem("Double Click To Edit"));
             }
         }
         clipGenerators->setRowCount(bsData->clipGenerators.size());
         for (auto i = 0; i < bsData->clipGenerators.size(); i++){
             if (clipGenerators->item(i, 0)){
-                clipGenerators->item(i, 0)->setText(bsData->clipGenerators.at(i)->eventName);
+                clipGenerators->item(i, 0)->setText(bsData->clipGenerators.at(i)->getEventName());
             }else{
-                clipGenerators->setItem(i, 0, new TableWidgetItem(bsData->clipGenerators.at(i)->eventName));
+                clipGenerators->setItem(i, 0, new TableWidgetItem(bsData->clipGenerators.at(i)->getEventName()));
                 clipGenerators->setItem(i, 1, new TableWidgetItem("Double Click To Edit"));
             }
         }

@@ -18,6 +18,7 @@ public:
     hkbBehaviorGraphStringData& operator=(const hkbBehaviorGraphStringData&) = delete;
     hkbBehaviorGraphStringData(const hkbBehaviorGraphStringData &) = delete;
     ~hkbBehaviorGraphStringData();
+public:
     static const QString getClassname();
     int getNumberOfEvents() const;
     int getNumberOfVariables() const;

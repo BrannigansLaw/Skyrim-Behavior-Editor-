@@ -11,6 +11,7 @@ public:
     hkbTimerModifier& operator=(const hkbTimerModifier&) = delete;
     hkbTimerModifier(const hkbTimerModifier &) = delete;
     ~hkbTimerModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

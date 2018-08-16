@@ -87,7 +87,7 @@ void hkbVariableValueSet::addWordVariableValue(int value){
 bool hkbVariableValueSet::readData(const HkxXmlReader &reader, long & index){
     bool ok;
     int numElems = 0;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);

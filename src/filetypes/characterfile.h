@@ -18,6 +18,7 @@ public:
     CharacterFile& operator=(const CharacterFile&) = delete;
     CharacterFile(const CharacterFile &) = delete;
     ~CharacterFile();
+public:
     bool addObjectToFile(HkxObject *obj, long ref = -1);
     QString getSkeletonFileName() const;
     QString getRootObjectReferenceString();

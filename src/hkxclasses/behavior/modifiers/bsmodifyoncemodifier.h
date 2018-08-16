@@ -11,6 +11,7 @@ public:
     BSModifyOnceModifier& operator=(const BSModifyOnceModifier&) = delete;
     BSModifyOnceModifier(const BSModifyOnceModifier &) = delete;
     ~BSModifyOnceModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

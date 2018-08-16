@@ -27,6 +27,43 @@ QString BSBoneSwitchGenerator::getName() const{
     return name;
 }
 
+void BSBoneSwitchGenerator::setName(const QString &newname){
+    std::lock_guard <std::mutex> guard(mutex);
+    (newname != name && newname != "") ? name = newname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
+}
+
+bool BSBoneSwitchGenerator::swapChildren(int index1, int index2){
+    HkxObject *gen1;
+    HkxObject *gen2;
+    if (ChildrenA.size() > index1 && ChildrenA.size() > index2 && index1 != index2 && index1 >= 0 && index2 >= 0){
+        gen1 = ChildrenA.at(index1).data();
+        gen2 = ChildrenA.at(index2).data();
+        ChildrenA[index1] = HkxSharedPtr(gen2);
+        ChildrenA[index2] = HkxSharedPtr(gen1);
+        getParentFile()->setIsChanged(true);
+    }else{
+        return false;
+    }
+    return true;
+}
+
+void BSBoneSwitchGenerator::updateChildIconNames() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    for (auto i = 0; i < ChildrenA.size(); i++){
+        if (ChildrenA.at(i).data()){
+            static_cast<DataIconManager*>(ChildrenA.at(i).data())->updateIconNames();
+        }
+    }
+}
+
+QString BSBoneSwitchGenerator::getDefaultGeneratorName() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    QString genname("NONE");
+    hkbGenerator *gen = static_cast<hkbGenerator *>(pDefaultGenerator.data());
+    (gen) ? genname = gen->getName() : NULL;
+    return genname;
+}
+
 bool BSBoneSwitchGenerator::insertObjectAt(int index, DataIconManager *obj){
     std::lock_guard <std::mutex> guard(mutex);
     if (obj){
@@ -171,7 +208,7 @@ bool BSBoneSwitchGenerator::readData(const HkxXmlReader &reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };

@@ -10,6 +10,7 @@ public:
     hkbAttachmentModifier& operator=(const hkbAttachmentModifier&) = delete;
     hkbAttachmentModifier(const hkbAttachmentModifier &) = delete;
     ~hkbAttachmentModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

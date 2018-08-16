@@ -97,7 +97,7 @@ void BSModifyOnceModifierUI::loadData(HkxObject *data){
     if (data){
         if (data->getSignature() == BS_MODIFY_ONCE_MODIFIER){
             bsData = static_cast<BSModifyOnceModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             if (bsData->pOnActivateModifier.data()){
                 table->item(ON_ACTIVATE_MODIFIER_ROW, VALUE_COLUMN)->setText(static_cast<hkbModifier *>(bsData->pOnActivateModifier.data())->getName());
             }else{
@@ -119,8 +119,8 @@ void BSModifyOnceModifierUI::loadData(HkxObject *data){
 
 void BSModifyOnceModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfGenerator(bsData));

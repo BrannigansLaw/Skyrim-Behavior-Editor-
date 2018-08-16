@@ -13,10 +13,7 @@ bool AnimCacheAnimSetData::read(QFile *file){
         return false;
     }
     QByteArray line;
-    bool ok = false;
-    uint numvars = 0;
-    uint numclips = 0;
-    uint numevents = 0;
+    auto ok = false;
     if (file->atEnd()){
         return false;
     }
@@ -28,11 +25,11 @@ bool AnimCacheAnimSetData::read(QFile *file){
     //Read cache events...
     line = file->readLine();
     line.chop(1);
-    numevents = line.toUInt(&ok);
+    auto numevents = line.toUInt(&ok);
     if (!ok){
         return false;
     }
-    for (uint i = 0; i < numevents; i++){
+    for (auto i = 0U; i < numevents; i++){
         if (file->atEnd()){
             return false;
         }
@@ -42,12 +39,12 @@ bool AnimCacheAnimSetData::read(QFile *file){
     }
     line = file->readLine();
     line.chop(1);
-    numvars = line.toUInt(&ok);
+    auto numvars = line.toUInt(&ok);
     if (!ok){
         return false;
     }
     //Get attack animation data, if any...
-    for (uint i = 0; i < numvars; i++){
+    for (auto i = 0U; i < numvars; i++){
         behaviorVariables.append(new AnimCacheVariable());
         if (!behaviorVariables.last()->read(file)){
             return false;
@@ -58,11 +55,11 @@ bool AnimCacheAnimSetData::read(QFile *file){
     }
     line = file->readLine();
     line.chop(1);
-    numclips = line.toUInt(&ok);
+    auto numclips = line.toUInt(&ok);
     if (!ok){
         return false;
     }
-    for (uint i = 0; i < numclips; i++){
+    for (auto i = 0U; i < numclips; i++){
         clipGenerators.append(new AnimCacheClipInfo());
         if (!clipGenerators.last()->read(file)){
             return false;
@@ -78,7 +75,7 @@ bool AnimCacheAnimSetData::read(QFile *file){
     if (!ok){
         return false;
     }
-    for (uint i = 0; i < numclips; i++){
+    for (auto i = 0U; i < numclips; i++){
         animations.append(new AnimCacheAnimationInfo());
         if (!animations.last()->read(file)){
             return false;
@@ -155,7 +152,7 @@ bool AnimCacheAnimSetData::addAnimationToCache(const QString & event, const QVec
 
 void AnimCacheAnimSetData::removeAnimationFromCache(const QString &animationname, const QString &clipname,  const QString &variablename){
     if (animationname != ""){
-        QString temp = animationname;
+        auto temp = animationname;
         if (temp.contains("/")){
             temp = temp.section("/", -1, -1);
         }else if (temp.contains("\\")){
@@ -166,27 +163,27 @@ void AnimCacheAnimSetData::removeAnimationFromCache(const QString &animationname
             temp.remove(index, temp.size() - index);
         }
         bool ok;
-        QString animationhash = QString(HkCRC().compute(temp.toLocal8Bit().toLower()));
+        auto animationhash = QString(HkCRC().compute(temp.toLocal8Bit().toLower()));
         animationhash = QString::number(animationhash.toLong(&ok, 16));
         if (!ok){
             CRITICAL_ERROR_MESSAGE("AnimCacheAnimSetData::removeAnimationFromCache(): animation hash is invalid!!!");
         }
         for (auto i = animations.size() - 1; i >= 0; i--){
-            if (animations.at(i)->crcAnimationName == animationhash){
+            if (animations.at(i)->getCrcAnimationName() == animationhash){
                 animations.removeAt(i);
             }
         }
     }
     if (variablename != ""){
         for (auto i = behaviorVariables.size() - 1; i >= 0; i--){
-            if (behaviorVariables.at(i)->name == variablename){
+            if (behaviorVariables.at(i)->getName() == variablename){
                 behaviorVariables.removeAt(i);
             }
         }
     }
     if (clipname != ""){
         for (auto i = clipGenerators.size() - 1; i >= 0; i--){
-            clipGenerators[i]->clipGenerators.removeAll(clipname);
+            clipGenerators[i]->removeClipGenerator(clipname);
         }
     }
 }

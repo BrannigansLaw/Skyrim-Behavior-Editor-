@@ -116,7 +116,7 @@ void GetHandleOnBoneModifierUI::loadData(HkxObject *data){
             boneNames.append("None");
             hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbGetHandleOnBoneModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             if (localFrameName->count() == 0){
                 localFrames = localFrames + static_cast<BehaviorFile *>(bsData->getParentFile())->getLocalFrameNames();
@@ -162,8 +162,8 @@ void GetHandleOnBoneModifierUI::loadData(HkxObject *data){
 
 void GetHandleOnBoneModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));

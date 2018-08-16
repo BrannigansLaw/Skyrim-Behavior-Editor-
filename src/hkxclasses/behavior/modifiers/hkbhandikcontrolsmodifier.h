@@ -12,6 +12,7 @@ public:
     hkbHandIkControlsModifier& operator=(const hkbHandIkControlsModifier&) = delete;
     hkbHandIkControlsModifier(const hkbHandIkControlsModifier &) = delete;
     ~hkbHandIkControlsModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

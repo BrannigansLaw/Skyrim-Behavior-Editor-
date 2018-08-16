@@ -305,7 +305,7 @@ void SenseHandleModifierUI::loadData(HkxObject *data){
             boneNames.append("None");
             hkbVariableBindingSet *varBind = nullptr;
             bsData = static_cast<hkbSenseHandleModifier *>(data);
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             sensorLocalOffset->setValue(bsData->sensorLocalOffset);
             if (localFrameName->count() == 0){
@@ -568,10 +568,10 @@ void SenseHandleModifierUI::returnToWidget(){
 
 void SenseHandleModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
-            emit modifierNameChanged(bsData->name, static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
+            emit modifierNameChanged(bsData->getName(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));
             bsData->setIsFileChanged(true);
         }
     }else{

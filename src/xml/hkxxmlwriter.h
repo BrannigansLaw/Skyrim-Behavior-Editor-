@@ -9,39 +9,41 @@
 
 class HkxFile;
 
-class HkxXMLWriter
+class HkxXMLWriter final
 {
     friend class BehaviorFile;
 public:
     HkxXMLWriter(HkxFile *file = nullptr);
-    virtual ~HkxXMLWriter();
+    HkxXMLWriter& operator=(const HkxXMLWriter&) = delete;
+    HkxXMLWriter(const HkxXMLWriter &) = delete;
+    ~HkxXMLWriter() = default;
+public:
     bool writeToXMLFile();
-//private:
     void setFile(HkxFile *file);
     void writeHeader(const QString & version, const QString & encoding);
     bool writeLine(const QString & tag, const QStringList & attribs, const QStringList & attribValues, const QString & value, bool nullValueAllowed = false);
     bool writeLine(const QString & tag, bool opening);
     bool writeLine(const QString & value);
 public:
-    const QString version;
-    const QString encoding;
-    const QString classversion;
-    const QString contentsversion;
-    const QString toplevelobject;
-    const QString filetype;
-    const QString section;
-    const QString object;
-    const QString parameter;
-    const QString string;
-    const QString name;
-    const QString clas;
-    const QString signature;
-    const QString numelements;
+    static const QString version;
+    static const QString encoding;
+    static const QString classversion;
+    static const QString contentsversion;
+    static const QString toplevelobject;
+    static const QString filetype;
+    static const QString section;
+    static const QString object;
+    static const QString parameter;
+    static const QString string;
+    static const QString name;
+    static const QString clas;
+    static const QString signature;
+    static const QString numelements;
 private:
     HkxFile *hkxXmlFile;
-    QFile *newfile;
-    QTextStream *stream;
-    ulong nestLevel;
+    QFile newfile;
+    QTextStream stream;
+    int nestLevel;
 };
 
 #endif // HKXXMLWRITER_H

@@ -121,6 +121,3 @@ QString hkbModifier::getClassname() const{
     }
 }
 
-hkbModifier::~hkbModifier(){
-    //
-}

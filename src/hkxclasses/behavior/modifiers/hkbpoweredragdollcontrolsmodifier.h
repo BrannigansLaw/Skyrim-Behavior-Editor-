@@ -11,6 +11,7 @@ public:
     hkbPoweredRagdollControlsModifier& operator=(const hkbPoweredRagdollControlsModifier&) = delete;
     hkbPoweredRagdollControlsModifier(const hkbPoweredRagdollControlsModifier &) = delete;
     ~hkbPoweredRagdollControlsModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

@@ -57,6 +57,3 @@ QString hkbGenerator::getClassname() const{
     }
 }
 
-hkbGenerator::~hkbGenerator(){
-    //
-}

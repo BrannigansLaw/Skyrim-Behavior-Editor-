@@ -61,7 +61,7 @@ bool hkbClipGenerator::readData(const HkxXmlReader &reader, long & index){
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     QByteArray text;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     auto checkvalue = [&](bool value, const QString & fieldname){
         (!value) ? LogFile::writeToLog(getParentFilename()+": "+getClassname()+": readData()!\n'"+fieldname+"' has invalid data!\nObject Reference: "+ref) : NULL;
     };
@@ -199,9 +199,8 @@ void hkbClipGenerator::fixMergedEventIndices(BehaviorFile *dominantfile){
 
 bool hkbClipGenerator::merge(HkxObject *recessiveObject){ //TO DO: Make thread safe!!!
     std::lock_guard <std::mutex> guard(mutex);
-    hkbClipGenerator *obj = nullptr;
     if (!getIsMerged() && recessiveObject && recessiveObject->getSignature() == HKB_CLIP_GENERATOR){
-        obj = static_cast<hkbClipGenerator *>(recessiveObject);
+        auto obj = static_cast<hkbClipGenerator *>(recessiveObject);
         injectWhileMerging(obj);
         if (triggers.data()){
             if (obj->triggers.data()){
@@ -235,7 +234,7 @@ SkyrimClipGeneratoData hkbClipGenerator::getClipGeneratorAnimData(ProjectAnimDat
     std::lock_guard <std::mutex> guard(mutex);
     QVector <SkyrimClipTrigger> animTrigs;
     qreal trigtime;
-    hkbClipTriggerArray *trigs = static_cast<hkbClipTriggerArray *>(triggers.data());
+    auto trigs = static_cast<hkbClipTriggerArray *>(triggers.data());
     if (trigs){
         for (auto i = 0; i < trigs->triggers.size(); i++){
             if (trigs->triggers.at(i).relativeToEndOfClip){
@@ -251,32 +250,117 @@ SkyrimClipGeneratoData hkbClipGenerator::getClipGeneratorAnimData(ProjectAnimDat
 
 void hkbClipGenerator::setName(const QString &oldclipname, const QString &newclipname){
     std::lock_guard <std::mutex> guard(mutex);
+    (newclipname != name && newclipname != "") ? name = newclipname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'name' was not set!");
     //static_cast<BehaviorFile *>(getParentFile())->setClipNameAnimData(oldclipname, newclipname);    //Unsafe...
-    name = newclipname;
 }
 
 void hkbClipGenerator::setAnimationName(int index, const QString &animationname){
     std::lock_guard <std::mutex> guard(mutex);
-    animationName = animationname;
+    (animationname != animationName && animationname != "" && animationname.contains(".hkx", Qt::CaseInsensitive)) ? animationName = animationname, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'animationName' was not set!");
     //static_cast<BehaviorFile *>(getParentFile())->setAnimationIndexAnimData(index, name);    //Unsafe...
 }
 
 void hkbClipGenerator::setPlaybackSpeed(qreal speed){
     std::lock_guard <std::mutex> guard(mutex);
-    playbackSpeed = speed;
+    (speed != playbackSpeed) ? playbackSpeed = speed, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'playbackSpeed' was not set!");
     //static_cast<BehaviorFile *>(getParentFile())->setPlaybackSpeedAnimData(name, speed);    //Unsafe...
 }
 
 void hkbClipGenerator::setCropStartAmountLocalTime(qreal time){
     std::lock_guard <std::mutex> guard(mutex);
-    cropStartAmountLocalTime = time;
+    (time != cropStartAmountLocalTime) ? cropStartAmountLocalTime = time, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'cropStartAmountLocalTime' was not set!");
     //static_cast<BehaviorFile *>(getParentFile())->setCropStartAmountLocalTimeAnimData(name, time);    //Unsafe...
 }
 
 void hkbClipGenerator::setCropEndAmountLocalTime(qreal time){
     std::lock_guard <std::mutex> guard(mutex);
-    cropEndAmountLocalTime = time;
+    (time != cropEndAmountLocalTime) ? cropEndAmountLocalTime = time, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'cropEndAmountLocalTime' was not set!");
     //static_cast<BehaviorFile *>(getParentFile())->setCropEndAmountLocalTimeAnimData(name, time);    //Unsafe...
+}
+
+hkbClipTriggerArray *hkbClipGenerator::getTriggers() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return static_cast<hkbClipTriggerArray *>(triggers.data());
+}
+
+QString hkbClipGenerator::getFlags() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return flags;
+}
+
+void hkbClipGenerator::setFlags(const QString &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != flags && value != "") ? flags = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'flags' was not set!");
+}
+
+QString hkbClipGenerator::getMode() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return mode;
+}
+
+void hkbClipGenerator::setMode(int index){
+    std::lock_guard <std::mutex> guard(mutex);
+    (index >= 0 && index < PlaybackMode.size() && mode != PlaybackMode.at(index)) ? mode = PlaybackMode.at(index), getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'mode' was not set!");
+}
+
+int hkbClipGenerator::getAnimationBindingIndex() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return animationBindingIndex;
+}
+
+void hkbClipGenerator::setAnimationBindingIndex(int value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != animationBindingIndex) ? animationBindingIndex = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'animationBindingIndex' was not set!");
+}
+
+qreal hkbClipGenerator::getUserControlledTimeFraction() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return userControlledTimeFraction;
+}
+
+void hkbClipGenerator::setUserControlledTimeFraction(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != userControlledTimeFraction) ? userControlledTimeFraction = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'userControlledTimeFraction' was not set!");
+}
+
+qreal hkbClipGenerator::getEnforcedDuration() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return enforcedDuration;
+}
+
+void hkbClipGenerator::setEnforcedDuration(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != enforcedDuration) ? enforcedDuration = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'enforcedDuration' was not set!");
+}
+
+qreal hkbClipGenerator::getPlaybackSpeed() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return playbackSpeed;
+}
+
+qreal hkbClipGenerator::getStartTime() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return startTime;
+}
+
+void hkbClipGenerator::setStartTime(const qreal &value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != startTime) ? startTime = value, getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'startTime' was not set!");
+}
+
+qreal hkbClipGenerator::getCropEndAmountLocalTime() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return cropEndAmountLocalTime;
+}
+
+qreal hkbClipGenerator::getCropStartAmountLocalTime() const{
+    std::lock_guard <std::mutex> guard(mutex);
+    return cropStartAmountLocalTime;
+}
+
+void hkbClipGenerator::setTriggers(hkbClipTriggerArray *value){
+    std::lock_guard <std::mutex> guard(mutex);
+    (value != triggers.data()) ? triggers = HkxSharedPtr(value), getParentFile()->setIsChanged(true) : LogFile::writeToLog(getClassname()+": 'triggers' was not set!");
 }
 
 bool hkbClipGenerator::link(){
@@ -284,7 +368,7 @@ bool hkbClipGenerator::link(){
     if (!static_cast<HkDynamicObject *>(this)->linkVar()){
         LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\nFailed to properly link 'variableBindingSet' data field!\nObject Name: "+name);
     }
-    HkxSharedPtr *ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggers.getShdPtrReference());
+    auto ptr = static_cast<BehaviorFile *>(getParentFile())->findHkxObject(triggers.getShdPtrReference());
     if (ptr){
         if ((*ptr)->getSignature() != HKB_CLIP_TRIGGER_ARRAY){
             LogFile::writeToLog(getParentFilename()+": "+getClassname()+": link()!\n'triggers' data field is linked to invalid child!\nObject Name: "+name);
@@ -304,10 +388,10 @@ void hkbClipGenerator::unlink(){
 QString hkbClipGenerator::evaluateDataValidity(){
     std::lock_guard <std::mutex> guard(mutex);
     QString errors;
-    bool isvalid = true;
-    bool valid = true;
-    QStringList list = static_cast<BehaviorFile *>(getParentFile())->getAnimationNames();
-    QString temp = HkDynamicObject::evaluateDataValidity();
+    auto isvalid = true;
+    auto valid = true;
+    auto list = static_cast<BehaviorFile *>(getParentFile())->getAnimationNames();
+    auto temp = HkDynamicObject::evaluateDataValidity();
     if (temp != ""){
         errors.append(temp+getParentFilename()+": "+getClassname()+": Ref: "+getReferenceString()+": "+name+": Invalid variable binding set!");
     }

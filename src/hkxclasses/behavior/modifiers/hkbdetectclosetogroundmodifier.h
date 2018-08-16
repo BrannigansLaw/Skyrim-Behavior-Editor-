@@ -11,6 +11,7 @@ public:
     hkbDetectCloseToGroundModifier& operator=(const hkbDetectCloseToGroundModifier&) = delete;
     hkbDetectCloseToGroundModifier(const hkbDetectCloseToGroundModifier &) = delete;
     ~hkbDetectCloseToGroundModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

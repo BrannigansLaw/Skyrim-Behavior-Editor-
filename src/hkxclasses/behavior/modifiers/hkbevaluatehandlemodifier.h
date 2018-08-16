@@ -11,6 +11,7 @@ public:
     hkbEvaluateHandleModifier& operator=(const hkbEvaluateHandleModifier&) = delete;
     hkbEvaluateHandleModifier(const hkbEvaluateHandleModifier &) = delete;
     ~hkbEvaluateHandleModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

@@ -176,7 +176,7 @@ void BSEventOnFalseToTrueModifierUI::loadData(HkxObject *data){
             hkbStringEventPayload *payload1 = static_cast<hkbStringEventPayload *>(bsData->eventToSend1.payload.data());
             hkbStringEventPayload *payload2 = static_cast<hkbStringEventPayload *>(bsData->eventToSend2.payload.data());
             hkbStringEventPayload *payload3 = static_cast<hkbStringEventPayload *>(bsData->eventToSend3.payload.data());
-            name->setText(bsData->name);
+            name->setText(bsData->getName());
             enable->setChecked(bsData->enable);
             bEnableEvent1->setChecked(bsData->bEnableEvent1);
             bVariableToTest1->setChecked(bsData->bVariableToTest1);
@@ -246,8 +246,8 @@ void BSEventOnFalseToTrueModifierUI::loadData(HkxObject *data){
 
 void BSEventOnFalseToTrueModifierUI::setName(){
     if (bsData){
-        if (bsData->name != name->text()){
-            bsData->name = name->text();
+        if (bsData->getName() != name->text()){
+            bsData->getName() = name->text();
             static_cast<DataIconManager*>((bsData))->updateIconNames();
             bsData->setIsFileChanged(true);
             emit modifierNameChanged(name->text(), static_cast<BehaviorFile *>(bsData->getParentFile())->getIndexOfModifier(bsData));

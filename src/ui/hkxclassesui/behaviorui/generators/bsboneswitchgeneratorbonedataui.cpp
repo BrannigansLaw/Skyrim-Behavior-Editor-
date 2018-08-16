@@ -86,7 +86,6 @@ void BSBoneSwitchGeneratorBoneDataUI::toggleSignals(bool toggleconnections){
 }
 
 void BSBoneSwitchGeneratorBoneDataUI::loadData(HkxObject *data, int childindex){
-    hkbVariableBindingSet *varBind = nullptr;
     toggleSignals(false);
     if (data){
         if (data->getSignature() == BS_BONE_SWITCH_GENERATOR_BONE_DATA){
@@ -94,32 +93,19 @@ void BSBoneSwitchGeneratorBoneDataUI::loadData(HkxObject *data, int childindex){
             bsData = static_cast<BSBoneSwitchGeneratorBoneData *>(data);
             (bsData->getSpBoneWeight().data()) ? spBoneWeight->setChecked(true) : spBoneWeight->setChecked(false);
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(bsData->getPGeneratorName());
-            varBind = bsData->getVariableBindingSetData();
-            if (varBind){
-                loadBinding(BONE_WEIGHTS_ROW, BINDING_COLUMN, varBind, "spBoneWeight");
-            }else{
-                table->item(BONE_WEIGHTS_ROW, BINDING_COLUMN)->setText(BINDING_ITEM_LABEL+"NONE");
-            }
+            auto varBind = bsData->getVariableBindingSetData();
+            UIHelper::loadBinding(BONE_WEIGHTS_ROW, BINDING_COLUMN, varBind, "spBoneWeight", table, bsData);
         }else{
-            CRITICAL_ERROR_MESSAGE(QString("BSBoneSwitchGeneratorBoneDataUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
+            LogFile::writeToLog(QString("BSBoneSwitchGeneratorBoneDataUI::loadData(): The data passed to the UI is the wrong type!\nSIGNATURE: "+QString::number(data->getSignature(), 16)).toLocal8Bit().data());
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::loadData(): The data passed to the UI is nullptr!!!");
+        LogFile::writeToLog("BSBoneSwitchGeneratorBoneDataUI::loadData(): The data passed to the UI is nullptr!!!");
     }
     toggleSignals(true);
 }
 
-void BSBoneSwitchGeneratorBoneDataUI::loadBinding(int row, int column, hkbVariableBindingSet *varBind, const QString &path){
-    UIHelperFunctions::loadBinding(row, column, varBind, path, table, bsData);
-}
-
 void BSBoneSwitchGeneratorBoneDataUI::setGenerator(int index, const QString & name){
-    UIHelperFunctions::setGenerator(index, name, bsData, static_cast<hkbGenerator *>(bsData->pGenerator.data()), NULL_SIGNATURE, HkxObject::TYPE_GENERATOR, table, behaviorView, GENERATOR_ROW, VALUE_COLUMN);
-    //emit returnToParent(true);
-}
-
-void BSBoneSwitchGeneratorBoneDataUI::setBinding(int index, int row, const QString & variableName, const QString & path, hkVariableType type, bool isProperty){
-    UIHelperFunctions::setBinding(index, row, BINDING_COLUMN, variableName, path, type, isProperty, table, bsData);
+    UIHelper::setGenerator(index, name, bsData, static_cast<hkbGenerator *>(bsData->pGenerator.data()), NULL_SIGNATURE, HkxObject::TYPE_GENERATOR, table, behaviorView, GENERATOR_ROW, VALUE_COLUMN);
 }
 
 void BSBoneSwitchGeneratorBoneDataUI::setBindingVariable(int index, const QString & name){
@@ -131,14 +117,10 @@ void BSBoneSwitchGeneratorBoneDataUI::setBindingVariable(int index, const QStrin
             if (table->item(BONE_WEIGHTS_ROW, BINDING_COLUMN)->checkState() != Qt::Unchecked){
                 isProperty = true;
             }
-            setBinding(index, row, name, "spBoneWeight", VARIABLE_TYPE_POINTER, isProperty);
-            break;
-        default:
-            return;
+            UIHelper::setBinding(index, row, BINDING_COLUMN, name, "spBoneWeight", VARIABLE_TYPE_POINTER, isProperty, table, bsData);
         }
-        bsData->setIsFileChanged(true);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSBoneSwitchGeneratorBoneDataUI::setBindingVariable(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -147,7 +129,7 @@ void BSBoneSwitchGeneratorBoneDataUI::viewBoneWeights(){
         boneWeightArrayUI->loadData(bsData->getSpBoneWeight().data());
         setCurrentIndex(BONE_WEIGHT_ARRAY_WIDGET);
     }else{
-        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::viewBoneWeights(): The data is nullptr!!");
+        LogFile::writeToLog("BSBoneSwitchGeneratorBoneDataUI::viewBoneWeights(): The data is nullptr!!");
     }
 }
 
@@ -160,7 +142,7 @@ void BSBoneSwitchGeneratorBoneDataUI::toggleBoneWeights(bool enable){
             bsData->spBoneWeight = HkxSharedPtr(new hkbBoneWeightArray(bsData->getParentFile(), -1, static_cast<BehaviorFile *>(bsData->getParentFile())->getNumberOfBones()));
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::toggleBoneWeights(): The data is nullptr!!");
+        LogFile::writeToLog("BSBoneSwitchGeneratorBoneDataUI::toggleBoneWeights(): The data is nullptr!!");
     }
 }
 
@@ -180,7 +162,7 @@ void BSBoneSwitchGeneratorBoneDataUI::selectTableToView(bool viewproperties, con
             }
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::selectTableToView(): The data is nullptr!!");
+        LogFile::writeToLog("BSBoneSwitchGeneratorBoneDataUI::selectTableToView(): The data is nullptr!!");
     }
 }
 
@@ -194,14 +176,13 @@ void BSBoneSwitchGeneratorBoneDataUI::viewSelected(int row, int column){
                     properties = true;
                 }
                 selectTableToView(properties, "spBoneWeight");
-                break;
             }
         }else if (row == GENERATOR_ROW && column == VALUE_COLUMN){
-            auto list = {hkbStateMachineStateInfo::getClassname(), hkbBlenderGeneratorChild::getClassname(), BSBoneSwitchGeneratorBoneData::getClassname()};
+            QStringList list = {hkbStateMachineStateInfo::getClassname(), hkbBlenderGeneratorChild::getClassname(), BSBoneSwitchGeneratorBoneData::getClassname()};
             emit viewGenerators(bsData->getIndexOfGenerator(bsData->getPGenerator()) + 1, QString(), list);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::viewSelected(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSBoneSwitchGeneratorBoneDataUI::viewSelected(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -211,13 +192,13 @@ void BSBoneSwitchGeneratorBoneDataUI::returnToWidget(){
 
 void BSBoneSwitchGeneratorBoneDataUI::variableRenamed(const QString & name, int index){
     if (bsData){
-        hkbVariableBindingSet *bind = bsData->getVariableBindingSetData();
+        auto bind = bsData->getVariableBindingSetData();
         if (bind){
             auto bindIndex = bind->getVariableIndexOfBinding("spBoneWeight");
             (bindIndex == index) ? table->item(BONE_WEIGHTS_ROW, BINDING_COLUMN)->setText(name) : NULL;
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSBoneSwitchGeneratorBoneDataUI::variableRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -227,7 +208,7 @@ void BSBoneSwitchGeneratorBoneDataUI::generatorRenamed(const QString &name, int 
             table->item(GENERATOR_ROW, VALUE_COLUMN)->setText(name);
         }
     }else{
-        CRITICAL_ERROR_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
+        LogFile::writeToLog("BSBoneSwitchGeneratorBoneDataUI::generatorRenamed(): The 'bsData' pointer is nullptr!!");
     }
 }
 
@@ -238,8 +219,7 @@ void BSBoneSwitchGeneratorBoneDataUI::setBehaviorView(BehaviorGraphView *view){
 void BSBoneSwitchGeneratorBoneDataUI::generatorTableElementSelected(int index, const QString &name){
     switch (currentIndex()){
     case MAIN_WIDGET:
-        setGenerator(index, name);
-        break;
+        setGenerator(index, name); break;
     default:
         WARNING_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::generatorTableElementSelected(): An unwanted element selected event was recieved!!");
     }
@@ -248,8 +228,7 @@ void BSBoneSwitchGeneratorBoneDataUI::generatorTableElementSelected(int index, c
 void BSBoneSwitchGeneratorBoneDataUI::variableTableElementSelected(int index, const QString &name){
     switch (currentIndex()){
     case MAIN_WIDGET:
-        setBindingVariable(index, name);
-        break;
+        setBindingVariable(index, name); break;
     default:
         WARNING_MESSAGE("BSBoneSwitchGeneratorBoneDataUI::variableTableElementSelected(): An unwanted element selected event was recieved!!");
     }
@@ -267,6 +246,6 @@ void BSBoneSwitchGeneratorBoneDataUI::connectToTables(GenericTableWidget *genera
         connect(this, SIGNAL(viewVariables(int,QString,QStringList)), variables, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
         connect(this, SIGNAL(viewProperties(int,QString,QStringList)), properties, SLOT(showTable(int,QString,QStringList)), Qt::UniqueConnection);
     }else{
-        CRITICAL_ERROR_MESSAGE("BlenderGeneratorChildUI::connectToTables(): One or more arguments are nullptr!!");
+        LogFile::writeToLog("BlenderGeneratorChildUI::connectToTables(): One or more arguments are nullptr!!");
     }
 }

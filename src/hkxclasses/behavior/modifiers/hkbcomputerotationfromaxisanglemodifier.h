@@ -11,6 +11,7 @@ public:
     hkbComputeRotationFromAxisAngleModifier& operator=(const hkbComputeRotationFromAxisAngleModifier&) = delete;
     hkbComputeRotationFromAxisAngleModifier(const hkbComputeRotationFromAxisAngleModifier &) = delete;
     ~hkbComputeRotationFromAxisAngleModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

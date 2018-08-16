@@ -68,43 +68,6 @@ int hkbBehaviorGraphData::addVariable(hkVariableType type, const QString & name,
     return index;
 }
 
-/*int hkbBehaviorGraphData::addVariable(const QString & type, const QString & name, bool isProperty){
-    hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
-    hkbVariableValueSet *varData = static_cast<hkbVariableValueSet *>(variableInitialValues.data());
-    int index = -1;
-    bool varAdded = false;
-    if (name != "" && (isProperty || !strData->variableNames.contains(name))){
-        hkVariableInfo varInfo;
-        varInfo.type = type;
-        if (isProperty){
-            index = strData->characterPropertyNames.indexOf(name);
-            if (index == -1){
-                strData->characterPropertyNames.append(name);
-                characterPropertyInfos.append(varInfo);
-                index = strData->characterPropertyNames.size() - 1;
-                varAdded = true;
-            }
-        }else{
-            index = strData->variableNames.indexOf(name);
-            if (index == -1){
-                strData->variableNames.append(name);
-                variableInfos.append(varInfo);
-                varData->wordVariableValues.append(0);
-                index = strData->variableNames.size() - 1;
-                varAdded = true;
-            }
-        }
-        if (varAdded){
-            if (type == "VARIABLE_TYPE_QUATERNION" || type == "VARIABLE_TYPE_VECTOR4"){
-                varData->quadVariableValues.append(hkQuadVariable());
-            }else if (type == "VARIABLE_TYPE_POINTER"){
-                //varData->variantVariableValues.append(HkxSharedPtr());
-            }
-        }
-    }
-    return index;
-}*/
-
 void hkbBehaviorGraphData::addVariable(hkVariableType type){
     std::lock_guard <std::mutex> guard(mutex);
     hkbBehaviorGraphStringData *strData = static_cast<hkbBehaviorGraphStringData *>(stringData.data());
@@ -337,7 +300,7 @@ bool hkbBehaviorGraphData::readData(const HkxXmlReader &reader, long & index){  
     std::lock_guard <std::mutex> guard(mutex);
     bool ok;
     int numElems = 0;
-    QByteArray ref = reader.getNthAttributeValueAt(index - 1, 0);
+    auto ref = reader.getNthAttributeValueAt(index - 1, 0);
     QByteArray text;
     while (index < reader.getNumElements() && reader.getNthAttributeNameAt(index, 1) != "class"){
         text = reader.getNthAttributeValueAt(index, 0);

@@ -11,6 +11,7 @@ public:
     BSEventOnFalseToTrueModifier& operator=(const BSEventOnFalseToTrueModifier&) = delete;
     BSEventOnFalseToTrueModifier(const BSEventOnFalseToTrueModifier &) = delete;
     ~BSEventOnFalseToTrueModifier();
+public:
     QString getName() const;
     static const QString getClassname();
 private:

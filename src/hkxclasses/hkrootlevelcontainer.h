@@ -10,6 +10,7 @@ public:
     hkRootLevelContainer& operator=(const hkRootLevelContainer&) = delete;
     hkRootLevelContainer(const hkRootLevelContainer &) = delete;
     ~hkRootLevelContainer();
+public:
     static const QString getClassname();
     void addVariant(const QString & name, HkxObject *ptr);
 private:

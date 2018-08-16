@@ -1,9 +1,11 @@
 #include "animcacheanimationinfo.h"
 #include "hkcrc.h"
 
+const QString AnimCacheAnimationInfo::XKH = "7891816";
+
 AnimCacheAnimationInfo::AnimCacheAnimationInfo(const QString & path, const QString & name, bool compute){
+    HkCRC crcGen;
     if (compute){
-        HkCRC crcGen;
         crcPath = crcGen.compute(QString(path).replace("/", "\\").toLower().toLocal8Bit());
         crcPath = QString::number(crcPath.toULong(nullptr, 16));
         crcAnimationName = crcGen.compute(name.toLower().toLocal8Bit());
@@ -12,11 +14,6 @@ AnimCacheAnimationInfo::AnimCacheAnimationInfo(const QString & path, const QStri
         crcPath = path;
         crcAnimationName = name;
     }
-}
-
-AnimCacheAnimationInfo::AnimCacheAnimationInfo(const AnimCacheAnimationInfo & other){
-    crcPath = other.crcPath;
-    crcAnimationName = other.crcAnimationName;
 }
 
 bool AnimCacheAnimationInfo::operator ==(const AnimCacheAnimationInfo & other) const{
@@ -48,7 +45,7 @@ bool AnimCacheAnimationInfo::read(QFile *file){
     }
     line = file->readLine();
     line.chop(1);
-    if (line != "7891816"){
+    if (line != XKH){
         return false;
     }
     return true;
@@ -60,7 +57,7 @@ bool AnimCacheAnimationInfo::write(QFile *file, QTextStream &out) const{
     }
     out << crcPath << "\n";
     out << crcAnimationName << "\n";
-    out << "7891816" << "\n";
+    out << XKH << "\n";
     return true;
 }
 
@@ -75,4 +72,8 @@ void AnimCacheAnimationInfo::setAnimationData(const QString &path, const QString
         crcPath = path;
         crcAnimationName = name;
     }
+}
+
+QString AnimCacheAnimationInfo::getCrcAnimationName() const{
+    return crcAnimationName;
 }
